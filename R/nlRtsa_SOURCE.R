@@ -20,10 +20,6 @@ init <- function(){
   source('~/Documents/GitHub/manylabRs/manylabRs/R/fRedsRutils.R')
 }
 
-center <- function(numvec){
-
-}
-
 ts.I <-function(y){
   #require(zoo)
   if(!all(is.numeric(y),is.null(dim(y)))){
