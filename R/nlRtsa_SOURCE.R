@@ -38,7 +38,7 @@ ts.I <-function(y){
   return(yc)
 }
 
-find_peaks <- function (x, m = 3, wells = FALSE){
+find_peaks <- function (x, m = 3, wells = FALSE, minpeak = sd(x, na.rm = TRUE)){
   x <- ifelse(wells,-1,1)*x
   shape <- diff(sign(diff(x, na.pad = FALSE)))
   pks <- sapply(which(shape < 0), FUN = function(i){
@@ -49,7 +49,7 @@ find_peaks <- function (x, m = 3, wells = FALSE){
     if(all(x[c(z : i, (i + 2) : w)] <= x[i + 1])) return(i + 1) else return(numeric(0))
   })
   pks <- unlist(pks)
-  pks
+  pks[x[pks]>minpeak]
 }
 
 
