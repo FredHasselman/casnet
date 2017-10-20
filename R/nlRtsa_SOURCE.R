@@ -38,18 +38,44 @@ ts.I <-function(y){
   return(yc)
 }
 
-find_peaks <- function (x, m = 3, wells = FALSE, minpeak = sd(x, na.rm = TRUE)){
-  x <- ifelse(wells,-1,1)*x
-  shape <- diff(sign(diff(x, na.pad = FALSE)))
-  pks <- sapply(which(shape < 0), FUN = function(i){
-    z <- i - m + 1
-    z <- ifelse(z > 0, z, 1)
-    w <- i + m + 1
-    w <- ifelse(w < length(x), w, length(x))
-    if(all(x[c(z : i, (i + 2) : w)] <= x[i + 1])) return(i + 1) else return(numeric(0))
-  })
-  pks <- unlist(pks)
-  pks[x[pks]>minpeak]
+find_peaks <- function (x,
+                        window        = 3,
+                        includeWells  = FALSE,
+                        minPeakDist   = round(window/2),
+                        minPeakHeight = .2*diff(range(x, na.rm = TRUE))){
+
+  fp <- function(x,window){
+    shape <- diff(sign(diff(x, na.pad = FALSE)))
+    pksl <- sapply(which(shape < 0), FUN = function(i){
+      z <- i - window + 1
+      z <- ifelse(z > 0, z, 1)
+      w <- i + window + 1
+      w <- ifelse(w < length(x), w, length(x))
+      if(all(x[c(z : i, (i + 2) : w)] <= x[i + 1])){
+        return(i + 1)
+      } else {
+        return(numeric(0))
+      }
+    })
+    return(unlist(pksl))
+  }
+
+  pks <- fp(x,window)
+  if(includeWells){
+    wls <- fp(-1*x,window)
+    pks <- sort(c(pks,wls))
+  }
+
+  distOK    <- diff(c(NA,pks))>=minPeakDist
+  distOK[1] <- TRUE
+
+  heightOK <- rep(FALSE,length(pks))
+  for(p in seq_along(pks)){
+    if(abs(x[pks[p]] - mean(x[c(max(1,(pks[p]-window)):(pks[p]-1),(pks[p]+1):min((pks[p]+window),length(x)))])) >= minPeakHeight){
+      heightOK[p] <- TRUE
+    }
+  }
+  return(pks[heightOK&distOK])
 }
 
 

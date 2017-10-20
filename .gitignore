@@ -32,3 +32,8 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 .Rproj.user
+Rplots.pdf
+exec/linux_i686/.rp_i686.dms.icloud
+exec/linux_i686/rp_i686.dms
+exec/linux_i686/.rp_i686.dms.icloud
+*.icloud
