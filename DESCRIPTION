@@ -1,11 +1,14 @@
 Package: casnet
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Toolbox for studying Complex Adaptive Systems and NETworks
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Fred Hasselman
+Maintainer: Fred Hasselman <f.hasselman@bsi.ru.nl>
+Description: A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
+    - Recurrence Quantification Analyses (CrossRQA, Categorical RQA, Chromatic RQA, Anisotropic RQA)
+    - Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)
+    - Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA)
+    - Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

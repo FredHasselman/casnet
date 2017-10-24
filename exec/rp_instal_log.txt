@@ -1,0 +1,2 @@
+sysCommand1	sysCommand2
+cp /Users/Fred/Documents/GitHub/casnet/commandline_rp/macOS_x86_64/rp_osxI.dms /Users/Fred/Documents/GitHub/casnet/exec/rp	chmod a+x  /Users/Fred/Documents/GitHub/casnet/exec/rp

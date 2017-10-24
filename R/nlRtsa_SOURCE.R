@@ -20,6 +20,42 @@ init <- function(){
   source('~/Documents/GitHub/manylabRs/manylabRs/R/fRedsRutils.R')
 }
 
+
+#' Rose tinted infix
+#'
+#'
+#' @param x If \code{x} is any of \code{Inf,-Inf,NA,NaN,NULL,length(x)==0}, it will return \code{y}; otherwise it returns \code{x}.
+#' @param y The value to return in case of catastrophy \code{>00<}
+#'
+#' @export
+#' @author Fred Hasselman
+#' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
+#' @seealso purrr::%||%
+#' @examples
+#' Inf %00% NA
+#'
+#' numeric(0) %00% ''
+#'
+#' NA %00% 0
+#'
+#' NaN %00% NA
+#'
+#' NULL %00% NA
+`%00%` <- function(x,y){
+  l0<-isna<-isnan<-isinf<-isnll<-FALSE
+  if(length(x)==0){
+    l0=TRUE
+  } else {
+    if(all(is.na(x)))       isna =TRUE
+    if(all(is.nan(x)))      isnan=TRUE
+    if(all(is.infinite(x))) isinf=TRUE
+    if(all(is.null(x)))     isnll=TRUE
+  }
+  if(any(l0,isna,isnan,isinf,isnll)){x<-y}
+  return(x)
+}
+
+
 ts_integrate <-function(y){
   #require(zoo)
   if(!all(is.numeric(y),is.null(dim(y)))){
@@ -164,7 +200,7 @@ crqa_cl <- function(y1,
                   returnMeasures = TRUE,
                   returnRP       = TRUE,
                   returnDist = FALSE,
-                  path_to_rp = paste0(system.file(package="casnet"),"/exec/"),
+                  path_to_rp = getOption("casnet.path_to_rp"),
                   saveOut    = FALSE,
                   path_out   = NULL,
                   file_ID    = NULL, ...){
@@ -278,7 +314,7 @@ crqa_cl <- function(y1,
   }
   closeAllConnections()
 
-  RCMD("./rp", options = opts, path = path.expand(path_to_rp), quiet = FALSE)
+  RCMD(paste0(getOption("casnet.rp_prefix"),"rp"), options = opts, path = path.expand(path_to_rp), quiet = FALSE)
 
  #system("./rp","-i '/var/folders/zr/n8mgv2nj5rz1qq04xsj_x_c80000gp/T//RtmpZAFB8n/fileb4ef2f6a0353.csv' 'test.csv' -o  -m 2 -t 2 -e 48.2 -l 2 -v 2 -w 1 -s",path = path.expand(path_to_rp), quiet = FALSE)
 
@@ -337,7 +373,7 @@ crqa_fast <- function(y1,
                     returnMeasures = TRUE,
                     returnRP       = TRUE,
                     returnDist = FALSE,
-                    path_to_rp = paste0(system.file(package="casnet"),"/exec/"),
+                    path_to_rp = getOption("casnet.path_to_rp"),
                     saveOut    = FALSE,
                     path_out   = NULL,
                     file_ID    = NULL, ...){

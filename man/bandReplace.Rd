@@ -9,9 +9,9 @@ bandReplace(mat, lower, upper, value = NA)
 \arguments{
 \item{mat}{A Matrix}
 
-\item{lower}{Lower diagonal to be included in the band (should be $\leq0$)}
+\item{lower}{Lower diagonal to be included in the band (should be $\\leq 0$)}
 
-\item{upper}{Upper diagonal to be included in the band (should be $\geq0$)}
+\item{upper}{Upper diagonal to be included in the band (should be $\\geq 0$)}
 
 \item{value}{A single value to replace all values in the selected band}
 }
@@ -25,8 +25,5 @@ Sets a band of matrix diagonals to any given value
 # Create a 10 by 10 matrix
 m <- Matrix(rnorm(10),10,10)
 
-bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands
-recmat_size(m,FALSE,0)  # Do not subtract diagonal
-recmat_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
-recmat_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
+bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands with 0 (Theiler window of 1)
 }
