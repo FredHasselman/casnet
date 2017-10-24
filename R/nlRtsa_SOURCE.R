@@ -20,7 +20,7 @@ init <- function(){
   source('~/Documents/GitHub/manylabRs/manylabRs/R/fRedsRutils.R')
 }
 
-ts.I <-function(y){
+ts_integrate <-function(y){
   #require(zoo)
   if(!all(is.numeric(y),is.null(dim(y)))){
     warning("Need a 1D numeric vector! Trying to convert...")
@@ -78,13 +78,6 @@ find_peaks <- function (x,
   return(pks[heightOK&distOK])
 }
 
-
-Msize <- function(mat, auto=NULL){
-  if(is.null(auto)){
-    auto <- isSymmetric(unname(mat))
-  }
-  return(cumprod(dim(mat) + ifelse(auto, c(0,-1), c(0,0)))[2]) #/ ifelse(auto,2,1))
-}
 
 repmat <- function(X,m,n){
   # % REPMAT R equivalent of repmat (matlab)
@@ -156,19 +149,18 @@ repmat <- function(X,m,n){
 
 
 # (C)RQA ------------------------------
-
-
-clRQA <- function(y1,
+crqa_cl <- function(y1,
                   y2    = NULL,
                   eDim  = 1,
                   eLag  = 1,
                   eRad  = 1,
                   DLmin = 2,
                   VLmin = 2,
-                  theiler = 1,
+                  theiler = 0,
                   win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
                   step    = win,
                   JRP     = FALSE,
+                  distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
                   returnMeasures = TRUE,
                   returnRP       = TRUE,
                   returnDist = FALSE,
@@ -265,6 +257,7 @@ clRQA <- function(y1,
                   "-l", DLmin,
                   "-v", VLmin,
                   "-w", theiler,
+                  "-n", distNorm,
                   "-s")
   } else {
     tmpf2 <- tempfile(tmpdir = tmpd, fileext = ".csv")
@@ -280,6 +273,7 @@ clRQA <- function(y1,
                   "-l", DLmin,
                   "-v", VLmin,
                   "-w", theiler,
+                  "-n", distNorm,
                   "-s")
   }
   closeAllConnections()
@@ -289,7 +283,7 @@ clRQA <- function(y1,
  #system("./rp","-i '/var/folders/zr/n8mgv2nj5rz1qq04xsj_x_c80000gp/T//RtmpZAFB8n/fileb4ef2f6a0353.csv' 'test.csv' -o  -m 2 -t 2 -e 48.2 -l 2 -v 2 -w 1 -s",path = path.expand(path_to_rp), quiet = FALSE)
 
   measures = try.CATCH(import(gsub("[']+","",measOUT)))
-  rpMAT    =  try.CATCH(import(gsub("[']+","",plotOUT)))
+  rpMAT    = try.CATCH(import(gsub("[']+","",plotOUT)))
   disthist = try.CATCH(import(gsub("[']+","",histOUT)))
 
   if(all(is.null(measures$warning),is.data.frame(measures$value))){
@@ -328,17 +322,18 @@ clRQA <- function(y1,
 }
 
 
-fastRQA <- function(y1,
+crqa_fast <- function(y1,
                     y2    = NULL,
                     eDim  = 1,
                     eLag  = 1,
                     eRad  = 1,
                     DLmin = 2,
                     VLmin = 2,
-                    theiler = 1,
+                    theiler = 0,
                     win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
                     step    = win,
                     JRP     = FALSE,
+                    distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
                     returnMeasures = TRUE,
                     returnRP       = TRUE,
                     returnDist = FALSE,
@@ -349,6 +344,16 @@ fastRQA <- function(y1,
 
 require(zoo)
 
+if(any(is.na(y1))){
+  y1 <- y1[!is.na(y1)]
+  warning("Removed NAs from timeseries y1 before (C)RQA")
+}
+
+if(any(is.na(y2%00%0))){
+    y2 <- y2[!is.na(y2)]
+    warning("Removed NAs from timeseries y2 before (C)RQA")
+  }
+
 # Catch parameters
 # params <- list(eDim  = eDim,
 #                eLag  = eLag,
@@ -357,6 +362,7 @@ require(zoo)
 #                VLmin = VLmin,
 #                theiler = theiler,
 #                JRP     = JRP,
+#                distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
 #                returnMeasures = returnMeasures,
 #                returnRP       = returnRP,
 #                returnDist     = returnDist,
@@ -365,7 +371,7 @@ require(zoo)
 #                path_out = path_out,
 #                file_ID  = file_ID)
 
-# Begin input checks --------------------------
+# Begin input checks
 
   if(is.null(path_out)){
     if(saveOut){
@@ -401,7 +407,7 @@ if(is.null(y2)){
 
   wlist <- rollapply(df,
                      width = win,
-                     FUN = function(df){clRQA(y1             = df[,1],
+                     FUN = function(df){crqa_cl(y1             = df[,1],
                                               y2             = df[,2],
                                               eDim           = eDim,
                                               eLag           = eLag,
@@ -410,6 +416,7 @@ if(is.null(y2)){
                                               VLmin          = VLmin,
                                               theiler        = theiler,
                                               JRP            = JRP,
+                                              distNorm       = distNorm,
                                               returnMeasures = returnMeasures,
                                               returnRP       = returnRP,
                                               returnDist     = returnDist,
@@ -435,18 +442,603 @@ if(is.null(y2)){
   return(out[c(returnMeasures,returnRP,returnDist)])
 }
 
-di2bi <- function(BImat, radius,   convMat = FALSE){
-  #  require(NetComp)
+#' crqa_parameters
+#'
+#' @param y Timeseries
+#' @param maxDims Maximum number of embedding dimensions
+#' @param emLag Optimal embedding lag (delay), e.g., provided by optimising algorithm.
+#' @param emLags A range of embedding lags to consider (default: )
+#' @param emDims A range of embedding dimensions (defsult: 1 - maxDims)
+#' @param nSize The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10% of all points)
+#'
+#' @description A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+crqa_parameters <- function(y,
+                            maxDim   = 5,
+                            maxLag   = round(length(y)/(maxDim+1)),
+                            emLag    = tau(y,
+                                           selection.methods = c("first.e.decay",
+                                                                 "first.zero",
+                                                                 "first.minimum"),
+                                           maxLag =maxLag),
+                            emLags     = tau(y, maxLag = maxLag),
+                            ami.method = c("first.minimum"),
+                            nnSizes  = c(.1,.3,.6,.9),
+                            nnThres  = .1,
+                            diagPlot = TRUE){
 
-  if(grepl("Matrix",class(BImat))){
-    BImat   <- as.matrix(BImat)
+  if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
+
+  emDims  <-  1:maxDim
+
+  y <- y[!is.na(y)]
+
+  lagList <- list()
+  cnt = 0
+  for(N in seq_along(nnSizes)){
+    for(L in seq_along(emLags$selection.method)){
+      Nn.max <- NA
+      for(D in seq_along(emDims)){
+        cnt = cnt+1
+        allN <- nonlinearTseries::findAllNeighbours(
+          nonlinearTseries::buildTakens(as.numeric(y),
+                                        emDims[[D]],
+                                        emLags$opLag[L]),
+          nnSizes[N])
+        Nn <- sum(laply(allN, length), na.rm = TRUE)
+        if(D==1){Nn.max <- Nn}
+        lagList[[cnt]] <- data.frame(Nsize        = nnSizes[N],
+                                     emLag.method = emLags$selection.method[[L]],
+                                     emLag = emLags$opLag[L],
+                                     emDim = emDims[D],
+                                     Nn    = Nn,
+                                     Nn.max = Nn.max)
+      }
+    }
+  }
+
+  df        <- ldply(lagList)
+  df$Nn.pct <- df$Nn/df$Nn.max
+
+
+  opt <- ldply(unique(df$emLag), function(n){
+    id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
+    if(length(id)>0){
+      idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
+      if(length(idmin)>0){
+        return(df[idmin,])
+      }
+    }
+  }
+  )
+
+  opt <- opt[opt$emDim==min(opt$emDim),][1,]
+
+  opDim <- opt$emDim
+  opLag <- opt$emLag
+
+  #opDim <- min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE)
+  # opLag <- tau(y,
+  #              selection.methods = ami.method,
+  #              maxLag =maxLag)$opLag[1]
+  #opLag <- df$emLag[which.min(min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE))]
+  #opRad = NULL
+
+  df$emLag <- factor(df$emLag)
+  df$Nsize <- factor(df$Nsize, labels = paste("nn size:",nnSizes))
+
+  if(diagPlot){
+
+    dfs <- data.frame(start= c(.5, hist(emDims)$mids),
+                      stop = c(hist(emDims)$mids,max(emDims)+.5),
+                      f=factor(seq_along(c(.5, hist(emDims)$mids))%%2))
+
+    library(scales) # use: alpha()
+    #myPal <- RColorBrewer::brewer.pal(length(emLag),"Dark2")
+    gNdims <- ggplot(df, aes(y = Nn.pct, x = emDim, colour = emLag)) +
+      geom_rect(aes(xmin = start, xmax = stop, fill = f),
+                ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
+      scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
+      geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
+      geom_hline(yintercept = c(0,1),   colour = "grey60") +
+      geom_hline(yintercept = 0.5, colour = "grey90") +
+      geom_line(position  = position_dodge(.4)) +
+      geom_point(position = position_dodge(.4)) +
+      annotate("text",x=maxDim/3,y=nnThres, label="threshold", size = .8) +
+      xlab("Embedding Dimension") + ylab("Nearest neigbours (% of max.)") +
+      facet_wrap(~Nsize, ncol=2) +
+      scale_x_continuous(breaks=emDims) +
+      scale_y_continuous(breaks = c(nnThres,.5,1)) +
+      scale_color_brewer("Lag",palette = "Set2") +
+      theme_minimal() +
+      theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
+            strip.text.x = element_text(colour = "black", face = "bold"),
+            panel.spacing = unit(1, "lines"),
+            legend.background = element_rect(colour = "grey90",fill = "grey90"),
+            legend.title = element_text(face = "bold"),
+            legend.key = element_rect(colour = "grey90", fill = "grey90"),
+            panel.grid.minor.x = element_blank(),
+            panel.grid.major.y = element_blank(),
+            panel.grid.minor.y = element_blank()
+      )
+
+    tmi <- mutualInformation(y,
+                             lag.max = maxLag,
+                             do.plot = TRUE)
+
+    dfMI <- data.frame(emDelay = tmi$time.lag[-1],
+                       ami     = tmi$mutual.information[-1])
+
+    gDelay <- ggplot(dfMI, aes(y = ami, x = emDelay)) +
+      geom_line() +
+      geom_vline(data = emLags, aes(colour=factor(selection.method),
+                                    xintercept = opLag),
+                 alpha = .3) +
+      geom_point(data = emLags, aes(x = opLag,
+                                    y=ami,
+                                    colour=factor(selection.method)),
+                 size=2) +
+      xlab("Embedding Lag") +
+      ylab("Average Mututal Information") +
+      scale_color_brewer("Method",palette = "Set2") +
+      theme_bw() +
+      theme(legend.position = c(.95, .95),
+            legend.justification = c("right", "top"),
+            legend.box.just = "right",
+            legend.margin = margin(6, 6, 6, 6),
+            legend.background = element_rect(colour = "grey90",fill = "grey90"),
+            legend.title = element_text(face = "bold"),
+            legend.key = element_rect(colour = "grey90", fill = "grey90"),
+            #panel.grid.major.x = element_blank(),
+            panel.grid.minor.x = element_blank(),
+            panel.grid.major.y = element_blank(),
+            panel.grid.minor.y = element_blank()
+      )
+
+    grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
+
+  }
+
+  return(list(optimLag  = opLag,
+              optimDim  = opDim,
+              #optimRad  = opRad,
+              optimRow  = opt,
+              optimData = df)
+  )
+}
+
+
+crqa_radius <- function(RM,
+                        startRadius = .10*max(RM, na.rm = TRUE),
+                        targetRR    = .05,
+                        tol         = 0.1,
+                        maxIter     = 100,
+                        AUTO        = FALSE,
+                        theiler     = 0,
+                        histIter    = FALSE){
+
+  if(!dplyr::between(tol,0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
+
+  AUTO        <- ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
+  recmat_size <- recmat_size(RM,AUTO,theiler)
+  if(AUTO){
+    cat(paste0("\nAuto-recurrence: Setting diagonal to 0 (matrix size: ",recmat_size,")\n"))
+  } else {
+    theiler = 0
+  }
+
+  RM <- bandReplace(RM,-theiler,theiler,0)
+
+  tryRadius <- startRadius
+  RR        <- 0
+  iter      <- 0
+  Converged <- FALSE
+  seqIter <- 1:maxIter
+
+  iterList <- data.frame(iter        = seqIter,
+                         RR          = RR,
+                         Radius      = tryRadius,
+                         targetRR    = targetRR,
+                         tolRRlo     = targetRR*(1-tol),
+                         tolRRhi     = targetRR*(tol+1),
+                         startRadius = startRadius,
+                         recmat_size      = recmat_size,
+                         AUTO        = AUTO,
+                         Converged   = Converged, check.names = FALSE)
+
+  exitIter <- FALSE
+
+  while(!exitIter){
+
+    iter <- iter+1
+
+    RR = nnzero(di2bi(RM,tryRadius),na.counted = FALSE)/recmat_size
+
+    iterList[iter,] <-    cbind.data.frame(iter,
+                                           RR,
+                                           tryRadius,
+                                           targetRR,
+                                           targetRR*(1-tol),
+                                           targetRR*(tol+1),
+                                           startRadius,
+                                           recmat_size,
+                                           AUTO,
+                                           Converged)
+
+    if(any((dplyr::between(RR,(targetRR*(1-tol)),(targetRR*(tol+1)))),(iter>=maxIter))){
+      exitIter <- TRUE
+    }
+
+    if(round(RR,digits = 2)>round(targetRR,digits = 2)){
+      tryRadius <- tryRadius*(min(0.8,tol*2))
+    } else {
+      tryRadius <- tryRadius*(min(1.8,1+(tol*2)))
+    }
+  }
+
+  iterList$Converged[iter] <- TRUE
+  if(iter>=maxIter){
+    warning("Max. iterations reached.")
+    iterList$Converged[iter] <- FALSE
+  }
+  if(!dplyr::between(RR,(targetRR*(1-tol)),(targetRR*(tol+1)))){
+    warning("Target RR not found, try increasing tolerance, or change starting value.")
+    iterList$Converged[iter] <- FALSE
+  }
+
+  ifelse(histIter,id<-c(1:iter),id<-iter)
+  return(iterList[id,])
+}
+
+
+crqa_mat_measures <- function(RM,
+                              DLmin = 2,
+                              VLmin = 2,
+                              HLmin = 2,
+                              DLmax = length(diag(rmat))-1,
+                              VLmax = length(diag(rmat))-1,
+                              HLmax = length(diag(rmat))-1,
+                              AUTO      = NULL,
+                              chromatic = FALSE,
+                              matrices  = FALSE,
+                              doHalf    = FALSE,
+                              Nboot     = NULL,
+                              CL        = .95){
+
+  # DLmin = 2
+  # VLmin = 2
+  # HLmin = 2
+  # DLmax = length(diag(rmat))-1
+  # VLmax = length(diag(rmat))-1
+  # HLmax = length(diag(rmat))-1
+  # chromatic = FALSE
+  # matrices  = FALSE
+  # CL        = .95
+
+  require(dplyr)
+
+  if(is.null(Nboot)){Nboot = 1}
+
+  NRows <- NROW(RM)
+  NCols <- NCOL(RM)
+  mc.cores <- detectCores()
+  if(Nboot<mc.cores) mc.cores <- Nboot
+
+  tstart <- Sys.time()
+  out    <- mclapply(1, function(i){
+    crp_prep(matrix(RM[ceiling(NCols*NRows*runif(NCols*NRows))], ncol=NCols, nrow = NRows),
+             radius= radius,
+             DLmin = DLmin,
+             VLmin = VLmin,
+             HLmin = HLmin,
+             DLmax = DLmax,
+             VLmax = VLmax,
+             HLmax = HLmax,
+             AUTO  = AUTO,
+             chromatic = chromatic,
+             matrices  = matrices,
+             doHalf    = doHalf)
+  },
+  mc.cores = mc.cores
+  )
+  dfori <- gather(as.data.frame(out), key = measure, value = value)
+  tend  <- Sys.time()
+
+  if(Nboot>1){
+
+    cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations...\n"))
+    cat(paste0("Estimated duration: ", round((difftime(tend,tstart, unit = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
+
+    tstart <-Sys.time()
+    bootOut <-  mclapply(1:Nboot, function(i){
+      replicate <- as.data.frame(crp_prep(matrix(RM[ceiling(NCols*NRows*runif(NCols*NRows))],
+                                                 ncol=NCols, nrow = NRows),
+                                          radius= radius,
+                                          DLmin = DLmin,
+                                          VLmin = VLmin,
+                                          HLmin = HLmin,
+                                          DLmax = DLmax,
+                                          VLmax = VLmax,
+                                          HLmax = HLmax,
+                                          AUTO  = AUTO,
+                                          chromatic = chromatic,
+                                          matrices  = matrices,
+                                          doHalf    = doHalf))
+      replicate$replicate = i
+      return(replicate)
+    },
+    mc.cores = mc.cores
+    )
+    tend <- Sys.time()
+    cat(paste0("Actual duration: ", round(difftime(tend,tstart, unit = "mins"), digits=1)," min.\n"))
+
+    dfrepl <- ldply(bootOut)
+    dfrepl <- gather(dfrepl, key = measure, value = value, -replicate)
+
+    if(length(CL)==1){
+      ci.lo <- (1-CL)/2
+      ci.hi <- CL + ci.lo
+    } else {
+      ci.lo <- CL[1]
+      ci.hi <- CL[2]
+    }
+
+    rqout <-  dfrepl %>% group_by(measure) %>%
+      summarize(
+        val      = NA,
+        ci.lower = quantile(value, ci.lo, na.rm = TRUE),
+        ci.upper = quantile(value, ci.hi, na.rm = TRUE),
+        mean     = mean(value, na.rm = TRUE),
+        sd       = sd(value, na.rm = TRUE),
+        var      = var(value, na.rm = TRUE),
+        N        = n(),
+        se       = sd(value, na.rm = TRUE)/sqrt(n()),
+        median   = mean(value, na.rm = TRUE),
+        mad      = mad(value, na.rm = TRUE)
+      )
+
+    for(m in 1:nrow(rqout)){
+      rqout$val[rqout$measure%in%dfori$measure[m]] <- dfori$value[m]
+    }
+  } else {
+    rqout <- dfori
+  }
+  return(rqout)
+}
+
+
+# sizeIn <- dim(RM)
+# mc.cores <- detectCores()
+# if(Nboot<mc.cores) mc.cores <- Nboot
+#
+# rp.rg   <- function(data,mle){return(matrix(data[ceiling(mle$NCols*mle$NRows*runif(mle$NCols*mle$NRows))], ncol= mle$NCols, nrow = mle$NRows))}
+#
+# rp.mle <- list(NCols=sizeIn[1], NRows=sizeIn[2])
+#
+# rp.fun  <- function(data, ...){crp_prep(RP    = data,
+#                                         radius= radius,
+#                                         DLmin = DLmin,
+#                                         VLmin = VLmin,
+#                                         HLmin = HLmin,
+#                                         DLmax = DLmax,
+#                                         VLmax = VLmax,
+#                                         HLmax = HLmax,
+#                                         AUTO  = AUTO,
+#                                         chromatic = chromatic,
+#                                         matrices  = matrices,
+#                                         doHalf    = doHalf)}
+# rp.boot <- function(...){
+#   boot(data      = RM,
+#        statistic = rp.fun,
+#        R         = Nboot,
+#        ran.gen   = rp.rg,
+#        mle       = rp.mle,
+#        parallel = "multicore",
+#        ncpus = detectCores()
+#        )
+#   #boot(RM, rp.fun, R = Nboot, sim = "parametric", ran.gen = rp.rg, mle = rp.mle)
+# }
+
+# replicates <-  boot(data      = RM,
+#                     statistic = rp.fun,
+#                     R         = Nboot,
+#                     sim = "parametric",
+#                     ran.gen   = rp.rg,
+#                     mle       = rp.mle,
+#                     parallel  = "multicore",
+#                     ncpus     = detectCores()
+#                     )
+#
+# cis <-  ldply(1:102, function(c){
+#   ci <- boot.ci(replicates, type = c("norm"), conf = 0.95, t0 = c, t=1:9)
+#   return(cbind.data.frame(measure = dimnames(replicates$t0)[[2]][c],
+#                           value = replicates$t0[c],
+#                           ci.lo = ci$normal[,2],
+#                           ci.up = ci$normal[,3])
+#          )})
+# dfrepl <- llply(1:Nboot, function(i) rp.boot(i))
+
+# bootout <- list() %>%
+#   bootstrap(Nboot) %>%
+#    do(as.data.frame( )
+#       )
+
+
+#' crqa_mat
+#'
+#' @param rp Recurrence Matrix
+#' @param radius
+#' @param DLmin
+#' @param VLmin
+#' @param HLmin
+#' @param DLmax
+#' @param VLmax
+#' @param HLmax
+#' @param AUTO Auto-recurrence? (default: FALSE)
+#' @param matrices
+#'
+#' @return
+#' @export
+#'
+#' @examples
+crqa_mat <- function(rmat,
+                     radius= NULL,
+                     DLmin = 2,
+                     VLmin = 2,
+                     HLmin = 2,
+                     DLmax = length(diag(rmat))-1,
+                     VLmax = length(diag(rmat))-1,
+                     HLmax = length(diag(rmat))-1,
+                     AUTO      = FALSE,
+                     doHalf    = FALSE,
+                     chromatic = FALSE,
+                     matrices  = FALSE,
+                     Nboot     = NULL,
+                     CL        = .95){
+
+  #  require(boot)
+  require(dplyr)
+  require(broom)
+
+  # Input should be a distance matrix, or a matrix of zeroes and ones with radius = NULL, output is a list
+  # Fred Hasselman (me@fredhasselman.com) - August 2013
+
+  if(is.null(AUTO)){
+    AUTO <- ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
+  }
+
+  #uval <- unique(as.vector(rmat))
+  if(all(as.vector(rmat)==0|as.vector(rmat)==1)){
+    RM <- rmat
+  } else {
+    if(!is.null(radius)){
+      RM <- di2bi(rmat,radius)
+    } else{
+      if(!chromatic){
+        stop("Expecting a binary (0,1) matrix.\nUse 'crqa_radius()', or set 'chromatic = TRUE'")
+      } else {
+        stop("Chromatic RQA not implemented yet.")
+      }
+    }
+  }
+  rm(rmat)
+
+  out <- crqa_mat_measures(RM,
+                           DLmin = DLmin,
+                           VLmin = VLmin,
+                           HLmin = HLmin,
+                           DLmax = DLmax,
+                           VLmax = VLmax,
+                           HLmax = HLmax,
+                           AUTO  = AUTO,
+                           chromatic = chromatic,
+                           matrices  = matrices,
+                           doHalf = doHalf,
+                           Nboot  = Nboot,
+                           CL     = CL)
+
+  #
+  #   if(is.null(Nboot)){Nboot = 1}
+  #
+  #   out <- crqa_mat_measures(RM,
+  #                            radius= radius,
+  #                            DLmin = DLmin,
+  #                            VLmin = VLmin,
+  #                            HLmin = HLmin,
+  #                            DLmax = DLmax,
+  #                            VLmax = VLmax,
+  #                            HLmax = HLmax,
+  #                            AUTO  = AUTO,
+  #                            chromatic = chromatic,
+  #                            matrices  = matrices,
+  #                            doHalf = doHalf,
+  #                            Nboot  = Nboot,
+  #                            CL     = CL)
+  #
+  #   dfori <- gather(out, key = measure, value = value)
+  #
+  #   col.ind <- tbl_df(index(RM))
+  #   row.ind <- tbl_df(sample(index(RM),size=nrow(RM)))
+  #
+  #   if(Nboot>1){cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations.\n"))
+  #     bootout <- col.ind  %>%
+  #       bootstrap(Nboot) %>%
+  #       do(crqa_mat_measures(RM[row.ind,unlist(.)],
+  #                            radius= radius,
+  #                            DLmin = DLmin,
+  #                            VLmin = VLmin,
+  #                            HLmin = HLmin,
+  #                            DLmax = DLmax,
+  #                            VLmax = VLmax,
+  #                            HLmax = HLmax,
+  #                            AUTO  = AUTO,
+  #                            chromatic = chromatic,
+  #                            matrices  = matrices,
+  #                            doHalf = doHalf))
+  #
+  #     dfrepl <- gather(bootout, key = measure, value = value, -replicate)
+  #
+  #     if(length(CL)==1){
+  #       ci.lo <- (1-CL)/2
+  #       ci.hi <- CL + ci.lo
+  #     } else {
+  #       ci.lo <- CL[1]
+  #       ci.hi <- CL[2]
+  #     }
+  #
+  #     rqout <-  dfrepl %>% group_by(measure) %>%
+  #       summarize(
+  #         val     = NA,
+  #         ci.low  = quantile(value, ci.lo, na.rm = TRUE),
+  #         ci.high = quantile(value, ci.hi, na.rm = TRUE),
+  #         mean    = mean(value, na.rm = TRUE),
+  #         sd      = sd(value, na.rm = TRUE),
+  #         var     = var(value, na.rm = TRUE),
+  #         N       = n(),
+  #         se      = sd(value, na.rm = TRUE)/sqrt(n()),
+  #         median  = mean(value, na.rm = TRUE),
+  #         mad     = mad(value, na.rm = TRUE)
+  #       )
+  #
+  #     for(m in 1:nrow(rqout)){
+  #       rqout$val[rqout$measure%in%dfori$measure[m]] <- dfori$value[m]
+  #     }
+  #   } else {
+  #     rqout <- dfori
+  #   }
+  return(out)
+}
+
+
+
+#' di2bi
+#'
+#' Distance matrix to binary matrix based on threshold value
+#'
+#' @param distmat Distance matrix
+#' @param radius The radius or threshold value
+#' @param convMat Should the matrix be converted to an object of type Matrix
+#'
+#' @return A matrix with only 0s and 1s
+#'
+#' @export
+#'
+#' @examples
+di2bi <- function(distmat, radius, convMat = FALSE){
+
+  if(grepl("Matrix",class(distmat))){
+    distmat   <- as.matrix(distmat)
     convMat <- TRUE
   }
 
-  # RP <- NetComp::matrix_threshold(BImat,threshold = radius, minval = 1, maxval = 0)
+  # RP <- NetComp::matrix_threshold(distmat,threshold = radius, minval = 1, maxval = 0)
 
-  RP <- matrix(0,dim(BImat)[1],dim(BImat)[2])
-  RP[BImat <= radius] <- 1
+  RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
+  RP[distmat <= radius] <- 1
 
   if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
 
@@ -521,7 +1113,7 @@ tau <- function(y,
 #' @export
 #'
 #' @examples
-est.eDim <- function(y, delay = tau(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
+est_eDim <- function(y, delay = tau(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
   cbind.data.frame(EmbeddingLag   = delay,
                    EmbeddingDim   = estimateEmbeddingDim(y,
                                                          time.lag  = delay,
@@ -827,266 +1419,52 @@ dist.hamming <- function(X, Y=NULL, embedded=TRUE) {
   nrow(X) - H
 }
 
-#' get.crqaParameters
+
+#' bandReplace
 #'
-#' @param y Timeseries
-#' @param maxDims Maximum number of embedding dimensions
-#' @param emLag Optimal embedding lag (delay), e.g., provided by optimising algorithm.
-#' @param emLags A range of embedding lags to consider (default: )
-#' @param emDims A range of embedding dimensions (defsult: 1 - maxDims)
-#' @param nSize The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10% of all points)
+#' Sets a band of matrix diagonals to any given value
 #'
-#' @description A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
+#' @param mat A Matrix
+#' @param lower Lower diagonal to be included in the band (should be $\\leq 0$)
+#' @param upper Upper diagonal to be included in the band (should be $\\geq 0$)
+#' @param value A single value to replace all values in the selected band
 #'
-#' @return
+#' @return A matrix in which the values in the selected diagonals have been replaced
+#'
 #' @export
 #'
 #' @examples
-get.crqaParameters <- function(y,
-                               maxDim   = 5,
-                               maxLag   = round(length(y)/(maxDim+1)),
-                               emLag    = tau(y,
-                                              selection.methods = c("first.e.decay",
-                                                                    "first.zero",
-                                                                    "first.minimum"),
-                                              maxLag =maxLag),
-                               emLags     = tau(y, maxLag = maxLag),
-                               ami.method = c("first.minimum"),
-                               nnSizes  = c(.1,.3,.6,.9),
-                               nnThres  = .1,
-                               diagPlot = TRUE){
-
-  if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
-
-  emDims  <-  1:maxDim
-
-  y <- y[!is.na(y)]
-
-  lagList <- list()
-  cnt = 0
-  for(N in seq_along(nnSizes)){
-    for(L in seq_along(emLags$selection.method)){
-      Nn.max <- NA
-      for(D in seq_along(emDims)){
-        cnt = cnt+1
-        allN <- nonlinearTseries::findAllNeighbours(
-          nonlinearTseries::buildTakens(as.numeric(y),
-                                        emDims[[D]],
-                                        emLags$opLag[L]),
-          nnSizes[N])
-        Nn <- sum(laply(allN, length), na.rm = TRUE)
-        if(D==1){Nn.max <- Nn}
-        lagList[[cnt]] <- data.frame(Nsize        = nnSizes[N],
-                                     emLag.method = emLags$selection.method[[L]],
-                                     emLag = emLags$opLag[L],
-                                     emDim = emDims[D],
-                                     Nn    = Nn,
-                                     Nn.max = Nn.max)
-      }
-    }
+#' # Create a 10 by 10 matrix
+#' m <- Matrix(rnorm(10),10,10)
+#'
+#' bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands with 0 (Theiler window of 1)
+bandReplace <- function(mat, lower, upper, value = NA){
+  if(lower>0){lower=-1*lower
+  warning("lower > 0 ...\n using: -1*lower")
+  }
+  if(upper<0){upper=abs(upper)
+  warning("upper > 0 ...\n using: abs(upper)")
+  }
+  if(all(lower==0,upper==0)){
+    diag(mat) <- value
+    message(paste0("lower and upper are both 0...\n using: diag(mat) <- ",value))
   }
 
-  df        <- ldply(lagList)
-  df$Nn.pct <- df$Nn/df$Nn.max
+  delta <- col(mat)-row(mat)
+  mat[delta >= lower & delta <= upper] <- value
 
-
-  opt <- ldply(unique(df$emLag), function(n){
-    id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
-    if(length(id)>0){
-      idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
-      if(length(idmin)>0){
-        return(df[idmin,])
-      }
-    }
-  }
-  )
-
-  opt <- opt[opt$emDim==min(opt$emDim),][1,]
-
-  opDim <- opt$emDim
-  opLag <- opt$emLag
-
-  #opDim <- min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE)
-  # opLag <- tau(y,
-  #              selection.methods = ami.method,
-  #              maxLag =maxLag)$opLag[1]
-  #opLag <- df$emLag[which.min(min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE))]
-  #opRad = NULL
-
-  df$emLag <- factor(df$emLag)
-  df$Nsize <- factor(df$Nsize, labels = paste("nn size:",nnSizes))
-
-  if(diagPlot){
-
-    dfs <- data.frame(start= c(.5, hist(emDims)$mids),
-                      stop = c(hist(emDims)$mids,max(emDims)+.5),
-                      f=factor(seq_along(c(.5, hist(emDims)$mids))%%2))
-
-    library(scales) # use: alpha()
-    #myPal <- RColorBrewer::brewer.pal(length(emLag),"Dark2")
-    gNdims <- ggplot(df, aes(y = Nn.pct, x = emDim, colour = emLag)) +
-      geom_rect(aes(xmin = start, xmax = stop, fill = f),
-                ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
-      scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
-      geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
-      geom_hline(yintercept = c(0,1),   colour = "grey60") +
-      geom_hline(yintercept = 0.5, colour = "grey90") +
-      geom_line(position  = position_dodge(.4)) +
-      geom_point(position = position_dodge(.4)) +
-      annotate("text",x=maxDim/3,y=nnThres, label="threshold", size = .8) +
-      xlab("Embedding Dimension") + ylab("Nearest neigbours (% of max.)") +
-      facet_wrap(~Nsize, ncol=2) +
-      scale_x_continuous(breaks=emDims) +
-      scale_y_continuous(breaks = c(nnThres,.5,1)) +
-      scale_color_brewer("Lag",palette = "Set2") +
-      theme_minimal() +
-      theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
-            strip.text.x = element_text(colour = "black", face = "bold"),
-            panel.spacing = unit(1, "lines"),
-            legend.background = element_rect(colour = "grey90",fill = "grey90"),
-            legend.title = element_text(face = "bold"),
-            legend.key = element_rect(colour = "grey90", fill = "grey90"),
-            panel.grid.minor.x = element_blank(),
-            panel.grid.major.y = element_blank(),
-            panel.grid.minor.y = element_blank()
-      )
-
-    tmi <- mutualInformation(y,
-                             lag.max = maxLag,
-                             do.plot = TRUE)
-
-    dfMI <- data.frame(emDelay = tmi$time.lag[-1],
-                       ami     = tmi$mutual.information[-1])
-
-    gDelay <- ggplot(dfMI, aes(y = ami, x = emDelay)) +
-      geom_line() +
-      geom_vline(data = emLags, aes(colour=factor(selection.method),
-                                    xintercept = opLag),
-                 alpha = .3) +
-      geom_point(data = emLags, aes(x = opLag,
-                                    y=ami,
-                                    colour=factor(selection.method)),
-                 size=2) +
-      xlab("Embedding Lag") +
-      ylab("Average Mututal Information") +
-      scale_color_brewer("Method",palette = "Set2") +
-      theme_bw() +
-      theme(legend.position = c(.95, .95),
-            legend.justification = c("right", "top"),
-            legend.box.just = "right",
-            legend.margin = margin(6, 6, 6, 6),
-            legend.background = element_rect(colour = "grey90",fill = "grey90"),
-            legend.title = element_text(face = "bold"),
-            legend.key = element_rect(colour = "grey90", fill = "grey90"),
-            #panel.grid.major.x = element_blank(),
-            panel.grid.minor.x = element_blank(),
-            panel.grid.major.y = element_blank(),
-            panel.grid.minor.y = element_blank()
-      )
-
-    grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
-
-  }
-
-  return(list(optimLag  = opLag,
-              optimDim  = opDim,
-              #optimRad  = opRad,
-              optimRow  = opt,
-              optimData = df)
-  )
+  return(mat)
 }
 
 
 
-get.radius <- function(RM,
-                       startRadius = .10*max(RM, na.rm = TRUE),
-                       targetRR    = .05,
-                       tol         = 0.1,
-                       maxIter     = 100,
-                       AUTO        = FALSE,
-                       histIter    = FALSE){
-
-  if(!dplyr::between(tol,0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
-
-   AUTO   <- ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
-   RMsize <- dim(RM)[1]*dim(RM)[2]  #Msize(RM,AUTO)
-  if(AUTO){
-    #RMsize <- RMsize - length(diag(RM))
-    diag(RM)<-0 #tril(rmat,-1)
-    cat(paste0("\nAuto-recurrence: Setting diagonal to 0 (matrix size: ",RMsize,")\n"))
-    }
-
-  tryRadius <- startRadius
-  RR        <- 0
-  iter      <- 0
-  Converged <- FALSE
-  seqIter <- 1:maxIter
-
-  iterList <- data.frame(iter        = seqIter,
-                         RR          = RR,
-                         Radius      = tryRadius,
-                         targetRR    = targetRR,
-                         tolRRlo     = targetRR*(1-tol),
-                         tolRRhi     = targetRR*(tol+1),
-                         startRadius = startRadius,
-                         RMsize      = RMsize,
-                         AUTO        = AUTO,
-                         Converged   = Converged, check.names = FALSE)
-
-  exitIter <- FALSE
-
-  while(!exitIter){
-
-    iter <- iter+1
-
-    RR = nnzero(di2bi(RM,tryRadius))/RMsize
-
-    iterList[iter,] <-    cbind.data.frame(iter,
-                                           RR,
-                                           tryRadius,
-                                           targetRR,
-                                           targetRR*(1-tol),
-                                           targetRR*(tol+1),
-                                           startRadius,
-                                           RMsize,
-                                           AUTO,
-                                           Converged)
-
-    if(any((dplyr::between(RR,(targetRR*(1-tol)),(targetRR*(tol+1)))),(iter>=maxIter))){
-      exitIter <- TRUE
-    }
-
-    if(round(RR,digits = 2)>round(targetRR,digits = 2)){
-      tryRadius <- tryRadius*0.8
-    } else {
-      tryRadius <- tryRadius*2.2
-    }
-  }
-
-  iterList$Converged[iter] <- TRUE
-  if(iter>=maxIter){
-    warning("Max. iterations reached.")
-    iterList$Converged[iter] <- FALSE
-  }
-  if(!dplyr::between(RR,(targetRR*(1-tol)),(targetRR*(tol+1)))){
-    warning("Target RR not found, try increasing tolerance, or change starting value.")
-    iterList$Converged[iter] <- FALSE
-  }
-
-  ifelse(histIter,id<-c(1:iter),id<-iter)
-  return(iterList[id,])
-}
-
-
-recMat <- function(y1, y2,
+recmat <- function(y1, y2,
                    emDim = 1,
                    emLag = 1,
                    to.ts = NULL,
                    to.sparse = FALSE,
                    order.by = NULL,
-                   method = "Manhattan", ...){
-  require(proxy)
-  require(scales)
+                   method = "Euclidean", ...){
 
   if(!all(is.data.frame(y1),is.data.frame(y2))){
     y1 <- as.data.frame(y1)
@@ -1140,7 +1518,163 @@ recMat <- function(y1, y2,
   return(dmat)
 }
 
-empty.crp <- function(){
+
+recmat_plot <- function(rmat, PhaseSpaceScale= TRUE){
+  require(grid)
+  require(ggplot2)
+  require(gtable)
+
+  AUTO <-ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
+
+  meltRP <- reshape2::melt(rmat)
+
+  if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
+    unthresholded = TRUE
+
+    # For presentation purpose only
+    if(PhaseSpaceScale){
+      meltRP$value <- scales::rescale(meltRP$value)
+    }
+  } else {
+    unthresholded = FALSE
+    meltRP$value <- factor(meltRP$value)
+  }
+
+
+  gRP <-  ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
+    geom_raster()
+
+  if(unthresholded){
+    gRP <- gRP + scale_fill_gradient2(low      = "red3",
+                                      high     = "steelblue",
+                                      mid      = "white",
+                                      na.value = scales::muted("slategray4"),
+                                      midpoint = .5,
+                                      limit    = c(min(meltRP$value),max(meltRP$value)),
+                                      space    = "Lab",
+                                      name     = "")
+    rptheme <-     theme(panel.background = element_rect("grey99"),
+                         panel.grid.major  = element_blank(),
+                         panel.grid.minor  = element_blank(),
+                         legend.background = element_blank(),
+                         legend.key = element_blank(),
+                         panel.border = element_blank(),
+                         axis.ticks = element_blank(),
+                         axis.text = element_blank(),
+                         axis.title.x =element_blank(),
+                         axis.title.y =element_blank(),
+                         plot.margin = margin(0,0,0,0))
+
+  } else {
+    gRP <- gRP + scale_fill_manual(values = c("white","black"),
+                                   na.value = scales::muted("slategray4"),
+                                   name  = "", guide = "none")
+
+    rptheme <-  theme(
+      panel.background = element_rect("grey50"),
+      panel.border = element_rect("grey50",fill=NA),
+      panel.grid.major  = element_blank(),
+      panel.grid.minor  = element_blank(),
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      axis.ticks = element_blank(),
+      axis.text = element_blank(),
+      axis.title.x =element_blank(),
+      axis.title.y =element_blank(),
+      plot.margin = margin(3,3,3,3))
+  }
+
+  gRP <- gRP +
+    geom_abline(slope = 1,colour = "grey50", size = 1) +
+    ggtitle(label=ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
+    rptheme +
+    coord_fixed(expand = FALSE)
+
+  if(!is.null(attr(rmat,"eDims1"))){
+
+    y1 <- data.frame(t1=attr(rmat,"eDims1"))
+    y2 <- data.frame(t2=attr(rmat,"eDims2"))
+
+    y1[,1] <- rescale(y1[,1])
+    gy1 <- ggplot(y1, aes(y=y1[,1], x= index(y1))) +
+      geom_line() +  xlab(colnames(y1)) + ylab("") +
+      geom_vline(xintercept = index(y1)[is.na(y1[,1])],
+                 colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+      theme(panel.background = element_rect("grey99"),
+            panel.grid.major  = element_blank(),
+            panel.grid.minor  = element_blank(),
+            legend.background = element_blank(),
+            legend.key = element_blank(),
+            panel.border = element_blank(),
+            axis.text = element_blank(),
+            axis.ticks = element_blank(),
+            axis.title.x =element_text(colour = "black",angle = 0, vjust = +3),
+            axis.title.y =element_blank(),
+            plot.margin = margin(0,0,0,0)
+      ) +
+      coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
+
+    y2[,1] <- rescale(y2[,1])
+    gy2 <- ggplot(y2, aes(y=y2[,1], x= index(y2))) +
+      geom_line() + xlab(colnames(y2)) + ylab("") +
+      geom_vline(xintercept = index(y2)[is.na(y2[,1])],
+                 colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+      theme(panel.background = element_rect("grey99"),
+            panel.grid.major  = element_blank(),
+            panel.grid.minor  = element_blank(),
+            legend.background = element_blank(),
+            legend.key = element_blank(),
+            panel.border = element_blank(),
+            axis.text = element_blank(),
+            axis.ticks = element_blank(),
+            axis.title.x =element_blank(),
+            axis.title.y =element_text(colour = "black",angle = 90, vjust = -2),
+            plot.margin = margin(0,0,0,0)) +
+      coord_flip(expand = FALSE) +
+      scale_y_reverse() #coord_fixed(1/2) +
+  } else {
+    gy1 <- gg.plotHolder()
+    gy2 <- gg.plotHolder()
+  }
+
+  gr <- ggplotGrob(gRP)
+
+  gindex <- subset(gr$layout, name == "panel")
+  g <- gtable_add_cols(gr, unit(2, "cm"),0)
+  g <- gtable_add_rows(g, unit(2,"cm"))
+  g <- gtable_add_grob(g, ggplotGrob(gy2), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
+  g <- gtable_add_grob(g, ggplotGrob(gy1), t=9, l=2, b=11, r=6)
+  grid.newpage()
+  grid.draw(g)
+}
+
+
+#' recmat_size
+#'
+#' @param mat A Matrix object
+#' @param AUTO Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass \code{FALSE} to prevent this behaviour. If \code{NULL} (default) \code{AUTO} will take on the value of \code{isSymmetric(mat)}.
+#' @param theiler Should a Theiler window be applied?
+#'
+#' @return Matrix size for computation of recurrence measures.
+#' @export
+#'
+#' @examples
+#' # Create a 10 by 10 matrix
+#' m <- Matrix(rnorm(10),10,10)
+#'
+#' recmat_size(m,TRUE,0)   # Subtract diagonal
+#' recmat_size(m,FALSE,0)  # Do not subtract diagonal
+#' recmat_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
+#' recmat_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
+recmat_size <- function(mat, AUTO=NULL, theiler = 0){
+  if(is.null(AUTO)){
+    AUTO <- isSymmetric(unname(mat))
+  }
+  return(cumprod(dim(mat))[2] - ifelse((AUTO&theiler==0),length(diag(mat)),
+                                       ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
+}
+
+crp_empty <- function(){
   data.frame(
     Radius   = NA,
     RT       = NA,
@@ -1178,7 +1712,7 @@ empty.crp <- function(){
     N_hl     = NA)
 }
 
-calc.crp <- function(RM,
+crp_calc <- function(RM,
                      radius= NULL,
                      DLmin = 2,
                      VLmin = 2,
@@ -1190,12 +1724,12 @@ calc.crp <- function(RM,
                      chromatic = FALSE,
                      matrices  = FALSE){
 
-  RMsize <- Msize(RM, auto=AUTO)
+  recmat_size <- Msize(RM, auto=AUTO)
 
   #Total nr. recurrent points
   RT <- Matrix::nnzero(RM, na.counted = FALSE)
   #Proportion recurrence / Recurrence Rate
-  RR <- RT/RMsize
+  RR <- RT/recmat_size
   #Get line segments
   lineSegments <- lineDists(RM)
 
@@ -1328,7 +1862,7 @@ calc.crp <- function(RM,
 }
 
 
-prep.crp <- function(RP,
+crp_prep <- function(RP,
                      radius= NULL,
                      DLmin = 2,
                      VLmin = 2,
@@ -1341,7 +1875,7 @@ prep.crp <- function(RP,
                      matrices  = FALSE,
                      doHalf    = FALSE){
 
-  out<-calc.crp(RP,
+  out<-crp_calc(RP,
                 radius= radius,
                 DLmin = DLmin,
                 VLmin = VLmin,
@@ -1355,7 +1889,7 @@ prep.crp <- function(RP,
 
   if(doHalf){
     if(!AUTO){
-      outLo <- calc.crp(Matrix::tril(RP,-1),
+      outLo <- crp_calc(Matrix::tril(RP,-1),
                         radius= radius,
                         DLmin = DLmin,
                         VLmin = VLmin,
@@ -1367,7 +1901,7 @@ prep.crp <- function(RP,
                         chromatic = chromatic,
                         matrices  = matrices)
 
-      outUp <- calc.crp(Matrix::triu(RP,-1),
+      outUp <- crp_calc(Matrix::triu(RP,-1),
                         radius= radius,
                         DLmin = DLmin,
                         VLmin = VLmin,
@@ -1383,462 +1917,14 @@ prep.crp <- function(RP,
                               upper = outUp)
     } else {
       out<- cbind.data.frame(full  = out,
-                             lower = empty.crp(),
-                             upper = empty.crp())
+                             lower = crp_empty(),
+                             upper = crp_empty())
     }
   }
   return(out)
 }
 
 
-crqa_mat_measures <- function(RM,
-                              DLmin = 2,
-                              VLmin = 2,
-                              HLmin = 2,
-                              DLmax = length(diag(rmat))-1,
-                              VLmax = length(diag(rmat))-1,
-                              HLmax = length(diag(rmat))-1,
-                              AUTO      = NULL,
-                              chromatic = FALSE,
-                              matrices  = FALSE,
-                              doHalf    = FALSE,
-                              Nboot     = NULL,
-                              CL        = .95){
-
-  # DLmin = 2
-  # VLmin = 2
-  # HLmin = 2
-  # DLmax = length(diag(rmat))-1
-  # VLmax = length(diag(rmat))-1
-  # HLmax = length(diag(rmat))-1
-  # chromatic = FALSE
-  # matrices  = FALSE
-  # CL        = .95
-
-  require(dplyr)
-
-  if(is.null(Nboot)){Nboot = 1}
-
-  NRows <- NROW(RM)
-  NCols <- NCOL(RM)
-  mc.cores <- detectCores()
-  if(Nboot<mc.cores) mc.cores <- Nboot
-
-  tstart <- Sys.time()
-  out    <- mclapply(1, function(i){
-    prep.crp(matrix(RM[ceiling(NCols*NRows*runif(NCols*NRows))], ncol=NCols, nrow = NRows),
-             radius= radius,
-             DLmin = DLmin,
-             VLmin = VLmin,
-             HLmin = HLmin,
-             DLmax = DLmax,
-             VLmax = VLmax,
-             HLmax = HLmax,
-             AUTO  = AUTO,
-             chromatic = chromatic,
-             matrices  = matrices,
-             doHalf    = doHalf)
-  },
-  mc.cores = mc.cores
-  )
-  dfori <- gather(as.data.frame(out), key = measure, value = value)
-  tend  <- Sys.time()
-
-  if(Nboot>1){
-
-    cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations...\n"))
-    cat(paste0("Estimated duration: ", round((difftime(tend,tstart, unit = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
-
-    tstart <-Sys.time()
-    bootOut <-  mclapply(1:Nboot, function(i){
-      replicate <- as.data.frame(prep.crp(matrix(RM[ceiling(NCols*NRows*runif(NCols*NRows))],
-                                                 ncol=NCols, nrow = NRows),
-                                          radius= radius,
-                                          DLmin = DLmin,
-                                          VLmin = VLmin,
-                                          HLmin = HLmin,
-                                          DLmax = DLmax,
-                                          VLmax = VLmax,
-                                          HLmax = HLmax,
-                                          AUTO  = AUTO,
-                                          chromatic = chromatic,
-                                          matrices  = matrices,
-                                          doHalf    = doHalf))
-      replicate$replicate = i
-      return(replicate)
-    },
-    mc.cores = mc.cores
-    )
-    tend <- Sys.time()
-    cat(paste0("Actual duration: ", round(difftime(tend,tstart, unit = "mins"), digits=1)," min.\n"))
-
-    dfrepl <- ldply(bootOut)
-    dfrepl <- gather(dfrepl, key = measure, value = value, -replicate)
-
-    if(length(CL)==1){
-      ci.lo <- (1-CL)/2
-      ci.hi <- CL + ci.lo
-    } else {
-      ci.lo <- CL[1]
-      ci.hi <- CL[2]
-    }
-
-    rqout <-  dfrepl %>% group_by(measure) %>%
-      summarize(
-        val      = NA,
-        ci.lower = quantile(value, ci.lo, na.rm = TRUE),
-        ci.upper = quantile(value, ci.hi, na.rm = TRUE),
-        mean     = mean(value, na.rm = TRUE),
-        sd       = sd(value, na.rm = TRUE),
-        var      = var(value, na.rm = TRUE),
-        N        = n(),
-        se       = sd(value, na.rm = TRUE)/sqrt(n()),
-        median   = mean(value, na.rm = TRUE),
-        mad      = mad(value, na.rm = TRUE)
-      )
-
-    for(m in 1:nrow(rqout)){
-      rqout$val[rqout$measure%in%dfori$measure[m]] <- dfori$value[m]
-    }
-  } else {
-    rqout <- dfori
-  }
-  return(rqout)
-}
-
-
-# sizeIn <- dim(RM)
-# mc.cores <- detectCores()
-# if(Nboot<mc.cores) mc.cores <- Nboot
-#
-# rp.rg   <- function(data,mle){return(matrix(data[ceiling(mle$NCols*mle$NRows*runif(mle$NCols*mle$NRows))], ncol= mle$NCols, nrow = mle$NRows))}
-#
-# rp.mle <- list(NCols=sizeIn[1], NRows=sizeIn[2])
-#
-# rp.fun  <- function(data, ...){prep.crp(RP    = data,
-#                                         radius= radius,
-#                                         DLmin = DLmin,
-#                                         VLmin = VLmin,
-#                                         HLmin = HLmin,
-#                                         DLmax = DLmax,
-#                                         VLmax = VLmax,
-#                                         HLmax = HLmax,
-#                                         AUTO  = AUTO,
-#                                         chromatic = chromatic,
-#                                         matrices  = matrices,
-#                                         doHalf    = doHalf)}
-# rp.boot <- function(...){
-#   boot(data      = RM,
-#        statistic = rp.fun,
-#        R         = Nboot,
-#        ran.gen   = rp.rg,
-#        mle       = rp.mle,
-#        parallel = "multicore",
-#        ncpus = detectCores()
-#        )
-#   #boot(RM, rp.fun, R = Nboot, sim = "parametric", ran.gen = rp.rg, mle = rp.mle)
-# }
-
-# replicates <-  boot(data      = RM,
-#                     statistic = rp.fun,
-#                     R         = Nboot,
-#                     sim = "parametric",
-#                     ran.gen   = rp.rg,
-#                     mle       = rp.mle,
-#                     parallel  = "multicore",
-#                     ncpus     = detectCores()
-#                     )
-#
-# cis <-  ldply(1:102, function(c){
-#   ci <- boot.ci(replicates, type = c("norm"), conf = 0.95, t0 = c, t=1:9)
-#   return(cbind.data.frame(measure = dimnames(replicates$t0)[[2]][c],
-#                           value = replicates$t0[c],
-#                           ci.lo = ci$normal[,2],
-#                           ci.up = ci$normal[,3])
-#          )})
-# dfrepl <- llply(1:Nboot, function(i) rp.boot(i))
-
-# bootout <- list() %>%
-#   bootstrap(Nboot) %>%
-#    do(as.data.frame( )
-#       )
-
-
-#' crqa_mat
-#'
-#' @param rp Recurrence Matrix
-#' @param radius
-#' @param DLmin
-#' @param VLmin
-#' @param HLmin
-#' @param DLmax
-#' @param VLmax
-#' @param HLmax
-#' @param AUTO Auto-recurrence? (default: FALSE)
-#' @param matrices
-#'
-#' @return
-#' @export
-#'
-#' @examples
-crqa_mat <- function(rmat,
-                     radius= NULL,
-                     DLmin = 2,
-                     VLmin = 2,
-                     HLmin = 2,
-                     DLmax = length(diag(rmat))-1,
-                     VLmax = length(diag(rmat))-1,
-                     HLmax = length(diag(rmat))-1,
-                     AUTO      = FALSE,
-                     doHalf    = FALSE,
-                     chromatic = FALSE,
-                     matrices  = FALSE,
-                     Nboot     = NULL,
-                     CL        = .95){
-
-  #  require(boot)
-  require(dplyr)
-  require(broom)
-
-  # Input should be a distance matrix, or a matrix of zeroes and ones with radius = NULL, output is a list
-  # Fred Hasselman (me@fredhasselman.com) - August 2013
-
-  if(is.null(AUTO)){
-    AUTO <- ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
-  }
-
-  #uval <- unique(as.vector(rmat))
-  if(all(as.vector(rmat)==0|as.vector(rmat)==1)){
-    RM <- rmat
-  } else {
-    if(!is.null(radius)){
-      RM <- di2bi(rmat,radius)
-    } else{
-      if(!chromatic){
-        stop("Expecting a binary (0,1) matrix.\nUse 'get.radius()', or set 'chromatic = TRUE'")
-      } else {
-        stop("Chromatic RQA not implemented yet.")
-      }
-    }
-  }
-  rm(rmat)
-
-  out <- crqa_mat_measures(RM,
-                           DLmin = DLmin,
-                           VLmin = VLmin,
-                           HLmin = HLmin,
-                           DLmax = DLmax,
-                           VLmax = VLmax,
-                           HLmax = HLmax,
-                           AUTO  = AUTO,
-                           chromatic = chromatic,
-                           matrices  = matrices,
-                           doHalf = doHalf,
-                           Nboot  = Nboot,
-                           CL     = CL)
-
-  #
-  #   if(is.null(Nboot)){Nboot = 1}
-  #
-  #   out <- crqa_mat_measures(RM,
-  #                            radius= radius,
-  #                            DLmin = DLmin,
-  #                            VLmin = VLmin,
-  #                            HLmin = HLmin,
-  #                            DLmax = DLmax,
-  #                            VLmax = VLmax,
-  #                            HLmax = HLmax,
-  #                            AUTO  = AUTO,
-  #                            chromatic = chromatic,
-  #                            matrices  = matrices,
-  #                            doHalf = doHalf,
-  #                            Nboot  = Nboot,
-  #                            CL     = CL)
-  #
-  #   dfori <- gather(out, key = measure, value = value)
-  #
-  #   col.ind <- tbl_df(index(RM))
-  #   row.ind <- tbl_df(sample(index(RM),size=nrow(RM)))
-  #
-  #   if(Nboot>1){cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations.\n"))
-  #     bootout <- col.ind  %>%
-  #       bootstrap(Nboot) %>%
-  #       do(crqa_mat_measures(RM[row.ind,unlist(.)],
-  #                            radius= radius,
-  #                            DLmin = DLmin,
-  #                            VLmin = VLmin,
-  #                            HLmin = HLmin,
-  #                            DLmax = DLmax,
-  #                            VLmax = VLmax,
-  #                            HLmax = HLmax,
-  #                            AUTO  = AUTO,
-  #                            chromatic = chromatic,
-  #                            matrices  = matrices,
-  #                            doHalf = doHalf))
-  #
-  #     dfrepl <- gather(bootout, key = measure, value = value, -replicate)
-  #
-  #     if(length(CL)==1){
-  #       ci.lo <- (1-CL)/2
-  #       ci.hi <- CL + ci.lo
-  #     } else {
-  #       ci.lo <- CL[1]
-  #       ci.hi <- CL[2]
-  #     }
-  #
-  #     rqout <-  dfrepl %>% group_by(measure) %>%
-  #       summarize(
-  #         val     = NA,
-  #         ci.low  = quantile(value, ci.lo, na.rm = TRUE),
-  #         ci.high = quantile(value, ci.hi, na.rm = TRUE),
-  #         mean    = mean(value, na.rm = TRUE),
-  #         sd      = sd(value, na.rm = TRUE),
-  #         var     = var(value, na.rm = TRUE),
-  #         N       = n(),
-  #         se      = sd(value, na.rm = TRUE)/sqrt(n()),
-  #         median  = mean(value, na.rm = TRUE),
-  #         mad     = mad(value, na.rm = TRUE)
-  #       )
-  #
-  #     for(m in 1:nrow(rqout)){
-  #       rqout$val[rqout$measure%in%dfori$measure[m]] <- dfori$value[m]
-  #     }
-  #   } else {
-  #     rqout <- dfori
-  #   }
-  return(out)
-}
-
-
-
-plotRecMat <- function(rmat, PhaseSpaceScale= TRUE){
-  require(grid)
-  require(ggplot2)
-  require(gtable)
-
-  AUTO <-ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
-
-  meltRP <- reshape2::melt(rmat)
-
-  if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
-    unthresholded = TRUE
-
-    # For presentation purpose only
-    if(PhaseSpaceScale){
-      meltRP$value <- scales::rescale(meltRP$value)
-    }
-  } else {
-    unthresholded = FALSE
-    meltRP$value <- factor(meltRP$value)
-  }
-
-
-  gRP <-  ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
-    geom_raster()
-
-  if(unthresholded){
-    gRP <- gRP + scale_fill_gradient2(low      = "red3",
-                                      high     = "steelblue",
-                                      mid      = "white",
-                                      na.value = scales::muted("slategray4"),
-                                      midpoint = .5,
-                                      limit    = c(min(meltRP$value),max(meltRP$value)),
-                                      space    = "Lab",
-                                      name     = "")
-    rptheme <-     theme(panel.background = element_rect("grey99"),
-                         panel.grid.major  = element_blank(),
-                         panel.grid.minor  = element_blank(),
-                         legend.background = element_blank(),
-                         legend.key = element_blank(),
-                         panel.border = element_blank(),
-                         axis.ticks = element_blank(),
-                         axis.text = element_blank(),
-                         axis.title.x =element_blank(),
-                         axis.title.y =element_blank(),
-                         plot.margin = margin(0,0,0,0))
-
-  } else {
-    gRP <- gRP + scale_fill_manual(values = c("white","black"),
-                                   na.value = scales::muted("slategray4"),
-                                   name  = "", guide = "none")
-
-    rptheme <-  theme(
-      panel.background = element_rect("grey50"),
-      panel.border = element_rect("grey50",fill=NA),
-      panel.grid.major  = element_blank(),
-      panel.grid.minor  = element_blank(),
-      legend.background = element_blank(),
-      legend.key = element_blank(),
-      axis.ticks = element_blank(),
-      axis.text = element_blank(),
-      axis.title.x =element_blank(),
-      axis.title.y =element_blank(),
-      plot.margin = margin(3,3,3,3))
-  }
-
-  gRP <- gRP +
-    geom_abline(slope = 1,colour = "grey50", size = 1) +
-    ggtitle(label=ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
-    rptheme +
-    coord_fixed(expand = FALSE)
-
-  if(!is.null(attr(rmat,"eDims1"))){
-
-    y1 <- data.frame(t1=attr(rmat,"eDims1"))
-    y2 <- data.frame(t2=attr(rmat,"eDims2"))
-
-    y1[,1] <- rescale(y1[,1])
-    gy1 <- ggplot(y1, aes(y=y1[,1], x= index(y1))) +
-      geom_line() +  xlab(colnames(y1)) + ylab("") +
-      geom_vline(xintercept = index(y1)[is.na(y1[,1])],
-                 colour = scales::muted("slategray4"),alpha=.1, size=.5) +
-      theme(panel.background = element_rect("grey99"),
-            panel.grid.major  = element_blank(),
-            panel.grid.minor  = element_blank(),
-            legend.background = element_blank(),
-            legend.key = element_blank(),
-            panel.border = element_blank(),
-            axis.text = element_blank(),
-            axis.ticks = element_blank(),
-            axis.title.x =element_text(colour = "black",angle = 0, vjust = +3),
-            axis.title.y =element_blank(),
-            plot.margin = margin(0,0,0,0)
-      ) +
-      coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
-
-    y2[,1] <- rescale(y2[,1])
-    gy2 <- ggplot(y2, aes(y=y2[,1], x= index(y2))) +
-      geom_line() + xlab(colnames(y2)) + ylab("") +
-      geom_vline(xintercept = index(y2)[is.na(y2[,1])],
-                 colour = scales::muted("slategray4"),alpha=.1, size=.5) +
-      theme(panel.background = element_rect("grey99"),
-            panel.grid.major  = element_blank(),
-            panel.grid.minor  = element_blank(),
-            legend.background = element_blank(),
-            legend.key = element_blank(),
-            panel.border = element_blank(),
-            axis.text = element_blank(),
-            axis.ticks = element_blank(),
-            axis.title.x =element_blank(),
-            axis.title.y =element_text(colour = "black",angle = 90, vjust = -2),
-            plot.margin = margin(0,0,0,0)) +
-      coord_flip(expand = FALSE) +
-      scale_y_reverse() #coord_fixed(1/2) +
-  } else {
-    gy1 <- gg.plotHolder()
-    gy2 <- gg.plotHolder()
-  }
-
-  gr <- ggplotGrob(gRP)
-
-  gindex <- subset(gr$layout, name == "panel")
-  g <- gtable_add_cols(gr, unit(2, "cm"),0)
-  g <- gtable_add_rows(g, unit(2,"cm"))
-  g <- gtable_add_grob(g, ggplotGrob(gy2), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
-  g <- gtable_add_grob(g, ggplotGrob(gy1), t=9, l=2, b=11, r=6)
-  grid.newpage()
-  grid.draw(g)
-}
 
 
 # plotRM.crqa <- function(RM,
@@ -2156,8 +2242,8 @@ plotRP.fnn <- function(FNNoutput){
 #'
 #' @examples
 #' # The logistic map in the chaotic regime
-#' growth.ac(Y0 = 0.01, r = 4, type = "logistic")
-growth.ac <- function(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving", "damping", "logistic", "vanGeert")[1]){
+#' growth_ac(Y0 = 0.01, r = 4, type = "logistic")
+growth_ac <- function(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving", "damping", "logistic", "vanGeert")[1]){
   # Create a vector Y of length N, which has value Y0 at Y[1]
   if(N>1){
     Y <- as.numeric(c(Y0, rep(NA,N-2)))
@@ -2188,21 +2274,21 @@ growth.ac <- function(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving", "dam
 #'
 #' @examples
 #' # Plot with the default settings
-#' xyplot(growth.ac.cond())
+#' xyplot(growth_ac_cond())
 #'
 #' # The function such that it can take a set of conditional rules and apply them sequentially during the iterations.
 #' # The conditional rules are passed as a `data.frame`
 #' (cond <- cbind.data.frame(Y = c(0.2, 0.6), par = c("r", "r"), val = c(0.5, 0.1)))
-#' xyplot(growth.ac.cond(cond=cond))
+#' xyplot(growth_ac_cond(cond=cond))
 #'
 #' # Combine a change of `r` and a change of `k`
 #' (cond <- cbind.data.frame(Y = c(0.2, 1.99), par = c("r", "k"), val = c(0.5, 3)))
-#' xyplot(growth.ac.cond(cond=cond))
+#' xyplot(growth_ac_cond(cond=cond))
 #'
 #' # A fantasy growth process
 #' (cond <- cbind.data.frame(Y = c(0.1, 1.99, 1.999, 2.5, 2.9), par = c("r", "k", "r", "r","k"), val = c(0.3, 3, 0.9, 0.1, 1.3)))
-#' xyplot(growth.ac.cond(cond=cond))
-growth.ac.cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y = 0.2, par = "r", val = 2), N = 100){
+#' xyplot(growth_ac_cond(cond=cond))
+growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y = 0.2, par = "r", val = 2), N = 100){
   # Create a vector Y of length N, which has value Y0 at Y[1]
   Y <- c(Y0, rep(NA, N-1))
   # Iterate N steps of the difference equation with values passed for Y0, k and r.
@@ -2601,7 +2687,7 @@ fd.default <- function(y, ...){
   cat("No type specified.\nReturning exponential growth power law.")
 
   r = 1.01
-  y <- growth.ac(Y0=0.001, r=r, N=2048, type = "driving")
+  y <- growth_ac(Y0=0.001, r=r, N=2048, type = "driving")
   tsp(y) <-c(1/500,2048/500,500)
   bulk <- log1p(hist(y,plot = F, breaks = seq(0,max(y),length.out = 129))$counts)
   size <- log1p(seq(0,2047,length.out = 128))
@@ -3188,7 +3274,7 @@ netGroupCol <- function(g,grp){
       if(length(E(g)[from(V(g)[grp[[c]]])])>0){
         id<-E(g)[from(V(g)[grp[[c]]])]$color%in%"#D9D9D9"
         if(any(id)){
-          E(g)[from(V(g)[grp[[c]]])[id]]$color <- add.alpha(groupColours[c],alpha = E(g)[from(V(g)[grp[[c]]])[id]]$alpha)
+          E(g)[from(V(g)[grp[[c]]])[id]]$color <- add_alpha(groupColours[c],alpha = E(g)[from(V(g)[grp[[c]]])[id]]$alpha)
         }
       }
     }
@@ -3218,7 +3304,7 @@ plot.loglog <- function(fd.OUT){
 }
 
 ## Add an alpha value to a colour
-add.alpha <- function(col, alpha=1){
+add_alpha <- function(col, alpha=1){
   if(missing(col))
     stop("Please provide a vector of colours.")
   apply(sapply(col, col2rgb)/255, 2,
