@@ -14,7 +14,7 @@
   toset <- !(names(op.casnet) %in% names(op))
   if(any(toset)) options(op.casnet[toset])
 
-  if(!file.exists(normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_instal_log.txt")))){
+  if(!file.exists(normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_instal_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
   }
   invisible()
