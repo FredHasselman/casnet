@@ -520,11 +520,11 @@ crqa_parameters <- function(y,
       Nn.max <- NA
       for(D in seq_along(emDims)){
         cnt = cnt+1
-        allN <- nonlinearTseries::findAllNeighbours(
-          nonlinearTseries::buildTakens(as.numeric(y),
-                                        emDims[[D]],
-                                        emLags$opLag[L]),
-          nnSizes[N])
+        surrDims <- nonlinearTseries::buildTakens(as.numeric(y),
+                                                  emDims[[D]],
+                                                  emLags$opLag[L])
+        rmat <- recmat(surrDims,surrDims)
+        allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*max(rmat, na.rm = TRUE))
         Nn <- sum(laply(allN, length), na.rm = TRUE)
         if(D==1){Nn.max <- Nn}
         lagList[[cnt]] <- data.frame(Nsize        = nnSizes[N],
@@ -537,11 +537,11 @@ crqa_parameters <- function(y,
     }
   }
 
-  df        <- ldply(lagList)
+  df        <- plyr::ldply(lagList)
   df$Nn.pct <- df$Nn/df$Nn.max
 
 
-  opt <- ldply(unique(df$emLag), function(n){
+  opt <- plyr::ldply(unique(df$emLag), function(n){
     id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
     if(length(id)>0){
       idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
@@ -573,9 +573,9 @@ crqa_parameters <- function(y,
                       stop = c(hist(emDims)$mids,max(emDims)+.5),
                       f=factor(seq_along(c(.5, hist(emDims)$mids))%%2))
 
-    library(scales) # use: alpha()
+    # use: alpha()
     #myPal <- RColorBrewer::brewer.pal(length(emLag),"Dark2")
-    gNdims <- ggplot(df, aes(y = Nn.pct, x = emDim, colour = emLag)) +
+    gNdims <- ggplot2::ggplot(df, aes(y = Nn.pct, x = emDim, colour = emLag)) +
       geom_rect(aes(xmin = start, xmax = stop, fill = f),
                 ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
       scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
@@ -602,14 +602,14 @@ crqa_parameters <- function(y,
             panel.grid.minor.y = element_blank()
       )
 
-    tmi <- mutualInformation(y,
+    tmi <-  nonlinearTseries::mutualInformation(y,
                              lag.max = maxLag,
                              do.plot = TRUE)
 
     dfMI <- data.frame(emDelay = tmi$time.lag[-1],
                        ami     = tmi$mutual.information[-1])
 
-    gDelay <- ggplot(dfMI, aes(y = ami, x = emDelay)) +
+    gDelay <- ggplot2::ggplot(dfMI, aes(y = ami, x = emDelay)) +
       geom_line() +
       geom_vline(data = emLags, aes(colour=factor(selection.method),
                                     xintercept = opLag),
@@ -635,7 +635,7 @@ crqa_parameters <- function(y,
             panel.grid.minor.y = element_blank()
       )
 
-    grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
+    gridExtra::grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
 
   }
 
@@ -659,7 +659,7 @@ crqa_radius <- function(RM,
 
   if(!dplyr::between(tol,0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
 
-  AUTO        <- ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
+  AUTO        <- ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
   recmat_size <- recmat_size(RM,AUTO,theiler)
   if(AUTO){
     cat(paste0("\nAuto-recurrence: Setting diagonal to 0 (matrix size: ",recmat_size,")\n"))
@@ -692,7 +692,7 @@ crqa_radius <- function(RM,
 
     iter <- iter+1
 
-    RR = nnzero(di2bi(RM,tryRadius),na.counted = FALSE)/recmat_size
+    RR = Matrix::nnzero(di2bi(RM,tryRadius),na.counted = FALSE)/recmat_size
 
     iterList[iter,] <-    cbind.data.frame(iter,
                                            RR,
@@ -936,15 +936,12 @@ crqa_mat <- function(rmat,
                      Nboot     = NULL,
                      CL        = .95){
 
-  #  require(boot)
-  require(dplyr)
-  require(broom)
 
   # Input should be a distance matrix, or a matrix of zeroes and ones with radius = NULL, output is a list
   # Fred Hasselman (me@fredhasselman.com) - August 2013
 
   if(is.null(AUTO)){
-    AUTO <- ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
+    AUTO <- ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
   }
 
   #uval <- unique(as.vector(rmat))
@@ -1105,7 +1102,7 @@ tau <- function(y,
                 ...){
 
   y   <- y[!is.na(y)]
-  tmi <- mutualInformation(y,
+  tmi <- nonlinearTseries::mutualInformation(y,
                            lag.max = maxLag,
                            do.plot = FALSE)
 
@@ -1359,9 +1356,6 @@ lineDists <- function(RP,
                       chromatic = FALSE,
                       matrices  = FALSE,
                       doHalf    = FALSE){
-  require(plyr)
-  require(dplyr)
-  require(tidyr)
 
   # For boot()
   # RP <- RP[indices,]
@@ -1509,8 +1503,6 @@ recmat <- function(y1, y2,
 
   et1 <- lagEmbed(y1, emDim, emLag)
   et2 <- lagEmbed(y2, emDim, emLag)
-  # colnames(et1) <- colnames(y1)
-  # colnames(et2) <- colnames(y2)
 
   dmat <- proxy::dist(x = et1,
                       y = et2,
@@ -1523,8 +1515,8 @@ recmat <- function(y1, y2,
   if(all(!is.null(to.ts),!is.null(order.by))){
 
     dmat <-  switch(to.ts,
-                    "xts" =  xts(dmat, order.by = as_datetime(order.by)),
-                    "zoo" =  zoo(dmat, order.by = as_datetime(order.by))
+                    "xts" =  xts::xts(dmat, order.by = as_datetime(order.by)),
+                    "zoo" =  zoo::zoo(dmat, order.by = as_datetime(order.by))
     )
   }
   if(!is.null(order.by)){
@@ -1560,7 +1552,7 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE){
   require(ggplot2)
   require(gtable)
 
-  AUTO <-ifelse(identical(as.vector(tril(rmat,-1)),as.vector(tril(t(rmat),-1))),TRUE,FALSE)
+  AUTO <-ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
 
   meltRP <- reshape2::melt(rmat)
 
@@ -2179,10 +2171,6 @@ crp_prep <- function(RP,
 #' @description Creates a recurrence plot from the sparse matrix output generated by \code{\link[crqa]{crqa}}.
 #' @examples
 plotRP.crqa <- function(crqaOutput){
-  require(Matrix)
-  require(lattice)
-  require(grid)
-  require(gridExtra)
 
   AUTO <- FALSE
 
@@ -2447,13 +2435,12 @@ hoodGraph2svg <- function(TDM,Vname,pname){
 }
 
 lagEmbed <- function (y, emDim, emLag){
-  require(lubridate)
 
-  if(any(is.ts(y), is.zoo(y), is.xts(y))){
+  if(any(is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
     timeVec <- time(y)
-    emTime <- as_datetime(timeVec[emLag+1])- as_datetime(timeVec[1])
+    emTime <- lubridate::as_datetime(timeVec[emLag+1])- lubridate::as_datetime(timeVec[1])
   } else {
-    timeVec <- index(y)
+    timeVec <- zoo::index(y)
     emTime <- emLag
   }
 
@@ -2477,7 +2464,7 @@ lagEmbed <- function (y, emDim, emLag){
   attr(emY, "embedding.lag")  = emLag
   attr(emY, "embedding.time") = emTime
   attr(emY, "id") = id
-  return(emY)
+  return(as.matrix(emY))
 }
 
 
@@ -2564,7 +2551,7 @@ plotSW <- function(n,k,p){
   V(g)$degree <- degree(g)
 
   # set colors and sizes for vertices
-  rev<-scale.R(log1p(V(g)$degree))
+  rev<-elascer(log1p(V(g)$degree))
   rev[rev<=0.2]<-0.2
   rev[rev>=0.9]<-0.9
   V(g)$rev <- rev$x
@@ -2588,7 +2575,7 @@ plotBA <- function(n,pwr,out.dist){
   V(g)$degree <- degree(g)
 
   # set colors and sizes for vertices
-  rev<-scale.R(log1p(V(g)$degree))
+  rev<-elascer(log1p(V(g)$degree))
   rev[rev<=0.2] <- 0.2
   rev[rev>=0.9] <- 0.9
   V(g)$rev <- rev$x
@@ -2943,7 +2930,7 @@ fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = disp
 #'
 #' @family FD estimators
 #' @examples
-fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order = 1, scale.max=trunc(length(y)/4), scale.min=4, scale.ratio=2^(1/4), overlap = 0, plot = FALSE){
+fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order = 1, scale.max=trunc(length(y)/4), scale.min=4, elasceratio=2^(1/4), overlap = 0, plot = FALSE){
   require(pracma)
   require(fractal)
 
@@ -2966,8 +2953,8 @@ fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order 
   # Normalize using N instead of N-1.
   if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (sd(y, na.rm = TRUE)*sqrt((N-1)/N))
 
-  out1 <- fractal::DFA(y, detrend=dtrend, sum.order=sum.order, scale.max=trunc(length(y)/2), scale.min=2, scale.ratio=2, overlap = 0, verbose=FALSE)
-  out2 <- fractal::DFA(y, detrend=dtrend, sum.order=sum.order, scale.max=scale.max, scale.min=scale.min, scale.ratio=scale.ratio, overlap = overlap, verbose=FALSE)
+  out1 <- fractal::DFA(y, detrend=dtrend, sum.order=sum.order, scale.max=trunc(length(y)/2), scale.min=2, elasceratio=2, overlap = 0, verbose=FALSE)
+  out2 <- fractal::DFA(y, detrend=dtrend, sum.order=sum.order, scale.max=scale.max, scale.min=scale.min, elasceratio=elasceratio, overlap = overlap, verbose=FALSE)
 
   lmfit1        <- lm(log(attributes(out1)$stat) ~ log(attributes(out1)$scale))
   lmfit2        <- lm(log(attributes(out2)$stat) ~ log(attributes(out2)$scale))
@@ -2994,7 +2981,7 @@ fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order 
   if(reload==TRUE){library(signal,verbose=FALSE,quietly=TRUE)}
 
   return(list(
-    PLAW  =  cbind.data.frame(freq.norm = scale.R(attributes(out1)$scale*frequency(y)), size = attributes(out1)$scale, bulk = attributes(out1)$stat),
+    PLAW  =  cbind.data.frame(freq.norm = elascer(attributes(out1)$scale*frequency(y)), size = attributes(out1)$scale, bulk = attributes(out1)$stat),
     fullRange = list(sap = coef(lmfit1)[2], H = attributes(out1)$logfit[]$coefficients['x'] , FD = sa2fd.dfa(coef(lmfit1)[2]), fitlm1 = lmfit1),
     fitRange  = list(sap = coef(lmfit2)[2], H = coef(lmfit2)[2], FD = sa2fd.dfa(coef(lmfit2)[2]), fitlm2 = lmfit2),
     info = list(out1,out2))
@@ -3017,9 +3004,6 @@ fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order 
 #'
 #' @examples
 DFA1 <- function(signal,mins=4,maxs=12,ressc=30,m=1){
-  require(pracma)
-  require(plyr)
-  require(dplyr)
 
   #   reload <- FALSE
   #   if("signal" %in% .packages()){
@@ -3057,9 +3041,6 @@ DFA1 <- function(signal,mins=4,maxs=12,ressc=30,m=1){
 #'
 #' @examples
 MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
-  require(pracma)
-  require(plyr)
-  require(dplyr)
 
   #   reload <- FALSE
   #   if("signal" %in% .packages()){
@@ -3212,7 +3193,6 @@ detRend <- function(TS, Order=1){
 #' g + gg.theme()
 #' g + gg.theme("noax")
 gg.theme <- function(type=c("clean","noax"),useArial = F, afmPATH="~/Dropbox"){
-  require(ggplot2)
 
   if(length(type)>1){type <- type[1]}
 
@@ -3263,7 +3243,6 @@ gg.theme <- function(type=c("clean","noax"),useArial = F, afmPATH="~/Dropbox"){
 #' library(gridExtra)
 #' grid.arrange(xDense, gg.plotHolder(), scatterP, yDense, ncol=2, nrow=2, widths=c(4, 1.4), heights=c(1.4, 4))
 gg.plotHolder <- function(useArial = F,afmPATH="~/Dropbox"){
-  require(ggplot2)
   ggplot() +
     geom_blank(aes(1,1)) +
     theme(line = element_blank(),
@@ -3293,8 +3272,6 @@ set.Arial <- function(afmPATH="~/Dropbox"){
 
 
 netGroupCol <- function(g,grp){
-  library(scales)
-
   if(length(grp)<=12){
     groupColours <-  brewer_pal(palette="Set3")(length(grp))
   } else {
@@ -3384,9 +3361,9 @@ add_alpha <- function(col, alpha=1){
 #   )
 # }
 
-#' Scale.R
+#' elascer
 #'
-#' @description Rescale a vector to a user defined range defined by user.
+#' @description The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.
 #'
 #' @param x     Input vector or data frame.
 #' @param mn     Minimum value of original, defaults to \code{min(x, na.rm = TRUE)}.
@@ -3397,9 +3374,9 @@ add_alpha <- function(col, alpha=1){
 #'
 #' @details Three uses:
 #' \enumerate{
-#' \item scale.R(x)             - Scale x to data range: min(x.out)==0;      max(x.out)==1
-#' \item scale.R(x,mn,mx)       - Scale x to arg. range: min(x.out)==mn==0;  max(x.out)==mx==1
-#' \item scale.R(x,mn,mx,lo,hi) - Scale x to arg. range: min(x.out)==mn==lo; max(x.out)==mx==hi
+#' \item elascer(x)             - Scale x to data range: min(x.out)==0;      max(x.out)==1
+#' \item elascer(x,mn,mx)       - Scale x to arg. range: min(x.out)==mn==0;  max(x.out)==mx==1
+#' \item elascer(x,mn,mx,lo,hi) - Scale x to arg. range: min(x.out)==mn==lo; max(x.out)==mx==hi
 #' }
 #'
 #' @return
@@ -3409,16 +3386,16 @@ add_alpha <- function(col, alpha=1){
 #' # Works on numeric objects
 #' somenumbers <- cbind(c(-5,100,sqrt(2)),c(exp(1),0,-pi))
 #'
-#' scale.R(somenumbers)
-#' scale.R(somenumbers,mn=-100)
+#' elascer(somenumbers)
+#' elascer(somenumbers,mn=-100)
 #
 #' # Values < mn will return < lo (default=0)
 #' # Values > mx will return > hi (default=1)
-#' scale.R(somenumbers,mn=-1,mx=99)
+#' elascer(somenumbers,mn=-1,mx=99)
 #'
-#' scale.R(somenumbers,lo=-1,hi=1)
-#' scale.R(somenumbers,mn=-10,mx=101,lo=-1,hi=4)
-scale.R <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
+#' elascer(somenumbers,lo=-1,hi=1)
+#' elascer(somenumbers,mn=-10,mx=101,lo=-1,hi=4)
+elascer <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
   x <- as.data.frame(x)
   u <- x
   for(i in 1:dim(x)[2]){
@@ -3461,8 +3438,6 @@ scale.R <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
 # 3 will go all the way across the bottom.
 #
 multi.PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  require(grid)
-
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
 

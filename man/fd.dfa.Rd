@@ -6,7 +6,7 @@
 \usage{
 \method{fd}{dfa}(y, fs = NULL, dtrend = "poly1", normalize = FALSE,
   sum.order = 1, scale.max = trunc(length(y)/4), scale.min = 4,
-  scale.ratio = 2^(1/4), overlap = 0, plot = FALSE)
+  elasceratio = 2^(1/4), overlap = 0, plot = FALSE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
