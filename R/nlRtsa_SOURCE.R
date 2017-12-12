@@ -358,6 +358,33 @@ crqa_cl <- function(y1,
 }
 
 
+#' fast (C)RQA using command line tools
+#'
+#' @param y1 y1
+#' @param y2 y1
+#' @param eDim y1
+#' @param eLag y1
+#' @param eRad y1
+#' @param DLmin y1
+#' @param VLmin y1
+#' @param theiler y1
+#' @param win y1
+#' @param step y1
+#' @param JRP y1
+#' @param distNorm y1
+#' @param returnMeasures y1
+#' @param returnRP y1
+#' @param returnDist y1
+#' @param path_to_rp y1
+#' @param saveOut y1
+#' @param path_out y1
+#' @param file_ID y1
+#' @param ... y1
+#'
+#' @return
+#' @export
+#'
+#' @examples
 crqa_fast <- function(y1,
                     y2    = NULL,
                     eDim  = 1,
@@ -650,6 +677,21 @@ crqa_parameters <- function(y,
 }
 
 
+#' Find a radius (fix RR)
+#'
+#' @param RM RM
+#' @param startRadius startRadius
+#' @param targetRR targetRR
+#' @param tol tol
+#' @param maxIter maxIter
+#' @param AUTO AUTO
+#' @param theiler theiler
+#' @param histIter histIter
+#'
+#' @return
+#' @export
+#'
+#' @examples
 crqa_radius <- function(RM,
                         startRadius = .10*max(RM, na.rm = TRUE),
                         targetRR    = .05,
@@ -1494,6 +1536,22 @@ bandReplace <- function(mat, lower, upper, value = NA){
 
 
 
+#' Recurrence Matrix
+#'
+#' @param y1 y1
+#' @param y2 y2
+#' @param emDim emDim
+#' @param emLag emLag
+#' @param to.ts to.ts
+#' @param to.sparse to.sparse
+#' @param order.by order.by
+#' @param method method
+#' @param ... other
+#'
+#' @return
+#' @export
+#'
+#' @examples
 recmat <- function(y1, y2,
                    emDim = 1,
                    emLag = 1,

@@ -3,7 +3,7 @@
   op.casnet <- list(
     casnet.path = find.package("casnet"),
     casnet.path_to_rp = normalizePath(paste0(find.package("casnet"),"/exec")),
-    casnet.rp_prefix = "./",
+    casnet.rp_prefix = ".",
     casnet.install.args = "",
     casnet.name = "Fred Hasselman", #"A toolbox for studying Complex Adaptive Systems and NETworks",
     casnet.desc.author = '"Fred Hasselman <f.hasselman@bsi.ru.nl> [aut, cre]"',
