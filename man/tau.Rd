@@ -4,8 +4,7 @@
 \alias{tau}
 \title{tau}
 \usage{
-tau(y, selection.methods = c("first.minimum"),
-  maxLag = round(length(y)/(maxDim + 1)), ...)
+tau(y, selection.methods = c("first.minimum"), maxLag = length(y)/4, ...)
 }
 \arguments{
 \item{y}{Time series}

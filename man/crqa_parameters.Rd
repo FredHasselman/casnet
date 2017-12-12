@@ -6,9 +6,9 @@
 \usage{
 crqa_parameters(y, maxDim = 5, maxLag = round(length(y)/(maxDim + 1)),
   emLag = tau(y, selection.methods = c("first.e.decay", "first.zero",
-  "first.minimum"), maxLag = maxLag), emLags = tau(y, maxLag = maxLag),
-  ami.method = c("first.minimum"), nnSizes = c(0.1, 0.3, 0.6, 0.9),
-  nnThres = 0.1, diagPlot = TRUE)
+  "first.minimum"), maxLag = round(length(y)/(maxDim + 1))), emLags = tau(y,
+  maxLag = round(length(y)/(maxDim + 1))), ami.method = c("first.minimum"),
+  nnSizes = c(0.1, 0.3, 0.6, 0.9), nnThres = 0.1, diagPlot = TRUE)
 }
 \arguments{
 \item{y}{Timeseries}

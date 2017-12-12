@@ -500,8 +500,9 @@ crqa_parameters <- function(y,
                                            selection.methods = c("first.e.decay",
                                                                  "first.zero",
                                                                  "first.minimum"),
-                                           maxLag =maxLag),
-                            emLags     = tau(y, maxLag = maxLag),
+                                           maxLag =round(length(y)/(maxDim+1))
+                                           ),
+                            emLags     = tau(y, maxLag = round(length(y)/(maxDim+1))),
                             ami.method = c("first.minimum"),
                             nnSizes  = c(.1,.3,.6,.9),
                             nnThres  = .1,
@@ -540,7 +541,6 @@ crqa_parameters <- function(y,
   df        <- plyr::ldply(lagList)
   df$Nn.pct <- df$Nn/df$Nn.max
 
-
   opt <- plyr::ldply(unique(df$emLag), function(n){
     id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
     if(length(id)>0){
@@ -548,6 +548,8 @@ crqa_parameters <- function(y,
       if(length(idmin)>0){
         return(df[idmin,])
       }
+    } else {
+      return(df[which.min(df$Nn.pct[(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag"))]),])
     }
   }
   )
@@ -1098,7 +1100,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 #' @examples
 tau <- function(y,
                 selection.methods = c("first.minimum"),
-                maxLag = round(length(y)/(maxDim+1)),
+                maxLag = length(y)/4,
                 ...){
 
   y   <- y[!is.na(y)]
@@ -1106,13 +1108,17 @@ tau <- function(y,
                            lag.max = maxLag,
                            do.plot = FALSE)
 
-  lags <- laply(selection.methods, function(s.m){
-    nonlinearTseries::timeLag(y,
-                              technique = "ami",
-                              selection.method = s.m,
-                              lag.max = maxLag,
-                              do.plot = FALSE)}
-  )
+  lags <- numeric(length=length(selection.methods))
+  cnt <- 0
+  for(s.m in selection.methods){
+    cnt <- cnt + 1
+    lag <-try.CATCH(nonlinearTseries::timeLag(y,
+                                              technique = "ami",
+                                              selection.method = s.m,
+                                              lag.max = maxLag,
+                                              do.plot = FALSE))
+    if(any(grepl("Error",lag$value))){lags[cnt] <- 1} else {lags[cnt] <- lag$value}
+  }
 
   #id.peaks <- find_peaks(tmi$mutual.information, m = 3, wells = TRUE)
   id.min   <- tmi$time.lag[which.min(tmi$mutual.information)]
