@@ -23,6 +23,7 @@
 
 get_os <- function(){
   sysinf <- Sys.info()
+  os <- NA
   if (!is.null(sysinf)){
     os <- sysinf['sysname']
     if (os == 'Darwin')  os <- "osx"
@@ -55,7 +56,7 @@ set_command_line_rp <- function(){
 
   # Windows
   if(os%in%"windows"){
-    sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/inst/commandline_rp/windows_x86/rp_x86.exe")), normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)),"attrib", paste("+s", normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)))
+    sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/windows_x86/rp_x86.exe")), normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)),"attrib", paste("+s", normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)))
     message(paste0("Detected: Windows \n  Copied: 'rp_x86.exe' to 'rp.exe' in package subdirectory 'exec' as the commandline CRP executable"))
     options(casnet_rp_prefix="/")
   }
