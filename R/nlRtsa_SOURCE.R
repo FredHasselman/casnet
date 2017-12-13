@@ -548,9 +548,9 @@ crqa_fast <- function(y1,
     if(N1<N2){
       y1[N1:(N2+(N2-N1))] <- 0
     }
-    df    <- zoo(cbind(y1=y1,y2=y2))
+    df    <- zoo::zoo(cbind(y1=y1,y2=y2))
   } else {
-    df    <- zoo(cbind(y1=y1,y2=NA))
+    df    <- zoo::zoo(cbind(y1=y1,y2=NA))
   }
 
   #if((win==min(length(y1),length(y2), na.rm = TRUE))&(step== 1)){
