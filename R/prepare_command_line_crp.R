@@ -52,7 +52,7 @@ set_command_line_rp <- function(){
   # macOSX
   if(os%in%"osx"){
     if(Sys.info()[["machine"]]%in%"x86_64"){
-      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/inst/commandline_rp/macOS_x86_64/rp_osxI.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)), "chmod",paste("a+x",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
+      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/macOS_x86_64/rp_osxI.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)), "chmod",paste("a+x",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
       message("Detected: macOS x86_64 \n  Copied: 'rp_osxI.dms' to 'rp' in package subdirectory 'exec' as the commandline CRP executable")
     } else {
       sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/macOS_PowerPC/rp_osxPPC.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
@@ -70,15 +70,15 @@ set_command_line_rp <- function(){
   # Linux
   if(os%in%"linux"){
     if(grepl("amd64",Sys.info()[["machine"]])&grepl("linux-gnu", R.version$os)){
-      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/inst/commandline_rp/linux_AMD_x86_64gnu/rp_x86_64.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod", paste("a+x ",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
+      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/linux_AMD_x86_64gnu/rp_x86_64.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod", paste("a+x ",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
       message(paste0("Detected: Linux AMD gnu \n  Copied: 'rp_x86_64.dms' to 'rp' in package subdirectory 'exec' as the commandline CRP executable"))
     }
     if(grepl("amd64",Sys.info()[["machine"]])&!grepl("linux-gnu", R.version$os)){
-      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/inst/commandline_rp/linux_AMD_x86_64i/rp_x86_64i.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod",paste("a+x",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
+      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/linux_AMD_x86_64i/rp_x86_64i.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod",paste("a+x",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
       message(paste0("Detected: Linux AMD gnu \n  Copied: 'rp_x86_64i.dms' to 'rp' in package subdirectory 'exec' as the commandline CRP executable"))
     }
     if(grepl("i686",Sys.info()[["machine"]])){
-      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/inst/commandline_rp/linux_i686/rp_i686.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
+      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/linux_i686/rp_i686.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
       message(paste0("Detected: Linux \n  Copied: 'rp_i686.dms' to 'rp' in package subdirectory 'exec' as the commandline CRP executable"))
     }
   }
