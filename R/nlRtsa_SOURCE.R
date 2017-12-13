@@ -219,24 +219,24 @@ repmat <- function(X,m,n){
 
 # (C)RQA ------------------------------
 crqa_cl <- function(y1,
-                  y2    = NULL,
-                  eDim  = 1,
-                  eLag  = 1,
-                  eRad  = 1,
-                  DLmin = 2,
-                  VLmin = 2,
-                  theiler = 0,
-                  win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
-                  step    = win,
-                  JRP     = FALSE,
-                  distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-                  returnMeasures = TRUE,
-                  returnRP       = TRUE,
-                  returnDist = FALSE,
-                  path_to_rp = getOption("casnet.path_to_rp"),
-                  saveOut    = FALSE,
-                  path_out   = NULL,
-                  file_ID    = NULL, ...){
+                    y2    = NULL,
+                    eDim  = 1,
+                    eLag  = 1,
+                    eRad  = 1,
+                    DLmin = 2,
+                    VLmin = 2,
+                    theiler = 0,
+                    win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
+                    step    = win,
+                    JRP     = FALSE,
+                    distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+                    returnMeasures = TRUE,
+                    returnRP       = TRUE,
+                    returnDist = FALSE,
+                    path_to_rp = getOption("casnet.path_to_rp"),
+                    saveOut    = FALSE,
+                    path_out   = NULL,
+                    file_ID    = NULL, ...){
 
   RQAmeasures <- list(
     RR      = 'Recurrence rate',
@@ -349,7 +349,7 @@ crqa_cl <- function(y1,
 
   RCMD(paste0(getOption("casnet.rp_prefix"),"rp"), options = opts, path = path.expand(path_to_rp), quiet = FALSE)
 
- #system("./rp","-i '/var/folders/zr/n8mgv2nj5rz1qq04xsj_x_c80000gp/T//RtmpZAFB8n/fileb4ef2f6a0353.csv' 'test.csv' -o  -m 2 -t 2 -e 48.2 -l 2 -v 2 -w 1 -s",path = path.expand(path_to_rp), quiet = FALSE)
+  #system("./rp","-i '/var/folders/zr/n8mgv2nj5rz1qq04xsj_x_c80000gp/T//RtmpZAFB8n/fileb4ef2f6a0353.csv' 'test.csv' -o  -m 2 -t 2 -e 48.2 -l 2 -v 2 -w 1 -s",path = path.expand(path_to_rp), quiet = FALSE)
 
   measures = try.CATCH(import(gsub("[']+","",measOUT)))
   rpMAT    = try.CATCH(import(gsub("[']+","",plotOUT)))
@@ -478,53 +478,57 @@ crqa_cl <- function(y1,
 #' @export
 #'
 crqa_fast <- function(y1,
-                    y2    = NULL,
-                    eDim  = 1,
-                    eLag  = 1,
-                    eRad  = 1,
-                    DLmin = 2,
-                    VLmin = 2,
-                    theiler = 0,
-                    win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
-                    step    = win,
-                    JRP     = FALSE,
-                    distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-                    returnMeasures = TRUE,
-                    returnRP       = TRUE,
-                    returnDist = FALSE,
-                    path_to_rp = getOption("casnet.path_to_rp"),
-                    saveOut    = FALSE,
-                    path_out   = NULL,
-                    file_ID    = NULL, ...){
+                      y2    = NULL,
+                      eDim  = 1,
+                      eLag  = 1,
+                      eRad  = 1,
+                      DLmin = 2,
+                      VLmin = 2,
+                      theiler = 0,
+                      win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
+                      step    = win,
+                      JRP     = FALSE,
+                      distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+                      returnMeasures = TRUE,
+                      returnRP       = TRUE,
+                      returnDist = FALSE,
+                      path_to_rp = getOption("casnet.path_to_rp"),
+                      saveOut    = FALSE,
+                      path_out   = NULL,
+                      file_ID    = NULL, ...){
 
-if(any(is.na(y1))){
-  y1 <- y1[!is.na(y1)]
-  warning("Removed NAs from timeseries y1 before (C)RQA")
-}
+  if(!file.exists(normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_instal_log.txt"), mustWork = FALSE))){
+    set_command_line_rp()
+  }
 
-if(any(is.na(y2%00%0))){
+  if(any(is.na(y1))){
+    y1 <- y1[!is.na(y1)]
+    warning("Removed NAs from timeseries y1 before (C)RQA")
+  }
+
+  if(any(is.na(y2%00%0))){
     y2 <- y2[!is.na(y2)]
     warning("Removed NAs from timeseries y2 before (C)RQA")
   }
 
-# Catch parameters
-# params <- list(eDim  = eDim,
-#                eLag  = eLag,
-#                eRad  = eRad,
-#                DLmin = DLmin,
-#                VLmin = VLmin,
-#                theiler = theiler,
-#                JRP     = JRP,
-#                distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-#                returnMeasures = returnMeasures,
-#                returnRP       = returnRP,
-#                returnDist     = returnDist,
-#                path_to_rp = path_to_rp,
-#                saveOut = saveOut,
-#                path_out = path_out,
-#                file_ID  = file_ID)
+  # Catch parameters
+  # params <- list(eDim  = eDim,
+  #                eLag  = eLag,
+  #                eRad  = eRad,
+  #                DLmin = DLmin,
+  #                VLmin = VLmin,
+  #                theiler = theiler,
+  #                JRP     = JRP,
+  #                distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+  #                returnMeasures = returnMeasures,
+  #                returnRP       = returnRP,
+  #                returnDist     = returnDist,
+  #                path_to_rp = path_to_rp,
+  #                saveOut = saveOut,
+  #                path_out = path_out,
+  #                file_ID  = file_ID)
 
-# Begin input checks
+  # Begin input checks
 
   if(is.null(path_out)){
     if(saveOut){
@@ -550,8 +554,8 @@ if(any(is.na(y2%00%0))){
   }
 
   #if((win==min(length(y1),length(y2), na.rm = TRUE))&(step== 1)){
-if(is.null(y2)){
-  cat("\nPerforming auto-RQA\n")
+  if(is.null(y2)){
+    cat("\nPerforming auto-RQA\n")
   } else {cat("\nPerforming cross-RQA\n")}
   #}
   if((win<min(length(y1),length(y2), na.rm = TRUE))){
@@ -561,22 +565,22 @@ if(is.null(y2)){
   wlist <- rollapply(df,
                      width = win,
                      FUN = function(df){crqa_cl(y1             = df[,1],
-                                              y2             = df[,2],
-                                              eDim           = eDim,
-                                              eLag           = eLag,
-                                              eRad           = eRad,
-                                              DLmin          = DLmin,
-                                              VLmin          = VLmin,
-                                              theiler        = theiler,
-                                              JRP            = JRP,
-                                              distNorm       = distNorm,
-                                              returnMeasures = returnMeasures,
-                                              returnRP       = returnRP,
-                                              returnDist     = returnDist,
-                                              path_to_rp     = path_to_rp,
-                                              saveOut        = saveOut,
-                                              path_out       = path_out,
-                                              file_ID        = file_ID)},
+                                                y2             = df[,2],
+                                                eDim           = eDim,
+                                                eLag           = eLag,
+                                                eRad           = eRad,
+                                                DLmin          = DLmin,
+                                                VLmin          = VLmin,
+                                                theiler        = theiler,
+                                                JRP            = JRP,
+                                                distNorm       = distNorm,
+                                                returnMeasures = returnMeasures,
+                                                returnRP       = returnRP,
+                                                returnDist     = returnDist,
+                                                path_to_rp     = path_to_rp,
+                                                saveOut        = saveOut,
+                                                path_out       = path_out,
+                                                file_ID        = file_ID)},
                      by = step,
                      by.column = FALSE,
                      align = "left",
@@ -617,7 +621,7 @@ crqa_parameters <- function(y,
                                                                  "first.zero",
                                                                  "first.minimum"),
                                            maxLag =round(length(y)/(maxDim+1))
-                                           ),
+                            ),
                             emLags     = tau(y, maxLag = round(length(y)/(maxDim+1))),
                             ami.method = c("first.minimum"),
                             nnSizes  = c(.1,.3,.6,.9),
@@ -721,8 +725,8 @@ crqa_parameters <- function(y,
       )
 
     tmi <-  nonlinearTseries::mutualInformation(y,
-                             lag.max = maxLag,
-                             do.plot = TRUE)
+                                                lag.max = maxLag,
+                                                do.plot = TRUE)
 
     dfMI <- data.frame(emDelay = tmi$time.lag[-1],
                        ami     = tmi$mutual.information[-1])
@@ -1254,8 +1258,8 @@ tau <- function(y,
 
   y   <- y[!is.na(y)]
   tmi <- nonlinearTseries::mutualInformation(y,
-                           lag.max = maxLag,
-                           do.plot = FALSE)
+                                             lag.max = maxLag,
+                                             do.plot = FALSE)
 
   lags <- numeric(length=length(selection.methods))
   cnt <- 0
