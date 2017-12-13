@@ -9,6 +9,9 @@ ts_integrate(y)
 \arguments{
 \item{y}{A 1D timeseries}
 }
+\value{
+The profile
+}
 \description{
 Create a timeseries profile
 }

@@ -34,6 +34,9 @@ crp_prep(RP, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 
 \item{doHalf}{Analyse half of the matrix?}
 }
+\value{
+A prepped matrix
+}
 \description{
 Prepare matrix
 }

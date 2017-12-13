@@ -60,7 +60,7 @@ init <- function(){
 #'
 #' @param y A 1D timeseries
 #'
-#' @return
+#' @return The profile
 #' @export
 #'
 #' @examples
@@ -599,18 +599,19 @@ crqa_fast <- function(y1,
   return(out[c(returnMeasures,returnRP,returnDist)])
 }
 
-#' crqa_parameters
+#' Find optimal (C)RQA parameters
+#'
+#' A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
 #'
 #' @param y Timeseries
 #' @param maxDims Maximum number of embedding dimensions
 #' @param emLag Optimal embedding lag (delay), e.g., provided by optimising algorithm.
-#' @param emLags A range of embedding lags to consider (default: )
-#' @param emDims A range of embedding dimensions (defsult: 1 - maxDims)
-#' @param nSize The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10% of all points)
+#' @param emLags A range of embedding lags to consider (default)
+#' @param emDims A range of embedding dimensions (default= 1 - maxDims)
+#' @param nSize The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10\% of all points)
 #'
-#' @description A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
+#' @return A list object containing the optimal values and iteration history.
 #'
-#' @return
 #' @export
 #'
 crqa_parameters <- function(y,
@@ -770,18 +771,17 @@ crqa_parameters <- function(y,
 }
 
 
-#' Find a radius (fix RR)
+#' Find a radius (fixed RR)
 #'
-#' @param RM RM
-#' @param startRadius startRadius
-#' @param targetRR targetRR
-#' @param tol tol
-#' @param maxIter maxIter
-#' @param AUTO AUTO
-#' @param theiler theiler
-#' @param histIter histIter
+#' @param RM Unthresholded Recurrence Matrix
+#' @param startRadius Starting value for the radius (default = 10\% of the maxumum distance)
+#' @param targetRR Target recurrence rate (default = \code{.05})
+#' @param tol Tolerance for achieving \code{targetRR} (default = \code{0.1})
+#' @param maxIter Maximum number of iterations to reach target (default = \code{100})
+#' @param theiler Size of theiler window (default \code{0})
+#' @param histIter Return iteration history? (defsault = \code{FALSE})
 #'
-#' @return
+#' @return A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 #' @export
 #'
 crqa_radius <- function(RM,
@@ -789,7 +789,6 @@ crqa_radius <- function(RM,
                         targetRR    = .05,
                         tol         = 0.1,
                         maxIter     = 100,
-                        AUTO        = FALSE,
                         theiler     = 0,
                         histIter    = FALSE){
 
@@ -885,8 +884,6 @@ crqa_radius <- function(RM,
 #' @param Nboot How many bootstraps?
 #' @param CL Confidence Limit for bootstrap results
 #'
-#' @return
-#' @export
 #'
 crqa_mat_measures <- function(RM,
                               DLmin = 2,
@@ -1061,23 +1058,29 @@ crqa_mat_measures <- function(RM,
 #       )
 
 
-#' crqa_mat
+#' Get bootsrapped (C)RQA measures based on a recurrence matrix
 #'
-#' @param rp Recurrence Matrix
+#' Measures based on horizontal line structures will be caluclated.
+#'
+#' @param rmat A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})
 #' @param radius Threshold for distance value that counts as a recurrence
-#' @param DLmin Minimal diagonal line length
-#' @param VLmin Minimal vertical line length
-#' @param HLmin Minimal horizontal line length
-#' @param DLmax Maximal diagonal line length
-#' @param VLmax Maximal vertical line length
-#' @param HLmax Maximal horizontal line length
-#' @param AUTO Auto-recurrence? (default: FALSE)
-#' @param matrices
+#' @param DLmin Minimal diagonal line length (default = \code{2})
+#' @param VLmin Minimal vertical line length (default = \code{2})
+#' @param HLmin Minimal horizontal line length (default = \code{2})
+#' @param DLmax Maximal diagonal line length (default = length of diagonal -1)
+#' @param VLmax Maximal vertical line length (default = length of diagonal -1)
+#' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
+#' @param AUTO Auto-recurrence? (default = \code{FALSE})
+#' @param doHalf Analyse half of the matrix? (default = \code{FALSE})
+#' @param chromatic Force chromatic RQA? (default = \code{FALSE})
+#' @param matrices Return matrices? (default = \code{FALSE})
+#' @param Nboot How many bootstrap replications? (default = \code{NULL})
+#' @param CL Confidence limit for bootstrap results (default = \code{.95})
+
+#' @return A list object containing (C)RQA measures (and matrices if requested)
 #'
-#' @return
 #' @export
 #'
-#' @examples
 crqa_mat <- function(rmat,
                      radius= NULL,
                      DLmin = 2,
@@ -1238,19 +1241,19 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 
 #' tau
 #'
+#' A wrapper for nonlinearTseries::timeLag
+#'
 #' @param y Time series
 #' @param selection.methods Selecting an optimal embedding lag (default: Return "first.e.decay", "first.zero", "first.minimum", "first.value", where value is 1/exp(1))
 #' @param value Threshold value for selection method first.value (default: 1/exp(1))
 #' @param maxLag Maximal lag to consider (default: 1/5 of timeseries length)
 #' @param nbins Number of bins for average mutual information function (default: 1/3 of number of unique values in timeseries)
-#' @param ...
+#' @param ... Additional parameters
 #'
-#' @description A wrapper for nonlinearTseries::timeLag
+#' @return The ami function with minima
 #'
-#' @return
 #' @export
 #'
-#' @examples
 tau <- function(y,
                 selection.methods = c("first.minimum"),
                 maxLag = length(y)/4,
@@ -1301,10 +1304,9 @@ tau <- function(y,
 #'
 #' @description A wrapper for nonlinearTseries::estimateEmbeddingDim
 #'
-#' @return
+#' @return Embedding dimensions
 #' @export
 #'
-#' @examples
 est_eDim <- function(y, delay = tau(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
   cbind.data.frame(EmbeddingLag   = delay,
                    EmbeddingDim   = estimateEmbeddingDim(y,
@@ -1324,10 +1326,10 @@ est_eDim <- function(y, delay = tau(y), maxDim = 20, threshold = .95, max.relati
 #'
 #' @author Fred Hasselman
 #'
-#' @return
+#' @return A list object with nonzero diagonals
+#'
 #' @export
 #'
-#' @examples
 nzdiags <- function(A=NULL, d=NULL){
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
   #require(Matrix)
@@ -1487,25 +1489,24 @@ nzdiags.chroma <- function(RP, d=NULL){
 #'
 #' @param RP A thresholded recurrence matrix (binary: 0 - 1)
 #' @param d Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \code{-50,50,100}.
-#' @param theiler Size of the theiler window, e.g. (\code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2, or if it is larger than the matrix or band indicated by parameter \code{d}.)
+#' @param theiler Size of the theiler window, e.g. \code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}.
 #' @param invert Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
 #'
 #' @description Extract lengths of diagonal and vertical line segments from a recurrence matrix.
 #' @details Based on the Matlab function \code{lineDists} by Stefan Schinkel, Copyright (C) 2009 Stefan Schinkel, University of Potsdam, http://www.agnld.uni-potsdam.de
 #'
-#'% References:
-#'% S. Schinkel, N. Marwan, O. Dimigen & J. Kurths (2009):
-#'% "Confidence Bounds of recurrence-based complexity measures
-#'% Physics Letters A,  373(26), pp. 2245-2250
-#'%
-#'% Copyright (C) 2009 Stefan Schinkel, University of Potsdam
-#'% http://www.agnld.uni-potsdam.de
+#' References:
+#' S. Schinkel, N. Marwan, O. Dimigen & J. Kurths (2009):
+#' "Confidence Bounds of recurrence-based complexity measures
+#' Physics Letters A,  373(26), pp. 2245-2250
+#'
+#' Copyright (C) 2009 Stefan Schinkel, University of Potsdam
+#' \url{http://www.agnld.uni-potsdam.de}
 #'
 #' @author Fred Hasselman
 #' @return A list object with distribution of line lengths.
 #' @export
 #'
-#' @examples
 lineDists <- function(RP,
                       d         = NULL,
                       theiler   = NULL,
@@ -1579,7 +1580,6 @@ lineDists <- function(RP,
 #' @return A hamming-distance matrix of X, or X and Y. Useful for ordered and unordered categorical data.
 #' @export
 #'
-#' @examples
 dist.hamming <- function(X, Y=NULL, embedded=TRUE) {
   if ( missing(Y) ) {
     if(embedded){
@@ -1659,10 +1659,9 @@ bandReplace <- function(mat, lower, upper, value = NA){
 #' @param method method
 #' @param ... other
 #'
-#' @return
+#' @return RM
 #' @export
 #'
-#' @examples
 recmat <- function(y1, y2,
                    emDim = 1,
                    emLag = 1,
@@ -2080,7 +2079,7 @@ crp_calc <- function(RM,
 #' @param matrices Return Matrices?
 #' @param doHalf Analyse half of the matrix?
 #'
-#' @return
+#' @return A prepped matrix
 #' @export
 #'
 crp_prep <- function(RP,
@@ -2358,11 +2357,10 @@ crp_prep <- function(RP,
 #'
 #' @param crqaOutput    List output from \code{\link[crqa]{crqa}}
 #'
-#' @return
+#' @return A list
 #' @export
 #' @author Fred Hasselman
 #' @description Creates a recurrence plot from the sparse matrix output generated by \code{\link[crqa]{crqa}}.
-#' @examples
 plotRP.crqa <- function(crqaOutput){
 
   AUTO <- FALSE
@@ -3052,7 +3050,7 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
 #' @export
 #'
 #' @family FD estimators
-#' @examples
+#'
 fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = dispersion(y)$scale, fitRange = c(scales[1], scales[length(scales)-2]), plot = FALSE){
   require(pracma)
   require(fractal)
@@ -3122,7 +3120,7 @@ fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = disp
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 #'
 #' @family FD estimators
-#' @examples
+#'
 fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order = 1, scale.max=trunc(length(y)/4), scale.min=4, elasceratio=2^(1/4), overlap = 0, plot = FALSE){
   require(pracma)
   require(fractal)
@@ -3189,13 +3187,12 @@ fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order 
 #' @param qq    A vector containing a range of values for the order of fluctuation \code{q}.
 #' @param mins    Minimum scale to consider.
 #' @param maxs    Maximum scale to consider.
-#' @param ressc
-#' @param m
+#' @param ressc ressc
+#' @param m m
 #'
-#' @return
+#' @return  output
 #' @export
 #'
-#' @examples
 DFA1 <- function(signal,mins=4,maxs=12,ressc=30,m=1){
 
   #   reload <- FALSE
@@ -3226,13 +3223,12 @@ DFA1 <- function(signal,mins=4,maxs=12,ressc=30,m=1){
 #' @param qq    A vector containing a range of values for the order of fluctuation \code{q}.
 #' @param mins    Minimum scale to consider.
 #' @param maxs    Maximum scale to consider.
-#' @param ressc
-#' @param m
+#' @param ressc rescc
+#' @param m m
 #'
-#' @return
+#' @return output
 #' @export
 #'
-#' @examples
 MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
 
   #   reload <- FALSE
@@ -3572,7 +3568,7 @@ add_alpha <- function(col, alpha=1){
 #' \item elascer(x,mn,mx,lo,hi) - Scale x to arg. range: min(x.out)==mn==lo; max(x.out)==mx==hi
 #' }
 #'
-#' @return
+#' @return scaled inout
 #' @export
 #'
 #' @examples

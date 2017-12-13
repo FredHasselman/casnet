@@ -41,7 +41,7 @@ get_os <- function(){
 
 #' Set command line RQA executable
 #'
-#' @return
+#' @return nothing
 #' @export
 #'
 set_command_line_rp <- function(){

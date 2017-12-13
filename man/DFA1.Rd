@@ -13,9 +13,14 @@ DFA1(signal, mins = 4, maxs = 12, ressc = 30, m = 1)
 
 \item{maxs}{Maximum scale to consider.}
 
-\item{m}{}
+\item{ressc}{ressc}
+
+\item{m}{m}
 
 \item{qq}{A vector containing a range of values for the order of fluctuation \code{q}.}
+}
+\value{
+output
 }
 \description{
 Detrended Fluctuation Analysis

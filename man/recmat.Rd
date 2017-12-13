@@ -26,6 +26,9 @@ recmat(y1, y2, emDim = 1, emLag = 1, to.ts = NULL, to.sparse = FALSE,
 
 \item{...}{other}
 }
+\value{
+RM
+}
 \description{
 Recurrence Matrix
 }

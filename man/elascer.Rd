@@ -18,6 +18,9 @@ elascer(x, mn = min(x, na.rm = T), mx = max(x, na.rm = T), lo = 0,
 
 \item{hi}{Minimum value to rescale to, defaults to \code{0}.}
 }
+\value{
+scaled inout
+}
 \description{
 The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.
 }

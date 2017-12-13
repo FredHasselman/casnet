@@ -13,6 +13,8 @@ lineDists(RP, d = NULL, theiler = NULL, Chromatic = FALSE,
 
 \item{d}{Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \code{-50,50,100}.}
 
+\item{theiler}{Size of the theiler window, e.g. \code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}.}
+
 \item{invert}{Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.}
 }
 \value{
@@ -24,13 +26,13 @@ Extract lengths of diagonal and vertical line segments from a recurrence matrix.
 \details{
 Based on the Matlab function \code{lineDists} by Stefan Schinkel, Copyright (C) 2009 Stefan Schinkel, University of Potsdam, http://www.agnld.uni-potsdam.de
 
-% References:
-% S. Schinkel, N. Marwan, O. Dimigen & J. Kurths (2009):
-% "Confidence Bounds of recurrence-based complexity measures
-% Physics Letters A,  373(26), pp. 2245-2250
-%
-% Copyright (C) 2009 Stefan Schinkel, University of Potsdam
-% http://www.agnld.uni-potsdam.de
+References:
+S. Schinkel, N. Marwan, O. Dimigen & J. Kurths (2009):
+"Confidence Bounds of recurrence-based complexity measures
+Physics Letters A,  373(26), pp. 2245-2250
+
+Copyright (C) 2009 Stefan Schinkel, University of Potsdam
+\url{http://www.agnld.uni-potsdam.de}
 }
 \author{
 Fred Hasselman

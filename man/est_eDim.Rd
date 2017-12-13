@@ -16,6 +16,9 @@ est_eDim(y, delay = tau(y), maxDim = 20, threshold = 0.95,
 
 \item{...}{}
 }
+\value{
+Embedding dimensions
+}
 \description{
 A wrapper for nonlinearTseries::estimateEmbeddingDim
 }

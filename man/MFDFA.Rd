@@ -16,7 +16,12 @@ MFDFA(signal, qq = c(-10, -5:5, 10), mins = 6, maxs = 12, ressc = 30,
 
 \item{maxs}{Maximum scale to consider.}
 
-\item{m}{}
+\item{ressc}{rescc}
+
+\item{m}{m}
+}
+\value{
+output
 }
 \description{
 Multi-fractal Detrended Fluctuation Analysis

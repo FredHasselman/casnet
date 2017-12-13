@@ -2,29 +2,29 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{crqa_radius}
 \alias{crqa_radius}
-\title{Find a radius (fix RR)}
+\title{Find a radius (fixed RR)}
 \usage{
 crqa_radius(RM, startRadius = 0.1 * max(RM, na.rm = TRUE), targetRR = 0.05,
-  tol = 0.1, maxIter = 100, AUTO = FALSE, theiler = 0,
-  histIter = FALSE)
+  tol = 0.1, maxIter = 100, theiler = 0, histIter = FALSE)
 }
 \arguments{
-\item{RM}{RM}
+\item{RM}{Unthresholded Recurrence Matrix}
 
-\item{startRadius}{startRadius}
+\item{startRadius}{Starting value for the radius (default = 10\% of the maxumum distance)}
 
-\item{targetRR}{targetRR}
+\item{targetRR}{Target recurrence rate (default = \code{.05})}
 
-\item{tol}{tol}
+\item{tol}{Tolerance for achieving \code{targetRR} (default = \code{0.1})}
 
-\item{maxIter}{maxIter}
+\item{maxIter}{Maximum number of iterations to reach target (default = \code{100})}
 
-\item{AUTO}{AUTO}
+\item{theiler}{Size of theiler window (default \code{0})}
 
-\item{theiler}{theiler}
-
-\item{histIter}{histIter}
+\item{histIter}{Return iteration history? (defsault = \code{FALSE})}
+}
+\value{
+A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 }
 \description{
-Find a radius (fix RR)
+Find a radius (fixed RR)
 }

@@ -11,6 +11,9 @@ nzdiags(A = NULL, d = NULL)
 
 \item{d}{An optional vecotor of diagonals to extract.}
 }
+\value{
+A list object with nonzero diagonals
+}
 \description{
 Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument \code{d}. Output mimics Matlab's \code{[B,d] = spdiags(A)} function.
 }

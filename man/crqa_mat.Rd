@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{crqa_mat}
 \alias{crqa_mat}
-\title{crqa_mat}
+\title{Get bootsrapped (C)RQA measures based on a recurrence matrix}
 \usage{
 crqa_mat(rmat, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(diag(rmat)) - 1, VLmax = length(diag(rmat)) - 1,
@@ -10,26 +10,37 @@ crqa_mat(rmat, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   chromatic = FALSE, matrices = FALSE, Nboot = NULL, CL = 0.95)
 }
 \arguments{
+\item{rmat}{A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})}
+
 \item{radius}{Threshold for distance value that counts as a recurrence}
 
-\item{DLmin}{Minimal diagonal line length}
+\item{DLmin}{Minimal diagonal line length (default = \code{2})}
 
-\item{VLmin}{Minimal vertical line length}
+\item{VLmin}{Minimal vertical line length (default = \code{2})}
 
-\item{HLmin}{Minimal horizontal line length}
+\item{HLmin}{Minimal horizontal line length (default = \code{2})}
 
-\item{DLmax}{Maximal diagonal line length}
+\item{DLmax}{Maximal diagonal line length (default = length of diagonal -1)}
 
-\item{VLmax}{Maximal vertical line length}
+\item{VLmax}{Maximal vertical line length (default = length of diagonal -1)}
 
-\item{HLmax}{Maximal horizontal line length}
+\item{HLmax}{Maximal horizontal line length (default = length of diagonal -1)}
 
-\item{AUTO}{Auto-recurrence? (default: FALSE)}
+\item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
-\item{matrices}{}
+\item{doHalf}{Analyse half of the matrix? (default = \code{FALSE})}
 
-\item{rp}{Recurrence Matrix}
+\item{chromatic}{Force chromatic RQA? (default = \code{FALSE})}
+
+\item{matrices}{Return matrices? (default = \code{FALSE})}
+
+\item{Nboot}{How many bootstrap replications? (default = \code{NULL})}
+
+\item{CL}{Confidence limit for bootstrap results (default = \code{.95})}
+}
+\value{
+A list object containing (C)RQA measures (and matrices if requested)
 }
 \description{
-crqa_mat
+Measures based on horizontal line structures will be caluclated.
 }

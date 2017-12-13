@@ -6,6 +6,9 @@
 \usage{
 set_command_line_rp()
 }
+\value{
+nothing
+}
 \description{
 Set command line RQA executable
 }

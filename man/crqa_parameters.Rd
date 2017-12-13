@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{crqa_parameters}
 \alias{crqa_parameters}
-\title{crqa_parameters}
+\title{Find optimal (C)RQA parameters}
 \usage{
 crqa_parameters(y, maxDim = 5, maxLag = round(length(y)/(maxDim + 1)),
   emLag = tau(y, selection.methods = c("first.e.decay", "first.zero",
@@ -15,13 +15,16 @@ crqa_parameters(y, maxDim = 5, maxLag = round(length(y)/(maxDim + 1)),
 
 \item{emLag}{Optimal embedding lag (delay), e.g., provided by optimising algorithm.}
 
-\item{emLags}{A range of embedding lags to consider (default: )}
+\item{emLags}{A range of embedding lags to consider (default)}
 
 \item{maxDims}{Maximum number of embedding dimensions}
 
-\item{emDims}{A range of embedding dimensions (defsult: 1 - maxDims)}
+\item{emDims}{A range of embedding dimensions (default= 1 - maxDims)}
 
-\item{nSize}{The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10% of all points)}
+\item{nSize}{The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10\% of all points)}
+}
+\value{
+A list object containing the optimal values and iteration history.
 }
 \description{
 A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
