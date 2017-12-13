@@ -21,6 +21,11 @@
 }
 
 
+#' Which OS is running?
+#'
+#' @return A string, "osx", "windows", "linux"
+#' @export
+#'
 get_os <- function(){
   sysinf <- Sys.info()
   os <- NA
@@ -38,6 +43,11 @@ get_os <- function(){
   tolower(os)
 }
 
+#' Set command line RQA executable
+#'
+#' @return
+#' @export
+#'
 set_command_line_rp <- function(){
   os <- get_os()
   execPath <- getOption("casnet.path_to_rp")
@@ -49,7 +59,7 @@ set_command_line_rp <- function(){
       sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/inst/commandline_rp/macOS_x86_64/rp_osxI.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)), "chmod",paste("a+x",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
       message("Detected: macOS x86_64 \n  Copied: 'rp_osxI.dms' to 'rp' in package subdirectory 'exec' as the commandline CRP executable")
     } else {
-      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/inst/commandline_rp/macOS_PowerPC/rp_osxPPC.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
+      sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/macOS_PowerPC/rp_osxPPC.dms")), normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/rp"), mustWork = FALSE)))
       message(paste0("Detected: macOS PowerPC \n  Copied: 'rp_osxPPC.dms' to 'rp' in package subdirectory 'exec' as the commandline CRP executable"))
     }
   }
@@ -58,7 +68,7 @@ set_command_line_rp <- function(){
   if(os%in%"windows"){
     sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/windows_x86/rp_x86.exe")), normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)),"attrib", paste("+s", normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)))
     message(paste0("Detected: Windows \n  Copied: 'rp_x86.exe' to 'rp.exe' in package subdirectory 'exec' as the commandline CRP executable"))
-    options(casnet_rp_prefix="/")
+    options(casnet.rp_prefix="/")
   }
 
   # Linux

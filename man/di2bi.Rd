@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{di2bi}
 \alias{di2bi}
-\title{di2bi}
+\title{Distance 2 binary}
 \usage{
 di2bi(distmat, radius, convMat = FALSE)
 }
