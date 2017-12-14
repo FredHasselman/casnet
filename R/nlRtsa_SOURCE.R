@@ -496,6 +496,8 @@ crqa_fast <- function(y1,
                       saveOut    = FALSE,
                       path_out   = NULL,
                       file_ID    = NULL, ...){
+require(plyr)
+require(dplyr)
 
   if(!file.exists(normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_instal_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
@@ -562,7 +564,7 @@ crqa_fast <- function(y1,
     cat(paste("Calculating recurrence measures in a window of size",win,"taking steps of",step,"data points.\n\n"))
   }
 
-  wlist <- rollapply(df,
+  wlist <- zoo::rollapply(df,
                      width = win,
                      FUN = function(df){crqa_cl(y1             = df[,1],
                                                 y2             = df[,2],
