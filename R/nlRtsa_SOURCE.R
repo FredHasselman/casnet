@@ -218,7 +218,33 @@ repmat <- function(X,m,n){
 
 
 # (C)RQA ------------------------------
-crqa_cl <- function(y1,
+#' crqa_cl_main [internal]
+#'
+#' @param y1 y1
+#' @param y2 y1
+#' @param eDim y1
+#' @param eLag y1
+#' @param eRad y1
+#' @param DLmin y1
+#' @param VLmin y1
+#' @param theiler y1
+#' @param win y1
+#' @param step y1
+#' @param JRP y1
+#' @param distNorm y1
+#' @param returnMeasures y1
+#' @param returnRP y1
+#' @param returnLineDist y1
+#' @param path_to_rp y1
+#' @param saveOut y1
+#' @param path_out y1
+#' @param file_ID y1
+#' @param ...
+#'
+#' @keywords internal
+#'
+#' @export
+crqa_cl_main <- function(y1,
                     y2    = NULL,
                     eDim  = 1,
                     eLag  = 1,
@@ -232,7 +258,7 @@ crqa_cl <- function(y1,
                     distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
                     returnMeasures = TRUE,
                     returnRP       = TRUE,
-                    returnDist = FALSE,
+                    returnLineDist = FALSE,
                     path_to_rp = getOption("casnet.path_to_rp"),
                     saveOut    = FALSE,
                     path_out   = NULL,
@@ -252,7 +278,7 @@ crqa_cl <- function(y1,
     TT      = 'Trapping time',
     V_entr  = 'Entropy of vertical line length distribution',
     T1      = 'Recurrence times 1st type',
-    T2      = 'Recurrence times 2nd type T2',
+    T2      = 'Recurrence times 2nd type',
     W_max   = 'Max interval',
     W_mean  = 'Mean interval',
     W_entr  = 'Entropy intervals',
@@ -260,7 +286,9 @@ crqa_cl <- function(y1,
     F_min   = 'F min'
   )
 
-  # y1, y2, eDim, eLag, eRad, DLmin, VLmin, theiler, JRP, returnMeasures, returnRP, returnDist, path_to_rp, saveOut, path_out, file_ID = 0){
+
+
+  # y1, y2, eDim, eLag, eRad, DLmin, VLmin, theiler, JRP, returnMeasures, returnRP, returnLineDist, path_to_rp, saveOut, path_out, file_ID = 0){
   # -i <string>  	data filename (input)
   # -j <string>  	filename of additional data for CRP/JRP (input)
   # -J 	compute JRP instead of default CRP (only if 2nd data is given)
@@ -286,7 +314,7 @@ crqa_cl <- function(y1,
     if(saveOut){
       path_out <- getwd()
     } else {
-      path_out <-  tempdir()
+      path_out <- tempdir()
     }
   }
 
@@ -304,56 +332,62 @@ crqa_cl <- function(y1,
   if(any(is.null(y2))){df <- df[,1]}
 
   file_ID <- file_ID + 1
-  plotOUT <- paste0("'",path_out,"/RQAplot_",file_ID, ".txt'")
-  measOUT <- paste0("'",path_out,"/RQAmeasures_",file_ID, ".txt'")
-  histOUT <- paste0("'",path_out,"/RQAhist_",file_ID, ".txt'")
+  plotOUT <- paste0(path_out,"/RQAplot_",file_ID, ".txt")
+  measOUT <- paste0(path_out,"/RQAmeasures_",file_ID, ".txt")
+  histOUTdiag <- paste0(path_out,"/RQAhist_diag_",file_ID, ".txt")
+  histOUThori <- paste0(path_out,"/RQAhist_hori_",file_ID, ".txt")
+
   # write.table(rbind(c('x','y','dist')),gsub("[']+","",plotOUT), col.names = FALSE, row.names = FALSE)
   # write.table(rbind(paste0(names(RQAmeasures))),gsub("[']+","",measOUT), col.names = FALSE,row.names = FALSE)
   # write.table(rbind(c('length','freq')),gsub("[']+","",histOUT),col.names = FALSE, row.names = FALSE)
 
   tmpd  <- tempdir()
-  tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".csv")
-  write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE)
+  tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
+  write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
 
   if(any(is.null(y2))|any(is.na(y2%00%NA))){
-    opts <- paste("-i", tmpf1,
-                  "-r", plotOUT,
-                  "-o", measOUT,
-                  "-p", histOUT,
+    opts <- paste("-i", shQuote(tmpf1),
+                  "-r", shQuote(plotOUT),
+                  "-o", shQuote(measOUT),
+                  "-p", shQuote(histOUTdiag),
+                  "-q", shQuote(histOUThori),
                   "-m", eDim,
                   "-t", eLag,
                   "-e", eRad,
                   "-l", DLmin,
                   "-v", VLmin,
                   "-w", theiler,
-                  "-n", distNorm,
+                  "-n", shQuote(distNorm),
                   "-s")
   } else {
-    tmpf2 <- tempfile(tmpdir = tmpd, fileext = ".csv")
-    write.table(as.data.frame(y2), tmpf2, col.names = FALSE, row.names = FALSE)
-    opts <- paste("-i", tmpf1,
-                  "-j", tmpf2,
-                  "-r", plotOUT,
-                  "-o", measOUT,
-                  "-p", histOUT,
+    tmpf2 <- tempfile(tmpdir = tmpd, fileext = ".dat")
+    write.table(as.data.frame(y2), tmpf2, col.names = FALSE, row.names = FALSE, sep = "\t")
+    opts <- paste("-i", shQuote(tmpf1),
+                  "-j", shQuote(tmpf2),
+                  "-r", shQuote(plotOUT),
+                  "-o", shQuote(measOUT),
+                  "-p", shQuote(histOUTdiag),
+                  "-q", shQuote(histOUThori),
                   "-m", eDim,
                   "-t", eLag,
                   "-e", eRad,
                   "-l", DLmin,
                   "-v", VLmin,
                   "-w", theiler,
-                  "-n", distNorm,
+                  "-n", shQuote(distNorm),
                   "-s")
   }
-  closeAllConnections()
 
-  RCMD(paste0(getOption("casnet.rp_prefix"),"rp"), options = opts, path = path.expand(path_to_rp), quiet = FALSE)
+  #closeAllConnections()
+
+  devtools::RCMD(shQuote(paste0(getOption("casnet.rp_prefix"),"rp")), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
 
   #system("./rp","-i '/var/folders/zr/n8mgv2nj5rz1qq04xsj_x_c80000gp/T//RtmpZAFB8n/fileb4ef2f6a0353.csv' 'test.csv' -o  -m 2 -t 2 -e 48.2 -l 2 -v 2 -w 1 -s",path = path.expand(path_to_rp), quiet = FALSE)
 
-  measures = try.CATCH(import(gsub("[']+","",measOUT)))
-  rpMAT    = try.CATCH(import(gsub("[']+","",plotOUT)))
-  disthist = try.CATCH(import(gsub("[']+","",histOUT)))
+  measures     = try.CATCH(rio::import(gsub("[']+","",measOUT)))
+  rpMAT        = try.CATCH(rio::import(gsub("[']+","",plotOUT)))
+  disthistDiag = try.CATCH(rio::import(gsub("[']+","",histOUTdiag)))
+  disthistHori = try.CATCH(rio::import(gsub("[']+","",histOUThori)))
 
   if(all(is.null(measures$warning),is.data.frame(measures$value))){
     measures <- measures$value
@@ -362,32 +396,42 @@ crqa_cl <- function(y1,
   }
   colnames(measures) <-names(RQAmeasures)
 
-  if(all(is.null(rpMAT$warning),is.data.frame(grepl("Error",paste(rpMAT$value))))){
+  if(all(is.null(rpMAT$warning),is.data.frame(rpMAT$value))){
     rpMAT <- rpMAT$value
   } else {
     rpMAT <- data.frame(y1=NA,y2=NA,dist=NA)
   }
   colnames(rpMAT) <-c('y1','y2','dist')
 
-  if(all(is.null(disthist$warning),is.data.frame(grepl("Error",paste(disthist$value))))){
-    disthist <- disthist$value
+  if(all(is.null(disthistDiag$warning),is.data.frame(grepl("Error",paste(disthistDiag$value))))){
+    disthistDiag <- disthistDiag$value
   } else {
-    disthist <- data.frame(line.length=NA,freq=NA)
+    disthistDiag <- data.frame(line.length=NA,freq=NA)
   }
-  colnames(disthist) <-c('line.length','freq')
+  colnames(disthistDiag) <-c('diag.line.length','freq')
+
+  if(all(is.null(disthistHori$warning),is.data.frame(grepl("Error",paste(disthistHori$value))))){
+    disthistHori <- disthistHori$value
+  } else {
+    disthistHori <- data.frame(line.length=NA,freq=NA)
+  }
+  colnames(disthistHori) <-c('hori.line.length','freq')
+
 
   cat(paste0("[ID ",file_ID,"] Analysis completed... "))
   if(!saveOut){
-    RCMD("rm", options = paste("-f",measOUT), quiet = TRUE) # path = path_out,
-    RCMD("rm", options = paste("-f",plotOUT), quiet = TRUE)
-    RCMD("rm", options = paste("-f",histOUT), quiet = TRUE)
+    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",measOUT), quiet = TRUE) # path = path_out,
+    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",plotOUT), quiet = TRUE)
+    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",histOUTdiag), quiet = TRUE)
+    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",histOUThori), quiet = TRUE)
     cat("temporary files removed ...\n")
   } else {
     cat("files saved ...\n")
   }
   return(list(measures = measures,
               rpMAT=rpMAT,
-              disthist=disthist))
+              diag_disthist=disthistDiag,
+              hori_disthist=disthistHori))
 }
 
 
@@ -406,12 +450,12 @@ crqa_cl <- function(y1,
 #' @param win Window to calculate the (C)RQA (default = minimum of length of \code{y1} or \code{y2})
 #' @param step Stepsize for sliding windows (default = size of \code{win}, so no sliding window)
 #' @param JRP Wether to calculate a Joint Recurrence Plot(default = \code{FALSE})
-#' @param distNorm One of "EUCLIDEAN" (default), \code{"MAX", "MIN", or "OP"}
+#' @param distNorm One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence plot
 #' @param returnMeasures Return the (C)RQA measures? (default = \code{TRUE})
-#' @param returnRP Return the recurrence plot? (default = \code{TRUE})
-#' @param returnDist Return the distribution of line length distances (default = \code{FALSE})
+#' @param returnRP Return the recurrent points in a dataframe? (default = \code{TRUE})
+#' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})
 #' @param path_to_rp Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)
-#' @param saveOut Save the output to files (default = \code{FALSE})
+#' @param saveOut Save the output to files? If \code{TRUE} and \code{pat_out = NA}, the current working directory will be used (default = \code{FALSE})
 #' @param path_out Path to save output if \code{saveOut = TRUE} (default = \code{NULL})
 #' @param file_ID A file ID which will be a prefix to to the filename if \code{saveOut = \code{TRUE}} (default = NULL, an integer will be added tot the file name to ensure unique files)
 #' @param ... Additional parameters (currently not used)
@@ -477,7 +521,7 @@ crqa_cl <- function(y1,
 #'
 #' @export
 #'
-crqa_fast <- function(y1,
+crqa_cl <- function(y1,
                       y2    = NULL,
                       eDim  = 1,
                       eLag  = 1,
@@ -491,7 +535,7 @@ crqa_fast <- function(y1,
                       distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
                       returnMeasures = TRUE,
                       returnRP       = TRUE,
-                      returnDist = FALSE,
+                      returnLineDist = FALSE,
                       path_to_rp = getOption("casnet.path_to_rp"),
                       saveOut    = FALSE,
                       path_out   = NULL,
@@ -524,11 +568,30 @@ require(dplyr)
   #                distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
   #                returnMeasures = returnMeasures,
   #                returnRP       = returnRP,
-  #                returnDist     = returnDist,
+  #                returnLineDist     = returnLineDist,
   #                path_to_rp = path_to_rp,
   #                saveOut = saveOut,
   #                path_out = path_out,
   #                file_ID  = file_ID)
+
+  # y2    = NULL
+  # eDim  = 1
+  # eLag  = 1
+  # eRad  = 1
+  # DLmin = 2
+  # VLmin = 2
+  # theiler = 0
+  # win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE)
+  # step    = win
+  # JRP     = FALSE
+  # distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]]
+  # returnMeasures = TRUE
+  # returnRP       = TRUE
+  # returnLineDist = FALSE
+  # path_to_rp = getOption("casnet.path_to_rp")
+  # saveOut    = FALSE
+  # path_out   = NULL
+  # file_ID    = NULL
 
   # Begin input checks
 
@@ -536,8 +599,10 @@ require(dplyr)
     if(saveOut){
       path_out <- getwd()
     } else {
-      path_out <-  tempdir()
+      path_out <- tempdir()
     }
+  } else {
+    path_out <- normalizePath(path_out, mustWork = TRUE)
   }
 
   if(!is.null(y2)){
@@ -558,6 +623,7 @@ require(dplyr)
   #if((win==min(length(y1),length(y2), na.rm = TRUE))&(step== 1)){
   if(is.null(y2)){
     cat("\nPerforming auto-RQA\n")
+    if(theiler<1){theiler=1}
   } else {cat("\nPerforming cross-RQA\n")}
   #}
   if((win<min(length(y1),length(y2), na.rm = TRUE))){
@@ -566,7 +632,7 @@ require(dplyr)
 
   wlist <- zoo::rollapply(df,
                      width = win,
-                     FUN = function(df){crqa_cl(y1             = df[,1],
+                     FUN = function(df){crqa_cl_main(y1             = df[,1],
                                                 y2             = df[,2],
                                                 eDim           = eDim,
                                                 eLag           = eLag,
@@ -578,7 +644,7 @@ require(dplyr)
                                                 distNorm       = distNorm,
                                                 returnMeasures = returnMeasures,
                                                 returnRP       = returnRP,
-                                                returnDist     = returnDist,
+                                                returnLineDist     = returnLineDist,
                                                 path_to_rp     = path_to_rp,
                                                 saveOut        = saveOut,
                                                 path_out       = path_out,
@@ -593,12 +659,15 @@ require(dplyr)
   rqa_measures <- ldply(wlist[,1]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
   rqa_rpvector <- ldply(wlist[,2]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
   rqa_diagdist <- ldply(wlist[,3]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_horidist <- ldply(wlist[,4]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
+
 
   out <- list(rqa_measures = rqa_measures,
               rqa_rpvector = rqa_rpvector,
-              rqa_diagdist = rqa_diagdist)
-
-  return(out[c(returnMeasures,returnRP,returnDist)])
+              rqa_diagdist = rqa_diagdist,
+              rqa_horidist = rqa_horidist)
+  if(saveOut){saveRDS(out,paste0(path_out,"CRQA_out",file_ID,".rds"))}
+  return(out[c(returnMeasures,returnRP,returnLineDist)])
 }
 
 #' Find optimal (C)RQA parameters
@@ -1232,11 +1301,12 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 
   RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   RP[distmat <= radius] <- 1
+  mostattributes(RP) <- attributes(distmat)
 
   if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
 
 
-  if(convMat){RP <- Matrix(RP)}
+  if(convMat){RP <- Matrix::Matrix(RP)}
 
   return(RP)
 }
@@ -1373,7 +1443,7 @@ nzdiags <- function(A=NULL, d=NULL){
     }
 
     for(i in seq_along(d)){
-      B[index(nzdiag[[i]]),i] <- nzdiag[[i]]
+      B[zoo::index(nzdiag[[i]]),i] <- nzdiag[[i]]
     }
     colnames(B) <- paste(d)
 
@@ -1426,7 +1496,7 @@ nzdiags.boot <- function(RP,d=NULL){
     }
 
     for(i in seq_along(d)){
-      B[index(nzdiag[[i]]),i] <- nzdiag[[i]]
+      B[zoo::index(nzdiag[[i]]),i] <- nzdiag[[i]]
     }
     colnames(B) <- paste(d)
 
@@ -1478,7 +1548,7 @@ nzdiags.chroma <- function(RP, d=NULL){
     }
 
     for(i in seq_along(d)){
-      B[index(nzdiag[[i]]),i] <- nzdiag[[i]]
+      B[zoo::index(nzdiag[[i]]),i] <- nzdiag[[i]]
     }
     colnames(B) <- paste(d)
 
@@ -1664,13 +1734,15 @@ bandReplace <- function(mat, lower, upper, value = NA){
 #' @return RM
 #' @export
 #'
-recmat <- function(y1, y2,
+recmat <- function(y1, y2=NULL,
                    emDim = 1,
                    emLag = 1,
                    to.ts = NULL,
                    to.sparse = FALSE,
                    order.by = NULL,
                    method = "Euclidean", ...){
+
+  if(is.null(y2)){y2 <- y1}
 
   if(!all(is.data.frame(y1),is.data.frame(y2))){
     y1 <- as.data.frame(y1)
@@ -1704,7 +1776,7 @@ recmat <- function(y1, y2,
   # }
 
   if(to.sparse){
-    dmat <- Matrix(dmat)
+    dmat <- Matrix::Matrix(dmat)
   }
 
   attr(dmat,"eDims1") <- et1
@@ -1723,10 +1795,22 @@ recmat <- function(y1, y2,
 }
 
 
-recmat_plot <- function(rmat, PhaseSpaceScale= TRUE){
-  require(grid)
-  require(ggplot2)
-  require(gtable)
+#' Plot (thresholded) distance matrix
+#'
+#' @param rmat A distance matrix or recurrence matrix
+#' @param PhaseSpaceScale For display purposes: Rescale the data? (default = \code{TRUE})
+#' @param doPlot Draw the plot? (default = \code{TRUE})
+#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{rmat} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
+#' @param plotMeasures Print common (C)RQA measures in the plot
+#'
+#' @return A nice plot of the recurrence matrix.
+#' @export
+#'
+recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, plotSurrogate = NA, plotMeasures = FALSE){
+  # require(grid)
+  # require(ggplot2)
+  # require(gtable)
+  # require(cowplot)
 
   AUTO <-ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
 
@@ -1745,7 +1829,7 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE){
   }
 
 
-  gRP <-  ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
+  gRP <-  ggplot2::ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
     geom_raster()
 
   if(unthresholded){
@@ -1790,7 +1874,7 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE){
 
   gRP <- gRP +
     geom_abline(slope = 1,colour = "grey50", size = 1) +
-    ggtitle(label=ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
+    ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
     rptheme +
     coord_fixed(expand = FALSE)
 
@@ -1799,10 +1883,10 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE){
     y1 <- data.frame(t1=attr(rmat,"eDims1"))
     y2 <- data.frame(t2=attr(rmat,"eDims2"))
 
-    y1[,1] <- rescale(y1[,1])
-    gy1 <- ggplot(y1, aes(y=y1[,1], x= index(y1))) +
+    y1[,1] <- scales::rescale(y1[,1])
+    gy1 <- ggplot2::ggplot(y1, aes(y=y1[,1], x= zoo::index(y1))) +
       geom_line() +  xlab(colnames(y1)) + ylab("") +
-      geom_vline(xintercept = index(y1)[is.na(y1[,1])],
+      geom_vline(xintercept = zoo::index(y1)[is.na(y1[,1])],
                  colour = scales::muted("slategray4"),alpha=.1, size=.5) +
       theme(panel.background = element_rect("grey99"),
             panel.grid.major  = element_blank(),
@@ -1818,10 +1902,10 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE){
       ) +
       coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
 
-    y2[,1] <- rescale(y2[,1])
-    gy2 <- ggplot(y2, aes(y=y2[,1], x= index(y2))) +
+    y2[,1] <- scales::rescale(y2[,1])
+    gy2 <- ggplot2::ggplot(y2, aes(y=y2[,1], x= zoo::index(y2))) +
       geom_line() + xlab(colnames(y2)) + ylab("") +
-      geom_vline(xintercept = index(y2)[is.na(y2[,1])],
+      geom_vline(xintercept = zoo::index(y2)[is.na(y2[,1])],
                  colour = scales::muted("slategray4"),alpha=.1, size=.5) +
       theme(panel.background = element_rect("grey99"),
             panel.grid.major  = element_blank(),
@@ -1841,15 +1925,20 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE){
     gy2 <- gg.plotHolder()
   }
 
-  gr <- ggplotGrob(gRP)
+  gr <- ggplot2::ggplotGrob(gRP)
 
   gindex <- subset(gr$layout, name == "panel")
-  g <- gtable_add_cols(gr, unit(2, "cm"),0)
-  g <- gtable_add_rows(g, unit(2,"cm"))
-  g <- gtable_add_grob(g, ggplotGrob(gy2), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
-  g <- gtable_add_grob(g, ggplotGrob(gy1), t=9, l=2, b=11, r=6)
-  grid.newpage()
-  grid.draw(g)
+  g <- gtable::gtable_add_cols(gr, grid::unit(2, "cm"),0)
+  g <- gtable::gtable_add_rows(g, grid::unit(2,"cm"))
+  g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy2), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
+  g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy1), t=9, l=2, b=11, r=6)
+
+  if(doPlot){
+  grid::grid.newpage()
+  grid::grid.draw(g)
+  }
+
+  return(g)
 }
 
 
@@ -2627,6 +2716,15 @@ hoodGraph2svg <- function(TDM,Vname,pname){
   return(sg)
 }
 
+#' lag Embed a time series
+#'
+#' @param y Time series
+#' @param emDim Embedding dimension
+#' @param emLag Embedding lag
+#'
+#' @return The lag embedded time series
+#' @export
+#'
 lagEmbed <- function (y, emDim, emLag){
 
   if(any(is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
@@ -3469,7 +3567,7 @@ netGroupCol <- function(g,grp){
     groupColours <- gradient_n_pal(brewer_pal(palette="Set3")(12))(seq(0, 1, length.out = length(grp)))
   }
 
-  E(g)$alpha <- rescale(E(g)$weight)
+  E(g)$alpha <- scales::rescale(E(g)$weight)
   E(g)$color <- "#D9D9D9"
   for(c in seq_along(grp)){
     if(length(grp[[c]])>0){
@@ -3679,6 +3777,8 @@ multi.PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 #' @param expr an \R expression to evaluate
 #' @return a list with 'value' and 'warning', where value' may be an error caught.
 #' @author Martin Maechler; Copyright (C) 2010-2012  The R Core Team
+#' @export
+#' @keywords internal
 try.CATCH <- function(expr){
   W <- NULL
   w.handler <- function(w){ # warning handler

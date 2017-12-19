@@ -31,3 +31,6 @@ Imports: dplyr,
     xts,
     zoo,
     tidyr
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder:knitr

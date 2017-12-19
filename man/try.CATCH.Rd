@@ -29,3 +29,4 @@ a warning, also keep the computed result.
 \author{
 Martin Maechler; Copyright (C) 2010-2012  The R Core Team
 }
+\keyword{internal}

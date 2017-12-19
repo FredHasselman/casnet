@@ -4,8 +4,8 @@
 \alias{recmat}
 \title{Recurrence Matrix}
 \usage{
-recmat(y1, y2, emDim = 1, emLag = 1, to.ts = NULL, to.sparse = FALSE,
-  order.by = NULL, method = "Euclidean", ...)
+recmat(y1, y2 = NULL, emDim = 1, emLag = 1, to.ts = NULL,
+  to.sparse = FALSE, order.by = NULL, method = "Euclidean", ...)
 }
 \arguments{
 \item{y1}{y1}

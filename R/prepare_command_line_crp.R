@@ -4,6 +4,7 @@
     casnet.path = find.package("casnet"),
     casnet.path_to_rp = normalizePath(paste0(find.package("casnet"),"/exec")),
     casnet.rp_prefix = "./",
+    casnet.sysdel = "rm",
     casnet.install.args = "",
     casnet.name = "Fred Hasselman", #"A toolbox for studying Complex Adaptive Systems and NETworks",
     casnet.desc.author = '"Fred Hasselman <f.hasselman@bsi.ru.nl> [aut, cre]"',
@@ -65,6 +66,7 @@ set_command_line_rp <- function(){
     sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/windows_x86/rp_x86.exe")), normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)),"attrib", paste("+s", normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)))
     message(paste0("Detected: Windows \n  Copied: 'rp_x86.exe' to 'rp.exe' in package subdirectory 'exec' as the commandline CRP executable"))
     options(casnet.rp_prefix="/")
+    options(casnet.sysdel="del")
   }
 
   # Linux
