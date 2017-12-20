@@ -32,3 +32,5 @@ exec/linux_i686/rp_i686.dms
 exec/rp
 exec/rp_instal_log.txt
 inst/doc
+
+build/*.*
