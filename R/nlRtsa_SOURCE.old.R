@@ -365,7 +365,7 @@ crqa_cl_main <- function(y1,
   }
 
   if(any(is.infinite(file_ID),is.null(file_ID))){file_ID <-0}
-#  if(any(is.null(y2))){df <- df[,1]}
+  if(any(is.null(y2))){df <- df[,1]}
 
 
   tmpd  <- tempdir()
@@ -379,10 +379,10 @@ crqa_cl_main <- function(y1,
   fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
 
   file_ID <- file_ID + 1
-  plotOUT     <- normalizePath(file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep), mustWork = F)
-  measOUT     <- normalizePath(file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep), mustWork = F)
-  histOUTdiag <- normalizePath(file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep), mustWork = F)
-  histOUThori <- normalizePath(file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"),fsep = fileSep), mustWork = F)
+  plotOUT     <- normalizePath(file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep))
+  measOUT     <- normalizePath(file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep))
+  histOUTdiag <- normalizePath(file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep))
+  histOUThori <- normalizePath(file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"),fsep = fileSep))
 
 
   if(any(is.null(y2))|any(is.na(y2%00%NA))){
@@ -433,7 +433,7 @@ crqa_cl_main <- function(y1,
   } else {
     measures <- rbind.data.frame(rep(NA,length(RQAmeasures)))
   }
-  if(get_os()!="windows"){colnames(measures) <-names(RQAmeasures)}
+  colnames(measures) <-names(RQAmeasures)
 
   if(all(is.null(rpMAT$warning),is.data.frame(rpMAT$value))){
     rpMAT <- rpMAT$value
