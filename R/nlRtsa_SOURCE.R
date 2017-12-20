@@ -372,9 +372,9 @@ crqa_cl_main <- function(y1,
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
   write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
 
-  if(!normalizePath(path_out,mustWork = TRUE)){
-
-  }
+  # if(grepl("Error",try.CATCH(normalizePath(path_out,mustWork = TRUE))$value)){
+  #
+  # }
 
   fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
 
