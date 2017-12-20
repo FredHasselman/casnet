@@ -575,7 +575,7 @@ crqa_cl <- function(y1,
                       saveOut    = FALSE,
                       path_out   = NULL,
                       file_ID    = NULL,
-                      silent     = FALSE, ...){
+                      silent     = TRUE, ...){
 require(plyr)
 require(dplyr)
 

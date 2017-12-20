@@ -1,8 +1,7 @@
 base
 casnet
 ggplot2
-gridExtra
-cowplot
 plyr
 dplyr
 bindrcpp
+cowplot

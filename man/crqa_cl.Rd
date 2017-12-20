@@ -10,7 +10,7 @@ crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
   distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]], returnMeasures = TRUE,
   returnRPvector = TRUE, returnLineDist = FALSE, plot_recmat = c("noplot",
   "recmat", "distmat")[[1]], path_to_rp = getOption("casnet.path_to_rp"),
-  saveOut = FALSE, path_out = NULL, file_ID = NULL, silent = FALSE, ...)
+  saveOut = FALSE, path_out = NULL, file_ID = NULL, silent = TRUE, ...)
 }
 \arguments{
 \item{y1}{Time series 1}
