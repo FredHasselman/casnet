@@ -6,9 +6,7 @@ citEntry(entry = "Manual",
    year = "2017",
    note = "R package version 0.1.0",
    url = "https://github.com/FredHasselman/casnet",
-   key = "casnet-package"
- ),
-
+   key = "casnet-package",
  textVersion  =
   paste("Fred Hasselman (2017).",
         "casnet: A toolbox for studying Complex Adaptive Systems and NETworks",
