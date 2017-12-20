@@ -372,13 +372,17 @@ crqa_cl_main <- function(y1,
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
   write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
 
+  if(!normalizePath(path_out,mustWork = TRUE)){
+
+  }
+
   fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
 
   file_ID <- file_ID + 1
-  plotOUT     <- file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep)
-  measOUT     <- file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep)
-  histOUTdiag <- file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep)
-  histOUThori <- file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"),fsep = fileSep)
+  plotOUT     <- normalizePath(file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep))
+  measOUT     <- normalizePath(file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep))
+  histOUTdiag <- normalizePath(file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep))
+  histOUThori <- normalizePath(file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"),fsep = fileSep))
 
 
   if(any(is.null(y2))|any(is.na(y2%00%NA))){
