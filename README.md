@@ -16,7 +16,7 @@ Either use `devtools::install_github` or download the tar/zip
 
 ### Use `devtools`
 
-```{r}
+```
 library(devtools)
 install_github("FredHasselman/casnet", build_vignettes = TRUE)
 ```
