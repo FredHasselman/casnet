@@ -368,10 +368,10 @@ crqa_cl_main <- function(y1,
   if(any(is.null(y2))){df <- df[,1]}
 
   file_ID <- file_ID + 1
-  plotOUT     <- paste0(path_out,"/RQAplot_",     file_ID, ".txt")
-  measOUT     <- paste0(path_out,"/RQAmeasures_", file_ID, ".txt")
-  histOUTdiag <- paste0(path_out,"/RQAhist_diag_",file_ID, ".txt")
-  histOUThori <- paste0(path_out,"/RQAhist_hori_",file_ID, ".txt")
+  plotOUT     <- file.path(path_out,paste0("RQAplot_",file_ID, ".txt"))
+  measOUT     <- file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"))
+  histOUTdiag <- file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"))
+  histOUThori <- file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"))
 
   tmpd  <- tempdir()
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
@@ -415,10 +415,10 @@ crqa_cl_main <- function(y1,
   # RCMD
   devtools::RCMD(shQuote(paste0(getOption("casnet.rp_prefix"),"rp")), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
 
-  measures     = try.CATCH(rio::import(gsub("[']+","",measOUT)))
-  rpMAT        = try.CATCH(rio::import(gsub("[']+","",plotOUT)))
-  disthistDiag = try.CATCH(rio::import(gsub("[']+","",histOUTdiag)))
-  disthistHori = try.CATCH(rio::import(gsub("[']+","",histOUThori)))
+  measures     = try.CATCH(rio::import(normalizePath(gsub("[']+","",measOUT))))
+  rpMAT        = try.CATCH(rio::import(normalizePath(gsub("[']+","",plotOUT))))
+  disthistDiag = try.CATCH(rio::import(normalizePath(gsub("[']+","",histOUTdiag))))
+  disthistHori = try.CATCH(rio::import(normalizePath(gsub("[']+","",histOUThori))))
 
   if(all(is.null(measures$warning),is.data.frame(measures$value))){
     measures <- measures$value
@@ -492,6 +492,7 @@ crqa_cl_main <- function(y1,
 #' @param saveOut Save the output to files? If \code{TRUE} and \code{pat_out = NA}, the current working directory will be used (default = \code{FALSE})
 #' @param path_out Path to save output if \code{saveOut = TRUE} (default = \code{NULL})
 #' @param file_ID A file ID which will be a prefix to to the filename if \code{saveOut = TRUE} (default = \code{NULL}, an integer will be added tot the file name to ensure unique files)
+#' @param silent  Do not display any messages (default = \code{TRUE})
 #' @param ... Additional parameters (currently not used)
 #'
 #'
@@ -579,7 +580,7 @@ crqa_cl <- function(y1,
 require(plyr)
 require(dplyr)
 
-  if(!file.exists(normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_instal_log.txt"), mustWork = FALSE))){
+  if(!file.exists(normalizePath(paste0(getOption("casnet.path_to_rp"),"\rp_instal_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
   }
 
@@ -672,16 +673,22 @@ require(dplyr)
   return(out[c(returnMeasures,returnRPvector,returnLineDist)])
 }
 
+# emDims A range of embedding dimensions (default= 1 - maxDims)
+# nSize The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10\% of all points)
+
 #' Find optimal (C)RQA parameters
 #'
 #' A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
 #'
 #' @param y Timeseries
-#' @param maxDims Maximum number of embedding dimensions
+#' @param maxDim Maximum number of embedding dimensions
+#' @param maxLag Maximum embedding lag
 #' @param emLag Optimal embedding lag (delay), e.g., provided by optimising algorithm.
 #' @param emLags A range of embedding lags to consider (default)
-#' @param emDims A range of embedding dimensions (default= 1 - maxDims)
-#' @param nSize The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10\% of all points)
+#' @param ami.method Method
+#' @param nnSizes  Neighbourhood size
+#' @param nnThres  Threshold
+#' @param diagPlot Plot the results
 #'
 #' @return A list object containing the optimal values and iteration history.
 #'
@@ -1374,7 +1381,7 @@ tau <- function(y,
 #' @param y Time series
 #' @param delay Embeding lag
 #' @param maxDim Maximum number of embedding dimensions
-#' @param ...
+#' @param ... Other arguments (not in use)
 #'
 #' @description A wrapper for nonlinearTseries::estimateEmbeddingDim
 #'
@@ -1698,6 +1705,7 @@ dist.hamming <- function(X, Y=NULL, embedded=TRUE) {
 #'
 #' @examples
 #' # Create a 10 by 10 matrix
+#' library(Matrix)
 #' m <- Matrix(rnorm(10),10,10)
 #'
 #' bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands with 0 (Theiler window of 1)
@@ -1955,6 +1963,7 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, 
 #'
 #' @examples
 #' # Create a 10 by 10 matrix
+#' library(Matrix)
 #' m <- Matrix(rnorm(10),10,10)
 #'
 #' recmat_size(m,TRUE,0)   # Subtract diagonal
@@ -1963,9 +1972,9 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, 
 #' recmat_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
 recmat_size <- function(mat, AUTO=NULL, theiler = 0){
   if(is.null(AUTO)){
-    AUTO <- isSymmetric(unname(mat))
+    AUTO <- Matrix::isSymmetric(unname(mat))
   }
-  return(cumprod(dim(mat))[2] - ifelse((AUTO&theiler==0),length(diag(mat)),
+  return(cumprod(dim(mat))[2] - ifelse((AUTO&theiler==0),length(Matrix::diag(mat)),
                                        ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
 }
 
@@ -2582,6 +2591,7 @@ growth_ac <- function(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving", "dam
 #'
 #' @examples
 #' # Plot with the default settings
+#' library(lattice)
 #' xyplot(growth_ac_cond())
 #'
 #' # The function such that it can take a set of conditional rules and apply them sequentially during the iterations.
@@ -2897,6 +2907,18 @@ FDrel <- function(g){
 
 sa2fd <- function(sa, ...) UseMethod("sa2fd")
 
+#' sa2df.default
+#'
+#' @param sa Self-affinity parameter
+#' @param ... Other argumentd
+#'
+#' @author Fred Hasselman
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+#'
+#' @family SA to FD converters
+#' @keywords internal
+#' @export
+#'
 sa2fd.default <- function(sa, ...){
   cat("No type specified.")
 }
@@ -2994,10 +3016,19 @@ sa2fd.sda <- function(sa){return(1-sa)}
 
 
 
-# fd estimators ---------------------------------------------------------------------------------------------------
+# fd estimators ----------------------------------------------
 
 fd <- function(y, ...) UseMethod("fd")
 
+#' fd.default
+#'
+#' @param y timeseries
+#' @param ... Other arguments
+#'
+#' @keywords internal
+#' @family FD estimators
+#' @export
+#'
 fd.default <- function(y, ...){
 
   cat("No type specified.\nReturning exponential growth power law.")
@@ -3051,13 +3082,11 @@ fd.default <- function(y, ...){
 #'
 #' A line is fitted on the periodogram in log-log coordinates. Two fit-ranges are used: The 25\% lowest frequencies and the Hurvich-Deo estimate (\code{\link[fractal]{HDEst}}).
 #'
-#' @examples
-#' fd.psd(rnorm(2048), plot = TRUE)
 fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
-  require(pracma)
-  require(fractal)
-  require(sapa)
-  require(ifultools)
+  # require(pracma)
+  # require(fractal)
+  # require(sapa)
+  # require(ifultools)
 
   if(!is.ts(y)){
     if(is.null(fs)){fs <- 1}
@@ -3101,11 +3130,11 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
   exp2 <- fractal::hurstSpec(y, sdf.method = "direct", freq.max = powspec$freq.norm[nr], taper. = Tukey)
 
   ifelse((glob > 0.2), {
-    lmfit1 <- lm(log(rev(powspec$bulk[powspec$size<=0.25])) ~ log(rev(powspec$size[powspec$size<=0.25])))
-    lmfit2 <- lm(log(rev(powspec$bulk[1:nr])) ~ log(rev(powspec$size[1:nr])))
+    lmfit1 <- stats::lm(log(rev(powspec$bulk[powspec$size<=0.25])) ~ log(rev(powspec$size[powspec$size<=0.25])))
+    lmfit2 <- stats::lm(log(rev(powspec$bulk[1:nr])) ~ log(rev(powspec$size[1:nr])))
   },{
-    lmfit1 <- lm(log(powspec$bulk[powspec$size<=0.25]) ~ log(powspec$size[powspec$size<=0.25]))
-    lmfit2 <- lm(log(powspec$bulk[1:nr]) ~ log(powspec$size[1:nr]))
+    lmfit1 <- stats::lm(log(powspec$bulk[powspec$size<=0.25]) ~ log(powspec$size[powspec$size<=0.25]))
+    lmfit2 <- stats::lm(log(powspec$bulk[1:nr]) ~ log(powspec$size[1:nr]))
   })
 
   if(plot){
@@ -3286,7 +3315,6 @@ fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order 
 #' Detrended Fluctuation Analysis
 #'
 #' @param signal    An input signal.
-#' @param qq    A vector containing a range of values for the order of fluctuation \code{q}.
 #' @param mins    Minimum scale to consider.
 #' @param maxs    Maximum scale to consider.
 #' @param ressc ressc

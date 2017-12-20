@@ -31,8 +31,8 @@ fd.sda
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other FD estimators: \code{\link{fd.dfa}},
-  \code{\link{fd.psd}}
+Other FD estimators: \code{\link{fd.default}},
+  \code{\link{fd.dfa}}, \code{\link{fd.psd}}
 }
 \author{
 Fred Hasselman

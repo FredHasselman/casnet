@@ -53,6 +53,8 @@ crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
 
 \item{file_ID}{A file ID which will be a prefix to to the filename if \code{saveOut = TRUE} (default = \code{NULL}, an integer will be added tot the file name to ensure unique files)}
 
+\item{silent}{Do not display any messages (default = \code{TRUE})}
+
 \item{...}{Additional parameters (currently not used)}
 }
 \value{

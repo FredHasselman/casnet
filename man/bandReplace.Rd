@@ -23,6 +23,7 @@ Sets a band of matrix diagonals to any given value
 }
 \examples{
 # Create a 10 by 10 matrix
+library(Matrix)
 m <- Matrix(rnorm(10),10,10)
 
 bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands with 0 (Theiler window of 1)

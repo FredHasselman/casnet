@@ -9,7 +9,8 @@ Description: A collection of analytic tools for studying signals recorded from c
     - Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)
     - Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA)
     - Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks)
-License: What license is it under?
+License: GPL-3
+Depends: R (>= 2.10)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
@@ -40,7 +41,3 @@ Suggests: knitr,
     stats,
     utils
 VignetteBuilder: knitr
-Depends: graphics,
-    grDevices,
-    stats,
-    utils

@@ -13,15 +13,21 @@ crqa_parameters(y, maxDim = 5, maxLag = round(length(y)/(maxDim + 1)),
 \arguments{
 \item{y}{Timeseries}
 
+\item{maxDim}{Maximum number of embedding dimensions}
+
+\item{maxLag}{Maximum embedding lag}
+
 \item{emLag}{Optimal embedding lag (delay), e.g., provided by optimising algorithm.}
 
 \item{emLags}{A range of embedding lags to consider (default)}
 
-\item{maxDims}{Maximum number of embedding dimensions}
+\item{ami.method}{Method}
 
-\item{emDims}{A range of embedding dimensions (default= 1 - maxDims)}
+\item{nnSizes}{Neighbourhood size}
 
-\item{nSize}{The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10\% of all points)}
+\item{nnThres}{Threshold}
+
+\item{diagPlot}{Plot the results}
 }
 \value{
 A list object containing the optimal values and iteration history.

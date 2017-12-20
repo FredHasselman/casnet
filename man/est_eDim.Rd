@@ -14,7 +14,7 @@ est_eDim(y, delay = tau(y), maxDim = 20, threshold = 0.95,
 
 \item{maxDim}{Maximum number of embedding dimensions}
 
-\item{...}{}
+\item{...}{Other arguments (not in use)}
 }
 \value{
 Embedding dimensions

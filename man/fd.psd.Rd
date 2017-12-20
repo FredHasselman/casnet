@@ -33,15 +33,12 @@ Calls function \code{\link[sapa]{SDF}} to estimate the scaling exponent of a tim
 
 A line is fitted on the periodogram in log-log coordinates. Two fit-ranges are used: The 25\% lowest frequencies and the Hurvich-Deo estimate (\code{\link[fractal]{HDEst}}).
 }
-\examples{
-fd.psd(rnorm(2048), plot = TRUE)
-}
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other FD estimators: \code{\link{fd.dfa}},
-  \code{\link{fd.sda}}
+Other FD estimators: \code{\link{fd.default}},
+  \code{\link{fd.dfa}}, \code{\link{fd.sda}}
 }
 \author{
 Fred Hasselman

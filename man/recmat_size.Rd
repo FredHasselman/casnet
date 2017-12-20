@@ -21,6 +21,7 @@ recmat_size
 }
 \examples{
 # Create a 10 by 10 matrix
+library(Matrix)
 m <- Matrix(rnorm(10),10,10)
 
 recmat_size(m,TRUE,0)   # Subtract diagonal

@@ -17,7 +17,7 @@ l_ply(sort(c("grDevices","graphics","stats","utils")), function(p) devtools::use
 
 # Install locally
 
-install(build_vignettes = TRUE)
+install(build_vignettes = TRUE, manual = TRUE)
 
 # BUILD tarballs / zip ---
 

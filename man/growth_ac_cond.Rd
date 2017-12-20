@@ -23,6 +23,7 @@ Conditional Autocatlytic Growth: Iterating differential equations (maps)
 }
 \examples{
 # Plot with the default settings
+library(lattice)
 xyplot(growth_ac_cond())
 
 # The function such that it can take a set of conditional rules and apply them sequentially during the iterations.

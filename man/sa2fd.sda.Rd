@@ -32,8 +32,8 @@ sa2fd.sda(-0.9)
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other SA to FD converters: \code{\link{sa2fd.dfa}},
-  \code{\link{sa2fd.psd}}
+Other SA to FD converters: \code{\link{sa2fd.default}},
+  \code{\link{sa2fd.dfa}}, \code{\link{sa2fd.psd}}
 }
 \author{
 Fred Hasselman
