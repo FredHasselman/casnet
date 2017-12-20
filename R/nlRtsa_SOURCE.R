@@ -433,28 +433,28 @@ crqa_cl_main <- function(y1,
   } else {
     measures <- rbind.data.frame(rep(NA,length(RQAmeasures)))
   }
-  if(get_os()!="windows"){colnames(measures) <-names(RQAmeasures)}
+  #if(get_os()!="windows"){colnames(measures) <-names(RQAmeasures)}
 
   if(all(is.null(rpMAT$warning),is.data.frame(rpMAT$value))){
     rpMAT <- rpMAT$value
   } else {
     rpMAT <- data.frame(y1=NA,y2=NA,dist=NA)
   }
-  colnames(rpMAT) <-c('y1','y2','dist')
+  colnames(rpMAT) <-c('y1','y2','dist')[1:NCOL(rpMAT)]
 
   if(all(is.null(disthistDiag$warning),is.data.frame(grepl("Error",paste(disthistDiag$value))))){
     disthistDiag <- disthistDiag$value
   } else {
     disthistDiag <- data.frame(line.length=NA,freq=NA)
   }
-  colnames(disthistDiag) <-c('diag.line.length','freq')
+  colnames(disthistDiag) <-c('diag.line.length','freq')[1:NCOL(disthistDiag)]
 
   if(all(is.null(disthistHori$warning),is.data.frame(grepl("Error",paste(disthistHori$value))))){
     disthistHori <- disthistHori$value
   } else {
     disthistHori <- data.frame(line.length=NA,freq=NA)
   }
-  colnames(disthistHori) <-c('hori.line.length','freq')
+  colnames(disthistHori) <-c('hori.line.length','freq')[1:NCOL(disthistHori)]
 
 
   cat(paste0("[ID ",file_ID,"] Analysis completed... "))
