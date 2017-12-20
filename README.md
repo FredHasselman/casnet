@@ -16,10 +16,14 @@ Either use `devtools::install_github` or download the tar/zip
 
 ### Use `devtools`
 
+Install directly from Github and check if the vignettes were installed.
+
 ```
 library(devtools)
 install_github("FredHasselman/casnet", build_vignettes = TRUE)
+vignette("cl_RQA")
 ```
+
 
 ### Use a tar/zip build
 
