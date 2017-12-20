@@ -367,15 +367,19 @@ crqa_cl_main <- function(y1,
   if(any(is.infinite(file_ID),is.null(file_ID))){file_ID <-0}
   if(any(is.null(y2))){df <- df[,1]}
 
-  file_ID <- file_ID + 1
-  plotOUT     <- file.path(path_out,paste0("RQAplot_",file_ID, ".txt"))
-  measOUT     <- file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"))
-  histOUTdiag <- file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"))
-  histOUThori <- file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"))
 
   tmpd  <- tempdir()
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
   write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
+
+  fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
+
+  file_ID <- file_ID + 1
+  plotOUT     <- file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep)
+  measOUT     <- file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep)
+  histOUTdiag <- file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep)
+  histOUThori <- file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"),fsep = fileSep)
+
 
   if(any(is.null(y2))|any(is.na(y2%00%NA))){
     opts <- paste("-i", shQuote(tmpf1),
