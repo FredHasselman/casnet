@@ -217,6 +217,68 @@ repmat <- function(X,m,n){
 # }
 
 
+
+# Catch parameters
+# params <- list(eDim  = eDim,
+#                eLag  = eLag,
+#                eRad  = eRad,
+#                DLmin = DLmin,
+#                VLmin = VLmin,
+#                theiler = theiler,
+#                JRP     = JRP,
+#                distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+#                returnMeasures = returnMeasures,
+#                returnRPvector       = returnRPvector,
+#                returnLineDist     = returnLineDist,
+#                path_to_rp = path_to_rp,
+#                saveOut = saveOut,
+#                path_out = path_out,
+#                file_ID  = file_ID)
+
+# y2    = NULL
+# eDim  = 1
+# eLag  = 1
+# eRad  = 1
+# DLmin = 2
+# VLmin = 2
+# theiler = 0
+# win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE)
+# step    = win
+# JRP     = FALSE
+# distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]]
+# returnMeasures = TRUE
+# returnRPvector       = TRUE
+# returnLineDist = FALSE
+# path_to_rp = getOption("casnet.path_to_rp")
+# saveOut    = FALSE
+# path_out   = NULL
+# file_ID    = NULL
+
+
+# y1, y2, eDim, eLag, eRad, DLmin, VLmin, theiler, JRP, returnMeasures, returnRPvector, returnLineDist, path_to_rp, saveOut, path_out, file_ID = 0){
+# -i <string>  	data filename (input)
+# -j <string>  	filename of additional data for CRP/JRP (input)
+# -J 	compute JRP instead of default CRP (only if 2nd data is given)
+# -r <string>	filename recurrence plot (output)
+# -o <string>	filename RQA measures (output)
+# -p <string>	filename histogramme diagonal line lengths (output)
+# -c	cummulative histogramme
+# -f <string>	format for recurrence plot file (ASCII, TIF), default=ASCII
+# -n <string>	distance norm (EUCLIDEAN, MAX, MIN, OP), default=EUCLIDEAN
+# -m <number>	embedding dimension, default=1
+# -t <number>	embedding delay, default=1
+# -e <number>	threshold, default=1 (if negative, a distance plot will be created)
+# -l <number>	minimal diagonal line, default=2
+# -v <number>	minimal vertical line, default=2
+# -w <number>	Theiler corrector, default=1
+# -D <string>	delimiter in data file, default=TAB
+# -d <string>	delimiter for RQA file, default=TAB
+# -s	silent (no messages displayed)
+# -V	print version information
+# -h	print this help text
+
+
+
 # (C)RQA ------------------------------
 #' crqa_cl_main [internal]
 #'
@@ -233,12 +295,14 @@ repmat <- function(X,m,n){
 #' @param JRP y1
 #' @param distNorm y1
 #' @param returnMeasures y1
-#' @param returnRP y1
+#' @param returnRPvector y1
 #' @param returnLineDist y1
+#' @param returnDistance y1
 #' @param path_to_rp y1
 #' @param saveOut y1
 #' @param path_out y1
 #' @param file_ID y1
+#' @param silent y1
 #' @param ...
 #'
 #' @keywords internal
@@ -257,12 +321,14 @@ crqa_cl_main <- function(y1,
                     JRP     = FALSE,
                     distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
                     returnMeasures = TRUE,
-                    returnRP       = TRUE,
+                    returnRPvector       = TRUE,
                     returnLineDist = FALSE,
+                    plot_recmat = c("noplot","recmat","distmat")[[1]],
                     path_to_rp = getOption("casnet.path_to_rp"),
                     saveOut    = FALSE,
                     path_out   = NULL,
-                    file_ID    = NULL, ...){
+                    file_ID    = NULL,
+                    silent     = TRUE, ...){
 
   RQAmeasures <- list(
     RR      = 'Recurrence rate',
@@ -273,50 +339,20 @@ crqa_cl_main <- function(y1,
     L_max   = 'maximal diagonal line length',
     L_mean  = 'mean diagonal line length',
     L_entr  = 'Entropy of diagonal line length distribution',
-    DIV     =  'Divergence (1/L_max)',
+    DIV     = 'Divergence (1/L_max)',
     V_max   = 'maximal vertical line length',
     TT      = 'Trapping time',
     V_entr  = 'Entropy of vertical line length distribution',
     T1      = 'Recurrence times 1st type',
     T2      = 'Recurrence times 2nd type',
     W_max   = 'Max interval',
-    W_mean  = 'Mean interval',
-    W_entr  = 'Entropy intervals',
-    W_prob  = 'Prob interval',
+    W_mean  = 'Mean of interval',
+    W_entr  = 'Entropy interval distribution',
+    W_prob  = 'Prob.of intervals',
     F_min   = 'F min'
   )
 
-
-
-  # y1, y2, eDim, eLag, eRad, DLmin, VLmin, theiler, JRP, returnMeasures, returnRP, returnLineDist, path_to_rp, saveOut, path_out, file_ID = 0){
-  # -i <string>  	data filename (input)
-  # -j <string>  	filename of additional data for CRP/JRP (input)
-  # -J 	compute JRP instead of default CRP (only if 2nd data is given)
-  # -r <string>	filename recurrence plot (output)
-  # -o <string>	filename RQA measures (output)
-  # -p <string>	filename histogramme diagonal line lengths (output)
-  # -c	cummulative histogramme
-  # -f <string>	format for recurrence plot file (ASCII, TIF), default=ASCII
-  # -n <string>	distance norm (EUCLIDEAN, MAX, MIN, OP), default=EUCLIDEAN
-  # -m <number>	embedding dimension, default=1
-  # -t <number>	embedding delay, default=1
-  # -e <number>	threshold, default=1 (if negative, a distance plot will be created)
-  # -l <number>	minimal diagonal line, default=2
-  # -v <number>	minimal vertical line, default=2
-  # -w <number>	Theiler corrector, default=1
-  # -D <string>	delimiter in data file, default=TAB
-  # -d <string>	delimiter for RQA file, default=TAB
-  # -s	silent (no messages displayed)
-  # -V	print version information
-  # -h	print this help text
-
-  if(is.null(path_out)){
-    if(saveOut){
-      path_out <- getwd()
-    } else {
-      path_out <- tempdir()
-    }
-  }
+  if(plot_recmat%in%"distmat"){-1 * eRad}
 
   if(is.null(file_ID)){
     fnames <- list.files(path=path_out)
@@ -332,14 +368,10 @@ crqa_cl_main <- function(y1,
   if(any(is.null(y2))){df <- df[,1]}
 
   file_ID <- file_ID + 1
-  plotOUT <- paste0(path_out,"/RQAplot_",file_ID, ".txt")
-  measOUT <- paste0(path_out,"/RQAmeasures_",file_ID, ".txt")
+  plotOUT     <- paste0(path_out,"/RQAplot_",     file_ID, ".txt")
+  measOUT     <- paste0(path_out,"/RQAmeasures_", file_ID, ".txt")
   histOUTdiag <- paste0(path_out,"/RQAhist_diag_",file_ID, ".txt")
   histOUThori <- paste0(path_out,"/RQAhist_hori_",file_ID, ".txt")
-
-  # write.table(rbind(c('x','y','dist')),gsub("[']+","",plotOUT), col.names = FALSE, row.names = FALSE)
-  # write.table(rbind(paste0(names(RQAmeasures))),gsub("[']+","",measOUT), col.names = FALSE,row.names = FALSE)
-  # write.table(rbind(c('length','freq')),gsub("[']+","",histOUT),col.names = FALSE, row.names = FALSE)
 
   tmpd  <- tempdir()
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
@@ -358,7 +390,7 @@ crqa_cl_main <- function(y1,
                   "-v", VLmin,
                   "-w", theiler,
                   "-n", shQuote(distNorm),
-                  "-s")
+                  ifelse(silent,"-s",""))
   } else {
     tmpf2 <- tempfile(tmpdir = tmpd, fileext = ".dat")
     write.table(as.data.frame(y2), tmpf2, col.names = FALSE, row.names = FALSE, sep = "\t")
@@ -375,14 +407,13 @@ crqa_cl_main <- function(y1,
                   "-v", VLmin,
                   "-w", theiler,
                   "-n", shQuote(distNorm),
-                  "-s")
+                  ifelse(silent,"-s",""))
   }
 
   #closeAllConnections()
 
+  # RCMD
   devtools::RCMD(shQuote(paste0(getOption("casnet.rp_prefix"),"rp")), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
-
-  #system("./rp","-i '/var/folders/zr/n8mgv2nj5rz1qq04xsj_x_c80000gp/T//RtmpZAFB8n/fileb4ef2f6a0353.csv' 'test.csv' -o  -m 2 -t 2 -e 48.2 -l 2 -v 2 -w 1 -s",path = path.expand(path_to_rp), quiet = FALSE)
 
   measures     = try.CATCH(rio::import(gsub("[']+","",measOUT)))
   rpMAT        = try.CATCH(rio::import(gsub("[']+","",plotOUT)))
@@ -420,20 +451,22 @@ crqa_cl_main <- function(y1,
 
   cat(paste0("[ID ",file_ID,"] Analysis completed... "))
   if(!saveOut){
-    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",measOUT), quiet = TRUE) # path = path_out,
-    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",plotOUT), quiet = TRUE)
+    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",measOUT),     quiet = TRUE)
+    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",plotOUT),     quiet = TRUE)
     devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",histOUTdiag), quiet = TRUE)
     devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",histOUThori), quiet = TRUE)
     cat("temporary files removed ...\n")
   } else {
     cat("files saved ...\n")
   }
-  return(list(measures = measures,
-              rpMAT=rpMAT,
-              diag_disthist=disthistDiag,
-              hori_disthist=disthistHori))
+  return(list(measures      = measures,
+              rpMAT         = rpMAT,
+              diag_disthist = disthistDiag,
+              hori_disthist = disthistHori))
 }
 
+
+# devtools::RCMD(shQuote(paste0(getOption("casnet.rp_prefix"),"rp")), options = "-V", path = normalizePath(getOption("casnet.path_to_rp"), mustWork = FALSE), quiet = FALSE)
 
 #' fast (C)RQA
 #'
@@ -450,18 +483,19 @@ crqa_cl_main <- function(y1,
 #' @param win Window to calculate the (C)RQA (default = minimum of length of \code{y1} or \code{y2})
 #' @param step Stepsize for sliding windows (default = size of \code{win}, so no sliding window)
 #' @param JRP Wether to calculate a Joint Recurrence Plot(default = \code{FALSE})
-#' @param distNorm One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence plot
+#' @param distNorm One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix
 #' @param returnMeasures Return the (C)RQA measures? (default = \code{TRUE})
-#' @param returnRP Return the recurrent points in a dataframe? (default = \code{TRUE})
+#' @param returnRPvector Return the recurrent points in a dataframe? (default = \code{TRUE})
 #' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})
+#' @param plot_recmat Produce a plot of the recurrence matrix by calling \code{\link{recmat_plot}}, values can "recmat" (the thresholded recurrence matrix),"distmat" (the unthresholded recurrence matrix) or "noplot" (default = \code{"noplot"})
 #' @param path_to_rp Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)
 #' @param saveOut Save the output to files? If \code{TRUE} and \code{pat_out = NA}, the current working directory will be used (default = \code{FALSE})
 #' @param path_out Path to save output if \code{saveOut = TRUE} (default = \code{NULL})
-#' @param file_ID A file ID which will be a prefix to to the filename if \code{saveOut = \code{TRUE}} (default = NULL, an integer will be added tot the file name to ensure unique files)
+#' @param file_ID A file ID which will be a prefix to to the filename if \code{saveOut = TRUE} (default = \code{NULL}, an integer will be added tot the file name to ensure unique files)
 #' @param ... Additional parameters (currently not used)
 #'
 #'
-#' @details The \code{rp} executable is installed when the package is loaded for the first time and is renamed to \code{rp}, from a platform specific filename located in the directory: \code{...\\casnet\\commandline_rp\\}.
+#' @details The \code{rp} executable is installed when the function is called for the first time and is renamed to \code{rp}, from a platform specific filename located in the directory: \code{...\\casnet\\commandline_rp\\}.
 #' The file is copied to the directory: \code{...\\casnet\\exec\\}
 #' The latter location is stored as an option and can be read by calling \code{getOption("casnet.path_to_rp")}.
 #'
@@ -470,9 +504,9 @@ crqa_cl_main <- function(y1,
 #' Some notes on resolving errors with \code{rp}.
 #'
 #' \itemize{
-#'  \item \emph{Copy failed} - Every time the package is loaded it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you detach the package and delete the log file, another copy of the executable will be attempted.
-#' \item \emph{Copy still fails and/or no permission to copy} - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as an argument (\code{path_to_rp}) in the \code{fast_crqa} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}. If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page
-#' \item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[devtools]{RCMD}} and makes use of the \code{\link{normalizePath}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return \code{"/"}, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")}
+#'  \item \emph{Copy failed} - Every time the function \code{crqa_cl()} is called it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you delete the log file, and call the function, another copy of the executable will be attempted.
+#' \item \emph{Copy still fails and/or no permission to copy} - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as the argument \code{path_to_rp} in the \code{fast_crqa} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}. If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page and copy to a directory you have access to. Then follow the instruction to set \code{path_to_rp}.
+#' \item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[devtools]{RCMD}} and makes use of the \code{\link{normalizePath}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return an empty character vector, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")} and fill in the prefix that is correct for your OS
 #' }
 #'
 #'
@@ -495,11 +529,11 @@ crqa_cl_main <- function(y1,
 #'  \item TT = 'Trapping time'
 #'  \item V_entr = 'Entropy of vertical line length distribution'
 #'  \item T1 = 'Recurrence times 1st type'
-#'  \item T2 = 'Recurrence times 2nd type T2'
-#'  \item W_max = 'Max interval'
-#'  \item W_mean = 'Mean interval'
-#'  \item W_entr = 'Entropy intervals'
-#'  \item W_prob = 'Prob interval'
+#'  \item T2 = 'Recurrence times 2nd type'
+#'  \item W_max = 'Max interval length'
+#'  \item W_mean = 'Mean of interval lengths'
+#'  \item W_entr = 'Entropy of interval length distribution'
+#'  \item W_prob = 'Probability of interval'
 #'  \item F_min = 'F min'
 #' }
 #' \item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{recmat_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
@@ -534,12 +568,14 @@ crqa_cl <- function(y1,
                       JRP     = FALSE,
                       distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
                       returnMeasures = TRUE,
-                      returnRP       = TRUE,
+                      returnRPvector       = TRUE,
                       returnLineDist = FALSE,
+                      plot_recmat = c("noplot","recmat","distmat")[[1]],
                       path_to_rp = getOption("casnet.path_to_rp"),
                       saveOut    = FALSE,
                       path_out   = NULL,
-                      file_ID    = NULL, ...){
+                      file_ID    = NULL,
+                      silent     = FALSE, ...){
 require(plyr)
 require(dplyr)
 
@@ -556,42 +592,6 @@ require(dplyr)
     y2 <- y2[!is.na(y2)]
     warning("Removed NAs from timeseries y2 before (C)RQA")
   }
-
-  # Catch parameters
-  # params <- list(eDim  = eDim,
-  #                eLag  = eLag,
-  #                eRad  = eRad,
-  #                DLmin = DLmin,
-  #                VLmin = VLmin,
-  #                theiler = theiler,
-  #                JRP     = JRP,
-  #                distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-  #                returnMeasures = returnMeasures,
-  #                returnRP       = returnRP,
-  #                returnLineDist     = returnLineDist,
-  #                path_to_rp = path_to_rp,
-  #                saveOut = saveOut,
-  #                path_out = path_out,
-  #                file_ID  = file_ID)
-
-  # y2    = NULL
-  # eDim  = 1
-  # eLag  = 1
-  # eRad  = 1
-  # DLmin = 2
-  # VLmin = 2
-  # theiler = 0
-  # win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE)
-  # step    = win
-  # JRP     = FALSE
-  # distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]]
-  # returnMeasures = TRUE
-  # returnRP       = TRUE
-  # returnLineDist = FALSE
-  # path_to_rp = getOption("casnet.path_to_rp")
-  # saveOut    = FALSE
-  # path_out   = NULL
-  # file_ID    = NULL
 
   # Begin input checks
 
@@ -643,12 +643,14 @@ require(dplyr)
                                                 JRP            = JRP,
                                                 distNorm       = distNorm,
                                                 returnMeasures = returnMeasures,
-                                                returnRP       = returnRP,
-                                                returnLineDist     = returnLineDist,
+                                                returnRPvector = returnRPvector,
+                                                returnLineDist = returnLineDist,
+                                                plot_recmat    = plot_recmat,
                                                 path_to_rp     = path_to_rp,
                                                 saveOut        = saveOut,
                                                 path_out       = path_out,
-                                                file_ID        = file_ID)},
+                                                file_ID        = file_ID,
+                                                silent         = silent)},
                      by = step,
                      by.column = FALSE,
                      align = "left",
@@ -667,7 +669,7 @@ require(dplyr)
               rqa_diagdist = rqa_diagdist,
               rqa_horidist = rqa_horidist)
   if(saveOut){saveRDS(out,paste0(path_out,"CRQA_out",file_ID,".rds"))}
-  return(out[c(returnMeasures,returnRP,returnLineDist)])
+  return(out[c(returnMeasures,returnRPvector,returnLineDist)])
 }
 
 #' Find optimal (C)RQA parameters

@@ -47,7 +47,7 @@ get_os <- function(){
 #'
 set_command_line_rp <- function(){
   os <- get_os()
-  execPath <- getOption("casnet.path_to_rp")
+  execPath   <- getOption("casnet.path_to_rp")
   sourcePath <- getOption("casnet.path")
 
   # macOSX
@@ -65,7 +65,7 @@ set_command_line_rp <- function(){
   if(os%in%"windows"){
     sysCommand <- c("cp",paste(normalizePath(paste0(sourcePath,"/commandline_rp/windows_x86/rp_x86.exe")), normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)),"attrib", paste("+s", normalizePath(paste0(execPath,"/rp.exe"), mustWork = FALSE)))
     message(paste0("Detected: Windows \n  Copied: 'rp_x86.exe' to 'rp.exe' in package subdirectory 'exec' as the commandline CRP executable"))
-    options(casnet.rp_prefix="/")
+    options(casnet.rp_prefix="")
     options(casnet.sysdel="del")
   }
 
