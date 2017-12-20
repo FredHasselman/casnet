@@ -31,7 +31,8 @@ Imports: dplyr,
     xts,
     zoo,
     tidyr,
-    cowplot
+    cowplot,
+    rio
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

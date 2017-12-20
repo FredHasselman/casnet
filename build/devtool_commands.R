@@ -1,8 +1,8 @@
+library(plyr)
 library(tidyverse)
 
-l_ply(sort(c("dplyr","fractal","ggplot2","gridExtra","ifultools","igraph","qgraph","lattice","latticeExtra","Matrix","nonlinearTseries","plyr","pracma","proxy","scales","tidyr","xts","zoo","cowplot")), function(p) devtools::use_package(p))
+l_ply(sort(c("dplyr","fractal","ggplot2","gridExtra","ifultools","igraph","qgraph","lattice","latticeExtra","rio","Matrix","nonlinearTseries","plyr","pracma","proxy","scales","tidyr","xts","zoo","cowplot")), function(p) devtools::use_package(p))
 
-devtools::use_vignette("commandline_RQA")
 
 df <- openxlsx::read.xlsx("/Users/Fred/Documents/Projects/RNGproject/2014 - Oomens/Ruw_totaal.xlsx",sheet=2,colNames=F)
 df <- df[df[,3]==1,]
@@ -22,10 +22,11 @@ write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE)
 devtools::install(build_vignettes = TRUE)
 vignette("cl_RQA")
 
+devtools::
 
 build_win(args = c("--no-examples"))
 
-
+build
 
 devtools::RCMD(paste0(getOption("casnet.rp_prefix"),"rp"), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
 
