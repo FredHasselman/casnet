@@ -133,7 +133,7 @@ g_1rnd <- recmat_plot(di2bi(recmat(y1=y_1rnd, y2=y_1rnd, emDim = 1, emLag = 1), 
 g_2rnd <- recmat_plot(di2bi(recmat(y1=y_2rnd, y2=y_2rnd, emDim = 1, emLag = 1), radius=1), doPlot=FALSE)
 
 # Display recurrence plots
-plot_grid(g_1rnd, g_2rnd, labels = c("ID 163 shuffled", "ID 291 shuffled"), align = "h")
+cowplot::plot_grid(g_1rnd, g_2rnd, labels = c("ID 163 shuffled", "ID 291 shuffled"), align = "h")
 
 # Display the RQA measures
 cbind.data.frame(subj163=t(crqa_1), subj163rnd=t(crqa_1rnd), subj291=t(crqa_2),  subj291rnd=t(crqa_2rnd))
@@ -183,7 +183,7 @@ g_2sur <- ggplot(crqa_2rnd_sur, aes(x=crqa_2rnd_sur$DET)) +
 
 The red dots indicate the pbserved values.
 ```{r RNG5a, echo=FALSE}
-plot_grid(g_1sur, g_2sur, labels = c(paste0("ID 163 - P(X=",round(crqa_1$DET,2),") = ",p_1), paste0("ID 291 - P(X=",round(crqa_2$DET,2),") = ",p_2), align = "h"))
+cowplot::plot_grid(g_1sur, g_2sur, labels = c(paste0("ID 163 - P(X=",round(crqa_1$DET,2),") = ",p_1), paste0("ID 291 - P(X=",round(crqa_2$DET,2),") = ",p_2), align = "h"))
 ```
 
 
@@ -210,7 +210,7 @@ g_2sur <- ggplot(crqa_2rnd_sur, aes(x=crqa_2rnd_sur$LAM)) +
   xlab("LAMinarity")
 
 
-plot_grid(g_1sur, g_2sur, labels = c(paste0("ID 163 - P(X=",round(crqa_1$LAM,2),") = ",p_1), paste0("ID 291 - P(X=",round(crqa_2$LAM,2),") = ",p_2), align = "h"))
+cowplot::plot_grid(g_1sur, g_2sur, labels = c(paste0("ID 163 - P(X=",round(crqa_1$LAM,2),") = ",p_1), paste0("ID 291 - P(X=",round(crqa_2$LAM,2),") = ",p_2), align = "h"))
 ```
 
 If we were naive to the orgin of these number sequences, the results for **LAM**inarity should make us doubt that they represent indendent draws from a discrete uniform distribution of the type $X \sim \mathcal{U}(1,9)$. If we had to decide which sequence was more, or, less random, then based on the **DET**erminism result, we would conclude that participant 163 produced a sequence that is less random than participant 291, the observed value of the former is at the right extreme of a distribution of `DET` values calculated from 99 realisations of the data constrained by $H_0$.

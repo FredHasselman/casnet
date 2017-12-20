@@ -1,6 +1,6 @@
 library(tidyverse)
 
-l_ply(sort(c("dplyr","fractal","ggplot2","gridExtra","ifultools","igraph","qgraph","lattice","latticeExtra","Matrix","nonlinearTseries","plyr","pracma","proxy","scales","tidyr","xts","zoo")), function(p) devtools::use_package(p))
+l_ply(sort(c("dplyr","fractal","ggplot2","gridExtra","ifultools","igraph","qgraph","lattice","latticeExtra","Matrix","nonlinearTseries","plyr","pracma","proxy","scales","tidyr","xts","zoo","cowplot")), function(p) devtools::use_package(p))
 
 devtools::use_vignette("commandline_RQA")
 
@@ -21,6 +21,9 @@ write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE)
 
 devtools::install(build_vignettes = TRUE)
 vignette("cl_RQA")
+
+
+build_win(args = c("--no-examples"))
 
 
 

@@ -30,7 +30,8 @@ Imports: dplyr,
     scales,
     xts,
     zoo,
-    tidyr
+    tidyr,
+    cowplot
 Suggests: knitr,
     rmarkdown
-VignetteBuilder:knitr
+VignetteBuilder: knitr
