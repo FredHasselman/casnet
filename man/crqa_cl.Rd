@@ -8,9 +8,9 @@ crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
   VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
   (length(y1) + 1), length(y2)), na.rm = TRUE), step = win, JRP = FALSE,
   distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]], returnMeasures = TRUE,
-  returnRP = TRUE, returnLineDist = FALSE,
-  path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
-  path_out = NULL, file_ID = NULL, ...)
+  returnRPvector = TRUE, returnLineDist = FALSE, plot_recmat = c("noplot",
+  "recmat", "distmat")[[1]], path_to_rp = getOption("casnet.path_to_rp"),
+  saveOut = FALSE, path_out = NULL, file_ID = NULL, silent = FALSE, ...)
 }
 \arguments{
 \item{y1}{Time series 1}
@@ -35,13 +35,15 @@ crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
 
 \item{JRP}{Wether to calculate a Joint Recurrence Plot(default = \code{FALSE})}
 
-\item{distNorm}{One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence plot}
+\item{distNorm}{One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
 
 \item{returnMeasures}{Return the (C)RQA measures? (default = \code{TRUE})}
 
-\item{returnRP}{Return the recurrent points in a dataframe? (default = \code{TRUE})}
+\item{returnRPvector}{Return the recurrent points in a dataframe? (default = \code{TRUE})}
 
 \item{returnLineDist}{Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})}
+
+\item{plot_recmat}{Produce a plot of the recurrence matrix by calling \code{\link{recmat_plot}}, values can "recmat" (the thresholded recurrence matrix),"distmat" (the unthresholded recurrence matrix) or "noplot" (default = \code{"noplot"})}
 
 \item{path_to_rp}{Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)}
 
@@ -49,7 +51,7 @@ crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
 
 \item{path_out}{Path to save output if \code{saveOut = TRUE} (default = \code{NULL})}
 
-\item{file_ID}{A file ID which will be a prefix to to the filename if \code{saveOut = \code{TRUE}} (default = NULL, an integer will be added tot the file name to ensure unique files)}
+\item{file_ID}{A file ID which will be a prefix to to the filename if \code{saveOut = TRUE} (default = \code{NULL}, an integer will be added tot the file name to ensure unique files)}
 
 \item{...}{Additional parameters (currently not used)}
 }
@@ -72,11 +74,11 @@ A list object containing 1-3 elements, depending on arguments requesting output.
  \item TT = 'Trapping time'
  \item V_entr = 'Entropy of vertical line length distribution'
  \item T1 = 'Recurrence times 1st type'
- \item T2 = 'Recurrence times 2nd type T2'
- \item W_max = 'Max interval'
- \item W_mean = 'Mean interval'
- \item W_entr = 'Entropy intervals'
- \item W_prob = 'Prob interval'
+ \item T2 = 'Recurrence times 2nd type'
+ \item W_max = 'Max interval length'
+ \item W_mean = 'Mean of interval lengths'
+ \item W_entr = 'Entropy of interval length distribution'
+ \item W_prob = 'Probability of interval'
  \item F_min = 'F min'
 }
 \item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{recmat_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
@@ -87,7 +89,7 @@ A list object containing 1-3 elements, depending on arguments requesting output.
 This function will run the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} executable provided by Norbert Marwan.
 }
 \details{
-The \code{rp} executable is installed when the package is loaded for the first time and is renamed to \code{rp}, from a platform specific filename located in the directory: \code{...\\casnet\\commandline_rp\\}.
+The \code{rp} executable is installed when the function is called for the first time and is renamed to \code{rp}, from a platform specific filename located in the directory: \code{...\\casnet\\commandline_rp\\}.
 The file is copied to the directory: \code{...\\casnet\\exec\\}
 The latter location is stored as an option and can be read by calling \code{getOption("casnet.path_to_rp")}.
 }
@@ -111,9 +113,9 @@ More information about recurrence analysis can be found on the \href{http://www.
 Some notes on resolving errors with \code{rp}.
 
 \itemize{
- \item \emph{Copy failed} - Every time the package is loaded it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you detach the package and delete the log file, another copy of the executable will be attempted.
-\item \emph{Copy still fails and/or no permission to copy} - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as an argument (\code{path_to_rp}) in the \code{fast_crqa} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}. If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page
-\item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[devtools]{RCMD}} and makes use of the \code{\link{normalizePath}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return \code{"/"}, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")}
+ \item \emph{Copy failed} - Every time the function \code{crqa_cl()} is called it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you delete the log file, and call the function, another copy of the executable will be attempted.
+\item \emph{Copy still fails and/or no permission to copy} - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as the argument \code{path_to_rp} in the \code{fast_crqa} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}. If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page and copy to a directory you have access to. Then follow the instruction to set \code{path_to_rp}.
+\item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[devtools]{RCMD}} and makes use of the \code{\link{normalizePath}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return an empty character vector, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")} and fill in the prefix that is correct for your OS
 }
 }
 

@@ -8,9 +8,9 @@ crqa_cl_main(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
   VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
   (length(y1) + 1), length(y2)), na.rm = TRUE), step = win, JRP = FALSE,
   distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]], returnMeasures = TRUE,
-  returnRP = TRUE, returnLineDist = FALSE,
-  path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
-  path_out = NULL, file_ID = NULL, ...)
+  returnRPvector = TRUE, returnLineDist = FALSE, plot_recmat = c("noplot",
+  "recmat", "distmat")[[1]], path_to_rp = getOption("casnet.path_to_rp"),
+  saveOut = FALSE, path_out = NULL, file_ID = NULL, silent = TRUE, ...)
 }
 \arguments{
 \item{y1}{y1}
@@ -39,7 +39,7 @@ crqa_cl_main(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
 
 \item{returnMeasures}{y1}
 
-\item{returnRP}{y1}
+\item{returnRPvector}{y1}
 
 \item{returnLineDist}{y1}
 
@@ -51,7 +51,11 @@ crqa_cl_main(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
 
 \item{file_ID}{y1}
 
+\item{silent}{y1}
+
 \item{...}{}
+
+\item{returnDistance}{y1}
 }
 \description{
 crqa_cl_main [internal]
