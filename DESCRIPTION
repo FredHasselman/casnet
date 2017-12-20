@@ -34,5 +34,13 @@ Imports: dplyr,
     cowplot,
     rio
 Suggests: knitr,
-    rmarkdown
+    rmarkdown,
+    graphics,
+    grDevices,
+    stats,
+    utils
 VignetteBuilder: knitr
+Depends: graphics,
+    grDevices,
+    stats,
+    utils

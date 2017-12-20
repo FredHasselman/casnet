@@ -33,4 +33,4 @@ exec/rp
 exec/rp_instal_log.txt
 inst/doc
 
-build/
+build/*.*
