@@ -25,13 +25,5 @@ vignette("cl_RQA")
 ```
 
 
-### Use a tar/zip build
-
-1. Go to [`FredHasselman/casnet/pkg`](https://github.com/FredHasselman/casnet/tree/master/pkg) 
-2. Select the file you need
-    * `.tar.gz` is the `source` package for Mac OS or Linux.
-    * `.zip` is the `source` package for Windows.
-    * `.tgz` is the `binary` package for any OS, select it if you want to compile the package on your machine (you'll need a compiler see [the documentation on CRAN](https://cran.r-project.org/index.html)).
-3. Install the package locally either through the RStudio GUI, or by calling `install.packages()` or `devtools::install()`
 
 
