@@ -379,10 +379,10 @@ crqa_cl_main <- function(y1,
   fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
 
   file_ID <- file_ID + 1
-  plotOUT     <- normalizePath(file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep), mustWork = F)
-  measOUT     <- normalizePath(file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep), mustWork = F)
-  histOUTdiag <- normalizePath(file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep), mustWork = F)
-  histOUThori <- normalizePath(file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"),fsep = fileSep), mustWork = F)
+  plotOUT     <- normalizePath(file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
+  measOUT     <- normalizePath(file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
+  histOUTdiag <- normalizePath(file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
+  histOUThori <- normalizePath(file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
 
 
   if(any(is.null(y2))|any(is.na(y2%00%NA))){
@@ -459,13 +459,18 @@ crqa_cl_main <- function(y1,
 
   cat(paste0("[ID ",file_ID,"] Analysis completed... "))
   if(!saveOut){
-    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",measOUT),     quiet = TRUE)
-    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",plotOUT),     quiet = TRUE)
-    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",histOUTdiag), quiet = TRUE)
-    devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",histOUThori), quiet = TRUE)
+    # devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",measOUT),     quiet = TRUE)
+    # devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",plotOUT),     quiet = TRUE)
+    # devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",histOUTdiag), quiet = TRUE)
+    # devtools::RCMD(getOption("casnet.sysdel"), options = paste("-f",histOUThori), quiet = TRUE)
+    file.remove(measOUT)
+    file.remove(plotOUT)
+    file.remove(histOUTdiag)
+    file.remove(histOUThori)
     cat("temporary files removed ...\n")
   } else {
     cat("files saved ...\n")
+    cat(measOUT,"\n",plotOUT,"\n",histOUTdiag,"\n",histOUThori,"\n")
   }
   return(list(measures      = measures,
               rpMAT         = rpMAT,
@@ -584,11 +589,12 @@ crqa_cl <- function(y1,
                       saveOut    = FALSE,
                       path_out   = NULL,
                       file_ID    = NULL,
-                      silent     = TRUE, ...){
+                      silent     = TRUE,
+                      ...){
 require(plyr)
 require(dplyr)
 
-  if(!file.exists(normalizePath(paste0(getOption("casnet.path_to_rp"),"\rp_instal_log.txt"), mustWork = FALSE))){
+  if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"rp_instal_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
   }
 
