@@ -18,7 +18,6 @@
   invisible()
 }
 
-
 #' Which OS is running?
 #'
 #' @return A string, "osx", "windows", "linux"
@@ -93,5 +92,3 @@ set_command_line_rp <- function(){
   }
 
 }
-
-

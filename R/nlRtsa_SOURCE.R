@@ -42,7 +42,7 @@ init <- function(){
 #'
 #' NULL %00% NA
 `%00%` <- function(x,y){
-  l0<-isna<-isnan<-isinf<-isnll<-FALSE
+  l0<-isna<-isnan<-isinf<-isnll<-isTryError<-FALSE
   if(length(x)==0){
     l0=TRUE
   } else {
@@ -50,8 +50,9 @@ init <- function(){
     if(all(is.nan(x)))      isnan=TRUE
     if(all(is.infinite(x))) isinf=TRUE
     if(all(is.null(x)))     isnll=TRUE
+    if(all(class(x)%in%"try-error")) isTryError=TRUE
   }
-  if(any(l0,isna,isnan,isinf,isnll)){x<-y}
+  if(any(l0,isna,isnan,isinf,isnll,isTryError)){x<-y}
   return(x)
 }
 
@@ -83,7 +84,7 @@ ts_integrate <-function(y){
   yc  <- y
   yc[t[idOK]] <- cumsum(yy[-length(yy)]*diff(tt))
   # recover initial diff value
-  yc <-yc + y[1]
+  yc <- y[idOK][1] + yc
   return(yc)
 }
 
@@ -625,7 +626,7 @@ require(dplyr)
     N1 <- NROW(y1)
     N2 <- NROW(y2)
     if(N1>N2){
-      params$y2[N2:(N1+(N1-N2))] <- 0
+      y2[N2:(N1+(N1-N2))] <- 0
     }
     if(N1<N2){
       y1[N1:(N2+(N2-N1))] <- 0
@@ -889,9 +890,9 @@ crqa_radius <- function(RM,
   if(!dplyr::between(tol,0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
 
   AUTO        <- ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
-  recmat_size <- recmat_size(RM,AUTO,theiler)
+  recmatsize <- recmat_size(RM,AUTO,theiler)
   if(AUTO){
-    cat(paste0("\nAuto-recurrence: Setting diagonal to 0 (matrix size: ",recmat_size,")\n"))
+    cat(paste0("\nAuto-recurrence: Setting diagonal to 0 (matrix size: ",recmatsize,")\n"))
   } else {
     theiler = 0
   }
@@ -911,7 +912,7 @@ crqa_radius <- function(RM,
                          tolRRlo     = targetRR*(1-tol),
                          tolRRhi     = targetRR*(tol+1),
                          startRadius = startRadius,
-                         recmat_size      = recmat_size,
+                         recmat.size      = recmatsize,
                          AUTO        = AUTO,
                          Converged   = Converged, check.names = FALSE)
 
@@ -921,7 +922,7 @@ crqa_radius <- function(RM,
 
     iter <- iter+1
 
-    RR = Matrix::nnzero(di2bi(RM,tryRadius),na.counted = FALSE)/recmat_size
+    RR = Matrix::nnzero(di2bi(RM,tryRadius),na.counted = FALSE)/recmatsize
 
     iterList[iter,] <-    cbind.data.frame(iter,
                                            RR,
@@ -930,7 +931,7 @@ crqa_radius <- function(RM,
                                            targetRR*(1-tol),
                                            targetRR*(tol+1),
                                            startRadius,
-                                           recmat_size,
+                                           recmatsize,
                                            AUTO,
                                            Converged)
 
@@ -1194,6 +1195,8 @@ crqa_mat <- function(rmat,
   # Input should be a distance matrix, or a matrix of zeroes and ones with radius = NULL, output is a list
   # Fred Hasselman (me@fredhasselman.com) - August 2013
 
+  require(parallel)
+
   if(is.null(AUTO)){
     AUTO <- ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
   }
@@ -1212,7 +1215,7 @@ crqa_mat <- function(rmat,
       }
     }
   }
-  rm(rmat)
+  #rm(rmat)
 
   out <- crqa_mat_measures(RM,
                            DLmin = DLmin,
@@ -2042,12 +2045,12 @@ crp_calc <- function(RM,
                      chromatic = FALSE,
                      matrices  = FALSE){
 
-  recmat_size <- Msize(RM, auto=AUTO)
+  recmatsize <- recmat_size(RM, AUTO=AUTO)
 
   #Total nr. recurrent points
   RT <- Matrix::nnzero(RM, na.counted = FALSE)
   #Proportion recurrence / Recurrence Rate
-  RR <- RT/recmat_size
+  RR <- RT/recmatsize
   #Get line segments
   lineSegments <- lineDists(RM)
 
