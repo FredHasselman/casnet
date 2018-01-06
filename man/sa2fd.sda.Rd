@@ -4,10 +4,12 @@
 \alias{sa2fd.sda}
 \title{Informed Dimension estimate from SDA slope.}
 \usage{
-\method{sa2fd}{sda}(sa)
+\method{sa2fd}{sda}(sa, ...)
 }
 \arguments{
 \item{sa}{Self-afinity parameter estimate based on SDA slope (e.g., \code{\link{fd.sda}})).}
+
+\item{...}{Other arguments}
 }
 \value{
 An informed estimate of the Fractal Dimension, see Hasselman(2013) for details.
@@ -18,22 +20,8 @@ Conversion formula: Standardised Dispersion Analysis (SDA) estimate of self-affi
 \details{
 Note that for some signals different PSD slope values project to a single SDA slope. That is, SDA cannot distinguish dplyr::between all variaties of power-law scaling in the frequency domain.
 }
-\examples{
-# Informed FD of white noise
-sa2fd.sda(-0.5)
-
-# Informed FD of Brownian noise
-sa2fd.sda(-1)
-
-# Informed FD of blue noise
-sa2fd.sda(-0.9)
-}
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
-}
-\seealso{
-Other SA to FD converters: \code{\link{sa2fd.default}},
-  \code{\link{sa2fd.dfa}}, \code{\link{sa2fd.psd}}
 }
 \author{
 Fred Hasselman

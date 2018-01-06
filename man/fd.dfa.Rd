@@ -11,13 +11,23 @@
 \arguments{
 \item{y}{A numeric vector or time series object.}
 
-\item{normalize}{Normalize the series (default).}
+\item{fs}{Sample rate}
+
+\item{dtrend}{Method to use for detrending, see \code{\link[fractal]{DFA}} (default = "poly1")}
+
+\item{normalize}{Normalize the series (default = TRUE)}
+
+\item{sum.order}{default = 1}
+
+\item{scale.max}{Maximum scale to use}
+
+\item{scale.min}{Minimium scale to use}
+
+\item{elasceratio}{see \code{\link[fractal]{DFA}}}
+
+\item{overlap}{By what percentage should scale bins overlap? (default = 0)}
 
 \item{plot}{Return the log-log spectrum with linear fit (default).}
-
-\item{detrend}{Subtract linear trend from the series (default).}
-
-\item{dmethod}{Method to use for detrending, see \code{\link[fractal]{DFA}}.}
 }
 \value{
 Estimate of Hurst exponent (slope of \code{log(bin)} vs. \code{log(RMSE))} and an FD estimate based on Hasselman(2013)

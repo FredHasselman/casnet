@@ -4,9 +4,8 @@
 \alias{lineDists}
 \title{lineDists}
 \usage{
-lineDists(RP, d = NULL, theiler = NULL, Chromatic = FALSE,
-  invert = FALSE, AUTO = NULL, chromatic = FALSE, matrices = FALSE,
-  doHalf = FALSE)
+lineDists(RP, d = NULL, theiler = NULL, invert = FALSE, AUTO = NULL,
+  chromatic = FALSE, matrices = FALSE, doHalf = FALSE)
 }
 \arguments{
 \item{RP}{A thresholded recurrence matrix (binary: 0 - 1)}
@@ -16,6 +15,14 @@ lineDists(RP, d = NULL, theiler = NULL, Chromatic = FALSE,
 \item{theiler}{Size of the theiler window, e.g. \code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}.}
 
 \item{invert}{Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.}
+
+\item{AUTO}{Is this an AUTO RQA?}
+
+\item{chromatic}{Chromatic RQA?}
+
+\item{matrices}{Return Matrices?}
+
+\item{doHalf}{Analyse half of the matrix?}
 }
 \value{
 A list object with distribution of line lengths.

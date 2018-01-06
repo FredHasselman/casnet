@@ -6,8 +6,8 @@
 \usage{
 crqa_mat(rmat, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(diag(rmat)) - 1, VLmax = length(diag(rmat)) - 1,
-  HLmax = length(diag(rmat)) - 1, AUTO = NULL, doHalf = FALSE,
-  chromatic = FALSE, matrices = FALSE, Nboot = NULL, CL = 0.95)
+  HLmax = length(diag(rmat)) - 1, AUTO = NULL, chromatic = FALSE,
+  matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95)
 }
 \arguments{
 \item{rmat}{A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})}
@@ -28,11 +28,11 @@ crqa_mat(rmat, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
-\item{doHalf}{Analyse half of the matrix? (default = \code{FALSE})}
-
 \item{chromatic}{Force chromatic RQA? (default = \code{FALSE})}
 
 \item{matrices}{Return matrices? (default = \code{FALSE})}
+
+\item{doHalf}{Analyse half of the matrix? (default = \code{FALSE})}
 
 \item{Nboot}{How many bootstrap replications? (default = \code{NULL})}
 

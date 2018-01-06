@@ -14,10 +14,6 @@ tau(y, selection.methods = c("first.minimum"), maxLag = length(y)/4, ...)
 \item{maxLag}{Maximal lag to consider (default: 1/5 of timeseries length)}
 
 \item{...}{Additional parameters}
-
-\item{value}{Threshold value for selection method first.value (default: 1/exp(1))}
-
-\item{nbins}{Number of bins for average mutual information function (default: 1/3 of number of unique values in timeseries)}
 }
 \value{
 The ami function with minima

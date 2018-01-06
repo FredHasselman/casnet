@@ -12,6 +12,8 @@ crqa_mat_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \arguments{
 \item{RM}{A binary recurrence matrix}
 
+\item{radius}{Threshold for distance value that counts as a recurrence}
+
 \item{DLmin}{Minimal diagonal line length}
 
 \item{VLmin}{Minimal vertical line length}

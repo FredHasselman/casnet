@@ -1,6 +1,6 @@
 Package: casnet
 Type: Package
-Title: Toolbox for studying Complex Adaptive Systems and NETworks
+Title: Toolbox for Studying Complex Adaptive Systems and NETworks
 Version: 0.1.0
 Author: Fred Hasselman
 Maintainer: Fred Hasselman <f.hasselman@bsi.ru.nl>
@@ -9,7 +9,7 @@ Description: A collection of analytic tools for studying signals recorded from c
     - Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)
     - Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA)
     - Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks)
-License: GPL-3
+License: GPL-3 + file LICENSE
 Depends: R (>= 2.10)
 Encoding: UTF-8
 LazyData: true
@@ -33,11 +33,17 @@ Imports: dplyr,
     zoo,
     tidyr,
     cowplot,
-    rio
+    rio,
+    gtable,
+    reshape2,
+    sapa,
+    signal
 Suggests: knitr,
     rmarkdown,
     graphics,
     grDevices,
     stats,
-    utils
+    utils,
+    devtools,
+    tidyverse
 VignetteBuilder: knitr

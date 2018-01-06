@@ -592,9 +592,9 @@ crqa_cl <- function(y1,
                       file_ID    = NULL,
                       silent     = TRUE,
                       ...){
-require(plyr)
-require(dplyr)
-require(zoo)
+# require(plyr)
+# require(dplyr)
+# require(zoo)
 
   if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"rp_instal_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
@@ -675,10 +675,10 @@ require(zoo)
 
 
   wlist        <- unclass(wlist)
-  rqa_measures <- ldply(wlist[,1]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_rpvector <- ldply(wlist[,2]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_diagdist <- ldply(wlist[,3]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_horidist <- ldply(wlist[,4]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_measures <- plyr::ldply(wlist[,1]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_rpvector <- plyr::ldply(wlist[,2]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_diagdist <- plyr::ldply(wlist[,3]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_horidist <- plyr::ldply(wlist[,4]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
 
 
   out <- list(rqa_measures = rqa_measures,
@@ -967,6 +967,7 @@ crqa_radius <- function(RM,
 #' Use `crqa_mat`
 #'
 #' @param RM A binary recurrence matrix
+#' @param radius Threshold for distance value that counts as a recurrence
 #' @param DLmin Minimal diagonal line length
 #' @param VLmin Minimal vertical line length
 #' @param HLmin Minimal horizontal line length
@@ -1168,9 +1169,9 @@ crqa_mat_measures <- function(RM,
 #' @param VLmax Maximal vertical line length (default = length of diagonal -1)
 #' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
 #' @param AUTO Auto-recurrence? (default = \code{FALSE})
-#' @param doHalf Analyse half of the matrix? (default = \code{FALSE})
 #' @param chromatic Force chromatic RQA? (default = \code{FALSE})
 #' @param matrices Return matrices? (default = \code{FALSE})
+#' @param doHalf Analyse half of the matrix? (default = \code{FALSE})
 #' @param Nboot How many bootstrap replications? (default = \code{NULL})
 #' @param CL Confidence limit for bootstrap results (default = \code{.95})
 
@@ -1187,9 +1188,9 @@ crqa_mat <- function(rmat,
                      VLmax = length(diag(rmat))-1,
                      HLmax = length(diag(rmat))-1,
                      AUTO      = NULL,
-                     doHalf    = FALSE,
                      chromatic = FALSE,
                      matrices  = FALSE,
+                     doHalf    = FALSE,
                      Nboot     = NULL,
                      CL        = .95){
 
@@ -1345,9 +1346,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 #'
 #' @param y Time series
 #' @param selection.methods Selecting an optimal embedding lag (default: Return "first.e.decay", "first.zero", "first.minimum", "first.value", where value is 1/exp(1))
-#' @param value Threshold value for selection method first.value (default: 1/exp(1))
 #' @param maxLag Maximal lag to consider (default: 1/5 of timeseries length)
-#' @param nbins Number of bins for average mutual information function (default: 1/3 of number of unique values in timeseries)
 #' @param ... Additional parameters
 #'
 #' @return The ami function with minima
@@ -1400,6 +1399,8 @@ tau <- function(y,
 #' @param y Time series
 #' @param delay Embeding lag
 #' @param maxDim Maximum number of embedding dimensions
+#' @param threshold See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
+#' @param max.relative.change See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
 #' @param ... Other arguments (not in use)
 #'
 #' @description A wrapper for nonlinearTseries::estimateEmbeddingDim
@@ -1409,7 +1410,7 @@ tau <- function(y,
 #'
 est_eDim <- function(y, delay = tau(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
   cbind.data.frame(EmbeddingLag   = delay,
-                   EmbeddingDim   = estimateEmbeddingDim(y,
+                   EmbeddingDim   = nonlinearTseries::estimateEmbeddingDim(y,
                                                          time.lag  = delay,
                                                          threshold = threshold,
                                                          max.relative.change = max.relative.change,
@@ -1591,6 +1592,11 @@ nzdiags.chroma <- function(RP, d=NULL){
 #' @param d Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \code{-50,50,100}.
 #' @param theiler Size of the theiler window, e.g. \code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}.
 #' @param invert Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
+#' @param AUTO Is this an AUTO RQA?
+#' @param chromatic Chromatic RQA?
+#' @param matrices Return Matrices?
+#' @param doHalf Analyse half of the matrix?
+#'
 #'
 #' @description Extract lengths of diagonal and vertical line segments from a recurrence matrix.
 #' @details Based on the Matlab function \code{lineDists} by Stefan Schinkel, Copyright (C) 2009 Stefan Schinkel, University of Potsdam, http://www.agnld.uni-potsdam.de
@@ -1610,7 +1616,6 @@ nzdiags.chroma <- function(RP, d=NULL){
 lineDists <- function(RP,
                       d         = NULL,
                       theiler   = NULL,
-                      Chromatic = FALSE,
                       invert    = FALSE,
                       AUTO      = NULL,
                       chromatic = FALSE,
@@ -1828,6 +1833,7 @@ recmat <- function(y1, y2=NULL,
 #'
 #' @param rmat A distance matrix or recurrence matrix
 #' @param PhaseSpaceScale For display purposes: Rescale the data? (default = \code{TRUE})
+#' @param title A title for the plot
 #' @param doPlot Draw the plot? (default = \code{TRUE})
 #' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{rmat} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
 #' @param plotMeasures Print common (C)RQA measures in the plot
@@ -2793,17 +2799,17 @@ lagEmbed <- function (y, emDim, emLag){
 
 sliceTS<-function(TSmat,epochSz=1) {
   # Slice columns of TSmat in epochs of size = epochSz
-  require(plyr)
+  #require(plyr)
 
   N<-dim(TSmat)
-  return(llply(seq(1,N[1],epochSz),function(i) TSmat[i:min(i+epochSz-1,N[1]),1:N[2]]))
+  return(plyr::llply(seq(1,N[1],epochSz),function(i) TSmat[i:min(i+epochSz-1,N[1]),1:N[2]]))
 }
 
 fltrIT <- function(TS,f){
   # Apply filtfilt to TS using f (filter settings)
-  require("signal")
+  #require("signal")
 
-  return(filtfilt(f=f,x=TS))
+  return(signal::filtfilt(f=f,x=TS))
 
 }
 
@@ -2930,7 +2936,7 @@ sa2fd <- function(sa, ...) UseMethod("sa2fd")
 #' sa2df.default
 #'
 #' @param sa Self-affinity parameter
-#' @param ... Other argumentd
+#' @param ... Other arguments
 #'
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
@@ -2947,7 +2953,8 @@ sa2fd.default <- function(sa, ...){
 #' Informed Dimension estimate from Spectral Slope (aplha)
 #'
 #' @description Conversion formula: From periodogram based self-affinity parameter estimate (\code{sa}) to an informed estimate of the (fractal) dimension (FD).
-#' @param sa Self-Affinity parameter estimate based on PSD slope (e.g., \code{\link{fd.psd}})).
+#' @param sa Self-Affinity parameter estimate based on PSD slope (e.g., \code{\link{fd.psd}}))
+#' @param ... Other arguments
 #'
 #' @return An informed estimate of the Fractal Dimension, see Hasselman(2013) for details.
 #' @export
@@ -2961,16 +2968,7 @@ sa2fd.default <- function(sa, ...){
 #'
 #' @family SA to FD converters
 #'
-#' @examples
-#' # Informed FD of white noise
-#' sa2fd.psd(0)
-#'
-#' # Informed FD of Brownian noise
-#' sa2fd.psd(-2)
-#'
-#' # Informed FD of blue noise
-#' sa2fd.psd(2)
-sa2fd.psd <- function(sa){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)))), digits = 2))}
+sa2fd.psd <- function(sa, ...){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)))), digits = 2))}
 
 
 #' Informed Dimension estimate from DFA slope (H)
@@ -2978,6 +2976,7 @@ sa2fd.psd <- function(sa){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)))), 
 #' @description Conversion formula: Detrended Fluctuation Analysis (DFA) estimate of the Hurst exponent (a self-affinity parameter \code{sa}) to an informed estimate of the (fractal) dimension (FD).
 #'
 #' @param sa Self-Afinity parameter estimate based on DFA slope (e.g., \code{\link{fd.sda}})).
+#' @param ... Other arguments
 #'
 #' @return An informed estimate of the Fractal Dimension, see Hasselman(2013) for details.
 #'
@@ -2992,16 +2991,7 @@ sa2fd.psd <- function(sa){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)))), 
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 #'
-#' @examples
-#' # Informed FD of white noise
-#' sa2fd.dfa(0.5)
-#'
-#' # Informed FD of Pink noise
-#' sa2fd.dfa(1)
-#'
-#' # Informed FD of blue noise
-#' sa2fd.dfa(0.1)
-sa2fd.dfa <- function(sa){return(round(2-(tanh(log(3)*sa)), digits = 2))}
+sa2fd.dfa <- function(sa, ...){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 
 
 #' Informed Dimension estimate from SDA slope.
@@ -3009,6 +2999,7 @@ sa2fd.dfa <- function(sa){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 #' @description Conversion formula: Standardised Dispersion Analysis (SDA) estimate of self-affinity parameter (\code{SA}) to an informed estimate of the fractal dimension (FD).
 #'
 #' @param sa Self-afinity parameter estimate based on SDA slope (e.g., \code{\link{fd.sda}})).
+#' @param ... Other arguments
 #'
 #' @details
 #'
@@ -3021,18 +3012,9 @@ sa2fd.dfa <- function(sa){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 #'
-#' @family SA to FD converters
+#' @family
 #'
-#' @examples
-#' # Informed FD of white noise
-#' sa2fd.sda(-0.5)
-#'
-#' # Informed FD of Brownian noise
-#' sa2fd.sda(-1)
-#'
-#' # Informed FD of blue noise
-#' sa2fd.sda(-0.9)
-sa2fd.sda <- function(sa){return(1-sa)}
+sa2fd.sda <- function(sa, ...){return(1-sa)}
 
 
 
@@ -3072,16 +3054,17 @@ fd.default <- function(y, ...){
 }
 
 
-# PSD -------------------------------------------------------------------------------------------------------------
+# PSD -------
 
 #' @title Power Spectral Density Slope (PSD).
 
 #' @description Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope.
 #'
 #' @param y    A numeric vector or time series object.
-#' @param normalize    Normalize the series (default).
-#' @param detrend    Subtract linear trend from the series (default).
-#' @param plot    Return the log-log spectrum with linear fit (default).
+#' @param fs Sample rate (default = NULL)
+#' @param normalize    Normalize the series (default = TRUE).
+#' @param dtrend    Subtract linear trend from the series (default = TRUE).
+#' @param plot    Return the log-log spectrum with linear fit (default = FALSE).
 #'
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
@@ -3184,7 +3167,11 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
 #' @title Standardised Dispersion Analysis (SDA).
 #'
 #' @param y    A numeric vector or time series object.
-#' @param normalize    Normalize the series (default).
+#' @param fs Sample rate (default = NULL)
+#' @param normalize    Normalize the series (default = TRUE).
+#' @param dtrend    Subtract linear trend from the series (default = TRUE).
+#' @param scales  default = \code{fractal::dispersion(y)$scale}, see \code{\link{[fractal]}dispersion}
+#' @param fitRange Scale bins (\code{c(min,max)}) to use for fitting the scaling relation
 #' @param plot    Return the log-log spectrum with linear fit (default).
 #'
 #' @author Fred Hasselman
@@ -3202,9 +3189,9 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
 #'
 #' @family FD estimators
 #'
-fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = dispersion(y)$scale, fitRange = c(scales[1], scales[length(scales)-2]), plot = FALSE){
-  require(pracma)
-  require(fractal)
+fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = fractal::dispersion(y)$scale, fitRange = c(scales[1], scales[length(scales)-2]), plot = FALSE){
+  #require(pracma)
+  #require(fractal)
 
   if(!is.ts(y)){
     if(is.null(fs)){fs <- 1}
@@ -3219,7 +3206,7 @@ fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = disp
   if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (sd(y, na.rm = TRUE)*sqrt((N-1)/N))
 
   bins          <- which(fitRange[1]==scales):which(fitRange[2]==scales)
-  out           <- dispersion(y, front = FALSE)
+  out           <- fractal::dispersion(y, front = FALSE)
   lmfit1        <- lm(log(out$sd) ~ log(out$scale))
   lmfit2        <- lm(log(out$sd[bins]) ~ log(out$scale[bins]))
 
@@ -3250,9 +3237,14 @@ fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = disp
 #' @title Detrended Fluctuation Analysis (DFA)
 #'
 #' @param y    A numeric vector or time series object.
-#' @param normalize    Normalize the series (default).
-#' @param detrend    Subtract linear trend from the series (default).
-#' @param dmethod     Method to use for detrending, see \code{\link[fractal]{DFA}}.
+#' @param fs   Sample rate
+#' @param dtrend Method to use for detrending, see \code{\link[fractal]{DFA}} (default = "poly1")
+#' @param normalize    Normalize the series (default = TRUE)
+#' @param sum.order   default = 1
+#' @param scale.max   Maximum scale to use
+#' @param scale.min   Minimium scale to use
+#' @param elasceratio  see \code{\link[fractal]{DFA}}
+#' @param overlap    By what percentage should scale bins overlap? (default = 0)
 #' @param plot    Return the log-log spectrum with linear fit (default).
 #'
 #'
@@ -3273,8 +3265,8 @@ fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = disp
 #' @family FD estimators
 #'
 fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order = 1, scale.max=trunc(length(y)/4), scale.min=4, elasceratio=2^(1/4), overlap = 0, plot = FALSE){
-  require(pracma)
-  require(fractal)
+  #require(pracma)
+  #require(fractal)
 
   reload <- FALSE
   if("signal" %in% .packages()){
@@ -3636,14 +3628,14 @@ netGroupCol <- function(g,grp){
 
 
 plot.loglog <- function(fd.OUT){
-  require(ggplot2)
-  require(scales)
+  #require(ggplot2)
+  #require(scales)
   g <- ggplot2::ggplot(fd.OUT$PLAW, aes(x=size,y=bulk), na.rm=T) +
-    scale_x_log10(breaks = log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$size)))+c(-1,1))),base=10),
-                  labels = trans_format("log10", math_format(10^.x)),
+    scale_x_log10(breaks = scales::log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$size)))+c(-1,1))),base=10),
+                  labels = scales::trans_format("log10", scales::math_format(10^.x)),
                   limits = range(round(log10(fd.OUT$PLAW$size)))+c(-1,1)) +
-    scale_y_log10(breaks = log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$bulk)))+c(-1,1))),base=10),
-                  labels = trans_format("log10", math_format(10^.x)),
+    scale_y_log10(breaks = scales::log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$bulk)))+c(-1,1))),base=10),
+                  labels = scales::trans_format("log10", scales::math_format(10^.x)),
                   limits = range(round(log10(fd.OUT$PLAW$bulk)))+c(-1,1)) +
     geom_point() +
     geom_abline(intercept = fd.OUT[[2]]$fitlm1$coefficients[[1]], slope = fd.OUT[[2]]$fitlm1$coefficients[[2]], colour = "red", size = 2) +

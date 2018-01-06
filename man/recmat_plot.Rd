@@ -12,6 +12,8 @@ recmat_plot(rmat, PhaseSpaceScale = TRUE, title = "", doPlot = TRUE,
 
 \item{PhaseSpaceScale}{For display purposes: Rescale the data? (default = \code{TRUE})}
 
+\item{title}{A title for the plot}
+
 \item{doPlot}{Draw the plot? (default = \code{TRUE})}
 
 \item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{rmat} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.}

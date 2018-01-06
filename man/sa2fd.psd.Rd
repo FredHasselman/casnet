@@ -4,10 +4,12 @@
 \alias{sa2fd.psd}
 \title{Informed Dimension estimate from Spectral Slope (aplha)}
 \usage{
-\method{sa2fd}{psd}(sa)
+\method{sa2fd}{psd}(sa, ...)
 }
 \arguments{
-\item{sa}{Self-Affinity parameter estimate based on PSD slope (e.g., \code{\link{fd.psd}})).}
+\item{sa}{Self-Affinity parameter estimate based on PSD slope (e.g., \code{\link{fd.psd}}))}
+
+\item{...}{Other arguments}
 }
 \value{
 An informed estimate of the Fractal Dimension, see Hasselman(2013) for details.
@@ -20,22 +22,12 @@ The spectral slope will be converted to a dimension estimate using:
 
 \deqn{D_{PSD}\approx\frac{3}{2}+\frac{14}{33}*\tanh\left(Slope * \ln(1+\sqrt{2})\right)}
 }
-\examples{
-# Informed FD of white noise
-sa2fd.psd(0)
-
-# Informed FD of Brownian noise
-sa2fd.psd(-2)
-
-# Informed FD of blue noise
-sa2fd.psd(2)
-}
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
 Other SA to FD converters: \code{\link{sa2fd.default}},
-  \code{\link{sa2fd.dfa}}, \code{\link{sa2fd.sda}}
+  \code{\link{sa2fd.dfa}}
 }
 \author{
 Fred Hasselman

@@ -5,13 +5,21 @@
 \title{Standardised Dispersion Analysis (SDA).}
 \usage{
 \method{fd}{sda}(y, fs = NULL, normalize = TRUE, dtrend = FALSE,
-  scales = dispersion(y)$scale, fitRange = c(scales[1],
+  scales = fractal::dispersion(y)$scale, fitRange = c(scales[1],
   scales[length(scales) - 2]), plot = FALSE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
 
-\item{normalize}{Normalize the series (default).}
+\item{fs}{Sample rate (default = NULL)}
+
+\item{normalize}{Normalize the series (default = TRUE).}
+
+\item{dtrend}{Subtract linear trend from the series (default = TRUE).}
+
+\item{scales}{default = \code{fractal::dispersion(y)$scale}, see \code{\link{[fractal]}dispersion}}
+
+\item{fitRange}{Scale bins (\code{c(min,max)}) to use for fitting the scaling relation}
 
 \item{plot}{Return the log-log spectrum with linear fit (default).}
 }

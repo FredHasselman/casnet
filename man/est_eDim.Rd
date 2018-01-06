@@ -14,6 +14,10 @@ est_eDim(y, delay = tau(y), maxDim = 20, threshold = 0.95,
 
 \item{maxDim}{Maximum number of embedding dimensions}
 
+\item{threshold}{See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
+
+\item{max.relative.change}{See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
+
 \item{...}{Other arguments (not in use)}
 }
 \value{

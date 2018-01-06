@@ -1,5 +1,7 @@
 # Disclaimer: **VERY BETA**
 
+[[![Travis-CI Build Status](https://travis-ci.org/FredHasselman/casnet.svg?branch=master)](https://travis-ci.org/FredHasselman/casnet)
+
 # **casnet**: An R toolbox for studying Complex Adaptive Systems and NETworks
 
 A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:

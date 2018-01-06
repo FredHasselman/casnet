@@ -9,7 +9,7 @@
 \arguments{
 \item{sa}{Self-affinity parameter}
 
-\item{...}{Other argumentd}
+\item{...}{Other arguments}
 }
 \description{
 sa2df.default
@@ -19,7 +19,7 @@ Hasselman, F. (2013). When the blind curve is finite: dimension estimation and m
 }
 \seealso{
 Other SA to FD converters: \code{\link{sa2fd.dfa}},
-  \code{\link{sa2fd.psd}}, \code{\link{sa2fd.sda}}
+  \code{\link{sa2fd.psd}}
 }
 \author{
 Fred Hasselman

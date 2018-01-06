@@ -4,10 +4,12 @@
 \alias{sa2fd.dfa}
 \title{Informed Dimension estimate from DFA slope (H)}
 \usage{
-\method{sa2fd}{dfa}(sa)
+\method{sa2fd}{dfa}(sa, ...)
 }
 \arguments{
 \item{sa}{Self-Afinity parameter estimate based on DFA slope (e.g., \code{\link{fd.sda}})).}
+
+\item{...}{Other arguments}
 }
 \value{
 An informed estimate of the Fractal Dimension, see Hasselman(2013) for details.
@@ -20,22 +22,12 @@ The DFA slope (H) will be converted to a dimension estimate using:
 
 \deqn{D_{DFA}\approx 2-(\tanh(\log(3)*sa)) }{D_{DFA} ≈ 2-(tanh(log(3)*sa)) }
 }
-\examples{
-# Informed FD of white noise
-sa2fd.dfa(0.5)
-
-# Informed FD of Pink noise
-sa2fd.dfa(1)
-
-# Informed FD of blue noise
-sa2fd.dfa(0.1)
-}
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
 Other SA to FD converters: \code{\link{sa2fd.default}},
-  \code{\link{sa2fd.psd}}, \code{\link{sa2fd.sda}}
+  \code{\link{sa2fd.psd}}
 }
 \author{
 Fred Hasselman
