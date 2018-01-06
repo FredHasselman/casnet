@@ -49,6 +49,7 @@ set_command_line_rp <- function(){
   os <- get_os()
   execPath   <- getOption("casnet.path_to_rp")
   sourcePath <- getOption("casnet.path")
+  unzip(paste0(sourcePath,"/commandline_rp.zip"),exdir=sourcePath)
 
   # macOSX
   if(os%in%"osx"){

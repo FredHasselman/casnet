@@ -13,11 +13,11 @@
 
 \item{fs}{Sample rate (default = NULL)}
 
-\item{normalize}{Normalize the series (default = TRUE).}
+\item{normalize}{Normalize the series (default = TRUE)}
 
-\item{dtrend}{Subtract linear trend from the series (default = TRUE).}
+\item{dtrend}{Subtract linear trend from the series (default = TRUE)}
 
-\item{scales}{default = \code{fractal::dispersion(y)$scale}, see \code{\link{[fractal]}dispersion}}
+\item{scales}{default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}}
 
 \item{fitRange}{Scale bins (\code{c(min,max)}) to use for fitting the scaling relation}
 

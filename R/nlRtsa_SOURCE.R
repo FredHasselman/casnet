@@ -1,24 +1,24 @@
 
 # Load required libraries --------------------------------
-
-init <- function(){
-  library(devtools)
-  library(rio)
-  library(plyr)
-  library(tidyverse)
-  library(nonlinearTseries)
-  library(zoo)
-  library(xts)
-  library(Matrix)
-  library(flexclust)
-  #library(NetComp)
-  library(igraph)
-  library(lattice)
-  library(latticeExtra)
-  library(grid)
-  library(gridExtra)
-  source('~/Documents/GitHub/manylabRs/manylabRs/R/fRedsRutils.R')
-}
+#
+# init <- function(){
+#   library(devtools)
+#   library(rio)
+#   library(plyr)
+#   library(tidyverse)
+#   library(nonlinearTseries)
+#   library(zoo)
+#   library(xts)
+#   library(Matrix)
+#   library(flexclust)
+#   #library(NetComp)
+#   library(igraph)
+#   library(lattice)
+#   library(latticeExtra)
+#   library(grid)
+#   library(gridExtra)
+#   source('~/Documents/GitHub/manylabRs/manylabRs/R/fRedsRutils.R')
+# }
 
 
 #' Rose tinted infix
@@ -1007,7 +1007,7 @@ crqa_mat_measures <- function(RM,
   # matrices  = FALSE
   # CL        = .95
 
-  require(dplyr)
+  #require(dplyr)
 
   if(is.null(Nboot)){Nboot = 1}
 
@@ -1198,7 +1198,7 @@ crqa_mat <- function(rmat,
   # Input should be a distance matrix, or a matrix of zeroes and ones with radius = NULL, output is a list
   # Fred Hasselman (me@fredhasselman.com) - August 2013
 
-  require(parallel)
+  #require(parallel)
 
   if(is.null(AUTO)){
     AUTO <- ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
@@ -3168,9 +3168,9 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
 #'
 #' @param y    A numeric vector or time series object.
 #' @param fs Sample rate (default = NULL)
-#' @param normalize    Normalize the series (default = TRUE).
-#' @param dtrend    Subtract linear trend from the series (default = TRUE).
-#' @param scales  default = \code{fractal::dispersion(y)$scale}, see \code{\link{[fractal]}dispersion}
+#' @param normalize Normalize the series (default = TRUE)
+#' @param dtrend Subtract linear trend from the series (default = TRUE)
+#' @param scales default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}
 #' @param fitRange Scale bins (\code{c(min,max)}) to use for fitting the scaling relation
 #' @param plot    Return the log-log spectrum with linear fit (default).
 #'
@@ -3189,7 +3189,13 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
 #'
 #' @family FD estimators
 #'
-fd.sda <- function(y, fs = NULL, normalize = TRUE, dtrend = FALSE, scales = fractal::dispersion(y)$scale, fitRange = c(scales[1], scales[length(scales)-2]), plot = FALSE){
+fd.sda <- function(y,
+                   fs = NULL,
+                   normalize = TRUE,
+                   dtrend = FALSE,
+                   scales = fractal::dispersion(y)$scale,
+                   fitRange = c(scales[1], scales[length(scales)-2]),
+                   plot = FALSE){
   #require(pracma)
   #require(fractal)
 
@@ -3268,12 +3274,12 @@ fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order 
   #require(pracma)
   #require(fractal)
 
-  reload <- FALSE
-  if("signal" %in% .packages()){
-    warning("signal:poly is loaded and stats:poly is needed... will unload package:signal, compute slope, and reload...")
-    reload <- TRUE
-    detach("package:signal", unload=TRUE)
-  }
+  # reload <- FALSE
+  # if("signal" %in% .packages()){
+  #   warning("signal:poly is loaded and stats:poly is needed... will unload package:signal, compute slope, and reload...")
+  #   reload <- TRUE
+  #   detach("package:signal", unload=TRUE)
+  # }
 
 
 
@@ -3312,7 +3318,7 @@ fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order 
     par(old)
   }
 
-  if(reload==TRUE){library(signal,verbose=FALSE,quietly=TRUE)}
+ # if(reload==TRUE){attach(signal,verbose=FALSE,quietly=TRUE)}
 
   return(list(
     PLAW  =  cbind.data.frame(freq.norm = elascer(attributes(out1)$scale*frequency(y)), size = attributes(out1)$scale, bulk = attributes(out1)$stat),
@@ -3423,7 +3429,7 @@ MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
   hq <- diff(tq)/diff(qq)
   Dq <- (qq[1:(length(qq)-1)]*hq) - (tq[1:(length(qq)-1)])
 
-  if(reload==TRUE){library(signal,verbose=FALSE,quietly=TRUE)}
+  #if(reload==TRUE){library(signal,verbose=FALSE,quietly=TRUE)}
 
   return(list(q=qq,Hq=Hq,tq=tq,hq=hq,Dq=Dq,Hglobal=Hglobal,Hadj=Hadj))
 }

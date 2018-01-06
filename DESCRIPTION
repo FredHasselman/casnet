@@ -37,7 +37,8 @@ Imports: dplyr,
     gtable,
     reshape2,
     sapa,
-    signal
+    signal,
+    lubridate
 Suggests: knitr,
     rmarkdown,
     graphics,
