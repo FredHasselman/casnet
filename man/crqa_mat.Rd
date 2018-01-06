@@ -6,7 +6,7 @@
 \usage{
 crqa_mat(rmat, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(diag(rmat)) - 1, VLmax = length(diag(rmat)) - 1,
-  HLmax = length(diag(rmat)) - 1, AUTO = FALSE, doHalf = FALSE,
+  HLmax = length(diag(rmat)) - 1, AUTO = NULL, doHalf = FALSE,
   chromatic = FALSE, matrices = FALSE, Nboot = NULL, CL = 0.95)
 }
 \arguments{

@@ -5,3 +5,4 @@ plyr
 dplyr
 bindrcpp
 cowplot
+zoo

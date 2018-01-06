@@ -583,7 +583,7 @@ crqa_cl <- function(y1,
                       JRP     = FALSE,
                       distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
                       returnMeasures = TRUE,
-                      returnRPvector       = TRUE,
+                      returnRPvector = TRUE,
                       returnLineDist = FALSE,
                       plot_recmat = c("noplot","recmat","distmat")[[1]],
                       path_to_rp = getOption("casnet.path_to_rp"),
@@ -594,6 +594,7 @@ crqa_cl <- function(y1,
                       ...){
 require(plyr)
 require(dplyr)
+require(zoo)
 
   if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"rp_instal_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
@@ -685,7 +686,7 @@ require(dplyr)
               rqa_diagdist = rqa_diagdist,
               rqa_horidist = rqa_horidist)
   if(saveOut){saveRDS(out,paste0(path_out,"CRQA_out",file_ID,".rds"))}
-  return(out[c(returnMeasures,returnRPvector,returnLineDist)])
+  return(out[c(returnMeasures,returnRPvector,returnLineDist,returnLineDist)])
 }
 
 # emDims A range of embedding dimensions (default= 1 - maxDims)
@@ -981,6 +982,7 @@ crqa_radius <- function(RM,
 #'
 #'
 crqa_mat_measures <- function(RM,
+                              radius = NULL,
                               DLmin = 2,
                               VLmin = 2,
                               HLmin = 2,
@@ -1010,7 +1012,7 @@ crqa_mat_measures <- function(RM,
 
   NRows <- NROW(RM)
   NCols <- NCOL(RM)
-  mc.cores <- detectCores()
+  mc.cores <- detectCores()-1
   if(Nboot<mc.cores) mc.cores <- Nboot
 
   tstart <- Sys.time()
@@ -1184,7 +1186,7 @@ crqa_mat <- function(rmat,
                      DLmax = length(diag(rmat))-1,
                      VLmax = length(diag(rmat))-1,
                      HLmax = length(diag(rmat))-1,
-                     AUTO      = FALSE,
+                     AUTO      = NULL,
                      doHalf    = FALSE,
                      chromatic = FALSE,
                      matrices  = FALSE,
@@ -2255,6 +2257,7 @@ crp_prep <- function(RP,
                               lower = outLo,
                               upper = outUp)
     } else {
+      warning("doHalf = TRUE and AUTO = TRUE. Results would be the same for lower and upper triangle!")
       out<- cbind.data.frame(full  = out,
                              lower = crp_empty(),
                              upper = crp_empty())
@@ -3608,10 +3611,10 @@ set.Arial <- function(afmPATH="~/Dropbox"){
 
 
 netGroupCol <- function(g,grp){
-  if(length(grp)<=12){
-    groupColours <-  brewer_pal(palette="Set3")(length(grp))
+  if(length(grp)<=11){
+    groupColours <-  brewer_pal(palette="RdYlBl")(length(grp))
   } else {
-    groupColours <- gradient_n_pal(brewer_pal(palette="Set3")(12))(seq(0, 1, length.out = length(grp)))
+    groupColours <- gradient_n_pal(brewer_pal(palette="Set3")(11))(seq(0, 1, length.out = length(grp)))
   }
 
   E(g)$alpha <- scales::rescale(E(g)$weight)
@@ -3732,9 +3735,11 @@ add_alpha <- function(col, alpha=1){
 #' elascer(somenumbers,lo=-1,hi=1)
 #' elascer(somenumbers,mn=-10,mx=101,lo=-1,hi=4)
 elascer <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
+  UNLIST = FALSE
+  if(!is.data.frame(x)){UNLIST=TRUE}
   x <- as.data.frame(x)
   u <- x
-  for(i in 1:dim(x)[2]){
+  for(i in 1:NCOL(x)){
     mn=min(x[,i],na.rm=T)
     mx=max(x[,i],na.rm=T)
     if(mn>mx){warning("Minimum (mn) >= maximum (mx).")}
@@ -3744,6 +3749,9 @@ elascer <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
       id<-complete.cases(u[,i])
       u[!id,i]<-0
     })
+  }
+  if(UNLIST){
+    u <- as.numeric(u[,1])
   }
   return(u)
 }
