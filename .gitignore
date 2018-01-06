@@ -35,3 +35,5 @@ inst/doc
 
 build/*.*
 build/package_data/*.*
+
+commandline_rp/*.*
