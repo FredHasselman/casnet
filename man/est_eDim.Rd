@@ -2,9 +2,9 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{est_eDim}
 \alias{est_eDim}
-\title{eDim}
+\title{Estimate number of embedding dimensions}
 \usage{
-est_eDim(y, delay = tau(y), maxDim = 20, threshold = 0.95,
+est_eDim(y, delay = est_eLag(y), maxDim = 20, threshold = 0.95,
   max.relative.change = 0.1, ...)
 }
 \arguments{

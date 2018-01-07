@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{bandReplace}
 \alias{bandReplace}
-\title{bandReplace}
+\title{Replace matrix diagonals}
 \usage{
 bandReplace(mat, lower, upper, value = NA)
 }

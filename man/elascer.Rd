@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{elascer}
 \alias{elascer}
-\title{elascer}
+\title{Elastic Scaler - A Flexible Rescale Function}
 \usage{
 elascer(x, mn = min(x, na.rm = T), mx = max(x, na.rm = T), lo = 0,
   hi = 1)

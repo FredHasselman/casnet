@@ -41,3 +41,4 @@ crqa_mat_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \description{
 Use `crqa_mat`
 }
+\keyword{internal}

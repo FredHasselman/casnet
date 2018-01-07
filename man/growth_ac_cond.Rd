@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{growth_ac_cond}
 \alias{growth_ac_cond}
-\title{Conditional Autocatlytic Growth: Iterating differential equations (maps)}
+\title{Examples of conditional dynamical growth models (maps)}
 \usage{
 growth_ac_cond(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y =
   0.2, par = "r", val = 2), N = 100)
@@ -28,15 +28,21 @@ xyplot(growth_ac_cond())
 
 # The function such that it can take a set of conditional rules and apply them sequentially during the iterations.
 # The conditional rules are passed as a `data.frame`
+
 (cond <- cbind.data.frame(Y = c(0.2, 0.6), par = c("r", "r"), val = c(0.5, 0.1)))
 xyplot(growth_ac_cond(cond=cond))
 
 # Combine a change of `r` and a change of `k`
+
 (cond <- cbind.data.frame(Y = c(0.2, 1.99), par = c("r", "k"), val = c(0.5, 3)))
 xyplot(growth_ac_cond(cond=cond))
 
 # A fantasy growth process
-(cond <- cbind.data.frame(Y = c(0.1, 1.99, 1.999, 2.5, 2.9), par = c("r", "k", "r", "r","k"), val = c(0.3, 3, 0.9, 0.1, 1.3)))
+
+cond <- cbind.data.frame(Y = c(0.1, 1.99, 1.999, 2.5, 2.9),
+par = c("r", "k", "r", "r","k"),
+val = c(0.3, 3, 0.9, 0.1, 1.3))
+
 xyplot(growth_ac_cond(cond=cond))
 }
 \seealso{

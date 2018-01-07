@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{growth_ac}
 \alias{growth_ac}
-\title{Autocatlytic Growth: Iterating differential equations (maps)}
+\title{Examples of dynamical growth models (maps)}
 \usage{
 growth_ac(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving",
   "damping", "logistic", "vanGeert")[1])

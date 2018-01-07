@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{crqa_cl}
 \alias{crqa_cl}
-\title{fast (C)RQA}
+\title{Fast (C)RQA (command line crp)}
 \usage{
 crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
   VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),

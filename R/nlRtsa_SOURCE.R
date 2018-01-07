@@ -309,6 +309,7 @@ repmat <- function(X,m,n){
 #' @keywords internal
 #'
 #' @export
+#'
 crqa_cl_main <- function(y1,
                     y2    = NULL,
                     eDim  = 1,
@@ -482,7 +483,7 @@ crqa_cl_main <- function(y1,
 
 # devtools::RCMD(shQuote(paste0(getOption("casnet.rp_prefix"),"rp")), options = "-V", path = normalizePath(getOption("casnet.path_to_rp"), mustWork = FALSE), quiet = FALSE)
 
-#' fast (C)RQA
+#' Fast (C)RQA (command line crp)
 #'
 #' This function will run the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} executable provided by Norbert Marwan.
 #'
@@ -623,7 +624,7 @@ crqa_cl <- function(y1,
   }
 
   if(!is.null(y2)){
-    y2 <- as.zoo(y2)
+    y2 <- zoo::as.zoo(y2)
     N1 <- NROW(y1)
     N2 <- NROW(y2)
     if(N1>N2){
@@ -713,13 +714,13 @@ crqa_cl <- function(y1,
 crqa_parameters <- function(y,
                             maxDim   = 5,
                             maxLag   = round(length(y)/(maxDim+1)),
-                            emLag    = tau(y,
+                            emLag    = est_eLag(y,
                                            selection.methods = c("first.e.decay",
                                                                  "first.zero",
                                                                  "first.minimum"),
                                            maxLag =round(length(y)/(maxDim+1))
                             ),
-                            emLags     = tau(y, maxLag = round(length(y)/(maxDim+1))),
+                            emLags     = est_eLag(y, maxLag = round(length(y)/(maxDim+1))),
                             ami.method = c("first.minimum"),
                             nnSizes  = c(.1,.3,.6,.9),
                             nnThres  = .1,
@@ -981,6 +982,9 @@ crqa_radius <- function(RM,
 #' @param Nboot How many bootstraps?
 #' @param CL Confidence Limit for bootstrap results
 #'
+#' @export
+#'
+#' @keywords internal
 #'
 crqa_mat_measures <- function(RM,
                               radius = NULL,
@@ -1013,11 +1017,11 @@ crqa_mat_measures <- function(RM,
 
   NRows <- NROW(RM)
   NCols <- NCOL(RM)
-  mc.cores <- detectCores()-1
+  mc.cores <- parallel::detectCores()-1
   if(Nboot<mc.cores) mc.cores <- Nboot
 
   tstart <- Sys.time()
-  out    <- mclapply(1, function(i){
+  out    <- parallel::mclapply(1, function(i){
     crp_prep(matrix(RM[ceiling(NCols*NRows*runif(NCols*NRows))], ncol=NCols, nrow = NRows),
              radius= radius,
              DLmin = DLmin,
@@ -1033,7 +1037,7 @@ crqa_mat_measures <- function(RM,
   },
   mc.cores = mc.cores
   )
-  dfori <- gather(as.data.frame(out), key = measure, value = value)
+  dfori <- tidyr::gather(as.data.frame(out), key = measure, value = value)
   tend  <- Sys.time()
 
   if(Nboot>1){
@@ -1042,7 +1046,7 @@ crqa_mat_measures <- function(RM,
     cat(paste0("Estimated duration: ", round((difftime(tend,tstart, unit = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
 
     tstart <-Sys.time()
-    bootOut <-  mclapply(1:Nboot, function(i){
+    bootOut <-  parallel::mclapply(1:Nboot, function(i){
       replicate <- as.data.frame(crp_prep(matrix(RM[ceiling(NCols*NRows*runif(NCols*NRows))],
                                                  ncol=NCols, nrow = NRows),
                                           radius= radius,
@@ -1065,7 +1069,7 @@ crqa_mat_measures <- function(RM,
     cat(paste0("Actual duration: ", round(difftime(tend,tstart, unit = "mins"), digits=1)," min.\n"))
 
     dfrepl <- ldply(bootOut)
-    dfrepl <- gather(dfrepl, key = measure, value = value, -replicate)
+    dfrepl <- tidyr::gather(dfrepl, key = measure, value = value, -replicate)
 
     if(length(CL)==1){
       ci.lo <- (1-CL)/2
@@ -1097,63 +1101,6 @@ crqa_mat_measures <- function(RM,
   }
   return(rqout)
 }
-
-
-# sizeIn <- dim(RM)
-# mc.cores <- detectCores()
-# if(Nboot<mc.cores) mc.cores <- Nboot
-#
-# rp.rg   <- function(data,mle){return(matrix(data[ceiling(mle$NCols*mle$NRows*runif(mle$NCols*mle$NRows))], ncol= mle$NCols, nrow = mle$NRows))}
-#
-# rp.mle <- list(NCols=sizeIn[1], NRows=sizeIn[2])
-#
-# rp.fun  <- function(data, ...){crp_prep(RP    = data,
-#                                         radius= radius,
-#                                         DLmin = DLmin,
-#                                         VLmin = VLmin,
-#                                         HLmin = HLmin,
-#                                         DLmax = DLmax,
-#                                         VLmax = VLmax,
-#                                         HLmax = HLmax,
-#                                         AUTO  = AUTO,
-#                                         chromatic = chromatic,
-#                                         matrices  = matrices,
-#                                         doHalf    = doHalf)}
-# rp.boot <- function(...){
-#   boot(data      = RM,
-#        statistic = rp.fun,
-#        R         = Nboot,
-#        ran.gen   = rp.rg,
-#        mle       = rp.mle,
-#        parallel = "multicore",
-#        ncpus = detectCores()
-#        )
-#   #boot(RM, rp.fun, R = Nboot, sim = "parametric", ran.gen = rp.rg, mle = rp.mle)
-# }
-
-# replicates <-  boot(data      = RM,
-#                     statistic = rp.fun,
-#                     R         = Nboot,
-#                     sim = "parametric",
-#                     ran.gen   = rp.rg,
-#                     mle       = rp.mle,
-#                     parallel  = "multicore",
-#                     ncpus     = detectCores()
-#                     )
-#
-# cis <-  ldply(1:102, function(c){
-#   ci <- boot.ci(replicates, type = c("norm"), conf = 0.95, t0 = c, t=1:9)
-#   return(cbind.data.frame(measure = dimnames(replicates$t0)[[2]][c],
-#                           value = replicates$t0[c],
-#                           ci.lo = ci$normal[,2],
-#                           ci.up = ci$normal[,3])
-#          )})
-# dfrepl <- llply(1:Nboot, function(i) rp.boot(i))
-
-# bootout <- list() %>%
-#   bootstrap(Nboot) %>%
-#    do(as.data.frame( )
-#       )
 
 
 #' Get bootsrapped (C)RQA measures based on a recurrence matrix
@@ -1218,9 +1165,10 @@ crqa_mat <- function(rmat,
       }
     }
   }
-  #rm(rmat)
+  rm(rmat)
 
   out <- crqa_mat_measures(RM,
+                           radius = radius,
                            DLmin = DLmin,
                            VLmin = VLmin,
                            HLmin = HLmin,
@@ -1303,6 +1251,7 @@ crqa_mat <- function(rmat,
   #   } else {
   #     rqout <- dfori
   #   }
+
   return(out)
 }
 
@@ -1340,7 +1289,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
   return(RP)
 }
 
-#' tau
+#' Estimate embedding lag (tau)
 #'
 #' A wrapper for nonlinearTseries::timeLag
 #'
@@ -1353,7 +1302,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 #'
 #' @export
 #'
-tau <- function(y,
+est_eLag <- function(y,
                 selection.methods = c("first.minimum"),
                 maxLag = length(y)/4,
                 ...){
@@ -1394,7 +1343,7 @@ tau <- function(y,
 }
 
 
-#' eDim
+#' Estimate number of embedding dimensions
 #'
 #' @param y Time series
 #' @param delay Embeding lag
@@ -1408,7 +1357,7 @@ tau <- function(y,
 #' @return Embedding dimensions
 #' @export
 #'
-est_eDim <- function(y, delay = tau(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
+est_eDim <- function(y, delay = est_eLag(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
   cbind.data.frame(EmbeddingLag   = delay,
                    EmbeddingDim   = nonlinearTseries::estimateEmbeddingDim(y,
                                                          time.lag  = delay,
@@ -1714,7 +1663,7 @@ dist.hamming <- function(X, Y=NULL, embedded=TRUE) {
 }
 
 
-#' bandReplace
+#' Replace matrix diagonals
 #'
 #' Sets a band of matrix diagonals to any given value
 #'
@@ -2133,7 +2082,7 @@ crp_calc <- function(RM,
   DIV_vl = 1/MAX_vl
   DIV_hl = 1/MAX_hl
 
-  crqaMatrices  <- list()
+  crqaMeasures <- list()
   crqaMatrices <- list()
 
   #Output
@@ -2481,279 +2430,6 @@ crp_prep <- function(RP,
 # }
 
 
-#' plotRP
-#'
-#' @param crqaOutput    List output from \code{\link[crqa]{crqa}}
-#'
-#' @return A list
-#' @export
-#' @author Fred Hasselman
-#' @description Creates a recurrence plot from the sparse matrix output generated by \code{\link[crqa]{crqa}}.
-plotRP.crqa <- function(crqaOutput){
-
-  AUTO <- FALSE
-
-  # Is is crqa output?
-  if(all(names(crqaOutput)%in%c("RR","DET","NRLINE","maxL","L","ENTR","rENTR","LAM","TT","RP"))){
-
-    # RP dimensions
-    nr <- dim(crqaOutput$RP)[1]
-    nc <- dim(crqaOutput$RP)[2]
-
-    RP <- crqaOutput$RP
-
-    # AUTO or CROSS?
-    if(class(RP)=="dtCMatrix"){
-      message("\nRP in crqa output is a Triangular Sparse Matrix, this implies auto-recurrence...\n")
-      AUTO <- TRUE
-    }
-    if(isSymmetric(RP)){
-      message("\nRP in crqa output is a Symmetric Sparse Matrix, this implies auto-recurrence: \n >> RP Measures will include the Line of Identity, unless:\n >> crqa() with side = 'upper' or 'lower' was used.\n >> crqa() with Theiler window (tw) of 1 was used.")
-      AUTO <- TRUE}
-
-    if(nc*nr>10^6){
-      message(paste("\nLarge RP with",nc*nr,"elements... \n >> This could take some time to plot!\n"))
-    }
-
-    ifelse(AUTO,
-           Titles <- list(main="Auto Recurrence Plot", X = expression(Y[t]), Y = expression(Y[t])),
-           Titles <- list(main="Cross Recurrence Plot", X = expression(X[t]), Y = expression(Y[t]))
-    )
-
-
-    # Thresholded or Distance matrix?
-    ifelse(is.logical(as.array(RP)),
-           distPallette <- colorRampPalette(c("white", "black"))(2),
-           distPallette <- colorRampPalette(c("red", "white", "blue")) #( length(unique(as.vector(RP))))
-    )
-
-    #distPallette <- colorRampPalette(c("white", "black"))(2)
-
-    lp <- levelplot(Matrix::as.matrix(RP),
-                    #colorkey = TRUE,
-                    region = TRUE, col.regions = distPallette, useRaster = TRUE, aspect = nc/nr,
-                    main = Titles$main,
-                    xlab = Titles$X,
-                    ylab = Titles$Y)
-
-    txt <- grid.text(paste0("\n   RR: ", round(crqaOutput$RR, digits = 1),
-                            "\n  DET: ", round(crqaOutput$DET, digits = 1),
-                            "\nmeanL: ", round(crqaOutput$maxL, digits = 1),
-                            "\n maxL: ", round(crqaOutput$NRLINE, digits = 1),
-                            "\n  LAM: ", round(crqaOutput$LAM, digits = 1),
-                            "\n   TT: ", round(crqaOutput$TT, digits = 1),
-                            "\n  ENT: ", round(crqaOutput$ENT, digits = 1),
-                            "\n rENT: ", round(crqaOutput$rENTR, digits = 1)),
-                     .02,.7, just = "left", draw = FALSE, gp = gpar(fontfamily = "mono", cex = .7))
-    # ,)
-
-    grid.arrange(lp, txt, ncol=2, nrow=1, widths=c(4, 1), heights=c(4))
-
-  } else {
-    warning("\nInput is not list output from function crqa().\n")
-  }
-
-}
-
-plotRP.fnn <- function(FNNoutput){
-  plot(FNNoutput["combined",],type="b",pch=16, cex=2, col="grey80", ylim=c(0,100), xaxt="n",
-       xlab = "Embedding Dimension", ylab = "False Nearest Neighbours")
-  lines(FNNoutput["atol",],type="b",pch="a",col="grey30", lty=2)
-  lines(FNNoutput["rtol",],type="b",pch="r", col="grey30",lty=2)
-  Axis(side=1,at=seq_along(FNNoutput[1,]),labels = dimnames(FNNoutput)[[2]])
-  legend("topright",c("Combined","atol","rtol"), pch = c(16,97,114), lty = c(1,2,2), col = c("grey80","grey30","grey30"), pt.cex=c(2,1,1))
-}
-
-# Toy models ------------------------------------------------------------------------------------------------------
-
-#' Autocatlytic Growth: Iterating differential equations (maps)
-#'
-#' @title Autocatlytic Growth: Iterating differential equations (maps)
-#'
-#' @param Y0    Initial value.
-#' @param r    Growth rate parameter.
-#' @param k    Carrying capacity.
-#' @param N    Length of the time series.
-#' @param type    One of: "driving" (default), "damping", "logistic", "vanGeert1991".
-#'
-#' @return A timeseries object of length N.
-#' @export
-#'
-#' @author Fred Hasselman
-#'
-#' @family autocatalytic growth functions
-#'
-#' @examples
-#' # The logistic map in the chaotic regime
-#' growth_ac(Y0 = 0.01, r = 4, type = "logistic")
-growth_ac <- function(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving", "damping", "logistic", "vanGeert")[1]){
-  # Create a vector Y of length N, which has value Y0 at Y[1]
-  if(N>1){
-    Y <- as.numeric(c(Y0, rep(NA,N-2)))
-    # Conditional on the value of type ...
-    switch(type,
-           # Iterate N steps of the difference function with values passed for Y0, k and r.
-           driving  = sapply(seq_along(Y), function(t) Y[[t+1]] <<- r * Y[t] ),
-           damping  = k + sapply(seq_along(Y), function(t) Y[[t+1]] <<- - r * Y[t]^2 / k),
-           logistic = sapply(seq_along(Y), function(t) Y[[t+1]] <<- r * Y[t] * ((k - Y[t]) / k)),
-           vanGeert = sapply(seq_along(Y), function(t) Y[[t+1]] <<- Y[t] * (1 + r - r * Y[t] / k))
-    )}
-  return(ts(Y))
-}
-
-#' Conditional Autocatlytic Growth: Iterating differential equations (maps)
-#'
-#' @param Y0 Initial value
-#' @param r Growth rate parameter
-#' @param k Carrying capacity
-#' @param cond Conditional rules passed as a data.frame of the form: cbind.data.frame(Y = ..., par = ..., val = ...)
-#' @param N Length of the time series
-#'
-#' @export
-#'
-#' @author Fred Hasselman
-#'
-#' @family autocatalytic growth functions
-#'
-#' @examples
-#' # Plot with the default settings
-#' library(lattice)
-#' xyplot(growth_ac_cond())
-#'
-#' # The function such that it can take a set of conditional rules and apply them sequentially during the iterations.
-#' # The conditional rules are passed as a `data.frame`
-#' (cond <- cbind.data.frame(Y = c(0.2, 0.6), par = c("r", "r"), val = c(0.5, 0.1)))
-#' xyplot(growth_ac_cond(cond=cond))
-#'
-#' # Combine a change of `r` and a change of `k`
-#' (cond <- cbind.data.frame(Y = c(0.2, 1.99), par = c("r", "k"), val = c(0.5, 3)))
-#' xyplot(growth_ac_cond(cond=cond))
-#'
-#' # A fantasy growth process
-#' (cond <- cbind.data.frame(Y = c(0.1, 1.99, 1.999, 2.5, 2.9), par = c("r", "k", "r", "r","k"), val = c(0.3, 3, 0.9, 0.1, 1.3)))
-#' xyplot(growth_ac_cond(cond=cond))
-growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y = 0.2, par = "r", val = 2), N = 100){
-  # Create a vector Y of length N, which has value Y0 at Y[1]
-  Y <- c(Y0, rep(NA, N-1))
-  # Iterate N steps of the difference equation with values passed for Y0, k and r.
-  cnt <- 1
-  for(t in seq_along(Y)){
-    # Check if the current value of Y is greater than the threshold for the current conditional rule in cond
-    if(Y[t] > cond$Y[cnt]){
-      # If the threshold is surpassed, change the parameter settings by evaluating: cond$par = cond$val
-      eval(parse(text = paste(cond$par[cnt], "=", cond$val[cnt])))
-      # Update the counter if there is another conditional rule in cond
-      if(cnt < nrow(cond)){cnt <- cnt + 1}
-    }
-    # Van Geert growth model
-    Y[[t+1]] <- Y[t] * (1 + r - r * Y[t] / k)
-  }
-  return(ts(Y))
-}
-
-# Complex Networks---------------------------------------------------------------
-graph2svg <- function(TDM,pname){
-
-  # Create weighted Term-Term matrix
-  tTM <- as.matrix(TDM)
-  TTM <- tTM %*% t(tTM)
-  TTM <- log1p(TTM)
-
-  g <- graph.adjacency(TTM,weighted=T,mode="undirected",diag=F)
-  g <- simplify(g)
-
-  # Remove vertices that were used in the search query
-  Vrem <- which(V(g)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
-  g <- (g - V(g)$name[Vrem])
-
-  # Set colors and sizes for vertices
-  V(g)$degree <- degree(g)
-  rev         <- scaleRange(log1p(V(g)$degree))
-  rev[rev<=0.3]<-0.3
-
-  V(g)$color       <- rgb(scaleRange(V(g)$degree), 1-scaleRange(V(g)$degree),  0, rev)
-  V(g)$size        <- 10*scaleRange(V(g)$degree)
-  V(g)$frame.color <- NA
-
-  # set vertex labels and their colors and sizes
-  V(g)$label       <- V(g)$name
-  V(g)$label.color <- rgb(0, 0, 0, rev)
-  V(g)$label.cex   <- scaleRange(V(g)$degree)+.1
-
-  # set edge width and color
-  rew <- scaleRange(E(g)$weight)
-  rew[rew<=0.3]<-0.3
-
-  E(g)$width <- 2*scaleRange(E(g)$weight)
-  E(g)$color <- rgb(.5, .5, 0, rew)
-  set.seed(958)
-
-  svg(paste(pname,sep=""),width=8,height=8)
-  plot(g, layout=layout.fruchterman.reingold(g))
-  dev.off()
-
-  return(g)
-}
-
-# Plot vertex neighbourhood
-hoodGraph2svg <- function(TDM,Vname,pname){
-
-  # Create weighted Term-Term matrix
-  tTM <- as.matrix(TDM)
-  TTM <- tTM %*% t(tTM)
-  TTM <- log1p(TTM)
-
-  ig <- graph.adjacency(TTM,weighted=T,mode="undirected",diag=F)
-  ig <- simplify(ig)
-
-  # Remove vertices that were used in the search query
-  Vrem <- which(V(ig)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
-  ig <- (ig - V(ig)$name[Vrem])
-
-  # This is a deletion specific for the Neighbourhood graphs
-  Vrem <- which(V(ig)$name %in% c("~rdsp~","~imp~","~som~","~bod~","~mlt~"))
-  ig   <- ig - V(ig)$name[Vrem]
-
-  idx <- which(V(ig)$name==Vname)
-  sg  <- graph.neighborhood(ig, order = 1, nodes=V(ig)[idx], mode = 'all')[[1]]
-
-  # set colors and sizes for vertices
-  V(sg)$degree <- degree(sg)
-
-  rev<-scaleRange(log1p(V(sg)$degree))
-  rev[rev<=0.3]<-0.3
-
-  V(sg)$color <- rgb(scaleRange(V(sg)$degree), 1-scaleRange(log1p(V(sg)$degree*V(sg)$degree)),  0, rev)
-
-  V(sg)$size        <- 35*scaleRange(V(sg)$degree)
-  V(sg)$frame.color <- NA
-
-  # set vertex labels and their colors and sizes
-  V(sg)$label       <- V(sg)$name
-  V(sg)$label.color <- rgb(0, 0, 0, rev)
-  V(sg)$label.cex   <- scaleRange(V(sg)$degree)
-
-  # set edge width and color
-  rew<-scaleRange(E(sg)$weight)
-  rew[rew<=0.3]<-0.3
-
-  E(sg)$width <- 6*scaleRange(E(sg)$weight)
-  E(sg)$color <- rgb(.5, .5, 0, rew)
-
-  idV <- which(V(sg)$name==Vname)
-  idE <- incident(sg,V(sg)[[idV]])
-  E(sg)$color[idE] <- rgb(0, 0, 1 ,0.8)
-
-  set.seed(958)
-
-  idx <- which(V(sg)$name==Vname)
-  svg(paste(pname,sep=""),width=8,height=8)
-  plot(sg,layout=layout.star(sg,center=V(sg)[idx]))
-  dev.off()
-
-  return(sg)
-}
-
 #' lag Embed a time series
 #'
 #' @param y Time series
@@ -2797,21 +2473,8 @@ lagEmbed <- function (y, emDim, emLag){
 }
 
 
-sliceTS<-function(TSmat,epochSz=1) {
-  # Slice columns of TSmat in epochs of size = epochSz
-  #require(plyr)
+# Complex Networks ---
 
-  N<-dim(TSmat)
-  return(plyr::llply(seq(1,N[1],epochSz),function(i) TSmat[i:min(i+epochSz-1,N[1]),1:N[2]]))
-}
-
-fltrIT <- function(TS,f){
-  # Apply filtfilt to TS using f (filter settings)
-  #require("signal")
-
-  return(signal::filtfilt(f=f,x=TS))
-
-}
 
 SWtest0 <- function(g){
   Nreps <- 10;
@@ -2873,54 +2536,8 @@ PLFsmall <- function(g){
   return(alpha)
 }
 
-plotSW <- function(n,k,p){
 
-  g <- watts.strogatz.game(1, n, k, p)
-
-  V(g)$degree <- degree(g)
-
-  # set colors and sizes for vertices
-  rev<-elascer(log1p(V(g)$degree))
-  rev[rev<=0.2]<-0.2
-  rev[rev>=0.9]<-0.9
-  V(g)$rev <- rev$x
-
-  V(g)$color       <- rgb(V(g)$rev, 1-V(g)$rev,  0, 1)
-  V(g)$size        <- 25*V(g)$rev
-
-  # set vertex labels and their colors and sizes
-  V(g)$label       <- ""
-
-  E(g)$width <- 1
-  E(g)$color <- rgb(0.5, 0.5, 0.5, 1)
-
-  return(g)
-}
-
-plotBA <- function(n,pwr,out.dist){
-  #require("Cairo")
-
-  g <- barabasi.game(n,pwr,out.dist=out.dist,directed=FALSE)
-  V(g)$degree <- degree(g)
-
-  # set colors and sizes for vertices
-  rev<-elascer(log1p(V(g)$degree))
-  rev[rev<=0.2] <- 0.2
-  rev[rev>=0.9] <- 0.9
-  V(g)$rev <- rev$x
-
-  V(g)$color    <- rgb(V(g)$rev, 1-V(g)$rev,  0, 1)
-  V(g)$size     <- 25*V(g)$rev
-  # V(g)$frame.color <- rgb(.5, .5,  0, .4)
-
-  # set vertex labels and their colors and sizes
-  V(g)$label <- ""
-
-  E(g)$width <- 1
-  E(g)$color <- rgb(0.5, 0.5, 0.5, 1)
-
-  return(g)
-}
+# FD estimators ----------------------------------------------
 
 
 FDrel <- function(g){
@@ -3017,8 +2634,6 @@ sa2fd.dfa <- function(sa, ...){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 sa2fd.sda <- function(sa, ...){return(1-sa)}
 
 
-
-# fd estimators ----------------------------------------------
 
 fd <- function(y, ...) UseMethod("fd")
 
@@ -3534,7 +3149,7 @@ gg.theme <- function(type=c("clean","noax"),useArial = F, afmPATH="~/Dropbox"){
   if(length(type)>1){type <- type[1]}
 
   if(useArial){
-    set.Arial(afmPATH)
+    #set.Arial(afmPATH)
     bf_font="Arial"
   } else {bf_font="Helvetica"}
 
@@ -3571,14 +3186,34 @@ gg.theme <- function(type=c("clean","noax"),useArial = F, afmPATH="~/Dropbox"){
 #' library(ggplot2)
 #' library(scales)
 #'
-#' df <- data.frame(x = rnorm(n = 100), y = rnorm(n = 100), group = factor(sample(x=c(0,1), size = 100, replace = TRUE)))
+#' df <- data.frame(x = rnorm(n = 100),
+#'                  y = rnorm(n = 100),
+#'                  group = factor(sample(x=c(0,1),
+#'                  size = 100, replace = TRUE)))
 #'
-#' scatterP <- ggplot(df, aes(x = x, y =y, colour = group)) + geom_point() + gg.theme()
-#' xDense <- ggplot(df, aes(x = x, fill = group)) + geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) + gg.theme("noax") + theme(legend.position = "none")
-#' yDense <- ggplot(df, aes(x = y, fill = group)) + geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) + coord_flip() + gg.theme("noax") + theme(legend.position = "none")
+#' scatterP <- ggplot(df, aes(x = x, y =y, colour = group)) +
+#'                    geom_point() +
+#'                    gg.theme()
+#'
+#' xDense <- ggplot(df, aes(x = x, fill = group)) +
+#'                  geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) +
+#'                  gg.theme("noax") +
+#'                  theme(legend.position = "none")
+#'
+#' yDense <- ggplot(df, aes(x = y, fill = group)) +
+#'                  geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) +
+#'                  coord_flip() +
+#'                  gg.theme("noax") +
+#'                  theme(legend.position = "none")
 #'
 #' library(gridExtra)
-#' grid.arrange(xDense, gg.plotHolder(), scatterP, yDense, ncol=2, nrow=2, widths=c(4, 1.4), heights=c(1.4, 4))
+#' grid.arrange(xDense,
+#'              gg.plotHolder(),
+#'              scatterP,
+#'              yDense,
+#'              ncol=2, nrow=2,
+#'              widths=c(4, 1.4),
+#'              heights=c(1.4, 4))
 gg.plotHolder <- function(useArial = F,afmPATH="~/Dropbox"){
   ggplot() +
     geom_blank(aes(1,1)) +
@@ -3591,20 +3226,70 @@ gg.plotHolder <- function(useArial = F,afmPATH="~/Dropbox"){
     )
 }
 
-set.Arial <- function(afmPATH="~/Dropbox"){
-  # Set up PDF device on MAC OSX to use Arial as a font in Graphs
-  if(nchar(afmPATH>0)){
-    if(file.exists(paste0(afmPATH,"/Arial.afm"))){
-      Arial <- Type1Font("Arial",
-                         c(paste(afmPATH,"/Arial.afm",sep=""),
-                           paste(afmPATH,"/Arial Bold.afm",sep=""),
-                           paste(afmPATH,"/Arial Italic.afm",sep=""),
-                           paste(afmPATH,"/Arial Bold Italic.afm",sep="")))
-      if(!"Arial" %in% names(pdfFonts())){pdfFonts(Arial=Arial)}
-      if(!"Arial" %in% names(postscriptFonts())){postscriptFonts(Arial=Arial)}
-      return()
-    } else {disp(header='useArial=TRUE',message='The directory did not contain the *.afm version of the Arial font family')}
-  } else {disp(header='useArial=TRUE',message='Please provide the path to the *.afm version of the Arial font family')}
+# set.Arial <- function(afmPATH="~/Dropbox"){
+#   # Set up PDF device on MAC OSX to use Arial as a font in Graphs
+#   if(nchar(afmPATH>0)){
+#     if(file.exists(paste0(afmPATH,"/Arial.afm"))){
+#       Arial <- Type1Font("Arial",
+#                          c(paste(afmPATH,"/Arial.afm",sep=""),
+#                            paste(afmPATH,"/Arial Bold.afm",sep=""),
+#                            paste(afmPATH,"/Arial Italic.afm",sep=""),
+#                            paste(afmPATH,"/Arial Bold Italic.afm",sep="")))
+#       if(!"Arial" %in% names(pdfFonts())){pdfFonts(Arial=Arial)}
+#       if(!"Arial" %in% names(postscriptFonts())){postscriptFonts(Arial=Arial)}
+#       return()
+#     } else {disp(header='useArial=TRUE',message='The directory did not contain the *.afm version of the Arial font family')}
+#   } else {disp(header='useArial=TRUE',message='Please provide the path to the *.afm version of the Arial font family')}
+# }
+
+
+plotSW <- function(n,k,p){
+
+  g <- watts.strogatz.game(1, n, k, p)
+
+  V(g)$degree <- degree(g)
+
+  # set colors and sizes for vertices
+  rev<-elascer(log1p(V(g)$degree))
+  rev[rev<=0.2]<-0.2
+  rev[rev>=0.9]<-0.9
+  V(g)$rev <- rev$x
+
+  V(g)$color       <- rgb(V(g)$rev, 1-V(g)$rev,  0, 1)
+  V(g)$size        <- 25*V(g)$rev
+
+  # set vertex labels and their colors and sizes
+  V(g)$label       <- ""
+
+  E(g)$width <- 1
+  E(g)$color <- rgb(0.5, 0.5, 0.5, 1)
+
+  return(g)
+}
+
+plotBA <- function(n,pwr,out.dist){
+  #require("Cairo")
+
+  g <- barabasi.game(n,pwr,out.dist=out.dist,directed=FALSE)
+  V(g)$degree <- degree(g)
+
+  # set colors and sizes for vertices
+  rev<-elascer(log1p(V(g)$degree))
+  rev[rev<=0.2] <- 0.2
+  rev[rev>=0.9] <- 0.9
+  V(g)$rev <- rev$x
+
+  V(g)$color    <- rgb(V(g)$rev, 1-V(g)$rev,  0, 1)
+  V(g)$size     <- 25*V(g)$rev
+  # V(g)$frame.color <- rgb(.5, .5,  0, .4)
+
+  # set vertex labels and their colors and sizes
+  V(g)$label <- ""
+
+  E(g)$width <- 1
+  E(g)$color <- rgb(0.5, 0.5, 0.5, 1)
+
+  return(g)
 }
 
 
@@ -3662,7 +3347,192 @@ add_alpha <- function(col, alpha=1){
           rgb(x[1], x[2], x[3], alpha=alpha))
 }
 
-# Variability Analyses --------------------------------------------------------------------------------------------------------------------------
+
+#' plotRP
+#'
+#' @param crqaOutput    List output from \code{\link[crqa]{crqa}}
+#'
+#' @return A list
+#' @export
+#' @author Fred Hasselman
+#' @description Creates a recurrence plot from the sparse matrix output generated by \code{\link[crqa]{crqa}}.
+plotRP.crqa <- function(crqaOutput){
+
+  AUTO <- FALSE
+
+  # Is is crqa output?
+  if(all(names(crqaOutput)%in%c("RR","DET","NRLINE","maxL","L","ENTR","rENTR","LAM","TT","RP"))){
+
+    # RP dimensions
+    nr <- dim(crqaOutput$RP)[1]
+    nc <- dim(crqaOutput$RP)[2]
+
+    RP <- crqaOutput$RP
+
+    # AUTO or CROSS?
+    if(class(RP)=="dtCMatrix"){
+      message("\nRP in crqa output is a Triangular Sparse Matrix, this implies auto-recurrence...\n")
+      AUTO <- TRUE
+    }
+    if(isSymmetric(RP)){
+      message("\nRP in crqa output is a Symmetric Sparse Matrix, this implies auto-recurrence: \n >> RP Measures will include the Line of Identity, unless:\n >> crqa() with side = 'upper' or 'lower' was used.\n >> crqa() with Theiler window (tw) of 1 was used.")
+      AUTO <- TRUE}
+
+    if(nc*nr>10^6){
+      message(paste("\nLarge RP with",nc*nr,"elements... \n >> This could take some time to plot!\n"))
+    }
+
+    ifelse(AUTO,
+           Titles <- list(main="Auto Recurrence Plot", X = expression(Y[t]), Y = expression(Y[t])),
+           Titles <- list(main="Cross Recurrence Plot", X = expression(X[t]), Y = expression(Y[t]))
+    )
+
+
+    # Thresholded or Distance matrix?
+    ifelse(is.logical(as.array(RP)),
+           distPallette <- colorRampPalette(c("white", "black"))(2),
+           distPallette <- colorRampPalette(c("red", "white", "blue")) #( length(unique(as.vector(RP))))
+    )
+
+    #distPallette <- colorRampPalette(c("white", "black"))(2)
+
+    lp <- levelplot(Matrix::as.matrix(RP),
+                    #colorkey = TRUE,
+                    region = TRUE, col.regions = distPallette, useRaster = TRUE, aspect = nc/nr,
+                    main = Titles$main,
+                    xlab = Titles$X,
+                    ylab = Titles$Y)
+
+    txt <- grid.text(paste0("\n   RR: ", round(crqaOutput$RR, digits = 1),
+                            "\n  DET: ", round(crqaOutput$DET, digits = 1),
+                            "\nmeanL: ", round(crqaOutput$maxL, digits = 1),
+                            "\n maxL: ", round(crqaOutput$NRLINE, digits = 1),
+                            "\n  LAM: ", round(crqaOutput$LAM, digits = 1),
+                            "\n   TT: ", round(crqaOutput$TT, digits = 1),
+                            "\n  ENT: ", round(crqaOutput$ENT, digits = 1),
+                            "\n rENT: ", round(crqaOutput$rENTR, digits = 1)),
+                     .02,.7, just = "left", draw = FALSE, gp = gpar(fontfamily = "mono", cex = .7))
+    # ,)
+
+    grid.arrange(lp, txt, ncol=2, nrow=1, widths=c(4, 1), heights=c(4))
+
+  } else {
+    warning("\nInput is not list output from function crqa().\n")
+  }
+
+}
+
+plotRP.fnn <- function(FNNoutput){
+  plot(FNNoutput["combined",],type="b",pch=16, cex=2, col="grey80", ylim=c(0,100), xaxt="n",
+       xlab = "Embedding Dimension", ylab = "False Nearest Neighbours")
+  lines(FNNoutput["atol",],type="b",pch="a",col="grey30", lty=2)
+  lines(FNNoutput["rtol",],type="b",pch="r", col="grey30",lty=2)
+  Axis(side=1,at=seq_along(FNNoutput[1,]),labels = dimnames(FNNoutput)[[2]])
+  legend("topright",c("Combined","atol","rtol"), pch = c(16,97,114), lty = c(1,2,2), col = c("grey80","grey30","grey30"), pt.cex=c(2,1,1))
+}
+
+# Complex Networks# graph2svg <- function(TDM,pname){
+#
+#   # Create weighted Term-Term matrix
+#   tTM <- as.matrix(TDM)
+#   TTM <- tTM %*% t(tTM)
+#   TTM <- log1p(TTM)
+#
+#   g <- graph.adjacency(TTM,weighted=T,mode="undirected",diag=F)
+#   g <- simplify(g)
+#
+#   # Remove vertices that were used in the search query
+#   Vrem <- which(V(g)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
+#   g <- (g - V(g)$name[Vrem])
+#
+#   # Set colors and sizes for vertices
+#   V(g)$degree <- degree(g)
+#   rev         <- scaleRange(log1p(V(g)$degree))
+#   rev[rev<=0.3]<-0.3
+#
+#   V(g)$color       <- rgb(scaleRange(V(g)$degree), 1-scaleRange(V(g)$degree),  0, rev)
+#   V(g)$size        <- 10*scaleRange(V(g)$degree)
+#   V(g)$frame.color <- NA
+#
+#   # set vertex labels and their colors and sizes
+#   V(g)$label       <- V(g)$name
+#   V(g)$label.color <- rgb(0, 0, 0, rev)
+#   V(g)$label.cex   <- scaleRange(V(g)$degree)+.1
+#
+#   # set edge width and color
+#   rew <- scaleRange(E(g)$weight)
+#   rew[rew<=0.3]<-0.3
+#
+#   E(g)$width <- 2*scaleRange(E(g)$weight)
+#   E(g)$color <- rgb(.5, .5, 0, rew)
+#   set.seed(958)
+#
+#   svg(paste(pname,sep=""),width=8,height=8)
+#   plot(g, layout=layout.fruchterman.reingold(g))
+#   dev.off()
+#
+#   return(g)
+# }
+#
+# # Plot vertex neighbourhood
+# hoodGraph2svg <- function(TDM,Vname,pname){
+#
+#   # Create weighted Term-Term matrix
+#   tTM <- as.matrix(TDM)
+#   TTM <- tTM %*% t(tTM)
+#   TTM <- log1p(TTM)
+#
+#   ig <- graph.adjacency(TTM,weighted=T,mode="undirected",diag=F)
+#   ig <- simplify(ig)
+#
+#   # Remove vertices that were used in the search query
+#   Vrem <- which(V(ig)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
+#   ig <- (ig - V(ig)$name[Vrem])
+#
+#   # This is a deletion specific for the Neighbourhood graphs
+#   Vrem <- which(V(ig)$name %in% c("~rdsp~","~imp~","~som~","~bod~","~mlt~"))
+#   ig   <- ig - V(ig)$name[Vrem]
+#
+#   idx <- which(V(ig)$name==Vname)
+#   sg  <- graph.neighborhood(ig, order = 1, nodes=V(ig)[idx], mode = 'all')[[1]]
+#
+#   # set colors and sizes for vertices
+#   V(sg)$degree <- degree(sg)
+#
+#   rev<-scaleRange(log1p(V(sg)$degree))
+#   rev[rev<=0.3]<-0.3
+#
+#   V(sg)$color <- rgb(scaleRange(V(sg)$degree), 1-scaleRange(log1p(V(sg)$degree*V(sg)$degree)),  0, rev)
+#
+#   V(sg)$size        <- 35*scaleRange(V(sg)$degree)
+#   V(sg)$frame.color <- NA
+#
+#   # set vertex labels and their colors and sizes
+#   V(sg)$label       <- V(sg)$name
+#   V(sg)$label.color <- rgb(0, 0, 0, rev)
+#   V(sg)$label.cex   <- scaleRange(V(sg)$degree)
+#
+#   # set edge width and color
+#   rew<-scaleRange(E(sg)$weight)
+#   rew[rew<=0.3]<-0.3
+#
+#   E(sg)$width <- 6*scaleRange(E(sg)$weight)
+#   E(sg)$color <- rgb(.5, .5, 0, rew)
+#
+#   idV <- which(V(sg)$name==Vname)
+#   idE <- incident(sg,V(sg)[[idV]])
+#   E(sg)$color[idE] <- rgb(0, 0, 1 ,0.8)
+#
+#   set.seed(958)
+#
+#   idx <- which(V(sg)$name==Vname)
+#   svg(paste(pname,sep=""),width=8,height=8)
+#   plot(sg,layout=layout.star(sg,center=V(sg)[idx]))
+#   dev.off()
+#
+#   return(sg)
+# }
+
 
 #
 # #' PSDslope
@@ -3698,7 +3568,134 @@ add_alpha <- function(col, alpha=1){
 #   )
 # }
 
-#' elascer
+
+
+# Toy models ----------
+
+#' Examples of dynamical growth models (maps)
+#'
+#' Autocatlytic Growth: Iterating differential equations (maps)
+#'
+#' @param Y0    Initial value.
+#' @param r    Growth rate parameter.
+#' @param k    Carrying capacity.
+#' @param N    Length of the time series.
+#' @param type    One of: "driving" (default), "damping", "logistic", "vanGeert1991".
+#'
+#' @return A timeseries object of length N.
+#' @export
+#'
+#' @author Fred Hasselman
+#'
+#' @family autocatalytic growth functions
+#'
+#' @examples
+#' # The logistic map in the chaotic regime
+#' growth_ac(Y0 = 0.01, r = 4, type = "logistic")
+growth_ac <- function(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving", "damping", "logistic", "vanGeert")[1]){
+  # Create a vector Y of length N, which has value Y0 at Y[1]
+  if(N>1){
+    Y <- as.numeric(c(Y0, rep(NA,N-2)))
+    # Conditional on the value of type ...
+    switch(type,
+           # Iterate N steps of the difference function with values passed for Y0, k and r.
+           driving  = sapply(seq_along(Y), function(t) Y[[t+1]] <<- r * Y[t] ),
+           damping  = k + sapply(seq_along(Y), function(t) Y[[t+1]] <<- - r * Y[t]^2 / k),
+           logistic = sapply(seq_along(Y), function(t) Y[[t+1]] <<- r * Y[t] * ((k - Y[t]) / k)),
+           vanGeert = sapply(seq_along(Y), function(t) Y[[t+1]] <<- Y[t] * (1 + r - r * Y[t] / k))
+    )}
+  return(ts(Y))
+}
+
+#' Examples of conditional dynamical growth models (maps)
+#'
+#' Conditional Autocatlytic Growth: Iterating differential equations (maps)
+#'
+#' @param Y0 Initial value
+#' @param r Growth rate parameter
+#' @param k Carrying capacity
+#' @param cond Conditional rules passed as a data.frame of the form: cbind.data.frame(Y = ..., par = ..., val = ...)
+#' @param N Length of the time series
+#'
+#' @export
+#'
+#' @author Fred Hasselman
+#'
+#' @family autocatalytic growth functions
+#'
+#' @examples
+#' # Plot with the default settings
+#' library(lattice)
+#' xyplot(growth_ac_cond())
+#'
+#' # The function such that it can take a set of conditional rules and apply them sequentially during the iterations.
+#' # The conditional rules are passed as a `data.frame`
+#'
+#' (cond <- cbind.data.frame(Y = c(0.2, 0.6), par = c("r", "r"), val = c(0.5, 0.1)))
+#' xyplot(growth_ac_cond(cond=cond))
+#'
+#' # Combine a change of `r` and a change of `k`
+#'
+#' (cond <- cbind.data.frame(Y = c(0.2, 1.99), par = c("r", "k"), val = c(0.5, 3)))
+#' xyplot(growth_ac_cond(cond=cond))
+#'
+#' # A fantasy growth process
+#'
+#' cond <- cbind.data.frame(Y = c(0.1, 1.99, 1.999, 2.5, 2.9),
+#' par = c("r", "k", "r", "r","k"),
+#' val = c(0.3, 3, 0.9, 0.1, 1.3))
+#'
+#' xyplot(growth_ac_cond(cond=cond))
+growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y = 0.2, par = "r", val = 2), N = 100){
+  # Create a vector Y of length N, which has value Y0 at Y[1]
+  Y <- c(Y0, rep(NA, N-1))
+  # Iterate N steps of the difference equation with values passed for Y0, k and r.
+  cnt <- 1
+  for(t in seq_along(Y)){
+    # Check if the current value of Y is greater than the threshold for the current conditional rule in cond
+    if(Y[t] > cond$Y[cnt]){
+      # If the threshold is surpassed, change the parameter settings by evaluating: cond$par = cond$val
+      eval(parse(text = paste(cond$par[cnt], "=", cond$val[cnt])))
+      # Update the counter if there is another conditional rule in cond
+      if(cnt < nrow(cond)){cnt <- cnt + 1}
+    }
+    # Van Geert growth model
+    Y[[t+1]] <- Y[t] * (1 + r - r * Y[t] / k)
+  }
+  return(ts(Y))
+}
+
+
+# HELPERS ----
+
+#' Slice columns of a matrix in epochs
+#'
+#' @param TSmat A matrix with tieseries as columns
+#' @param epochSz Epoch size
+#'
+#' @return A list with epochs
+#' @export
+#'
+sliceTS<-function(TSmat,epochSz=1) {
+  N<-dim(TSmat)
+  return(plyr::llply(seq(1,N[1],epochSz),function(i) TSmat[i:min(i+epochSz-1,N[1]),1:N[2]]))
+}
+
+
+#' Wrapper for filtfilt
+#'
+#' @param TS A time series
+#' @param f A filter
+#'
+#' @return A filtered signal
+#' @export
+#' @keywords internal
+fltrIT <- function(TS,f){
+  return(signal::filtfilt(f=f,x=TS))
+}
+
+
+#' Elastic Scaler - A Flexible Rescale Function
 #'
 #' @description The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.
 #'
@@ -3767,8 +3764,7 @@ elascer <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
 #   knit2html(input = infile, output = outfile, options = c(mdOpt), extensions = c(mdExt))
 # }
 
-# MULTIPLOT FUNCTION ------------------------------------------------------------------------------------------------------------------
-#
+
 # [copied from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/ ]
 #
 # ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)

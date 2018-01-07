@@ -22,12 +22,32 @@ gg.plotHolder
 library(ggplot2)
 library(scales)
 
-df <- data.frame(x = rnorm(n = 100), y = rnorm(n = 100), group = factor(sample(x=c(0,1), size = 100, replace = TRUE)))
+df <- data.frame(x = rnorm(n = 100),
+                 y = rnorm(n = 100),
+                 group = factor(sample(x=c(0,1),
+                 size = 100, replace = TRUE)))
 
-scatterP <- ggplot(df, aes(x = x, y =y, colour = group)) + geom_point() + gg.theme()
-xDense <- ggplot(df, aes(x = x, fill = group)) + geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) + gg.theme("noax") + theme(legend.position = "none")
-yDense <- ggplot(df, aes(x = y, fill = group)) + geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) + coord_flip() + gg.theme("noax") + theme(legend.position = "none")
+scatterP <- ggplot(df, aes(x = x, y =y, colour = group)) +
+                   geom_point() +
+                   gg.theme()
+
+xDense <- ggplot(df, aes(x = x, fill = group)) +
+                 geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) +
+                 gg.theme("noax") +
+                 theme(legend.position = "none")
+
+yDense <- ggplot(df, aes(x = y, fill = group)) +
+                 geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) +
+                 coord_flip() +
+                 gg.theme("noax") +
+                 theme(legend.position = "none")
 
 library(gridExtra)
-grid.arrange(xDense, gg.plotHolder(), scatterP, yDense, ncol=2, nrow=2, widths=c(4, 1.4), heights=c(1.4, 4))
+grid.arrange(xDense,
+             gg.plotHolder(),
+             scatterP,
+             yDense,
+             ncol=2, nrow=2,
+             widths=c(4, 1.4),
+             heights=c(1.4, 4))
 }
