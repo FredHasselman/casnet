@@ -5,5 +5,4 @@
 #' @name casnet
 #' @docType package
 #'
-#'
 NULL

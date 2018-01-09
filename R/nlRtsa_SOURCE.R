@@ -1,3 +1,6 @@
+#' @importFrom magrittr %>%
+NULL
+
 
 # Load required libraries --------------------------------
 #
@@ -307,8 +310,6 @@ repmat <- function(X,m,n){
 #' @param ...
 #'
 #' @keywords internal
-#'
-#' @importFrom magrittr "%>%"
 #'
 #' @export
 #'
