@@ -601,7 +601,7 @@ crqa_cl <- function(y1,
 # require(dplyr)
 # require(zoo)
 
-  if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"rp_install_log.txt"), mustWork = FALSE))){
+  if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"/rp_install_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
   }
 

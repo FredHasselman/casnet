@@ -41,7 +41,7 @@ get_os <- function(){
     if (grepl("^darwin", R.version$os))
       os <- "osx"
     (grepl("linux-gnu", R.version$os))
-     os <- "linux-gnu"
+    os <- "linux-gnu"
   }
   tolower(os)
 }
@@ -52,6 +52,8 @@ get_os <- function(){
 #' @export
 #'
 set_command_line_rp <- function(){
+
+  copyright_text <- c("Note that the platform specific `rp` command line executables were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at: http://tocsy.pik-potsdam.de/ \n\n The full copyright statement on the website is as follows: \n\n  > \u00A9 2004-2017 SOME RIGHTS RESERVED  \n  > University of Potsdam, Interdisciplinary Center for Dynamics of Complex Systems, Germany  \n  > Potsdam Institute for Climate Impact Research, Transdisciplinary Concepts and Methods, Germany  \n  > This work is licensed under a [Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Germany License](https://creativecommons.org/licenses/by-nc-nd/2.0/de/).  \n\n  More information about recurrence quantification analysis can be found on the [Recurrence Plot website](http://www.recurrence-plot.tk).")
 
   dl_instruction <- c("Download failed!\nCopying failed!\n\nTo install do the following:\n1. Either go to https://github.com/FredHasselman/casnet/tree/master/inst and download and unzip 'commandline_rp.zip', or go to http://tocsy.pik-potsdam.de/commandline-rp.php \n2. Find the executable for your OS\n3. Copy it to the '/exec' directory under 'casnet' \n4. Rename to 'rp' or 'rp.exe' on Windows\n5. Put an empty text file in '/exec' with the following name 'rp_instal_log.txt' \n 6. Run this code to test if everything is ok: crqa_cl(rnorm(100))")
 
@@ -72,7 +74,7 @@ set_command_line_rp <- function(){
     URL <- "http://tocsy.pik-potsdam.de/RP/rp_sun"
     sys <- "sun_solaris"
     exe <- "rp_sun.dms"
-    }
+  }
 
   # macOSX
   if(os%in%"osx"){
@@ -127,10 +129,10 @@ set_command_line_rp <- function(){
 
   if(LOG==0){
     if(!os%in%"windows"){
-    devtools::RCMD(cmd="chmod",options=paste0("a+x ",getOption("casnet.rp_command")),path=normalizePath(execPath, mustWork = FALSE))
-      }
+      devtools::RCMD(cmd="chmod",options=paste0("a+x ",getOption("casnet.rp_command")),path=normalizePath(execPath, mustWork = FALSE))
+    }
     message(paste0("Detected: ",sys,"\n  Copied: ",URL," to ",getOption("casnet.rp_command")," in ",execPath," as the commandline CRP executable"))
-    rio::export(data.frame(url=URL),normalizePath(paste0(execPath,"/rp_install_log.txt")))
+    rio::export(data.frame(url=c(URL,copyright_text)),normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_install_log.txt"), mustWork = FALSE))
   } else {
     if(ZIP){
       message(paste0("Detected: ",sys, "\n  FAILED to Copy: ",URL," to ",getOption("casnet.rp_command")," in ",execPath," as the commandline CRP executable \n Trying .zip file..."))
@@ -139,12 +141,13 @@ set_command_line_rp <- function(){
       if(all(nchar(sysCommand)>0)){
         devtools::RCMD(sysCommand[[1]], options = sysCommand[[2]], path = getOption("casnet.path"), quiet = TRUE)
         devtools::RCMD(sysCommand[[3]], options = sysCommand[[4]], path = getOption("casnet.path"), quiet = TRUE)
-        rio::export(data.frame(sysCommand=c(paste(sysCommand[[1]],sysCommand[[2]]),paste(sysCommand[[3]],sysCommand[[4]]))),normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_install_log.txt"), mustWork = FALSE))
-    }
+        rio::export(data.frame(sysCommand=c(paste(sysCommand[[1]], sysCommand[[2]]), paste(sysCommand[[3]], sysCommand[[4]]),copyright_text)), normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_install_log.txt"), mustWork = FALSE))
+      }
     } else {
       message(dl_instruction)
     }
+  }
 
-    }
+  message(paste0("\n==================COPYRIGHT=NOTICE==================\n\n",copyright_text,"\n\n==================COPYRIGHT=NOTICE==================\n"))
 }
 
