@@ -22,6 +22,8 @@
 
 #' Which OS is running?
 #'
+#'  Some systems not tested, but based on the cran page: [check flavors](https://cran.r-project.org/web/checks/check_flavors.html)
+#'
 #' @return A string, "osx", "windows", "linux"
 #' @export
 #'
@@ -30,14 +32,16 @@ get_os <- function(){
   os <- NA
   if (!is.null(sysinf)){
     os <- sysinf['sysname']
-    if (os == 'Darwin')  os <- "osx"
-    if (os == 'Windows') os <- "windows"
+    if (os == "Darwin")  os <- "osx"
+    if (os == "Windows") os <- "windows"
+    if (os == "SunOS")   os <- "sun"
+    if (os == "Solaris") os <- "solaris"
   } else { ## mystery machine
     os <- .Platform$OS.type
     if (grepl("^darwin", R.version$os))
       os <- "osx"
-    if (grepl("linux-gnu", R.version$os))
-      os <- "linux"
+    (grepl("linux-gnu", R.version$os))
+     os <- "linux-gnu"
   }
   tolower(os)
 }
@@ -63,6 +67,13 @@ set_command_line_rp <- function(){
     ZIP = TRUE
   }
 
+  # Sun / Solaris
+  if(os%in%c("sun","solaris")){
+    URL <- "http://tocsy.pik-potsdam.de/RP/rp_sun"
+    sys <- "sun_solaris"
+    exe <- "rp_sun.dms"
+    }
+
   # macOSX
   if(os%in%"osx"){
 
@@ -80,7 +91,7 @@ set_command_line_rp <- function(){
   # Windows
   if(os%in%"windows"){
     options(casnet.rp_prefix="")
-    options(casnet.rp_command="rp.exe")
+    options(casnet.rp_command="rp") #options(casnet.rp_command="rp.exe")
     options(casnet.sysdel="del")
     options(casnet.syscopy="copy")
 
@@ -90,7 +101,7 @@ set_command_line_rp <- function(){
   }
 
   # Linux
-  if(os%in%"linux"){
+  if(os%in%c("linux","linux-gnu")){
 
     if(grepl("amd64",Sys.info()[["machine"]])&grepl("linux-gnu", R.version$os)){
       sys <- "linux_AMD_x86_64gnu"
@@ -98,10 +109,10 @@ set_command_line_rp <- function(){
       URL <- "http://tocsy.pik-potsdam.de/RP/rp_x86_64"
     }
 
-    if(grepl("amd64",Sys.info()[["machine"]])&!grepl("linux-gnu", R.version$os)){
+    if(grepl("amd64",Sys.info()[["machine"]])&!grepl("linux", R.version$os)){
       sys <- "linux_AMD_x86_64i"
       exe <- "rp_x86_64i.dms"
-      URL <- "http://tocsy.pik-potsdam.de/RP/rp_x86_64"
+      URL <- "http://tocsy.pik-potsdam.de/RP/rp_x86_64i"
     }
 
     if(grepl("i686",Sys.info()[["machine"]])){
@@ -115,26 +126,25 @@ set_command_line_rp <- function(){
   LOG <- try(utils::download.file(url = URL, destfile = normalizePath(paste0(execPath,"/",getOption("casnet.rp_command")), mustWork = FALSE)))
 
   if(LOG==0){
-    if(os%in%c("osx","linux")){
+    if(!os%in%"windows"){
     devtools::RCMD(cmd="chmod",options=paste0("a+x ",getOption("casnet.rp_command")),path=normalizePath(execPath, mustWork = FALSE))
       }
     message(paste0("Detected: ",sys,"\n  Copied: ",URL," to ",getOption("casnet.rp_command")," in ",execPath," as the commandline CRP executable"))
-    rio::export(data.frame(url=URL),normalizePath(paste0(execPath,"rp_install_log.txt")))
+    rio::export(data.frame(url=URL),normalizePath(paste0(execPath,"/rp_install_log.txt")))
   } else {
     if(ZIP){
       message(paste0("Detected: ",sys, "\n  FAILED to Copy: ",URL," to ",getOption("casnet.rp_command")," in ",execPath," as the commandline CRP executable \n Trying .zip file..."))
       sysCommand <- c(getOption("syscopy"),paste(normalizePath(paste0(sourcePath,"/commandline_rp/",sys,"/",exe)), normalizePath(paste0(execPath,"/",getOption("casnet.rp_command")), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/",getOption("casnet.rp_command")), mustWork = FALSE)))
-      TRYSY = TRUE
+
+      if(all(nchar(sysCommand)>0)){
+        devtools::RCMD(sysCommand[[1]], options = sysCommand[[2]], path = getOption("casnet.path"), quiet = TRUE)
+        devtools::RCMD(sysCommand[[3]], options = sysCommand[[4]], path = getOption("casnet.path"), quiet = TRUE)
+        rio::export(data.frame(sysCommand=c(paste(sysCommand[[1]],sysCommand[[2]]),paste(sysCommand[[3]],sysCommand[[4]]))),normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_install_log.txt"), mustWork = FALSE))
+    }
     } else {
       message(dl_instruction)
     }
-  }
-  if(TRYSYS){
-    if(all(nchar(sysCommand)>0)){
-      devtools::RCMD(sysCommand[[1]], options = sysCommand[[2]], path = getOption("casnet.path"), quiet = TRUE)
-      devtools::RCMD(sysCommand[[3]], options = sysCommand[[4]], path = getOption("casnet.path"), quiet = TRUE)
-      rio::export(data.frame(sysCommand=c(paste(sysCommand[[1]],sysCommand[[2]]),paste(sysCommand[[3]],sysCommand[[4]]))),normalizePath(paste0(getOption("casnet.path_to_rp"),"/rp_instal_log.txt"), mustWork = FALSE))
+
     }
-  }
 }
 
