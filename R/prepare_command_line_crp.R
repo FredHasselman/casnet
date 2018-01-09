@@ -115,7 +115,9 @@ set_command_line_rp <- function(){
   LOG <- try(utils::download.file(url = URL, destfile = normalizePath(paste0(execPath,"/",getOption("casnet.rp_command")), mustWork = FALSE)))
 
   if(LOG==0){
+    if(os%in%c("osx","linux")){
     devtools::RCMD(cmd="chmod",options=paste0("a+x ",getOption("casnet.rp_command")),path=normalizePath(execPath, mustWork = FALSE))
+      }
     message(paste0("Detected: ",sys,"\n  Copied: ",URL," to ",getOption("casnet.rp_command")," in ",execPath," as the commandline CRP executable"))
     rio::export(data.frame(url=URL),normalizePath(paste0(execPath,"rp_install_log.txt")))
   } else {
