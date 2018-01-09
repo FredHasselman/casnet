@@ -91,7 +91,7 @@ set_command_line_rp <- function(){
   # Windows
   if(os%in%"windows"){
     options(casnet.rp_prefix="")
-    options(casnet.rp_command="rp") #options(casnet.rp_command="rp.exe")
+    options(casnet.rp_command="rp.exe")
     options(casnet.sysdel="del")
     options(casnet.syscopy="copy")
 
@@ -123,7 +123,7 @@ set_command_line_rp <- function(){
   }
 
   # Get the file from internet
-  LOG <- try(utils::download.file(url = URL, destfile = normalizePath(paste0(execPath,"/",getOption("casnet.rp_command")), mustWork = FALSE)))
+  LOG <- try(utils::download.file(url = URL, mode = "wb", cacheOK = FALSE, destfile = normalizePath(paste0(execPath,"/",getOption("casnet.rp_command")), mustWork = FALSE)))
 
   if(LOG==0){
     if(!os%in%"windows"){

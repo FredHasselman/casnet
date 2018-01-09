@@ -4,7 +4,10 @@
 \name{casnet}
 \alias{casnet}
 \alias{casnet-package}
-\title{casnet.}
+\title{A Toolbox for Studying Complex Adaptive Systems and NETworks}
 \description{
-casnet.
+A Toolbox for Studying Complex Adaptive Systems and NETworks
+}
+\author{
+Fred Hasselman
 }

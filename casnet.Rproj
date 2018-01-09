@@ -18,5 +18,5 @@ BuildType: Package
 PackageUseDevtools: Yes
 PackageInstallArgs: --with-keep.source
 PackageBuildArgs: --no-build-vignettes
-PackageCheckArgs: --as-cran --no-ex
+PackageCheckArgs: --as-cran
 PackageRoxygenize: rd,collate,namespace,vignette

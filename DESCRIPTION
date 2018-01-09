@@ -1,6 +1,6 @@
 Package: casnet
 Type: Package
-Title: Toolbox for Studying Complex Adaptive Systems and NETworks
+Title: A Toolbox for Studying Complex Adaptive Systems and NETworks
 Version: 0.1.1
 Authors@R: person("Fred", "Hasselman", email = "f.hasselman@bsi.ru.nl", role = c("aut", "cre"))
 Maintainer: Fred Hasselman <f.hasselman@bsi.ru.nl>

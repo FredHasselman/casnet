@@ -308,6 +308,8 @@ repmat <- function(X,m,n){
 #'
 #' @keywords internal
 #'
+#' @importFrom magrittr "%>%"
+#'
 #' @export
 #'
 crqa_cl_main <- function(y1,
@@ -331,6 +333,7 @@ crqa_cl_main <- function(y1,
                     path_out   = NULL,
                     file_ID    = NULL,
                     silent     = TRUE, ...){
+
 
   RQAmeasures <- list(
     RR      = 'Recurrence rate',
@@ -423,7 +426,7 @@ crqa_cl_main <- function(y1,
   #closeAllConnections()
 
   # RCMD
-  devtools::RCMD(shQuote(paste0(getOption("casnet.rp_prefix"),getOption("casnet.rp_command"))), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
+  devtools::RCMD(paste0(getOption("casnet.rp_prefix"),getOption("casnet.rp_command")), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
 
   measures     = try.CATCH(rio::import(normalizePath(gsub("[']+","",measOUT))))
   rpMAT        = try.CATCH(rio::import(normalizePath(gsub("[']+","",plotOUT))))
