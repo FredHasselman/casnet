@@ -6,7 +6,7 @@
 \usage{
 \method{fd}{sda}(y, fs = NULL, normalize = TRUE, dtrend = FALSE,
   scales = fractal::dispersion(y)$scale, fitRange = c(scales[1],
-  scales[length(scales) - 2]), plot = FALSE)
+  scales[length(scales) - 2]), doPlot = FALSE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -21,7 +21,7 @@
 
 \item{fitRange}{Scale bins (\code{c(min,max)}) to use for fitting the scaling relation}
 
-\item{plot}{Return the log-log spectrum with linear fit (default).}
+\item{doPlot}{Return the log-log spectrum with linear fit (default).}
 }
 \value{
 A list object containing:

@@ -5,7 +5,7 @@
 \title{Power Spectral Density Slope (PSD).}
 \usage{
 \method{fd}{psd}(y, fs = NULL, normalize = TRUE, dtrend = TRUE,
-  plot = FALSE)
+  doPlot = FALSE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -16,7 +16,7 @@
 
 \item{dtrend}{Subtract linear trend from the series (default = TRUE).}
 
-\item{plot}{Return the log-log spectrum with linear fit (default = FALSE).}
+\item{doPlot}{Return the log-log spectrum with linear fit (default = FALSE).}
 }
 \value{
 A list object containing:

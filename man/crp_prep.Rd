@@ -5,8 +5,8 @@
 \title{Prepare matrix}
 \usage{
 crp_prep(RP, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
-  DLmax = length(diag(rmat)) - 1, VLmax = length(diag(rmat)) - 1,
-  HLmax = length(diag(rmat)) - 1, AUTO = FALSE, chromatic = FALSE,
+  DLmax = length(diag(RP)) - 1, VLmax = length(diag(RP)) - 1,
+  HLmax = length(diag(RP)) - 1, AUTO = FALSE, chromatic = FALSE,
   matrices = FALSE, doHalf = FALSE)
 }
 \arguments{

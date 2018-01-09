@@ -6,7 +6,7 @@
 \usage{
 \method{fd}{dfa}(y, fs = NULL, dtrend = "poly1", normalize = FALSE,
   sum.order = 1, scale.max = trunc(length(y)/4), scale.min = 4,
-  elasceratio = 2^(1/4), overlap = 0, plot = FALSE)
+  elasceratio = 2^(1/4), overlap = 0, doPlot = FALSE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -27,7 +27,7 @@
 
 \item{overlap}{By what percentage should scale bins overlap? (default = 0)}
 
-\item{plot}{Return the log-log spectrum with linear fit (default).}
+\item{doPlot}{Return the log-log spectrum with linear fit (default).}
 }
 \value{
 Estimate of Hurst exponent (slope of \code{log(bin)} vs. \code{log(RMSE))} and an FD estimate based on Hasselman(2013)

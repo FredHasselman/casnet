@@ -372,7 +372,7 @@ crqa_cl_main <- function(y1,
 
   tmpd  <- tempdir()
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
-  write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
+  utils::write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
 
   # if(grepl("Error",try.CATCH(normalizePath(path_out,mustWork = TRUE))$value)){
   #
@@ -403,7 +403,7 @@ crqa_cl_main <- function(y1,
                   ifelse(silent,"-s",""))
   } else {
     tmpf2 <- tempfile(tmpdir = tmpd, fileext = ".dat")
-    write.table(as.data.frame(y2), tmpf2, col.names = FALSE, row.names = FALSE, sep = "\t")
+    utils::write.table(as.data.frame(y2), tmpf2, col.names = FALSE, row.names = FALSE, sep = "\t")
     opts <- paste("-i", shQuote(tmpf1),
                   "-j", shQuote(tmpf2),
                   "-r", shQuote(plotOUT),
@@ -423,7 +423,7 @@ crqa_cl_main <- function(y1,
   #closeAllConnections()
 
   # RCMD
-  devtools::RCMD(shQuote(paste0(getOption("casnet.rp_prefix"),"rp")), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
+  devtools::RCMD(shQuote(paste0(getOption("casnet.rp_prefix"),"/",getOption("casnet.rp_command"))), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
 
   measures     = try.CATCH(rio::import(normalizePath(gsub("[']+","",measOUT))))
   rpMAT        = try.CATCH(rio::import(normalizePath(gsub("[']+","",plotOUT))))
@@ -597,7 +597,7 @@ crqa_cl <- function(y1,
 # require(dplyr)
 # require(zoo)
 
-  if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"rp_instal_log.txt"), mustWork = FALSE))){
+  if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"rp_install_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
   }
 
@@ -676,10 +676,10 @@ crqa_cl <- function(y1,
 
 
   wlist        <- unclass(wlist)
-  rqa_measures <- plyr::ldply(wlist[,1]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_rpvector <- plyr::ldply(wlist[,2]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_diagdist <- plyr::ldply(wlist[,3]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_horidist <- plyr::ldply(wlist[,4]) %>% mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_measures <-plyr::ldply(wlist[,1]) %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_rpvector <-plyr::ldply(wlist[,2]) %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_diagdist <-plyr::ldply(wlist[,3]) %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_horidist <-plyr::ldply(wlist[,4]) %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
 
 
   out <- list(rqa_measures = rqa_measures,
@@ -742,9 +742,9 @@ crqa_parameters <- function(y,
         surrDims <- nonlinearTseries::buildTakens(as.numeric(y),
                                                   emDims[[D]],
                                                   emLags$opLag[L])
-        rmat <- recmat(surrDims,surrDims)
-        allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*max(rmat, na.rm = TRUE))
-        Nn <- sum(laply(allN, length), na.rm = TRUE)
+        RM <- recmat(surrDims,surrDims)
+        allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*max(RM, na.rm = TRUE))
+        Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
         if(D==1){Nn.max <- Nn}
         lagList[[cnt]] <- data.frame(Nsize        = nnSizes[N],
                                      emLag.method = emLags$selection.method[[L]],
@@ -756,10 +756,10 @@ crqa_parameters <- function(y,
     }
   }
 
-  df        <- plyr::ldply(lagList)
+  df        <-plyr::ldply(lagList)
   df$Nn.pct <- df$Nn/df$Nn.max
 
-  opt <- plyr::ldply(unique(df$emLag), function(n){
+  opt <-plyr::ldply(unique(df$emLag), function(n){
     id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
     if(length(id)>0){
       idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
@@ -789,14 +789,14 @@ crqa_parameters <- function(y,
 
   if(diagPlot){
 
-    dfs <- data.frame(start= c(.5, hist(emDims)$mids),
-                      stop = c(hist(emDims)$mids,max(emDims)+.5),
-                      f=factor(seq_along(c(.5, hist(emDims)$mids))%%2))
+    dfs <- data.frame(startAt= c(.5, graphics::hist(emDims)$mids),
+                      stopAt = c(graphics::hist(emDims)$mids,max(emDims)+.5),
+                      f=factor(seq_along(c(.5, graphics::hist(emDims)$mids))%%2))
 
     # use: alpha()
     #myPal <- RColorBrewer::brewer.pal(length(emLag),"Dark2")
     gNdims <- ggplot2::ggplot(df, aes(y = Nn.pct, x = emDim, colour = emLag)) +
-      geom_rect(aes(xmin = start, xmax = stop, fill = f),
+      geom_rect(aes(xmin = startAt, xmax = stopAt, fill = f),
                 ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
       scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
       geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
@@ -891,7 +891,7 @@ crqa_radius <- function(RM,
 
   if(!dplyr::between(tol,0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
 
-  AUTO        <- ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
+  AUTO        <- ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
   recmatsize <- recmat_size(RM,AUTO,theiler)
   if(AUTO){
     cat(paste0("\nAuto-recurrence: Setting diagonal to 0 (matrix size: ",recmatsize,")\n"))
@@ -991,9 +991,9 @@ crqa_mat_measures <- function(RM,
                               DLmin = 2,
                               VLmin = 2,
                               HLmin = 2,
-                              DLmax = length(diag(rmat))-1,
-                              VLmax = length(diag(rmat))-1,
-                              HLmax = length(diag(rmat))-1,
+                              DLmax = length(diag(RM))-1,
+                              VLmax = length(diag(RM))-1,
+                              HLmax = length(diag(RM))-1,
                               AUTO      = NULL,
                               chromatic = FALSE,
                               matrices  = FALSE,
@@ -1022,7 +1022,7 @@ crqa_mat_measures <- function(RM,
 
   tstart <- Sys.time()
   out    <- parallel::mclapply(1, function(i){
-    crp_prep(matrix(RM[ceiling(NCols*NRows*runif(NCols*NRows))], ncol=NCols, nrow = NRows),
+    crp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))], ncol=NCols, nrow = NRows),
              radius= radius,
              DLmin = DLmin,
              VLmin = VLmin,
@@ -1043,11 +1043,11 @@ crqa_mat_measures <- function(RM,
   if(Nboot>1){
 
     cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations...\n"))
-    cat(paste0("Estimated duration: ", round((difftime(tend,tstart, unit = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
+    cat(paste0("Estimated duration: ", round((difftime(tend,tstart, units = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
 
     tstart <-Sys.time()
     bootOut <-  parallel::mclapply(1:Nboot, function(i){
-      replicate <- as.data.frame(crp_prep(matrix(RM[ceiling(NCols*NRows*runif(NCols*NRows))],
+      replicate <- as.data.frame(crp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))],
                                                  ncol=NCols, nrow = NRows),
                                           radius= radius,
                                           DLmin = DLmin,
@@ -1066,9 +1066,9 @@ crqa_mat_measures <- function(RM,
     mc.cores = mc.cores
     )
     tend <- Sys.time()
-    cat(paste0("Actual duration: ", round(difftime(tend,tstart, unit = "mins"), digits=1)," min.\n"))
+    cat(paste0("Actual duration: ", round(difftime(tend,tstart, units = "mins"), digits=1)," min.\n"))
 
-    dfrepl <- ldply(bootOut)
+    dfrepl <-plyr::ldply(bootOut)
     dfrepl <- tidyr::gather(dfrepl, key = measure, value = value, -replicate)
 
     if(length(CL)==1){
@@ -1079,18 +1079,18 @@ crqa_mat_measures <- function(RM,
       ci.hi <- CL[2]
     }
 
-    rqout <-  dfrepl %>% group_by(measure) %>%
+    rqout <-  dfrepl %>% dplyr::group_by(measure) %>%
       summarize(
         val      = NA,
-        ci.lower = quantile(value, ci.lo, na.rm = TRUE),
-        ci.upper = quantile(value, ci.hi, na.rm = TRUE),
+        ci.lower = stats::quantile(value, ci.lo, na.rm = TRUE),
+        ci.upper = stats::quantile(value, ci.hi, na.rm = TRUE),
         mean     = mean(value, na.rm = TRUE),
-        sd       = sd(value, na.rm = TRUE),
-        var      = var(value, na.rm = TRUE),
+        sd       = stats::sd(value, na.rm = TRUE),
+        var      = stats::var(value, na.rm = TRUE),
         N        = n(),
-        se       = sd(value, na.rm = TRUE)/sqrt(n()),
+        se       = stats::sd(value, na.rm = TRUE)/sqrt(n()),
         median   = mean(value, na.rm = TRUE),
-        mad      = mad(value, na.rm = TRUE)
+        mad      = stats::mad(value, na.rm = TRUE)
       )
 
     for(m in 1:nrow(rqout)){
@@ -1231,18 +1231,18 @@ crqa_mat <- function(rmat,
   #       ci.hi <- CL[2]
   #     }
   #
-  #     rqout <-  dfrepl %>% group_by(measure) %>%
+  #     rqout <-  dfrepl %>% dplyr::group_by(measure) %>%
   #       summarize(
   #         val     = NA,
-  #         ci.low  = quantile(value, ci.lo, na.rm = TRUE),
-  #         ci.high = quantile(value, ci.hi, na.rm = TRUE),
+  #         ci.low  = stats::quantile(value, ci.lo, na.rm = TRUE),
+  #         ci.high = stats::quantile(value, ci.hi, na.rm = TRUE),
   #         mean    = mean(value, na.rm = TRUE),
-  #         sd      = sd(value, na.rm = TRUE),
-  #         var     = var(value, na.rm = TRUE),
+  #         sd      = stats::sd(value, na.rm = TRUE),
+  #         var     = stats::var(value, na.rm = TRUE),
   #         N       = n(),
-  #         se      = sd(value, na.rm = TRUE)/sqrt(n()),
+  #         se      = stats::sd(value, na.rm = TRUE)/sqrt(n()),
   #         median  = mean(value, na.rm = TRUE),
-  #         mad     = mad(value, na.rm = TRUE)
+  #         mad     = stats::mad(value, na.rm = TRUE)
   #       )
   #
   #     for(m in 1:nrow(rqout)){
@@ -1337,7 +1337,7 @@ est_eLag <- function(y,
   tmi$mutual.information[tmi$time.lag%in%out$opLag]
   out$ami <- sapply(out$opLag, function(r) tmi$mutual.information[r])
 
-  #tout <- summarise(group_by(out, opLag, ami), selection.method = paste0(unique(selection.method), collapse="|")
+  #tout <- summarise(dplyr::group_by(out, opLag, ami), selection.method = paste0(unique(selection.method), collapse="|")
 
   return(out)
 }
@@ -1397,7 +1397,7 @@ nzdiags <- function(A=NULL, d=NULL){
     if(is.null(d)){
 
       # Get diagonals which have nonzero elements
-      keepID <- ldply(spd, function(di) any(di>0))
+      keepID <-plyr::ldply(spd, function(di) any(di>0))
       nzdiag <- spd[keepID$V1]
       # Indices of nonzero diagonals
       dvec      <- as.numeric(keepID$.id[keepID$V1])
@@ -1450,7 +1450,7 @@ nzdiags.boot <- function(RP,d=NULL){
     if(is.null(d)){
 
       # Get diagonals which have nonzero elements
-      keepID <- ldply(spd, function(di) any(di>0))
+      keepID <-plyr::ldply(spd, function(di) any(di>0))
       nzdiag <- spd[keepID$V1]
       # Indices of nonzero diagonals
       d      <- as.numeric(keepID$.id[keepID$V1])
@@ -1502,7 +1502,7 @@ nzdiags.chroma <- function(RP, d=NULL){
     if(is.null(d)){
 
       # Get diagonals which have nonzero elements
-      keepID <- ldply(spd, function(di) any(di>0))
+      keepID <-plyr::ldply(spd, function(di) any(di>0))
       nzdiag <- spd[keepID$V1]
       # Indices of nonzero diagonals
       d      <- as.numeric(keepID$.id[keepID$V1])
@@ -1995,9 +1995,9 @@ crp_calc <- function(RM,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(diag(rmat))-1,
-                     VLmax = length(diag(rmat))-1,
-                     HLmax = length(diag(rmat))-1,
+                     DLmax = length(diag(RM))-1,
+                     VLmax = length(diag(RM))-1,
+                     HLmax = length(diag(RM))-1,
                      AUTO      = FALSE,
                      chromatic = FALSE,
                      matrices  = FALSE){
@@ -2073,9 +2073,9 @@ crp_calc <- function(RM,
   REP_vl  <- N_vl/N_dl
 
   #Coefficient of determination
-  CoV_dl = sd(freq_dl)/mean(freq_dl)
-  CoV_vl = sd(freq_vl)/mean(freq_vl)
-  CoV_hl = sd(freq_hl)/mean(freq_hl)
+  CoV_dl = stats::sd(freq_dl)/mean(freq_dl)
+  CoV_vl = stats::sd(freq_vl)/mean(freq_vl)
+  CoV_hl = stats::sd(freq_hl)/mean(freq_hl)
 
   #Divergence
   DIV_dl = 1/MAX_dl
@@ -2163,9 +2163,9 @@ crp_prep <- function(RP,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(diag(rmat))-1,
-                     VLmax = length(diag(rmat))-1,
-                     HLmax = length(diag(rmat))-1,
+                     DLmax = length(diag(RP))-1,
+                     VLmax = length(diag(RP))-1,
+                     HLmax = length(diag(RP))-1,
                      AUTO      = FALSE,
                      chromatic = FALSE,
                      matrices  = FALSE,
@@ -2324,8 +2324,8 @@ crp_prep <- function(RP,
 #
 #     #Thresholded or Distance matrix?
 #     ifelse((all(as.vector(RM)==0|as.vector(RM)==1)),
-#            distPallette <- colorRampPalette(c("white", "black"))(2),
-#            distPallette <- colorRampPalette(colors = c("red3", "snow", "steelblue"),
+#            distPallette <- grDevices::colorRampPalette(c("white", "black"))(2),
+#            distPallette <- grDevices::colorRampPalette(colors = c("red3", "snow", "steelblue"),
 #                                             space = "Lab",
 #                                             interpolate = "spline")
 #     )
@@ -2441,8 +2441,8 @@ crp_prep <- function(RP,
 #'
 lagEmbed <- function (y, emDim, emLag){
 
-  if(any(is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
-    timeVec <- time(y)
+  if(any(stats::is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
+    timeVec <- stats::time(y)
     emTime <- lubridate::as_datetime(timeVec[emLag+1])- lubridate::as_datetime(timeVec[1])
   } else {
     timeVec <- zoo::index(y)
@@ -2479,11 +2479,11 @@ lagEmbed <- function (y, emDim, emLag){
 SWtest0 <- function(g){
   Nreps <- 10;
   histr  <- vector("integer",Nreps)
-  target<- round(mean(degree(g)))
+  target<- round(mean(igraph::degree(g)))
   now   <- target/2
   for(i in 1:Nreps){
-    gt      <- watts.strogatz.game(dim=1, size=length(degree(g)), nei=now, 0)
-    histr[i] <- round(mean(degree(gt)))
+    gt      <- igraph::watts.strogatz.game(dim=1, size=length(igraph::degree(g)), nei=now, 0)
+    histr[i] <- round(mean(igraph::degree(gt)))
     ifelse(histr[i] %in% histr,break,{
       ifelse(histr[i]>target,{now<-now-1},{
         ifelse(histr[i]<target,{now<-now+1},{
@@ -2496,7 +2496,7 @@ SWtest0 <- function(g){
 
 
 # SWtestV <- function(g,N){
-#  return(list(cp=transitivity(g,type="global"),cpR=transitivity(rewire(g,mode=c("simple"),niter=N),type="global"),lp=average.path.length(g), lpR=average.path.length(rewire(g,mode=c("simple"),niter=N))))
+#  return(list(cp=igraph::transitivity(g,type="global"),cpR=igraph::transitivity(igraph::rewire(g,mode=c("simple"),niter=N),type="global"),lp=igraph::average.path.length(g), lpR=igraph::average.path.length(igraph::rewire(g,mode=c("simple"),niter=N))))
 # }
 
 SWtestE <- function(g,p=1,N=20){
@@ -2504,46 +2504,46 @@ SWtestE <- function(g,p=1,N=20){
 
   for(n in 1:N) {
     gt<-SWtest0(g)
-    values[n,] <- c(transitivity(g,type="localaverage"),transitivity(rewire(g,each_edge(p=p)),type="localaverage"),transitivity(gt,type="localaverage"),average.path.length(g),average.path.length(rewire(g,each_edge(p=p))),average.path.length(gt))}
+    values[n,] <- c(igraph::transitivity(g,type="localaverage"),igraph::transitivity(igraph::rewire(g,igraph::each_edge(p=p)),type="localaverage"),igraph::transitivity(gt,type="localaverage"),igraph::average.path.length(g),igraph::average.path.length(igraph::rewire(g,igraph::each_edge(p=p))),igraph::average.path.length(gt))}
   values[n,values[n,]==0] <- NA #values[n,values[n,]==0]+1e-8}
 
   values   <- cbind(values,(values[,1]/values[,2])/(values[,4]/values[,5]),(values[,1]/values[,3]),(values[,4]/values[,6]),((values[,1]/values[,3])/values[,2])/((values[,4]/values[,6])/values[,5]))
-  valuesSD <- data.frame(matrix(apply(values[,1:10],2,sd,na.rm=T),nrow=1,ncol=10,dimnames=list(c(1),c("cp","cpR","cp0","lp","lpR","lp0","SWI","cp:cp0","lp:lp0","SWIn"))))
+  valuesSD <- data.frame(matrix(apply(values[,1:10],2,FUN = stats::sd,na.rm=TRUE),nrow=1,ncol=10,dimnames=list(c(1),c("cp","cpR","cp0","lp","lpR","lp0","SWI","cp:cp0","lp:lp0","SWIn"))))
   valuesAV <- data.frame(matrix(colMeans(values[,1:10],na.rm=T),nrow=1,ncol=10,dimnames=list(c(1),c("cp","cpR","cp0","lp","lpR","lp0","SWI","cp:cp0","lp:lp0","SWIn"))))
   return(list(valuesAV=valuesAV,valuesSD=valuesSD,valuesSE=valuesSD/sqrt(N)))
 }
 
-PLFsmall <- function(g){
-
-  if(length(V(g))>100){stop("Vertices > 100, no need to use PLFsmall, use a binning procedure")}
-
-  d <- degree(g)
-
-  y <- hist(d,breaks=0.5:(max(d)+0.5),plot=FALSE)$counts
-  if(length(y)<2){
-    warning("Less than 2 points in Log-Log regression... alpha=0")
-    alpha <- 0
-  } else {
-    if(length(y)==2){
-      warning("Caution... Log-Log slope is a bridge (2 points)")
-      chop <- 0
-    } else {
-      chop <- 1
-    }
-    alpha <- coef(lm(rev(log1p(y)[1:(length(y)-chop)]) ~ log1p(1:(length(y)-chop))))[2]
-  }
-
-  return(alpha)
-}
+# PLFsmall <- function(g){
+#
+#   if(length(igraph::V(g))>100){stop("Vertices > 100, no need to use PLFsmall, use a binning procedure")}
+#
+#   d <- igraph::degree(g)
+#
+#   y <- graphics::hist(d,breaks=0.5:(max(d)+0.5),plot=FALSE)$counts
+#   if(length(y)<2){
+#     warning("Less than 2 points in Log-Log regression... alpha=0")
+#     alpha <- 0
+#   } else {
+#     if(length(y)==2){
+#       warning("Caution... Log-Log slope is a bridge (2 points)")
+#       chop <- 0
+#     } else {
+#       chop <- 1
+#     }
+#     alpha <- stats::coef(stats::lm(rev(log1p(y)[1:(length(y)-chop)]) ~ log1p(1:(length(y)-chop))))[2]
+#   }
+#
+#   return(alpha)
+# }
 
 
 # FD estimators ----------------------------------------------
 
 
 FDrel <- function(g){
-  d<-degree(g,mode="all")
-  nbreaks <- round(length(V(g))/2)-1
-  y<-hist(d,breaks=nbreaks,plot=F)$density
+  d<-igraph::degree(g,mode="all")
+  nbreaks <- round(length(igraph::V(g))/2)-1
+  y<-graphics::hist(d,breaks=nbreaks,plot=FALSE)$density
   y<-y[y>0]
   return(FD <- -sum(y*log2(y))/-(log2(1/length(y))))
 }
@@ -2652,20 +2652,20 @@ fd.default <- function(y, ...){
 
   r = 1.01
   y <- growth_ac(Y0=0.001, r=r, N=2048, type = "driving")
-  tsp(y) <-c(1/500,2048/500,500)
-  bulk <- log1p(hist(y,plot = F, breaks = seq(0,max(y),length.out = 129))$counts)
+  stats::tsp(y) <-c(1/500,2048/500,500)
+  bulk <- log1p(graphics::hist(y,plot = FALSE, breaks = seq(0,max(y),length.out = 129))$counts)
   size <- log1p(seq(0,2047,length.out = 128))
   id<-bulk==0
 
-  lmfit <- lm(bulk[!id] ~ size[!id])
+  lmfit <- stats::lm(bulk[!id] ~ size[!id])
 
   old <- ifultools::splitplot(2,1,1)
-  plot(y, ylab = "Y", main = paste0('Exponential growth  sap: ', round(coef(lmfit)[2],digits=2), ' | r:', r))
+  graphics::plot(y, ylab = "Y", main = paste0('Exponential growth  sap: ', round(stats::coef(lmfit)[2],digits=2), ' | r:', r))
   ifultools::splitplot(2,1,2)
-  plot(size[!id],bulk[!id], xlab="Size = log(bin(Time))", ylab = "Bulk = logbin(Y)", pch=21, bg="grey60", pty="s")
-  lines(size[!id], predict(lmfit),lwd=4,col="darkred")
-  #legend("bottomleft",c(paste0("Range (n = ",sum(powspec$size<=0.25),")"), paste0("Hurvic-Deo estimate (n = ",nr,")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
-  par(old)
+  graphics::plot(size[!id],bulk[!id], xlab="Size = log(bin(Time))", ylab = "Bulk = logbin(Y)", pch=21, bg="grey60", pty="s")
+  graphics::lines(size[!id], stats::predict(lmfit),lwd=4,col="darkred")
+  #graphics::legend("bottomleft",c(paste0("Range (n = ",sum(powspec$size<=0.25),")"), paste0("Hurvic-Deo estimate (n = ",nr,")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
+  graphics::par(old)
 }
 
 
@@ -2679,7 +2679,7 @@ fd.default <- function(y, ...){
 #' @param fs Sample rate (default = NULL)
 #' @param normalize    Normalize the series (default = TRUE).
 #' @param dtrend    Subtract linear trend from the series (default = TRUE).
-#' @param plot    Return the log-log spectrum with linear fit (default = FALSE).
+#' @param doPlot    Return the log-log spectrum with linear fit (default = FALSE).
 #'
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
@@ -2700,23 +2700,23 @@ fd.default <- function(y, ...){
 #'
 #' A line is fitted on the periodogram in log-log coordinates. Two fit-ranges are used: The 25\% lowest frequencies and the Hurvich-Deo estimate (\code{\link[fractal]{HDEst}}).
 #'
-fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
+fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, doPlot = FALSE){
   # require(pracma)
   # require(fractal)
   # require(sapa)
   # require(ifultools)
 
-  if(!is.ts(y)){
+  if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
-    y <- ts(y, frequency = fs)
+    y <- stats::ts(y, frequency = fs)
     cat("\n\nfd.psd:\tSample rate was set to 1.\n\n")
   }
 
   N             <- length(y)
   # Simple linear detrending.
-  if(dtrend)    y <- ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
+  if(dtrend)    y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
   # Normalize using N instead of N-1.
-  if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (sd(y, na.rm = TRUE)*sqrt((N-1)/N))
+  if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (stats::sd(y, na.rm = TRUE)*sqrt((N-1)/N))
 
   # Number of frequencies estimated cannot be set! (defaults to Nyquist)
   # Use Tukey window: cosine taper with r = 0.5
@@ -2732,13 +2732,13 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
   Tukey <- sapa::taper(type="raised cosine", flatness = 0.5, n.sample = npad)
   psd   <- sapa::SDF(y, taper. = Tukey, npad = npad)
 
-  powspec <- cbind.data.frame(freq.norm = attr(psd, "frequency")[-1], size = attr(psd, "frequency")[-1]*frequency(y), bulk = as.matrix(psd)[-1])
+  powspec <- cbind.data.frame(freq.norm = attr(psd, "frequency")[-1], size = attr(psd, "frequency")[-1]*stats::frequency(y), bulk = as.matrix(psd)[-1])
 
   # First check the global slope for anti-persistent noise (GT +0.20)
   # If so, fit the line starting from the highest frequency
   nr     <- length(powspec[,1])
-  lsfit  <- lm(log(powspec$bulk[1:nr]) ~ log(powspec$size[1:nr]))
-  glob   <- coef(lsfit)[2]
+  lsfit  <- stats::lm(log(powspec$bulk[1:nr]) ~ log(powspec$size[1:nr]))
+  glob   <- stats::coef(lsfit)[2]
 
   # General guideline: fit over 25% frequencies
   # If signal is continuous (sampled) consider Wijnants et al. (2013) log-log fitting procedure
@@ -2755,21 +2755,21 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
     lmfit2 <- stats::lm(log(powspec$bulk[1:nr]) ~ log(powspec$size[1:nr]))
   })
 
-  if(plot){
+  if(doPlot){
     old<- ifultools::splitplot(2,1,1)
-    plot(y,ylab = "Y", main = paste0('Lowest 25%    sap: ', round(coef(lmfit1)[2],digits=2), ' | H:', round(exp1,digits=2), ' | FD:',round(sa2fd.psd(coef(lmfit1)[2]),digits=2),'\nHurvic-Deo    sap: ', round(coef(lmfit2)[2],digits=2), ' | H:', round(exp2,digits=2), ' | FD:',round(sa2fd.psd(coef(lmfit2)[2]),digits=2)))
+    graphics::plot(y,ylab = "Y", main = paste0('Lowest 25%    sap: ', round(stats::coef(lmfit1)[2],digits=2), ' | H:', round(exp1,digits=2), ' | FD:',round(sa2fd.psd(stats::coef(lmfit1)[2]),digits=2),'\nHurvic-Deo    sap: ', round(stats::coef(lmfit2)[2],digits=2), ' | H:', round(exp2,digits=2), ' | FD:',round(sa2fd.psd(stats::coef(lmfit2)[2]),digits=2)))
     ifultools::splitplot(2,1,2)
-    plot(log(powspec$bulk) ~ log(powspec$size), xlab="log(Frequency)", ylab = "log(Power)")
-    lines(log(powspec$size[powspec$size<=0.25]), predict(lmfit1),lwd=3,col="darkred")
-    lines(log(powspec$size[1:nr]), predict(lmfit2),lwd=3,col="darkblue")
-    legend("bottomleft",c(paste0("lowest 25% (n = ",sum(powspec$size<=0.25),")"), paste0("Hurvic-Deo estimate (n = ",nr,")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
-    par(old)
+    graphics::plot(log(powspec$bulk) ~ log(powspec$size), xlab="log(Frequency)", ylab = "log(Power)")
+    graphics::lines(log(powspec$size[powspec$size<=0.25]), stats::predict(lmfit1),lwd=3,col="darkred")
+    graphics::lines(log(powspec$size[1:nr]), stats::predict(lmfit2),lwd=3,col="darkblue")
+    graphics::legend("bottomleft",c(paste0("lowest 25% (n = ",sum(powspec$size<=0.25),")"), paste0("Hurvic-Deo estimate (n = ",nr,")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
+    graphics::par(old)
   }
 
   return(list(
     PLAW  = powspec,
-    low25 = list(sap = coef(lmfit1)[2], H = exp1, FD = sa2fd.psd(coef(lmfit1)[2]), fitlm1 = lmfit1),
-    HD    = list(sap = coef(lmfit2)[2], H = exp2, FD = sa2fd.psd(coef(lmfit2)[2]), fitlm2 = lmfit2),
+    low25 = list(sap = stats::coef(lmfit1)[2], H = exp1, FD = sa2fd.psd(stats::coef(lmfit1)[2]), fitlm1 = lmfit1),
+    HD    = list(sap = stats::coef(lmfit2)[2], H = exp2, FD = sa2fd.psd(stats::coef(lmfit2)[2]), fitlm2 = lmfit2),
     info  = psd)
   )
 }
@@ -2787,7 +2787,7 @@ fd.psd <- function(y, fs = NULL, normalize = TRUE, dtrend = TRUE, plot = FALSE){
 #' @param dtrend Subtract linear trend from the series (default = TRUE)
 #' @param scales default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}
 #' @param fitRange Scale bins (\code{c(min,max)}) to use for fitting the scaling relation
-#' @param plot    Return the log-log spectrum with linear fit (default).
+#' @param doPlot    Return the log-log spectrum with linear fit (default).
 #'
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
@@ -2810,42 +2810,42 @@ fd.sda <- function(y,
                    dtrend = FALSE,
                    scales = fractal::dispersion(y)$scale,
                    fitRange = c(scales[1], scales[length(scales)-2]),
-                   plot = FALSE){
+                   doPlot = FALSE){
   #require(pracma)
   #require(fractal)
 
-  if(!is.ts(y)){
+  if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
-    y <- ts(y, frequency = fs)
+    y <- stats::ts(y, frequency = fs)
     cat("\n\nfd.sda:\tSample rate was set to 1.\n\n")
   }
 
   N             <- length(y)
   # Simple linear detrending.
-  if(dtrend)    y <- ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
+  if(dtrend)    y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
   # Normalize using N instead of N-1.
-  if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (sd(y, na.rm = TRUE)*sqrt((N-1)/N))
+  if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (stats::sd(y, na.rm = TRUE)*sqrt((N-1)/N))
 
   bins          <- which(fitRange[1]==scales):which(fitRange[2]==scales)
   out           <- fractal::dispersion(y, front = FALSE)
-  lmfit1        <- lm(log(out$sd) ~ log(out$scale))
-  lmfit2        <- lm(log(out$sd[bins]) ~ log(out$scale[bins]))
+  lmfit1        <- stats::lm(log(out$sd) ~ log(out$scale))
+  lmfit2        <- stats::lm(log(out$sd[bins]) ~ log(out$scale[bins]))
 
-  if(plot){
+  if(doPlot){
     old<- ifultools::splitplot(2,1,1)
-    plot(y,ylab = "Y", main = paste0('Full    sap: ', round(coef(lmfit1)[2],digits=2), ' | H:', round(1+coef(lmfit1)[2],digits=2), ' | FD:',round(sa2fd.sda(coef(lmfit1)[2]),digits=2),'\nRange    sap: ', round(coef(lmfit2)[2],digits=2), ' | H:', round(1+coef(lmfit1)[2],digits=2), ' | FD:',round(sa2fd.sda(coef(lmfit2)[2]),digits=2)))
+    graphics::plot(y,ylab = "Y", main = paste0('Full    sap: ', round(stats::coef(lmfit1)[2],digits=2), ' | H:', round(1+stats::coef(lmfit1)[2],digits=2), ' | FD:',round(sa2fd.sda(stats::coef(lmfit1)[2]),digits=2),'\nRange    sap: ', round(stats::coef(lmfit2)[2],digits=2), ' | H:', round(1+stats::coef(lmfit1)[2],digits=2), ' | FD:',round(sa2fd.sda(stats::coef(lmfit2)[2]),digits=2)))
     ifultools::splitplot(2,1,2)
-    plot(log(out$sd) ~ log(out$scale), xlab="log(Bin Size)", ylab = "log(SD)")
-    lines(log(out$scale), predict(lmfit1),lwd=3,col="darkred")
-    lines(log(out$scale[bins]), predict(lmfit2),lwd=3,col="darkblue")
-    legend("bottomleft",c(paste0("Full (n = ",length(out$scale),")"), paste0("Range (n = ",length(bins),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
-    par(old)
+    graphics::plot(log(out$sd) ~ log(out$scale), xlab="log(Bin Size)", ylab = "log(SD)")
+    graphics::lines(log(out$scale), stats::predict(lmfit1),lwd=3,col="darkred")
+    graphics::lines(log(out$scale[bins]), stats::predict(lmfit2),lwd=3,col="darkblue")
+    graphics::legend("bottomleft",c(paste0("Full (n = ",length(out$scale),")"), paste0("Range (n = ",length(bins),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
+    graphics::par(old)
   }
 
   return(list(
-    PLAW  =  cbind.data.frame(freq.norm = frequency(y)/scales, size = out$scale, bulk = out$sd),
-    fullRange = list(sap = coef(lmfit1)[2], H = 1+coef(lmfit1)[2], FD = sa2fd.sda(coef(lmfit1)[2]), fitlm1 = lmfit1),
-    fitRange  = list(sap = coef(lmfit2)[2], H = 1+coef(lmfit2)[2], FD = sa2fd.sda(coef(lmfit2)[2]), fitlm2 = lmfit2),
+    PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/scales, size = out$scale, bulk = out$sd),
+    fullRange = list(sap = stats::coef(lmfit1)[2], H = 1+stats::coef(lmfit1)[2], FD = sa2fd.sda(stats::coef(lmfit1)[2]), fitlm1 = lmfit1),
+    fitRange  = list(sap = stats::coef(lmfit2)[2], H = 1+stats::coef(lmfit2)[2], FD = sa2fd.sda(stats::coef(lmfit2)[2]), fitlm2 = lmfit2),
     info = out)
   )
 }
@@ -2866,7 +2866,7 @@ fd.sda <- function(y,
 #' @param scale.min   Minimium scale to use
 #' @param elasceratio  see \code{\link[fractal]{DFA}}
 #' @param overlap    By what percentage should scale bins overlap? (default = 0)
-#' @param plot    Return the log-log spectrum with linear fit (default).
+#' @param doPlot    Return the log-log spectrum with linear fit (default).
 #'
 #'
 #' @return Estimate of Hurst exponent (slope of \code{log(bin)} vs. \code{log(RMSE))} and an FD estimate based on Hasselman(2013)
@@ -2885,7 +2885,7 @@ fd.sda <- function(y,
 #'
 #' @family FD estimators
 #'
-fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order = 1, scale.max=trunc(length(y)/4), scale.min=4, elasceratio=2^(1/4), overlap = 0, plot = FALSE){
+fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order = 1, scale.max=trunc(length(y)/4), scale.min=4, elasceratio=2^(1/4), overlap = 0, doPlot = FALSE){
   #require(pracma)
   #require(fractal)
 
@@ -2898,47 +2898,47 @@ fd.dfa <- function(y, fs = NULL, dtrend = "poly1", normalize = FALSE, sum.order 
 
 
 
-  if(!is.ts(y)){
+  if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
-    y <- ts(y, frequency = fs)
+    y <- stats::ts(y, frequency = fs)
     cat("\n\nfd.dfa:\tSample rate was set to 1.\n\n")
   }
 
   N             <- length(y)
   # Normalize using N instead of N-1.
-  if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (sd(y, na.rm = TRUE)*sqrt((N-1)/N))
+  if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (stats::sd(y, na.rm = TRUE)*sqrt((N-1)/N))
 
   out1 <- fractal::DFA(y, detrend=dtrend, sum.order=sum.order, scale.max=trunc(length(y)/2), scale.min=2, elasceratio=2, overlap = 0, verbose=FALSE)
   out2 <- fractal::DFA(y, detrend=dtrend, sum.order=sum.order, scale.max=scale.max, scale.min=scale.min, elasceratio=elasceratio, overlap = overlap, verbose=FALSE)
 
-  lmfit1        <- lm(log(attributes(out1)$stat) ~ log(attributes(out1)$scale))
-  lmfit2        <- lm(log(attributes(out2)$stat) ~ log(attributes(out2)$scale))
+  lmfit1        <- stats::lm(log(attributes(out1)$stat) ~ log(attributes(out1)$scale))
+  lmfit2        <- stats::lm(log(attributes(out2)$stat) ~ log(attributes(out2)$scale))
 
-  if(plot){
-    plot.new()
+  if(doPlot){
+    graphics::plot.new()
     old <- ifultools::splitplot(2,1,1)
-    plot(y,ylab = "Y", main = paste0('Full    sap: ', round(coef(lmfit1)[2],digits=2), ' | H:',
+    graphics::plot(y,ylab = "Y", main = paste0('Full    sap: ', round(stats::coef(lmfit1)[2],digits=2), ' | H:',
                                      round(attributes(out1)$logfit[]$coefficients['x'] ,digits=2), ' | FD:',
-                                     round(sa2fd.dfa(coef(lmfit1)[2]),digits=2),'\nRange    sap: ',
-                                     round(coef(lmfit2)[2],digits=2), ' | H:',
+                                     round(sa2fd.dfa(stats::coef(lmfit1)[2]),digits=2),'\nRange    sap: ',
+                                     round(stats::coef(lmfit2)[2],digits=2), ' | H:',
                                      round(attributes(out2)$logfit[]$coefficients['x'] ,digits=2), ' | FD:',
-                                     round(sa2fd.dfa(coef(lmfit2)[2]),digits=2)
+                                     round(sa2fd.dfa(stats::coef(lmfit2)[2]),digits=2)
     )
     )
     ifultools::splitplot(2,1,2)
-    plot(log(attributes(out1)$stat) ~ log(attributes(out1)$scale), xlab="log(Bin Size)", ylab = "log(RMSE)")
-    lines(log(attributes(out1)$scale), predict(lmfit1),lwd=3,col="darkred")
-    lines(log(attributes(out2)$scale), predict(lmfit2),lwd=3,col="darkblue")
-    legend("topleft",c(paste0("Full (n = ",length(attributes(out1)$scale),")"), paste0("Range (n = ",length(attributes(out2)$scale),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
-    par(old)
+    graphics::plot(log(attributes(out1)$stat) ~ log(attributes(out1)$scale), xlab="log(Bin Size)", ylab = "log(RMSE)")
+    graphics::lines(log(attributes(out1)$scale), stats::predict(lmfit1),lwd=3,col="darkred")
+    graphics::lines(log(attributes(out2)$scale), stats::predict(lmfit2),lwd=3,col="darkblue")
+    graphics::legend("topleft",c(paste0("Full (n = ",length(attributes(out1)$scale),")"), paste0("Range (n = ",length(attributes(out2)$scale),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
+    graphics::par(old)
   }
 
  # if(reload==TRUE){attach(signal,verbose=FALSE,quietly=TRUE)}
 
   return(list(
-    PLAW  =  cbind.data.frame(freq.norm = elascer(attributes(out1)$scale*frequency(y)), size = attributes(out1)$scale, bulk = attributes(out1)$stat),
-    fullRange = list(sap = coef(lmfit1)[2], H = attributes(out1)$logfit[]$coefficients['x'] , FD = sa2fd.dfa(coef(lmfit1)[2]), fitlm1 = lmfit1),
-    fitRange  = list(sap = coef(lmfit2)[2], H = coef(lmfit2)[2], FD = sa2fd.dfa(coef(lmfit2)[2]), fitlm2 = lmfit2),
+    PLAW  =  cbind.data.frame(freq.norm = elascer(attributes(out1)$scale*stats::frequency(y)), size = attributes(out1)$scale, bulk = attributes(out1)$stat),
+    fullRange = list(sap = stats::coef(lmfit1)[2], H = attributes(out1)$logfit[]$coefficients['x'] , FD = sa2fd.dfa(stats::coef(lmfit1)[2]), fitlm1 = lmfit1),
+    fitRange  = list(sap = stats::coef(lmfit2)[2], H = stats::coef(lmfit2)[2], FD = sa2fd.dfa(stats::coef(lmfit2)[2]), fitlm2 = lmfit2),
     info = list(out1,out2))
   )
 }
@@ -3025,20 +3025,20 @@ MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
   if(Hadj!=0){TSm  <- as.matrix(cbind(t=1:length(Y),y=cumsum(Y-mean(Y))))}
 
   for(ns in seq_along(scale)){
-    RMS_scale[[ns]] <- ldply(sliceTS(TSm,scale[ns]),function(sv){return(sqrt(mean(detRend(sv[,2]))^2))})
+    RMS_scale[[ns]] <-plyr::ldply(sliceTS(TSm,scale[ns]),function(sv){return(sqrt(mean(detRend(sv[,2]))^2))})
     for(nq in seq_along(qq)){
       qRMS[[nq]][1:length(RMS_scale[[ns]]$V1)] <- RMS_scale[[ns]]$V1^qq[nq]
       Fq[[nq]][ns] <- mean(qRMS[[nq]][1:length(RMS_scale[[ns]]$V1)])^(1/qq[nq])
-      if(is.inf(log2(Fq[[nq]][ns]))){Fq[[nq]][ns]<-NA}
+      if(is.infinite(log2(Fq[[nq]][ns]))){Fq[[nq]][ns]<-NA}
     }
     Fq[[which(qq==0)]][ns] <- exp(0.5*mean(log(RMS_scale[[ns]]^2)))
-    if(is.inf(log2(Fq[[which(qq==0)]][ns]))){Fq[[which(qq==0)]][ns]<-NA}
+    if(is.infinite(log2(Fq[[which(qq==0)]][ns]))){Fq[[which(qq==0)]][ns]<-NA}
   }
 
   fmin<-1
   fmax<-which(scale==max(scale))
-  #for(nq in seq_along(qq)){Hq[nq] <- lm(log2(Fq[[nq]])~log2(scale))$coefficients[2]}
-  Hq <- ldply(Fq,function(Fqs){lm(log2(Fqs[fmin:fmax])~log2(scale[fmin:fmax]),na.action=na.omit)$coefficients[2]})
+  #for(nq in seq_along(qq)){Hq[nq] <- stats::lm(log2(Fq[[nq]])~log2(scale))$coefficients[2]}
+  Hq <-plyr::ldply(Fq,function(Fqs){stats::lm(log2(Fqs[fmin:fmax])~log2(scale[fmin:fmax]),na.action=stats::na.omit)$coefficients[2]})
 
   tq <- (Hq[,1]*qq)-1
   hq <- diff(tq)/diff(qq)
@@ -3054,15 +3054,15 @@ monoH <- function(TSm,scale){
   dfaRMS_scale <- vector("list",length(scale))
   F2 <- numeric(length(scale))
   for(ns in seq_along(scale)){
-    dfaRMS_scale[[ns]] <- ldply(sliceTS(TSm,scale[ns]),function(sv){return(sqrt(mean(detRend(sv[,2]))^2))})
+    dfaRMS_scale[[ns]] <-plyr::ldply(sliceTS(TSm,scale[ns]),function(sv){return(sqrt(mean(detRend(sv[,2]))^2))})
     F2[ns] <- mean(dfaRMS_scale[[ns]]$V1^2)^(1/2)
-    if(is.inf(log2(F2[ns]))){F2[ns] <- NA}
+    if(is.infinite(log2(F2[ns]))){F2[ns] <- NA}
   }
-  return(lm(log2(F2)~log2(scale),na.action=na.omit)$coefficients[2])
+  return(stats::lm(log2(F2)~log2(scale),na.action=stats::na.omit)$coefficients[2])
 }
 
 detRend <- function(TS, Order=1){
-  detR <- lm(TS~stats::poly(1:length(TS), degree=Order))$residuals
+  detR <- stats::lm(TS~stats::poly(1:length(TS), degree=Order))$residuals
   return(detR)
 }
 
@@ -3070,7 +3070,7 @@ detRend <- function(TS, Order=1){
 #
 # set.seed(100)
 # z <- dispersion(rnorm(1024))
-# plot(log(z$scale),log(z$sd))
+# graphics::plot(log(z$scale),log(z$sd))
 # #
 
 # trace(detRend,edit=T)
@@ -3081,7 +3081,7 @@ detRend <- function(TS, Order=1){
 #
 # Hglobal <-
 #
-# segments <- laply(scale,function(s) floor(length(X)/s))
+# segments <- plyr::laply(scale,function(s) floor(length(X)/s))
 # IDv <- llply(segments,slice.index,)
 # segv <- function(X,segments){
 #
@@ -3117,7 +3117,7 @@ detRend <- function(TS, Order=1){
 # hq <- diff(tq)/diff(qq)
 # Dq <- (qq[1:(length(qq)-1)]*hq) - (tq[1:(length(qq)-1)])
 #
-# plot(hq,Dq,type="l")
+# graphics::plot(hq,Dq,type="l")
 #
 #
 # qq<-c(-10,-5,seq(-2,2,.1),5,10)
@@ -3245,24 +3245,24 @@ gg.plotHolder <- function(useArial = F,afmPATH="~/Dropbox"){
 
 plotSW <- function(n,k,p){
 
-  g <- watts.strogatz.game(1, n, k, p)
+  g <- igraph::watts.strogatz.game(1, n, k, p)
 
-  V(g)$degree <- degree(g)
+  igraph::V(g)$degree <- igraph::degree(g)
 
   # set colors and sizes for vertices
-  rev<-elascer(log1p(V(g)$degree))
+  rev<-elascer(log1p(igraph::V(g)$degree))
   rev[rev<=0.2]<-0.2
   rev[rev>=0.9]<-0.9
-  V(g)$rev <- rev$x
+  igraph::V(g)$rev <- rev$x
 
-  V(g)$color       <- rgb(V(g)$rev, 1-V(g)$rev,  0, 1)
-  V(g)$size        <- 25*V(g)$rev
+  igraph::V(g)$color       <- grDevices::rgb(igraph::V(g)$rev, 1-igraph::V(g)$rev,  0, 1)
+  igraph::V(g)$size        <- 25*igraph::V(g)$rev
 
   # set vertex labels and their colors and sizes
-  V(g)$label       <- ""
+  igraph::V(g)$label       <- ""
 
-  E(g)$width <- 1
-  E(g)$color <- rgb(0.5, 0.5, 0.5, 1)
+  igraph::E(g)$width <- 1
+  igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
   return(g)
 }
@@ -3271,23 +3271,23 @@ plotBA <- function(n,pwr,out.dist){
   #require("Cairo")
 
   g <- barabasi.game(n,pwr,out.dist=out.dist,directed=FALSE)
-  V(g)$degree <- degree(g)
+  igraph::V(g)$degree <- igraph::degree(g)
 
   # set colors and sizes for vertices
-  rev<-elascer(log1p(V(g)$degree))
+  rev<-elascer(log1p(igraph::V(g)$degree))
   rev[rev<=0.2] <- 0.2
   rev[rev>=0.9] <- 0.9
-  V(g)$rev <- rev$x
+  igraph::V(g)$rev <- rev$x
 
-  V(g)$color    <- rgb(V(g)$rev, 1-V(g)$rev,  0, 1)
-  V(g)$size     <- 25*V(g)$rev
-  # V(g)$frame.color <- rgb(.5, .5,  0, .4)
+  igraph::V(g)$color    <- grDevices::rgb(igraph::V(g)$rev, 1-igraph::V(g)$rev,  0, 1)
+  igraph::V(g)$size     <- 25*igraph::V(g)$rev
+  # igraph::V(g)$frame.color <- grDevices::rgb(.5, .5,  0, .4)
 
   # set vertex labels and their colors and sizes
-  V(g)$label <- ""
+  igraph::V(g)$label <- ""
 
-  E(g)$width <- 1
-  E(g)$color <- rgb(0.5, 0.5, 0.5, 1)
+  igraph::E(g)$width <- 1
+  igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
   return(g)
 }
@@ -3300,16 +3300,16 @@ netGroupCol <- function(g,grp){
     groupColours <- gradient_n_pal(brewer_pal(palette="Set3")(11))(seq(0, 1, length.out = length(grp)))
   }
 
-  E(g)$alpha <- scales::rescale(E(g)$weight)
-  E(g)$color <- "#D9D9D9"
+  igraph::E(g)$alpha <- scales::rescale(igraph::E(g)$weight)
+  igraph::E(g)$color <- "#D9D9D9"
   for(c in seq_along(grp)){
     if(length(grp[[c]])>0){
-      V(g)[grp[[c]]]$color   <-  groupColours[c]
+      igraph::V(g)[grp[[c]]]$color   <-  groupColours[c]
 
-      if(length(E(g)[from(V(g)[grp[[c]]])])>0){
-        id<-E(g)[from(V(g)[grp[[c]]])]$color%in%"#D9D9D9"
+      if(length(igraph::E(g)[from(igraph::V(g)[grp[[c]]])])>0){
+        id<-igraph::E(g)[from(igraph::V(g)[grp[[c]]])]$color%in%"#D9D9D9"
         if(any(id)){
-          E(g)[from(V(g)[grp[[c]]])[id]]$color <- add_alpha(groupColours[c],alpha = E(g)[from(V(g)[grp[[c]]])[id]]$alpha)
+          igraph::E(g)[from(igraph::V(g)[grp[[c]]])[id]]$color <- add_alpha(groupColours[c],alpha = igraph::E(g)[from(igraph::V(g)[grp[[c]]])[id]]$alpha)
         }
       }
     }
@@ -3342,9 +3342,9 @@ plot.loglog <- function(fd.OUT){
 add_alpha <- function(col, alpha=1){
   if(missing(col))
     stop("Please provide a vector of colours.")
-  apply(sapply(col, col2rgb)/255, 2,
+  apply(sapply(col, grDevices::col2rgb)/255, 2,
         function(x)
-          rgb(x[1], x[2], x[3], alpha=alpha))
+          grDevices::rgb(x[1], x[2], x[3], alpha=alpha))
 }
 
 
@@ -3390,11 +3390,11 @@ plotRP.crqa <- function(crqaOutput){
 
     # Thresholded or Distance matrix?
     ifelse(is.logical(as.array(RP)),
-           distPallette <- colorRampPalette(c("white", "black"))(2),
-           distPallette <- colorRampPalette(c("red", "white", "blue")) #( length(unique(as.vector(RP))))
+           distPallette <- grDevices::colorRampPalette(c("white", "black"))(2),
+           distPallette <- grDevices::colorRampPalette(c("red", "white", "blue")) #( length(unique(as.vector(RP))))
     )
 
-    #distPallette <- colorRampPalette(c("white", "black"))(2)
+    #distPallette <- grDevices::colorRampPalette(c("white", "black"))(2)
 
     lp <- levelplot(Matrix::as.matrix(RP),
                     #colorkey = TRUE,
@@ -3423,12 +3423,12 @@ plotRP.crqa <- function(crqaOutput){
 }
 
 plotRP.fnn <- function(FNNoutput){
-  plot(FNNoutput["combined",],type="b",pch=16, cex=2, col="grey80", ylim=c(0,100), xaxt="n",
+  graphics::plot(FNNoutput["combined",],type="b",pch=16, cex=2, col="grey80", ylim=c(0,100), xaxt="n",
        xlab = "Embedding Dimension", ylab = "False Nearest Neighbours")
-  lines(FNNoutput["atol",],type="b",pch="a",col="grey30", lty=2)
-  lines(FNNoutput["rtol",],type="b",pch="r", col="grey30",lty=2)
-  Axis(side=1,at=seq_along(FNNoutput[1,]),labels = dimnames(FNNoutput)[[2]])
-  legend("topright",c("Combined","atol","rtol"), pch = c(16,97,114), lty = c(1,2,2), col = c("grey80","grey30","grey30"), pt.cex=c(2,1,1))
+  graphics::lines(FNNoutput["atol",],type="b",pch="a",col="grey30", lty=2)
+  graphics::lines(FNNoutput["rtol",],type="b",pch="r", col="grey30",lty=2)
+  graphics::Axis(side=1,at=seq_along(FNNoutput[1,]),labels = dimnames(FNNoutput)[[2]])
+  graphics::legend("topright",c("Combined","atol","rtol"), pch = c(16,97,114), lty = c(1,2,2), col = c("grey80","grey30","grey30"), pt.cex=c(2,1,1))
 }
 
 # Complex Networks# graph2svg <- function(TDM,pname){
@@ -3442,33 +3442,33 @@ plotRP.fnn <- function(FNNoutput){
 #   g <- simplify(g)
 #
 #   # Remove vertices that were used in the search query
-#   Vrem <- which(V(g)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
-#   g <- (g - V(g)$name[Vrem])
+#   Vrem <- which(igraph::V(g)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
+#   g <- (g - igraph::V(g)$name[Vrem])
 #
 #   # Set colors and sizes for vertices
-#   V(g)$degree <- degree(g)
-#   rev         <- scaleRange(log1p(V(g)$degree))
+#   igraph::V(g)$degree <- igraph::degree(g)
+#   rev         <- scaleRange(log1p(igraph::V(g)$degree))
 #   rev[rev<=0.3]<-0.3
 #
-#   V(g)$color       <- rgb(scaleRange(V(g)$degree), 1-scaleRange(V(g)$degree),  0, rev)
-#   V(g)$size        <- 10*scaleRange(V(g)$degree)
-#   V(g)$frame.color <- NA
+#   igraph::V(g)$color       <- grDevices::rgb(scaleRange(igraph::V(g)$degree), 1-scaleRange(igraph::V(g)$degree),  0, rev)
+#   igraph::V(g)$size        <- 10*scaleRange(igraph::V(g)$degree)
+#   igraph::V(g)$frame.color <- NA
 #
 #   # set vertex labels and their colors and sizes
-#   V(g)$label       <- V(g)$name
-#   V(g)$label.color <- rgb(0, 0, 0, rev)
-#   V(g)$label.cex   <- scaleRange(V(g)$degree)+.1
+#   igraph::V(g)$label       <- igraph::V(g)$name
+#   igraph::V(g)$label.color <- grDevices::rgb(0, 0, 0, rev)
+#   igraph::V(g)$label.cex   <- scaleRange(igraph::V(g)$degree)+.1
 #
 #   # set edge width and color
-#   rew <- scaleRange(E(g)$weight)
+#   rew <- scaleRange(igraph::E(g)$weight)
 #   rew[rew<=0.3]<-0.3
 #
-#   E(g)$width <- 2*scaleRange(E(g)$weight)
-#   E(g)$color <- rgb(.5, .5, 0, rew)
+#   igraph::E(g)$width <- 2*scaleRange(igraph::E(g)$weight)
+#   igraph::E(g)$color <- grDevices::rgb(.5, .5, 0, rew)
 #   set.seed(958)
 #
 #   svg(paste(pname,sep=""),width=8,height=8)
-#   plot(g, layout=layout.fruchterman.reingold(g))
+#   graphics::plot(g, layout=layout.fruchterman.reingold(g))
 #   dev.off()
 #
 #   return(g)
@@ -3486,48 +3486,48 @@ plotRP.fnn <- function(FNNoutput){
 #   ig <- simplify(ig)
 #
 #   # Remove vertices that were used in the search query
-#   Vrem <- which(V(ig)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
-#   ig <- (ig - V(ig)$name[Vrem])
+#   Vrem <- which(igraph::V(ig)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
+#   ig <- (ig - igraph::V(ig)$name[Vrem])
 #
 #   # This is a deletion specific for the Neighbourhood graphs
-#   Vrem <- which(V(ig)$name %in% c("~rdsp~","~imp~","~som~","~bod~","~mlt~"))
-#   ig   <- ig - V(ig)$name[Vrem]
+#   Vrem <- which(igraph::V(ig)$name %in% c("~rdsp~","~imp~","~som~","~bod~","~mlt~"))
+#   ig   <- ig - igraph::V(ig)$name[Vrem]
 #
-#   idx <- which(V(ig)$name==Vname)
-#   sg  <- graph.neighborhood(ig, order = 1, nodes=V(ig)[idx], mode = 'all')[[1]]
+#   idx <- which(igraph::V(ig)$name==Vname)
+#   sg  <- graph.neighborhood(ig, order = 1, nodes=igraph::V(ig)[idx], mode = 'all')[[1]]
 #
 #   # set colors and sizes for vertices
-#   V(sg)$degree <- degree(sg)
+#   igraph::V(sg)$igraph::degree <- igraph::degree(sg)
 #
-#   rev<-scaleRange(log1p(V(sg)$degree))
+#   rev<-scaleRange(log1p(igraph::V(sg)$igraph::degree))
 #   rev[rev<=0.3]<-0.3
 #
-#   V(sg)$color <- rgb(scaleRange(V(sg)$degree), 1-scaleRange(log1p(V(sg)$degree*V(sg)$degree)),  0, rev)
+#   igraph::V(sg)$color <- grDevices::rgb(scaleRange(igraph::V(sg)$igraph::degree), 1-scaleRange(log1p(igraph::V(sg)$igraph::degree*igraph::V(sg)$igraph::degree)),  0, rev)
 #
-#   V(sg)$size        <- 35*scaleRange(V(sg)$degree)
-#   V(sg)$frame.color <- NA
+#   igraph::V(sg)$size        <- 35*scaleRange(igraph::V(sg)$igraph::degree)
+#   igraph::V(sg)$frame.color <- NA
 #
 #   # set vertex labels and their colors and sizes
-#   V(sg)$label       <- V(sg)$name
-#   V(sg)$label.color <- rgb(0, 0, 0, rev)
-#   V(sg)$label.cex   <- scaleRange(V(sg)$degree)
+#   igraph::V(sg)$label       <- igraph::V(sg)$name
+#   igraph::V(sg)$label.color <- grDevices::rgb(0, 0, 0, rev)
+#   igraph::V(sg)$label.cex   <- scaleRange(igraph::V(sg)$igraph::degree)
 #
 #   # set edge width and color
-#   rew<-scaleRange(E(sg)$weight)
+#   rew<-scaleRange(igraph::E(sg)$weight)
 #   rew[rew<=0.3]<-0.3
 #
-#   E(sg)$width <- 6*scaleRange(E(sg)$weight)
-#   E(sg)$color <- rgb(.5, .5, 0, rew)
+#   igraph::E(sg)$width <- 6*scaleRange(igraph::E(sg)$weight)
+#   igraph::E(sg)$color <- grDevices::rgb(.5, .5, 0, rew)
 #
-#   idV <- which(V(sg)$name==Vname)
-#   idE <- incident(sg,V(sg)[[idV]])
-#   E(sg)$color[idE] <- rgb(0, 0, 1 ,0.8)
+#   idV <- which(igraph::V(sg)$name==Vname)
+#   idE <- incident(sg,igraph::V(sg)[[idV]])
+#   igraph::E(sg)$color[idE] <- grDevices::rgb(0, 0, 1 ,0.8)
 #
 #   set.seed(958)
 #
-#   idx <- which(V(sg)$name==Vname)
+#   idx <- which(igraph::V(sg)$name==Vname)
 #   svg(paste(pname,sep=""),width=8,height=8)
-#   plot(sg,layout=layout.star(sg,center=V(sg)[idx]))
+#   graphics::plot(sg,layout=layout.star(sg,center=igraph::V(sg)[idx]))
 #   dev.off()
 #
 #   return(sg)
@@ -3541,28 +3541,28 @@ plotRP.fnn <- function(FNNoutput){
 # #' @param fs    Sample frequency (defults to 1).
 # #' @param nfft    Number of frequencies to estimate (defaults to next power of 2)
 # #' @param fitRange    Vector of length 2 with range of frequencies to perform log-log fit.
-# #' @param plot    Plot the log-log spectrum and slope.
+# #' @param doPlot    Plot the log-log spectrum and slope.
 # #'
 # #' @return
 # #' @export
 # #'
 # #' @examples
 # #'
-# PSDslope <- function(y  = ts(rnorm(n = 1024), frequency = 1),
-#                      fs = frequency(y),
+# PSDslope <- function(y  = stats::ts(rnorm(n = 1024), frequency = 1),
+#                      fs = stats::frequency(y),
 #                      nfft = 2^(nextpow2(length(y)/2)),
 #                      fitRange = c(1,round(.1*nfft)),
-#                      plot = FALSE){
+#                      doPlot = FALSE){
 #   require(oce)
 #   require(signal)
-#   if(!is.ts(y)){ts(y, frequency = fs)}
+#   if(!stats::is.ts(y)){stats::ts(y, frequency = fs)}
 #
 #   win <- signal::hamming(n=nfft)
 #
-#   perioGram <- oce::pwelch(x = y, window = win, fs = frequency(y), nfft = nfft, plot = FALSE)
+#   perioGram <- oce::pwelch(x = y, window = win, fs = stats::frequency(y), nfft = nfft, doPlot = FALSE)
 #   spec <- data.frame(Frequency = perioGram$freq, Power = perioGram$spec)
 #   spec[1,1:2] <- NA
-#   fit <- lm(log10(spec$Power[fitRange[1]:fitRange[2]])~log10(spec$Power[fitRange[1]:fitRange[2]]))
+#   fit <- stats::lm(log10(spec$Power[fitRange[1]:fitRange[2]])~log10(spec$Power[fitRange[1]:fitRange[2]]))
 #   return(list(spec = spec,
 #               slope = fit)
 #   )
@@ -3604,7 +3604,7 @@ growth_ac <- function(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving", "dam
            logistic = sapply(seq_along(Y), function(t) Y[[t+1]] <<- r * Y[t] * ((k - Y[t]) / k)),
            vanGeert = sapply(seq_along(Y), function(t) Y[[t+1]] <<- Y[t] * (1 + r - r * Y[t] / k))
     )}
-  return(ts(Y))
+  return(stats::ts(Y))
 }
 
 #' Examples of conditional dynamical growth models (maps)
@@ -3628,7 +3628,8 @@ growth_ac <- function(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving", "dam
 #' library(lattice)
 #' xyplot(growth_ac_cond())
 #'
-#' # The function such that it can take a set of conditional rules and apply them sequentially during the iterations.
+#' # The function can take a set of conditional rules
+#' # and apply them sequentially during the iterations.
 #' # The conditional rules are passed as a `data.frame`
 #'
 #' (cond <- cbind.data.frame(Y = c(0.2, 0.6), par = c("r", "r"), val = c(0.5, 0.1)))
@@ -3662,7 +3663,7 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
     # Van Geert growth model
     Y[[t+1]] <- Y[t] * (1 + r - r * Y[t] / k)
   }
-  return(ts(Y))
+  return(stats::ts(Y))
 }
 
 
@@ -3741,7 +3742,7 @@ elascer <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
     if(lo>hi){warning("Lowest scale value (lo) >= highest scale value (hi).")}
     ifelse(mn==mx,{u[,i]<-rep(mx,length(x[,i]))},{
       u[,i]<-(((x[i]-mn)*(hi-lo))/(mx-mn))+lo
-      id<-complete.cases(u[,i])
+      id<-stats::complete.cases(u[,i])
       u[!id,i]<-0
     })
   }

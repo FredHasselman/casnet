@@ -7,7 +7,7 @@
 set_command_line_rp()
 }
 \value{
-nothing
+Message informing whether the procedure was succesful.
 }
 \description{
 Set command line RQA executable

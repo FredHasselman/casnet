@@ -5,8 +5,8 @@
 \title{Get (C)RQA measures from Recurrence Matrix}
 \usage{
 crqa_mat_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
-  DLmax = length(diag(rmat)) - 1, VLmax = length(diag(rmat)) - 1,
-  HLmax = length(diag(rmat)) - 1, AUTO = NULL, chromatic = FALSE,
+  DLmax = length(diag(RM)) - 1, VLmax = length(diag(RM)) - 1,
+  HLmax = length(diag(RM)) - 1, AUTO = NULL, chromatic = FALSE,
   matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95)
 }
 \arguments{

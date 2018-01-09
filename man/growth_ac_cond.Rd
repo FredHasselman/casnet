@@ -26,7 +26,8 @@ Conditional Autocatlytic Growth: Iterating differential equations (maps)
 library(lattice)
 xyplot(growth_ac_cond())
 
-# The function such that it can take a set of conditional rules and apply them sequentially during the iterations.
+# The function can take a set of conditional rules
+# and apply them sequentially during the iterations.
 # The conditional rules are passed as a `data.frame`
 
 (cond <- cbind.data.frame(Y = c(0.2, 0.6), par = c("r", "r"), val = c(0.5, 0.1)))
