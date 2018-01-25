@@ -6,11 +6,12 @@
 \usage{
 crqa_cl_main(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
   VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
-  (length(y1) + 1), length(y2)), na.rm = TRUE), step = win, JRP = FALSE,
+  (length(y1) + 1), length(y2)), na.rm = TRUE), step = step, JRP = FALSE,
   distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]], returnMeasures = TRUE,
-  returnRPvector = TRUE, returnLineDist = FALSE, plot_recmat = c("noplot",
-  "recmat", "distmat")[[1]], path_to_rp = getOption("casnet.path_to_rp"),
-  saveOut = FALSE, path_out = NULL, file_ID = NULL, silent = TRUE, ...)
+  returnRPvector = FALSE, returnLineDist = FALSE,
+  plot_recmat = c("noplot", "recmat", "distmat")[[1]],
+  path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
+  path_out = NULL, file_ID = NULL, silent = TRUE, ...)
 }
 \arguments{
 \item{y1}{y1}

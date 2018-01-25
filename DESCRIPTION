@@ -40,7 +40,8 @@ Imports: dplyr,
     sapa,
     signal,
     lubridate,
-    magrittr
+    magrittr,
+    tseries
 Suggests: knitr,
     rmarkdown,
     graphics,

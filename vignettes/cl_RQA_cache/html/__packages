@@ -1,8 +1,7 @@
 base
 casnet
 ggplot2
-plyr
-dplyr
 bindrcpp
 cowplot
-zoo
+plyr
+dplyr

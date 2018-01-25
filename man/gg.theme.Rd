@@ -4,14 +4,10 @@
 \alias{gg.theme}
 \title{gg.theme}
 \usage{
-gg.theme(type = c("clean", "noax"), useArial = F, afmPATH = "~/Dropbox")
+gg.theme(type = c("clean", "noax"))
 }
 \arguments{
 \item{type}{One of \code{"clean"}, or \code{"noax"}}
-
-\item{useArial}{Use the Arial font (requires \code{.afm} font files in the \code{afmPath})}
-
-\item{afmPATH}{Path to Arial \code{.afm} font files.}
 }
 \value{
 A theme for \code{ggplot2}.

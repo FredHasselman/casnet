@@ -314,27 +314,29 @@ repmat <- function(X,m,n){
 #' @export
 #'
 crqa_cl_main <- function(y1,
-                    y2    = NULL,
-                    eDim  = 1,
-                    eLag  = 1,
-                    eRad  = 1,
-                    DLmin = 2,
-                    VLmin = 2,
-                    theiler = 0,
-                    win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
-                    step    = win,
-                    JRP     = FALSE,
-                    distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-                    returnMeasures = TRUE,
-                    returnRPvector       = TRUE,
-                    returnLineDist = FALSE,
-                    plot_recmat = c("noplot","recmat","distmat")[[1]],
-                    path_to_rp = getOption("casnet.path_to_rp"),
-                    saveOut    = FALSE,
-                    path_out   = NULL,
-                    file_ID    = NULL,
-                    silent     = TRUE, ...){
+                         y2    = NULL,
+                         eDim  = 1,
+                         eLag  = 1,
+                         eRad  = 1,
+                         DLmin = 2,
+                         VLmin = 2,
+                         theiler = 0,
+                         win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
+                         step    = step,
+                         JRP     = FALSE,
+                         distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+                         returnMeasures = TRUE,
+                         returnRPvector       = FALSE,
+                         returnLineDist = FALSE,
+                         plot_recmat = c("noplot","recmat","distmat")[[1]],
+                         path_to_rp = getOption("casnet.path_to_rp"),
+                         saveOut    = FALSE,
+                         path_out   = NULL,
+                         file_ID    = NULL,
+                         silent     = TRUE, ...){
 
+
+  file_ID <- file_ID%00%0
 
   RQAmeasures <- list(
     RR      = 'Recurrence rate',
@@ -360,20 +362,6 @@ crqa_cl_main <- function(y1,
 
   if(plot_recmat%in%"distmat"){-1 * eRad}
 
-  if(is.null(file_ID)){
-    fnames <- list.files(path=path_out)
-    rqaID  <- grepl("(RQAplot|RQAhist|RQAmeasures)",fnames)
-    if(any(rqaID)){
-      file_ID <- max(as.numeric(gsub("(RQAplot|RQAhist|RQAmeasures|txt|[[:punct:]])+","",fnames[rqaID]),"[_]"), na.rm = TRUE)
-    } else {
-      file_ID <- 0
-    }
-  }
-
-  if(any(is.infinite(file_ID),is.null(file_ID))){file_ID <-0}
-#  if(any(is.null(y2))){df <- df[,1]}
-
-
   tmpd  <- tempdir()
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
   utils::write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
@@ -384,7 +372,6 @@ crqa_cl_main <- function(y1,
 
   fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
 
-  file_ID <- file_ID + 1
   plotOUT     <- normalizePath(file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
   measOUT     <- normalizePath(file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
   histOUTdiag <- normalizePath(file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
@@ -429,10 +416,15 @@ crqa_cl_main <- function(y1,
   # RCMD
   devtools::RCMD(paste0(getOption("casnet.rp_prefix"),getOption("casnet.rp_command")), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = FALSE)
 
-  measures     = try.CATCH(rio::import(normalizePath(gsub("[']+","",measOUT))))
-  rpMAT        = try.CATCH(rio::import(normalizePath(gsub("[']+","",plotOUT))))
-  disthistDiag = try.CATCH(rio::import(normalizePath(gsub("[']+","",histOUTdiag))))
-  disthistHori = try.CATCH(rio::import(normalizePath(gsub("[']+","",histOUThori))))
+ # if(returnMeasures){
+    measures <- try.CATCH(rio::import(normalizePath(gsub("[']+","",measOUT))))
+#  if(returnRPvector){
+    rpMAT    <- try.CATCH(rio::import(normalizePath(gsub("[']+","",plotOUT))))
+
+ # if(returnLineDist){
+    disthistDiag <- try.CATCH(rio::import(normalizePath(gsub("[']+","",histOUTdiag))))
+    disthistHori <- try.CATCH(rio::import(normalizePath(gsub("[']+","",histOUThori))))
+
 
   if(all(is.null(measures$warning),is.data.frame(measures$value))){
     measures <- measures$value
@@ -478,10 +470,27 @@ crqa_cl_main <- function(y1,
     cat("files saved ...\n")
     cat(measOUT,"\n",plotOUT,"\n",histOUTdiag,"\n",histOUThori,"\n")
   }
-  return(list(measures      = measures,
-              rpMAT         = rpMAT,
-              diag_disthist = disthistDiag,
-              hori_disthist = disthistHori))
+
+  # justData <- FALSE
+  # if(win==step){
+  #   message("Windowed (c)rqa: Returning only (c)rqa measures, use saveOut = TRUE, to get the distribution files")
+  #   justData <- TRUE
+  # }
+  #
+  # if(returnMeasures&!returnRPvector&!returnLineDist){
+  #   justData<- TRUE
+  # }
+  #
+  # if(justData){
+  #   return(list(measures=measures))
+  # } else{
+
+    return(list(measures = measures,
+                rpMAT    = rpMAT,
+                diag_disthist = disthistDiag,
+                hori_disthist = disthistHori))
+           #[c(returnMeasures,returnRPvector,returnLineDist,returnLineDist)])
+
 }
 
 
@@ -504,32 +513,29 @@ crqa_cl_main <- function(y1,
 #' @param JRP Wether to calculate a Joint Recurrence Plot(default = \code{FALSE})
 #' @param distNorm One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix
 #' @param returnMeasures Return the (C)RQA measures? (default = \code{TRUE})
-#' @param returnRPvector Return the recurrent points in a dataframe? (default = \code{TRUE})
+#' @param returnRPvector Return the recurrent points in a dataframe? (default = \code{FALSE})
 #' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})
-#' @param plot_recmat Produce a plot of the recurrence matrix by calling \code{\link{recmat_plot}}, values can "recmat" (the thresholded recurrence matrix),"distmat" (the unthresholded recurrence matrix) or "noplot" (default = \code{"noplot"})
+#' @param plot_recmat Produce a plot of the recurrence matrix by calling \code{\link{recmat_plot}}, values can be \code{"recmat"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})
 #' @param path_to_rp Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)
 #' @param saveOut Save the output to files? If \code{TRUE} and \code{pat_out = NA}, the current working directory will be used (default = \code{FALSE})
 #' @param path_out Path to save output if \code{saveOut = TRUE} (default = \code{NULL})
 #' @param file_ID A file ID which will be a prefix to to the filename if \code{saveOut = TRUE} (default = \code{NULL}, an integer will be added tot the file name to ensure unique files)
-#' @param silent  Do not display any messages (default = \code{TRUE})
+#' @param silent Do not display any messages (default = \code{TRUE})
+#' @param surrogateTest Perform surrogate tests. If \code{TRUE}, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments \code{ns = 39, fft = TRUE, amplitude = TRUE})
 #' @param ... Additional parameters (currently not used)
 #'
-#'
-#' @details The \code{rp} executable is installed when the function is called for the first time and is renamed to \code{rp}, from a platform specific filename located in the directory: \code{...\\casnet\\commandline_rp\\}.
+#' @details The \code{rp} executable is installed when the function is called for the first time and is renamed to \code{rp}, from a platform specific filename downloaded from \url{http://tocsy.pik-potsdam.de/commandline-rp.php} or extracted from an archive located in the directory: \code{...\\casnet\\commandline_rp\\}.
 #' The file is copied to the directory: \code{...\\casnet\\exec\\}
 #' The latter location is stored as an option and can be read by calling \code{getOption("casnet.path_to_rp")}.
 #'
-#'
 #' @section Troubleshooting:
-#' Some notes on resolving errors with \code{rp}.
+#' Some notes on resolving errors with \code{rp}.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in \code{...\\casnet\\commandline_rp\\crp_cl.zip}. If that fails, the copy will have failed. It should be relatively easy to get \code{crqa_cl()} working using custom settings:
 #'
 #' \itemize{
-#'  \item \emph{Copy failed} - Every time the function \code{crqa_cl()} is called it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you delete the log file, and call the function, another copy of the executable will be attempted.
-#' \item \emph{Copy still fails and/or no permission to copy} - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as the argument \code{path_to_rp} in the \code{fast_crqa} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}. If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page and copy to a directory you have access to. Then follow the instruction to set \code{path_to_rp}.
+#' \item \emph{Copy failed} - Every time the function \code{crqa_cl()} is called it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you delete the log file, and call the function, another copy of the executable will be attempted.
+#' \item \emph{Copy still fails and/or no permission to copy} - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as the argument \code{path_to_rp} in the \code{crqa_cl} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}. If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page and copy to a directory you have access to. Then follow the instruction to set \code{path_to_rp}.
 #' \item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[devtools]{RCMD}} and makes use of the \code{\link{normalizePath}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return an empty character vector, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")} and fill in the prefix that is correct for your OS
 #' }
-#'
-#'
 #'
 #' @return A list object containing 1-3 elements, depending on arguments requesting output.
 #'
@@ -559,6 +565,7 @@ crqa_cl_main <- function(y1,
 #' \item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{recmat_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
 #' \item \code{rqa_diagdist} - The distribution of diagonal line lengths
 #' }
+#'
 #' @note The platform specific \code{rp} command line executables were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at \url{http://tocsy.pik-potsdam.de/}.
 #'
 #' The full copyright statement on the website is as follows:
@@ -588,7 +595,7 @@ crqa_cl <- function(y1,
                       JRP     = FALSE,
                       distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
                       returnMeasures = TRUE,
-                      returnRPvector = TRUE,
+                      returnRPvector = FALSE,
                       returnLineDist = FALSE,
                       plot_recmat = c("noplot","recmat","distmat")[[1]],
                       path_to_rp = getOption("casnet.path_to_rp"),
@@ -596,36 +603,13 @@ crqa_cl <- function(y1,
                       path_out   = NULL,
                       file_ID    = NULL,
                       silent     = TRUE,
+                      surrogateTest = FALSE,
                       ...){
-# require(plyr)
-# require(dplyr)
-# require(zoo)
 
   if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"/rp_install_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
   }
 
-  if(any(is.na(y1))){
-    y1 <- y1[!is.na(y1)]
-    warning("Removed NAs from timeseries y1 before (C)RQA")
-  }
-
-  if(any(is.na(y2%00%0))){
-    y2 <- y2[!is.na(y2)]
-    warning("Removed NAs from timeseries y2 before (C)RQA")
-  }
-
-  # Begin input checks
-
-  if(is.null(path_out)){
-    if(saveOut){
-      path_out <- getwd()
-    } else {
-      path_out <- tempdir()
-    }
-  } else {
-    path_out <- normalizePath(path_out, mustWork = TRUE)
-  }
 
   if(!is.null(y2)){
     y2 <- zoo::as.zoo(y2)
@@ -637,9 +621,26 @@ crqa_cl <- function(y1,
     if(N1<N2){
       y1[N1:(N2+(N2-N1))] <- 0
     }
-    df    <- zoo::zoo(cbind(y1=y1,y2=y2))
+    df <- cbind.data.frame(y1=unclass(y1),y2=unclass(y2))
+    df <- df[complete.cases(df),]
   } else {
-    df    <- zoo::zoo(cbind(y1=y1,y2=NA))
+    if(any(is.na(y1))){
+      y1 <- y1[!is.na(y1)]
+      warning("Removed NAs from timeseries y1 before (C)RQA")
+    }
+    df <- cbind.data.frame(y1=unclass(y1),y2=NA)
+  }
+
+
+  # Begin input checks
+  if(is.null(path_out)){
+    if(saveOut){
+      path_out <- getwd()
+    } else {
+      path_out <- tempdir()
+    }
+  } else {
+    path_out <- normalizePath(path_out, mustWork = TRUE)
   }
 
   #if((win==min(length(y1),length(y2), na.rm = TRUE))&(step== 1)){
@@ -648,54 +649,117 @@ crqa_cl <- function(y1,
     if(theiler<1){theiler=1}
   } else {cat("\nPerforming cross-RQA\n")}
   #}
+
   if((win<min(length(y1),length(y2), na.rm = TRUE))){
-    cat(paste("Calculating recurrence measures in a window of size",win,"taking steps of",step,"data points.\n\n"))
+    cat(paste("Calculating recurrence measures in a window of size",win,"taking steps of",step,"data points.\n\nRecalculating radius for each window...\n\n"))
   }
 
-  wlist <- zoo::rollapply(df,
-                     width = win,
-                     FUN = function(df){crqa_cl_main(y1             = df[,1],
-                                                y2             = df[,2],
-                                                eDim           = eDim,
-                                                eLag           = eLag,
-                                                eRad           = eRad,
-                                                DLmin          = DLmin,
-                                                VLmin          = VLmin,
-                                                theiler        = theiler,
-                                                JRP            = JRP,
-                                                distNorm       = distNorm,
-                                                returnMeasures = returnMeasures,
-                                                returnRPvector = returnRPvector,
-                                                returnLineDist = returnLineDist,
-                                                plot_recmat    = plot_recmat,
-                                                path_to_rp     = path_to_rp,
-                                                saveOut        = saveOut,
-                                                path_out       = path_out,
-                                                file_ID        = file_ID,
-                                                silent         = silent)},
-                     by = step,
-                     by.column = FALSE,
-                     align = "left",
-                     coredata = TRUE)
+  if(surrogateTest){
+    surrogateSeries <- tseries::surrogate(y1,ns=39,fft = TRUE, amplitude = TRUE)
+  }
+
+  if(win==step){
+      wIndex <- seq_along(NROW(df))
+    } else {
+      wIndex <- seq(1,NROW(df)-win, by = step)
+      }
+  if((dplyr::last(wIndex)+win-NROW(df))>0){
+    dplyr::add_row(df,y1=rep(NA,(dplyr::last(wIndex)+win-NROW(df))))
+  }
+
+  # wlist <- zoo::rollapply(df,
+  #                    width = max(win,80,na.rm=TRUE),
+  #                    FUN = function(df.w){crqa_cl_main(y1      = df.w[,1],
+  #                                               y2             = df.w[,2],
+  #                                               eDim           = eDim,
+  #                                               eLag           = eLag,
+  #                                               eRad           = eRad,
+  #                                               DLmin          = DLmin,
+  #                                               VLmin          = VLmin,
+  #                                               theiler        = theiler,
+  #                                               JRP            = JRP,
+  #                                               distNorm       = distNorm,
+  #                                               returnMeasures = returnMeasures,
+  #                                               returnRPvector = returnRPvector,
+  #                                               returnLineDist = returnLineDist,
+  #                                               plot_recmat    = plot_recmat,
+  #                                               path_to_rp     = path_to_rp,
+  #                                               saveOut        = saveOut,
+  #                                               path_out       = path_out,
+  #                                               file_ID        = file_ID,
+  #                                               silent         = silent)},
+  #                    by = max(1,step,na.rm = TRUE),
+  #                    fill = NA,
+  #                    by.column = FALSE,
+  #                    partial = 80,
+  #                    align = "right",
+  #                    coredata = TRUE)
+
+wIndices <- plyr::llply(wIndex, function(w){seq(w,w+(win-1))})
+names(wIndices) <- paste0("window: ",seq_along(wIndices)," | start: ",wIndex," | stop: ",wIndex+win-1)
+
+mc.cores <- parallel::detectCores()-1
+if(step==win) mc.cores <- 1
+
+if(is.null(file_ID)){
+  fnames <- list.files(path=path_out)
+  rqaID  <- grepl("(RQAplot)|(RQAhist[_](diag|hori))|(RQAmeasures)",fnames)
+  if(any(rqaID)){
+    file_ID <- max(as.numeric(gsub("((RQAplot)|(RQAhist[_](diag|hori))|(RQAmeasures)|txt|[[:punct:]])+","",fnames[rqaID]),"[_]"), na.rm = TRUE)
+  }
+}
 
 
-  wlist        <- unclass(wlist)
-  rqa_measures <-plyr::ldply(wlist[,1]) %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_rpvector <-plyr::ldply(wlist[,2]) %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_diagdist <-plyr::ldply(wlist[,3]) %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
-  rqa_horidist <-plyr::ldply(wlist[,4]) %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+wlist <- parallel::mclapply(wIndices, function(ind){
+  crqa_cl_main(y1             = df[ind,1],
+               y2             = df[ind,2],
+               eDim           = eDim,
+               eLag           = eLag,
+               eRad           = eRad,
+               DLmin          = DLmin,
+               VLmin          = VLmin,
+               theiler        = theiler,
+               JRP            = JRP,
+               distNorm       = distNorm,
+               returnMeasures = returnMeasures,
+               returnRPvector = returnRPvector,
+               returnLineDist = returnLineDist,
+               plot_recmat    = plot_recmat,
+               path_to_rp     = path_to_rp,
+               saveOut        = saveOut,
+               path_out       = path_out,
+               file_ID        = dplyr::first(ind),
+               silent         = silent)},
+  mc.cores = mc.cores
+  )
 
+#
+#   wlist        <- unclass(wlist)
+  rqa_measures <-plyr::ldply(wlist, function(l) l$measures) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_rpvector <-plyr::ldply(wlist, function(l) l$rpMAT) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_diagdist <-plyr::ldply(wlist, function(l) l$diag_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+  rqa_horidist <-plyr::ldply(wlist, function(l) l$hori_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+
+
+  doPlot <- which(plot_recmat%in%c("noplot","recmat","distmat"))
+
+  if(doPlot>1){
+    if(doPlot==2){
+      plotList <- plyr::llply(wIndices, function(ind) recmat_plot(di2bi(recmat(df[ind,1],df[ind,2], emDim = eDim, emLag = eLag),radius = eRad)))
+                              }
+    if(doPlot==3){plotList <- plyr::llply(wIndices, function(ind) recmat_plot(recmat(df[ind,1],df[ind,2], emDim = eDim, emLag = eLag)))}
+    multi.PLOT(plotList)
+  }
 
   out <- list(rqa_measures = rqa_measures,
               rqa_rpvector = rqa_rpvector,
               rqa_diagdist = rqa_diagdist,
               rqa_horidist = rqa_horidist)
   if(saveOut){saveRDS(out,paste0(path_out,"CRQA_out",file_ID,".rds"))}
+
   return(out[c(returnMeasures,returnRPvector,returnLineDist,returnLineDist)])
 }
 
-# emDims A range of embedding dimensions (default= 1 - maxDims)
-# nSize The neighbourhood size used to estimate the number of nearest neighbours of a coordinate (default: 10\% of all points)
 
 #' Find optimal (C)RQA parameters
 #'
@@ -1283,12 +1347,13 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 
   RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   RP[distmat <= radius] <- 1
-  mostattributes(RP) <- attributes(distmat)
 
   if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
 
 
   if(convMat){RP <- Matrix::Matrix(RP)}
+
+  attributes(RP) <- attributes(distmat)
 
   return(RP)
 }
@@ -1768,15 +1833,9 @@ recmat <- function(y1, y2=NULL,
 
   attr(dmat,"eDims1") <- et1
   attr(dmat,"eDims2") <- et2
+  attr(dmat,"eDims1.name") <- colnames(y1)
+  attr(dmat,"eDims2.name") <- colnames(y2)
   attr(dmat,"AUTO")   <- ifelse(identical(et1,et2),TRUE,FALSE)
-
-  # RM <- structure(.Data  = dmat,
-  #                 emDims1.name = colnames(y1),
-  #                 emDims2.name = colnames(y2),
-  #                 eDims1 = et1,
-  #                 eDims2 = et2,
-  #                 AUTO   = ifelse(identical(et1,et2),TRUE,FALSE))
-  # #class(RM) <- "recmat"
 
   return(dmat)
 }
@@ -1795,10 +1854,6 @@ recmat <- function(y1, y2=NULL,
 #' @export
 #'
 recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, plotSurrogate = NA, plotMeasures = FALSE){
-  # require(grid)
-  # require(ggplot2)
-  # require(gtable)
-  # require(cowplot)
 
   AUTO <-ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
 
@@ -1809,7 +1864,7 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, 
 
     # For presentation purpose only
     if(PhaseSpaceScale){
-      meltRP$value <- scales::rescale(meltRP$value)
+      meltRP$value <- elascer(meltRP$value)
     }
   } else {
     unthresholded = FALSE
@@ -1839,7 +1894,7 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, 
                          axis.text = element_blank(),
                          axis.title.x =element_blank(),
                          axis.title.y =element_blank(),
-                         plot.margin = margin(0,0,0,0))
+                         plot.margin = margin(0,2,2,0))
 
   } else {
     gRP <- gRP + scale_fill_manual(values = c("white","black"),
@@ -1871,8 +1926,11 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, 
     y1 <- data.frame(t1=attr(rmat,"eDims1"))
     y2 <- data.frame(t2=attr(rmat,"eDims2"))
 
+    colnames(y1) <- attr(rmat,"eDims1.name")
+    colnames(y2) <- attr(rmat,"eDims2.name")
+
     y1[,1] <- scales::rescale(y1[,1])
-    gy1 <- ggplot2::ggplot(y1, aes(y=y1[,1], x= zoo::index(y1))) +
+    gy1 <- ggplot2::ggplot(y1, aes(y=y1, x= zoo::index(y1))) +
       geom_line() +  xlab(colnames(y1)) + ylab("") +
       geom_vline(xintercept = zoo::index(y1)[is.na(y1[,1])],
                  colour = scales::muted("slategray4"),alpha=.1, size=.5) +
@@ -1891,7 +1949,7 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, 
       coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
 
     y2[,1] <- scales::rescale(y2[,1])
-    gy2 <- ggplot2::ggplot(y2, aes(y=y2[,1], x= zoo::index(y2))) +
+    gy2 <- ggplot2::ggplot(y2, aes(y=y2, x= zoo::index(y2))) +
       geom_line() + xlab(colnames(y2)) + ylab("") +
       geom_vline(xintercept = zoo::index(y2)[is.na(y2[,1])],
                  colour = scales::muted("slategray4"),alpha=.1, size=.5) +
@@ -1925,8 +1983,7 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, 
   grid::grid.newpage()
   grid::grid.draw(g)
   }
-
-  return(g)
+  return(invisible(g))
 }
 
 
@@ -2467,6 +2524,8 @@ lagEmbed <- function (y, emDim, emLag){
     emY <-  matrix(nrow = N, ncol = 1, byrow = TRUE, dimnames = list(NULL,"tau.0"))
     emY <- y
   }
+
+  # Alternative: rollapply(y, list(-d * seq(0, k-1)), c)
 
   id <- deparse(substitute(y))
   attr(emY, "embedding.dims") = emDim
@@ -3133,8 +3192,6 @@ detRend <- function(TS, Order=1){
 #' gg.theme
 #'
 #' @param type      One of \code{"clean"}, or \code{"noax"}
-#' @param useArial    Use the Arial font (requires \code{.afm} font files in the \code{afmPath})
-#' @param afmPATH    Path to Arial \code{.afm} font files.
 #'
 #' @details Will generate a \code{"clean"} ggplot theme, or a theme without any axes (\code{"noax"}).
 #'
@@ -3148,17 +3205,12 @@ detRend <- function(TS, Order=1){
 #' g <- ggplot(data.frame(x = rnorm(n = 100), y = rnorm(n = 100)), aes(x = x, y = y)) + geom_point()
 #' g + gg.theme()
 #' g + gg.theme("noax")
-gg.theme <- function(type=c("clean","noax"),useArial = F, afmPATH="~/Dropbox"){
+gg.theme <- function(type=c("clean","noax")){
 
   if(length(type)>1){type <- type[1]}
 
-  if(useArial){
-    #set.Arial(afmPATH)
-    bf_font="Arial"
-  } else {bf_font="Helvetica"}
-
   switch(type,
-         clean = theme_bw(base_size = 16, base_family=bf_font) +
+         clean = theme_bw(base_size = 16, base_family="sans") +
            theme(axis.text.x     = element_text(size = 14),
                  axis.title.y    = element_text(vjust = +1.5),
                  panel.grid.major  = element_blank(),
@@ -3178,9 +3230,6 @@ gg.theme <- function(type=c("clean","noax"),useArial = F, afmPATH="~/Dropbox"){
 }
 
 #' gg.plotHolder
-#'
-#' @param useArial    Use the Arial font (requires \code{.afm} font files in the \code{afmPath})
-#' @param afmPATH    Path to Arial \code{.afm} font files.
 #'
 #' @return A blank \code{ggplot2} object that can be used in concordance with \code{grid.arrange}.
 #' @export
@@ -3218,63 +3267,190 @@ gg.theme <- function(type=c("clean","noax"),useArial = F, afmPATH="~/Dropbox"){
 #'              ncol=2, nrow=2,
 #'              widths=c(4, 1.4),
 #'              heights=c(1.4, 4))
-gg.plotHolder <- function(useArial = F,afmPATH="~/Dropbox"){
-  ggplot() +
+gg.plotHolder <- function(){
+  return(ggplot() +
     geom_blank(aes(1,1)) +
     theme(line = element_blank(),
           text  = element_blank(),
           title = element_blank(),
           plot.background = element_blank(),
           panel.border = element_blank(),
-          panel.background = element_blank()
-    )
+          panel.background = element_blank())
+  )
 }
 
-# set.Arial <- function(afmPATH="~/Dropbox"){
-#   # Set up PDF device on MAC OSX to use Arial as a font in Graphs
-#   if(nchar(afmPATH>0)){
-#     if(file.exists(paste0(afmPATH,"/Arial.afm"))){
-#       Arial <- Type1Font("Arial",
-#                          c(paste(afmPATH,"/Arial.afm",sep=""),
-#                            paste(afmPATH,"/Arial Bold.afm",sep=""),
-#                            paste(afmPATH,"/Arial Italic.afm",sep=""),
-#                            paste(afmPATH,"/Arial Bold Italic.afm",sep="")))
-#       if(!"Arial" %in% names(pdfFonts())){pdfFonts(Arial=Arial)}
-#       if(!"Arial" %in% names(postscriptFonts())){postscriptFonts(Arial=Arial)}
-#       return()
-#     } else {disp(header='useArial=TRUE',message='The directory did not contain the *.afm version of the Arial font family')}
-#   } else {disp(header='useArial=TRUE',message='Please provide the path to the *.afm version of the Arial font family')}
-# }
+
+#' Set Edge weights by group
+#'
+#'  Use a layout which takes a \code{weights}
+#'
+#' @param g  An igraph object whose edges (\code{get.edgelist(g)}) will be re-weighted according to the \code{membership} argument.
+#' @param groups A named numeric vector with \code{length(V(g))} integers representing each group, or, a named character vector describing each group. If \code{names(groups)==NULL} then the names of the vector will be set as \code{names(groups) == V(g)$name}. If \code{V(g)$name==NULL}, the names of the vector will be set by the Vertex index
+#' @param weigth.within The weight within a group (\code{default = 100})
+#' @param weight.between The weight within a group (\code{default = 1})
+#' @param preserve.weight.within If \code{E(g)$weights} is not \code{NULL}, try to preserve edge weigths within a group
+#' @param preserve.weight.between If \code{E(g)$weights} is not \code{NULL}, try to preserve edge weigths between a groups
+#'
+#' @return A numeric vector with \code{length(get.edgelist(g))} edge weights that will cluster groups defined in \code{membership} if a layout is used that can handle edge weights as a parameter (see examples).
+#'
+#' @export
+#'
+#' @family tools for plotting networks
+#'
+#' @examples
+#' # Make a star graph and let the odd numbers cluster together
+#' library(igraph)
+#' g <-make_full_graph(10, directed=FALSE)
+#' E(g)$width <- 3
+#' V(g)$name <- paste(1:10)
+#' membership <- rep(c(1,2),5)
+#' names(membership) <- V(g)$name
+#' E(g)$weight <- plotNET_groupWeight(g,membership,1000,10)
+#' g$layout=layout.fruchterman.reingold(g,weights=E(g)$weight)
+#' plot(g)
+#'
+#' # Make 3 groups by changing the 'membership' vector
+#' membership[3:6] <- 3
+#' names(membership) <- V(g)$name
+#' E(g)$weight <- plotNET_groupWeight(g,membership,1000,10)
+#' g$layout=layout.fruchterman.reingold(g,weights=E(g)$weight)
+#' plot(g)
+#'
+#' # Use plotNET_groupColour for Vertex and Edge group colours
+#' g <- plotNET_groupColour(g, membership, colourE=TRUE)
+#' plot(g)
+#'
+plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, preserve.weight.within=FALSE, preserve.weight.between=FALSE){
+  edgl <- get.edgelist(g)
+
+  for(r in seq_along(edgl[,1])){
+    row <- edgl[r,]
+    if(as.numeric(membership[which(names(membership)==row[1])])==as.numeric(membership[which(names(membership)==row[2])])){
+     E(g)$weight[r] <- weigth.within + ifelse(preserve.weight.within, E(g)$weight[r]%00%0, 0)
+    } else {
+     E(g)$weight[r] <- weight.between + ifelse(preserve.weight.between, E(g)$weight[r]%00%0, 0)
+    }
+  }
+  return(E(g)$weight)
+}
 
 
-plotSW <- function(n,k,p){
+#' Plot Network Based on RQA
+#'
+#' @param g An igraph object
+#' @param labels Vertex labels
+#' @param nodesize Set nodesizes by \code{degree(g, normalised = TRUE)} (default) or \code{hubscore(g)$vector}. If a numeric value is passed all vertex sizes will be set to that value.
+#' @param edgeweight Set size of edges to \code{"E(g)$weight"} by passing "weight". If a single numeric value is provided all edges will be set to that value.
+#'
+#' @return an igraph object
+#' @export
+#'
+#' @family tools for plotting networks
+#'
+plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], edgeweight = "weight"){
 
-  g <- igraph::watts.strogatz.game(1, n, k, p)
-
-  igraph::V(g)$degree <- igraph::degree(g)
+  rev <- NA
+  if(is.character(nodesize)){
+  switch(nodesize,
+         degree   = rev <- elascer(log1p(igraph::degree(g,normalized = TRUE))),
+         hubscore = rev <- elascer(log1p(igraph::hub_score(g)$vector))
+           )
+  } else {
+    rev <- as.numeric(nodesize)
+    }
 
   # set colors and sizes for vertices
-  rev<-elascer(log1p(igraph::V(g)$degree))
+  #rev<-elascer(log1p(igraph::V(g)$degree))
+
   rev[rev<=0.2]<-0.2
   rev[rev>=0.9]<-0.9
-  igraph::V(g)$rev <- rev$x
+  igraph::V(g)$rev <- rev
 
   igraph::V(g)$color       <- grDevices::rgb(igraph::V(g)$rev, 1-igraph::V(g)$rev,  0, 1)
   igraph::V(g)$size        <- 25*igraph::V(g)$rev
 
   # set vertex labels and their colors and sizes
+  if(all(is.na(labels))){
   igraph::V(g)$label       <- ""
+  } else {
+    igraph::V(g)$label       <- labels
+    igraph::V(g)$label.cex   <- elascer(igraph::V(g)$size,lo = .4, hi = 1.1)
+    igraph::V(g)$label.color <- "black"
+  }
 
-  igraph::E(g)$width <- 1
+  if(edgeweight%in%"weight"){
+    igraph::E(g)$width <- elascer(igraph::E(g)$weight,lo = .1, hi = 5)
+  } else {
+    if(is.numeric(edgeweight)){
+      igraph::E(g)$width <- as.numeric(edgeweight)
+    } else {
+      igraph::E(g)$width <- 1
+    }
+  }
   igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
+
+  return(invisible(g))
+}
+
+
+#' Example of Strogatz-Watts small-world network
+#'
+#' A wrapper around \code{\link[igraph]{sample_smallworld}} with \code{dim=1}
+#'
+#' @param n Size of the lattice (integer)
+#' @param k Neighbourhood size (integer)
+#' @param p Rewiring probability (between \code{0} and \code{1})
+#'
+#' @return A Strogatz-Watts small-world igraph object
+#'
+#' @export
+#'
+#' @family tools for plotting networks
+#'
+#' @seealso \code{\link[igraph]{sample_smallworld}}
+#'
+plotNET_SW <- function(n=100,k=5,p=0.05){
+
+  g <- igraph::sample_smallworld(1, n, k, p)
+  g <- plotNET_prep(g)
+
+  # igraph::V(g)$degree <- igraph::degree(g)
+  #
+  # # set colors and sizes for vertices
+  # rev<-elascer(log1p(igraph::V(g)$degree))
+  # rev[rev<=0.2]<-0.2
+  # rev[rev>=0.9]<-0.9
+  # igraph::V(g)$rev <- rev$x
+  #
+  # igraph::V(g)$color       <- grDevices::rgb(igraph::V(g)$rev, 1-igraph::V(g)$rev,  0, 1)
+  # igraph::V(g)$size        <- 25*igraph::V(g)$rev
+  #
+  # # set vertex labels and their colors and sizes
+  # igraph::V(g)$label       <- ""
+  #
+  # igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
   return(g)
 }
 
-plotBA <- function(n,pwr,out.dist){
-  #require("Cairo")
+#' Example of Barabasi scale-free network
+#'
+#' A wrapper around \code{\link[igraph]{sample_pa}}
+#'
+#' @param n Number of vertices
+#' @param pwr Power of preferential attachment
+#' @param out.dist Degree distribution
+#'
+#' @return A Barabasi scale-free igraph object
+#' @export
+#'
+#' @family tools for plotting networks
+#'
+#' @seealso \code{\link[igraph]{sample_pa}}
+#'
+plotNET_BA <- function(n=100, pwr=1, out.dist=NULL){
 
-  g <- barabasi.game(n,pwr,out.dist=out.dist,directed=FALSE)
+  g <- igraph::sample_pa(n, power = pwr, out.dist=out.dist, directed=FALSE)
   igraph::V(g)$degree <- igraph::degree(g)
 
   # set colors and sizes for vertices
@@ -3289,7 +3465,6 @@ plotBA <- function(n,pwr,out.dist){
 
   # set vertex labels and their colors and sizes
   igraph::V(g)$label <- ""
-
   igraph::E(g)$width <- 1
   igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
@@ -3297,34 +3472,105 @@ plotBA <- function(n,pwr,out.dist){
 }
 
 
-netGroupCol <- function(g,grp){
-  if(length(grp)<=11){
-    groupColours <-  brewer_pal(palette="RdYlBl")(length(grp))
+#' Vertex Group Colours
+#'
+#' Identify Vertex and/or Edge groups by colour.
+#'
+#' @param g An igraph object
+#' @param groups A named numeric vector with \code{length(V(g))} integers representing each group, or, a named character vector describing each group. If \code{names(groups)==NULL} then the names of the vector will be set as \code{names(groups) == V(g)$name}. If \code{V(g)$name==NULL}, the names of the vector will be set by the Vertex index
+#' @param colourV Colour Vertices based on \code{groups} (default = \code{TRUE})
+#' @param alphaV Set transparency for Vertices (default = \code{1})
+#' @param colourE Colour Edges based on \code{groups} (default = \code{FALSE})
+#' @param alphaE Set transparency for Edges (default = \code{0.8})
+#' @param groupColours A list of length \code{groups} with valid colour codes
+#'
+#' @return An igraph object with vertices and/or edges coloured by groups listed in \code{groups}
+#'
+#' @export
+#'
+#' @family tools for plotting networks
+#'
+plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=FALSE, alphaE=FALSE, groupColours=NA){
+
+  if(length(groups)==gorder(g)){
+    unigroups <- unique(groups)
+    if(is.null(names(groups))){
+      names(groups) <- paste0(1:gorder(g))
+    }
   } else {
-    groupColours <- gradient_n_pal(brewer_pal(palette="Set3")(11))(seq(0, 1, length.out = length(grp)))
+    stop("length(groups) must be equal to number of Vertices: gorder(g)")
   }
 
-  igraph::E(g)$alpha <- scales::rescale(igraph::E(g)$weight)
-  igraph::E(g)$color <- "#D9D9D9"
-  for(c in seq_along(grp)){
-    if(length(grp[[c]])>0){
-      igraph::V(g)[grp[[c]]]$color   <-  groupColours[c]
 
-      if(length(igraph::E(g)[from(igraph::V(g)[grp[[c]]])])>0){
-        id<-igraph::E(g)[from(igraph::V(g)[grp[[c]]])]$color%in%"#D9D9D9"
-        if(any(id)){
-          igraph::E(g)[from(igraph::V(g)[grp[[c]]])[id]]$color <- add_alpha(groupColours[c],alpha = igraph::E(g)[from(igraph::V(g)[grp[[c]]])[id]]$alpha)
-        }
-      }
+
+  if(is.na(groupColours)){
+    if(length(unigroups)<=11){
+      groupColours <-  scales::brewer_pal(palette="RdYlBu")(length(unigroups))
+    } else {
+      groupColours <- scales::gradient_n_pal(scales::brewer_pal(palette="RdYlBu")(11))(seq(0, 1, length.out = length(unigroups)))
     }
   }
+
+  # Add alpha .08 to edges by default
+  igraph::E(g)$alpha <- .8
+  if(alphaE){
+    if(all(is.null(igraph::E(g)$weight))){
+      warning("If you want to set Edge transparency, provide weight values in E(g)$weight...")
+    } else {
+      igraph::E(g)$alpha <- elascer(igraph::E(g)$weight)
+      }
+    }
+
+  # Add a default colour and alphac
+  igraph::E(g)$color <- add_alpha("#D9D9D9",alpha = igraph::E(g)$alpha)
+
+  if(alphaV){
+    igraph::V(g)$alpha <- elascer(igraph::degree(g))
+  }
+
+
+  for(c in unigroups){
+    if(length(groups==c)>0){
+
+      igraph::V(g)[groups==c]$group      <- unigroups[[c]]
+      igraph::V(g)[groups==c]$groupnum   <- c
+
+      if(colourV){
+      igraph::V(g)[groups==c]$color      <- groupColours[c]
+      igraph::V(g)[groups==c]$colour     <- igraph::V(g)[groups==c]$color
+      }
+
+      if(alphaV){
+        igraph::V(g)[groups==c]$color <- add_alpha(igraph::V(g)[groups==c]$color, alpha = igraph::V(g)[groups==c]$alpha)
+        igraph::V(g)[groups==c]$colour <- igraph::V(g)[groups==c]$color
+      }
+
+      # Get ids for the edges that connect this group
+      id <- which(E(g)%in%E(g)[igraph::V(g)[groups==c]%--% igraph::V(g)[groups==c]])
+
+
+      if(length(id)>0){
+
+        igraph::E(g)[id]$group             <- unigroups[[c]]
+        igraph::E(g)[id]$groupnum          <- c
+
+        if(colourE){
+          igraph::E(g)[id]$color  <- add_alpha(groupColours[c], alpha = igraph::E(g)[id]$alpha)
+        }
+        if(alphaE){
+          igraph::E(g)[id]$color <- add_alpha(groupColours[c], alpha = igraph::E(g)[id]$alpha)
+        }
+
+        } # edge IDs > 0
+      } # group IDs > 0
+  } # group loop
+
   return(g)
 }
 
 
-plot.loglog <- function(fd.OUT){
-  #require(ggplot2)
-  #require(scales)
+plotFA_loglog <- function(fd.OUT){
+
   g <- ggplot2::ggplot(fd.OUT$PLAW, aes(x=size,y=bulk), na.rm=T) +
     scale_x_log10(breaks = scales::log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$size)))+c(-1,1))),base=10),
                   labels = scales::trans_format("log10", scales::math_format(10^.x)),
@@ -3342,13 +3588,18 @@ plot.loglog <- function(fd.OUT){
   return(g)
 }
 
-## Add an alpha value to a colour
+
+#' Add transparency to a colour
+#'
+#' @param col A colour name, hexadecimal string or positive integer \code{i}, such that palette()[i]
+#' @param alpha Alpha transparency value
+#'
+#' @return An rgb colour with transparency
+#' @export
+#'
 add_alpha <- function(col, alpha=1){
-  if(missing(col))
-    stop("Please provide a vector of colours.")
-  apply(sapply(col, grDevices::col2rgb)/255, 2,
-        function(x)
-          grDevices::rgb(x[1], x[2], x[3], alpha=alpha))
+  if(missing(col)){stop("Please provide a vector of colours.")}
+  apply(sapply(col, grDevices::col2rgb)/255, 2, function(x){grDevices::rgb(x[1], x[2], x[3], alpha=alpha)})
 }
 
 
@@ -3360,7 +3611,7 @@ add_alpha <- function(col, alpha=1){
 #' @export
 #' @author Fred Hasselman
 #' @description Creates a recurrence plot from the sparse matrix output generated by \code{\link[crqa]{crqa}}.
-plotRP.crqa <- function(crqaOutput){
+plotRP_crqa <- function(crqaOutput){
 
   AUTO <- FALSE
 
@@ -3426,7 +3677,7 @@ plotRP.crqa <- function(crqaOutput){
 
 }
 
-plotRP.fnn <- function(FNNoutput){
+plotRP_fnn <- function(FNNoutput){
   graphics::plot(FNNoutput["combined",],type="b",pch=16, cex=2, col="grey80", ylim=c(0,100), xaxt="n",
        xlab = "Embedding Dimension", ylab = "False Nearest Neighbours")
   graphics::lines(FNNoutput["atol",],type="b",pch="a",col="grey30", lty=2)
@@ -3672,6 +3923,106 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 
 
 # HELPERS ----
+
+
+#' Center a vector on Mean or Median
+#'
+#' @param numvec A numeric vector
+#' @param na.rm Set the \code{na.rm} field
+#' @param type Center on the \code{"mean"} (default) or the \code{"median"} of the vector
+#'
+#' @return A mean or median centered vector
+#' @export
+#'
+#' @author Fred Hasselman
+#'
+center <- function(numvec, na.rm=TRUE, type = c("mean","median")[1]){
+  if(!is.numeric(numvec)){
+    stop("Vector must be numeric!")
+  } else {
+  switch(type,
+         mean   = return(numvec -   mean(numvec, na.rm=na.rm)),
+         median = return(numvec - median(numvec, na.rm=na.rm))
+         )
+  }
+}
+
+#' Normalise a vector by Mean/SD, or Median/MAD
+#'
+#'
+#' @param numvec A numeric vector
+#' @param na.rm Set the \code{na.rm} field
+#' @param type Center on the \code{"mean"} and divide by \code{sd} (default), or center on \code{"median"} and divide by \code{mad}
+#'
+#' @return A normalised vector
+#' @export
+#'
+#' @author Fred Hasselman
+#'
+normalise <- function(numvec, na.rm=TRUE, type = c("mean","median")[1]){
+  if(!is.numeric(numvec)){
+    stop("Vector must be numeric!")
+  } else {
+  switch(type,
+         mean   = return((numvec - mean(numvec,na.rm=na.rm)) / sd(numvec,na.rm=na.rm)),
+         median = return((numvec - median(numvec, na.rm=na.rm)) / mad(numvec, na.rm = na.rm))
+         )
+  }
+}
+
+# Help lme4 get a better convergence
+nlopt <- function(par, fn, lower, upper, control) {
+  # Add to call: control = lmerControl(optimizer = "nloptwrap", calc.derivs = FALSE
+  .nloptr <<- res <- nloptr(par, fn, lb = lower, ub = upper,
+                            opts = list(algorithm = "NLOPT_LN_BOBYQA", print_level = 1,
+                                        maxeval = 1000, xtol_abs = 1e-6, ftol_abs = 1e-6))
+  list(par = res$solution,
+       fval = res$objective,
+       conv = if (res$status > 0) 0 else res$status,
+       message = res$message
+  )
+}
+
+# Convert decimal point
+c2p <- function(text,N=1){
+  if(!is.character(text)){text<-as.character(text)}
+  if(sum(grepl("[,]",text))>=N){text <- gsub(",",".",text)}
+  return(text)
+}
+
+# Count missing values in x
+nmissing <- function(x){
+  sum(is.na(x))
+}
+
+#' Surrogate Test
+#'
+#' @param surrogatesValues Vector of measures based on surrogate time series
+#' @param observedValue The measure obtained from the observed value
+#' @param sides Is this a 1 or 2-sided test (default = \code{1})
+#' @param alpha Significane threshold for the test
+#' @param doPlot Plot a histogram (default = \code{FALSE})
+#' @param measureName Label for x-axis
+#'
+#' @return A point p-value for the observed value
+#' @export
+#'
+point_p <- function(surrogatesValues,
+                    observedValue,
+                    sides = 1,
+                    alpha = sides/(length(surrogatesValues)+1),
+                    doPlot = FALSE,
+                    measureName = ""){
+  vec <- c(surrogatesValues, observedValue)
+  pp  <- (1-((unique(min_rank(vec)[which(vec%in%observedValue)])-1) * alpha))%00%NA
+  if(doPlot){
+    ggplot(data.frame(x=vec), aes(x=x)) +
+      geom_histogram(binwidth=.01, center=0, colour="white", fill="grey50") +
+      geom_point(aes(x=observedValue),y=0,colour="red",size=5) +
+      xlab(measureName) + theme_bw()
+  }
+  return(pp)
+}
 
 #' Slice columns of a matrix in epochs
 #'

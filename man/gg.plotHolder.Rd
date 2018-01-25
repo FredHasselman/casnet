@@ -4,12 +4,7 @@
 \alias{gg.plotHolder}
 \title{gg.plotHolder}
 \usage{
-gg.plotHolder(useArial = F, afmPATH = "~/Dropbox")
-}
-\arguments{
-\item{useArial}{Use the Arial font (requires \code{.afm} font files in the \code{afmPath})}
-
-\item{afmPATH}{Path to Arial \code{.afm} font files.}
+gg.plotHolder()
 }
 \value{
 A blank \code{ggplot2} object that can be used in concordance with \code{grid.arrange}.
