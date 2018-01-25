@@ -168,7 +168,7 @@ set_command_line_rp <- function(){
       devtools::RCMD(cmd="chmod",options=paste0("a+x ",rp_command), path=normalizePath(execPath, mustWork = FALSE))
     }
     message(paste0("Detected: ",sys,"\n  Copied: ",URL," to ",rp_command," in ",execPath," as the commandline CRP executable"))
-    rio::export(data.frame(url=c(URL,copyright_text)),normalizePath(paste0(rp_command,"/rp_install_log.txt"), mustWork = FALSE))
+    rio::export(data.frame(url=c(URL,copyright_text)),normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
   } else {
     if(ZIP){
       message(paste0("Detected: ",sys, "\n  FAILED to Copy: ",URL," to ",rp_command," in ",execPath," as the commandline CRP executable \n Trying .zip file..."))
