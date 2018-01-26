@@ -180,7 +180,7 @@ set_command_line_rp <- function(){
       if(all(nchar(sysCommand)>0)){
         devtools::RCMD(sysCommand[[1]], options = sysCommand[[2]], path = sourcePath, quiet = TRUE)
         devtools::RCMD(sysCommand[[3]], options = sysCommand[[4]], path = sourcePath, quiet = TRUE)
-        write.table(data.frame(sysCommand=c(paste(sysCommand[[1]], sysCommand[[2]]), paste(sysCommand[[3]], sysCommand[[4]]),copyright_text)), normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
+        utils::write.table(data.frame(sysCommand=c(paste(sysCommand[[1]], sysCommand[[2]]), paste(sysCommand[[3]], sysCommand[[4]]),copyright_text)), normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
       }
     } else {
       message(dl_instruction)

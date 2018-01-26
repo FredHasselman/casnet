@@ -1,4 +1,5 @@
 #' @importFrom magrittr %>%
+#' @import ggplot2
 NULL
 
 
@@ -622,7 +623,7 @@ crqa_cl <- function(y1,
       y1[N1:(N2+(N2-N1))] <- 0
     }
     df <- cbind.data.frame(y1=unclass(y1),y2=unclass(y2))
-    df <- df[complete.cases(df),]
+    df <- df[stats::complete.cases(df),]
   } else {
     if(any(is.na(y1))){
       y1 <- y1[!is.na(y1)]
@@ -732,7 +733,7 @@ wlist <- parallel::mclapply(wIndices, function(ind){
                silent         = silent)},
   mc.cores = mc.cores
   )
-stopCluster(cl)
+parallel::stopCluster(cl)
 
 
 #   wlist        <- unclass(wlist)
@@ -1089,6 +1090,7 @@ crqa_mat_measures <- function(RM,
   if(Nboot<mc.cores) mc.cores <- Nboot
 
   tstart <- Sys.time()
+  cl <- parallel::makeCluster(mc.cores)
   out    <- parallel::mclapply(1, function(i){
     crp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))], ncol=NCols, nrow = NRows),
              radius= radius,
@@ -1105,8 +1107,10 @@ crqa_mat_measures <- function(RM,
   },
   mc.cores = mc.cores
   )
-  dfori <- tidyr::gather(as.data.frame(out), key = measure, value = value)
+  parallel::stopCluster(cl)
   tend  <- Sys.time()
+
+  dfori <- tidyr::gather(as.data.frame(out), key = "measure", value = "value")
 
   if(Nboot>1){
 
@@ -1114,6 +1118,7 @@ crqa_mat_measures <- function(RM,
     cat(paste0("Estimated duration: ", round((difftime(tend,tstart, units = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
 
     tstart <-Sys.time()
+    cl <- parallel::makeCluster(mc.cores)
     bootOut <-  parallel::mclapply(1:Nboot, function(i){
       replicate <- as.data.frame(crp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))],
                                                  ncol=NCols, nrow = NRows),
@@ -1133,11 +1138,12 @@ crqa_mat_measures <- function(RM,
     },
     mc.cores = mc.cores
     )
+    parallel::stopCluster(cl)
     tend <- Sys.time()
     cat(paste0("Actual duration: ", round(difftime(tend,tstart, units = "mins"), digits=1)," min.\n"))
 
-    dfrepl <-plyr::ldply(bootOut)
-    dfrepl <- tidyr::gather(dfrepl, key = measure, value = value, -replicate)
+    dfrepl <- plyr::ldply(bootOut)
+    dfrepl <- tidyr::gather(dfrepl, key = "measure", value = "value", -replicate)
 
     if(length(CL)==1){
       ci.lo <- (1-CL)/2
@@ -1155,9 +1161,9 @@ crqa_mat_measures <- function(RM,
         mean     = mean(value, na.rm = TRUE),
         sd       = stats::sd(value, na.rm = TRUE),
         var      = stats::var(value, na.rm = TRUE),
-        N        = n(),
-        se       = stats::sd(value, na.rm = TRUE)/sqrt(n()),
-        median   = mean(value, na.rm = TRUE),
+        N        = dplyr::n(),
+        se       = stats::sd(value, na.rm = TRUE)/sqrt(dplyr::n()),
+        median   = stats::median(value, na.rm = TRUE),
         mad      = stats::mad(value, na.rm = TRUE)
       )
 
@@ -3942,7 +3948,7 @@ center <- function(numvec, na.rm=TRUE, type = c("mean","median")[1]){
   } else {
   switch(type,
          mean   = return(numvec -   mean(numvec, na.rm=na.rm)),
-         median = return(numvec - median(numvec, na.rm=na.rm))
+         median = return(numvec - stats::median(numvec, na.rm=na.rm))
          )
   }
 }
@@ -3964,8 +3970,8 @@ normalise <- function(numvec, na.rm=TRUE, type = c("mean","median")[1]){
     stop("Vector must be numeric!")
   } else {
   switch(type,
-         mean   = return((numvec - mean(numvec,na.rm=na.rm)) / sd(numvec,na.rm=na.rm)),
-         median = return((numvec - median(numvec, na.rm=na.rm)) / mad(numvec, na.rm = na.rm))
+         mean   = return((numvec - mean(numvec,na.rm=na.rm)) / stats::sd(numvec,na.rm=na.rm)),
+         median = return((numvec - stats::median(numvec, na.rm=na.rm)) / stats::mad(numvec, na.rm = na.rm))
          )
   }
 }

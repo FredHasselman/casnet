@@ -41,7 +41,8 @@ Imports: dplyr,
     signal,
     lubridate,
     magrittr,
-    tseries
+    tseries,
+    parallel
 Suggests: knitr,
     rmarkdown,
     graphics,
