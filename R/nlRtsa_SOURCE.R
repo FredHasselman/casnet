@@ -709,7 +709,7 @@ if(is.null(file_ID)){
   }
 }
 
-
+cl <- parallel::makeCluster(mc.cores)
 wlist <- parallel::mclapply(wIndices, function(ind){
   crqa_cl_main(y1             = df[ind,1],
                y2             = df[ind,2],
@@ -732,14 +732,14 @@ wlist <- parallel::mclapply(wIndices, function(ind){
                silent         = silent)},
   mc.cores = mc.cores
   )
+stopCluster(cl)
 
-#
+
 #   wlist        <- unclass(wlist)
   rqa_measures <-plyr::ldply(wlist, function(l) l$measures) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
   rqa_rpvector <-plyr::ldply(wlist, function(l) l$rpMAT) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
   rqa_diagdist <-plyr::ldply(wlist, function(l) l$diag_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
   rqa_horidist <-plyr::ldply(wlist, function(l) l$hori_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
-
 
   doPlot <- which(plot_recmat%in%c("noplot","recmat","distmat"))
 
@@ -1364,7 +1364,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 #'
 #' @param y Time series
 #' @param selection.methods Selecting an optimal embedding lag (default: Return "first.e.decay", "first.zero", "first.minimum", "first.value", where value is 1/exp(1))
-#' @param maxLag Maximal lag to consider (default: 1/5 of timeseries length)
+#' @param maxLag Maximal lag to consider (default: 1/4 of timeseries length)
 #' @param ... Additional parameters
 #'
 #' @return The ami function with minima

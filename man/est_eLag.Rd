@@ -12,7 +12,7 @@ est_eLag(y, selection.methods = c("first.minimum"), maxLag = length(y)/4,
 
 \item{selection.methods}{Selecting an optimal embedding lag (default: Return "first.e.decay", "first.zero", "first.minimum", "first.value", where value is 1/exp(1))}
 
-\item{maxLag}{Maximal lag to consider (default: 1/5 of timeseries length)}
+\item{maxLag}{Maximal lag to consider (default: 1/4 of timeseries length)}
 
 \item{...}{Additional parameters}
 }
