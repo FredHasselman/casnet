@@ -11,7 +11,7 @@ crqa_cl_main(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
   returnRPvector = FALSE, returnLineDist = FALSE,
   plot_recmat = c("noplot", "recmat", "distmat")[[1]],
   path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
-  path_out = NULL, file_ID = NULL, silent = TRUE, ...)
+  path_out = NULL, file_ID = NULL, silent = TRUE, fixedRadius = NA, ...)
 }
 \arguments{
 \item{y1}{y1}
@@ -57,6 +57,8 @@ crqa_cl_main(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
 \item{...}{}
 
 \item{returnDistance}{y1}
+
+\item{fixedRdius}{y1}
 }
 \description{
 crqa_cl_main [internal]

@@ -5,7 +5,7 @@
 \title{Find a radius (fixed RR)}
 \usage{
 crqa_radius(RM, startRadius = 0.1 * max(RM, na.rm = TRUE), targetRR = 0.05,
-  tol = 0.1, maxIter = 100, theiler = 0, histIter = FALSE)
+  tol = 0.1, maxIter = 100, theiler = -1, histIter = FALSE)
 }
 \arguments{
 \item{RM}{Unthresholded Recurrence Matrix}

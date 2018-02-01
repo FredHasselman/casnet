@@ -308,6 +308,7 @@ repmat <- function(X,m,n){
 #' @param path_out y1
 #' @param file_ID y1
 #' @param silent y1
+#' @param fixedRdius y1
 #' @param ...
 #'
 #' @keywords internal
@@ -334,7 +335,8 @@ crqa_cl_main <- function(y1,
                          saveOut    = FALSE,
                          path_out   = NULL,
                          file_ID    = NULL,
-                         silent     = TRUE, ...){
+                         silent     = TRUE,
+                         fixedRadius = NA, ...){
 
 
   file_ID <- file_ID%00%0
@@ -367,9 +369,7 @@ crqa_cl_main <- function(y1,
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
   utils::write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
 
-  # if(grepl("Error",try.CATCH(normalizePath(path_out,mustWork = TRUE))$value)){
-  #
-  # }
+
 
   fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
 
@@ -668,39 +668,11 @@ crqa_cl <- function(y1,
     dplyr::add_row(df,y1=rep(NA,(dplyr::last(wIndex)+win-NROW(df))))
   }
 
-  # wlist <- zoo::rollapply(df,
-  #                    width = max(win,80,na.rm=TRUE),
-  #                    FUN = function(df.w){crqa_cl_main(y1      = df.w[,1],
-  #                                               y2             = df.w[,2],
-  #                                               eDim           = eDim,
-  #                                               eLag           = eLag,
-  #                                               eRad           = eRad,
-  #                                               DLmin          = DLmin,
-  #                                               VLmin          = VLmin,
-  #                                               theiler        = theiler,
-  #                                               JRP            = JRP,
-  #                                               distNorm       = distNorm,
-  #                                               returnMeasures = returnMeasures,
-  #                                               returnRPvector = returnRPvector,
-  #                                               returnLineDist = returnLineDist,
-  #                                               plot_recmat    = plot_recmat,
-  #                                               path_to_rp     = path_to_rp,
-  #                                               saveOut        = saveOut,
-  #                                               path_out       = path_out,
-  #                                               file_ID        = file_ID,
-  #                                               silent         = silent)},
-  #                    by = max(1,step,na.rm = TRUE),
-  #                    fill = NA,
-  #                    by.column = FALSE,
-  #                    partial = 80,
-  #                    align = "right",
-  #                    coredata = TRUE)
-
 wIndices <- plyr::llply(wIndex, function(w){seq(w,w+(win-1))})
 names(wIndices) <- paste0("window: ",seq_along(wIndices)," | start: ",wIndex," | stop: ",wIndex+win-1)
 
-mc.cores <- parallel::detectCores()-1
-if(step==win) mc.cores <- 1
+mc.cores <- parallel::detectCores(logical=FALSE)-1
+if(NROW(df)==win) mc.cores <- 1
 
 if(is.null(file_ID)){
   fnames <- list.files(path=path_out)
@@ -710,7 +682,8 @@ if(is.null(file_ID)){
   }
 }
 
-cl <- parallel::makeCluster(mc.cores)
+#cl <- parallel::makeCluster(mc.cores)
+#parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","eDim","eLag","eRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp","saveOut","path_out","file_ID","silent","..."))
 wlist <- parallel::mclapply(wIndices, function(ind){
   crqa_cl_main(y1             = df[ind,1],
                y2             = df[ind,2],
@@ -730,10 +703,9 @@ wlist <- parallel::mclapply(wIndices, function(ind){
                saveOut        = saveOut,
                path_out       = path_out,
                file_ID        = dplyr::first(ind),
-               silent         = silent)},
-  mc.cores = mc.cores
-  )
-parallel::stopCluster(cl)
+               silent         = silent)} ,mc.cores = mc.cores)
+#parallel::stopCluster(cl)
+
 
 
 #   wlist        <- unclass(wlist)
@@ -955,21 +927,23 @@ crqa_radius <- function(RM,
                         targetRR    = .05,
                         tol         = 0.1,
                         maxIter     = 100,
-                        theiler     = 0,
+                        theiler     = -1,
                         histIter    = FALSE){
 
   if(!dplyr::between(tol,0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
 
   AUTO        <- ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
-  recmatsize <- recmat_size(RM,AUTO,theiler)
+
   if(AUTO){
-    cat(paste0("\nAuto-recurrence: Setting diagonal to 0 (matrix size: ",recmatsize,")\n"))
-  } else {
-    theiler = 0
+    cat(paste0("\nAuto-recurrence: Setting diagonal to 0\n"))
+    if(theiler < 0) theiler <- 0
+    }
+
+  recmatsize <- recmat_size(RM,AUTO,theiler)
+
+  if(theiler>=0){
+    RM <- bandReplace(RM,-theiler,theiler,0)
   }
-
-  RM <- bandReplace(RM,-theiler,theiler,0)
-
   tryRadius <- startRadius
   RR        <- 0
   iter      <- 0

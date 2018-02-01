@@ -1,9 +1,17 @@
 .onLoad <- function(libname, pkgname="casnet") {
+  if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
+    cat("\nRU account detected...\nTrying drive letters...")
+    ppath <- normalizePath(paste0("U:\\",paste0(strsplit(system.file(package="casnet"),"[/]")[[1]][-c(1,2)],collapse="/")), mustWork = TRUE)
+    execpath <- normalizePath(paste0(ppath,"/exec"))
+  } else {
+    ppath     <- system.file(package="casnet")
+    execpath <- system.file("exec", package="casnet")
+  }
   casnet_OS_options <- set_os_options()
   op <- options()
   op.casnet <- list(
-    casnet.path = system.file(package="casnet"),
-    casnet.path_to_rp = system.file("exec", package="casnet"),
+    casnet.path = ppath,
+    casnet.path_to_rp = execpath,
     casnet.rp_prefix = casnet_OS_options$rp_prefix,
     casnet.rp_command = casnet_OS_options$rp_command,
     casnet.rp_URL = casnet_OS_options$URL,
