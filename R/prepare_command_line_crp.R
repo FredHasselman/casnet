@@ -3,7 +3,7 @@
     cat("\nRU account detected...\nTrying drive letters...")
     ppath <- normalizePath(paste0("U:\\",paste0(strsplit(system.file(package="casnet"),"[/]")[[1]][-c(1,2)],collapse="/")), mustWork = TRUE)
     #execpath <- normalizePath(paste0(ppath,"/exec"), mustWork = TRUE)
-    execpath <- normalizePath(paste0("C:\runlocal"), mustWork = TRUE)
+    execpath <- normalizePath(paste0("C:\\runlocal"), mustWork = TRUE)
 
   } else {
     ppath     <- system.file(package="casnet")
