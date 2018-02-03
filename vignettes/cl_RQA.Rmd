@@ -175,12 +175,12 @@ p_2 <- 1 - ((unique(min_rank(crqa_2rnd_sur$DET)[which(crqa_2rnd_sur$DET%in%crqa_
 
 g_1sur <- ggplot(crqa_1rnd_sur, aes(x=crqa_1rnd_sur$DET)) +
   geom_histogram(binwidth=.01, center=0, colour="white", fill="grey50") + 
-  geom_point(data=crqa_1, aes(x=DET),y=0,colour="red",size=5) +
+  geom_point(data=crqa_1, aes(x=DET,y=0),colour="red",size=5) +
   xlab("DETerminism") + theme_bw()
 
 g_2sur <- ggplot(crqa_2rnd_sur, aes(x=crqa_2rnd_sur$DET)) +
   geom_histogram(binwidth=.01, center=0, colour="white", fill="grey50") + 
-  geom_point(data=crqa_2, aes(x=DET),y=0,colour="red",size=5) +
+  geom_point(data=crqa_2, aes(x=DET,y=0), colour="red",size=5) +
   xlab("DETerminism") + theme_bw()
 ```
 
@@ -204,12 +204,12 @@ p_2 <- 1 - ((unique(min_rank(crqa_2rnd_sur$LAM)[which(crqa_2rnd_sur$LAM%in%crqa_
 
 g_1sur <- ggplot(crqa_1rnd_sur, aes(x=crqa_1rnd_sur$LAM)) +
   geom_histogram(binwidth=.01, center=0, colour="white", fill="grey50") + 
-  geom_point(data=crqa_1, aes(x=LAM),y=0,colour="red",size=5) +
+  geom_point(data=crqa_1, aes(x=LAM,y=0),colour="red",size=5) +
   xlab("LAMinarity")
 
 g_2sur <- ggplot(crqa_2rnd_sur, aes(x=crqa_2rnd_sur$LAM)) +
   geom_histogram(binwidth=.01, center=0, colour="white", fill="grey50") + 
-  geom_point(data=crqa_2, aes(x=LAM),y=0,colour="red",size=5) +
+  geom_point(data=crqa_2, aes(x=LAM,y=0),colour="red",size=5) +
   xlab("LAMinarity")
 
 
