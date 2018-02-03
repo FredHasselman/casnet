@@ -1,10 +1,13 @@
 .onLoad <- function(libname, pkgname="casnet") {
   if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
     cat("\nRU account detected...\n")
+    RU <- TRUE
     ppath <- normalizePath(paste0("U:\\",paste0(strsplit(system.file(package="casnet"),"[/]")[[1]][-c(1,2)],collapse="/")), mustWork = TRUE)
     #execpath <- normalizePath(paste0(ppath,"/exec"), mustWork = TRUE)
-    execpath <- normalizePath(paste0("C:\\Users/",paste0(strsplit(system.file(package="casnet"),"[/]")[[1]][2],"/Documents",collapse="/")), mustWork = TRUE)
+    #execpath <- normalizePath(paste0("C:\\Users/",paste0(strsplit(system.file(package="casnet"),"[/]")[[1]][2],"/Documents",collapse="/")), mustWork = TRUE)
+    execpath <- normalizePath(paste0("C:\\Temp"))
   } else {
+    RU <- FALSE
     ppath     <- system.file(package="casnet")
     execpath <- system.file("exec", package="casnet")
   }
@@ -13,6 +16,7 @@
   op.casnet <- list(
     casnet.path = ppath,
     casnet.path_to_rp = execpath,
+    casnet.isRU = RU,
     casnet.rp_prefix = casnet_OS_options$rp_prefix,
     casnet.rp_command = casnet_OS_options$rp_command,
     casnet.rp_URL = casnet_OS_options$URL,
@@ -152,7 +156,11 @@ set_command_line_rp <- function(){
   os                <- get_os()
   casnet_OS_options <- set_os_options()
 
-  URL <- casnet_OS_options$URL
+  if(getOption("casnet.isRU")){
+    URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/rp_86.exe"
+  } else {
+    URL <- casnet_OS_options$URL
+    }
   sys <- casnet_OS_options$sys
   exe <- casnet_OS_options$exe
   rp_prefix  <- casnet_OS_options$rep_prefix
