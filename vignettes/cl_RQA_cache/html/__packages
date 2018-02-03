@@ -1,4 +1,5 @@
 base
+devtools
 casnet
 ggplot2
 cowplot
