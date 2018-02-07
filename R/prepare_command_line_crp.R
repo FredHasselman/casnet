@@ -65,7 +65,7 @@ set_os_options <- function(os = get_os()){
   # Default Unix / OSx
   sys        <- "linux"
   exe        <- "rp"
-#  URL        <- "http://tocsy.pik-potsdam.de/RP/rp_x86_64"
+  URL        <- "http://tocsy.pik-potsdam.de/RP/rp_x86_64"
   rp_prefix  <- "./"
   rp_command <- "rp"
   sysdel     <- "rm"
