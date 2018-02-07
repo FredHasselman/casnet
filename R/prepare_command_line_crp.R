@@ -66,7 +66,7 @@ set_os_options <- function(os = get_os()){
   # Default Unix / OSx
   sys        <- "linux"
   exe        <- "rp"
-  URL        <- "http://tocsy.pik-potsdam.de/RP/rp_x86_64"
+#  URL        <- "http://tocsy.pik-potsdam.de/RP/rp_x86_64"
   rp_prefix  <- "./"
   rp_command <- "rp"
   sysdel     <- "rm"
@@ -103,11 +103,11 @@ set_os_options <- function(os = get_os()){
 
     sys <- "windows_x86"
     exe <- "rp_x86.exe"
-    if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
-      URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/"
-    } else {
+#    if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
+#      URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/"
+#    } else {
       URL <- "http://tocsy.pik-potsdam.de/RP/rp_x86.exe"
-      }
+ #     }
   }
 
   # Linux
