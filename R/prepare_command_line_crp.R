@@ -103,7 +103,11 @@ set_os_options <- function(os = get_os()){
 
     sys <- "windows_x86"
     exe <- "rp_x86.exe"
-    URL <- "http://tocsy.pik-potsdam.de/RP/rp_x86.exe"
+    if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
+      URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/"
+    } else {
+      URL <- "http://tocsy.pik-potsdam.de/RP/rp_x86.exe"
+      }
   }
 
   # Linux
