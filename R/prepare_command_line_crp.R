@@ -25,8 +25,7 @@
     casnet.install.args = "",
     casnet.name = "Fred Hasselman", #"A toolbox for studying Complex Adaptive Systems and NETworks",
     casnet.desc.author = '"Fred Hasselman <f.hasselman@bsi.ru.nl> [aut, cre]"',
-    casnet.desc.license = "GP-L3",
-    casnet.desc.suggests = NULL,
+    casnet.desc.license = "GP-L3",    casnet.desc.suggests = NULL,
     casnet.desc = list()
   )
   toset <- !(names(op.casnet) %in% names(op))
@@ -160,11 +159,11 @@ set_command_line_rp <- function(){
   os                <- get_os()
   casnet_OS_options <- set_os_options()
 
-  if(getOption("casnet.isRU")){
-    URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/rp_86.exe"
-  } else {
-    URL <- casnet_OS_options$URL
-    }
+#  if(getOption("casnet.isRU")){
+#    URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/rp_86.exe"
+#  } else {
+   URL <- casnet_OS_options$URL
+#    }
   sys <- casnet_OS_options$sys
   exe <- casnet_OS_options$exe
   rp_prefix  <- casnet_OS_options$rep_prefix
