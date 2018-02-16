@@ -2,29 +2,35 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{crqa_radius}
 \alias{crqa_radius}
-\title{Find a radius (fixed RR)}
+\title{Find fixed or optimal radius}
 \usage{
-crqa_radius(RM, startRadius = 0.1 * max(RM, na.rm = TRUE), targetRR = 0.05,
-  tol = 0.1, maxIter = 100, theiler = -1, histIter = FALSE)
+crqa_radius(RM, startRadius = 0.1 * max(RM, na.rm = TRUE),
+  targetMeasure = c("RR", "DET", "LAM")[1], targetValue = 0.05, tol = 0.1,
+  maxIter = 100, theiler = -1, histIter = FALSE, type = c("fixed",
+  "optimal")[1])
 }
 \arguments{
 \item{RM}{Unthresholded Recurrence Matrix}
 
 \item{startRadius}{Starting value for the radius (default = 10\% of the maxumum distance)}
 
-\item{targetRR}{Target recurrence rate (default = \code{.05})}
+\item{targetMeasure}{If \code{type} is set to "optimal", it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM".}
 
-\item{tol}{Tolerance for achieving \code{targetRR} (default = \code{0.1})}
+\item{targetValue}{When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).}
+
+\item{tol}{Tolerance for achieving \code{target} (default = \code{0.1})}
 
 \item{maxIter}{Maximum number of iterations to reach target (default = \code{100})}
 
 \item{theiler}{Size of theiler window (default \code{0})}
 
-\item{histIter}{Return iteration history? (defsault = \code{FALSE})}
+\item{histIter}{Return iteration history? (default = \code{FALSE})}
+
+\item{type}{Either "fixed" (default) or "optimal", "fixed" will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}; "optimal" will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.}
 }
 \value{
 A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 }
 \description{
-Find a radius (fixed RR)
+Find fixed or optimal radius
 }

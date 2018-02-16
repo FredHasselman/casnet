@@ -909,30 +909,34 @@ crqa_parameters <- function(y,
 }
 
 
-#' Find a radius (fixed RR)
+#' Find fixed or optimal radius
 #'
 #' @param RM Unthresholded Recurrence Matrix
 #' @param startRadius Starting value for the radius (default = 10\% of the maxumum distance)
-#' @param targetRR Target recurrence rate (default = \code{.05})
-#' @param tol Tolerance for achieving \code{targetRR} (default = \code{0.1})
+#' @param targetMeasure If \code{type} is set to "optimal", it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM".
+#' @param  targetValue When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).
+#' @param tol Tolerance for achieving \code{target} (default = \code{0.1})
 #' @param maxIter Maximum number of iterations to reach target (default = \code{100})
 #' @param theiler Size of theiler window (default \code{0})
-#' @param histIter Return iteration history? (defsault = \code{FALSE})
+#' @param histIter Return iteration history? (default = \code{FALSE})
+#' @param type Either "fixed" (default) or "optimal", "fixed" will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}; "optimal" will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.
 #'
 #' @return A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 #' @export
 #'
 crqa_radius <- function(RM,
-                        startRadius = .10*max(RM, na.rm = TRUE),
-                        targetRR    = .05,
-                        tol         = 0.1,
-                        maxIter     = 100,
-                        theiler     = -1,
-                        histIter    = FALSE){
+                        startRadius    = .10*max(RM, na.rm = TRUE),
+                        targetMeasure  = c("RR","DET","LAM")[1],
+                        targetValue    = 0.05,
+                        tol            = 0.1,
+                        maxIter        = 100,
+                        theiler        = -1,
+                        histIter       = FALSE,
+                        type           = c("fixed","optimal")[1]){
 
   if(!dplyr::between(tol,0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
 
-  AUTO        <- ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
+  AUTO <- ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
 
   if(AUTO){
     cat(paste0("\nAuto-recurrence: Setting diagonal to 0\n"))
@@ -944,20 +948,23 @@ crqa_radius <- function(RM,
   if(theiler>=0){
     RM <- bandReplace(RM,-theiler,theiler,0)
   }
+
+  if(type%in%"fixed"){
+
   tryRadius <- startRadius
-  RR        <- 0
+  Measure   <- 0
   iter      <- 0
   Converged <- FALSE
-  seqIter <- 1:maxIter
+  seqIter   <- 1:maxIter
 
   iterList <- data.frame(iter        = seqIter,
-                         RR          = RR,
+                         Measure     = Measure,
                          Radius      = tryRadius,
-                         targetRR    = targetRR,
-                         tolRRlo     = targetRR*(1-tol),
-                         tolRRhi     = targetRR*(tol+1),
+                         targetValue = targetValue,
+                         tollo       = targetValue*(1-tol),
+                         tolhi       = targetValue*(tol+1),
                          startRadius = startRadius,
-                         recmat.size      = recmatsize,
+                         recmat.size = recmatsize,
                          AUTO        = AUTO,
                          Converged   = Converged, check.names = FALSE)
 
@@ -967,20 +974,24 @@ crqa_radius <- function(RM,
 
     iter <- iter+1
 
-    RR = Matrix::nnzero(di2bi(RM,tryRadius),na.counted = FALSE)/recmatsize
+    case_when(
+      RR  = Measure <- crp_calc(RM, radius = tryRadius, AUTO=AUTO)$RR,
+      DET = Measure <- crp_calc(RM, radius = tryRadius, AUTO=AUTO)$DET,
+      LAM = Measure <- crp_calc(RM, radius = tryRadius, AUTO=AUTO)$LAM
+    )
 
-    iterList[iter,] <-    cbind.data.frame(iter,
-                                           RR,
-                                           tryRadius,
-                                           targetRR,
-                                           targetRR*(1-tol),
-                                           targetRR*(tol+1),
-                                           startRadius,
-                                           recmatsize,
-                                           AUTO,
-                                           Converged)
+    iterList[iter,] <-    cbind.data.frame(iter        = seqIter,
+                                           Measure     = Measure,
+                                           Radius      = tryRadius,
+                                           targetValue = targetValue,
+                                           tollo       = targetValue*(1-tol),
+                                           tolhi       = targetValue*(tol+1),
+                                           startRadius = startRadius,
+                                           recmat.size = recmatsize,
+                                           AUTO        = AUTO,
+                                           Converged   = Converged)
 
-    if(any((dplyr::between(RR,(targetRR*(1-tol)),(targetRR*(tol+1)))),(iter>=maxIter))){
+    if(any((dplyr::between(Measure,(targetValue*(1-tol)),(targetValue*(tol+1)))),(iter>=maxIter))){
       exitIter <- TRUE
     }
 
@@ -1003,6 +1014,14 @@ crqa_radius <- function(RM,
 
   ifelse(histIter,id<-c(1:iter),id<-iter)
   return(iterList[id,])
+
+  }
+
+  if(type%in%"optimal"){
+
+    RMnoise
+
+  }
 }
 
 
@@ -1127,22 +1146,24 @@ crqa_mat_measures <- function(RM,
       ci.hi <- CL[2]
     }
 
-    rqout <-  dfrepl %>% dplyr::group_by(measure) %>%
-      summarize(
-        val      = NA,
-        ci.lower = stats::quantile(value, ci.lo, na.rm = TRUE),
-        ci.upper = stats::quantile(value, ci.hi, na.rm = TRUE),
-        mean     = mean(value, na.rm = TRUE),
-        sd       = stats::sd(value, na.rm = TRUE),
-        var      = stats::var(value, na.rm = TRUE),
-        N        = dplyr::n(),
-        se       = stats::sd(value, na.rm = TRUE)/sqrt(dplyr::n()),
-        median   = stats::median(value, na.rm = TRUE),
-        mad      = stats::mad(value, na.rm = TRUE)
+    rqout <-  dfrepl %>%
+      dplyr::group_by(measure) %>%
+      dplyr::summarise(
+        val          = NA,
+        ci.lower     = stats::quantile(value%00%NA, ci.lo, na.rm = TRUE),
+        ci.upper     = stats::quantile(value%00%NA, ci.hi, na.rm = TRUE),
+        BOOTmean     = mean(value%00%NA, na.rm = TRUE),
+        BOOTsd       = stats::sd(value%00%NA, na.rm = TRUE),
+        BOOTse       = BOOTsd/sqrt(Nboot),
+        BOOTvar      = stats::var(value%00%NA, na.rm = TRUE),
+        BOOTmedian   = stats::median(value%00%NA, na.rm = TRUE),
+        BOOTmad      = stats::mad(value%00%NA, na.rm = TRUE),
+        BOOTn        = Nboot
       )
 
     for(m in 1:nrow(rqout)){
       rqout$val[rqout$measure%in%dfori$measure[m]] <- dfori$value[m]
+
     }
   } else {
     rqout <- dfori
@@ -1508,7 +1529,7 @@ nzdiags.boot <- function(RP,d=NULL){
 
       # Diagonals are specified
       d <- sort(as.vector(d))
-      keepID <-  names(spd)%in%d
+      keepID <- names(spd)%in%d
       nzdiag <- spd[keepID]
     }
 
@@ -2045,6 +2066,7 @@ crp_calc <- function(RM,
 
   recmatsize <- recmat_size(RM, AUTO=AUTO)
 
+  RM <- di2bi(RM,radius = radius)
   #Total nr. recurrent points
   RT <- Matrix::nnzero(RM, na.counted = FALSE)
   #Proportion recurrence / Recurrence Rate
