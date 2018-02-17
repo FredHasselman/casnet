@@ -28,5 +28,4 @@ vignette("cl_RQA")
 
 ### Vignette build failing?
 
-If  building the vignettes fails on installation, just omit the argument and locate the vignettes in the `/docs/man/` folder of the repository.
-
+If  building the vignettes fails on installation, just omit the argument and locate the vignettes in the `inst/docs/` folder of the repository.
