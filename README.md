@@ -26,6 +26,7 @@ install_github("FredHasselman/casnet", build_vignettes = TRUE)
 vignette("cl_RQA")
 ```
 
+### Vignette build failing?
 
-
+If  building the vignettes fails on installation, just omit the argument and locate the vignettes in the `/docs/man/` folder of the repository.
 
