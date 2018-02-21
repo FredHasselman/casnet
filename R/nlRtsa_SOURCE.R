@@ -1,4 +1,5 @@
 #' @importFrom magrittr %>%
+#' @importFrom DescTools %[]% %][% %nin%
 #' @import ggplot2
 NULL
 
@@ -912,29 +913,45 @@ crqa_parameters <- function(y,
 #' Find fixed or optimal radius
 #'
 #' @param RM Unthresholded Recurrence Matrix
-#' @param startRadius Starting value for the radius (default = 10\% of the maxumum distance)
-#' @param targetMeasure If \code{type} is set to "optimal", it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM".
-#' @param  targetValue When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).
-#' @param tol Tolerance for achieving \code{target} (default = \code{0.1})
-#' @param maxIter Maximum number of iterations to reach target (default = \code{100})
+#' @param y1  A numeric vector or time series
+#' @param y2  A numeric vector or time series
+#' @param emLag Delay to use for embedding
+#' @param emDim Number of embedding dimensions
+#' @param type Either \code{"fixed"} (default) or \code{"optimal"}, \code{"fixed"} will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}, \code{"optimal"} will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.
+#' @param startRadius If \code{type = "fixed"} this is the starting value for the radius (default = 10\% of the maxumum distance in RM). If \code{type = "optimal"} this will be a range of radius values (in normalised SD units) that will be considered (default = \code{seq(0,1.5,by=.01)})
+#' @param targetMeasure If \code{type} is set to \code{"optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM"
+#' @param targetValue When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).
+#' @param tol Tolerance for achieving \code{targetValue} for \code{targetMeasure} (default = \code{0.1})
+#' @param maxIter If \code{type = "fixed"}: Maximum number of iterations to reach targetValue. If \code{type = "optimal"}: The number of \code{signal + noise} series used to generate the ROC. (default = \code{100})
 #' @param theiler Size of theiler window (default \code{0})
 #' @param histIter Return iteration history? (default = \code{FALSE})
-#' @param type Either "fixed" (default) or "optimal", "fixed" will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}; "optimal" will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.
+#' @param noiseLevel Noise level to construct the \code{signal + noiseLevel *} \eqn{N(\mu=0,\sigma=1)} (default = \code{0.75})
+#' @param plotROC Generates an ROC plot if \code{type = "optimal"}
 #'
 #' @return A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 #' @export
 #'
-crqa_radius <- function(RM,
-                        startRadius    = .10*max(RM, na.rm = TRUE),
+crqa_radius <- function(RM = NA,
+                        y1 = NA,
+                        y2 = NA,
+                        emLag = 1,
+                        emDim = 1,
+                        type           = c("fixed","optimal")[1],
+                        startRadius    = ifelse(type=="fixed", .10*max(RM, na.rm = TRUE), seq(0,1.5,by=0.01)),
                         targetMeasure  = c("RR","DET","LAM")[1],
                         targetValue    = 0.05,
                         tol            = 0.1,
                         maxIter        = 100,
                         theiler        = -1,
                         histIter       = FALSE,
-                        type           = c("fixed","optimal")[1]){
+                        noiseLevel     = 0.75,
+                        plotROC        = FALSE){
 
-  if(!dplyr::between(tol,0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
+  optimOK <- FALSE
+  if(is.na(RM)&!is.na(y1)){
+    optimOK <- TRUE
+    RM <- recmat(y1=y1, y2=y2,emDim=emDim, emLag=emLag)
+  }
 
   AUTO <- ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
 
@@ -950,6 +967,8 @@ crqa_radius <- function(RM,
   }
 
   if(type%in%"fixed"){
+
+  if(tol%][%c(0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
 
   tryRadius <- startRadius
   Measure   <- 0
@@ -991,11 +1010,11 @@ crqa_radius <- function(RM,
                                            AUTO        = AUTO,
                                            Converged   = Converged)
 
-    if(any((dplyr::between(Measure,(targetValue*(1-tol)),(targetValue*(tol+1)))),(iter>=maxIter))){
+    if(any(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1)),(iter>=maxIter))){
       exitIter <- TRUE
     }
 
-    if(round(RR,digits = 2)>round(targetRR,digits = 2)){
+    if(round(Measure,digits = 2)>round(targetValue,digits = 2)){
       tryRadius <- tryRadius*(min(0.8,tol*2))
     } else {
       tryRadius <- tryRadius*(min(1.8,1+(tol*2)))
@@ -1004,10 +1023,10 @@ crqa_radius <- function(RM,
 
   iterList$Converged[iter] <- TRUE
   if(iter>=maxIter){
-    warning("Max. iterations reached.")
+    warning("Max. iterations reached!")
     iterList$Converged[iter] <- FALSE
   }
-  if(!dplyr::between(RR,(targetRR*(1-tol)),(targetRR*(tol+1)))){
+  if(RR %][% c(targetRR*(1-tol),targetRR*(tol+1))){
     warning("Target RR not found, try increasing tolerance, or change starting value.")
     iterList$Converged[iter] <- FALSE
   }
@@ -1015,13 +1034,19 @@ crqa_radius <- function(RM,
   ifelse(histIter,id<-c(1:iter),id<-iter)
   return(iterList[id,])
 
-  }
+  } # if "fixed"
 
   if(type%in%"optimal"){
+    if(optimOK){
 
-    RMnoise
 
-  }
+
+    } else {
+
+      stop("Need time series vector(s) to perform optimal Radius search.")
+
+    }
+  } # if "optimal"
 }
 
 

@@ -42,7 +42,8 @@ Imports: dplyr,
     lubridate,
     magrittr,
     tseries,
-    parallel
+    parallel,
+    DescTools
 Suggests: knitr,
     rmarkdown,
     graphics,

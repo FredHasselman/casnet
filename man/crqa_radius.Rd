@@ -4,29 +4,42 @@
 \alias{crqa_radius}
 \title{Find fixed or optimal radius}
 \usage{
-crqa_radius(RM, startRadius = 0.1 * max(RM, na.rm = TRUE),
-  targetMeasure = c("RR", "DET", "LAM")[1], targetValue = 0.05, tol = 0.1,
-  maxIter = 100, theiler = -1, histIter = FALSE, type = c("fixed",
-  "optimal")[1])
+crqa_radius(RM = NA, y1 = NA, y2 = NA, emLag = 1, emDim = 1,
+  type = c("fixed", "optimal")[1], startRadius = ifelse(type == "fixed", 0.1
+  * max(RM, na.rm = TRUE), seq(0, 1.5, by = 0.01)), targetMeasure = c("RR",
+  "DET", "LAM")[1], targetValue = 0.05, tol = 0.1, maxIter = 100,
+  theiler = -1, histIter = FALSE, noiseLevel = 0.75, plotROC = FALSE)
 }
 \arguments{
 \item{RM}{Unthresholded Recurrence Matrix}
 
-\item{startRadius}{Starting value for the radius (default = 10\% of the maxumum distance)}
+\item{y1}{A numeric vector or time series}
 
-\item{targetMeasure}{If \code{type} is set to "optimal", it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM".}
+\item{y2}{A numeric vector or time series}
+
+\item{emLag}{Delay to use for embedding}
+
+\item{emDim}{Number of embedding dimensions}
+
+\item{type}{Either "fixed" (default) or "optimal", "fixed" will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}; "optimal" will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.}
+
+\item{startRadius}{If \code{type = "fixed"} this is the starting value for the radius (default = 10\% of the maxumum distance in RM). If \code{type = "optimal"} this will be a range of radius values (in normalised SD units) that will be considered (default = \code{seq(0,1.5,by=.01)})}
+
+\item{targetMeasure}{If \code{type} is set to \code{"optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM"}
 
 \item{targetValue}{When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).}
 
-\item{tol}{Tolerance for achieving \code{target} (default = \code{0.1})}
+\item{tol}{Tolerance for achieving \code{targetValue} for \code{targetMeasure} (default = \code{0.1})}
 
-\item{maxIter}{Maximum number of iterations to reach target (default = \code{100})}
+\item{maxIter}{If \code{type = "fixed"}: Maximum number of iterations to reach targetValue. If \code{type = "optimal"}: The number of \code{signal + noise} series used to generate the ROC. (default = \code{100})}
 
 \item{theiler}{Size of theiler window (default \code{0})}
 
 \item{histIter}{Return iteration history? (default = \code{FALSE})}
 
-\item{type}{Either "fixed" (default) or "optimal", "fixed" will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}; "optimal" will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.}
+\item{noiseLevel}{Noise level to construct the \code{signal + noiseLevel *} \eqn{\mathcal{N}(\mu=0,\sigma=1)} (default = \code{0.75})}
+
+\item{plotROC}{Generates an ROC plot if \code{type = "optimal"}}
 }
 \value{
 A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
