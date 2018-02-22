@@ -4,11 +4,11 @@
 \alias{recmat_plot}
 \title{Plot (thresholded) distance matrix}
 \usage{
-recmat_plot(rmat, PhaseSpaceScale = TRUE, title = "", doPlot = TRUE,
+recmat_plot(RM, PhaseSpaceScale = TRUE, title = "", doPlot = TRUE,
   plotSurrogate = NA, plotMeasures = FALSE)
 }
 \arguments{
-\item{rmat}{A distance matrix or recurrence matrix}
+\item{RM}{A distance matrix or recurrence matrix}
 
 \item{PhaseSpaceScale}{For display purposes: Rescale the data? (default = \code{TRUE})}
 
@@ -16,7 +16,7 @@ recmat_plot(rmat, PhaseSpaceScale = TRUE, title = "", doPlot = TRUE,
 
 \item{doPlot}{Draw the plot? (default = \code{TRUE})}
 
-\item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{rmat} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.}
+\item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.}
 
 \item{plotMeasures}{Print common (C)RQA measures in the plot}
 }

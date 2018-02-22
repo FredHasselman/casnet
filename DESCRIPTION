@@ -43,7 +43,8 @@ Imports: dplyr,
     magrittr,
     tseries,
     parallel,
-    DescTools
+    DescTools,
+    pROC
 Suggests: knitr,
     rmarkdown,
     graphics,

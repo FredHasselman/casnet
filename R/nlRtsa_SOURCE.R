@@ -653,7 +653,7 @@ crqa_cl <- function(y1,
   #}
 
   if((win<min(length(y1),length(y2), na.rm = TRUE))){
-    cat(paste("Calculating recurrence measures in a window of size",win,"taking steps of",step,"data points.\n\nRecalculating radius for each window...\n\n"))
+    cat(paste("Calculating recurrence measures in a window of size",win,"taking steps of",step,"data points.\n\n")) #Recalculating radius for each window...\n\n
   }
 
   if(surrogateTest){
@@ -918,11 +918,12 @@ crqa_parameters <- function(y,
 #' @param emLag Delay to use for embedding
 #' @param emDim Number of embedding dimensions
 #' @param type Either \code{"fixed"} (default) or \code{"optimal"}, \code{"fixed"} will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}, \code{"optimal"} will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.
-#' @param startRadius If \code{type = "fixed"} this is the starting value for the radius (default = 10\% of the maxumum distance in RM). If \code{type = "optimal"} this will be a range of radius values (in normalised SD units) that will be considered (default = \code{seq(0,1.5,by=.01)})
-#' @param targetMeasure If \code{type} is set to \code{"optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM"
+#' @param startRadius If \code{type = "fixed"} this is the starting value for the radius (default = 10\% of the maxumum distance in RM). If \code{type = "optimal"} this will be a range of radius values (in normalised SD units) that will be considered (default = \code{seq(0,2,by=.01)})
+#' @param eachRadius If \code{type = "optim"} this is the number of signal and noise series that will be generated for each level in \code{startRadius} (default = \code{1})
+#' @param targetMeasure If \code{type} is set to \code{"optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option \code{type = "all"} will report all the optimal values obtained from one realisation of \code{startRadius * eachRadius} signal and noise series.
 #' @param targetValue When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).
 #' @param tol Tolerance for achieving \code{targetValue} for \code{targetMeasure} (default = \code{0.1})
-#' @param maxIter If \code{type = "fixed"}: Maximum number of iterations to reach targetValue. If \code{type = "optimal"}: The number of \code{signal + noise} series used to generate the ROC. (default = \code{100})
+#' @param maxIter If \code{type = "fixed"}: Maximum number of iterations to reach targetValue.
 #' @param theiler Size of theiler window (default \code{0})
 #' @param histIter Return iteration history? (default = \code{FALSE})
 #' @param noiseLevel Noise level to construct the \code{signal + noiseLevel *} \eqn{N(\mu=0,\sigma=1)} (default = \code{0.75})
@@ -931,14 +932,15 @@ crqa_parameters <- function(y,
 #' @return A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 #' @export
 #'
-crqa_radius <- function(RM = NA,
-                        y1 = NA,
-                        y2 = NA,
+crqa_radius <- function(RM = NULL,
+                        y1 = NULL,
+                        y2 = NULL,
                         emLag = 1,
                         emDim = 1,
                         type           = c("fixed","optimal")[1],
-                        startRadius    = ifelse(type=="fixed", .10*max(RM, na.rm = TRUE), seq(0,1.5,by=0.01)),
-                        targetMeasure  = c("RR","DET","LAM")[1],
+                        startRadius    = if(type=="fixed"){.10*max(RM, na.rm = TRUE)}else{seq(0,2,by=0.01)},
+                        eachRadius     = 1,
+                        targetMeasure  = c("RR","DET","LAM","T1","all")[1],
                         targetValue    = 0.05,
                         tol            = 0.1,
                         maxIter        = 100,
@@ -948,7 +950,7 @@ crqa_radius <- function(RM = NA,
                         plotROC        = FALSE){
 
   optimOK <- FALSE
-  if(is.na(RM)&!is.na(y1)){
+  if(is.null(RM)&!is.null(y1)){
     optimOK <- TRUE
     RM <- recmat(y1=y1, y2=y2,emDim=emDim, emLag=emLag)
   }
@@ -958,7 +960,7 @@ crqa_radius <- function(RM = NA,
   if(AUTO){
     cat(paste0("\nAuto-recurrence: Setting diagonal to 0\n"))
     if(theiler < 0) theiler <- 0
-    }
+  }
 
   recmatsize <- recmat_size(RM,AUTO,theiler)
 
@@ -968,78 +970,160 @@ crqa_radius <- function(RM = NA,
 
   if(type%in%"fixed"){
 
-  if(tol%][%c(0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
+    if(tol%][%c(0,1)){stop("Argument tol must be dplyr::between 0 and 1.")}
 
-  tryRadius <- startRadius
-  Measure   <- 0
-  iter      <- 0
-  Converged <- FALSE
-  seqIter   <- 1:maxIter
+    tryRadius <- startRadius
+    Measure   <- 0
+    iter      <- 0
+    Converged <- FALSE
+    seqIter   <- 1:maxIter
 
-  iterList <- data.frame(iter        = seqIter,
-                         Measure     = Measure,
-                         Radius      = tryRadius,
-                         targetValue = targetValue,
-                         tollo       = targetValue*(1-tol),
-                         tolhi       = targetValue*(tol+1),
-                         startRadius = startRadius,
-                         recmat.size = recmatsize,
-                         AUTO        = AUTO,
-                         Converged   = Converged, check.names = FALSE)
+    iterList <- data.frame(iter        = seqIter,
+                           Measure     = Measure,
+                           Radius      = tryRadius,
+                           targetValue = targetValue,
+                           tollo       = targetValue*(1-tol),
+                           tolhi       = targetValue*(tol+1),
+                           startRadius = startRadius,
+                           recmat.size = recmatsize,
+                           AUTO        = AUTO,
+                           Converged   = Converged, check.names = FALSE)
 
-  exitIter <- FALSE
+    exitIter <- FALSE
 
-  while(!exitIter){
+    while(!exitIter){
 
-    iter <- iter+1
+      iter <- iter+1
 
-    case_when(
-      RR  = Measure <- crp_calc(RM, radius = tryRadius, AUTO=AUTO)$RR,
-      DET = Measure <- crp_calc(RM, radius = tryRadius, AUTO=AUTO)$DET,
-      LAM = Measure <- crp_calc(RM, radius = tryRadius, AUTO=AUTO)$LAM
-    )
+      Measure  <- dplyr::case_when(
+        targetMeasure == "RR"  ~ crp_calc(RM, radius = tryRadius, AUTO=AUTO)$RR,
+        targetMeasure == "DET" ~ crp_calc(RM, radius = tryRadius, AUTO=AUTO)$DET,
+        targetMeasure == "LAM" ~ crp_calc(RM, radius = tryRadius, AUTO=AUTO)$LAM
+      )
 
-    iterList[iter,] <-    cbind.data.frame(iter        = seqIter,
-                                           Measure     = Measure,
-                                           Radius      = tryRadius,
-                                           targetValue = targetValue,
-                                           tollo       = targetValue*(1-tol),
-                                           tolhi       = targetValue*(tol+1),
-                                           startRadius = startRadius,
-                                           recmat.size = recmatsize,
-                                           AUTO        = AUTO,
-                                           Converged   = Converged)
+      iterList[iter,] <-    cbind.data.frame(iter        = seqIter,
+                                             Measure     = Measure,
+                                             Radius      = tryRadius,
+                                             targetValue = targetValue,
+                                             tollo       = targetValue*(1-tol),
+                                             tolhi       = targetValue*(tol+1),
+                                             startRadius = startRadius,
+                                             recmat.size = recmatsize,
+                                             AUTO        = AUTO,
+                                             Converged   = Converged)
 
-    if(any(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1)),(iter>=maxIter))){
-      exitIter <- TRUE
+      if(any(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1)),(iter>=maxIter))){
+        exitIter <- TRUE
+      }
+
+      if(round(Measure,digits = 2)>round(targetValue,digits = 2)){
+        tryRadius <- tryRadius*(min(0.8,tol*2))
+      } else {
+        tryRadius <- tryRadius*(min(1.8,1+(tol*2)))
+      }
     }
 
-    if(round(Measure,digits = 2)>round(targetValue,digits = 2)){
-      tryRadius <- tryRadius*(min(0.8,tol*2))
-    } else {
-      tryRadius <- tryRadius*(min(1.8,1+(tol*2)))
+    iterList$Converged[iter] <- TRUE
+    if(iter>=maxIter){
+      warning("Max. iterations reached!")
+      iterList$Converged[iter] <- FALSE
     }
-  }
+    if(RR %][% c(targetRR*(1-tol),targetRR*(tol+1))){
+      warning("Target RR not found, try increasing tolerance, or change starting value.")
+      iterList$Converged[iter] <- FALSE
+    }
 
-  iterList$Converged[iter] <- TRUE
-  if(iter>=maxIter){
-    warning("Max. iterations reached!")
-    iterList$Converged[iter] <- FALSE
-  }
-  if(RR %][% c(targetRR*(1-tol),targetRR*(tol+1))){
-    warning("Target RR not found, try increasing tolerance, or change starting value.")
-    iterList$Converged[iter] <- FALSE
-  }
-
-  ifelse(histIter,id<-c(1:iter),id<-iter)
-  return(iterList[id,])
+    ifelse(histIter,id<-c(1:iter),id<-iter)
+    return(iterList[id,])
 
   } # if "fixed"
 
   if(type%in%"optimal"){
+
     if(optimOK){
+      #dfRR <- ldply(seq(0,2,by=.01), .fun = function(r){doNoise(y1, radius = r)}, .parallel = TRUE, .paropts = list(.packages = "casnet", .combine=ddply,.multicombine=TRUE))
+
+      startRadius <- rep(startRadius, each = eachRadius)
+
+      dfREC  <-  plyr::ldply(startRadius, function(r){rocNoise(y = y1,eDim = emDim, eLag = emLag, radius = r, noiseLevel = noiseLevel)})
+      dfREC  <- dplyr::arrange(dfREC,radius)
+
+     if(targetMeasure=="all"){
+
+       rocREC <- list(RR  = pROC::roc(controls=dfREC$`#RR`[dfREC$response%in%"signal+noise"],
+                                     cases=dfREC$`#RR`[dfREC$response=="noise"]),
+                      DET = pROC::roc(controls=dfREC$DET[dfREC$response%in%"signal+noise"],
+                                      cases=dfREC$DET[dfREC$response=="noise"]),
+                      LAM = pROC::roc(controls=dfREC$LAM[dfREC$response%in%"signal+noise"],
+                                      cases=dfREC$LAM[dfREC$response=="noise"]),
+                      T1  = pROC::roc(controls=dfREC$T1[dfREC$response%in%"signal+noise"],
+                                      cases=dfREC$T1[dfREC$response=="noise"]))
 
 
+       optimal.radius <- list(RR = dfREC$radius[(dfREC$`#RR`>=max(pROC::coords(rocREC, "b",best.method="c", ret="t")))][1],
+                              DET = dfREC$radius[(dfREC$DET>=max(pROC::coords(rocREC, "b",best.method="c", ret="t")))][1],
+                              LAM = dfREC$radius[(dfREC$LAM>=max(pROC::coords(rocREC, "b",best.method="c", ret="t")))][1],
+                              T1 = dfREC$radius[(dfREC$T1>=max(pROC::coords(rocREC, "b",best.method="c", ret="t")))][1]
+                              )
+
+       optimal.value <- list(RR  = pROC::coords(rocREC$RR, x="best",best.method="closest.topleft", ret="threshold"),
+                             DET = pROC::coords(rocREC$DET, x="best",best.method="closest.topleft", ret="threshold"),
+                             LAM = pROC::coords(rocREC$LAM, x="best",best.method="closest.topleft", ret="threshold"),
+                             T1  = pROC::coords(rocREC$T1, x="best",best.method="closest.topleft", ret="threshold")
+                             )
+
+       if(plotROC){
+         op<-graphics::par(pty="s")
+         pROC::plot.roc(rocREC,
+                        print.thres="best",
+                        print.thres.best.method="closest.topleft",
+                        print.auc=TRUE, auc.polygon=TRUE,
+                        main = paste("Optimal radius for", targetMeasure,"=",round(optimal.value,3),"is:",optimal.radius))
+
+         #    plot(precision ~ recall, t(pROC::coords(rocREC, "all", ret = c("recall", "precision"))), type="l")
+         #  graphics::text(x=-5,y=0,labels=paste("Optimal radius for", targetMeasure,"=",optimal.value,"is:",optimal.radius))
+         graphics::par(op)
+       }
+
+
+     } else {
+
+      rocREC <- dplyr::case_when(
+        targetMeasure == "RR"  ~ list(rocREC=pROC::roc(controls=dfREC$`#RR`[dfREC$response%in%"signal+noise"],
+                                                       cases=dfREC$`#RR`[dfREC$response=="noise"])),
+        targetMeasure == "DET" ~ list(rocREC=pROC::roc(controls=dfREC$DET[dfREC$response%in%"signal+noise"],
+                                                       cases=dfREC$DET[dfREC$response=="noise"])),
+        targetMeasure == "LAM" ~ list(rocREC=pROC::roc(controls=dfREC$LAM[dfREC$response%in%"signal+noise"],
+                                                       cases=dfREC$LAM[dfREC$response=="noise"])),
+        targetMeasure == "T1"  ~ list(rocREC=pROC::roc(controls=dfREC$T1[dfREC$response%in%"signal+noise"],
+                                                       cases=dfREC$T1[dfREC$response=="noise"]))
+      )
+
+     rocREC <- rocREC[[1]]
+      optimal.radius <- dplyr::case_when(
+        targetMeasure == "RR"  ~ dfREC$radius[(dfREC$`#RR`>=max(pROC::coords(rocREC, "b",best.method="c", ret="t")))][1],
+        targetMeasure == "DET" ~ dfREC$radius[(dfREC$DET>=max(pROC::coords(rocREC, "b",best.method="c", ret="t")))][1],
+        targetMeasure == "LAM" ~ dfREC$radius[(dfREC$LAM>=max(pROC::coords(rocREC, "b",best.method="c", ret="t")))][1],
+        targetMeasure == "T1"  ~ dfREC$radius[(dfREC$T1>=max(pROC::coords(rocREC, "b",best.method="c", ret="t")))][1]
+      )
+      optimal.value <- pROC::coords(rocREC, x="best",best.method="closest.topleft", ret="threshold")
+
+      if(plotROC){
+       op<-graphics::par(pty="s")
+        pROC::plot.roc(rocREC,
+                       print.thres="best",
+                       print.thres.best.method="closest.topleft",
+                       print.auc=TRUE, auc.polygon=TRUE,
+                       main = paste("Optimal radius for", targetMeasure,"=",round(optimal.value,3),"is:",optimal.radius))
+
+    #    plot(precision ~ recall, t(pROC::coords(rocREC, "all", ret = c("recall", "precision"))), type="l")
+      #  graphics::text(x=-5,y=0,labels=paste("Optimal radius for", targetMeasure,"=",optimal.value,"is:",optimal.radius))
+        graphics::par(op)
+      }
+
+     }
+
+      return(data.frame(measure=targetMeasure,optimal.value=optimal.value,optimal.radius=optimal.radius))
 
     } else {
 
@@ -1048,6 +1132,27 @@ crqa_radius <- function(RM = NA,
     }
   } # if "optimal"
 }
+
+
+#' rocNOISE
+#'
+#' @param y y
+#' @param radius radius
+#' @param eDim embedding Dims
+#' @param eLag embedding Lag
+#' @param noiseLevel noise Level
+#'
+#' @return data frame for ROC
+#' @export
+#'
+#' @keywords internal
+rocNoise <- function(y,radius, eDim=1, eLag=1, noiseLevel=.75){
+  yn          <- rnorm(NROW(y), mean=0, sd=sd(y,na.rm = TRUE))
+  noise_out   <- crqa_cl(yn, eRad = radius, eDim=eDim, eLag=eLag)
+  measure_out <- crqa_cl((y + noiseLevel * yn),eRad = radius, eDim=eDim, eLag=eLag)
+  return(cbind.data.frame(radius=radius,response=c("signal+noise","noise"),rbind(measure_out$rqa_measures,noise_out$rqa_measures)))
+}
+
 
 
 #' Get (C)RQA measures from Recurrence Matrix
@@ -1091,14 +1196,16 @@ crqa_mat_measures <- function(RM,
   # DLmin = 2
   # VLmin = 2
   # HLmin = 2
-  # DLmax = length(diag(rmat))-1
-  # VLmax = length(diag(rmat))-1
-  # HLmax = length(diag(rmat))-1
+  # DLmax = length(diag(RM))-1
+  # VLmax = length(diag(RM))-1
+  # HLmax = length(diag(RM))-1
   # chromatic = FALSE
   # matrices  = FALSE
   # CL        = .95
 
   #require(dplyr)
+
+  if(AUTO){RM<-bandReplace(RM,lower = 0,upper = 0,value = NA)}
 
   if(is.null(Nboot)){Nboot = 1}
 
@@ -1201,7 +1308,7 @@ crqa_mat_measures <- function(RM,
 #'
 #' Measures based on horizontal line structures will be caluclated.
 #'
-#' @param rmat A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})
+#' @param RM A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})
 #' @param radius Threshold for distance value that counts as a recurrence
 #' @param DLmin Minimal diagonal line length (default = \code{2})
 #' @param VLmin Minimal vertical line length (default = \code{2})
@@ -1220,14 +1327,14 @@ crqa_mat_measures <- function(RM,
 #'
 #' @export
 #'
-crqa_mat <- function(rmat,
+crqa_mat <- function(RM,
                      radius= NULL,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(diag(rmat))-1,
-                     VLmax = length(diag(rmat))-1,
-                     HLmax = length(diag(rmat))-1,
+                     DLmax = length(diag(RM))-1,
+                     VLmax = length(diag(RM))-1,
+                     HLmax = length(diag(RM))-1,
                      AUTO      = NULL,
                      chromatic = FALSE,
                      matrices  = FALSE,
@@ -1242,15 +1349,14 @@ crqa_mat <- function(rmat,
   #require(parallel)
 
   if(is.null(AUTO)){
-    AUTO <- ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
+    AUTO <- ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
   }
 
-  #uval <- unique(as.vector(rmat))
-  if(all(as.vector(rmat)==0|as.vector(rmat)==1)){
-    RM <- rmat
+  #uval <- unique(as.vector(RM))
+  if(!all(as.vector(RM)==0|as.vector(RM)==1)){
   } else {
     if(!is.null(radius)){
-      RM <- di2bi(rmat,radius)
+      RM <- di2bi(RM,radius)
     } else{
       if(!chromatic){
         stop("Expecting a binary (0,1) matrix.\nUse 'crqa_radius()', or set 'chromatic = TRUE'")
@@ -1259,7 +1365,7 @@ crqa_mat <- function(rmat,
       }
     }
   }
-  rm(rmat)
+  #rm(RM)
 
   out <- crqa_mat_measures(RM,
                            radius = radius,
@@ -1370,7 +1476,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
   }
 
   # RP <- NetComp::matrix_threshold(distmat,threshold = radius, minval = 1, maxval = 0)
-
+  if(radius==0) radius <- .Machine$double.eps
   RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   RP[distmat <= radius] <- 1
 
@@ -1837,7 +1943,6 @@ recmat <- function(y1, y2=NULL,
 
   #dmat <- as.data.frame(dmat)
   dmat <- unclass(dmat)
-  #rmat <- scales::rescale(rmat)
   if(all(!is.null(to.ts),!is.null(order.by))){
 
     dmat <-  switch(to.ts,
@@ -1869,21 +1974,21 @@ recmat <- function(y1, y2=NULL,
 
 #' Plot (thresholded) distance matrix
 #'
-#' @param rmat A distance matrix or recurrence matrix
+#' @param RM A distance matrix or recurrence matrix
 #' @param PhaseSpaceScale For display purposes: Rescale the data? (default = \code{TRUE})
 #' @param title A title for the plot
 #' @param doPlot Draw the plot? (default = \code{TRUE})
-#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{rmat} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
+#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
 #' @param plotMeasures Print common (C)RQA measures in the plot
 #'
 #' @return A nice plot of the recurrence matrix.
 #' @export
 #'
-recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, plotSurrogate = NA, plotMeasures = FALSE){
+recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, plotSurrogate = NA, plotMeasures = FALSE){
 
-  AUTO <-ifelse(identical(as.vector(Matrix::tril(rmat,-1)),as.vector(Matrix::tril(t(rmat),-1))),TRUE,FALSE)
+  AUTO <-ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
 
-  meltRP <- reshape2::melt(rmat)
+  meltRP <- reshape2::melt(RM)
 
   if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
     unthresholded = TRUE
@@ -1947,13 +2052,13 @@ recmat_plot <- function(rmat, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, 
     rptheme +
     coord_fixed(expand = FALSE)
 
-  if(!is.null(attr(rmat,"eDims1"))){
+  if(!is.null(attr(RM,"eDims1"))){
 
-    y1 <- data.frame(t1=attr(rmat,"eDims1"))
-    y2 <- data.frame(t2=attr(rmat,"eDims2"))
+    y1 <- data.frame(t1=attr(RM,"eDims1"))
+    y2 <- data.frame(t2=attr(RM,"eDims2"))
 
-    colnames(y1) <- attr(rmat,"eDims1.name")
-    colnames(y2) <- attr(rmat,"eDims2.name")
+    colnames(y1) <- attr(RM,"eDims1.name")
+    colnames(y2) <- attr(RM,"eDims2.name")
 
     y1[,1] <- scales::rescale(y1[,1])
     gy1 <- ggplot2::ggplot(y1, aes(y=y1, x= zoo::index(y1))) +
