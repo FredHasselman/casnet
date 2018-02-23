@@ -2863,6 +2863,36 @@ fd.default <- function(y, ...){
   graphics::par(old)
 }
 
+# Relative Roughness ----
+
+
+#' Relative Roughness
+#'
+#' Relative Rougness is a ratio of local variance (autocovariance at lag-1) to global variance (autocovariance at lag-0) that can be used to classify different 'noises'.
+#'
+#'\deqn{RR = 2 * \left[1 − \frac{\gamma(y)}{Var(y)}\right]}{RR = 2 * [ 1 − autoCov-1(y) / Var(y) ]}
+#'
+#' @param y A numeric vector.
+#'
+#' @return The Relative Roughness of y, the values of local and global variance are returned as attributes
+#' @export
+#'
+#' @references
+#' \itemize{
+#' \item{Marmelat, V., Torre, K., & Delignieres, D. (2012). Relative roughness: an index for testing the suitability of the monofractal model. \emph{Frontiers in Physiology, 3}, 208.}}
+#'
+#'
+RR <- function(y){
+  # lag.max = n gives autocovariance of lags 0 ... n,
+  VAR  <- acf(y, lag.max = 1, type = 'covariance', plot=FALSE)
+  # RR formula
+  RelR   <- 2*(1-VAR$acf[2] / VAR$acf[1])
+  # Add some attributes to the output
+  attributes(RelR) <- list(localAutoCoVariance = VAR$acf[2], globalAutoCoVariance = VAR$acf[1])
+  return(RelR)
+}
+
+
 
 # PSD -------
 

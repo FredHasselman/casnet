@@ -7,7 +7,7 @@
 crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
   type = c("fixed", "optimal")[1], startRadius = if (type == "fixed") {    
   0.1 * max(RM, na.rm = TRUE) } else {     seq(0, 2, by = 0.01) },
-  eachRadius = 10, targetMeasure = c("RR", "DET", "LAM", "T1")[1],
+  eachRadius = 1, targetMeasure = c("RR", "DET", "LAM", "T1", "all")[1],
   targetValue = 0.05, tol = 0.1, maxIter = 100, theiler = -1,
   histIter = FALSE, noiseLevel = 0.75, plotROC = FALSE)
 }
@@ -26,9 +26,9 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 
 \item{startRadius}{If \code{type = "fixed"} this is the starting value for the radius (default = 10\% of the maxumum distance in RM). If \code{type = "optimal"} this will be a range of radius values (in normalised SD units) that will be considered (default = \code{seq(0,2,by=.01)})}
 
-\item{eachRadius}{If \code{type = "optim"} this is the number of signal and noise series that will be generated for each level in \code{startRadius} (default = \code{10})}
+\item{eachRadius}{If \code{type = "optim"} this is the number of signal and noise series that will be generated for each level in \code{startRadius} (default = \code{1})}
 
-\item{targetMeasure}{If \code{type} is set to \code{"optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM"}
+\item{targetMeasure}{If \code{type} is set to \code{"optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option \code{type = "all"} will report all the optimal values obtained from one realisation of \code{startRadius * eachRadius} signal and noise series.}
 
 \item{targetValue}{When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).}
 
