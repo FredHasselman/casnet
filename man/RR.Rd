@@ -19,6 +19,6 @@ Relative Rougness is a ratio of local variance (autocovariance at lag-1) to glob
 \deqn{RR = 2 * \left[1 − \frac{\gamma(y)}{Var(y)}\right]}{RR = 2 * [ 1 − autoCov-1(y) / Var(y) ]}
 }
 \references{
-\enumerate{
+\itemize{
 \item{Marmelat, V., Torre, K., & Delignieres, D. (2012). Relative roughness: an index for testing the suitability of the monofractal model. \emph{Frontiers in Physiology, 3}, 208.}}
 }

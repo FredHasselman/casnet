@@ -4,10 +4,10 @@
 \alias{sliceTS}
 \title{Slice columns of a matrix in epochs}
 \usage{
-sliceTS(TSmat, epochSz = 1)
+sliceTS(y, epochSz = 4)
 }
 \arguments{
-\item{TSmat}{A matrix with tieseries as columns}
+\item{y}{A matrix with timeseries as columns}
 
 \item{epochSz}{Epoch size}
 }

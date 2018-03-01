@@ -4,7 +4,7 @@
 \alias{crqa_cl}
 \title{Fast (C)RQA (command line crp)}
 \usage{
-crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
+crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
   VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
   (length(y1) + 1), length(y2)), na.rm = TRUE), step = win, JRP = FALSE,
   distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]], returnMeasures = TRUE,
@@ -12,18 +12,18 @@ crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
   plot_recmat = c("noplot", "recmat", "distmat")[[1]],
   path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
   path_out = NULL, file_ID = NULL, silent = TRUE, surrogateTest = FALSE,
-  ...)
+  targetValue = 0.05, ...)
 }
 \arguments{
 \item{y1}{Time series 1}
 
 \item{y2}{Time series 2 for Cross Recurrence Analysis (default = \code{NULL})}
 
-\item{eDim}{Embedding dimensions (default = \code{1})}
+\item{emDim}{Embedding dimensions (default = \code{1})}
 
-\item{eLag}{Embedding lag (default = \code{1})}
+\item{emLag}{Embedding lag (default = \code{1})}
 
-\item{eRad}{Radius on distance matrix (default = \code{1})}
+\item{emRad}{Radius on distance matrix (default = \code{1})}
 
 \item{DLmin}{Minimum length of diagonal structure to be considered a line (default = \code{2})}
 
@@ -58,6 +58,8 @@ crqa_cl(y1, y2 = NULL, eDim = 1, eLag = 1, eRad = 1, DLmin = 2,
 \item{silent}{Do not display any messages (default = \code{TRUE})}
 
 \item{surrogateTest}{Perform surrogate tests. If \code{TRUE}, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments \code{ns = 39, fft = TRUE, amplitude = TRUE})}
+
+\item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}. This is useful for windowed analysis, it will estimate a new radius for each window.}
 
 \item{...}{Additional parameters (currently not used)}
 }

@@ -15,7 +15,7 @@
 fd.default
 }
 \seealso{
-Other FD estimators: \code{\link{fd.dfa}},
-  \code{\link{fd.psd}}, \code{\link{fd.sda}}
+Other FD estimators: \code{\link{fd_dfa}},
+  \code{\link{fd_psd}}, \code{\link{fd_sda}}
 }
 \keyword{internal}

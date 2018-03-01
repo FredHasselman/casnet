@@ -5,11 +5,12 @@
 \title{Find fixed or optimal radius}
 \usage{
 crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
-  type = c("fixed", "optimal")[1], startRadius = if (type == "fixed") {    
-  0.1 * max(RM, na.rm = TRUE) } else {     seq(0, 2, by = 0.01) },
-  eachRadius = 1, targetMeasure = c("RR", "DET", "LAM", "T1", "all")[1],
-  targetValue = 0.05, tol = 0.1, maxIter = 100, theiler = -1,
-  histIter = FALSE, noiseLevel = 0.75, plotROC = FALSE)
+  type = c("fixed", "optimal")[1], startRadius = NULL, eachRadius = 1,
+  targetMeasure = c("RR", "DET", "LAM", "T1", "all")[1], targetValue = 0.05,
+  tol = 0.1, maxIter = 100, theiler = -1, histIter = FALSE,
+  noiseLevel = 0.75, noiseType = c("normal", "uniform")[1],
+  plotROC = FALSE, normalise = c("mean.sd", "median.mad", "none")[3],
+  silent = FALSE)
 }
 \arguments{
 \item{RM}{Unthresholded Recurrence Matrix}
@@ -41,6 +42,8 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 \item{histIter}{Return iteration history? (default = \code{FALSE})}
 
 \item{noiseLevel}{Noise level to construct the \code{signal + noiseLevel *} \eqn{N(\mu=0,\sigma=1)} (default = \code{0.75})}
+
+\item{noiseType}{Type}
 
 \item{plotROC}{Generates an ROC plot if \code{type = "optimal"}}
 }

@@ -40,3 +40,4 @@ A prepped matrix
 \description{
 Prepare matrix
 }
+\keyword{internal}

@@ -4,7 +4,8 @@
 \alias{normalise}
 \title{Normalise a vector by Mean/SD, or Median/MAD}
 \usage{
-normalise(numvec, na.rm = TRUE, type = c("mean", "median")[1])
+normalise(numvec, na.rm = TRUE, type = c("mean.sd", "median.mad")[1],
+  adjustN = TRUE)
 }
 \arguments{
 \item{numvec}{A numeric vector}
@@ -12,6 +13,8 @@ normalise(numvec, na.rm = TRUE, type = c("mean", "median")[1])
 \item{na.rm}{Set the \code{na.rm} field}
 
 \item{type}{Center on the \code{"mean"} and divide by \code{sd} (default), or center on \code{"median"} and divide by \code{mad}}
+
+\item{adjustN}{Use the population SD estimator (\code{N-1}), or \code{N} (default = \code{TRUE})}
 }
 \value{
 A normalised vector

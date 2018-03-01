@@ -5,9 +5,9 @@
 \title{Find optimal (C)RQA parameters}
 \usage{
 crqa_parameters(y, maxDim = 5, maxLag = round(length(y)/(maxDim + 1)),
-  emLag = est_eLag(y, selection.methods = c("first.e.decay", "first.zero",
+  emLag = est_emLag(y, selection.methods = c("first.e.decay", "first.zero",
   "first.minimum"), maxLag = round(length(y)/(maxDim + 1))),
-  emLags = est_eLag(y, maxLag = round(length(y)/(maxDim + 1))),
+  emLags = est_emLag(y, maxLag = round(length(y)/(maxDim + 1))),
   ami.method = c("first.minimum"), nnSizes = c(0.1, 0.3, 0.6, 0.9),
   nnThres = 0.1, diagPlot = TRUE)
 }

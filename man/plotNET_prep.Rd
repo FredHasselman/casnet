@@ -5,7 +5,7 @@
 \title{Plot Network Based on RQA}
 \usage{
 plotNET_prep(g, labels = NA, nodesize = c("degree", "hubscore")[1],
-  edgeweight = "weight")
+  labelsize = "asnodesize", edgeweight = "weight")
 }
 \arguments{
 \item{g}{An igraph object}
@@ -13,6 +13,8 @@ plotNET_prep(g, labels = NA, nodesize = c("degree", "hubscore")[1],
 \item{labels}{Vertex labels}
 
 \item{nodesize}{Set nodesizes by \code{degree(g, normalised = TRUE)} (default) or \code{hubscore(g)$vector}. If a numeric value is passed all vertex sizes will be set to that value.}
+
+\item{labelsize}{Set labelsize: "asnodesize" sets the \code{cex} for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the \code{cex} of all labels to that value. A numeric vector of length two, \code{c(min,max)} wil scale the node sizes to \code{min} and \code{max} which}
 
 \item{edgeweight}{Set size of edges to \code{"E(g)$weight"} by passing "weight". If a single numeric value is provided all edges will be set to that value.}
 }

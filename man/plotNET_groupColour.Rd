@@ -5,7 +5,7 @@
 \title{Vertex Group Colours}
 \usage{
 plotNET_groupColour(g, groups, colourV = TRUE, alphaV = FALSE,
-  colourE = FALSE, alphaE = FALSE, groupColours = NA)
+  colourE = FALSE, alphaE = FALSE, groupColours = NULL)
 }
 \arguments{
 \item{g}{An igraph object}

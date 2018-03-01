@@ -44,7 +44,9 @@ Imports: dplyr,
     tseries,
     parallel,
     DescTools,
-    pROC
+    pROC,
+    purrr,
+    future
 Suggests: knitr,
     rmarkdown,
     graphics,
