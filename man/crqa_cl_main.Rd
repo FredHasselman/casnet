@@ -64,4 +64,9 @@ crqa_cl_main(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA,
 \description{
 crqa_cl_main [internal]
 }
+\seealso{
+Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
+  \code{\link{crqa_mat_measures}}, \code{\link{crqa_mat}},
+  \code{\link{crqa_parameters}}, \code{\link{crqa_radius}}
+}
 \keyword{internal}

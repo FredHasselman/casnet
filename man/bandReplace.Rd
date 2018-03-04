@@ -28,3 +28,13 @@ m <- Matrix(rnorm(10),10,10)
 
 bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands with 0 (Theiler window of 1)
 }
+\seealso{
+Other Distance Matrix operations: \code{\link{di2bi}},
+  \code{\link{di2we}}, \code{\link{dist_hamming}},
+  \code{\link{lineDists}}, \code{\link{nzdiags}},
+  \code{\link{recmat_plot}}, \code{\link{recmat_size}},
+  \code{\link{recmat}}
+}
+\author{
+Fred Hasselman
+}

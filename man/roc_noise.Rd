@@ -5,8 +5,8 @@
 \title{roc_noise}
 \usage{
 roc_noise(y, radius, emDim = 1, emLag = 1, noiseLevel = 0.75,
-  normalise = c("mean.sd", "median.mad", "none")[3], noiseType = c("normal",
-  "uniform")[1])
+  standardiseBy = c("mean.sd", "median.mad", "none")[3],
+  noiseType = c("normal", "uniform")[1])
 }
 \arguments{
 \item{y}{y}
@@ -19,7 +19,7 @@ roc_noise(y, radius, emDim = 1, emLag = 1, noiseLevel = 0.75,
 
 \item{noiseLevel}{noise Level}
 
-\item{normalise}{normalise y? Choose from "mean.sd","median.mad","none".}
+\item{standardiseBy}{Standardise y? Choose from "mean.sd","median.mad","none".}
 
 \item{noiseType}{Use a Normal distribution of uniform distribution for noiselevels}
 }

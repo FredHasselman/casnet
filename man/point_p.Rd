@@ -4,13 +4,11 @@
 \alias{point_p}
 \title{Surrogate Test}
 \usage{
-point_p(surrogatesValues, observedValue, sides = 1,
-  alpha = sides/(length(surrogatesValues) + 1), doPlot = FALSE,
+point_p(surrogateValues, observedValue, sides = 1,
+  alpha = sides/(length(surrogateValues) + 1), doPlot = FALSE,
   measureName = "")
 }
 \arguments{
-\item{surrogatesValues}{Vector of measures based on surrogate time series}
-
 \item{observedValue}{The measure obtained from the observed value}
 
 \item{sides}{Is this a 1 or 2-sided test (default = \code{1})}
@@ -20,6 +18,8 @@ point_p(surrogatesValues, observedValue, sides = 1,
 \item{doPlot}{Plot a histogram (default = \code{FALSE})}
 
 \item{measureName}{Label for x-axis}
+
+\item{surrogatesValues}{Vector of measures based on surrogate time series}
 }
 \value{
 A point p-value for the observed value

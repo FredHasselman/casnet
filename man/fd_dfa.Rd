@@ -5,7 +5,7 @@
 \title{Detrended Fluctuation Analysis (DFA)}
 \usage{
 fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
-  polyOrder = 1, normalise = c("mean.sd", "median.mad")[1],
+  polyOrder = 1, standardiseBy = c("mean.sd", "median.mad")[1],
   adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)),
   scaleResolution = 30, scaleS = NA, overlap = 0, doPlot = FALSE, ...)
 }
@@ -17,6 +17,8 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
 \item{removeTrend}{Method to use for detrending, see \code{\link[fractal]{DFA}} (default = "poly")}
 
 \item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
+
+\item{standardiseBy}{Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
 \item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg) (default = \code{TRUE})}
 
@@ -43,14 +45,18 @@ A list object containing:
 }
 }
 \description{
-fd.dfa
+fd_dfa
 }
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other FD estimators: \code{\link{fd.default}},
-  \code{\link{fd_psd}}, \code{\link{fd_sda}}
+Other Fluctuation Analyses: \code{\link{MFDFA}},
+  \code{\link{RR}}, \code{\link{fd_psd}},
+  \code{\link{fd_sda}}
+
+Other FD estimators: \code{\link{fd_psd}},
+  \code{\link{fd_sda}}
 }
 \author{
 Fred Hasselman

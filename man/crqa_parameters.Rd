@@ -36,3 +36,8 @@ A list object containing the optimal values and iteration history.
 \description{
 A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
 }
+\seealso{
+Other Recurrence Quantification Analysis: \code{\link{crqa_cl_main}},
+  \code{\link{crqa_cl}}, \code{\link{crqa_mat_measures}},
+  \code{\link{crqa_mat}}, \code{\link{crqa_radius}}
+}

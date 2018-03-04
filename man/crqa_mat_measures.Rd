@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{crqa_mat_measures}
 \alias{crqa_mat_measures}
-\title{Get (C)RQA measures from Recurrence Matrix}
+\title{Get (C)RQA measures from a Recurrence Matrix}
 \usage{
 crqa_mat_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(diag(RM)) - 1, VLmax = length(diag(RM)) - 1,
@@ -40,5 +40,10 @@ crqa_mat_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 }
 \description{
 Use `crqa_mat`
+}
+\seealso{
+Other Recurrence Quantification Analysis: \code{\link{crqa_cl_main}},
+  \code{\link{crqa_cl}}, \code{\link{crqa_mat}},
+  \code{\link{crqa_parameters}}, \code{\link{crqa_radius}}
 }
 \keyword{internal}

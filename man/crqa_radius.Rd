@@ -9,7 +9,7 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
   targetMeasure = c("RR", "DET", "LAM", "T1", "all")[1], targetValue = 0.05,
   tol = 0.1, maxIter = 100, theiler = -1, histIter = FALSE,
   noiseLevel = 0.75, noiseType = c("normal", "uniform")[1],
-  plotROC = FALSE, normalise = c("mean.sd", "median.mad", "none")[3],
+  plotROC = FALSE, standardiseBy = c("mean.sd", "median.mad", "none")[3],
   silent = FALSE)
 }
 \arguments{
@@ -46,10 +46,19 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 \item{noiseType}{Type}
 
 \item{plotROC}{Generates an ROC plot if \code{type = "optimal"}}
+
+\item{standardiseBy}{Standardise}
+
+\item{silent}{Silent}
 }
 \value{
 A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 }
 \description{
 Find fixed or optimal radius
+}
+\seealso{
+Other Recurrence Quantification Analysis: \code{\link{crqa_cl_main}},
+  \code{\link{crqa_cl}}, \code{\link{crqa_mat_measures}},
+  \code{\link{crqa_mat}}, \code{\link{crqa_parameters}}
 }

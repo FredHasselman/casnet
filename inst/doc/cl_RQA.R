@@ -24,6 +24,3 @@ ggplot(RNG[IDs,],aes(x=time,y=number,group=ID)) +
   ggtitle("Which of these number sequences is more 'random'?") +
   theme_bw()
 
-## ----RNG5a, echo=FALSE---------------------------------------------------
-cowplot::plot_grid(g_1sur, g_2sur, labels = c(paste0("ID 163 - P(X=",round(crqa_1$DET,2),") = ",p_1), paste0("ID 291 - P(X=",round(crqa_2$DET,2),") = ",p_2), align = "h"))
-

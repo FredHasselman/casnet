@@ -42,5 +42,10 @@ crqa_mat(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 A list object containing (C)RQA measures (and matrices if requested)
 }
 \description{
-Measures based on horizontal line structures will be caluclated.
+A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures will be caluclated.
+}
+\seealso{
+Other Recurrence Quantification Analysis: \code{\link{crqa_cl_main}},
+  \code{\link{crqa_cl}}, \code{\link{crqa_mat_measures}},
+  \code{\link{crqa_parameters}}, \code{\link{crqa_radius}}
 }

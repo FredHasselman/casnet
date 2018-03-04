@@ -4,7 +4,7 @@
 \alias{fd_sda}
 \title{Standardised Dispersion Analysis (SDA).}
 \usage{
-fd_sda(y, fs = NULL, normalize = TRUE, dtrend = FALSE,
+fd_sda(y, fs = NULL, standardiseBy = TRUE, detrend = FALSE,
   scales = fractal::dispersion(y)$scale, fitRange = c(scales[1],
   scales[length(scales) - 2]), doPlot = FALSE)
 }
@@ -13,15 +13,15 @@ fd_sda(y, fs = NULL, normalize = TRUE, dtrend = FALSE,
 
 \item{fs}{Sample rate (default = NULL)}
 
-\item{normalize}{Normalize the series (default = TRUE)}
-
-\item{dtrend}{Subtract linear trend from the series (default = TRUE)}
-
 \item{scales}{default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}}
 
 \item{fitRange}{Scale bins (\code{c(min,max)}) to use for fitting the scaling relation}
 
 \item{doPlot}{Return the log-log spectrum with linear fit (default).}
+
+\item{normalize}{Normalize the series (default = TRUE)}
+
+\item{dtrend}{Subtract linear trend from the series (default = TRUE)}
 }
 \value{
 A list object containing:
@@ -33,14 +33,18 @@ A list object containing:
 }
 }
 \description{
-fd.sda
+fd_sda
 }
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other FD estimators: \code{\link{fd.default}},
-  \code{\link{fd_dfa}}, \code{\link{fd_psd}}
+Other Fluctuation Analyses: \code{\link{MFDFA}},
+  \code{\link{RR}}, \code{\link{fd_dfa}},
+  \code{\link{fd_psd}}
+
+Other FD estimators: \code{\link{fd_dfa}},
+  \code{\link{fd_psd}}
 }
 \author{
 Fred Hasselman

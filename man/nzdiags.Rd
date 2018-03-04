@@ -17,6 +17,13 @@ A list object with nonzero diagonals
 \description{
 Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument \code{d}. Output mimics Matlab's \code{[B,d] = spdiags(A)} function.
 }
+\seealso{
+Other Distance Matrix operations: \code{\link{bandReplace}},
+  \code{\link{di2bi}}, \code{\link{di2we}},
+  \code{\link{dist_hamming}}, \code{\link{lineDists}},
+  \code{\link{recmat_plot}}, \code{\link{recmat_size}},
+  \code{\link{recmat}}
+}
 \author{
 Fred Hasselman
 }

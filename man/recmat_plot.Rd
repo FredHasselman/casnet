@@ -26,3 +26,10 @@ A nice plot of the recurrence matrix.
 \description{
 Plot (thresholded) distance matrix
 }
+\seealso{
+Other Distance Matrix operations: \code{\link{bandReplace}},
+  \code{\link{di2bi}}, \code{\link{di2we}},
+  \code{\link{dist_hamming}}, \code{\link{lineDists}},
+  \code{\link{nzdiags}}, \code{\link{recmat_size}},
+  \code{\link{recmat}}
+}

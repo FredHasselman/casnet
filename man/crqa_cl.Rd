@@ -7,7 +7,8 @@
 crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
   VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
   (length(y1) + 1), length(y2)), na.rm = TRUE), step = win, JRP = FALSE,
-  distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]], returnMeasures = TRUE,
+  distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+  standardise = c("mean.sd", "median.mad")[1], returnMeasures = TRUE,
   returnRPvector = FALSE, returnLineDist = FALSE,
   plot_recmat = c("noplot", "recmat", "distmat")[[1]],
   path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
@@ -62,6 +63,8 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 \item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}. This is useful for windowed analysis, it will estimate a new radius for each window.}
 
 \item{...}{Additional parameters (currently not used)}
+
+\item{Standardise}{Standardise data}
 }
 \value{
 A list object containing 1-3 elements, depending on arguments requesting output.
@@ -127,3 +130,8 @@ Some notes on resolving errors with \code{rp}.The script will first try to downl
 }
 }
 
+\seealso{
+Other Recurrence Quantification Analysis: \code{\link{crqa_cl_main}},
+  \code{\link{crqa_mat_measures}}, \code{\link{crqa_mat}},
+  \code{\link{crqa_parameters}}, \code{\link{crqa_radius}}
+}
