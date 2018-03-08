@@ -17,6 +17,8 @@ ts_trimfill(x, y, action = c("fill", "trim.cut", "trim.NA")[1],
 \item{type}{Should trimming or filling take place at the \code{"end"} (default), or \code{"front"} of the vector? The option \code{"center"} will try to distribute trimming by \code{NA} or filling by \code{padding} evenly across the front and end of the vector.}
 
 \item{padding}{A value to use for padding (default = \code{0})}
+
+\item{silent}{Run silent-ish}
 }
 \value{
 A list with two vectors of equal length.

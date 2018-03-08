@@ -1,340 +1,4 @@
-#' Elastic Scaler - A Flexible Rescale Function
-#'
-#' @description The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.
-#'
-#' @param x     Input vector or data frame.
-#' @param mn     Minimum value of original, defaults to \code{min(x, na.rm = TRUE)}.
-#' @param mx     Maximum value of original, defaults to \code{max(x, na.rm = TRUE)}.
-#' @param hi     Minimum value to rescale to, defaults to \code{0}.
-#' @param lo     Maximum value to rescale to, defaults to \code{1}.
-#'
-#'
-#' @details Three uses:
-#' \enumerate{
-#' \item elascer(x)             - Scale x to data range: min(x.out)==0;      max(x.out)==1
-#' \item elascer(x,mn,mx)       - Scale x to arg. range: min(x.out)==mn==0;  max(x.out)==mx==1
-#' \item elascer(x,mn,mx,lo,hi) - Scale x to arg. range: min(x.out)==mn==lo; max(x.out)==mx==hi
-#' }
-#'
-#' @return scaled inout
-#' @export
-#'
-#' @examples
-#' # Works on numeric objects
-#' somenumbers <- cbind(c(-5,100,sqrt(2)),c(exp(1),0,-pi))
-#'
-#' elascer(somenumbers)
-#' elascer(somenumbers,mn=-100)
-#
-#' # Values < mn will return < lo (default=0)
-#' # Values > mx will return > hi (default=1)
-#' elascer(somenumbers,mn=-1,mx=99)
-#'
-#' elascer(somenumbers,lo=-1,hi=1)
-#' elascer(somenumbers,mn=-10,mx=101,lo=-1,hi=4)
-elascer <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
-  UNLIST = FALSE
-  if(!is.data.frame(x)){UNLIST=TRUE}
-  x <- as.data.frame(x)
-  u <- x
-  for(i in 1:NCOL(x)){
-    mn=min(x[,i],na.rm=T)
-    mx=max(x[,i],na.rm=T)
-    if(mn>mx){warning("Minimum (mn) >= maximum (mx).")}
-    if(lo>hi){warning("Lowest scale value (lo) >= highest scale value (hi).")}
-    ifelse(mn==mx,{u[,i]<-rep(mx,length(x[,i]))},{
-      u[,i]<-(((x[i]-mn)*(hi-lo))/(mx-mn))+lo
-      id<-stats::complete.cases(u[,i])
-      u[!id,i]<-0
-    })
-  }
-  if(UNLIST){
-    u <- as.numeric(u[,1])
-  }
-  return(u)
-}
-
-# Rmd2htmlWP <- function(infile, outfile, sup = T) {
-#   require(markdown)
-#   require(knitr)
-#   mdOpt <- markdownHTMLOptions(default = T)
-#   mdOpt <- mdOpt[mdOpt != "mathjax"]
-#   mdExt <- markdownExtensions()
-#   mdExt <- mdExt[mdExt != "latex_math"]
-#   if (sup == T) {
-#     mdExt <- mdExt[mdExt != "superscript"]
-#   }
-#   knit2html(input = infile, output = outfile, options = c(mdOpt), extensions = c(mdExt))
-# }
-
-
-# [copied from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/ ]
-#
-# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
-# - cols:   Number of columns in layout
-# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
-#
-# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
-# then plot 1 will go in the upper left, 2 will go in the upper right, and
-# 3 will go all the way across the bottom.
-#
-multi_PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-
-  numPlots = length(plots)
-
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-
-  if (numPlots==1) {
-    print(plots[[1]])
-
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-
-#' TRY ... CATCH
-#'
-#' @details
-#'  In longer simulations, aka computer experiments,
-#'  you may want to
-#'  1) catch all errors and warnings (and continue)
-#'  2) store the error or warning messages
-#'
-#'  Here's a solution  (see \R-help mailing list, Dec 9, 2010):
-#'
-#' Catch *and* save both errors and warnings, and in the case of
-#' a warning, also keep the computed result.
-#'
-#' @title tryCatch both warnings (with value) and errors
-#' @param expr an \R expression to evaluate
-#' @return a list with 'value' and 'warning', where value' may be an error caught.
-#' @author Martin Maechler; Copyright (C) 2010-2012  The R Core Team
-#' @export
-#' @keywords internal
-try_CATCH <- function(expr){
-  W <- NULL
-  w.handler <- function(w){ # warning handler
-    W <<- w
-    invokeRestart("muffleWarning")
-  }
-  list(value = withCallingHandlers(tryCatch(expr, error = function(e) e),
-                                   warning = w.handler),
-       warning = W)
-}
-
-
-#' Rose tinted infix
-#'
-#'
-#' @param x If \code{x} is any of \code{Inf,-Inf,NA,NaN,NULL,length(x)==0}, it will return \code{y}; otherwise it returns \code{x}.
-#' @param y The value to return in case of catastrophy \code{>00<}
-#'
-#' @export
-#' @author Fred Hasselman
-#' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
-#' @seealso purrrr::%||%
-#' @examples
-#' Inf %00% NA
-#'
-#' numeric(0) %00% ''
-#'
-#' NA %00% 0
-#'
-#' NaN %00% NA
-#'
-#' NULL %00% NA
-`%00%` <- function(x,y){
-  if(length(x)==0){
-    x <- y
-  } else{
-
-    for(i in seq_along(x)){
-      l0<-isna<-isnan<-isinf<-isnll<-isTryError<-FALSE
-      if(length(x[i])==0){
-        l0=TRUE
-      } else {
-        if(all(is.na(x[i])))       isna =TRUE
-        if(all(is.nan(x[i])))      isnan=TRUE
-        if(all(is.infinite(x[i]))) isinf=TRUE
-        if(all(is.null(x[i])))     isnll=TRUE
-        if(all(class(x[i])%in%"try-error")) isTryError=TRUE
-      }
-      if(any(l0,isna,isnan,isinf,isnll,isTryError)){x[i]<-y}
-    }
-  }
-  return(x)
-}
-
-
-is.wholenumber <- function(x, tol = .Machine$double.eps^0.5){
-  return(abs(x - round(x)) < tol)
-}
-
-#' Signed increment
-#'
-#' Increment an integer counter by an arbitrary (signed) interval.
-#'
-#' @param counter If \code{counter} and \code{increment} are both a (signed) integers \code{counter} will change by the value of \code{increment}.
-#' @param increment An integer value \eqn{\neq 0} to add to \code{counter}
-#'
-#' @export
-#' @author Fred Hasselman
-#' @seealso %++%
-#' @examples
-#'
-#' # Notice the difference between passing an object and a value for counter
-#'
-#' # Value
-#' (10 %+-% -5)
-#' (10 %+-% -5)
-#'
-#' # Object
-#' i <- 10
-#' (i %+-% -5)
-#' (i %+-% -5)
-#'
-#' # This means we can use the infix in a while ... statement
-#' while(i > -3) i %+-% -5
-#' # WARNING: As is the case for any while ... statement, be careful not to create an infinite loop!
-#'
-`%+-%` <- function(counter, increment){
-  if(is.na(counter%00%NA)|is.na(increment%00%NA)|!is.wholenumber(counter)|!is.wholenumber(increment)|increment==0){
-    stop("Don't know how to work with counter and/or increment argument.\n Did you use integers?")
-  } else{
-    result <- counter + increment
-    if(counter>0&result<=0){warning("Positive valued counter changed sign (counter <= 0)!")}
-    if(counter<0&result>=0){warning("Negative valued counter changed sign (counter >= 0)!")}
-    obj <- try_CATCH(as.numeric(deparse(substitute(counter))))
-    if(is.na(obj$value)){
-      eval(parse(text=paste(deparse(substitute(counter))," <<- result")))
-    } else {
-      return(result)
-    }
-  }
-}
-
-
-#' Positive increment
-#'
-#' Increment a counter by an arbitrary interval greater than 0.
-#'
-#' @param counter If \code{counter} \eqn{\ge 0} and \code{increment} \eqn{> 0} and are both integers, \code{counter} will change by the value of \code{increment}.
-#' @param increment An integer value \eqn{> 0} to add to \code{counter}
-#'
-#' @export
-#' @author Fred Hasselman
-#' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
-#' @seealso %+-%
-#' @examples
-#'
-#' # Notice the difference between passing an object and a value for counter
-#'
-#' # Value
-#' (0 %++% 5)
-#' (0 %++% 5)
-#'
-#' # Object
-#' i <- 0
-#' (i %+-% 5)
-#' (i %+-% 5)
-#'
-#' # This means we can use the infix in a while ... statement
-#' while(i < 20) i %+-% 5
-#' # WARNING: As is the case for any while ... statement, be careful not to create an infinite loop!
-#'
-`%++%` <- function(counter,increment){
-  if(is.na(counter%00%NA)|is.na(increment%00%NA)|!is.wholenumber(counter)|!is.wholenumber(increment)|increment<=0|counter<0){
-    stop("Don't know how to work with counter and/or increment argument.\n Did you use integers?")
-  } else{
-    result <- counter + increment
-    obj <- try_CATCH(as.numeric(deparse(substitute(counter))))
-    if(is.na(obj$value)){
-      eval(parse(text=paste(deparse(substitute(counter))," <<- result")))
-    } else {
-      return(result)
-    }
-  }
-}
-
-
-#' Repeat Copies of a Matrix
-#'
-#' @param X A matrix
-#' @param m Multiply dim(X)[1] m times
-#' @param n Multiply dim(X)[2] n times
-#'
-#' @return A repeated matrix
-#' @export
-#'
-repmat <- function(X,m,n){
-  #  REPMAT R equivalent of repmat (matlab)
-  #  FORMAT
-  #  DESC
-  #  description not available.
-
-  if (is.matrix(X))
-  {
-    mx = dim(X)[1]
-    nx = dim(X)[2]
-    out <- matrix(t(matrix(X,mx,nx*n)),mx*m,nx*n,byrow=T)
-  }
-  else if (is.vector(X)) {
-    mx = 1
-    nx = length(X)
-    out <- matrix(t(matrix(X,mx,nx*n)),mx*m,nx*n,byrow=T)
-  }
-  else if (length(X) == 1)
-  {
-    out <- matrix(X,m, n)
-  }
-  return (out)
-}
-
-
-
-#' @import DescTools
-#'
-NULL
-
-#' @importFrom magrittr %>%
-#'
-NULL
-
-#' @importFrom plyr .
-#'
-NULL
-
-#' @import ggplot2
-#'
-NULL
-
-#' @import multidplyr
-#'
-NULL
-
-
-
-# (C)RQA ------------------------------
+# (C)RQA ------------------------
 
 #' crqa_cl_main
 #'
@@ -1150,7 +814,8 @@ crqa_parameters <- function(y,
 #' @param noiseType Type
 #' @param plotROC Generates an ROC plot if \code{type = "optimal"}
 #' @param standardiseBy Standardise
-#' @param silent Silent
+#' @param radiusOnFail Radius to return when search fails \code{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \code{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \code{"percentile" = quantile(RM, prob = .05) of distances greater tham 0}.
+#' @param silent Silent-ish
 #'
 #' @family Recurrence Quantification Analysis
 #'
@@ -1193,7 +858,7 @@ crqa_radius <- function(RM = NULL,
 
   if(is.null(startRadius)){
     if(type=="fixed"){
-      startRadius <- as.numeric(quantile(unique(as.vector(Matrix::tril(RM,-1))),probs = ifelse(targetValue>=1,.05,targetValue)))
+      startRadius <- as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))),probs = ifelse(targetValue>=1,.05,targetValue)))
     } else {
       startRadius <- seq(0,1.5,by=0.001)
     }
@@ -1276,7 +941,7 @@ crqa_radius <- function(RM = NULL,
       iterList$Radius[iter] <- dplyr::case_when(
         radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
         radiusOnFail%in%"huge" ~ 1 + max(RM),
-        radiusOnFail%in%"percentile" ~ as.numeric(quantile(unique(as.vector(Matrix::tril(RM,-1))),probs = ifelse(targetValue>=1,.05,targetValue)))
+        radiusOnFail%in%"percentile" ~ as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))),probs = ifelse(targetValue>=1,.05,targetValue)))
       )
       warning(paste0("\nTarget not found, try increasing tolerance, max. iterations, or, change value of startRadius.\nreturning radius: ",iterList$Radius[iter]))
     }
@@ -2995,8 +2660,8 @@ crp_prep <- function(RP,
 
 #' Inter-layer mutual information
 #'
+#' @param g0 An igraph objec representing a layer in a multiplex graph
 #' @param g1 An igraph objec representing a layer in a multiplex graph
-#' @param g2 An igraph objec representing a layer in a multiplex graph
 #' @param probTable Option to return the table with marginal and joint degree distribution probabilities (default = \code{TRUE})
 #'
 #' @return The inter-layer mutual information between \code{g1} and \code{g2}. If \code{probTable=TRUE}, a list object with two fields, the inter-layer mutual information and the table with marginal and joint degree distributions
@@ -3056,9 +2721,9 @@ il_mi <- function(g0,g1, probTable=FALSE){
 #' }
 
 
-#' @title  Distance to binary matrix
+#' @title Distance to binary matrix
 #'
-#' @description  Distance matrix to binary matrix based on threshold value
+#' @description Distance matrix to binary matrix based on threshold value
 #'
 #' @param distmat Distance matrix
 #' @param radius The radius or threshold value
@@ -3339,7 +3004,7 @@ sa2fd_sda <- function(sa, ...){return(1-sa)}
 #'
 RR <- function(y){
   # lag.max = n gives autocovariance of lags 0 ... n,
-  VAR  <- acf(y, lag.max = 1, type = 'covariance', plot=FALSE)
+  VAR  <- stats::acf(y, lag.max = 1, type = 'covariance', plot=FALSE)
   # RR formula
   RelR   <- 2*(1-VAR$acf[2] / VAR$acf[1])
   # Add some attributes to the output
@@ -3354,8 +3019,8 @@ RR <- function(y){
 #'
 #' @param y    A numeric vector or time series object.
 #' @param fs Sample rate (default = NULL)
-#' @param normalize    Normalize the series (default = TRUE).
-#' @param dtrend    Subtract linear trend from the series (default = TRUE).
+#' @param standardise    standardise the series (default = TRUE).
+#' @param detrend    Subtract linear trend from the series (default = TRUE).
 #' @param doPlot    Return the log-log spectrum with linear fit (default = FALSE).
 #'
 #' @author Fred Hasselman
@@ -3393,9 +3058,9 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FA
 
   N             <- length(y)
   # Simple linear detrending.
-  if(dtrend)    y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
-  # Normalize using N instead of N-1.
-  if(normalize) y <- (y - mean(y, na.rm = TRUE)) / (stats::sd(y, na.rm = TRUE)*sqrt((N-1)/N))
+  if(detrend)    y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
+  # standardise using N instead of N-1.
+  if(standardise) y <- (y - mean(y, na.rm = TRUE)) / (stats::sd(y, na.rm = TRUE)*sqrt((N-1)/N))
 
   # Number of frequencies estimated cannot be set! (defaults to Nyquist)
   # Use Tukey window: cosine taper with r = 0.5
@@ -3459,8 +3124,8 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FA
 #'
 #' @param y    A numeric vector or time series object.
 #' @param fs Sample rate (default = NULL)
-#' @param normalize Normalize the series (default = TRUE)
-#' @param dtrend Subtract linear trend from the series (default = TRUE)
+#' @param standardise standardise the series (default = TRUE)
+#' @param detrend Subtract linear trend from the series (default = TRUE)
 #' @param scales default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}
 #' @param fitRange Scale bins (\code{c(min,max)}) to use for fitting the scaling relation
 #' @param doPlot    Return the log-log spectrum with linear fit (default).
@@ -3501,7 +3166,7 @@ fd_sda <- function(y,
   N             <- length(y)
   # Simple linear detrending.
   if(detrend)   y <- ts_detrend(y) # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
-  # Normalize using N instead of N-1.
+  # standardise using N instead of N-1.
   if(standardiseBy){ts_standardise(y,type="mean.sd",adjustN = FALSE)}
 
   bins          <- which(fitRange[1]==scales):which(fitRange[2]==scales)
@@ -3514,7 +3179,7 @@ fd_sda <- function(y,
     graphics::plot(y,ylab = "Y", main = paste0('Full    sap: ', round(stats::coef(lmfit1)[2],digits=2), ' | H:', round(1+stats::coef(lmfit1)[2],digits=2), ' | FD:',round(sa2fd_sda(stats::coef(lmfit1)[2]),digits=2),'\nRange    sap: ', round(stats::coef(lmfit2)[2],digits=2), ' | H:', round(1+stats::coef(lmfit1)[2],digits=2), ' | FD:',round(sa2fd_sda(stats::coef(lmfit2)[2]),digits=2)))
     ifultools::splitplot(2,1,2)
     graphics::plot(log(out$sd) ~ log(out$scale), xlab="log(Bin Size)", ylab = "log(SD)")
-    graphics::lines(lmfit1$model$`log(out$scale)`,predict(lmfit1),lwd=3,col="darkred")
+    graphics::lines(lmfit1$model$`log(out$scale)`,stats::predict(lmfit1),lwd=3,col="darkred")
     graphics::lines(lmfit2$model$`log(out$scale[bins])`, stats::predict(lmfit2),lwd=3,col="darkblue")
     graphics::legend("bottomleft",c(paste0("Full (n = ",length(out$scale),")"), paste0("Range (n = ",length(bins),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
     graphics::par(old)
@@ -3539,7 +3204,7 @@ fd_sda <- function(y,
 #' @param checkSummationOrder checkSummationOrder
 #' @param checkNonStationarity checkNonStationarity
 #' @param checkNonHomogeneity checkNonHomogeneity
-#' @param fixVector fixVector
+#' @param fixNumericVector fixVector
 #' @param fixTimeVector fixTimeVector
 #' @param fixPow2 foxPow2
 #' @param fixNA fixNA
@@ -3571,12 +3236,12 @@ ts_checkfix <- function(y, checkNumericVector = TRUE, checkTimeVector = TRUE, ch
   }
 
   if(checkTimeVector){
-    if(grepl("(ts|mts|xts|zoo)",class(y))){txt <-paste0("has a time vector:",tsp(ts))} else {
+    if(grepl("(ts|mts|xts|zoo)",class(y))){txt <-paste0("has a time vector:",stats::tsp(y))} else {
       txt <- "does not have a time vector"
       if(is.list(fixTimeVector)){
-        if(all(names(fixTimeVector)%in%names(formals(ts)))){
+        if(all(names(fixTimeVector)%in%names(formals(stats::ts)))){
           fixTimeVector$data <- NULL
-          etxt <- paste0("ts(data = y, ",paste0(names(fixTimeVector)," = ",fixTimeVector,collapse = ", "),")")
+          etxt <- paste0("stats::ts(data = y, ",paste0(names(fixTimeVector)," = ",fixTimeVector,collapse = ", "),")")
           y <- eval(parse(text = paste(etxt)))
           txt <- paste(txt,"... FIXED by",etxt)
           rm(etxt)
@@ -3602,7 +3267,7 @@ ts_checkfix <- function(y, checkNumericVector = TRUE, checkTimeVector = TRUE, ch
 #' @param scaleMin   Minimium scale to use
 #' @param scaleResolution  The scales at which detrended fluctuation will be evaluated will are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}
 #' @param scaleS If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.
-#' @param overlap Turn DFA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The dtrended fluctuation in   For scale \code{128} this will be  (default = \code{0})
+#' @param overlap Turn DFA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})
 #' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
 #' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
 #' @param ... Other arguments
@@ -4638,6 +4303,7 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 #' @param action Use \code{"fill"} to fill the shortest vector with \code{padding} (default); \code{"trim.cut"} to trim the longest vector to the length of the shortest; \code{"trim.NA"} to fill the longest vector with \code{NA}. This is a shortcut for running \code{action = "trim.cut"} with \code{padding=NA}, which can be useful if one wants to match the shortest series, but preserve the original length of largest vector.
 #' @param type Should trimming or filling take place at the \code{"end"} (default), or \code{"front"} of the vector? The option \code{"center"} will try to distribute trimming by \code{NA} or filling by \code{padding} evenly across the front and end of the vector.
 #' @param padding A value to use for padding (default = \code{0})
+#' @param silent Run silent-ish
 #'
 #' @return A list with two vectors of equal length.
 #'
@@ -4756,11 +4422,6 @@ ts_windower <- function(y, win=length(y), step=round(win/2), overlap=NA, adjustY
 }
 
 
-
-
-
-
-
 #' Detrend a time series
 #'
 #' @param y A time series ot numeric vector
@@ -4811,7 +4472,7 @@ ts_levels <- function(y, minLevelChange=10, minLevelDuration=round(minLevelChang
                          cp = minLevelChange),
                        data=dfs)
 
-  dfs$p <- predict(tree, data.frame(x=x))
+  dfs$p <- stats::predict(tree, data.frame(x=x))
 
   return(list(tree  = tree,
               pred  = dfs))
@@ -5021,7 +4682,7 @@ nmissing <- function(x){
 
 #' Surrogate Test
 #'
-#' @param surrogatesValues Vector of measures based on surrogate time series
+#' @param surrogateValues Vector of measures based on surrogate time series
 #' @param observedValue The measure obtained from the observed value
 #' @param sides Is this a 1 or 2-sided test (default = \code{1})
 #' @param alpha Significane threshold for the test
@@ -5070,3 +4731,337 @@ fltrIT <- function(TS,f){
   return(signal::filtfilt(f=f,x=TS))
 }
 
+
+#' Elastic Scaler - A Flexible Rescale Function
+#'
+#' @description The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.
+#'
+#' @param x     Input vector or data frame.
+#' @param mn     Minimum value of original, defaults to \code{min(x, na.rm = TRUE)}.
+#' @param mx     Maximum value of original, defaults to \code{max(x, na.rm = TRUE)}.
+#' @param hi     Minimum value to rescale to, defaults to \code{0}.
+#' @param lo     Maximum value to rescale to, defaults to \code{1}.
+#'
+#'
+#' @details Three uses:
+#' \enumerate{
+#' \item elascer(x)             - Scale x to data range: min(x.out)==0;      max(x.out)==1
+#' \item elascer(x,mn,mx)       - Scale x to arg. range: min(x.out)==mn==0;  max(x.out)==mx==1
+#' \item elascer(x,mn,mx,lo,hi) - Scale x to arg. range: min(x.out)==mn==lo; max(x.out)==mx==hi
+#' }
+#'
+#' @return scaled inout
+#' @export
+#'
+#' @examples
+#' # Works on numeric objects
+#' somenumbers <- cbind(c(-5,100,sqrt(2)),c(exp(1),0,-pi))
+#'
+#' elascer(somenumbers)
+#' elascer(somenumbers,mn=-100)
+#
+#' # Values < mn will return < lo (default=0)
+#' # Values > mx will return > hi (default=1)
+#' elascer(somenumbers,mn=-1,mx=99)
+#'
+#' elascer(somenumbers,lo=-1,hi=1)
+#' elascer(somenumbers,mn=-10,mx=101,lo=-1,hi=4)
+elascer <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
+  UNLIST = FALSE
+  if(!is.data.frame(x)){UNLIST=TRUE}
+  x <- as.data.frame(x)
+  u <- x
+  for(i in 1:NCOL(x)){
+    mn=min(x[,i],na.rm=T)
+    mx=max(x[,i],na.rm=T)
+    if(mn>mx){warning("Minimum (mn) >= maximum (mx).")}
+    if(lo>hi){warning("Lowest scale value (lo) >= highest scale value (hi).")}
+    ifelse(mn==mx,{u[,i]<-rep(mx,length(x[,i]))},{
+      u[,i]<-(((x[i]-mn)*(hi-lo))/(mx-mn))+lo
+      id<-stats::complete.cases(u[,i])
+      u[!id,i]<-0
+    })
+  }
+  if(UNLIST){
+    u <- as.numeric(u[,1])
+  }
+  return(u)
+}
+
+# Rmd2htmlWP <- function(infile, outfile, sup = T) {
+#   require(markdown)
+#   require(knitr)
+#   mdOpt <- markdownHTMLOptions(default = T)
+#   mdOpt <- mdOpt[mdOpt != "mathjax"]
+#   mdExt <- markdownExtensions()
+#   mdExt <- mdExt[mdExt != "latex_math"]
+#   if (sup == T) {
+#     mdExt <- mdExt[mdExt != "superscript"]
+#   }
+#   knit2html(input = infile, output = outfile, options = c(mdOpt), extensions = c(mdExt))
+# }
+
+
+# [copied from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/ ]
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multi_PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+  if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+#' TRY ... CATCH
+#'
+#' @details
+#'  In longer simulations, aka computer experiments,
+#'  you may want to
+#'  1) catch all errors and warnings (and continue)
+#'  2) store the error or warning messages
+#'
+#'  Here's a solution  (see \R-help mailing list, Dec 9, 2010):
+#'
+#' Catch *and* save both errors and warnings, and in the case of
+#' a warning, also keep the computed result.
+#'
+#' @title tryCatch both warnings (with value) and errors
+#' @param expr an \R expression to evaluate
+#' @return a list with 'value' and 'warning', where value' may be an error caught.
+#' @author Martin Maechler; Copyright (C) 2010-2012  The R Core Team
+#' @export
+#' @keywords internal
+try_CATCH <- function(expr){
+  W <- NULL
+  w.handler <- function(w){ # warning handler
+    W <<- w
+    invokeRestart("muffleWarning")
+  }
+  list(value = withCallingHandlers(tryCatch(expr, error = function(e) e),
+                                   warning = w.handler),
+       warning = W)
+}
+
+
+#' Rose tinted infix
+#'
+#'
+#' @param x If \code{x} is any of \code{Inf,-Inf,NA,NaN,NULL,length(x)==0}, it will return \code{y}; otherwise it returns \code{x}.
+#' @param y The value to return in case of catastrophy \code{>00<}
+#'
+#' @export
+#' @author Fred Hasselman
+#' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
+#' @seealso purrrr::%||%
+#' @examples
+#' Inf %00% NA
+#'
+#' numeric(0) %00% ''
+#'
+#' NA %00% 0
+#'
+#' NaN %00% NA
+#'
+#' NULL %00% NA
+`%00%` <- function(x,y){
+  if(length(x)==0){
+    x <- y
+  } else{
+
+    for(i in seq_along(x)){
+      l0<-isna<-isnan<-isinf<-isnll<-isTryError<-FALSE
+      if(length(x[i])==0){
+        l0=TRUE
+      } else {
+        if(all(is.na(x[i])))       isna =TRUE
+        if(all(is.nan(x[i])))      isnan=TRUE
+        if(all(is.infinite(x[i]))) isinf=TRUE
+        if(all(is.null(x[i])))     isnll=TRUE
+        if(all(class(x[i])%in%"try-error")) isTryError=TRUE
+      }
+      if(any(l0,isna,isnan,isinf,isnll,isTryError)){x[i]<-y}
+    }
+  }
+  return(x)
+}
+
+
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5){
+  return(abs(x - round(x)) < tol)
+}
+
+#' Signed increment
+#'
+#' Increment an integer counter by an arbitrary (signed) interval.
+#'
+#' @param counter If \code{counter} and \code{increment} are both a (signed) integers \code{counter} will change by the value of \code{increment}.
+#' @param increment An integer value \eqn{\neq 0} to add to \code{counter}
+#'
+#' @export
+#' @author Fred Hasselman
+#' @seealso %++%
+#' @examples
+#'
+#' # Notice the difference between passing an object and a value for counter
+#'
+#' # Value
+#' (10 %+-% -5)
+#' (10 %+-% -5)
+#'
+#' # Object
+#' i <- 10
+#' (i %+-% -5)
+#' (i %+-% -5)
+#'
+#' # This means we can use the infix in a while ... statement
+#' while(i > -3) i %+-% -5
+#' # WARNING: As is the case for any while ... statement, be careful not to create an infinite loop!
+#'
+`%+-%` <- function(counter, increment){
+  if(is.na(counter%00%NA)|is.na(increment%00%NA)|!is.wholenumber(counter)|!is.wholenumber(increment)|increment==0){
+    stop("Don't know how to work with counter and/or increment argument.\n Did you use integers?")
+  } else{
+    result <- counter + increment
+    if(counter>0&result<=0){warning("Positive valued counter changed sign (counter <= 0)!")}
+    if(counter<0&result>=0){warning("Negative valued counter changed sign (counter >= 0)!")}
+    obj <- try_CATCH(as.numeric(deparse(substitute(counter))))
+    if(is.na(obj$value)){
+      eval(parse(text=paste(deparse(substitute(counter))," <<- result")))
+    } else {
+      return(result)
+    }
+  }
+}
+
+
+#' Positive increment
+#'
+#' Increment a counter by an arbitrary interval greater than 0.
+#'
+#' @param counter If \code{counter} \eqn{\ge 0} and \code{increment} \eqn{> 0} and are both integers, \code{counter} will change by the value of \code{increment}.
+#' @param increment An integer value \eqn{> 0} to add to \code{counter}
+#'
+#' @export
+#' @author Fred Hasselman
+#' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
+#' @seealso %+-%
+#' @examples
+#'
+#' # Notice the difference between passing an object and a value for counter
+#'
+#' # Value
+#' (0 %++% 5)
+#' (0 %++% 5)
+#'
+#' # Object
+#' i <- 0
+#' (i %+-% 5)
+#' (i %+-% 5)
+#'
+#' # This means we can use the infix in a while ... statement
+#' while(i < 20) i %+-% 5
+#' # WARNING: As is the case for any while ... statement, be careful not to create an infinite loop!
+#'
+`%++%` <- function(counter,increment){
+  if(is.na(counter%00%NA)|is.na(increment%00%NA)|!is.wholenumber(counter)|!is.wholenumber(increment)|increment<=0|counter<0){
+    stop("Don't know how to work with counter and/or increment argument.\n Did you use integers?")
+  } else{
+    result <- counter + increment
+    obj <- try_CATCH(as.numeric(deparse(substitute(counter))))
+    if(is.na(obj$value)){
+      eval(parse(text=paste(deparse(substitute(counter))," <<- result")))
+    } else {
+      return(result)
+    }
+  }
+}
+
+
+#' Repeat Copies of a Matrix
+#'
+#' @param X A matrix
+#' @param m Multiply dim(X)[1] m times
+#' @param n Multiply dim(X)[2] n times
+#'
+#' @return A repeated matrix
+#' @export
+#'
+repmat <- function(X,m,n){
+  #  REPMAT R equivalent of repmat (matlab)
+  #  FORMAT
+  #  DESC
+  #  description not available.
+
+  if (is.matrix(X))
+  {
+    mx = dim(X)[1]
+    nx = dim(X)[2]
+    out <- matrix(t(matrix(X,mx,nx*n)),mx*m,nx*n,byrow=T)
+  }
+  else if (is.vector(X)) {
+    mx = 1
+    nx = length(X)
+    out <- matrix(t(matrix(X,mx,nx*n)),mx*m,nx*n,byrow=T)
+  }
+  else if (length(X) == 1)
+  {
+    out <- matrix(X,m, n)
+  }
+  return (out)
+}
+
+
+
+#' @import DescTools
+#'
+NULL
+
+#' @importFrom magrittr %>%
+#'
+NULL
+
+#' @importFrom plyr .
+#'
+NULL
+
+#' @import ggplot2
+#'
+NULL
+
+#' @import multidplyr
+#'
+NULL

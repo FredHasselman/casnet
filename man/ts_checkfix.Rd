@@ -28,6 +28,8 @@ ts_checkfix(y, checkNumericVector = TRUE, checkTimeVector = TRUE,
 
 \item{checkNonHomogeneity}{checkNonHomogeneity}
 
+\item{fixNumericVector}{fixVector}
+
 \item{fixTimeVector}{fixTimeVector}
 
 \item{fixPow2}{foxPow2}
@@ -41,8 +43,6 @@ ts_checkfix(y, checkNumericVector = TRUE, checkTimeVector = TRUE,
 \item{fixNonStationarity}{fixNonStationarity}
 
 \item{fixNonHomogeneity}{fixNonHomogeneity}
-
-\item{fixVector}{fixVector}
 }
 \value{
 A 'check' report and/or a 'fixed' vector y.

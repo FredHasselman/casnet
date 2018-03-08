@@ -11,11 +11,11 @@ fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FALSE)
 
 \item{fs}{Sample rate (default = NULL)}
 
+\item{standardise}{standardise the series (default = TRUE).}
+
+\item{detrend}{Subtract linear trend from the series (default = TRUE).}
+
 \item{doPlot}{Return the log-log spectrum with linear fit (default = FALSE).}
-
-\item{normalize}{Normalize the series (default = TRUE).}
-
-\item{dtrend}{Subtract linear trend from the series (default = TRUE).}
 }
 \value{
 A list object containing:

@@ -1,6 +1,6 @@
 .onLoad <- function(libname, pkgname="casnet") {
   if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
-    cat("\nRU account detected...\n")
+    #cat("\nRU account detected...\n")
     RU <- TRUE
     ppath <- normalizePath(paste0("U:\\",paste0(strsplit(system.file(package="casnet"),"[/]")[[1]][-c(1,2)],collapse="/")), mustWork = TRUE)
     #execpath <- normalizePath(paste0(ppath,"/exec"), mustWork = TRUE)

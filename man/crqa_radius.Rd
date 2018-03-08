@@ -49,7 +49,9 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 
 \item{standardiseBy}{Standardise}
 
-\item{silent}{Silent}
+\item{radiusOnFail}{Radius to return when search fails \code{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \code{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \code{"percentile" = quantile(RM, prob = .05) of distances greater tham 0}.}
+
+\item{silent}{Silent-ish}
 }
 \value{
 A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)

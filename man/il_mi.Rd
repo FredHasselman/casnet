@@ -7,11 +7,11 @@
 il_mi(g0, g1, probTable = FALSE)
 }
 \arguments{
+\item{g0}{An igraph objec representing a layer in a multiplex graph}
+
 \item{g1}{An igraph objec representing a layer in a multiplex graph}
 
 \item{probTable}{Option to return the table with marginal and joint degree distribution probabilities (default = \code{TRUE})}
-
-\item{g2}{An igraph objec representing a layer in a multiplex graph}
 }
 \value{
 The inter-layer mutual information between \code{g1} and \code{g2}. If \code{probTable=TRUE}, a list object with two fields, the inter-layer mutual information and the table with marginal and joint degree distributions
