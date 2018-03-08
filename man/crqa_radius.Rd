@@ -9,7 +9,7 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
   targetMeasure = c("RR", "DET", "LAM", "T1", "all")[1], targetValue = 0.05,
   tol = 0.1, maxIter = 100, theiler = -1, histIter = FALSE,
   noiseLevel = 0.75, noiseType = c("normal", "uniform")[1],
-  plotROC = FALSE, standardiseBy = c("mean.sd", "median.mad", "none")[3],
+  plotROC = FALSE, standardise = c("mean.sd", "median.mad", "none")[3],
   radiusOnFail = c("tiny", "huge", "percentile")[1], silent = FALSE)
 }
 \arguments{
@@ -47,7 +47,7 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 
 \item{plotROC}{Generates an ROC plot if \code{type = "optimal"}}
 
-\item{standardiseBy}{Standardise}
+\item{standardise}{Standardise}
 
 \item{radiusOnFail}{Radius to return when search fails \code{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \code{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \code{"percentile" = quantile(RM, prob = .05) of distances greater tham 0}.}
 

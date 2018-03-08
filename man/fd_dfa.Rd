@@ -5,7 +5,7 @@
 \title{Detrended Fluctuation Analysis (DFA)}
 \usage{
 fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
-  polyOrder = 1, standardiseBy = c("mean.sd", "median.mad")[1],
+  polyOrder = 1, standardise = c("mean.sd", "median.mad")[1],
   adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)),
   scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4,
   doPlot = FALSE, ...)
@@ -19,7 +19,7 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
 
 \item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
 
-\item{standardiseBy}{Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")}
+\item{standardise}{Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
 \item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg) (default = \code{TRUE})}
 

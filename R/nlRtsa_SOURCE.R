@@ -469,7 +469,7 @@ crqa_cl <- function(y1,
     df_par   <- plyr::ldply(dfList, .id="window")
     group    <- rep(1:cores_available, each=(win+1), length.out=nrow(df_par))
     df_par$window   <- paste("Cluster:",group,"|",df_par$window)
-    cl       <- multidplyr::create_cluster(cores_available)
+    cl       <- parallel::create_cluster(cores_available)
     by_group <- df_par %>% multidplyr::partition(window, cluster = cl)
 
     by_group %>%
@@ -813,7 +813,7 @@ crqa_parameters <- function(y,
 #' @param noiseLevel Noise level to construct the \code{signal + noiseLevel *} \eqn{N(\mu=0,\sigma=1)} (default = \code{0.75})
 #' @param noiseType Type
 #' @param plotROC Generates an ROC plot if \code{type = "optimal"}
-#' @param standardiseBy Standardise
+#' @param standardise Standardise
 #' @param radiusOnFail Radius to return when search fails \code{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \code{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \code{"percentile" = quantile(RM, prob = .05) of distances greater tham 0}.
 #' @param silent Silent-ish
 #'
@@ -839,7 +839,7 @@ crqa_radius <- function(RM = NULL,
                         noiseLevel     = 0.75,
                         noiseType      = c("normal","uniform")[1],
                         plotROC        = FALSE,
-                        standardiseBy  = c("mean.sd","median.mad","none")[3],
+                        standardise  = c("mean.sd","median.mad","none")[3],
                         radiusOnFail   = c("tiny","huge","percentile")[1],
                         silent         = FALSE){
 
@@ -955,7 +955,7 @@ crqa_radius <- function(RM = NULL,
 
     if(optimOK){
 
-      if(!silent){cat(paste0("\nNormalisation set to: ",standardiseBy,"!!\n"))}
+      if(!silent){cat(paste0("\nNormalisation set to: ",standardise,"!!\n"))}
 
       startRadius <- rep(startRadius, each = eachRadius)
 
@@ -964,7 +964,7 @@ crqa_radius <- function(RM = NULL,
                                                                emLag = emLag,
                                                                radius = r,
                                                                noiseLevel = noiseLevel,
-                                                               standardiseBy = standardiseBy,
+                                                               standardise = standardise,
                                                                noiseType = noiseType)},
                              .progress = progress_text(char = "ʘ‿ʘ"))
 
@@ -1113,18 +1113,18 @@ crqa_radius <- function(RM = NULL,
 #' @param emDim embedding Dims
 #' @param emLag embedding Lag
 #' @param noiseLevel noise Level
-#' @param standardiseBy Standardise y? Choose from "mean.sd","median.mad","none".
+#' @param standardise Standardise y? Choose from "mean.sd","median.mad","none".
 #' @param noiseType Use a Normal distribution of uniform distribution for noiselevels
 #'
 #' @return data frame for ROC
 #' @export
 #'
 #' @keywords internal
-roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardiseBy = c("mean.sd","median.mad","none")[3], noiseType = c("normal","uniform")[1]){
+roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise = c("mean.sd","median.mad","none")[3], noiseType = c("normal","uniform")[1]){
   y <- dplyr::case_when(
-    standardiseBy == "mean.sd"   ~ ts_standardise(y, type="mean.sd"),
-    standardiseBy == "median.sd" ~ ts_standardise(y, type="median.mad"),
-    standardiseBy == "none"      ~ y
+    standardise == "mean.sd"   ~ ts_standardise(y, type="mean.sd"),
+    standardise == "median.sd" ~ ts_standardise(y, type="median.mad"),
+    standardise == "none"      ~ y
   )
 
   yn <- case_when(
@@ -3167,7 +3167,7 @@ fd_sda <- function(y,
   # Simple linear detrending.
   if(detrend)   y <- ts_detrend(y) # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
   # standardise using N instead of N-1.
-  if(standardiseBy){ts_standardise(y,type="mean.sd",adjustN = FALSE)}
+  if(standardise){ts_standardise(y,type="mean.sd",adjustN = FALSE)}
 
   bins          <- which(fitRange[1]==scales):which(fitRange[2]==scales)
   out           <- fractal::dispersion(y, front = FALSE)
@@ -3261,7 +3261,7 @@ ts_checkfix <- function(y, checkNumericVector = TRUE, checkTimeVector = TRUE, ch
 #' @param fs   Sample rate
 #' @param removeTrend Method to use for detrending, see \code{\link[fractal]{DFA}} (default = "poly")
 #' @param polyOrder Order of polynomial trend to remove if \code{removeTrend = "poly"}
-#' @param standardiseBy Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")
+#' @param standardise Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")
 #' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg) (default = \code{TRUE})
 #' @param scaleMax   Maximum scale to use
 #' @param scaleMin   Minimium scale to use
@@ -3291,7 +3291,7 @@ ts_checkfix <- function(y, checkNumericVector = TRUE, checkTimeVector = TRUE, ch
 #'
 #' @family FD estimators
 #'
-fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1], polyOrder=1, standardiseBy = c("mean.sd","median.mad")[1], adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4, doPlot = FALSE, ...){
+fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1], polyOrder=1, standardise = c("mean.sd","median.mad")[1], adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4, doPlot = FALSE, ...){
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
@@ -3312,8 +3312,8 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
   }
 
   # Standardise by N
-  if(any(standardiseBy%in%c("mean.sd","median.mad"))){
-    y <- ts_standardise(y, type = standardiseBy,  adjustN = FALSE)
+  if(any(standardise%in%c("mean.sd","median.mad"))){
+    y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
   }
 
   if(adjustSumOrder){
@@ -3326,17 +3326,17 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
     # Adjust TS by global H
     Hadj <- 0
     if((Hglobal>1.2)&(Hglobal<1.8)){
-      Y <- diff(y)
+      y <- diff(y)
       Hadj=1}
     if(Hglobal>1.8){
-      Y <- diff(diff(y))
+      y <- diff(diff(y))
       Hadj <- 2}
     if(Hglobal<0.2){
-      Y <- ts_integrate(ts_center(y))
+      y <- ts_integrate(ts_center(y))
       Hadj <- -1}
   }
 
-  TSm    <- as.matrix(cbind(t=1:NROW(Y),y=Y))
+  TSm    <- as.matrix(cbind(t=1:NROW(Y),y=y))
   DFAout <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder, returnPLAW = TRUE, returnSegments = TRUE)
 
    fitRange <- which(lapply(DFAout$segments,NROW)>=minData)
@@ -3349,7 +3349,7 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
   if(doPlot){
     graphics::plot.new()
     old <- ifultools::splitplot(2,1,1)
-    graphics::plot(Y,ylab = "Y", main = paste0('Full    sap: ', round(lmfit1$coefficients[2], digits=2), ' | H:',
+    graphics::plot(y,ylab = "Y", main = paste0('Full    sap: ', round(lmfit1$coefficients[2], digits=2), ' | H:',
                                      round(H1,digits=2), ' | FD:',
                                      round(sa2fd_dfa(stats::coef(lmfit1)[2]),digits=2),'\nRange    sap: ',
                                      round(lmfit2$coefficients[2],digits=2), ' | H:',
@@ -3411,7 +3411,7 @@ MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
   qRegLine  <- vector("list",length(qq))
   Hq        <- numeric(length(qq))
 
-  Y        <- cumsum(signal-mean(signal))
+  y        <- cumsum(signal-mean(signal))
   TSm      <- as.matrix(cbind(t=1:length(Y),y=Y))
   Hglobal  <- monoH(TSm,scale)
 
