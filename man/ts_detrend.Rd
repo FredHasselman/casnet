@@ -4,12 +4,12 @@
 \alias{ts_detrend}
 \title{Detrend a time series}
 \usage{
-ts_detrend(y, order = 1)
+ts_detrend(y, polyOrder = 1)
 }
 \arguments{
 \item{y}{A time series ot numeric vector}
 
-\item{order}{order Order of polynomial trend to remove}
+\item{polyOrder}{order Order of polynomial trend to remove}
 }
 \value{
 Residuals after detrending polynomial of order \code{order}

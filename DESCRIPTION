@@ -47,7 +47,9 @@ Imports: dplyr,
     pROC,
     purrr,
     future,
-    rpart
+    rpart,
+    doFuture,
+    multidplyr
 Suggests: knitr,
     rmarkdown,
     graphics,

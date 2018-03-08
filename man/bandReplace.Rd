@@ -4,16 +4,18 @@
 \alias{bandReplace}
 \title{Replace matrix diagonals}
 \usage{
-bandReplace(mat, lower, upper, value = NA)
+bandReplace(mat, lower, upper, value = NA, silent = TRUE)
 }
 \arguments{
 \item{mat}{A Matrix}
 
-\item{lower}{Lower diagonal to be included in the band (should be $\\leq 0$)}
+\item{lower}{Lower diagonal to be included in the band (should be \eqn{\le 0})}
 
-\item{upper}{Upper diagonal to be included in the band (should be $\\geq 0$)}
+\item{upper}{Upper diagonal to be included in the band (should be \eqn{\ge 0})}
 
-\item{value}{A single value to replace all values in the selected band}
+\item{value}{A single value to replace all values in the selected band (default = \code{NA})}
+
+\item{silent}{Operate in silence, only (some) warnings will be shown (default = \code{TRUE})}
 }
 \value{
 A matrix in which the values in the selected diagonals have been replaced
@@ -29,7 +31,7 @@ m <- Matrix(rnorm(10),10,10)
 bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands with 0 (Theiler window of 1)
 }
 \seealso{
-Other Distance Matrix operations: \code{\link{di2bi}},
+Other Distance matrix operations: \code{\link{di2bi}},
   \code{\link{di2we}}, \code{\link{dist_hamming}},
   \code{\link{lineDists}}, \code{\link{nzdiags}},
   \code{\link{recmat_plot}}, \code{\link{recmat_size}},

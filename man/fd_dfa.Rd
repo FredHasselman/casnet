@@ -7,7 +7,8 @@
 fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
   polyOrder = 1, standardiseBy = c("mean.sd", "median.mad")[1],
   adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)),
-  scaleResolution = 30, scaleS = NA, overlap = 0, doPlot = FALSE, ...)
+  scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4,
+  doPlot = FALSE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -30,9 +31,13 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
 
 \item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.}
 
-\item{overlap}{A number between \code{0 and 1} representing the proportion of bin overlap (default = \code{0})}
+\item{overlap}{Turn DFA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The dtrended fluctuation in   For scale \code{128} this will be  (default = \code{0})}
+
+\item{minData}{Minimum number of data points in a bin needed to calculate detrended fluctuation}
 
 \item{doPlot}{Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).}
+
+\item{...}{Other arguments}
 }
 \value{
 Estimate of Hurst exponent (slope of \code{log(bin)} vs. \code{log(RMSE))} and an FD estimate based on Hasselman(2013)

@@ -20,7 +20,7 @@ A matrix with 0s and leaves the values < threshold distance value
 Distance matrix to weighted matrix based on threshold value
 }
 \seealso{
-Other Distance Matrix operations: \code{\link{bandReplace}},
+Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{dist_hamming}},
   \code{\link{lineDists}}, \code{\link{nzdiags}},
   \code{\link{recmat_plot}}, \code{\link{recmat_size}},

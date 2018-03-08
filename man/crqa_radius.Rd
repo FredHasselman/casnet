@@ -10,7 +10,7 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
   tol = 0.1, maxIter = 100, theiler = -1, histIter = FALSE,
   noiseLevel = 0.75, noiseType = c("normal", "uniform")[1],
   plotROC = FALSE, standardiseBy = c("mean.sd", "median.mad", "none")[3],
-  silent = FALSE)
+  radiusOnFail = c("tiny", "huge", "percentile")[1], silent = FALSE)
 }
 \arguments{
 \item{RM}{Unthresholded Recurrence Matrix}
@@ -25,11 +25,11 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 
 \item{type}{Either \code{"fixed"} (default) or \code{"optimal"}, \code{"fixed"} will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}, \code{"optimal"} will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.}
 
-\item{startRadius}{If \code{type = "fixed"} this is the starting value for the radius (default = 10\% of the maxumum distance in RM). If \code{type = "optimal"} this will be a range of radius values (in normalised SD units) that will be considered (default = \code{seq(0,2,by=.01)})}
+\item{startRadius}{If \code{type = "fixed"} this is the starting value for the radius (default = percentile of unique distances in RM given by \code{targetValue}). If \code{type = "optimal"} this will be a range of radius values (in normalised SD units) that will be considered (default = \code{seq(0,2,by=.01)})}
 
-\item{eachRadius}{If \code{type = "optim"} this is the number of signal and noise series that will be generated for each level in \code{startRadius} (default = \code{1})}
+\item{eachRadius}{If \code{type = "optimal"} this is the number of signal and noise series that will be generated for each level in \code{startRadius} (default = \code{1})}
 
-\item{targetMeasure}{If \code{type} is set to \code{"optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option \code{type = "all"} will report all the optimal values obtained from one realisation of \code{startRadius * eachRadius} signal and noise series.}
+\item{targetMeasure}{If \code{type = "optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option \code{targetMeasure = "all"} will report all the optimal values obtained from one realisation of \code{startRadius * eachRadius} signal and noise series.}
 
 \item{targetValue}{When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).}
 
@@ -58,7 +58,7 @@ A dataframe listing settings ussed to search for the radius, the radius found gi
 Find fixed or optimal radius
 }
 \seealso{
-Other Recurrence Quantification Analysis: \code{\link{crqa_cl_main}},
-  \code{\link{crqa_cl}}, \code{\link{crqa_mat_measures}},
-  \code{\link{crqa_mat}}, \code{\link{crqa_parameters}}
+Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
+  \code{\link{crqa_mat_measures}}, \code{\link{crqa_mat}},
+  \code{\link{crqa_parameters}}
 }

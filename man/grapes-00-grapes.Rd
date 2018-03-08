@@ -26,7 +26,7 @@ NaN \%00\% NA
 NULL \%00\% NA
 }
 \seealso{
-purrr::%||%
+purrrr::%||%
 }
 \author{
 Fred Hasselman

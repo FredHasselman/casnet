@@ -20,7 +20,7 @@ A hamming-distance matrix of X, or X and Y. Useful for ordered and unordered cat
 Calculate Hamming distance
 }
 \seealso{
-Other Distance Matrix operations: \code{\link{bandReplace}},
+Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{di2we}},
   \code{\link{lineDists}}, \code{\link{nzdiags}},
   \code{\link{recmat_plot}}, \code{\link{recmat_size}},

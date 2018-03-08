@@ -13,7 +13,7 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
   plot_recmat = c("noplot", "recmat", "distmat")[[1]],
   path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
   path_out = NULL, file_ID = NULL, silent = TRUE, surrogateTest = FALSE,
-  targetValue = 0.05, ...)
+  targetValue = 0.05, useParallel = FALSE, ...)
 }
 \arguments{
 \item{y1}{Time series 1}
@@ -40,6 +40,8 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{distNorm}{One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
 
+\item{standardise}{Standardise data}
+
 \item{returnMeasures}{Return the (C)RQA measures? (default = \code{TRUE})}
 
 \item{returnRPvector}{Return the recurrent points in a dataframe? (default = \code{FALSE})}
@@ -62,9 +64,9 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}. This is useful for windowed analysis, it will estimate a new radius for each window.}
 
-\item{...}{Additional parameters (currently not used)}
+\item{useParallel}{Speed up calculations by using the parallel processing options provided by \code{\link[multidplyr]{partition}} to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr]{map2}} to assign data and \code{\link[parallel]{detectCores}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
 
-\item{Standardise}{Standardise data}
+\item{...}{Additional parameters (currently not used)}
 }
 \value{
 A list object containing 1-3 elements, depending on arguments requesting output.
@@ -131,7 +133,7 @@ Some notes on resolving errors with \code{rp}.The script will first try to downl
 }
 
 \seealso{
-Other Recurrence Quantification Analysis: \code{\link{crqa_cl_main}},
-  \code{\link{crqa_mat_measures}}, \code{\link{crqa_mat}},
-  \code{\link{crqa_parameters}}, \code{\link{crqa_radius}}
+Other Recurrence Quantification Analysis: \code{\link{crqa_mat_measures}},
+  \code{\link{crqa_mat}}, \code{\link{crqa_parameters}},
+  \code{\link{crqa_radius}}
 }

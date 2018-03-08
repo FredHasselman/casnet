@@ -2,23 +2,19 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{crqa_cl_main}
 \alias{crqa_cl_main}
-\title{crqa_cl_main [internal]}
+\title{crqa_cl_main}
 \usage{
-crqa_cl_main(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA,
-  DLmin = 2, VLmin = 2, theiler = 0, win = min(length(y1),
-  ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm = TRUE),
-  step = step, JRP = FALSE, distNorm = c("EUCLIDEAN", "MAX", "MIN",
-  "OP")[[1]], returnMeasures = TRUE, returnRPvector = FALSE,
-  returnLineDist = FALSE, plot_recmat = c("noplot", "recmat",
-  "distmat")[[1]], path_to_rp = getOption("casnet.path_to_rp"),
-  saveOut = FALSE, path_out = NULL, file_ID = NULL, silent = TRUE,
-  targetValue = 0.05, ...)
+crqa_cl_main(data, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
+  VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
+  (length(y1) + 1), length(y2)), na.rm = TRUE), step = step, JRP = FALSE,
+  distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]], returnMeasures = TRUE,
+  returnRPvector = FALSE, returnLineDist = FALSE,
+  plot_recmat = c("noplot", "recmat", "distmat")[[1]],
+  path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
+  path_out = NULL, file_ID = NULL, silent = TRUE, targetValue = 0.05,
+  useParallel = FALSE, ...)
 }
 \arguments{
-\item{y1}{y1}
-
-\item{y2}{y1}
-
 \item{emDim}{y1}
 
 \item{emLag}{y1}
@@ -59,14 +55,13 @@ crqa_cl_main(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA,
 
 \item{...}{}
 
+\item{y1}{y1}
+
+\item{y2}{y1}
+
 \item{returnDistance}{y1}
 }
 \description{
-crqa_cl_main [internal]
-}
-\seealso{
-Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
-  \code{\link{crqa_mat_measures}}, \code{\link{crqa_mat}},
-  \code{\link{crqa_parameters}}, \code{\link{crqa_radius}}
+crqa_cl_main
 }
 \keyword{internal}

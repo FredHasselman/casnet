@@ -42,8 +42,8 @@ crqa_mat_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 Use `crqa_mat`
 }
 \seealso{
-Other Recurrence Quantification Analysis: \code{\link{crqa_cl_main}},
-  \code{\link{crqa_cl}}, \code{\link{crqa_mat}},
-  \code{\link{crqa_parameters}}, \code{\link{crqa_radius}}
+Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
+  \code{\link{crqa_mat}}, \code{\link{crqa_parameters}},
+  \code{\link{crqa_radius}}
 }
 \keyword{internal}

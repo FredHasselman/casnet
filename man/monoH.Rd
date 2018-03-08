@@ -4,14 +4,15 @@
 \alias{monoH}
 \title{mono Hurst}
 \usage{
-monoH(TSm, scaleS, order = 1)
+monoH(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE,
+  returnSegments = FALSE)
 }
 \arguments{
-\item{TSm}{TS}
+\item{TSm}{TS matrix with 2 columns \code{t} (1st) and \code{y} (second)}
 
-\item{scaleS}{scales}
+\item{scaleS}{scales to evaluate}
 
-\item{order}{order}
+\item{polyOrder}{If numeric: order to use for polynomial detrendiing, if "adaptive" will use the best fitting polynomial.}
 }
 \description{
 mono Hurst

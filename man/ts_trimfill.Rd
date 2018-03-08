@@ -5,14 +5,14 @@
 \title{Trim or Fill Vectors}
 \usage{
 ts_trimfill(x, y, action = c("fill", "trim.cut", "trim.NA")[1],
-  type = c("end", "center", "front")[1], padding = 0)
+  type = c("end", "center", "front")[1], padding = 0, silent = TRUE)
 }
 \arguments{
 \item{x}{A numeric vector}
 
 \item{y}{A numeric vector}
 
-\item{action}{Use \code{"fill"} to fill the shortest vector with \code{padding} (default); \code{"trim.cut"} to trim the longest vector to the length of the shortest; \code{"trim.NA"} to fill the longest vector with \code{NA}}
+\item{action}{Use \code{"fill"} to fill the shortest vector with \code{padding} (default); \code{"trim.cut"} to trim the longest vector to the length of the shortest; \code{"trim.NA"} to fill the longest vector with \code{NA}. This is a shortcut for running \code{action = "trim.cut"} with \code{padding=NA}, which can be useful if one wants to match the shortest series, but preserve the original length of largest vector.}
 
 \item{type}{Should trimming or filling take place at the \code{"end"} (default), or \code{"front"} of the vector? The option \code{"center"} will try to distribute trimming by \code{NA} or filling by \code{padding} evenly across the front and end of the vector.}
 

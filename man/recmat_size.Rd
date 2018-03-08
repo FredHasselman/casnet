@@ -30,7 +30,7 @@ recmat_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
 recmat_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
 }
 \seealso{
-Other Distance Matrix operations: \code{\link{bandReplace}},
+Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{di2we}},
   \code{\link{dist_hamming}}, \code{\link{lineDists}},
   \code{\link{nzdiags}}, \code{\link{recmat_plot}},

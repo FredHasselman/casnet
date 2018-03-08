@@ -4,7 +4,7 @@
 \alias{fd_sda}
 \title{Standardised Dispersion Analysis (SDA).}
 \usage{
-fd_sda(y, fs = NULL, standardiseBy = TRUE, detrend = FALSE,
+fd_sda(y, fs = NULL, standardise = TRUE, detrend = FALSE,
   scales = fractal::dispersion(y)$scale, fitRange = c(scales[1],
   scales[length(scales) - 2]), doPlot = FALSE)
 }
