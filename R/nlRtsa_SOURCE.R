@@ -107,16 +107,16 @@ crqa_cl_main <- function(data,
 
   if(any(is.null(y2))|any(is.na(y2%00%NA))){
 
-    if(is.na(emRad)){
+   if(is.na(emRad)){
       if(!is.na(targetValue)){
-        emRad <- crqa_radius(y1 = y1, emDim = emDim, emLag = emLag,
-                             targetValue = targetValue, radiusOnFail = "percentile",  tol = .2,silent = silent)
-        if(emRad$Converged){
-          emRad <- emRad$Radius
-        } else {
-            emRad <-  emRad <- sd(c(y1,y2),na.rm = T)
-            }
-      }
+         emRad <- crqa_radius(y1 = y1, emDim = emDim, emLag = emLag,
+                              targetValue = targetValue, radiusOnFail = "percentile",  tol = .2,silent = silent)
+         if(emRad$Converged){
+           emRad <- emRad$Radius
+         } else {
+             emRad <-  emRad <- sd(c(y1,y2),na.rm = T)
+             }
+       }
     }
     opts <- paste("-i", shQuote(tmpf1),
                   "-r", shQuote(plotOUT),
@@ -166,17 +166,17 @@ crqa_cl_main <- function(data,
   ## RCMD
   devtools::RCMD(paste0(getOption("casnet.rp_prefix"),getOption("casnet.rp_command")), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = silent)
 
-  measures     <- try_CATCH(utils::read.table(normalizePath(gsub("[']+","",measOUT)),header=TRUE))
-  rpMAT        <- try_CATCH(utils::read.table(normalizePath(gsub("[']+","",plotOUT)),header=TRUE))
-  disthistDiag <- try_CATCH(utils::read.table(normalizePath(gsub("[']+","",histOUTdiag)),header=TRUE))
-  disthistHori <- try_CATCH(utils::read.table(normalizePath(gsub("[']+","",histOUThori)),header=TRUE))
+  measures     <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",measOUT)),header=TRUE))
+  rpMAT        <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",plotOUT)),header=TRUE))
+  disthistDiag <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",histOUTdiag)),header=TRUE))
+  disthistHori <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",histOUThori)),header=TRUE))
 
   if(all(is.null(measures$warning),is.data.frame(measures$value))){
     measures <- measures$value
   } else {
     measures <- rbind.data.frame(rep(NA,length(RQAmeasures)))
   }
-  colnames(measures) <- gsub("[#]RR","RR",colnames(measures))
+  colnames(measures) <- gsub("(#RR)|(X.RR)","RR",colnames(measures))
   measures <- cbind.data.frame(measures, emDim=emDim, emLag=emLag, emRad=emRad, DLmin=DLmin, VLmin=VLmin, distNorm =distNorm)
 
   if(all(is.null(rpMAT$warning),is.data.frame(rpMAT$value))){
@@ -325,7 +325,7 @@ crqa_cl <- function(y1,
                     step    = win,
                     JRP     = FALSE,
                     distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-                    standardise   = c("mean.sd","median.mad")[1],
+                    standardise   = c("none","mean.sd","median.mad")[1],
                     returnMeasures = TRUE,
                     returnRPvector = FALSE,
                     returnLineDist = FALSE,
@@ -886,7 +886,7 @@ crqa_radius <- function(RM = NULL,
     RM <- recmat(y1=y1, y2=y2,emDim=emDim, emLag=emLag)
   }
 
-  AUTO <- ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
+  AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
 
   if(AUTO){
     if(!silent){cat(paste0("\nAuto-recurrence: Setting diagonal to (1 + max. distance) for analyses\n"))}
@@ -895,7 +895,7 @@ crqa_radius <- function(RM = NULL,
 
   if(is.null(startRadius)){
     if(type=="fixed"){
-      startRadius <- as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))),probs = ifelse(targetValue>=1,.05,targetValue)))
+      startRadius <- as.numeric(stats::quantile(unique(as.vector(RM[lower.tri(RM)])),probs = ifelse(targetValue>=1,.05,targetValue)))
     } else {
       startRadius <- seq(0,1.5,by=0.001)
     }
@@ -906,8 +906,6 @@ crqa_radius <- function(RM = NULL,
   if(theiler>=0){
     RM <- bandReplace(RM,-theiler,theiler,1+max(RM),silent = silent)
   }
-
-
 
   if(type%in%"fixed"){
 
@@ -2720,7 +2718,7 @@ il_mi <- function(g0,g1, probTable=FALSE){
   equal$degree <- seq_along(equal[,1])-1
 
   # imiAB <- sum(equal$joint * log(equal$joint/(equal[,1]*equal[,2]+.Machine$double.eps))%00%0, na.rm = TRUE)
-  imiAB <- infotheo::mutinformation(p01,p10)
+  imiAB <- infotheo:::mutinformation(p01,p10)
   if(probTable){
     attributes(imiAB) <- list(miType = "inter-layer mutual information", probTable = equal)
   } else {
