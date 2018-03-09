@@ -1900,7 +1900,7 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
   warning("upper > 0 ...\n using: abs(upper)")
   }
   if(all(lower==0,upper==0)){
-    diag(mat) <- value
+    #diag(mat) <- value
     if(!silent){message(paste0("lower and upper are both 0 (no band, just diagonal)\n using: diag(mat) <- ",round(value,4),"..."))}
   }
 
