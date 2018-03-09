@@ -60,8 +60,8 @@ crqa_cl_main <- function(data,
     returnRPvector = FALSE
     returnLineDist = FALSE
   }
-  y1     <- data[["y1"]]
-  y2     <- data[["y2"]]
+  y1     <- data[,1]
+  y2     <- data[,2]
 
   fixedRR <- FALSE
   if(is.na(emRad)){fixedRR=TRUE}
@@ -466,67 +466,104 @@ crqa_cl <- function(y1,
      cores_available <- 1
    }
 
-    df_par   <- plyr::ldply(dfList, .id="window")
-    group    <- rep(1:cores_available, each=(win+1), length.out=nrow(df_par))
-    df_par$window   <- paste("Cluster:",group,"|",df_par$window)
-    cl       <- parallel::create_cluster(cores_available)
-    by_group <- df_par %>% multidplyr::partition(window, cluster = cl)
+    #df_par   <- plyr::ldply(dfList, .id="window")
+    #group    <- rep(1:cores_available, each=(win+1), length.out=nrow(df_par))
+    #df_par$window   <- paste("Cluster:",group,"|",df_par$window)
+    cl       <- parallel::makeCluster(cores_available)
+    #by_group <- df_par %>% multidplyr::partition(window, cluster = cl)
 
-    by_group %>%
-      cluster_library(c("devtools","utils","plyr","dplyr","tidyr","Matrix","pROC")) %>%
-      cluster_assign_value("crqa_cl_main", crqa_cl_main) %>%
-      cluster_assign_value("crqa_radius", crqa_radius) %>%
-      cluster_assign_value("emDim", emDim)  %>%
-      cluster_assign_value("emLag", emLag)  %>%
-      cluster_assign_value("emRad", emRad)  %>%
-      cluster_assign_value("DLmin", DLmin)  %>%
-      cluster_assign_value("VLmin", VLmin)  %>%
-      cluster_assign_value("theiler", theiler)  %>%
-      cluster_assign_value("JRP", JRP)  %>%
-      cluster_assign_value("distNorm", distNorm)  %>%
-      cluster_assign_value("returnMeasures", returnMeasures)  %>%
-      cluster_assign_value("returnRPvector", returnRPvector)  %>%
-      cluster_assign_value("returnLineDist", returnLineDist)  %>%
-      cluster_assign_value("plot_recmat", plot_recmat)  %>%
-      cluster_assign_value("path_to_rp", path_to_rp)  %>%
-      cluster_assign_value("saveOut", saveOut)  %>%
-      cluster_assign_value("path_out", path_out)  %>%
-      cluster_assign_value("file_ID", file_ID)  %>%
-      cluster_assign_value("silent", silent)  %>%
-      cluster_assign_value("targetValue", targetValue) %>%
-      cluster_assign_value("useParallel", useParallel)
+    parallel::clusterEvalQ(cl, library(devtools))
+    parallel::clusterEvalQ(cl,library(utils))
+    parallel::clusterEvalQ(cl,library(plyr))
+    parallel::clusterEvalQ(cl,library(tidyverse))
+    parallel::clusterEvalQ(cl,library(pROC))
+    parallel::clusterEvalQ(cl,library(Matrix))
+    parallel::clusterEvalQ(cl,library(casnet))
+
+    parallel::clusterExport(cl, varlist = c("data","emDim","emLag","emRad","DLmin","VLmin","theiler","win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp", "saveOut","path_out","file_ID","silent","targetValue", "useParallel"))
+
+      # cluster_library(c("devtools","utils","plyr","dplyr","tidyr","Matrix","pROC")) %>%
+      # cluster_assign_value("crqa_cl_main", crqa_cl_main) %>%
+      # cluster_assign_value("crqa_radius", crqa_radius) %>%
+      # cluster_assign_value("emDim", emDim)  %>%
+      # cluster_assign_value("emLag", emLag)  %>%
+      # cluster_assign_value("emRad", emRad)  %>%
+      # cluster_assign_value("DLmin", DLmin)  %>%
+      # cluster_assign_value("VLmin", VLmin)  %>%
+      # cluster_assign_value("theiler", theiler)  %>%
+      # cluster_assign_value("JRP", JRP)  %>%
+      # cluster_assign_value("distNorm", distNorm)  %>%
+      # cluster_assign_value("returnMeasures", returnMeasures)  %>%
+      # cluster_assign_value("returnRPvector", returnRPvector)  %>%
+      # cluster_assign_value("returnLineDist", returnLineDist)  %>%
+      # cluster_assign_value("plot_recmat", plot_recmat)  %>%
+      # cluster_assign_value("path_to_rp", path_to_rp)  %>%
+      # cluster_assign_value("saveOut", saveOut)  %>%
+      # cluster_assign_value("path_out", path_out)  %>%
+      # cluster_assign_value("file_ID", file_ID)  %>%
+      # cluster_assign_value("silent", silent)  %>%
+      # cluster_assign_value("targetValue", targetValue) %>%
+      # cluster_assign_value("useParallel", useParallel)
 
   #  parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp","saveOut","path_out","file_ID","silent","..."))
 
-    start <- proc.time()
 
-    wList <- by_group %>%
-      dplyr::do(crqa_cl_main(data = .,
-                             emDim          = emDim,
-                             emLag          = emLag,
-                             emRad          = emRad,
-                             DLmin          = DLmin,
-                             VLmin          = VLmin,
-                             theiler        = theiler,
-                             JRP            = JRP,
-                             distNorm       = distNorm,
-                             returnMeasures = returnMeasures,
-                             returnRPvector = returnRPvector,
-                             returnLineDist = returnLineDist,
-                             plot_recmat    = plot_recmat,
-                             path_to_rp     = path_to_rp,
-                             saveOut        = saveOut,
-                             path_out       = path_out,
-                             file_ID        = file_ID,
-                             silent         = silent,
-                             targetValue    = targetValue,
-                             useParallel    = useParallel)) %>%
-      dplyr::collect()
+  start <- proc.time()
 
-    time_elapsed_parallel <- proc.time() - start # End clock
 
-     cat("\nCompleted in:\n")
-     print(time_elapsed_parallel)
+  wList <- parallel::parLapply(cl,dfList,function(df){crqa_cl_main(data = df,
+                                                                       emDim          = emDim,
+                                                                       emLag          = emLag,
+                                                                       emRad          = emRad,
+                                                                       DLmin          = DLmin,
+                                                                       VLmin          = VLmin,
+                                                                       theiler        = theiler,
+                                                                       JRP            = JRP,
+                                                                       distNorm       = distNorm,
+                                                                       returnMeasures = returnMeasures,
+                                                                       returnRPvector = returnRPvector,
+                                                                       returnLineDist = returnLineDist,
+                                                                       plot_recmat    = plot_recmat,
+                                                                       path_to_rp     = path_to_rp,
+                                                                       saveOut        = saveOut,
+                                                                       path_out       = path_out,
+                                                                       file_ID        = file_ID,
+                                                                       silent         = silent,
+                                                                       targetValue    = targetValue,
+                                                                       useParallel    = useParallel)})
+
+  parallel::stopCluster(cl)
+  time_elapsed_parallel <- proc.time() - start # End clock
+
+  cat("\nCompleted in:\n")
+  print(time_elapsed_parallel)
+
+
+
+  #
+  # wList <- by_group %>%
+  # dplyr::do(crqa_cl_main(data = .,
+  #                        emDim          = emDim,
+  #                        emLag          = emLag,
+  #                        emRad          = emRad,
+  #                        DLmin          = DLmin,
+  #                        VLmin          = VLmin,
+  #                        theiler        = theiler,
+  #                        JRP            = JRP,
+  #                        distNorm       = distNorm,
+  #                        returnMeasures = returnMeasures,
+  #                        returnRPvector = returnRPvector,
+  #                        returnLineDist = returnLineDist,
+  #                        plot_recmat    = plot_recmat,
+  #                        path_to_rp     = path_to_rp,
+  #                        saveOut        = saveOut,
+  #                        path_out       = path_out,
+  #                        file_ID        = file_ID,
+  #                        silent         = silent,
+  #                        targetValue    = targetValue,
+  #                        useParallel    = useParallel)) %>%
+  #   dplyr::collect()
+
 
   # names(dfList)<-1:length(dfList)
  # evText <- ldply(seq_along(dfList), function(w) paste("getIt %<-% crqa_cl_main(data = dfList[[",w,"]], emDim = emDim, emLag = emLag, emRad = emRad, DLmin = DLmin, VLmin = VLmin, theiler = theiler, JRP = JRP, distNorm = distNorm, returnMeasures = returnMeasures, returnRPvector = returnRPvector, returnLineDist = returnLineDist, plot_recmat = plot_recmat, path_to_rp = path_to_rp, saveOut = saveOut, path_out = path_out, file_ID = file_ID, silent = silent, targetValue = targetValue)"))
@@ -1849,6 +1886,7 @@ dist_hamming <- function(X, Y=NULL, embedded=TRUE) {
 #'
 #' @family Distance matrix operations
 #' @author Fred Hasselman
+#'
 #'
 #' @examples
 #' # Create a 10 by 10 matrix
@@ -3336,7 +3374,7 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
       Hadj <- -1}
   }
 
-  TSm    <- as.matrix(cbind(t=1:NROW(Y),y=y))
+  TSm    <- as.matrix(cbind(t=1:NROW(y),y=y))
   DFAout <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder, returnPLAW = TRUE, returnSegments = TRUE)
 
    fitRange <- which(lapply(DFAout$segments,NROW)>=minData)
