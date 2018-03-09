@@ -19,35 +19,6 @@ A matrix with only 0s and 1s
 \description{
 Distance matrix to binary matrix based on threshold value
 }
-\details{
-#' Inter-layer entropy
-#'
-#' @param g1 An igraph objec representing a layer in a multiplex graph
-#' @param g2 An igraph objec representing a layer in a multiplex graph
-#' @param probTable Option to return the table with marginal and joint degree distribution probabilities (default = \code{TRUE})
-#'
-#' @return The inter-layer mutual information between \code{g1} and \code{g2}. If \code{probTable=TRUE}, a list object with two fields, the inter-layer mutual information and the table with marginal and joint degree distributions
-#' @export
-#'
-il_ent <- function(g0,g1, probTable=FALSE){
-  d0    <- igraph::degree_distribution(g0)
-  d1    <- igraph::degree_distribution(g1)
-  equal <- data.frame(ts_trimfill(d0,d1))
-
-p01 <- graphics::hist(x = igraph::degree(g0),breaks = seq(-.5,(NROW(equal)-.5)),plot=F)$counts
-  p10 <- graphics::hist(x = igraph::degree(g1),breaks = seq(-.5,(NROW(equal)-.5)),plot=F)$counts
-  equal$joint <-  (p01+p10) / sum(p01,p10,na.rm = TRUE)
-  equal$degree <- seq_along(equal[,1])-1
-
-imiAB <- sum(equal$joint * log(equal$joint/(equal[,1]*equal[,2]+.Machine$double.eps))%00%0, na.rm = TRUE)
-  if(probTable){
-    attributes(imiAB) <- list(miType = "inter-layer mutual information", probTable = equal)
-  } else {
-    attributes(imiAB) <- list(miType = "inter-layer mutual information")
-  }
-  return(imiAB)
-}
-}
 \seealso{
 Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{di2we}}, \code{\link{dist_hamming}},

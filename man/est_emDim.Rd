@@ -4,7 +4,7 @@
 \alias{est_emDim}
 \title{Estimate number of embedding dimensions}
 \usage{
-est_emDim(y, delay = est_eLag(y), maxDim = 20, threshold = 0.95,
+est_emDim(y, delay = est_emLag(y), maxDim = 20, threshold = 0.95,
   max.relative.change = 0.1, ...)
 }
 \arguments{

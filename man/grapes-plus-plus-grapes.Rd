@@ -36,7 +36,7 @@ while(i < 20) i \%+-\% 5
 
 }
 \seealso{
-%+-%
+function %+-%
 }
 \author{
 Fred Hasselman

@@ -114,7 +114,7 @@ crqa_cl_main <- function(data,
          if(emRad$Converged){
            emRad <- emRad$Radius
          } else {
-             emRad <-  emRad <- sd(c(y1,y2),na.rm = T)
+             emRad <-  emRad <- stats::sd(c(y1,y2),na.rm = T)
              }
        }
     }
@@ -139,7 +139,7 @@ crqa_cl_main <- function(data,
         if(emRad$Converged){
           emRad <- emRad$Radius
         } else {
-            emRad <- sd(c(y1,y2),na.rm = T)
+            emRad <- stats::sd(c(y1,y2),na.rm = T)
             }
       }
     }
@@ -408,7 +408,7 @@ crqa_cl <- function(y1,
 
   # Adjust time series lengths
   if((dplyr::last(wIndex)+win-NROW(df))>0){
-    #dplyr::add_row(df,y1=rep(NA,(dplyr::last(wIndex)+win-NROW(df))))}
+
     yy1 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,1])
     yy2 <- rep(NA,length(yy1))
     if(!all(is.na(df[,2]))){
@@ -568,7 +568,7 @@ crqa_cl <- function(y1,
   # names(dfList)<-1:length(dfList)
  # evText <- ldply(seq_along(dfList), function(w) paste("getIt %<-% crqa_cl_main(data = dfList[[",w,"]], emDim = emDim, emLag = emLag, emRad = emRad, DLmin = DLmin, VLmin = VLmin, theiler = theiler, JRP = JRP, distNorm = distNorm, returnMeasures = returnMeasures, returnRPvector = returnRPvector, returnLineDist = returnLineDist, plot_recmat = plot_recmat, path_to_rp = path_to_rp, saveOut = saveOut, path_out = path_out, file_ID = file_ID, silent = silent, targetValue = targetValue)"))
 
-   # wList <- llply(evText, function(w){eval(parse(text = paste(w)))}, .progress = plyr::progress_text(char = "ʘ‿ʘ"))
+   # wList <- llply(evText, function(w){eval(parse(text = paste(w)))}, .progress = plyr::progress_text(char = "~o~"))
 
   } else {
 
@@ -597,7 +597,7 @@ crqa_cl <- function(y1,
         file_ID        = file_ID,
         silent         = silent,
         targetValue    = targetValue)},
-      .progress = plyr::progress_text(char = "ʘ‿ʘ"))
+      .progress = plyr::progress_text(char = "o~o"))
 
 
     time_elapsed_parallel <- proc.time() - start # End clock
@@ -610,7 +610,7 @@ crqa_cl <- function(y1,
 
      rqa_measures <- rqa_rpvector <- rqa_diagdist <- rqa_horidist <- NA
   if(useParallel){
-    rqa_measures <- unnest(wList)
+    rqa_measures <-  tidyr::unnest(wList)
   } else {
     rqa_measures <-plyr::ldply(wList, function(l) l$measures) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
     rqa_rpvector <-plyr::ldply(wList, function(l) l$rpMAT) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
@@ -1001,7 +1001,7 @@ crqa_radius <- function(RM = NULL,
                                                                noiseLevel = noiseLevel,
                                                                standardise = standardise,
                                                                noiseType = noiseType)},
-                             .progress = progress_text(char = "ʘ‿ʘ"))
+                             .progress = plyr::progress_text(char = "o~o"))
 
 
       dfREC      <-  dplyr::arrange(dfREC,response,radius)
@@ -1086,8 +1086,8 @@ crqa_radius <- function(RM = NULL,
        }
 
        return(data.frame(measure = c("RR","DET","LAM","T1"),
-                         optimal = ldply(optimal.value)[-1],
-                         radius  = ldply(optimal.radius)[-1]
+                         optimal = plyr::ldply(optimal.value)[-1],
+                         radius  = plyr::ldply(optimal.radius)[-1]
                          )
               )
 
@@ -1162,7 +1162,7 @@ roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise =
     standardise == "none"      ~ y
   )
 
-  yn <- case_when(
+  yn <- dplyr::case_when(
     noiseType == "normal"  ~ stats::rnorm(NROW(y), mean=round(mean(y, na.rm = TRUE),3), sd=stats::sd(y,na.rm = TRUE)),
     noiseType == "uniform" ~ sign(rnorm(1))*stats::runif(NROW(y), min=floor(min(y, na.rm = TRUE)), max = ceiling(max(y,na.rm = TRUE)))
     )
@@ -1428,10 +1428,10 @@ crqa_mat <- function(RM,
   #                            Nboot  = Nboot,
   #                            CL     = CL)
   #
-  #   dfori <- gather(out, key = measure, value = value)
+  #   dfori <- dplyr::gather(out, key = measure, value = value)
   #
-  #   col.ind <- tbl_df(index(RM))
-  #   row.ind <- tbl_df(sample(index(RM),size=nrow(RM)))
+  #   col.ind <- dplyr::tbl_df(index(RM))
+  #   row.ind <- dplyr::tbl_df(sample(index(RM),size=nrow(RM)))
   #
   #   if(Nboot>1){cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations.\n"))
   #     bootout <- col.ind  %>%
@@ -1555,7 +1555,7 @@ est_emLag <- function(y,
 #' @return Embedding dimensions
 #' @export
 #'
-est_emDim <- function(y, delay = est_eLag(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
+est_emDim <- function(y, delay = est_emLag(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
   cbind.data.frame(EmbeddingLag   = delay,
                    EmbeddingDim   = nonlinearTseries::estimateEmbeddingDim(y,
                                                          time.lag  = delay,
@@ -1957,8 +1957,8 @@ recmat <- function(y1, y2=NULL,
   if(all(!is.null(to.ts),!is.null(order.by))){
 
     dmat <-  switch(to.ts,
-                    "xts" =  xts::xts(dmat, order.by = as_datetime(order.by)),
-                    "zoo" =  zoo::zoo(dmat, order.by = as_datetime(order.by))
+                    "xts" =  xts::xts(dmat, order.by = lubridate::as_datetime(order.by)),
+                    "zoo" =  zoo::zoo(dmat, order.by = lubridate::as_datetime(order.by))
     )
   }
   if(!is.null(order.by)){
@@ -2718,7 +2718,7 @@ il_mi <- function(g0,g1, probTable=FALSE){
   equal$degree <- seq_along(equal[,1])-1
 
   # imiAB <- sum(equal$joint * log(equal$joint/(equal[,1]*equal[,2]+.Machine$double.eps))%00%0, na.rm = TRUE)
-  imiAB <- infotheo:::mutinformation(p01,p10)
+  imiAB <- infotheo::mutinformation(p01,p10)
   if(probTable){
     attributes(imiAB) <- list(miType = "inter-layer mutual information", probTable = equal)
   } else {
@@ -2726,35 +2726,6 @@ il_mi <- function(g0,g1, probTable=FALSE){
   }
   return(imiAB)
 }
-
-#'
-#' #' Inter-layer entropy
-#' #'
-#' #' @param g1 An igraph objec representing a layer in a multiplex graph
-#' #' @param g2 An igraph objec representing a layer in a multiplex graph
-#' #' @param probTable Option to return the table with marginal and joint degree distribution probabilities (default = \code{TRUE})
-#' #'
-#' #' @return The inter-layer mutual information between \code{g1} and \code{g2}. If \code{probTable=TRUE}, a list object with two fields, the inter-layer mutual information and the table with marginal and joint degree distributions
-#' #' @export
-#' #'
-#' il_ent <- function(g0,g1, probTable=FALSE){
-#'   d0    <- igraph::degree_distribution(g0)
-#'   d1    <- igraph::degree_distribution(g1)
-#'   equal <- data.frame(ts_trimfill(d0,d1))
-#'
-#'   p01 <- graphics::hist(x = igraph::degree(g0),breaks = seq(-.5,(NROW(equal)-.5)),plot=F)$counts
-#'   p10 <- graphics::hist(x = igraph::degree(g1),breaks = seq(-.5,(NROW(equal)-.5)),plot=F)$counts
-#'   equal$joint <-  (p01+p10) / sum(p01,p10,na.rm = TRUE)
-#'   equal$degree <- seq_along(equal[,1])-1
-#'
-#'   imiAB <- sum(equal$joint * log(equal$joint/(equal[,1]*equal[,2]+.Machine$double.eps))%00%0, na.rm = TRUE)
-#'   if(probTable){
-#'     attributes(imiAB) <- list(miType = "inter-layer mutual information", probTable = equal)
-#'   } else {
-#'     attributes(imiAB) <- list(miType = "inter-layer mutual information")
-#'   }
-#'   return(imiAB)
-#' }
 
 
 #' @title Distance to binary matrix
@@ -4432,7 +4403,7 @@ ts_windower <- function(y, win=length(y), step=round(win/2), overlap=NA, adjustY
       if(is.null(adjustY)){
         stop("No valid arguments of ts_trimfill passed to adjustY!")
       } else {
-        adjustY<- llply(adjustY, function(e) if(is.character(e)){shQuote(e)} else {e})
+        adjustY<- plyr::llply(adjustY, function(e) if(is.character(e)){shQuote(e)} else {e})
         adjustOK <- TRUE
       }
     }
@@ -5014,7 +4985,7 @@ is.wholenumber <- function(x, tol = .Machine$double.eps^0.5){
 #' @export
 #' @author Fred Hasselman
 #' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
-#' @seealso %+-%
+#' @seealso  function %+-%
 #' @examples
 #'
 #' # Notice the difference between passing an object and a value for counter
@@ -5095,9 +5066,5 @@ NULL
 NULL
 
 #' @import ggplot2
-#'
-NULL
-
-#' @import multidplyr
 #'
 NULL
