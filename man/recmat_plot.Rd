@@ -4,8 +4,8 @@
 \alias{recmat_plot}
 \title{Plot (thresholded) distance matrix}
 \usage{
-recmat_plot(RM, PhaseSpaceScale = TRUE, title = "", doPlot = TRUE,
-  plotSurrogate = NA, plotMeasures = FALSE)
+recmat_plot(RM, PhaseSpaceScale = TRUE, title = "", xlab = "",
+  ylab = "", doPlot = TRUE, plotSurrogate = NA, plotMeasures = FALSE)
 }
 \arguments{
 \item{RM}{A distance matrix or recurrence matrix}

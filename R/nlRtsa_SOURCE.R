@@ -509,8 +509,6 @@ crqa_cl <- function(y1,
 
 
   start <- proc.time()
-
-
   wList <- parallel::parLapply(cl,dfList,function(df){crqa_cl_main(data = df,
                                                                        emDim          = emDim,
                                                                        emLag          = emLag,
@@ -602,7 +600,8 @@ crqa_cl <- function(y1,
 
     time_elapsed_parallel <- proc.time() - start # End clock
 
-    cat(paste("\nCompleted in",time_elapsed_parallel,"\n"))
+    cat(paste("\nCompleted in:\n"))
+    print(time_elapsed_parallel)
 
 
     } # useParallel
@@ -938,9 +937,11 @@ crqa_radius <- function(RM = NULL,
       iter <- iter+1
       #p$tick()$print()
 
-      crpOut <- crqa_mat(RM = RM, radius = tryRadius, AUTO=AUTO)
+      crpOut <- crqa_mat(RM = RM, threshold = tryRadius, AUTO=AUTO)
 
-      Measure  <-  crpOut %>% tidyr::spread(measure,value) %>% .[[targetMeasure]]
+      # Measure  <-  crpOut %>% tidyr::spread(measure,value) %>% .[[targetMeasure]]
+      Measure  <-  crpOut[[targetMeasure]]
+
 
       iterList[iter,] <-    cbind.data.frame(iter        = iter,
                                              Measure     = Measure,
@@ -1218,19 +1219,6 @@ crqa_mat_measures <- function(RM,
                               Nboot     = NULL,
                               CL        = .95){
 
-  # DLmin = 2
-  # VLmin = 2
-  # HLmin = 2
-  # DLmax = length(diag(RM))-1
-  # VLmax = length(diag(RM))-1
-  # HLmax = length(diag(RM))-1
-  # chromatic = FALSE
-  # matrices  = FALSE
-  # CL        = .95
-
-  #require(dplyr)
-
-  #if(AUTO){RM<-bandReplace(RM,lower = 0,upper = 0,value = NA)}
 
   if(is.null(Nboot)){Nboot = 1}
 
@@ -1264,6 +1252,7 @@ crqa_mat_measures <- function(RM,
   dfori <- tidyr::gather(as.data.frame(out), key = "measure", value = "value")
 
   if(Nboot>1){
+
 
     cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations...\n"))
     cat(paste0("Estimated duration: ", round((difftime(tend,tstart, units = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
@@ -1324,7 +1313,7 @@ crqa_mat_measures <- function(RM,
 
     }
   } else {
-    rqout <- dfori
+    rqout <- dfori %>% tidyr::spread(measure,value)
   }
   return(rqout)
 }
@@ -1357,7 +1346,7 @@ crqa_mat_measures <- function(RM,
 #'
 #'
 crqa_mat <- function(RM,
-                     radius= NULL,
+                     threshold = NULL,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
@@ -1378,13 +1367,13 @@ crqa_mat <- function(RM,
   #require(parallel)
 
   if(is.null(AUTO)){
-    AUTO <- ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
+    AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
   }
 
   #uval <- unique(as.vector(RM))
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
-    if(!is.null(radius)){
-      RM <- di2bi(RM,radius)
+    if(!is.null(threshold)){
+      RM <- di2bi(RM,threshold)
     } else{
       if(!chromatic){
         stop("Expecting a binary (0,1) matrix.\nUse 'crqa_radius()', or set 'chromatic = TRUE'")
@@ -1396,7 +1385,7 @@ crqa_mat <- function(RM,
   #rm(RM)
 
   out <- crqa_mat_measures(RM,
-                           radius = radius,
+                           radius = threshold,
                            DLmin = DLmin,
                            VLmin = VLmin,
                            HLmin = HLmin,
@@ -1997,24 +1986,36 @@ recmat <- function(y1, y2=NULL,
 #'
 #' @family Distance matrix operations
 #'
-recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, plotSurrogate = NA, plotMeasures = FALSE){
+recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", xlab = "", ylab="", doPlot = TRUE, plotSurrogate = NA, plotMeasures = FALSE){
 
-  AUTO <-ifelse(identical(as.vector(Matrix::tril(RM,-1)),as.vector(Matrix::tril(t(RM),-1))),TRUE,FALSE)
+  AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
 
   meltRP <- reshape2::melt(RM)
 
   if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
+
     unthresholded = TRUE
 
     # For presentation purpose only
     if(PhaseSpaceScale){
       meltRP$value <- elascer(meltRP$value)
+      RM <- RM / max(meltRP$value, na.rm = TRUE)
     }
+
+    if(plotMeasures){
+      epsilon <- crqa_radius(RM,silent = TRUE)$Radius
+      rpOUT   <- crqa_mat(RM,threshold = epsilon, AUTO = AUTO)
+    }
+
   } else {
     unthresholded = FALSE
     meltRP$value <- factor(meltRP$value)
-  }
 
+    if(plotMeasures){
+      rpOUT <- crqa_mat(RM, AUTO = AUTO)
+    }
+
+  }
 
   gRP <-  ggplot2::ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
     geom_raster()
@@ -2067,18 +2068,19 @@ recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, pl
 
   if(!is.null(attr(RM,"emDims1"))){
 
+
     gRP <- gRP + ylab("") + xlab("")
 
     y1 <- data.frame(t1=attr(RM,"emDims1"))
     y2 <- data.frame(t2=attr(RM,"emDims2"))
 
-  xdims <- attr(RM,"emDims1.name")
-  ydims <- attr(RM,"emDims2.name")
+  xdims <- ifelse(nchar(xlab)>0,xlab,attr(RM,"emDims1.name"))
+  ydims <- ifelse(nchar(ylab)>0,ylab,attr(RM,"emDims2.name"))
 
     # Y1
 
     colnames(y1) <- paste0("X",1:NCOL(y1))
-    y1$tm <- 1:NROW(y1)
+    y1$tm  <- 1:NROW(y1)
     y1$tmna <- 0
     y1$tmna[is.na(y1[,1])] <- y1$tm[is.na(y1[,1])]
     y1 <- tidyr::gather(y1,key="Dimension",value = "Value", -c("tm","tmna"))
@@ -2133,6 +2135,19 @@ recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, pl
   } else {
     gy1 <- gg_plotHolder()
     gy2 <- gg_plotHolder()
+    gRP <- gRP + xlab + ylab
+  }
+
+  if(plotMeasures){
+    rpOUT <- round(rpOUT,3)
+    rpOUTdat <- rpOUT %>% select(one_of(c("Radius","RT","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>% gather(key=measure,value=value) %>% mutate(x=rep(0,9),y=9:1)
+    rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
+
+    gA <-ggplot2::ggplot(rpOUTdat,aes(x=x,y=y)) +
+      geom_text(aes(label=label), family="mono", hjust="left", vjust="center", size=3) +
+      scale_x_continuous(limits = c(0,.3)) + theme_void()
+                         #geom="text", label = paste("Radius:",rpOUT$Radius,"\nRec points:",rpOUT$RT,"\nRR",rpOUT$RR,"\nDET:",rpOUT$DET,"\nMEAN_dl:",rpOUT$MEAN_dl,"\nENT_dl:",rpOUT$ENT_dl,"\nLAM_vl:",rpOUT$LAM_vl, "\nTT_vl:",rpOUT$TT_vl,"\nENTR_vl:",rpOUT$ENT_vl)) + theme_minimal() + theme(text = element_text(family = "mono"))
+                                              #,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
   }
 
   gr <- ggplot2::ggplotGrob(gRP)
@@ -2143,6 +2158,11 @@ recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", doPlot = TRUE, pl
   g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy2), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
   gindexX <- subset(g$layout, name == "layout")
   g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy1),13,6)
+
+  if(plotMeasures){
+    g <- gtable::gtable_add_cols(g, grid::unit(2, "cm"),0)
+    g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gA), t=gindexX$t, l=1, b=gindexX$b, r=gindexX$l)
+  }
 
   if(doPlot){
   grid::grid.newpage()

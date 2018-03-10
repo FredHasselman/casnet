@@ -4,15 +4,13 @@
 \alias{crqa_mat}
 \title{Get bootsrapped (C)RQA measures based on a recurrence matrix}
 \usage{
-crqa_mat(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
+crqa_mat(RM, threshold = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(diag(RM)) - 1, VLmax = length(diag(RM)) - 1,
   HLmax = length(diag(RM)) - 1, AUTO = NULL, chromatic = FALSE,
   matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95)
 }
 \arguments{
 \item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})}
-
-\item{radius}{Threshold for distance value that counts as a recurrence}
 
 \item{DLmin}{Minimal diagonal line length (default = \code{2})}
 
@@ -37,6 +35,8 @@ crqa_mat(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \item{Nboot}{How many bootstrap replications? (default = \code{NULL})}
 
 \item{CL}{Confidence limit for bootstrap results (default = \code{.95})}
+
+\item{radius}{Threshold for distance value that counts as a recurrence}
 }
 \value{
 A list object containing (C)RQA measures (and matrices if requested)
