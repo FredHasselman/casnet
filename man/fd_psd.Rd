@@ -4,18 +4,21 @@
 \alias{fd_psd}
 \title{Power Spectral Density Slope (PSD).}
 \usage{
-fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FALSE)
+fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FALSE,
+  silent = TRUE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
 
-\item{fs}{Sample rate (default = NULL)}
+\item{fs}{Sample rate (default = \code{NULL})}
 
-\item{standardise}{standardise the series (default = TRUE).}
+\item{standardise}{standardise the series (default = \code{TRUE}).}
 
-\item{detrend}{Subtract linear trend from the series (default = TRUE).}
+\item{detrend}{Subtract linear trend from the series (default = \code{TRUE}).}
 
-\item{doPlot}{Return the log-log spectrum with linear fit (default = FALSE).}
+\item{doPlot}{Return the log-log spectrum with linear fit (default = \code{FALSE}).}
+
+\item{silent}{Run in silent-ish mode (default = \code{TRUE)})}
 }
 \value{
 A list object containing:

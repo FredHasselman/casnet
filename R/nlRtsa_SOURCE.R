@@ -2074,8 +2074,8 @@ recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", xlab = "", ylab="
     y1 <- data.frame(t1=attr(RM,"emDims1"))
     y2 <- data.frame(t2=attr(RM,"emDims2"))
 
-  xdims <- ifelse(nchar(xlab)>0,xlab,attr(RM,"emDims1.name"))
-  ydims <- ifelse(nchar(ylab)>0,ylab,attr(RM,"emDims2.name"))
+    xdims <- ifelse(nchar(xlab)>0,xlab,attr(RM,"emDims1.name"))
+    ydims <- ifelse(nchar(ylab)>0,ylab,attr(RM,"emDims2.name"))
 
     # Y1
 
@@ -2106,12 +2106,12 @@ recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", xlab = "", ylab="
       coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
 
     # Y2
-      colnames(y2) <- paste0("Y",1:NCOL(y2))
-      y2$tm <- 1:NROW(y2)
-      y2$tmna <- 0
-      y2$tmna[is.na(y2[,1])] <- y2$tm[is.na(y2[,1])]
-      y2 <- tidyr::gather(y2,key="Dimension",value = "Value", -c("tm","tmna"))
-      y2$Value <-  elascer(y2$Value)
+    colnames(y2) <- paste0("Y",1:NCOL(y2))
+    y2$tm <- 1:NROW(y2)
+    y2$tmna <- 0
+    y2$tmna[is.na(y2[,1])] <- y2$tm[is.na(y2[,1])]
+    y2 <- tidyr::gather(y2,key="Dimension",value = "Value", -c("tm","tmna"))
+    y2$Value <-  elascer(y2$Value)
 
     gy2 <- ggplot2::ggplot(y2, aes(y=Value, x=tm, group=Dimension)) +
       geom_line(aes(colour=Dimension), show.legend = FALSE) +
@@ -2146,8 +2146,8 @@ recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", xlab = "", ylab="
     gA <-ggplot2::ggplot(rpOUTdat,aes(x=x,y=y)) +
       geom_text(aes(label=label), family="mono", hjust="left", vjust="center", size=3) +
       scale_x_continuous(limits = c(0,.3)) + theme_void()
-                         #geom="text", label = paste("Radius:",rpOUT$Radius,"\nRec points:",rpOUT$RT,"\nRR",rpOUT$RR,"\nDET:",rpOUT$DET,"\nMEAN_dl:",rpOUT$MEAN_dl,"\nENT_dl:",rpOUT$ENT_dl,"\nLAM_vl:",rpOUT$LAM_vl, "\nTT_vl:",rpOUT$TT_vl,"\nENTR_vl:",rpOUT$ENT_vl)) + theme_minimal() + theme(text = element_text(family = "mono"))
-                                              #,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
+    #geom="text", label = paste("Radius:",rpOUT$Radius,"\nRec points:",rpOUT$RT,"\nRR",rpOUT$RR,"\nDET:",rpOUT$DET,"\nMEAN_dl:",rpOUT$MEAN_dl,"\nENT_dl:",rpOUT$ENT_dl,"\nLAM_vl:",rpOUT$LAM_vl, "\nTT_vl:",rpOUT$TT_vl,"\nENTR_vl:",rpOUT$ENT_vl)) + theme_minimal() + theme(text = element_text(family = "mono"))
+    #,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
   }
 
   gr <- ggplot2::ggplotGrob(gRP)
@@ -2165,8 +2165,8 @@ recmat_plot <- function(RM, PhaseSpaceScale= TRUE, title = "", xlab = "", ylab="
   }
 
   if(doPlot){
-  grid::grid.newpage()
-  grid::grid.draw(g)
+    grid::grid.newpage()
+    grid::grid.draw(g)
   }
   return(invisible(g))
 }
@@ -2716,8 +2716,8 @@ crp_prep <- function(RP,
 
 #' Inter-layer mutual information
 #'
-#' @param g0 An igraph objec representing a layer in a multiplex graph
-#' @param g1 An igraph objec representing a layer in a multiplex graph
+#' @param g0 An igraph object representing a layer in a multiplex graph
+#' @param g1 An igraph object representing a layer in a multiplex graph
 #' @param probTable Option to return the table with marginal and joint degree distribution probabilities (default = \code{TRUE})
 #'
 #' @return The inter-layer mutual information between \code{g1} and \code{g2}. If \code{probTable=TRUE}, a list object with two fields, the inter-layer mutual information and the table with marginal and joint degree distributions
@@ -3045,10 +3045,11 @@ RR <- function(y){
 #' @description Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope.
 #'
 #' @param y    A numeric vector or time series object.
-#' @param fs Sample rate (default = NULL)
-#' @param standardise    standardise the series (default = TRUE).
-#' @param detrend    Subtract linear trend from the series (default = TRUE).
-#' @param doPlot    Return the log-log spectrum with linear fit (default = FALSE).
+#' @param fs Sample rate (default = \code{NULL})
+#' @param standardise    standardise the series (default = \code{TRUE}).
+#' @param detrend    Subtract linear trend from the series (default = \code{TRUE}).
+#' @param doPlot    Return the log-log spectrum with linear fit (default = \code{FALSE}).
+#' @param silent Run in silent-ish mode (default = \code{TRUE)})
 #'
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
@@ -3071,23 +3072,23 @@ RR <- function(y){
 #'
 #' A line is fitted on the periodogram in log-log coordinates. Two fit-ranges are used: The 25\% lowest frequencies and the Hurvich-Deo estimate (\code{\link[fractal]{HDEst}}).
 #'
-fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FALSE){
-  # require(pracma)
-  # require(fractal)
-  # require(sapa)
-  # require(ifultools)
+fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FALSE, silent = TRUE){
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
     y <- stats::ts(y, frequency = fs)
-    cat("\n\nfd.psd:\tSample rate was set to 1.\n\n")
+   if(!silent){cat("\n\nfd.psd:\tSample rate was set to 1.\n\n")}
   }
 
-  N             <- length(y)
+  N <- length(y)
   # Simple linear detrending.
-  if(detrend)    y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
+  if(detrend){
+    y <- stats::ts(ts_detrend(as.vector(y)), frequency = fs)
+    }
   # standardise using N instead of N-1.
-  if(standardise) y <- (y - mean(y, na.rm = TRUE)) / (stats::sd(y, na.rm = TRUE)*sqrt((N-1)/N))
+  if(standardise){
+    y <- stats::ts(ts_standardise(y,adjustN=FALSE), frequency = fs)
+    }
 
   # Number of frequencies estimated cannot be set! (defaults to Nyquist)
   # Use Tukey window: cosine taper with r = 0.5
@@ -3113,10 +3114,12 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FA
 
   # General guideline: fit over 25% frequencies
   # If signal is continuous (sampled) consider Wijnants et al. (2013) log-log fitting procedure
-  nr <- fractal::HDEst(NFT = length(powspec[,1]), sdf = psd)
+  nr <- fractal::HDEst(NFT = length(powspec$bulk[1:nr]), sdf = as.vector(powspec$bulk[1:nr]))
 
-  exp1 <- fractal::hurstSpec(y, sdf.method = "direct", freq.max = 0.25, taper. = Tukey )
-  exp2 <- fractal::hurstSpec(y, sdf.method = "direct", freq.max = powspec$freq.norm[nr], taper. = Tukey)
+
+  exp1 <- fractal::hurstSpec(y, sdf.method="direct", freq.max = 0.25, taper.=Tukey )
+  if(nr>=length(powspec$freq.norm)){nr <- length(powspec$freq.norm)-1}
+  exp2 <- fractal::hurstSpec(y, sdf.method="direct", freq.max = powspec$freq.norm[nr], taper.=Tukey)
 
   ifelse((glob > 0.2), {
     lmfit1 <- stats::lm(log(rev(powspec$bulk[powspec$size<=0.25])) ~ log(rev(powspec$size[powspec$size<=0.25])))
@@ -3178,23 +3181,22 @@ fd_sda <- function(y,
                    fs = NULL,
                    standardise = TRUE,
                    detrend = FALSE,
-                   scales = fractal::dispersion(y)$scale,
+                   scales = 2^(1:(log2(length(y)/2))),
                    fitRange = c(scales[1], scales[length(scales)-2]),
-                   doPlot = FALSE){
-  #require(pracma)
-  #require(fractal)
+                   doPlot = FALSE,
+                   silent = TRUE){
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
     y <- stats::ts(y, frequency = fs)
-    cat("\n\nfd.sda:\tSample rate was set to 1.\n\n")
+   if(!silent){cat("\n\nfd.sda:\tSample rate was set to 1.\n\n")}
   }
 
   N             <- length(y)
   # Simple linear detrending.
-  if(detrend)   y <- ts_detrend(y) # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
+  if(detrend){y <- ts_detrend(y)} # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
   # standardise using N instead of N-1.
-  if(standardise){ts_standardise(y,type="mean.sd",adjustN = FALSE)}
+  if(standardise){y <- ts_standardise(y,type="mean.sd",adjustN = FALSE)}
 
   bins          <- which(fitRange[1]==scales):which(fitRange[2]==scales)
   out           <- fractal::dispersion(y, front = FALSE)
@@ -3213,7 +3215,7 @@ fd_sda <- function(y,
   }
 
   return(list(
-    PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/scales, size = out$scale, bulk = out$sd),
+    PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/out$scale, size = out$scale, bulk = out$sd),
     fullRange = list(sap = stats::coef(lmfit1)[2], H = 1+stats::coef(lmfit1)[2], FD = sa2fd_sda(stats::coef(lmfit1)[2]), fitlm1 = lmfit1),
     fitRange  = list(sap = stats::coef(lmfit2)[2], H = 1+stats::coef(lmfit2)[2], FD = sa2fd_sda(stats::coef(lmfit2)[2]), fitlm2 = lmfit2),
     info = out)
@@ -3675,6 +3677,8 @@ gg_plotHolder <- function(){
 #' @param weight.between The weight within a group (\code{default = 1})
 #' @param preserve.weight.within If \code{E(g)$weights} is not \code{NULL}, try to preserve edge weigths within a group
 #' @param preserve.weight.between If \code{E(g)$weights} is not \code{NULL}, try to preserve edge weigths between a groups
+#' @param doPlot Plot the igraph object
+#' @param returnOnlyWeights Do not return the graph, just the weights. If \code{FALSE} this will return the graph object, otherwis it returns \code{E(g)$weights}
 #'
 #' @return A numeric vector with \code{length(get.edgelist(g))} edge weights that will cluster groups defined in \code{membership} if a layout is used that can handle edge weights as a parameter (see examples).
 #'
@@ -3705,7 +3709,7 @@ gg_plotHolder <- function(){
 #' g <- plotNET_groupColour(g, membership, colourE=TRUE)
 #' plot(g)
 #'
-plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, preserve.weight.within=FALSE, preserve.weight.between=FALSE){
+plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, preserve.weight.within=FALSE, preserve.weight.between=FALSE, doPlot = FALSE, returnOnlyWeights = TRUE){
   edgl <- igraph::get.edgelist(g)
 
   for(r in seq_along(edgl[,1])){
@@ -3716,7 +3720,15 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
      E(g)$weight[r] <- weight.between + ifelse(preserve.weight.between, E(g)$weight[r]%00%0, 0)
     }
   }
-  return(E(g)$weight)
+  if(doPlot){
+    plot.new()
+    plot(g)
+  }
+  if(returnWeightsOnly){
+    return(E(g)$weight)
+  } else {
+    return(invisible(g))
+  }
 }
 
 
@@ -3727,13 +3739,14 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
 #' @param nodesize Set nodesizes by \code{degree(g, normalised = TRUE)} (default) or \code{hubscore(g)$vector}. If a numeric value is passed all vertex sizes will be set to that value.
 #' @param labelsize Set labelsize: "asnodesize" sets the \code{cex} for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the \code{cex} of all labels to that value. A numeric vector of length two, \code{c(min,max)} wil scale the node sizes to \code{min} and \code{max} which
 #' @param edgeweight Set size of edges to \code{"E(g)$weight"} by passing "weight". If a single numeric value is provided all edges will be set to that value.
+#' @param doPlot Plot the igraph object.
 #'
 #' @return an igraph object
 #' @export
 #'
 #' @family tools for plotting networks
 #'
-plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], labelsize = "asnodesize", edgeweight = "weight"){
+plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], labelsize = "asnodesize", edgeweight = "weight", doPlot = TRUE){
 
   rev <- NA
   if(is.character(nodesize)){
@@ -3782,7 +3795,10 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
   }
   igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
   }
-
+  if(doPlot){
+    plot.new()
+    plot(g)
+  }
   return(invisible(g))
 }
 
@@ -3794,6 +3810,7 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
 #' @param n Size of the lattice (integer)
 #' @param k Neighbourhood size (integer)
 #' @param p Rewiring probability (between \code{0} and \code{1})
+#' @param doPlot PLot the igraph object
 #'
 #' @return A Strogatz-Watts small-world igraph object
 #'
@@ -3803,7 +3820,7 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
 #'
 #' @seealso \code{\link[igraph]{sample_smallworld}}
 #'
-plotNET_SW <- function(n=100,k=5,p=0.05){
+plotNET_SW <- function(n=100,k=5,p=0.05, doPlot = TRUE){
 
   g <- igraph::sample_smallworld(1, n, k, p)
   g <- plotNET_prep(g)
@@ -3824,7 +3841,11 @@ plotNET_SW <- function(n=100,k=5,p=0.05){
   #
   # igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
-  return(g)
+  if(doPlot){
+    plot.new()
+    plot(g)
+  }
+  return(invisible(g))
 }
 
 #' Example of Barabasi scale-free network
@@ -3834,6 +3855,7 @@ plotNET_SW <- function(n=100,k=5,p=0.05){
 #' @param n Number of vertices
 #' @param pwr Power of preferential attachment
 #' @param out.dist Degree distribution
+#' @param doPlot Plot the igraph object
 #'
 #' @return A Barabasi scale-free igraph object
 #' @export
@@ -3842,7 +3864,7 @@ plotNET_SW <- function(n=100,k=5,p=0.05){
 #'
 #' @seealso \code{\link[igraph]{sample_pa}}
 #'
-plotNET_BA <- function(n=100, pwr=1, out.dist=NULL){
+plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
 
   g <- igraph::sample_pa(n, power = pwr, out.dist=out.dist, directed=FALSE)
   igraph::V(g)$degree <- igraph::degree(g)
@@ -3862,7 +3884,11 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL){
   igraph::E(g)$width <- 1
   igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
-  return(g)
+  if(doPlot){
+    plot.new()
+    plot(g)
+  }
+  return(invisible(g))
 }
 
 
@@ -3877,6 +3903,7 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL){
 #' @param colourE Colour Edges based on \code{groups} (default = \code{FALSE})
 #' @param alphaE Set transparency for Edges (default = \code{0.8})
 #' @param groupColours A list of length \code{groups} with valid colour codes
+#' @param doPlot Plot the igraph object
 #'
 #' @return An igraph object with vertices and/or edges coloured by groups listed in \code{groups}
 #'
@@ -3884,7 +3911,7 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL){
 #'
 #' @family tools for plotting networks
 #'
-plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=FALSE, alphaE=FALSE, groupColours=NULL){
+plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=FALSE, alphaE=FALSE, groupColours=NULL, doPlot = TRUE){
 
   if(length(groups)==gorder(g)){
     if(is.null(names(groups))){
@@ -3960,7 +3987,11 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
       } # group IDs > 0
   } # group loop
 
-  return(g)
+  if(doPlot){
+    plot.new()
+    plot(g)
+  }
+  return(invisible(g))
 }
 
 
@@ -3982,6 +4013,156 @@ plotFA_loglog <- function(fd.OUT){
     gg_theme("clean")
   return(g)
 }
+
+
+
+#' Surrogate Test
+#'
+#' @param surrogateValues Vector of measures based on surrogate time series
+#' @param observedValue The measure obtained from the observed value
+#' @param sides Is this a 1 or 2-sided test (default = \code{1})
+#' @param binWidth The size of the histogram bins. The default is to look for the max. number of digits and set the width to \code{1/10^(Ndigits-1)}. If integers are detectec width will be set to 1.
+#' @param alpha Significance threshold for the test. This value is currently calculated from the data as \eqn{\frac{1}{rank}*Nsides}, setting it will not have an effect.
+#' @param measureName Label for x-axis
+#' @param title A title for the plot
+#' @param doPlot Plot a histogram of the distribution (default = \code{TRUE})
+#' @param returnOnlyPvalue Do not return the graph, just the point p-value (default = \code{FALSE})
+#'
+#' @return A point p-value for the observed value, and/or a histogram of the distribution (\code{ggplot2} object).
+#' @export
+#'
+plotSUR_hist <- function(surrogateValues,
+                         observedValue,
+                         sides = c("two.sided","greater","less")[1],
+                         binWidth = NULL,
+                         measureName = "",
+                         title="",
+                         doPlot = TRUE,
+                         returnOnlyPvalue = FALSE){
+
+  if(any(sides%in%c("two.sided","greater","less"))){
+    nsides <- dplyr::case_when(sides == "two.sided" ~ 2,
+                        sides %in% c("greater","less") ~ 1)
+  } else {
+    stop("Use one of: 'two.sided', 'greater' or 'less' for argument 'sides'")
+  }
+
+  vec            <- sort(c(surrogateValues, as.vector(observedValue)))
+
+  if(is.null(binWidth)){
+    if(all(is.wholenumber(vec))){
+      binWidth<-1
+    } else {
+      binWidth<-1/10^(max(nchar(gsub("(\\d[.])+","",signif(vec))),na.rm = TRUE))
+      if(binWidth<mean(diff(vec))){
+        binWidth<-round(mean(diff(vec)),3)
+      }
+    }
+  }
+
+  alpha <- nsides/length(vec)
+
+  rank_dist_bin_lab  <- ggplot2::cut_width(vec, width=binWidth, center = 0, closed = "left")
+  if(length(levels(rank_dist_bin_lab))>10*length(vec)){warning("Too many levels? Change binWidth!")}
+  rank_dist_bin      <- ggplot2::cut_interval(vec, n=length(levels(rank_dist_bin_lab)), labels=FALSE)
+  #ggplot2::cut_interval(rank_dist_bin,n = length(unique(rank_dist_bin)),labels=F)
+  low <- seq(vec[1],vec[length(vec)],length.out = length(vec))[floor(length(vec)/2)]
+  hi  <- seq(vec[1],vec[length(vec)],length.out = length(vec))[ceiling(length(vec)/2)]
+  rank_dist_mid     <- mean(low,hi)
+  rank_dist_bin_mid <- rank_dist_bin[which(vec>=rank_dist_mid)[1]]
+  rank_dist         <- rank(vec,ties.method = "max")
+  rank_obs         <- unique(rank(vec,ties.method = "max")[which(vec==observedValue)])
+
+  rank_obs_p <- NULL
+
+  if(sides%in%"less"){
+    rank_obs_p     <- (1/((length(vec)+1)-rank_obs)*nsides)%00%NA #*table(rank(rev(vec),ties.method = "max"))[rank_obs]
+    #rank_obs_p     <- table(rank(rev(vec),ties.method = "max"))[rank_obs]
+    #rank_obs       <- unique(rank(vec,ties.method = "min")[which(vec==observedValue)])
+    dist_lines     <- c(min(rank_dist_bin),rank_dist_bin_mid)
+  }
+
+  if(sides%in%"two.sided"){
+    if(observedValue<rank_dist_mid){
+      rank_obs_p     <- (1/((length(vec)+1)-rank_obs)*nsides)%00%NA
+    } else {
+    rank_obs_p     <- ((1/rank_obs)*nsides)%00%NA
+    }
+    dist_lines    <- c(min(rank_dist_bin),rank_dist_bin_mid, max(rank_dist_bin))
+  }
+
+  if(sides%in%"greater"){
+    rank_obs_p     <- ((1/rank_obs)*nsides)%00%NA #*table(rank(rev(vec),ties.method = "max"))[rank_obs]
+    dist_lines     <- c(rank_dist_bin_mid, max(rank_dist_bin))
+  }
+
+  if(!is.null(rank_obs)){
+
+  rank_dist_prob <- 1/rank_dist
+  df.dist <- data.frame(value      = vec,
+                   rank_dist       = rank_dist,
+                   rank_dist_prob  = rank_dist_prob,
+                   rank_dist_bin   = rank_dist_bin,
+                   rank_dist_bin_label = rank_dist_bin_lab
+                   )
+
+  ornd   <- round(observedValue,3)
+  prnd   <- round(rank_obs_p,3)
+  pLabel <- list(bquote(plain(P)(X==.(ornd)) ==.(prnd) ~ ~ alpha == .(alpha)))
+  obs    <- cbind.data.frame(obs = "obs",
+                          x = unique(df.dist$rank_dist_bin[rank_obs]),
+                          y = 0)
+
+  breaks <- seq(1,max(df.dist$rank_dist_bin))
+  labels <- levels(df.dist$rank_dist_bin_label)
+  # if(length(breaks)>=length(vec)/2){
+  #   breaks <- breaks[round(seq(1,max(breaks),length.out=max(breaks)/2))]
+  #   labels <- paste(signif(unique(vec)[breaks],3))
+  #   if(!all(diff(diff(breaks))!=0)){
+  #     breaks <- seq(1,max(df.dist$rank_dist_bin),by=2)
+  #     if(max(df.dist$rank_dist_bin)!=max(breaks)){
+  #     breaks <- c(breaks, max(breaks)+min(diff(breaks)))
+  #     labels <- c(paste(signif(na.exclude(unique(vec)[breaks],3))),paste(signif(max(na.exclude(unique(vec)[breaks],3))+min(diff(na.exclude(unique(vec)[breaks]))),3)))
+  #     }
+  #   }
+  # }
+
+
+  g <- ggplot2:: ggplot(df.dist,aes(x=rank_dist_bin)) +
+    geom_histogram(breaks= seq(1,(max(df.dist$rank_dist_bin)+1))-.5,colour="white") +
+    geom_vline(xintercept = dist_lines, colour="steelblue") +
+    geom_point(data=obs, aes(x=x, y=y,colour=obs), size=5) +
+    scale_x_continuous(name = measureName, breaks = breaks, labels = labels) +
+    scale_color_manual("Observed",values="red", breaks="obs", labels = pLabel) +
+    ggtitle(label = title, subtitle = paste0(nsides,"-sided test with ",length(surrogateValues)," surrogate values. The observed value has (max) rank ",rank_obs,".")) +
+    theme_bw() +
+    theme(legend.position = c(1,.90),
+          legend.justification = "right",
+          legend.background = element_rect(colour = "black"),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.major.y = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          axis.text.x = element_text(angle=90, vjust = 0.5))
+
+    if(doPlot){
+      grid::grid.newpage()
+      grid::grid.draw(g)
+    }
+
+  attr(rank_obs_p,"sides")         <- sides
+  attr(rank_obs_p,"rank_observed") <- rank_obs
+  attr(rank_obs_p,"N_values")      <- length(vec)
+  attr(rank_obs_p,"alpha")         <- alpha
+
+  if(returnOnlyPvalue){
+    return(rank_obs_p)
+  }
+  return(invisible(list(pvalue=rank_obs_p,surrogates_plot=g,plot_data=df.dist)))
+  } else {
+    stop("Could not determine a rank order probability. Did you provide a correct argument for sides?")
+  }
+}
+
 
 
 #' Add transparency to a colour
@@ -4707,37 +4888,7 @@ nmissing <- function(x){
   sum(is.na(x))
 }
 
-#' Surrogate Test
-#'
-#' @param surrogateValues Vector of measures based on surrogate time series
-#' @param observedValue The measure obtained from the observed value
-#' @param sides Is this a 1 or 2-sided test (default = \code{1})
-#' @param alpha Significane threshold for the test
-#' @param doPlot Plot a histogram (default = \code{FALSE})
-#' @param measureName Label for x-axis
-#'
-#' @return A point p-value for the observed value
-#' @export
-#'
-point_p <- function(surrogateValues,
-                    observedValue,
-                    sides = 1,
-                    alpha = sides/(length(surrogateValues)+1),
-                    doPlot = FALSE,
-                    measureName = ""){
-  vec <- c(surrogateValues, observedValue)
-  pp  <- (1-((unique(dplyr::min_rank(vec)[which(vec%in%observedValue)])-1) * alpha))%00%NA
 
-   g1<- ggplot2::ggplot(data.frame(x=vec), aes(x=x)) +
-      geom_histogram(binwidth=.01, center=0, colour="white", fill="grey50") +
-      geom_point(aes(x=observedValue,y=0,colour=paste0("P(X=",round(pp,2),")")),size=5) +
-      scale_color_manual("Observed",values="red",labels= paste0("P(X=",round(pp,2),")")) +
-      xlab(measureName)  + theme_bw() + theme(legend.position = c(.9, .9))
-   if(doPlot){
-    plot(g1)
-  }
- return(list(pvalue=pp,plot=g1))
-}
 
 
 # doChecks <- function(y,standardise=FALSE,center=FALSE,){

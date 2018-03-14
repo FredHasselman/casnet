@@ -5,7 +5,8 @@
 \title{Set Edge weights by group}
 \usage{
 plotNET_groupWeight(g, groups, weigth.within = 100, weight.between = 1,
-  preserve.weight.within = FALSE, preserve.weight.between = FALSE)
+  preserve.weight.within = FALSE, preserve.weight.between = FALSE,
+  doPlot = FALSE, returnOnlyWeights = TRUE)
 }
 \arguments{
 \item{g}{An igraph object whose edges (\code{get.edgelist(g)}) will be re-weighted according to the \code{membership} argument.}
@@ -19,6 +20,10 @@ plotNET_groupWeight(g, groups, weigth.within = 100, weight.between = 1,
 \item{preserve.weight.within}{If \code{E(g)$weights} is not \code{NULL}, try to preserve edge weigths within a group}
 
 \item{preserve.weight.between}{If \code{E(g)$weights} is not \code{NULL}, try to preserve edge weigths between a groups}
+
+\item{doPlot}{Plot the igraph object}
+
+\item{returnOnlyWeights}{Do not return the graph, just the weights. If \code{FALSE} this will return the graph object, otherwis it returns \code{E(g)$weights}}
 }
 \value{
 A numeric vector with \code{length(get.edgelist(g))} edge weights that will cluster groups defined in \code{membership} if a layout is used that can handle edge weights as a parameter (see examples).

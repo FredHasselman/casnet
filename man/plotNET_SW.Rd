@@ -4,7 +4,7 @@
 \alias{plotNET_SW}
 \title{Example of Strogatz-Watts small-world network}
 \usage{
-plotNET_SW(n = 100, k = 5, p = 0.05)
+plotNET_SW(n = 100, k = 5, p = 0.05, doPlot = TRUE)
 }
 \arguments{
 \item{n}{Size of the lattice (integer)}
@@ -12,6 +12,8 @@ plotNET_SW(n = 100, k = 5, p = 0.05)
 \item{k}{Neighbourhood size (integer)}
 
 \item{p}{Rewiring probability (between \code{0} and \code{1})}
+
+\item{doPlot}{PLot the igraph object}
 }
 \value{
 A Strogatz-Watts small-world igraph object

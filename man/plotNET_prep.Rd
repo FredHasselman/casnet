@@ -5,7 +5,7 @@
 \title{Plot Network Based on RQA}
 \usage{
 plotNET_prep(g, labels = NA, nodesize = c("degree", "hubscore")[1],
-  labelsize = "asnodesize", edgeweight = "weight")
+  labelsize = "asnodesize", edgeweight = "weight", doPlot = TRUE)
 }
 \arguments{
 \item{g}{An igraph object}
@@ -17,6 +17,8 @@ plotNET_prep(g, labels = NA, nodesize = c("degree", "hubscore")[1],
 \item{labelsize}{Set labelsize: "asnodesize" sets the \code{cex} for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the \code{cex} of all labels to that value. A numeric vector of length two, \code{c(min,max)} wil scale the node sizes to \code{min} and \code{max} which}
 
 \item{edgeweight}{Set size of edges to \code{"E(g)$weight"} by passing "weight". If a single numeric value is provided all edges will be set to that value.}
+
+\item{doPlot}{Plot the igraph object.}
 }
 \value{
 an igraph object

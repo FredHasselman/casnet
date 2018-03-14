@@ -5,7 +5,7 @@
 \title{Vertex Group Colours}
 \usage{
 plotNET_groupColour(g, groups, colourV = TRUE, alphaV = FALSE,
-  colourE = FALSE, alphaE = FALSE, groupColours = NULL)
+  colourE = FALSE, alphaE = FALSE, groupColours = NULL, doPlot = TRUE)
 }
 \arguments{
 \item{g}{An igraph object}
@@ -21,6 +21,8 @@ plotNET_groupColour(g, groups, colourV = TRUE, alphaV = FALSE,
 \item{alphaE}{Set transparency for Edges (default = \code{0.8})}
 
 \item{groupColours}{A list of length \code{groups} with valid colour codes}
+
+\item{doPlot}{Plot the igraph object}
 }
 \value{
 An igraph object with vertices and/or edges coloured by groups listed in \code{groups}

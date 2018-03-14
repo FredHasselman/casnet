@@ -5,8 +5,8 @@
 \title{Standardised Dispersion Analysis (SDA).}
 \usage{
 fd_sda(y, fs = NULL, standardise = TRUE, detrend = FALSE,
-  scales = fractal::dispersion(y)$scale, fitRange = c(scales[1],
-  scales[length(scales) - 2]), doPlot = FALSE)
+  scales = 2^(1:(log2(length(y)/2))), fitRange = c(scales[1],
+  scales[length(scales) - 2]), doPlot = FALSE, silent = TRUE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}

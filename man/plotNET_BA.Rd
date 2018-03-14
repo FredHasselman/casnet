@@ -4,7 +4,7 @@
 \alias{plotNET_BA}
 \title{Example of Barabasi scale-free network}
 \usage{
-plotNET_BA(n = 100, pwr = 1, out.dist = NULL)
+plotNET_BA(n = 100, pwr = 1, out.dist = NULL, doPlot = TRUE)
 }
 \arguments{
 \item{n}{Number of vertices}
@@ -12,6 +12,8 @@ plotNET_BA(n = 100, pwr = 1, out.dist = NULL)
 \item{pwr}{Power of preferential attachment}
 
 \item{out.dist}{Degree distribution}
+
+\item{doPlot}{Plot the igraph object}
 }
 \value{
 A Barabasi scale-free igraph object
