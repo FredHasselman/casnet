@@ -2864,7 +2864,7 @@ di2we <- function(distmat, radius, convMat = FALSE){
 ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE){
 
   id <- deparse(substitute(y))
-  y_data <- y
+  y_data <- as.numeric(y[,1])
 
   if(any(stats::is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
     y <- stats::time(y)
@@ -2903,9 +2903,13 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE){
       attr(emY, "data.y") = y_data
       return(as.matrix(emY))
    } else {
+     if(emDim>1){
      for(c in 1:NCOL(emY)){
        emY[,c] <-  y_data[emY[,c]]
      }
+     } else{
+         emY <- as.matrix(y_data)
+       }
        return(emY)
      }
 }
