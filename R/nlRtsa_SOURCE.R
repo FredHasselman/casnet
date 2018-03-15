@@ -657,40 +657,51 @@ crqa_cl <- function(y1,
 #'
 #' A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
 #'
-#' @param y Timeseries
-#' @param maxDim Maximum number of embedding dimensions
-#' @param maxLag Maximum embedding lag
-#' @param emLag Optimal embedding lag (delay), e.g., provided by optimising algorithm.
-#' @param emLags A range of embedding lags to consider (default)
-#' @param ami.method Method
+#' @param y A numeric vector or time series
+#' @param maxDim Maximum number of embedding dimensions (default = \code{min(c(10, length(y)),na.rm = TRUE)})
+#' @param maxLag Maximum embedding lag. Defaults to \code{floor(length(y)/(maxDim+1))}.
+#' @param lagMethods Optimal embedding lag (delay), e.g., provided by optimising algorithm.
+#' @param lagMethods A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timemLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")
 #' @param nnSizes  Neighbourhood size
 #' @param nnThres  Threshold
+#' @param theiler Theiler window on distance matrix (default = \code{0})
 #' @param diagPlot Plot the results
+#' @param silent Silent-ish mode
+#' @param ... Other parameters passed to \code{\link[nonlinearTseries]{timeLag}}
 #'
 #' @return A list object containing the optimal values and iteration history.
+#'
+#' @details A number of functions are called to determie optimal parameters for delay embedding a time series:
+#'
+#' \itemize{
+#' \item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet]{est_emLag}}, which is a wrapper around \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"} to get lags based on the mutual information function.}
+#' \item{Embedding dimension (\code{m, \code{emLag}}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
+#' }
 #'
 #' @family Recurrence Quantification Analysis
 #'
 #' @export
 #'
 crqa_parameters <- function(y,
-                            maxDim   = 5,
-                            maxLag   = round(length(y)/(maxDim+1)),
-                            emLag    = est_emLag(y,
-                                           selection.methods = c("first.e.decay",
-                                                                 "first.zero",
-                                                                 "first.minimum"),
-                                           maxLag =round(length(y)/(maxDim+1))
-                            ),
-                            emLags     = est_emLag(y, maxLag = round(length(y)/(maxDim+1))),
-                            ami.method = c("first.minimum"),
+                            maxDim   = 10,
+                            maxLag   = floor(length(y)/(maxDim+1)),
+                            lagMethods = c("first.zero", "first.minimum"),
+                            emLag     = NULL,
                             nnSizes  = c(.1,.3,.6,.9),
                             nnThres  = .1,
-                            diagPlot = TRUE){
+                            theiler  = 0,
+                            diagPlot = TRUE,
+                            silent   = TRUE,
+                            ...){
 
   if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
 
   emDims  <-  1:maxDim
+  if(is.null(emLag)){
+    emLags <- est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+  } else {
+    emLags <- cbind.data.frame(selection.method = "User", optimal.lag = emLag)
+  }
 
   y <- y[!is.na(y)]
 
@@ -698,22 +709,30 @@ crqa_parameters <- function(y,
   cnt = 0
   for(N in seq_along(nnSizes)){
     for(L in seq_along(emLags$selection.method)){
+      if(!is.na(emLags$optimal.lag[L])){
       Nn.max <- NA
       for(D in seq_along(emDims)){
         cnt = cnt+1
-        surrDims <- nonlinearTseries::buildTakens(as.numeric(y),
-                                                  emDims[[D]],
-                                                  emLags$opLag[L])
-        RM <- recmat(surrDims,surrDims)
-        allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*max(RM, na.rm = TRUE))
+        surrDims <- nonlinearTseries::buildTakens(time.series =  as.numeric(y),
+                                                  embedding.dim =  emDims[[D]],
+                                                  time.lag = emLags$optimal.lag[L])
+
+
+        # RM <- recmat(y,y, emDim = emDims[[D]], emLag = emLags$optimal.lag[L])
+        # RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
+
+        # (fn.out <- false.nearest(rnorm(1024), m=6, d=1, t=1, rt=3))
+        # plot(fn.out)
+        allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N])
         Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
         if(D==1){Nn.max <- Nn}
         lagList[[cnt]] <- data.frame(Nsize        = nnSizes[N],
                                      emLag.method = emLags$selection.method[[L]],
-                                     emLag = emLags$opLag[L],
+                                     emLag = emLags$optimal.lag[L],
                                      emDim = emDims[D],
                                      Nn    = Nn,
                                      Nn.max = Nn.max)
+      }
       }
     }
   }
@@ -751,9 +770,9 @@ crqa_parameters <- function(y,
 
   if(diagPlot){
 
-    dfs <- data.frame(startAt= c(.5, graphics::hist(emDims)$mids),
-                      stopAt = c(graphics::hist(emDims)$mids,max(emDims)+.5),
-                      f=factor(seq_along(c(.5, graphics::hist(emDims)$mids))%%2))
+    dfs <- data.frame(startAt= c(.5, graphics::hist(emDims,plot=FALSE)$mids),
+                      stopAt = c(graphics::hist(emDims,plot=FALSE)$mids,max(emDims)+.5),
+                      f=factor(seq_along(c(.5, graphics::hist(emDims,plot=FALSE)$mids))%%2))
 
     # use: alpha()
     #myPal <- RColorBrewer::brewer.pal(length(emLag),"Dark2")
@@ -786,7 +805,7 @@ crqa_parameters <- function(y,
 
     tmi <-  nonlinearTseries::mutualInformation(y,
                                                 lag.max = maxLag,
-                                                do.plot = TRUE)
+                                                do.plot = FALSE)
 
     dfMI <- data.frame(emDelay = tmi$time.lag[-1],
                        ami     = tmi$mutual.information[-1])
@@ -794,12 +813,9 @@ crqa_parameters <- function(y,
     gDelay <- ggplot2::ggplot(dfMI, aes(y = ami, x = emDelay)) +
       geom_line() +
       geom_vline(data = emLags, aes(colour=factor(selection.method),
-                                    xintercept = opLag),
+                                    xintercept = optimal.lag),
                  alpha = .3) +
-      geom_point(data = emLags, aes(x = opLag,
-                                    y=ami,
-                                    colour=factor(selection.method)),
-                 size=2) +
+      geom_point(data = emLags, aes(x = optimal.lag, y = ami, colour = factor(selection.method)), size = 2) +
       xlab("Embedding Lag") +
       ylab("Average Mututal Information") +
       scale_color_brewer("Method",palette = "Set2") +
@@ -1478,12 +1494,12 @@ crqa_mat <- function(RM,
 #'
 #' A wrapper for nonlinearTseries::timemLag
 #'
-#' @param y Time series
+#' @param y Time series or numeric vector
 #' @param selection.methods Selecting an optimal embedding lag (default: Return "first.e.decay", "first.zero", "first.minimum", "first.value", where value is 1/exp(1))
 #' @param maxLag Maximal lag to consider (default: 1/4 of timeseries length)
 #' @param ... Additional parameters
 #'
-#' @return The ami function with minima
+#' @return The ami function with requested minima
 #'
 #' @export
 #'
@@ -1501,14 +1517,14 @@ est_emLag <- function(y,
 
   lags <- numeric(length=length(selection.methods))
   cnt <- 0
-  for(s.m in selection.methods){
+  for(sm in selection.methods){
     cnt <- cnt + 1
     lag <-try_CATCH(nonlinearTseries::timeLag(y,
                                               technique = "ami",
-                                              selection.method = s.m,
+                                              selection.method = sm,
                                               lag.max = maxLag,
                                               do.plot = FALSE))
-    if(any(grepl("Error",lag$value))){lags[cnt] <- 1} else {lags[cnt] <- lag$value}
+    if(any(grepl("Error",lag$value))){lags[cnt] <- NA} else {lags[cnt] <- lag$value}
   }
 
   #id.peaks <- find_peaks(tmi$mutual.information, m = 3, wells = TRUE)
@@ -1518,11 +1534,17 @@ est_emLag <- function(y,
   out <-   cbind.data.frame(selection.method = c(selection.methods,
                                                  "global.minimum",
                                                  "maximum.lag"),
-                            opLag = c(lags, id.min, maxLag)
+                            optimal.lag = c(lags, id.min, maxLag)
   )
 
-  tmi$mutual.information[tmi$time.lag%in%out$opLag]
-  out$ami <- sapply(out$opLag, function(r) tmi$mutual.information[r])
+  #tmi$mutual.information[tmi$time.lag%in%out$optimal.lag]
+  out$ami <- sapply(out$optimal.lag, function(r){
+    if(is.na(r)){
+      NA
+      } else {
+        tmi$mutual.information[r]
+        }
+    })
 
   #tout <- summarise(dplyr::group_by(out, opLag, ami), selection.method = paste0(unique(selection.method), collapse="|")
 
@@ -1532,8 +1554,8 @@ est_emLag <- function(y,
 
 #' Estimate number of embedding dimensions
 #'
-#' @param y Time series
-#' @param delay Embeding lag
+#' @param y Time series or numeric vector
+#' @param delay Embedding lag
 #' @param maxDim Maximum number of embedding dimensions
 #' @param threshold See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
 #' @param max.relative.change See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
@@ -1544,13 +1566,14 @@ est_emLag <- function(y,
 #' @return Embedding dimensions
 #' @export
 #'
-est_emDim <- function(y, delay = est_emLag(y), maxDim = 20, threshold = .95, max.relative.change = .1, ...){
+est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max.relative.change = .1, doPlot = FALSE, ...){
   cbind.data.frame(EmbeddingLag   = delay,
                    EmbeddingDim   = nonlinearTseries::estimateEmbeddingDim(y,
                                                          time.lag  = delay,
                                                          threshold = threshold,
                                                          max.relative.change = max.relative.change,
-                                                         max.embedding.dim = maxDim)
+                                                         max.embedding.dim = maxDim,
+                                                         do.plot = doPlot)
   )
 }
 
@@ -2834,10 +2857,10 @@ di2we <- function(distmat, radius, convMat = FALSE){
 lagEmbed <- function (y, emDim, emLag){
 
   if(any(stats::is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
-    timeVec <- stats::time(y)
-    emTime <- lubridate::as_datetime(timeVec[emLag+1])- lubridate::as_datetime(timeVec[1])
+    y <- stats::time(y)
+    emTime <- lubridate::as_datetime(y[emLag+1])- lubridate::as_datetime(y[1])
   } else {
-    timeVec <- zoo::index(y)
+    y <- zoo::index(y)
     emTime <- emLag
   }
 
@@ -4162,6 +4185,8 @@ plotSUR_hist <- function(surrogateValues,
     stop("Could not determine a rank order probability. Did you provide a correct argument for sides?")
   }
 }
+
+
 
 
 

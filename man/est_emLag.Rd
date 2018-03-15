@@ -8,7 +8,7 @@ est_emLag(y, selection.methods = c("first.minimum"), maxLag = length(y)/4,
   ...)
 }
 \arguments{
-\item{y}{Time series}
+\item{y}{Time series or numeric vector}
 
 \item{selection.methods}{Selecting an optimal embedding lag (default: Return "first.e.decay", "first.zero", "first.minimum", "first.value", where value is 1/exp(1))}
 
@@ -17,7 +17,7 @@ est_emLag(y, selection.methods = c("first.minimum"), maxLag = length(y)/4,
 \item{...}{Additional parameters}
 }
 \value{
-The ami function with minima
+The ami function with requested minima
 }
 \description{
 A wrapper for nonlinearTseries::timemLag

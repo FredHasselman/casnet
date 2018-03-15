@@ -4,13 +4,13 @@
 \alias{est_emDim}
 \title{Estimate number of embedding dimensions}
 \usage{
-est_emDim(y, delay = est_emLag(y), maxDim = 20, threshold = 0.95,
-  max.relative.change = 0.1, ...)
+est_emDim(y, delay = est_emLag(y), maxDim = 15, threshold = 0.95,
+  max.relative.change = 0.1, doPlot = FALSE, ...)
 }
 \arguments{
-\item{y}{Time series}
+\item{y}{Time series or numeric vector}
 
-\item{delay}{Embeding lag}
+\item{delay}{Embedding lag}
 
 \item{maxDim}{Maximum number of embedding dimensions}
 

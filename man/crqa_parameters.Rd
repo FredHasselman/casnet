@@ -4,37 +4,47 @@
 \alias{crqa_parameters}
 \title{Find optimal (C)RQA parameters}
 \usage{
-crqa_parameters(y, maxDim = 5, maxLag = round(length(y)/(maxDim + 1)),
-  emLag = est_emLag(y, selection.methods = c("first.e.decay", "first.zero",
-  "first.minimum"), maxLag = round(length(y)/(maxDim + 1))),
-  emLags = est_emLag(y, maxLag = round(length(y)/(maxDim + 1))),
-  ami.method = c("first.minimum"), nnSizes = c(0.1, 0.3, 0.6, 0.9),
-  nnThres = 0.1, diagPlot = TRUE)
+crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
+  lagMethods = c("first.zero", "first.minimum"), emLag = NULL,
+  nnSizes = c(0.1, 0.3, 0.6, 0.9), nnThres = 0.1, theiler = 0,
+  diagPlot = TRUE, silent = TRUE, ...)
 }
 \arguments{
-\item{y}{Timeseries}
+\item{y}{A numeric vector or time series}
 
-\item{maxDim}{Maximum number of embedding dimensions}
+\item{maxDim}{Maximum number of embedding dimensions (default = \code{min(c(10, length(y)),na.rm = TRUE)})}
 
-\item{maxLag}{Maximum embedding lag}
+\item{maxLag}{Maximum embedding lag. Defaults to \code{floor(length(y)/(maxDim+1))}.}
 
-\item{emLag}{Optimal embedding lag (delay), e.g., provided by optimising algorithm.}
-
-\item{emLags}{A range of embedding lags to consider (default)}
-
-\item{ami.method}{Method}
+\item{lagMethods}{Optimal embedding lag (delay), e.g., provided by optimising algorithm.}
 
 \item{nnSizes}{Neighbourhood size}
 
 \item{nnThres}{Threshold}
 
+\item{theiler}{Theiler window on distance matrix (default = \code{0})}
+
 \item{diagPlot}{Plot the results}
+
+\item{silent}{Silent-ish mode}
+
+\item{...}{Other parameters passed to \code{\link[nonlinearTseries]{timeLag}}}
+
+\item{lagMethods}{A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timemLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")}
 }
 \value{
 A list object containing the optimal values and iteration history.
 }
 \description{
 A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
+}
+\details{
+A number of functions are called to determie optimal parameters for delay embedding a time series:
+
+\itemize{
+\item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet]{est_emLag}}, which is a wrapper around \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"} to get lags based on the mutual information function.}
+\item{Embedding dimension (\code{m, \code{emLag}}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
+}
 }
 \seealso{
 Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
