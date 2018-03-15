@@ -2845,16 +2845,22 @@ di2we <- function(distmat, radius, convMat = FALSE){
 
 
 
-#' lag Embed a time series
+#' Delay embedding of a time series
+#'
+#' Create a state vector based on an embedding lag and a number of embedding dimanesions.
 #'
 #' @param y Time series
 #' @param emDim Embedding dimension
 #' @param emLag Embedding lag
 #'
 #' @return The lag embedded time series
+#' @family Time series operations
+#'
+#' @author Fred Hasselman
+#'
 #' @export
 #'
-lagEmbed <- function (y, emDim, emLag){
+ts_embed <- function (y, emDim, emLag){
 
   if(any(stats::is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
     y <- stats::time(y)
@@ -2886,6 +2892,8 @@ lagEmbed <- function (y, emDim, emLag){
   attr(emY, "embedding.lag")  = emLag
   attr(emY, "embedding.time") = emTime
   attr(emY, "id") = id
+
+
   return(as.matrix(emY))
 }
 

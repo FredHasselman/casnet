@@ -46,10 +46,7 @@ Imports: dplyr,
     DescTools,
     pROC,
     purrr,
-    future,
-    rpart,
-    doFuture,
-    multidplyr
+    rpart
 Suggests: knitr,
     rmarkdown,
     graphics,

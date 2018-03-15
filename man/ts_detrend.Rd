@@ -19,9 +19,9 @@ Detrend a time series
 }
 \seealso{
 Other Time series operations: \code{\link{ts_center}},
-  \code{\link{ts_levels}}, \code{\link{ts_peaks}},
-  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
-  \code{\link{ts_trimfill}}
+  \code{\link{ts_embed}}, \code{\link{ts_levels}},
+  \code{\link{ts_peaks}}, \code{\link{ts_slice}},
+  \code{\link{ts_standardise}}, \code{\link{ts_trimfill}}
 }
 \author{
 Fred Hasselman
