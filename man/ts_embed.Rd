@@ -4,7 +4,7 @@
 \alias{ts_embed}
 \title{Delay embedding of a time series}
 \usage{
-ts_embed(y, emDim, emLag)
+ts_embed(y, emDim, emLag, returnOnlyIndices = FALSE)
 }
 \arguments{
 \item{y}{Time series}
@@ -12,6 +12,8 @@ ts_embed(y, emDim, emLag)
 \item{emDim}{Embedding dimension}
 
 \item{emLag}{Embedding lag}
+
+\item{returnOnlyIndices}{Return only the index of y for each surrogate dimension, not the values (default = \code{FALSE})}
 }
 \value{
 The lag embedded time series

@@ -1956,8 +1956,8 @@ recmat <- function(y1, y2=NULL,
     y2 <- as.data.frame(y2)
   }
 
-  et1 <- lagEmbed(y1, emDim, emLag)
-  et2 <- lagEmbed(y2, emDim, emLag)
+  et1 <- ts_embed(y1, emDim, emLag)
+  et2 <- ts_embed(y2, emDim, emLag)
 
   dmat <- proxy::dist(x = et1,
                       y = et2,
@@ -2852,6 +2852,7 @@ di2we <- function(distmat, radius, convMat = FALSE){
 #' @param y Time series
 #' @param emDim Embedding dimension
 #' @param emLag Embedding lag
+#' @param returnOnlyIndices Return only the index of y for each surrogate dimension, not the values (default = \code{FALSE})
 #'
 #' @return The lag embedded time series
 #' @family Time series operations
@@ -2860,7 +2861,10 @@ di2we <- function(distmat, radius, convMat = FALSE){
 #'
 #' @export
 #'
-ts_embed <- function (y, emDim, emLag){
+ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE){
+
+  id <- deparse(substitute(y))
+  y_data <- y
 
   if(any(stats::is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
     y <- stats::time(y)
@@ -2870,31 +2874,40 @@ ts_embed <- function (y, emDim, emLag){
     emTime <- emLag
   }
 
-  y <- as.numeric(unlist(y))
+  y  <- as.numeric(unlist(y))
   N  <- NROW(y)
+
   if(emDim > 1){
     lag.id    <- seq(1, (emDim*emLag), emLag)
     maxN      <- N - max(lag.id)
     emY       <- matrix(nrow = maxN, ncol = emDim)
+
     for(tau in seq_along(lag.id)){
       emY[,tau] = y[lag.id[tau]:(N-(rev(lag.id)[tau]))]
     }
     colnames(emY) <- paste0("tau.",0:(emDim-1))
   } else {
     emY <-  matrix(nrow = N, ncol = 1, byrow = TRUE, dimnames = list(NULL,"tau.0"))
-    emY <- y
+    emY <-  y
   }
 
   # Alternative: rollapply(y, list(-d * seq(0, k-1)), c)
 
-  id <- deparse(substitute(y))
+
   attr(emY, "embedding.dims") = emDim
   attr(emY, "embedding.lag")  = emLag
   attr(emY, "embedding.time") = emTime
-  attr(emY, "id") = id
+  attr(emY, "variable.y") = id
 
-
-  return(as.matrix(emY))
+   if(returnOnlyIndices){
+      attr(emY, "data.y") = y_data
+      return(as.matrix(emY))
+   } else {
+     for(c in 1:NCOL(emY)){
+       emY[,c] <-  y_data[emY[,c]]
+     }
+       return(emY)
+     }
 }
 
 
