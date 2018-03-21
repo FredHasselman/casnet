@@ -2215,7 +2215,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
 
   gRP <- gRP +
     geom_abline(slope = 1,colour = "grey50", size = 1) +
-    ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
+    #ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
     rptheme +
     coord_fixed(expand = FALSE)
 
@@ -2341,12 +2341,17 @@ if(useGtable){
     }
    if(plotMeasures&!unthresholded){
      g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
-             plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)))
+             plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)))
    }
   } else {
       g <- gRP
   }
+
+    g <- g + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot"))
+
     } # use gtable
+
+
 
   if(doPlot){
     plot.new()
