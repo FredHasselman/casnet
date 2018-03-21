@@ -4,8 +4,7 @@
 \alias{est_emLag}
 \title{Estimate embedding lag (tau)}
 \usage{
-est_emLag(y, selection.methods = c("first.minimum"), maxLag = length(y)/4,
-  ...)
+est_emLag(y, selection.methods = "first.minimum", maxLag = length(y)/4, ...)
 }
 \arguments{
 \item{y}{Time series or numeric vector}

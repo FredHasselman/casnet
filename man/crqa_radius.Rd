@@ -49,7 +49,7 @@ crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 
 \item{standardise}{Standardise}
 
-\item{radiusOnFail}{Radius to return when search fails \code{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \code{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \code{"percentile" = quantile(RM, prob = .05) of distances greater tham 0}.}
+\item{radiusOnFail}{Radius to return when search fails \code{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \code{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \code{"percentile" = quantile(RM, prob = targetValue) of distances greater than 0}.}
 
 \item{silent}{Silent-ish}
 }

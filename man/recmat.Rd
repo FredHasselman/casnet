@@ -5,26 +5,31 @@
 \title{Recurrence Matrix}
 \usage{
 recmat(y1, y2 = NULL, emDim = 1, emLag = 1, to.ts = NULL,
-  to.sparse = FALSE, order.by = NULL, method = "Euclidean", ...)
+  order.by = NULL, to.sparse = FALSE, method = "Euclidean",
+  doPlot = FALSE, silent = TRUE, ...)
 }
 \arguments{
-\item{y1}{y1}
+\item{y1}{A numeric vector or time series}
 
-\item{y2}{y2}
+\item{y2}{A numeric vector or time series for cross recurrence}
 
-\item{emDim}{emDim}
+\item{emDim}{The embedding dimensions}
 
-\item{emLag}{emLag}
+\item{emLag}{The embedding lag}
 
-\item{to.ts}{to.ts}
+\item{to.ts}{Should \code{y1} and \code{y2} be converted to time series objects?}
 
-\item{to.sparse}{to.sparse}
+\item{order.by}{If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.}
 
-\item{order.by}{order.by}
+\item{to.sparse}{Should sparse matrices be used?}
 
-\item{method}{method}
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
-\item{...}{other}
+\item{doPlot}{Plot the matrix by calling \code{\link{recmat_plot}} with defult settings}
+
+\item{silent}{Silent-ish mode}
+
+\item{...}{Any paramters to pass to \code{\link{recmat_plot}} if \code{doPlot = TRUE}}
 }
 \value{
 RM

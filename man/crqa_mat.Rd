@@ -7,7 +7,8 @@
 crqa_mat(RM, threshold = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(diag(RM)) - 1, VLmax = length(diag(RM)) - 1,
   HLmax = length(diag(RM)) - 1, AUTO = NULL, chromatic = FALSE,
-  matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95)
+  matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95,
+  doParallel = FALSE)
 }
 \arguments{
 \item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})}
@@ -35,6 +36,8 @@ crqa_mat(RM, threshold = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \item{Nboot}{How many bootstrap replications? (default = \code{NULL})}
 
 \item{CL}{Confidence limit for bootstrap results (default = \code{.95})}
+
+\item{doParallel}{Use parallel?}
 
 \item{radius}{Threshold for distance value that counts as a recurrence}
 }

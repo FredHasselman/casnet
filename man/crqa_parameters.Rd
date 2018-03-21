@@ -5,8 +5,8 @@
 \title{Find optimal (C)RQA parameters}
 \usage{
 crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
-  lagMethods = c("first.zero", "first.minimum"), emLag = NULL,
-  nnSizes = c(0.1, 0.3, 0.6, 0.9), nnThres = 0.1, theiler = 0,
+  lagMethods = "first.minimum", emLag = NULL, nnRadius = 10,
+  nnSizes = c(0.005, 0.01, 0.005, 0.1), nnThres = 0.1, theiler = 0,
   diagPlot = TRUE, silent = TRUE, ...)
 }
 \arguments{

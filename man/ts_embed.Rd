@@ -4,7 +4,7 @@
 \alias{ts_embed}
 \title{Delay embedding of a time series}
 \usage{
-ts_embed(y, emDim, emLag, returnOnlyIndices = FALSE)
+ts_embed(y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
 }
 \arguments{
 \item{y}{Time series}

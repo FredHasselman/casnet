@@ -4,21 +4,28 @@
 \alias{recmat_plot}
 \title{Plot (thresholded) distance matrix}
 \usage{
-recmat_plot(RM, PhaseSpaceScale = TRUE, title = "", xlab = "",
-  ylab = "", doPlot = TRUE, plotSurrogate = NA, plotMeasures = FALSE)
+recmat_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE, title = "",
+  xlab = "", ylab = "", plotSurrogate = NA, doPlot = TRUE,
+  useGtable = FALSE)
 }
 \arguments{
 \item{RM}{A distance matrix or recurrence matrix}
 
-\item{PhaseSpaceScale}{For display purposes: Rescale the data? (default = \code{TRUE})}
+\item{plotDimensions}{Should the state vectors be plotted if they are available as attributes of `RM` (default = \code{TRUE})}
+
+\item{plotMeasures}{Print common (C)RQA measures in the plot if the matrix is binary}
 
 \item{title}{A title for the plot}
 
-\item{doPlot}{Draw the plot? (default = \code{TRUE})}
+\item{xlab}{An x-axis label}
+
+\item{ylab}{An y-axis label}
 
 \item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.}
 
-\item{plotMeasures}{Print common (C)RQA measures in the plot}
+\item{doPlot}{Draw the plot? (default = \code{TRUE})}
+
+\item{useGtable}{Use package \code{\link{gtable}} instead of \code{\link{patchwork}} to plot.}
 }
 \value{
 A nice plot of the recurrence matrix.

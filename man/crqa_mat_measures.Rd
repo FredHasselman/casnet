@@ -7,7 +7,8 @@
 crqa_mat_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(diag(RM)) - 1, VLmax = length(diag(RM)) - 1,
   HLmax = length(diag(RM)) - 1, AUTO = NULL, chromatic = FALSE,
-  matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95)
+  matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95,
+  doParallel = FALSE)
 }
 \arguments{
 \item{RM}{A binary recurrence matrix}
@@ -37,6 +38,8 @@ crqa_mat_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \item{Nboot}{How many bootstraps?}
 
 \item{CL}{Confidence Limit for bootstrap results}
+
+\item{doParallel}{Use parallel?}
 }
 \description{
 Use `crqa_mat`

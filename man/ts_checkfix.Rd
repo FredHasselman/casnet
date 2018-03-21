@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{ts_checkfix}
 \alias{ts_checkfix}
-\title{Check and Fix a vector}
+\title{Check and/or Fix a vector}
 \usage{
 ts_checkfix(y, checkNumericVector = TRUE, checkTimeVector = TRUE,
   checkPow2 = TRUE, checkScale = TRUE, checkSummationOrder = TRUE,
@@ -48,5 +48,5 @@ ts_checkfix(y, checkNumericVector = TRUE, checkTimeVector = TRUE,
 A 'check' report and/or a 'fixed' vector y.
 }
 \description{
-Check and Fix a vector
+Check and/or Fix a vector
 }
