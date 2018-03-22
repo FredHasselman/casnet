@@ -2129,6 +2129,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
     # }
 
     if(plotMeasures){
+
       epsilon <- crqa_radius(RM,silent = TRUE)$Radius
       rpOUT   <- crqa_mat(RM,threshold = epsilon, AUTO = AUTO)
     }
@@ -2325,14 +2326,19 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
 
   if(plotMeasures){
 
-    rpOUT <- round(rpOUT,3)
-    rpOUTdat <- rpOUT %>% dplyr::select(dplyr::one_of(c("Radius","RT","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>% tidyr::gather(key=measure,value=value) %>% dplyr::mutate(x=rep(0,9),y=9:1)
-    rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
+    rpOUT    <- round(rpOUT,3)
+    rpOUTdat <- rpOUT %>%
+      dplyr::select(dplyr::one_of(c("Radius","RT","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>%
+      tidyr::gather(key=measure,value=value) %>%
+      dplyr::mutate(x=rep(0,9),y=9:1)
 
+    rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
 
     gA <-ggplot2::ggplot(rpOUTdat,aes(x=x,y=y)) +
       geom_text(aes(label=label), family="mono", hjust="left", vjust="center", size=3) +
-      scale_x_continuous(limits = c(0,.3)) + theme_void()
+      scale_x_continuous(limits = c(0,.3)) +
+      theme_void()
+
     #geom="text", label = paste("Radius:",rpOUT$Radius,"\nRec points:",rpOUT$RT,"\nRR",rpOUT$RR,"\nDET:",rpOUT$DET,"\nMEAN_dl:",rpOUT$MEAN_dl,"\nENT_dl:",rpOUT$ENT_dl,"\nLAM_vl:",rpOUT$LAM_vl, "\nTT_vl:",rpOUT$TT_vl,"\nENTR_vl:",rpOUT$ENT_vl)) + theme_minimal() + theme(text = element_text(family = "mono"))
    # ,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
   }
@@ -2367,11 +2373,17 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
       if(unthresholded){
         g <- (gy2 + gRP + gDist + gg_plotHolder() + gy1 + gg_plotHolder() +
                 plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+
       } else {
 
+        if(plotMeasures){
         g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
                 plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
-      }
+        } else {
+          g <- (gy2 + gRP + gg_plotHolder() + gg_plotHolder() + gy1 + gg_plotHolder() +
+                  plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+        }
+        }
 
     } else {
       g <- gRP
