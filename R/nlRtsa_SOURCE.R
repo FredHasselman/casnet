@@ -658,12 +658,13 @@ crqa_cl <- function(y1,
 #' A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
 #'
 #' @param y A numeric vector or time series
-#' @param maxDim Maximum number of embedding dimensions (default = \code{min(c(10, length(y)),na.rm = TRUE)})
-#' @param maxLag Maximum embedding lag. Defaults to \code{floor(length(y)/(maxDim+1))}.
-#' @param lagMethods Optimal embedding lag (delay), e.g., provided by optimising algorithm.
+#' @param maxDim Maximum number of embedding dimensions (default = \code{10})
+#' @param maxLag Maximum embedding lag to consider. Defaults to \code{floor(length(y)/(maxDim+1))}.
+#' @param emLag Optimal embedding lag (delay), e.g., provided by optimising algorithm. Leave empty to estimate (default = \code{NULL})
 #' @param lagMethods A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timemLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")
-#' @param nnSizes  Neighbourhood size
-#' @param nnThres  Threshold
+#' @param nnSizes  Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5)})
+#' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{c(5,10)})
+#' @param nnThres  Threshold for selecting optimal parameter in percentage points (default = \code{10})
 #' @param theiler Theiler window on distance matrix (default = \code{0})
 #' @param diagPlot Plot the results
 #' @param silent Silent-ish mode
@@ -675,7 +676,7 @@ crqa_cl <- function(y1,
 #'
 #' \itemize{
 #' \item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet]{est_emLag}}, which is a wrapper around \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"} to get lags based on the mutual information function.}
-#' \item{Embedding dimension (\code{m, \code{emLag}}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
+#' \item{Embedding dimension (\code{m, \code{emDim}}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[fractal]{FNN}}}
 #' }
 #'
 #' @family Recurrence Quantification Analysis
@@ -687,9 +688,9 @@ crqa_parameters <- function(y,
                             maxLag   = floor(length(y)/(maxDim+1)),
                             lagMethods = "first.minimum",
                             emLag     = NULL,
-                            nnRadius = 10,
-                            nnSizes  = c(5e-3,1e-2,.5e-2,1e-1),
-                            nnThres  = .1,
+                            nnSizes  = c(2,5,10,15),
+                            nnRadius = 5,
+                            nnThres  = 10,
                             theiler  = 0,
                             diagPlot = TRUE,
                             silent   = TRUE,
@@ -697,6 +698,8 @@ crqa_parameters <- function(y,
 
   if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
 
+  if(length(nnRadius)!=1){stop("nnRadius must have 1 numeric value")}
+  if(length(nnSizes)!=4){stop("nnSizes must have 4 numeric values")}
   y <- y[!is.na(y)]
   #y <- ts_standardise(y, adjustN = FALSE)
 
@@ -707,41 +710,61 @@ crqa_parameters <- function(y,
     emLags <- cbind.data.frame(selection.method = "User", optimal.lag = emLag)
   }
 
+  # (fn.out <- tseriesChaos::false.nearest(lx, m=10, d=17, t=0, eps=sd(lx)/10, rt=20))
+  # plot(fn.out[1,],type="b")
 
   lagList <- list()
   cnt = 0
   for(N in seq_along(nnSizes)){
-    for(L in seq_along(emLags$selection.method)){
-      if(!is.na(emLags$optimal.lag[L])){
-      Nn.max <- NA
-      # RM <- recmat(y,y, emDim = emDims[[1]], emLag = emLags$optimal.lag[L])
-      # RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
-      # RMmax <- max(RM, na.rm = TRUE)
+    for(R in seq_along(nnRadius)){
+      for(L in seq_along(emLags$selection.method)){
 
-      for(D in seq_along(emDims)){
+      if(!is.na(emLags$optimal.lag[L])){
         cnt = cnt+1
-        surrDims <- nonlinearTseries::buildTakens(time.series =  as.numeric(y),
-                                                  embedding.dim =  emDims[[D]],
-                                                  time.lag = emLags$optimal.lag[L])
+        Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
+      for(D in seq_along(emDims)){
+        RM <- recmat(y,y, emDim = emDims[[D]], emLag = emLags$optimal.lag[L])
+        RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
+        Nn.min[D] <- min(RM, na.rm = TRUE)
+        Nn.max[D] <- max(RM, na.rm = TRUE)
+        Nn.sd[D]   <- sd(RM, na.rm = TRUE)
+        Nn.mean[D] <- mean(RM, na.rm = TRUE)
+        rm(RM)
+      }
+
+        #surrDims <- nonlinearTseries::buildTakens(time.series =  as.numeric(y), embedding.dim =  emDims[[D]], time.lag = emLags$optimal.lag[L])
 
         # (fn.out <- false.nearest(rnorm(1024), m=6, d=1, t=1, rt=3))
         # plot(fn.out)
-        allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*sd(y))
-        Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
-        if(D==1){Nn.max <- Nn}
-        lagList[[cnt]] <- data.frame(Nsize        = nnSizes[N],
+
+        fnnSeries <- fractal::FNN(x = as.numeric(y),
+                                  dimension = maxDim,
+                                  tlag = emLags$optimal.lag[L],
+                                  rtol = nnRadius[R],
+                                  atol = nnSizes[N],
+                                  olag = 1
+                                  )
+
+        #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*sd(y))
+        #Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
+      #   if(D==1){Nn.max <- Nn}
+        lagList[[cnt]] <- data.frame(Nn.pct = as.numeric(fnnSeries[1,]),
+                                     Nsize = nnSizes[N],
+                                     Nradius = nnRadius[R],
                                      emLag.method = emLags$selection.method[[L]],
                                      emLag = emLags$optimal.lag[L],
-                                     emDim = emDims[D],
-                                     Nn    = Nn,
+                                     emDim = emDims,
+                                     Nn.mean = Nn.mean,
+                                     Nn.sd  = Nn.sd,
+                                     Nn.min = Nn.min,
                                      Nn.max = Nn.max)
-      }
+       }
       }
     }
   }
 
   df        <- plyr::ldply(lagList)
-  df$Nn.pct <- df$Nn/df$Nn.max
+ # df$Nn.pct <- df$Nn/df$Nn.max
 
   opt <-plyr::ldply(unique(df$emLag), function(n){
     id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
@@ -769,7 +792,8 @@ crqa_parameters <- function(y,
   #opRad = NULL
 
   df$emLag <- factor(df$emLag)
-  df$Nsize <- factor(df$Nsize, labels = paste("nn size:",nnSizes))
+  df$Nns   <- interaction(df$Nsize,df$Nradius)
+  df$Nns.f  <-  factor(df$Nns, levels=levels(df$Nns), labels = paste0("size=",nnSizes," | radius=",nnRadius))
 
   if(diagPlot){
 
@@ -788,22 +812,29 @@ crqa_parameters <- function(y,
     #  RColorBrewer::brewer.pal(n = length(unique(df$emLag) name = "Set2")
 
     # use: alpha()
-    #myPal <- RColorBrewer::brewer.pal(length(emLag),"Dark2")
-    gNdims <- ggplot2::ggplot(df, aes(y = Nn.pct, x = emDim, colour = emLag)) +
-      geom_rect(aes(xmin = startAt, xmax = stopAt, fill = f),
+
+   Ncol <- length(emLags$selection.method[!is.na(emLags$optimal.lag)])
+   myPal <- RColorBrewer::brewer.pal(Ncol,"Set2")
+  myPalLag <- myPal
+  names(myPalLag) <- emLags$selection.method[!is.na(emLags$optimal.lag)]
+  myPalNn <- myPal
+  names(myPalNn) <- emLags$optimal.lag[!is.na(emLags$optimal.lag)]
+
+    gNdims <- ggplot2::ggplot(df, ggplot2::aes(y = Nn.pct, x = emDim, colour = emLag)) +
+      geom_rect( ggplot2::aes(xmin = startAt, xmax = stopAt, fill = f),
                 ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
       scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
       geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
-      geom_hline(yintercept = c(0,1),   colour = "grey60") +
-      geom_hline(yintercept = 0.5, colour = "grey90") +
+      geom_hline(yintercept = c(0,100),   colour = "grey60") +
+      geom_hline(yintercept = 50, colour = "grey90") +
       geom_line(position  = position_dodge(.4)) +
       geom_point(position = position_dodge(.4)) +
       annotate("text",x=maxDim/3,y=nnThres, label="threshold", size = .8) +
       xlab("Embedding Dimension") + ylab("Nearest neigbours (% of max.)") +
-      facet_wrap(~Nsize, ncol=2) +
+      facet_wrap(~Nns.f, ncol=2) +
       scale_x_continuous(breaks=emDims) +
-      scale_y_continuous(breaks = c(nnThres,.5,1)) +
-      scale_color_manual("Lag",values = emLags$selection.method[!is.na(emLags$optimal.lag)]) +
+      scale_y_continuous(breaks = c(nnThres,50,100)) +
+      scale_color_manual("Lag", values = myPalNn ) +
       theme_minimal() +
       theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
             strip.text.x = element_text(colour = "black", face = "bold"),
@@ -818,13 +849,12 @@ crqa_parameters <- function(y,
 
     gDelay <- ggplot2::ggplot(dfMI, aes(y = ami, x = emDelay)) +
       geom_line() +
-      geom_vline(data = emLags, aes(colour=factor(selection.method),
-                                    xintercept = optimal.lag),
-                 alpha = .3) +
-      geom_point(data = emLags, aes(x = optimal.lag, y = ami, colour = factor(selection.method)), size = 2) +
+      geom_vline(data = emLags,  ggplot2::aes(colour=factor(selection.method),
+                                    xintercept = optimal.lag), alpha = .3) +
+      geom_point(data = emLags,  ggplot2::aes(x = optimal.lag, y = ami, colour = factor(selection.method)), size = 2) +
       xlab("Embedding Lag") +
       ylab("Average Mututal Information") +
-      scale_color_brewer("Method",palette = "Set2") +
+      scale_color_manual("Lag", values = myPalLag) +
       theme_bw() +
       theme(legend.position = c(.95, .95),
             legend.justification = c("right", "top"),
@@ -2049,18 +2079,16 @@ recmat <- function(y1, y2=NULL,
   if(doPlot){
     dotArgs <- list(...)
 
+    nameOK  <- names(dotArgs)%in%methods::formalArgs(recmat_plot)
     # Plot with defaults
-    if(is.na(dotArgs%00%NA)){
+    if(!all(dotArgs)){
       dotArgs    <- formals(recmat_plot)
       nameOk <- rep(TRUE,length(dotArgs))
-    } else {
-      nameOK  <- names(dotArgs)%in%methods::formalArgs(recmat_plot)
     }
+
     dotArgs$RM <- dmat
-    do.call(recmat_plot,dotArgs[nameOk])
+    do.call(recmat_plot, dotArgs[nameOk])
   }
-
-
   return(dmat)
 }
 
@@ -2087,6 +2115,8 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
   AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
 
   meltRP <- reshape2::melt(RM)
+
+  #meltRP$value <- log(meltRP$value+.Machine$double.eps)
 
   if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
 
@@ -2136,12 +2166,12 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
                          panel.border = element_blank(),
                          axis.ticks = element_blank(),
                          axis.text = element_blank(),
-                         axis.title.x =element_blank(),
-                         axis.title.y =element_blank(),
+                         axis.title.x = element_blank(),
+                         axis.title.y = element_blank(),
                          plot.margin = margin(0,0,0,0))
 
 
-    # Create a custom legend
+    # Create a custom legend ---
     distrange  <- round(seq(0,max(RM,na.rm = TRUE),length.out=7),2)
     resol      <- sort(unique(round(as.vector(RM),2)))
     if(length(resol)<7){
@@ -2160,7 +2190,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
     RecScale <- RecScale %>% dplyr::add_row(epsilon=mean(c(0,distrange$Radius[1])),RR=mean(c(0,distrange$Measure[1])),.before = 1) %>% dplyr::add_row(epsilon=max(RM),RR=1)
 
     resol$y <- elascer(x = resol$y,lo = min(log(RecScale$RR),na.rm = TRUE), hi = max(log(RecScale$RR),na.rm = TRUE))
-    resol$value <- log(resol$value)
+    #resol$value <- log(resol$value)
     resol <- resol[-1,]
 
     gDist <-  ggplot2::ggplot(resol,aes(x=x,y=y,fill=value)) +
@@ -2170,8 +2200,8 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
                            high     = "steelblue",
                            mid      = "white",
                            na.value = scales::muted("slategray4"),
-                           midpoint = median(resol$value),
-                           limit    = c(min(resol$value),max(resol$value)),
+                           midpoint = mean(resol$value, na.rm = TRUE),
+                           #limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                            space    = "Lab",
                            name     = "") +
       coord_equal(1, expand = FALSE) +
@@ -2296,7 +2326,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
   if(plotMeasures){
 
     rpOUT <- round(rpOUT,3)
-    rpOUTdat <- rpOUT %>% dplyr::select(one_of(c("Radius","RT","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>% tidyr::gather(key=measure,value=value) %>% dplyr::mutate(x=rep(0,9),y=9:1)
+    rpOUTdat <- rpOUT %>% dplyr::select(dplyr::one_of(c("Radius","RT","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>% tidyr::gather(key=measure,value=value) %>% dplyr::mutate(x=rep(0,9),y=9:1)
     rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
 
 
@@ -2308,48 +2338,45 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
   }
 
 
-if(useGtable){
+  if(useGtable){
 
-  gRP <- gRP + theme(panel.background = element_rect(colour="white"))
+    gRP <- gRP + theme(panel.background = element_rect(colour="white"))
 
-  gr <- ggplot2::ggplotGrob(gRP)
+    gr <- ggplot2::ggplotGrob(gRP)
 
-  gindex <- subset(gr$layout, name == "panel")
-  g <- gtable::gtable_add_cols(gr, grid::unit(2, "cm"),0)
-  g <- gtable::gtable_add_rows(g, grid::unit(2,"cm"))
-  g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy2), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
-  gindexX <- subset(g$layout, name == "layout")
-  g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy1),13,6)
+    gindex <- subset(gr$layout, name == "panel")
+    g <- gtable::gtable_add_cols(gr, grid::unit(2, "cm"),0)
+    g <- gtable::gtable_add_rows(g, grid::unit(2,"cm"))
+    g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy2), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
+    gindexX <- subset(g$layout, name == "layout")
+    g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy1),13,6)
 
-  if(plotMeasures){
-    g <- gtable::gtable_add_cols(g, grid::unit(2, "cm"),0)
-    g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gA), t=gindexX$t, l=1, b=gindexX$b, r=gindexX$l)
-  }
-
-
-  if(!plotDimensions&!plotMeasures){
-    g <- gRP
-  }
-
-  } else {
-
-  if(plotDimensions|plotMeasures){
-
-    if(unthresholded){
-    g <- (gy2 + gRP + gDist + gg_plotHolder() + gy1 + gg_plotHolder() +
-            plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)))
+    if(plotMeasures){
+      g <- gtable::gtable_add_cols(g, grid::unit(2, "cm"),0)
+      g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gA), t=gindexX$t, l=1, b=gindexX$b, r=gindexX$l)
     }
-   if(plotMeasures&!unthresholded){
-     g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
-             plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)))
-   }
-  } else {
+
+    if(!plotMeasures){
       g <- gRP
-  }
+    }
 
-    g <- g + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot"))
+  } else {
 
-    } # use gtable
+    if(plotDimensions){
+
+      if(unthresholded){
+        g <- (gy2 + gRP + gDist + gg_plotHolder() + gy1 + gg_plotHolder() +
+                plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+      } else {
+
+        g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
+                plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+      }
+
+    } else {
+      g <- gRP
+    }
+  } # use gtable
 
 
 

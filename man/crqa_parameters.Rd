@@ -5,22 +5,26 @@
 \title{Find optimal (C)RQA parameters}
 \usage{
 crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
-  lagMethods = "first.minimum", emLag = NULL, nnRadius = 10,
-  nnSizes = c(0.005, 0.01, 0.005, 0.1), nnThres = 0.1, theiler = 0,
-  diagPlot = TRUE, silent = TRUE, ...)
+  lagMethods = "first.minimum", emLag = NULL, nnSizes = c(2, 5, 10, 15),
+  nnRadius = 5, nnThres = 10, theiler = 0, diagPlot = TRUE,
+  silent = TRUE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series}
 
-\item{maxDim}{Maximum number of embedding dimensions (default = \code{min(c(10, length(y)),na.rm = TRUE)})}
+\item{maxDim}{Maximum number of embedding dimensions (default = \code{10})}
 
-\item{maxLag}{Maximum embedding lag. Defaults to \code{floor(length(y)/(maxDim+1))}.}
+\item{maxLag}{Maximum embedding lag to consider. Defaults to \code{floor(length(y)/(maxDim+1))}.}
 
-\item{lagMethods}{Optimal embedding lag (delay), e.g., provided by optimising algorithm.}
+\item{lagMethods}{A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timemLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")}
 
-\item{nnSizes}{Neighbourhood size}
+\item{emLag}{Optimal embedding lag (delay), e.g., provided by optimising algorithm. Leave empty to estimate (default = \code{NULL})}
 
-\item{nnThres}{Threshold}
+\item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5)})}
+
+\item{nnRadius}{If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{c(5,10)})}
+
+\item{nnThres}{Threshold for selecting optimal parameter in percentage points (default = \code{10})}
 
 \item{theiler}{Theiler window on distance matrix (default = \code{0})}
 
@@ -29,8 +33,6 @@ crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
 \item{silent}{Silent-ish mode}
 
 \item{...}{Other parameters passed to \code{\link[nonlinearTseries]{timeLag}}}
-
-\item{lagMethods}{A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timemLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")}
 }
 \value{
 A list object containing the optimal values and iteration history.
@@ -43,7 +45,7 @@ A number of functions are called to determie optimal parameters for delay embedd
 
 \itemize{
 \item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet]{est_emLag}}, which is a wrapper around \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"} to get lags based on the mutual information function.}
-\item{Embedding dimension (\code{m, \code{emLag}}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
+\item{Embedding dimension (\code{m, \code{emDim}}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[fractal]{FNN}}}
 }
 }
 \seealso{
