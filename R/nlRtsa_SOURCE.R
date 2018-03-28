@@ -5006,9 +5006,9 @@ ts_detrend <- function(y, polyOrder=1){
 #'  Use recursive partitioning function (\link[rpart]{rpart} from \code{rpart} to perform a 'classification' of relatively stable levels in a timeseries.
 #'
 #' @param y A time series of numeric vector
-#' @param minLevelChange A factor indicating how much the signal should change before is is consider a new level (default = \code{20})
+#' @param minDataSplit A factor indicating how many datapoints should be in a segment before it we analyze whether it contains a level change (default = \code{12})
 #' @param minLevelDuration Minimum durtion (length) of a level (default = \code{round(minLevelChange/3)})
-#' @param changeSensitivity A factor indicating a criterion
+#' @param changeSensitivity A factor indicating a criterion of change that must occur before declaring a new level.
 #' @param maxLevels Maximum number of levels in one series (default = \code{30})
 #' @param method The partitioning method to use, see the manual pages of \link[rpart]{rpart} for details.
 #'
@@ -5019,16 +5019,16 @@ ts_detrend <- function(y, polyOrder=1){
 #'
 #' @author Fred Hasselman
 #'
-ts_levels <- function(y, minLevelChange=10, minLevelDuration=round(minLevelChange/3), changeSensitivity = 0.01, maxLevels=30, method=c("anova","poisson","class","exp")[1]){
+ts_levels <- function(y, minDataSplit=12, minLevelDuration=round(minDataSplit/3), changeSensitivity = 0.01, maxLevels=30, method=c("anova","poisson","class","exp")[1]){
   x <- seq_along(y)
   dfs  <- data.frame(x=x, y=y)
   tree <- rpart::rpart(y ~ x,
                        method=method,
                        control = list(
-                         minsplit=minLevelDuration,
-                         minbucket = minLastLevel,
+                         minsplit=minDataSplit,
+                         minbucket = minLevelDuration,
                          maxdepth = maxLevels,
-                         cp = minLevelChange),
+                         cp = changeSensitivity),
                        data=dfs)
 
   dfs$p <- stats::predict(tree, data.frame(x=x))
@@ -5141,15 +5141,70 @@ ts_standardise <- function(y, na.rm=TRUE, type = c("mean.sd","median.mad")[1], a
     stop("Vector must be numeric!")
   } else {
     N <- NROW(y)
-    if(adjustN){type <- "mean.sdN"}
+    if(adjustN){
+      SDtype <- "Bessel"
+    } else {
+      SDtype <- "unadjusted"
+    }
     switch(type,
-           mean.sd    = return((y - mean(y,na.rm = na.rm)) / stats::sd(y,na.rm = na.rm)),
-           mean.sdN   = return(y - mean(y, na.rm = na.rm) / (stats::sd(y, na.rm = na.rm)*sqrt((N-1)/N))),
+           mean.sd    = return((y - mean(y, na.rm = na.rm)) / ts_sd(y,na.rm = na.rm, type = SDtype)),
            median.mad = return((y - stats::median(y, na.rm=na.rm)) / stats::mad(y, na.rm = na.rm))
     )
   }
 }
 
+#' Standard Deviation estimates
+#'
+#' Calculates the population estimate of the standard deviation, or the unadjusted standard deviation.
+#'
+#' @param y Time series or numeric vector
+#' @param na.rm Remove missing values
+#' @param type Apply Bessel's correction (divide by N-1) or return unadjusted SD (divide by N)
+#'
+#' @return Standard deviation of \code{y}
+#' @export
+#'
+ts_sd <- function(y, na.rm=TRUE, type = c("Bessel","unadjusted")[1], silent=TRUE){
+
+  if(!is.numeric(y)){
+    stop("Vector must be numeric!")
+    }
+
+  if(na.rm){
+    y<-y[complete.cases(y)]
+  }
+
+  N <- NROW(y)
+  Y_mean     <- mean(y)
+  Y_sd       <- sd(y)
+  Bessel     <- sqrt((sum((y - Y_mean)^2)/(N-1)))
+  unadjusted <- sqrt((sum((y - Y_mean)^2)/N))
+
+  if(type=="Bessel"){
+    if(all.equal(Y_sd,Bessel)){
+      if(!silent){
+        cat(paste0("\nDifference adjusted-unadjusted SD:",Bessel-unadjusted,"\n"))
+      }
+    } else {
+      cat(paste0("\nWARNING: Computation of SD based on N = ",N," and Mean = ",Y_mean," differs from function sd(y)!!!\n"))
+      cat(paste0("Difference Bessel-sd(y):",Bessel-Y_sd,"\n"))
+    }
+    out <- Bessel
+  }
+
+  if(type=="unadjusted"){
+    if(all.equal(unadjusted,(Y_sd/sqrt(N/(N-1))))){
+    if(!silent){
+      cat(paste0("\nDifference Unadjusted-Adjusted:",unadjusted-Bessel,"\n"))
+    }
+    } else {
+      cat(paste0("\nWARNING: Computation of SD based on N = ",N," and Mean = ",Y_mean," differs from function sd(y)!!!\n"))
+      cat(paste0("Difference unadjusted-(Y_sd/sqrt(N/(N-1))):",unadjusted-(Y_sd/sqrt(N/(N-1))),"\n"))
+    }
+    out <- unadjusted
+  }
+  return(out)
+}
 
 #' Slice columns of a matrix in epochs
 #'

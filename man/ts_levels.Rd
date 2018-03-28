@@ -4,18 +4,18 @@
 \alias{ts_levels}
 \title{Detect levels in time series}
 \usage{
-ts_levels(y, minLevelChange = 10,
-  minLevelDuration = round(minLevelChange/3), changeSensitivity = 0.01,
-  maxLevels = 30, method = c("anova", "poisson", "class", "exp")[1])
+ts_levels(y, minDataSplit = 12, minLevelDuration = round(minDataSplit/3),
+  changeSensitivity = 0.01, maxLevels = 30, method = c("anova", "poisson",
+  "class", "exp")[1])
 }
 \arguments{
 \item{y}{A time series of numeric vector}
 
-\item{minLevelChange}{A factor indicating how much the signal should change before is is consider a new level (default = \code{20})}
+\item{minDataSplit}{A factor indicating how many datapoints should be in a segment before it we analyze whether it contains a level change (default = \code{12})}
 
 \item{minLevelDuration}{Minimum durtion (length) of a level (default = \code{round(minLevelChange/3)})}
 
-\item{changeSensitivity}{A factor indicating a criterion}
+\item{changeSensitivity}{A factor indicating a criterion of change that must occur before declaring a new level.}
 
 \item{maxLevels}{Maximum number of levels in one series (default = \code{30})}
 
