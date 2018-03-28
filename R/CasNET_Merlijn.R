@@ -33,6 +33,7 @@
 #' @references Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. European Journal of Psychological Assessment, 19, 175-184.
 #' @references Haken, H. & Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.
 #' @references Schiepek, G. K., St?ger-Schmidinger, B., Aichhorn, W., Sch?ller, H., & Aas, B. (2016). Systemic case formulation, individualized process monitoring, and state dynamics in a case of dissociative identity disorder. Frontiers in psychology, 7, 1545.
+#'
 dyn_comp = function(df, col_first, col_last, scale_min, scale_max, win=NROW(df),  doPlot = FALSE){
 
 
@@ -229,9 +230,11 @@ DC_D = function (df, win, xmin, xmax, col_first, col_last){
 #' @description Computes significant peaks in the dynamic complexity time series. Example: Schiepek, Tominschek & Heinzel, 2014.
 #'
 #' @param df A dataframe of dynamic complexity values, e.g. output data from dyn_comp
-#' @param win Window size over which dynamic complexity was calculated (nescesary for plot)
+#' @param win Window size over which dynamic complexity was calculated (neccesary for plot)
+#' @param doPlot If \code{TRUE} shows a plot and returns a \code{\link[ggplot2]{ggplot}} object in a list. If \code{FALSE}, no plot will be drawn and no object will be returned (default = \code{FALSE})
 #'
 #' @return A list with a dataframe of binary critical instability indices and a summed critical intability index, a ggplot object containing a critical instability diagram.
+#'
 #' @export
 #'
 #' @author Merlijn Olthof
@@ -241,7 +244,7 @@ DC_D = function (df, win, xmin, xmax, col_first, col_last){
 #' @references Haken, H. & Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.
 #' @references Schiepek, G. K., Tominschek, I., & Heinzel, S. (2014). Self-organization in psychotherapy: testing the synergetic model of change processes. Frontiers in psychology, 5, 1089.
 #'
-crit_in = function(df, win){
+crit_in = function(df, win, doPlot = TRUE){
 
   df.ci <- matrix(data=NA, nrow=nrow(df), ncol=ncol(df))
   df.ci <- data.frame(df.ci)

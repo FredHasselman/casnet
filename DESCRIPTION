@@ -50,7 +50,6 @@ Imports:
     infotheo,
     methods,
     RColorBrewer,
-    patchwork,
     tibble
 Suggests: knitr,
     rmarkdown,

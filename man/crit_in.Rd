@@ -4,12 +4,14 @@
 \alias{crit_in}
 \title{Critical Instability}
 \usage{
-crit_in(df, win)
+crit_in(df, win, doPlot = TRUE)
 }
 \arguments{
 \item{df}{A dataframe of dynamic complexity values, e.g. output data from dyn_comp}
 
-\item{win}{Window size over which dynamic complexity was calculated (nescesary for plot)}
+\item{win}{Window size over which dynamic complexity was calculated (neccesary for plot)}
+
+\item{doPlot}{If \code{TRUE} shows a plot and returns a \code{\link[ggplot2]{ggplot}} object in a list. If \code{FALSE}, no plot will be drawn and no object will be returned (default = \code{FALSE})}
 }
 \value{
 A list with a dataframe of binary critical instability indices and a summed critical intability index, a ggplot object containing a critical instability diagram.
