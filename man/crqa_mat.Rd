@@ -13,6 +13,8 @@ crqa_mat(RM, threshold = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \arguments{
 \item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})}
 
+\item{threshold}{Threshold for distance value that counts as a recurrence}
+
 \item{DLmin}{Minimal diagonal line length (default = \code{2})}
 
 \item{VLmin}{Minimal vertical line length (default = \code{2})}
@@ -38,8 +40,6 @@ crqa_mat(RM, threshold = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \item{CL}{Confidence limit for bootstrap results (default = \code{.95})}
 
 \item{doParallel}{Use parallel?}
-
-\item{radius}{Threshold for distance value that counts as a recurrence}
 }
 \value{
 A list object containing (C)RQA measures (and matrices if requested)

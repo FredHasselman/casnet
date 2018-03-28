@@ -661,7 +661,7 @@ crqa_cl <- function(y1,
 #' @param maxDim Maximum number of embedding dimensions (default = \code{10})
 #' @param maxLag Maximum embedding lag to consider. Defaults to \code{floor(length(y)/(maxDim+1))}.
 #' @param emLag Optimal embedding lag (delay), e.g., provided by optimising algorithm. Leave empty to estimate (default = \code{NULL})
-#' @param lagMethods A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timemLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")
+#' @param lagMethods A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")
 #' @param nnSizes  Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5)})
 #' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{c(5,10)})
 #' @param nnThres  Threshold for selecting optimal parameter in percentage points (default = \code{10})
@@ -1395,7 +1395,7 @@ crqa_mat_measures <- function(RM,
 #' A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures will be caluclated.
 #'
 #' @param RM A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})
-#' @param radius Threshold for distance value that counts as a recurrence
+#' @param threshold Threshold for distance value that counts as a recurrence
 #' @param DLmin Minimal diagonal line length (default = \code{2})
 #' @param VLmin Minimal vertical line length (default = \code{2})
 #' @param HLmin Minimal horizontal line length (default = \code{2})
@@ -1618,6 +1618,7 @@ est_emLag <- function(y,
 #' @param maxDim Maximum number of embedding dimensions
 #' @param threshold See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
 #' @param max.relative.change See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
+#' @param doPlot Plot
 #' @param ... Other arguments (not in use)
 #'
 #' @description A wrapper for nonlinearTseries::estimateEmbeddingDim
@@ -2096,62 +2097,68 @@ recmat <- function(y1, y2=NULL,
 #' Plot (thresholded) distance matrix
 #'
 #' @param RM A distance matrix or recurrence matrix
-#' @param plotDimensions Should the state vectors be plotted if they are available as attributes of `RM` (default = \code{TRUE})
+#' @param plotDimensions Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})
 #' @param plotMeasures Print common (C)RQA measures in the plot if the matrix is binary
+#' @param radiusValue If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.
 #' @param title A title for the plot
 #' @param xlab An x-axis label
 #' @param ylab An y-axis label
 #' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
 #' @param doPlot Draw the plot? (default = \code{TRUE})
-#' @param useGtable Use package \code{\link{gtable}} instead of \code{\link{patchwork}} to plot.
+#' @param useGtable Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set set to FALSE to use package \code{patchwork}. This package is in development, see the warning for instructions on how to install it.
 #'
 #' @return A nice plot of the recurrence matrix.
 #' @export
 #'
 #' @family Distance matrix operations
 #'
-recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title = "", xlab = "", ylab="", plotSurrogate = NA, doPlot = TRUE, useGtable = FALSE){
+recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE){
 
-  AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
-
-  meltRP <- reshape2::melt(RM)
-
-  #meltRP$value <- log(meltRP$value+.Machine$double.eps)
-
-  if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
-
-    unthresholded = TRUE
-
-    # For presentation purpose only
-    # if(PhaseSpaceScale){
-    #   meltRP$value <- elascer(meltRP$value)
-    #   RM <- RM / max(meltRP$value, na.rm = TRUE)
-    # }
-
-    if(plotMeasures){
-
-      epsilon <- crqa_radius(RM,silent = TRUE)$Radius
-      rpOUT   <- crqa_mat(RM,threshold = epsilon, AUTO = AUTO)
-    }
-
-  } else {
-
-    unthresholded = FALSE
-    meltRP$value <- factor(meltRP$value)
-
-    if(plotMeasures){
-      rpOUT <- crqa_mat(RM, AUTO = AUTO)
-    }
-
+  # check patchwork
+  if(!length(find.package("patchwork",quiet = TRUE))>0){
+    warning("Package patchwork is not installed...\n1. Install Xcode from App Store (MacOS) or rwintools.exe from CRAN (Windows) \n2. Install patchwork: devtools::install_github('thomasp85/patchwork')\n3. Install casnet: devtools::install_github('FredHasselman/casnet')\n....Using gtable instead, with limited options\n")
+    useGtable=TRUE
   }
 
+
+  # check auto-recurrence
+  AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
+
+  # prepare data
+  meltRP <- reshape2::melt(RM)
+
+  # check unthresholded
+  if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
+    unthresholded <- TRUE
+  } else {
+    unthresholded <- FALSE
+    if(!is.null(attr(RM,"emRadius"))){
+      radiusValue <- attr(RM,"emRadius")
+    }
+    meltRP$value <- factor(meltRP$value)
+  }
+
+  # Get CRQA measures
+  if(plotMeasures){
+    if(is.na(radiusValue)){
+      radiusValue <- crqa_radius(RM,silent = TRUE)$Radius
+    }
+    if(unthresholded){
+      rpOUT   <- crqa_mat(RM, threshold = radiusValue, AUTO = AUTO)
+    } else {
+      rpOUT   <- crqa_mat(RM, AUTO = AUTO)
+    }
+  }
+
+  # main plot
   gRP <-  ggplot2::ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
     geom_raster(show.legend = FALSE) +
+    geom_abline(slope = 1,colour = "grey50", size = 1) +
+    #ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
     scale_x_continuous(expand = c(0,0)) +
     scale_y_continuous(expand = c(0,0))
 
   if(unthresholded){
-
     gRP <- gRP + scale_fill_gradient2(low      = "red3",
                                       high     = "steelblue",
                                       mid      = "white",
@@ -2170,7 +2177,6 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
                          axis.title.x = element_blank(),
                          axis.title.y = element_blank(),
                          plot.margin = margin(0,0,0,0))
-
 
     # Create a custom legend ---
     distrange  <- round(seq(0,max(RM,na.rm = TRUE),length.out=7),2)
@@ -2222,9 +2228,9 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
             axis.title.y = element_text(hjust = 0, size = 10),
             # axis.title.y.left = element_text(hjust = 0, size = 10),
             # axis.title.y.right = element_text(hjust = 0, size = 10),
-            plot.margin = margin(20,5,20,5))
+            plot.margin = margin(0,5,0,5, unit = "pt"))
 
-  } else {
+  } else { # unthresholded
 
     gRP <- gRP + scale_fill_manual(values = c("white","black"),
                                    na.value = scales::muted("slategray4"),
@@ -2241,106 +2247,119 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
       axis.text = element_blank(),
       axis.title.x =element_blank(),
       axis.title.y =element_blank(),
-      plot.margin = margin(3,3,3,3))
+      plot.margin = margin(0,0,0,0))
   }
 
-  gRP <- gRP +
-    geom_abline(slope = 1,colour = "grey50", size = 1) +
-    #ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
-    rptheme +
-    coord_fixed(expand = FALSE)
+
+  # Main plot
+  gRP <- gRP + xlab(xlab) + ylab(ylab) + rptheme + coord_fixed(expand = FALSE)
+
+  gy1 <- gg_plotHolder()
+  gy2 <- gg_plotHolder()
 
 
-  if(!is.null(attr(RM,"emDims1"))){
+  if(plotDimensions){
 
-    gRP <- gRP + ylab("") + xlab("")
+    if(!is.null(attr(RM,"emDims1"))){
 
-    y1 <- data.frame(t1=attr(RM,"emDims1"))
-    y2 <- data.frame(t2=attr(RM,"emDims2"))
+      gRP <- gRP + ylab("") + xlab("")
 
-    xdims <- ifelse(nchar(xlab)>0,xlab,attr(RM,"emDims1.name"))
-    ydims <- ifelse(nchar(ylab)>0,ylab,attr(RM,"emDims2.name"))
+      y1 <- data.frame(t1=attr(RM,"emDims1"))
+      y2 <- data.frame(t2=attr(RM,"emDims2"))
 
-    # Y1
+      xdims <- ifelse(nchar(xlab)>0,xlab,attr(RM,"emDims1.name"))
+      if(AUTO){
+        ydims <- xdims
+      } else {
+        ydims <- ifelse(nchar(ylab)>0,ylab,attr(RM,"emDims2.name"))
+      }
 
-    colnames(y1) <- paste0("X",1:NCOL(y1))
-    y1$tm  <- 1:NROW(y1)
-    y1$tmna <- 0
-    y1$tmna[is.na(y1[,1])] <- y1$tm[is.na(y1[,1])]
-    y1 <- tidyr::gather(y1,key="Dimension",value = "Value", -c("tm","tmna"))
-    y1$Value <-  elascer(y1$Value)
+      # Y1
 
-    gy1 <- ggplot2::ggplot(y1, aes(y=Value, x= tm,  group=Dimension)) +
-      geom_line(aes(colour=Dimension), show.legend = FALSE) +
-      xlab(xdims) + ylab("") +
-      geom_vline(aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
-      scale_color_grey() +
-      scale_x_continuous(expand = c(0,0)) +
-      scale_y_continuous(expand = c(0,0)) +
-      theme(panel.background = element_rect("grey99"),
-            panel.grid.major  = element_blank(),
-            panel.grid.minor  = element_blank(),
-            legend.background = element_blank(),
-            legend.key = element_blank(),
-            panel.border = element_blank(),
-            axis.text = element_blank(),
-            axis.ticks = element_blank(),
-            axis.title.x =element_text(colour = "black",angle = 0, vjust = +3),
-            axis.title.y =element_blank(),
-            plot.margin = margin(0,10,0,10, unit = "pt")) +
-      coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
+      colnames(y1) <- paste0("X",1:NCOL(y1))
+      y1$tm  <- 1:NROW(y1)
+      y1$tmna <- 0
+      y1$tmna[is.na(y1[,1])] <- y1$tm[is.na(y1[,1])]
+      y1 <- tidyr::gather(y1,key="Dimension",value = "Value", -c("tm","tmna"))
+      y1$Value <-  elascer(y1$Value)
 
-    # Y2
-    colnames(y2) <- paste0("Y",1:NCOL(y2))
-    y2$tm <- 1:NROW(y2)
-    y2$tmna <- 0
-    y2$tmna[is.na(y2[,1])] <- y2$tm[is.na(y2[,1])]
-    y2 <- tidyr::gather(y2,key="Dimension",value = "Value", -c("tm","tmna"))
-    y2$Value <-  elascer(y2$Value)
+      gy1 <- ggplot2::ggplot(y1, aes(y=Value, x= tm,  group=Dimension)) +
+        geom_line(aes(colour=Dimension), show.legend = FALSE) +
+        xlab(xdims) + ylab("") +
+        geom_vline(aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+        scale_color_grey() +
+        scale_x_continuous(expand = c(0,0)) +
+        scale_y_continuous(expand = c(0,0)) +
+        theme(panel.background = element_rect("grey99"),
+              panel.grid.major  = element_blank(),
+              panel.grid.minor  = element_blank(),
+              legend.background = element_blank(),
+              legend.key = element_blank(),
+              panel.border = element_blank(),
+              axis.text = element_blank(),
+              axis.ticks = element_blank(),
+              axis.title.x =element_text(colour = "black",angle = 0, vjust = +3),
+              axis.title.y =element_blank(),
+              plot.margin = margin(0,0,0,0, unit = "pt")) +
+        coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
 
-    gy2 <- ggplot2::ggplot(y2, aes(y=Value, x=tm, group=Dimension)) +
-      geom_line(aes(colour=Dimension), show.legend = FALSE) +
-      ylab("") + xlab(ydims) +
-      geom_vline(aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
-      scale_color_grey() +
-      scale_x_continuous(expand = c(0,0)) +
-      theme(panel.background = element_rect("grey99"),
-            panel.grid.major  = element_blank(),
-            panel.grid.minor  = element_blank(),
-            legend.background = element_blank(),
-            legend.key = element_blank(),
-            panel.border = element_blank(),
-            axis.text = element_blank(),
-            axis.ticks = element_blank(),
-            axis.title.x =element_blank(),
-            axis.title.y =element_text(colour = "black",angle = 90, vjust = -2),
-            plot.margin = margin(0,0,0,0, unit = "pt")) +
-      coord_flip(expand = FALSE) +
-      scale_y_reverse(expand = c(0,0))
+      # Y2
+      colnames(y2) <- paste0("Y",1:NCOL(y2))
+      y2$tm <- 1:NROW(y2)
+      y2$tmna <- 0
+      y2$tmna[is.na(y2[,1])] <- y2$tm[is.na(y2[,1])]
+      y2 <- tidyr::gather(y2,key="Dimension",value = "Value", -c("tm","tmna"))
+      y2$Value <-  elascer(y2$Value)
 
-  } else {
-    gy1 <- gg_plotHolder()
-    gy2 <- gg_plotHolder()
-    gRP <- gRP + xlab(xlab) + ylab(ylab)
-  }
+      gy2 <- ggplot2::ggplot(y2, aes(y=Value, x=tm, group=Dimension)) +
+        geom_line(aes(colour=Dimension), show.legend = FALSE) +
+        ylab("") + xlab(ydims) +
+        geom_vline(aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+        scale_color_grey() +
+        scale_x_continuous(expand = c(0,0)) +
+        theme(panel.background = element_rect("grey99"),
+              panel.grid.major  = element_blank(),
+              panel.grid.minor  = element_blank(),
+              legend.background = element_blank(),
+              legend.key = element_blank(),
+              panel.border = element_blank(),
+              axis.text = element_blank(),
+              axis.ticks = element_blank(),
+              axis.title.x =element_blank(),
+              axis.title.y =element_text(colour = "black",angle = 90, vjust = -2),
+              plot.margin = margin(0,0,0,0, unit = "pt")) +
+        coord_flip(expand = FALSE) +
+        scale_y_reverse(expand = c(0,0))
+
+    } else {
+      plotDimensions= FALSE
+    }
+  } # plotdimensions
+
 
   if(plotMeasures){
 
     rpOUT    <- round(rpOUT,3)
+    if(is.na(rpOUT$Radius)){
+      rpOUT$Radius <- round(radiusValue,3)
+    }
+
     rpOUTdat <- rpOUT %>%
       dplyr::select(dplyr::one_of(c("Radius","RT","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>%
       tidyr::gather(key=measure,value=value) %>%
       dplyr::mutate(x=rep(0,9),y=9:1)
 
+    rpOUTdat <- cbind(rpOUTdat,rpOUTdat)
     rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
 
     gA <-ggplot2::ggplot(rpOUTdat,aes(x=x,y=y)) +
-      geom_text(aes(label=label), family="mono", hjust="left", vjust="center", size=3) +
-      scale_x_continuous(limits = c(0,.3)) +
-      theme_void()
+      geom_text(aes(label=label), family="mono", hjust="left", vjust="center", size=3, parse = FALSE) +
+      #scale_x_continuous(limits = c(0,.3)) +
+      theme_void() +
+      theme(plot.margin = margin(0,5,0,5, unit = "pt"))
 
     #geom="text", label = paste("Radius:",rpOUT$Radius,"\nRec points:",rpOUT$RT,"\nRR",rpOUT$RR,"\nDET:",rpOUT$DET,"\nMEAN_dl:",rpOUT$MEAN_dl,"\nENT_dl:",rpOUT$ENT_dl,"\nLAM_vl:",rpOUT$LAM_vl, "\nTT_vl:",rpOUT$TT_vl,"\nENTR_vl:",rpOUT$ENT_vl)) + theme_minimal() + theme(text = element_text(family = "mono"))
-   # ,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
+    # ,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
   }
 
 
@@ -2348,23 +2367,69 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
 
     gRP <- gRP + theme(panel.background = element_rect(colour="white"))
 
-    gr <- ggplot2::ggplotGrob(gRP)
+    g <- ggplot2::ggplotGrob(gRP)
 
-    gindex <- subset(gr$layout, name == "panel")
-    g <- gtable::gtable_add_cols(gr, grid::unit(2, "cm"),0)
-    g <- gtable::gtable_add_rows(g, grid::unit(2,"cm"))
-    g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy2), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
-    gindexX <- subset(g$layout, name == "layout")
-    g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gy1),13,6)
+    if(plotDimensions){
+      gry2<-ggplot2::ggplotGrob(gy2)
+      gry1<-ggplot2::ggplotGrob(gy1)
+    }
+
+    if(unthresholded){
+      grDist <- ggplot2::ggplotGrob(gDist)
+    }
 
     if(plotMeasures){
-      g <- gtable::gtable_add_cols(g, grid::unit(2, "cm"),0)
-      g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gA), t=gindexX$t, l=1, b=gindexX$b, r=gindexX$l)
+      grA <- ggplot2::ggplotGrob(gA)
     }
 
-    if(!plotMeasures){
-      g <- gRP
+    if(plotDimensions&!plotMeasures&unthresholded){
+      mat <- matrix(list(gry2, nullGrob(),g, gry1, grDist, nullGrob()),nrow = 2)
+      gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
+
+    if(plotDimensions&!plotMeasures&!unthresholded){
+      mat <- matrix(list(gry2, nullGrob(),g, gry1),nrow = 2)
+      gt  <- gtable::gtable_matrix("bi_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1, .25), "null"),respect = TRUE)
+    }
+
+    if(plotDimensions&plotMeasures&unthresholded){
+      mat <- matrix(list(grA, nullGrob(), gry2, nullGrob(),g, gry1, grDist, nullGrob()),nrow = 2)
+      gt<- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+    }
+
+    if(plotDimensions&plotMeasures&!unthresholded){
+      mat <- matrix(list(grA, nullGrob(), gry2, nullGrob(),g, gry1),nrow = 2)
+      gt<- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+    }
+
+    if(!plotDimensions&plotMeasures&unthresholded){
+      mat <- matrix(list(grA, g, grDist),nrow = 1)
+      gt<- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+    }
+
+    if(!plotDimensions&plotMeasures&!unthresholded){
+      mat <- matrix(list(grA, g),nrow = 1)
+      gt<- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+    }
+
+    if(!plotDimensions&!plotMeasures&unthresholded){
+      mat <- matrix(list(g, grDist),nrow = 1)
+      gt<- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+    }
+
+    if(!plotDimensions&!plotMeasures&!unthresholded){
+      mat <- matrix(list(g),nrow = 1)
+      gt<- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+    }
+
+    # gindex <- subset(g$layout, name == "layout")
+    # g <- gtable::gtable_add_cols(g, grid::unit(.5, "grobwidth", data = g),0)
+    # g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gA), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
+    #rm(gindex)
+    #}
+
+  #  gt <- gtable::gtable_add_col_space(gt,)
+
 
   } else {
 
@@ -2377,13 +2442,13 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
       } else {
 
         if(plotMeasures){
-        g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
-                plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+          g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
+                  plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
         } else {
           g <- (gy2 + gRP + gg_plotHolder() + gg_plotHolder() + gy1 + gg_plotHolder() +
                   plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
         }
-        }
+      }
 
     } else {
       g <- gRP
@@ -2391,12 +2456,16 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, title =
   } # use gtable
 
 
-
   if(doPlot){
-    plot.new()
-    plot(g)
+    if(useGtable){
+      grid.newpage()
+      grid.draw(gt)
+    } else {
+      plot.new()
+      plot(g)
+    }
+    return(invisible(g))
   }
-  return(invisible(g))
 }
 
 
@@ -3018,6 +3087,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
   if(convMat){RP <- Matrix::Matrix(RP)}
 
   attributes(RP) <- attributes(distmat)
+  attr(RP,"emRadius") <- radius
 
   return(RP)
 }
@@ -3352,6 +3422,7 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FA
 #' @param scales default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}
 #' @param fitRange Scale bins (\code{c(min,max)}) to use for fitting the scaling relation
 #' @param doPlot    Return the log-log spectrum with linear fit (default).
+#' @param silent Silent-ish mode
 #'
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
@@ -3859,7 +3930,7 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
     plot.new()
     plot(g)
   }
-  if(returnWeightsOnly){
+  if(returnOnlyWeights){
     return(E(g)$weight)
   } else {
     return(invisible(g))
@@ -4157,11 +4228,12 @@ plotFA_loglog <- function(fd.OUT){
 #' @param observedValue The measure obtained from the observed value
 #' @param sides Is this a 1 or 2-sided test (default = \code{1})
 #' @param binWidth The size of the histogram bins. The default is to look for the max. number of digits and set the width to \code{1/10^(Ndigits-1)}. If integers are detectec width will be set to 1.
-#' @param alpha Significance threshold for the test. This value is currently calculated from the data as \eqn{\frac{1}{rank}*Nsides}, setting it will not have an effect.
 #' @param measureName Label for x-axis
 #' @param title A title for the plot
 #' @param doPlot Plot a histogram of the distribution (default = \code{TRUE})
 #' @param returnOnlyPvalue Do not return the graph, just the point p-value (default = \code{FALSE})
+#'
+#' alpha Significance threshold for the test. This value is currently calculated from the data as \eqn{\frac{1}{rank}*Nsides}, setting it will not have an effect.
 #'
 #' @return A point p-value for the observed value, and/or a histogram of the distribution (\code{ggplot2} object).
 #' @export
@@ -4646,6 +4718,7 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 #' @param emDim Embedding dimension
 #' @param emLag Embedding lag
 #' @param returnOnlyIndices Return only the index of y for each surrogate dimension, not the values (default = \code{FALSE})
+#' @param silent Silent-ish mode
 #'
 #' @return The lag embedded time series
 #' @family Time series operations
@@ -5389,7 +5462,6 @@ is.wholenumber <- function(x, tol = .Machine$double.eps^0.5){
 #'
 #' @export
 #' @author Fred Hasselman
-#' @seealso %++%
 #' @examples
 #'
 #' # Notice the difference between passing an object and a value for counter
@@ -5434,7 +5506,6 @@ is.wholenumber <- function(x, tol = .Machine$double.eps^0.5){
 #' @export
 #' @author Fred Hasselman
 #' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
-#' @seealso  function %+-%
 #' @examples
 #'
 #' # Notice the difference between passing an object and a value for counter
@@ -5510,7 +5581,4 @@ NULL
 NULL
 
 #' @import ggplot2
-NULL
-
-#' @import patchwork
 NULL

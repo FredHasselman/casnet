@@ -32,9 +32,6 @@ while(i > -3) i \%+-\% -5
 # WARNING: As is the case for any while ... statement, be careful not to create an infinite loop!
 
 }
-\seealso{
-%++%
-}
 \author{
 Fred Hasselman
 }

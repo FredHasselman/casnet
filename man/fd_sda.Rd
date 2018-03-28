@@ -22,6 +22,8 @@ fd_sda(y, fs = NULL, standardise = TRUE, detrend = FALSE,
 \item{fitRange}{Scale bins (\code{c(min,max)}) to use for fitting the scaling relation}
 
 \item{doPlot}{Return the log-log spectrum with linear fit (default).}
+
+\item{silent}{Silent-ish mode}
 }
 \value{
 A list object containing:

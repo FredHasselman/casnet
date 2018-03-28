@@ -23,9 +23,9 @@ plotSUR_hist(surrogateValues, observedValue, sides = c("two.sided", "greater",
 
 \item{doPlot}{Plot a histogram of the distribution (default = \code{TRUE})}
 
-\item{returnOnlyPvalue}{Do not return the graph, just the point p-value (default = \code{FALSE})}
+\item{returnOnlyPvalue}{Do not return the graph, just the point p-value (default = \code{FALSE})
 
-\item{alpha}{Significance threshold for the test. This value is currently calculated from the data as \eqn{\frac{1}{rank}*Nsides}, setting it will not have an effect.}
+alpha Significance threshold for the test. This value is currently calculated from the data as \eqn{\frac{1}{rank}*Nsides}, setting it will not have an effect.}
 }
 \value{
 A point p-value for the observed value, and/or a histogram of the distribution (\code{ggplot2} object).

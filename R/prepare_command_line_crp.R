@@ -30,7 +30,7 @@
   )
   toset <- !(names(op.casnet) %in% names(op))
   if(any(toset)) options(op.casnet[toset])
-  for(p in c("grDevices","graphics","stats","utils","ggplot2")){requireNamespace(p, quietly = TRUE)}
+  for(p in c("grDevices","graphics","stats","utils")){requireNamespace(p, quietly = TRUE)}
   invisible()
 }
 

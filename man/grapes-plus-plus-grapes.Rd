@@ -35,9 +35,6 @@ while(i < 20) i \%+-\% 5
 # WARNING: As is the case for any while ... statement, be careful not to create an infinite loop!
 
 }
-\seealso{
-function %+-%
-}
 \author{
 Fred Hasselman
 }

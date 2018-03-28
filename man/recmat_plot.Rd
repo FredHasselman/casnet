@@ -4,16 +4,18 @@
 \alias{recmat_plot}
 \title{Plot (thresholded) distance matrix}
 \usage{
-recmat_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE, title = "",
-  xlab = "", ylab = "", plotSurrogate = NA, doPlot = TRUE,
-  useGtable = FALSE)
+recmat_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
+  radiusValue = NA, title = "", xlab = "", ylab = "",
+  plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE)
 }
 \arguments{
 \item{RM}{A distance matrix or recurrence matrix}
 
-\item{plotDimensions}{Should the state vectors be plotted if they are available as attributes of `RM` (default = \code{TRUE})}
+\item{plotDimensions}{Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})}
 
 \item{plotMeasures}{Print common (C)RQA measures in the plot if the matrix is binary}
+
+\item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
 
 \item{title}{A title for the plot}
 
@@ -25,7 +27,7 @@ recmat_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE, title = "",
 
 \item{doPlot}{Draw the plot? (default = \code{TRUE})}
 
-\item{useGtable}{Use package \code{\link{gtable}} instead of \code{\link{patchwork}} to plot.}
+\item{useGtable}{Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set set to FALSE to use package \code{patchwork}. This package is in development, see the warning for instructions on how to install it.}
 }
 \value{
 A nice plot of the recurrence matrix.

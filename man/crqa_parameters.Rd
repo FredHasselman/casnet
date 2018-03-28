@@ -16,7 +16,7 @@ crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
 
 \item{maxLag}{Maximum embedding lag to consider. Defaults to \code{floor(length(y)/(maxDim+1))}.}
 
-\item{lagMethods}{A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timemLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")}
+\item{lagMethods}{A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")}
 
 \item{emLag}{Optimal embedding lag (delay), e.g., provided by optimising algorithm. Leave empty to estimate (default = \code{NULL})}
 

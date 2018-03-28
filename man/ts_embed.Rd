@@ -14,6 +14,8 @@ ts_embed(y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
 \item{emLag}{Embedding lag}
 
 \item{returnOnlyIndices}{Return only the index of y for each surrogate dimension, not the values (default = \code{FALSE})}
+
+\item{silent}{Silent-ish mode}
 }
 \value{
 The lag embedded time series
