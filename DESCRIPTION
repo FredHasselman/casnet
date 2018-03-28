@@ -2,7 +2,7 @@ Package: casnet
 Type: Package
 Title: A Toolbox for Studying Complex Adaptive Systems and NETworks
 Version: 0.1.2
-Authors@R: person("Fred", "Hasselman", email = "f.hasselman@bsi.ru.nl", role = c("aut", "cre"),)
+Authors@R: person("Fred", "Hasselman", email = "f.hasselman@bsi.ru.nl", role = c("aut", "cre"))
 Maintainer: Fred Hasselman <f.hasselman@bsi.ru.nl>
 Description: A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
     - Recurrence Quantification Analyses (CrossRQA, Categorical RQA, Chromatic RQA, Anisotropic RQA).

@@ -66,7 +66,8 @@ if(doPlot){
     ggplot2::ggtitle('Complexity Resonance Diagram') +
     ggplot2::coord_cartesian(ylim=c(0.5,(ncol(mat.dc)+0.5)), xlim=c(win-0.5,nrow(mat.dc)+0.5), expand=FALSE)
 
-
+  graphics::plot.new()
+  graphics::plot(plot.dc)
   return(list(df.comp = df.comp,
               plot.dc = plot.dc))
 } else {
@@ -270,7 +271,7 @@ crit_in = function(df, win){
   colnames(mat.ci) <- c(1:ncol(mat.ci))
   mat.ci[,ncol(mat.ci)] <- mat.ci[,ncol(mat.ci)]*10 #the last column, showing Critical Instability of all items has values of 10 instead of 1
 
-
+if(doPlot){
   plot.ci <- ggplot2::ggplot(reshape2::melt(mat.ci), aes(x=Var1, y=Var2, fill=as.factor(value))) + ggplot2::geom_tile() +
     ggplot2::scale_fill_manual(values = c("NA", "grey", "black")) +
     ggplot2::theme_bw() +
@@ -283,6 +284,12 @@ crit_in = function(df, win){
     ggplot2::ggtitle('Critical Instability Plot') +
     ggplot2::coord_cartesian(ylim=c(0.5,(ncol(mat.ci)+0.5)), xlim=c(win-0.5,nrow(mat.ci)+0.5), expand=F)
 
+   graphics::plot.new()
+   graphics::plot(plot.ci)
+
   return(list(df.ci = df.ci,
               plot.ci = plot.ci))
+} else {
+    return(df.ci)
+  }
 }
