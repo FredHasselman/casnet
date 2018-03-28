@@ -12,6 +12,8 @@ ts_sd(y, na.rm = TRUE, type = c("Bessel", "unadjusted")[1], silent = TRUE)
 \item{na.rm}{Remove missing values}
 
 \item{type}{Apply Bessel's correction (divide by N-1) or return unadjusted SD (divide by N)}
+
+\item{silent}{Silent-ish mode (default = \code{TRUE})}
 }
 \value{
 Standard deviation of \code{y}

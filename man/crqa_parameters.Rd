@@ -45,7 +45,7 @@ A number of functions are called to determie optimal parameters for delay embedd
 
 \itemize{
 \item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet]{est_emLag}}, which is a wrapper around \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"} to get lags based on the mutual information function.}
-\item{Embedding dimension (\code{m, \code{emDim}}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[fractal]{FNN}}}
+\item{Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[fractal]{FNN}}}
 }
 }
 \seealso{

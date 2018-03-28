@@ -36,7 +36,7 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{step}{Stepsize for sliding windows (default = size of \code{win}, so no sliding window)}
 
-\item{JRP}{Wether to calculate a Joint Recurrence Plot(default = \code{FALSE})}
+\item{JRP}{Wether to calculate a Joint Recurrence Plot (default = \code{FALSE})}
 
 \item{distNorm}{One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
 

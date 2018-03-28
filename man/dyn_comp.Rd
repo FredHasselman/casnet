@@ -18,12 +18,12 @@ dyn_comp(df, col_first, col_last, scale_min, scale_max, win = NROW(df),
 
 \item{scale_max}{Theoretical maximum value of the scale.}
 
-\item{win}{Window size. Default is whole time series.}
+\item{win}{Window size (default = \code{NROW(df)}}
 
-\item{doPlot}{doPlot=TRUE shows a plot. Default is doPlot=FALSE.}
+\item{doPlot}{If \code{TRUE} shows a plot and returns an invisible \code{\link[ggplot2]{ggplot}} object. If \code{FALSE}, plot will be drawn and no object will be returned (default = \code{FALSE})}
 }
 \value{
-A list object containing a dataframe of dynamic complexity values and a ggplot object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016)
+If \code{doPlot = TRUE}, a list object containing a dataframe of dynamic complexity values and a \code{ggplot2} object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016). If \code{doPlot = FALSE} the dataframe is returned.
 }
 \description{
 Calculates Dynamic Complexity, a complexity index for short and coarse-grained time series (Schiepek & Strunk, 2010; Schiepek, 2003; Haken & Schiepek 2006).

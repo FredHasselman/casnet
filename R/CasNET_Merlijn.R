@@ -18,12 +18,13 @@
 #' @param df A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.
 #' @param col_first The first column of the dataframe that should be analyzed.
 #' @param col_last The last column of the dataframe that should be analyzed.
-#' @param win Window size. Default is whole time series.
+#' @param win Window size (default = \code{NROW(df)}
 #' @param scale_min Theoretical minimum value of thescale.
 #' @param scale_max Theoretical maximum value of the scale.
-#' @param doPlot doPlot=TRUE shows a plot. Default is doPlot=FALSE.
+#' @param doPlot If \code{TRUE} shows a plot and returns an invisible \code{\link[ggplot2]{ggplot}} object. If \code{FALSE}, plot will be drawn and no object will be returned (default = \code{FALSE})
 #'
-#' @return A list object containing a dataframe of dynamic complexity values and a ggplot object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016)
+#' @return If \code{doPlot = TRUE}, a list object containing a dataframe of dynamic complexity values and a \code{ggplot2} object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016). If \code{doPlot = FALSE} the dataframe is returned.
+#'
 #' @export
 #'
 #' @author Merlijn Olthof
@@ -53,8 +54,9 @@ if(win>0){ok=TRUE}
   colnames(mat.dc) <- c(1:ncol(mat.dc))
 
 
+if(doPlot){
   plot.dc <- ggplot2::ggplot(reshape2::melt(mat.dc), aes(x=Var1, y=Var2, fill=value)) + ggplot2::geom_tile() +
-    ggplot2::scale_fill_gradient2(low='blue', high='red', mid='yellow', midpoint=(max(mat.dc, na.rm=T)/2), na.value='white') +
+    ggplot2::scale_fill_gradient2(low='blue', high='red', mid='yellow', midpoint=(max(mat.dc, na.rm=TRUE)/2), na.value='white') +
     ggplot2::theme_bw() +
     ggplot2::xlab('Days') +
     ggplot2::ylab('Items')+
@@ -62,11 +64,14 @@ if(win>0){ok=TRUE}
     ggplot2::scale_y_continuous(minor_breaks=seq(0.5, ncol(mat.dc), 1), breaks=seq(0.5, ncol(mat.dc)+0.5, 1), label=c(0:(ncol(mat.dc)))) +
     ggplot2::scale_x_continuous(minor_breaks=seq(0.5,nrow(mat.dc),1), breaks=seq(0.5,nrow(mat.dc)+0.5,1), label=c(0:nrow(mat.dc))) +
     ggplot2::ggtitle('Complexity Resonance Diagram') +
-    ggplot2::coord_cartesian(ylim=c(0.5,(ncol(mat.dc)+0.5)), xlim=c(win-0.5,nrow(mat.dc)+0.5), expand=F)
+    ggplot2::coord_cartesian(ylim=c(0.5,(ncol(mat.dc)+0.5)), xlim=c(win-0.5,nrow(mat.dc)+0.5), expand=FALSE)
 
 
   return(list(df.comp = df.comp,
               plot.dc = plot.dc))
+} else {
+    return(df.comp)
+  }
 }
 
 
@@ -217,7 +222,8 @@ DC_D = function (df, win, xmin, xmax, col_first, col_last){
   return(ew_data_D)
 }
 
-#function to compute critical instability
+# function to compute critical instability
+
 #' @title Critical Instability
 #' @description Computes significant peaks in the dynamic complexity time series. Example: Schiepek, Tominschek & Heinzel, 2014.
 #'
@@ -263,6 +269,7 @@ crit_in = function(df, win){
   mat.ci <- data.matrix(df.ci)
   colnames(mat.ci) <- c(1:ncol(mat.ci))
   mat.ci[,ncol(mat.ci)] <- mat.ci[,ncol(mat.ci)]*10 #the last column, showing Critical Instability of all items has values of 10 instead of 1
+
 
   plot.ci <- ggplot2::ggplot(reshape2::melt(mat.ci), aes(x=Var1, y=Var2, fill=as.factor(value))) + ggplot2::geom_tile() +
     ggplot2::scale_fill_manual(values = c("NA", "grey", "black")) +

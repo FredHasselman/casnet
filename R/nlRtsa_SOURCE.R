@@ -236,7 +236,7 @@ crqa_cl_main <- function(data,
 #' @param theiler Theiler window (default = \code{0})
 #' @param win Window to calculate the (C)RQA (default = minimum of length of \code{y1} or \code{y2})
 #' @param step Stepsize for sliding windows (default = size of \code{win}, so no sliding window)
-#' @param JRP Wether to calculate a Joint Recurrence Plot(default = \code{FALSE})
+#' @param JRP Wether to calculate a Joint Recurrence Plot (default = \code{FALSE})
 #' @param distNorm One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix
 #' @param standardise Standardise data
 #' @param returnMeasures Return the (C)RQA measures? (default = \code{TRUE})
@@ -676,7 +676,7 @@ crqa_cl <- function(y1,
 #'
 #' \itemize{
 #' \item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet]{est_emLag}}, which is a wrapper around \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"} to get lags based on the mutual information function.}
-#' \item{Embedding dimension (\code{m, \code{emDim}}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[fractal]{FNN}}}
+#' \item{Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[fractal]{FNN}}}
 #' }
 #'
 #' @family Recurrence Quantification Analysis
@@ -727,7 +727,7 @@ crqa_parameters <- function(y,
         RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
         Nn.min[D] <- min(RM, na.rm = TRUE)
         Nn.max[D] <- max(RM, na.rm = TRUE)
-        Nn.sd[D]   <- sd(RM, na.rm = TRUE)
+        Nn.sd[D]   <- stats::sd(RM, na.rm = TRUE)
         Nn.mean[D] <- mean(RM, na.rm = TRUE)
         rm(RM)
       }
@@ -2383,22 +2383,22 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
     }
 
     if(plotDimensions&!plotMeasures&unthresholded){
-      mat <- matrix(list(gry2, nullGrob(),g, gry1, grDist, nullGrob()),nrow = 2)
+      mat <- matrix(list(gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
       gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
     if(plotDimensions&!plotMeasures&!unthresholded){
-      mat <- matrix(list(gry2, nullGrob(),g, gry1),nrow = 2)
+      mat <- matrix(list(gry2, grid::nullGrob(),g, gry1),nrow = 2)
       gt  <- gtable::gtable_matrix("bi_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1, .25), "null"),respect = TRUE)
     }
 
     if(plotDimensions&plotMeasures&unthresholded){
-      mat <- matrix(list(grA, nullGrob(), gry2, nullGrob(),g, gry1, grDist, nullGrob()),nrow = 2)
+      mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
       gt<- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
     if(plotDimensions&plotMeasures&!unthresholded){
-      mat <- matrix(list(grA, nullGrob(), gry2, nullGrob(),g, gry1),nrow = 2)
+      mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
       gt<- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
@@ -2443,10 +2443,10 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
 
         if(plotMeasures){
           g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
-                  plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+                  patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
         } else {
           g <- (gy2 + gRP + gg_plotHolder() + gg_plotHolder() + gy1 + gg_plotHolder() +
-                  plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+                  patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
         }
       }
 
@@ -2458,11 +2458,11 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
 
   if(doPlot){
     if(useGtable){
-      grid.newpage()
-      grid.draw(gt)
+      grid::grid.newpage()
+      grid::grid.draw(gt)
     } else {
-      plot.new()
-      plot(g)
+      graphics::plot.new()
+      graphics::plot(g)
     }
     return(invisible(g))
   }
@@ -5160,6 +5160,7 @@ ts_standardise <- function(y, na.rm=TRUE, type = c("mean.sd","median.mad")[1], a
 #' @param y Time series or numeric vector
 #' @param na.rm Remove missing values
 #' @param type Apply Bessel's correction (divide by N-1) or return unadjusted SD (divide by N)
+#' @param silent Silent-ish mode (default = \code{TRUE})
 #'
 #' @return Standard deviation of \code{y}
 #' @export
@@ -5171,12 +5172,12 @@ ts_sd <- function(y, na.rm=TRUE, type = c("Bessel","unadjusted")[1], silent=TRUE
     }
 
   if(na.rm){
-    y<-y[complete.cases(y)]
+    y<-y[stats::complete.cases(y)]
   }
 
   N <- NROW(y)
   Y_mean     <- mean(y)
-  Y_sd       <- sd(y)
+  Y_sd       <- stats::sd(y)
   Bessel     <- sqrt((sum((y - Y_mean)^2)/(N-1)))
   unadjusted <- sqrt((sum((y - Y_mean)^2)/N))
 
