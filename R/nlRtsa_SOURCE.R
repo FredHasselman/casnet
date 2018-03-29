@@ -5236,11 +5236,11 @@ fltrIT <- function(TS,f){
 #'
 #' @description The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.
 #'
-#' @param x     Input vector or data frame.
-#' @param mn     Minimum value of original, defaults to \code{min(x, na.rm = TRUE)}.
-#' @param mx     Maximum value of original, defaults to \code{max(x, na.rm = TRUE)}.
-#' @param hi     Minimum value to rescale to, defaults to \code{0}.
-#' @param lo     Maximum value to rescale to, defaults to \code{1}.
+#' @param x   Input vector or data frame.
+#' @param mn  Minimum value of original, defaults to \code{min(x, na.rm = TRUE)}.
+#' @param mx  Maximum value of original, defaults to \code{max(x, na.rm = TRUE)}.
+#' @param hi  Minimum value to rescale to, defaults to \code{0}.
+#' @param lo  Maximum value to rescale to, defaults to \code{1}.
 #'
 #'
 #' @details Three uses:
