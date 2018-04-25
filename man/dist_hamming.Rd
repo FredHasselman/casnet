@@ -22,9 +22,9 @@ Calculate Hamming distance
 \seealso{
 Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{lineDists}}, \code{\link{nzdiags}},
-  \code{\link{recmat_plot}}, \code{\link{recmat_size}},
-  \code{\link{recmat}}
+  \code{\link{rp_lineDist}}, \code{\link{rp_nzdiags}},
+  \code{\link{rp_plot}}, \code{\link{rp_size}},
+  \code{\link{rp}}
 }
 \author{
 Fred Hasselman

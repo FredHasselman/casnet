@@ -27,7 +27,6 @@ output
 Multi-fractal Detrended Fluctuation Analysis
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{RR}},
-  \code{\link{fd_dfa}}, \code{\link{fd_psd}},
-  \code{\link{fd_sda}}
+Other Fluctuation Analyses: \code{\link{fd_RR}},
+  \code{\link{fd_dfa}}, \code{\link{fd_psd}}
 }

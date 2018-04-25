@@ -6,7 +6,8 @@
 \usage{
 fd_sda(y, fs = NULL, standardise = TRUE, detrend = FALSE,
   scales = 2^(1:(log2(length(y)/2))), fitRange = c(scales[1],
-  scales[length(scales) - 2]), doPlot = FALSE, silent = TRUE)
+  scales[length(scales) - 2]), doPlot = FALSE, returnPLAW = FALSE,
+  returnInfo = FALSE, silent = TRUE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -21,7 +22,11 @@ fd_sda(y, fs = NULL, standardise = TRUE, detrend = FALSE,
 
 \item{fitRange}{Scale bins (\code{c(min,max)}) to use for fitting the scaling relation}
 
-\item{doPlot}{Return the log-log spectrum with linear fit (default).}
+\item{doPlot}{Return the log-log spectrum with linear fit (default = \code{TRUE}).}
+
+\item{returnPLAW}{Return the power law data (default = \code{FALSE})}
+
+\item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
 
 \item{silent}{Silent-ish mode}
 }
@@ -39,14 +44,6 @@ fd_sda
 }
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
-}
-\seealso{
-Other Fluctuation Analyses: \code{\link{MFDFA}},
-  \code{\link{RR}}, \code{\link{fd_dfa}},
-  \code{\link{fd_psd}}
-
-Other FD estimators: \code{\link{fd_dfa}},
-  \code{\link{fd_psd}}
 }
 \author{
 Fred Hasselman

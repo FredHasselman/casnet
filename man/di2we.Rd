@@ -11,7 +11,7 @@ di2we(distmat, radius, convMat = FALSE)
 
 \item{radius}{The radius or threshold value}
 
-\item{convMat}{Should the matrix be converted to an object of type Matrix}
+\item{convMat}{convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)}
 }
 \value{
 A matrix with 0s and leaves the values < threshold distance value
@@ -22,7 +22,7 @@ Distance matrix to weighted matrix based on threshold value
 \seealso{
 Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{dist_hamming}},
-  \code{\link{lineDists}}, \code{\link{nzdiags}},
-  \code{\link{recmat_plot}}, \code{\link{recmat_size}},
-  \code{\link{recmat}}
+  \code{\link{rp_lineDist}}, \code{\link{rp_nzdiags}},
+  \code{\link{rp_plot}}, \code{\link{rp_size}},
+  \code{\link{rp}}
 }

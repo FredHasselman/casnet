@@ -5,7 +5,7 @@
 \title{mono Hurst}
 \usage{
 monoH(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE,
-  returnSegments = FALSE)
+  returnSegments = FALSE, removeRMSbelow = .Machine$double.eps)
 }
 \arguments{
 \item{TSm}{TS matrix with 2 columns \code{t} (1st) and \code{y} (second)}

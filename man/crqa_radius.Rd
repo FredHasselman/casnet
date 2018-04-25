@@ -61,6 +61,6 @@ Find fixed or optimal radius
 }
 \seealso{
 Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
-  \code{\link{crqa_mat_measures}}, \code{\link{crqa_mat}},
-  \code{\link{crqa_parameters}}
+  \code{\link{crqa_parameters}},
+  \code{\link{crqa_rp_measures}}, \code{\link{crqa_rp}}
 }

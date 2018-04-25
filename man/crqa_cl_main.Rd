@@ -9,7 +9,7 @@ crqa_cl_main(data, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
   (length(y1) + 1), length(y2)), na.rm = TRUE), step = step, JRP = FALSE,
   distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]], returnMeasures = TRUE,
   returnRPvector = FALSE, returnLineDist = FALSE,
-  plot_recmat = c("noplot", "recmat", "distmat")[[1]],
+  plot_recmat = c("noplot", "rp", "distmat")[[1]],
   path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
   path_out = NULL, file_ID = NULL, silent = TRUE, targetValue = 0.05,
   useParallel = FALSE, ...)

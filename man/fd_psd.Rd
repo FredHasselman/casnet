@@ -4,8 +4,8 @@
 \alias{fd_psd}
 \title{Power Spectral Density Slope (PSD).}
 \usage{
-fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FALSE,
-  silent = TRUE)
+fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TRUE,
+  returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -16,7 +16,11 @@ fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FALSE,
 
 \item{detrend}{Subtract linear trend from the series (default = \code{TRUE}).}
 
-\item{doPlot}{Return the log-log spectrum with linear fit (default = \code{FALSE}).}
+\item{doPlot}{Return the log-log spectrum with linear fit (default = \code{TRUE}).}
+
+\item{returnPLAW}{Return the power law data (default = \code{FALSE})}
+
+\item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
 
 \item{silent}{Run in silent-ish mode (default = \code{TRUE)})}
 }
@@ -41,12 +45,8 @@ A line is fitted on the periodogram in log-log coordinates. Two fit-ranges are u
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other FD estimators: \code{\link{fd_dfa}},
-  \code{\link{fd_sda}}
-
 Other Fluctuation Analyses: \code{\link{MFDFA}},
-  \code{\link{RR}}, \code{\link{fd_dfa}},
-  \code{\link{fd_sda}}
+  \code{\link{fd_RR}}, \code{\link{fd_dfa}}
 }
 \author{
 Fred Hasselman

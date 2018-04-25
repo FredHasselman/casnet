@@ -10,7 +10,7 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
   distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
   standardise = c("none", "mean.sd", "median.mad")[1],
   returnMeasures = TRUE, returnRPvector = FALSE, returnLineDist = FALSE,
-  plot_recmat = c("noplot", "recmat", "distmat")[[1]],
+  plot_recmat = c("noplot", "rp", "distmat")[[1]],
   path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
   path_out = NULL, file_ID = NULL, silent = TRUE, surrogateTest = FALSE,
   targetValue = 0.05, useParallel = FALSE, ...)
@@ -48,7 +48,7 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{returnLineDist}{Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})}
 
-\item{plot_recmat}{Produce a plot of the recurrence matrix by calling \code{\link{recmat_plot}}, values can be \code{"recmat"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})}
+\item{plot_recmat}{Produce a plot of the recurrence matrix by calling \code{\link{rp_plot}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})}
 
 \item{path_to_rp}{Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)}
 
@@ -94,7 +94,7 @@ A list object containing 1-3 elements, depending on arguments requesting output.
  \item W_prob = 'Probability of interval'
  \item F_min = 'F min'
 }
-\item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{recmat_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
+\item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{rp_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
 \item \code{rqa_diagdist} - The distribution of diagonal line lengths
 }
 }
@@ -133,7 +133,7 @@ Some notes on resolving errors with \code{rp}.The script will first try to downl
 }
 
 \seealso{
-Other Recurrence Quantification Analysis: \code{\link{crqa_mat_measures}},
-  \code{\link{crqa_mat}}, \code{\link{crqa_parameters}},
-  \code{\link{crqa_radius}}
+Other Recurrence Quantification Analysis: \code{\link{crqa_parameters}},
+  \code{\link{crqa_radius}},
+  \code{\link{crqa_rp_measures}}, \code{\link{crqa_rp}}
 }

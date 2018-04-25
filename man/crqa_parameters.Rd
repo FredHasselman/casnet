@@ -50,6 +50,6 @@ A number of functions are called to determie optimal parameters for delay embedd
 }
 \seealso{
 Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
-  \code{\link{crqa_mat_measures}}, \code{\link{crqa_mat}},
-  \code{\link{crqa_radius}}
+  \code{\link{crqa_radius}},
+  \code{\link{crqa_rp_measures}}, \code{\link{crqa_rp}}
 }

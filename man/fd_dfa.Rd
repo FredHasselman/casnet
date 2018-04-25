@@ -8,7 +8,8 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
   polyOrder = 1, standardise = c("mean.sd", "median.mad")[1],
   adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)),
   scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4,
-  doPlot = FALSE, ...)
+  doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE,
+  ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -37,6 +38,12 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
 
 \item{doPlot}{Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).}
 
+\item{returnPLAW}{Return the power law data (default = \code{FALSE})}
+
+\item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
+
+\item{silent}{Silent-ish mode}
+
 \item{...}{Other arguments}
 }
 \value{
@@ -57,11 +64,7 @@ Hasselman, F. (2013). When the blind curve is finite: dimension estimation and m
 }
 \seealso{
 Other Fluctuation Analyses: \code{\link{MFDFA}},
-  \code{\link{RR}}, \code{\link{fd_psd}},
-  \code{\link{fd_sda}}
-
-Other FD estimators: \code{\link{fd_psd}},
-  \code{\link{fd_sda}}
+  \code{\link{fd_RR}}, \code{\link{fd_psd}}
 }
 \author{
 Fred Hasselman

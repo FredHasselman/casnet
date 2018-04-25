@@ -4,21 +4,22 @@
 \alias{ts_checkfix}
 \title{Check and/or Fix a vector}
 \usage{
-ts_checkfix(y, checkNumericVector = TRUE, checkTimeVector = TRUE,
-  checkPow2 = TRUE, checkScale = TRUE, checkSummationOrder = TRUE,
-  checkNonStationarity = TRUE, checkNonHomogeneity = TRUE,
-  fixNumericVector = FALSE, fixTimeVector = FALSE, fixPow2 = FALSE,
+ts_checkfix(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE,
+  checkTimeVector = FALSE, checkPow2 = FALSE, checkScale = FALSE,
+  checkSummationOrder = FALSE, checkNonStationarity = FALSE,
+  checkNonHomogeneity = FALSE, fixNumericVector = FALSE,
+  fixWholeNumbers = FALSE, fixTimeVector = FALSE, fixPow2 = FALSE,
   fixNA = TRUE, fixScale = FALSE, fixSummationOrder = FALSE,
   fixNonStationarity = FALSE, fixNonHomogeneity = FALSE)
 }
 \arguments{
 \item{y}{A time series object or numeric vector}
 
-\item{checkNumericVector}{checkVector}
+\item{checkNumericVector}{is 1D numeric vector?}
 
-\item{checkTimeVector}{checkTimeVector}
+\item{checkTimeVector}{has time vector?}
 
-\item{checkPow2}{checkPow2}
+\item{checkPow2}{length is power of 2?}
 
 \item{checkScale}{checkScale}
 
@@ -28,7 +29,7 @@ ts_checkfix(y, checkNumericVector = TRUE, checkTimeVector = TRUE,
 
 \item{checkNonHomogeneity}{checkNonHomogeneity}
 
-\item{fixNumericVector}{fixVector}
+\item{fixNumericVector}{return a 1D numeric vector (WARNING: Data frames and Matrices with NCOL > 1 wil be converted to long form)}
 
 \item{fixTimeVector}{fixTimeVector}
 
@@ -43,6 +44,10 @@ ts_checkfix(y, checkNumericVector = TRUE, checkTimeVector = TRUE,
 \item{fixNonStationarity}{fixNonStationarity}
 
 \item{fixNonHomogeneity}{fixNonHomogeneity}
+
+\item{checkWholeNumber}{contains only wholenumbers?}
+
+\item{fixWholeNumber}{fixWholeNumber}
 }
 \value{
 A 'check' report and/or a 'fixed' vector y.

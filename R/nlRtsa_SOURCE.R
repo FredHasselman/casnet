@@ -44,7 +44,7 @@ crqa_cl_main <- function(data,
                          returnMeasures = TRUE,
                          returnRPvector = FALSE,
                          returnLineDist = FALSE,
-                         plot_recmat = c("noplot","recmat","distmat")[[1]],
+                         plot_recmat = c("noplot","rp","distmat")[[1]],
                          path_to_rp = getOption("casnet.path_to_rp"),
                          saveOut    = FALSE,
                          path_out   = NULL,
@@ -242,7 +242,7 @@ crqa_cl_main <- function(data,
 #' @param returnMeasures Return the (C)RQA measures? (default = \code{TRUE})
 #' @param returnRPvector Return the recurrent points in a dataframe? (default = \code{FALSE})
 #' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})
-#' @param plot_recmat Produce a plot of the recurrence matrix by calling \code{\link{recmat_plot}}, values can be \code{"recmat"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})
+#' @param plot_recmat Produce a plot of the recurrence matrix by calling \code{\link{rp_plot}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})
 #' @param path_to_rp Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)
 #' @param saveOut Save the output to files? If \code{TRUE} and \code{pat_out = NA}, the current working directory will be used (default = \code{FALSE})
 #' @param path_out Path to save output if \code{saveOut = TRUE} (default = \code{NULL})
@@ -291,7 +291,7 @@ crqa_cl_main <- function(data,
 #'  \item W_prob = 'Probability of interval'
 #'  \item F_min = 'F min'
 #' }
-#' \item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{recmat_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
+#' \item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{rp_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
 #' \item \code{rqa_diagdist} - The distribution of diagonal line lengths
 #' }
 #'
@@ -329,7 +329,7 @@ crqa_cl <- function(y1,
                     returnMeasures = TRUE,
                     returnRPvector = FALSE,
                     returnLineDist = FALSE,
-                    plot_recmat = c("noplot","recmat","distmat")[[1]],
+                    plot_recmat = c("noplot","rp","distmat")[[1]],
                     path_to_rp = getOption("casnet.path_to_rp"),
                     saveOut    = FALSE,
                     path_out   = NULL,
@@ -617,13 +617,13 @@ crqa_cl <- function(y1,
     rqa_horidist <-plyr::ldply(wList, function(l) l$hori_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
   }
 
-  doPlot <- which(plot_recmat%in%c("noplot","recmat","distmat"))
+  doPlot <- which(plot_recmat%in%c("noplot","rp","distmat"))
 
   if(doPlot>1){
     if(doPlot==2){
-      plotList <- plyr::llply(wIndices, function(ind) recmat_plot(di2bi(recmat(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag),radius = emRad)))
+      plotList <- plyr::llply(wIndices, function(ind) rp_plot(di2bi(rp(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag),radius = emRad)))
     }
-    if(doPlot==3){plotList <- plyr::llply(wIndices, function(ind) recmat_plot(recmat(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag)))}
+    if(doPlot==3){plotList <- plyr::llply(wIndices, function(ind) rp_plot(rp(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag)))}
     multi_PLOT(plotList)
   }
 
@@ -723,7 +723,7 @@ crqa_parameters <- function(y,
         cnt = cnt+1
         Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
       for(D in seq_along(emDims)){
-        RM <- recmat(y,y, emDim = emDims[[D]], emLag = emLags$optimal.lag[L])
+        RM <- rp(y,y, emDim = emDims[[D]], emLag = emLags$optimal.lag[L])
         RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
         Nn.min[D] <- min(RM, na.rm = TRUE)
         Nn.max[D] <- max(RM, na.rm = TRUE)
@@ -801,9 +801,7 @@ crqa_parameters <- function(y,
                       stopAt = c(graphics::hist(emDims,plot=FALSE)$mids,max(emDims)+.5),
                       f=factor(seq_along(c(.5, graphics::hist(emDims,plot=FALSE)$mids))%%2))
 
-    tmi <-  nonlinearTseries::mutualInformation(y,
-                                                lag.max = maxLag,
-                                                do.plot = FALSE)
+    tmi <-  nonlinearTseries::mutualInformation(y, lag.max = maxLag, n.partitions = , do.plot = FALSE)
 
     dfMI <- data.frame(emDelay = tmi$time.lag[-1],
                        ami     = tmi$mutual.information[-1])
@@ -867,9 +865,12 @@ crqa_parameters <- function(y,
             panel.grid.minor.x = element_blank(),
             panel.grid.major.y = element_blank(),
             panel.grid.minor.y = element_blank()
+
       )
 
-    gridExtra::grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
+    g <- gridExtra::grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
+    grid::grid.newpage()
+    grid::grid.draw(g)
 
   }
 
@@ -877,7 +878,8 @@ crqa_parameters <- function(y,
               optimDim  = opDim,
               #optimRad  = opRad,
               optimRow  = opt,
-              optimData = df)
+              optimData = df,
+              diagPlot = invisible(g))[TRUE,TRUE,TRUE,TRUE,diagPlot]
   )
 }
 
@@ -934,10 +936,12 @@ crqa_radius <- function(RM = NULL,
   optimOK <- FALSE
   if(is.null(RM)&!is.null(y1)){
     optimOK <- TRUE
-    RM <- recmat(y1=y1, y2=y2,emDim=emDim, emLag=emLag)
+    RM <- rp(y1=y1, y2=y2,emDim=emDim, emLag=emLag)
   }
 
-  AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
+  # check auto-recurrence
+  RM   <- rp_checkfix(RM, checkAUTO = TRUE)
+  AUTO <- attr(RM,"AUTO")
 
   if(AUTO){
     if(!silent){cat(paste0("\nAuto-recurrence: Setting diagonal to (1 + max. distance) for analyses\n"))}
@@ -952,7 +956,7 @@ crqa_radius <- function(RM = NULL,
     }
   }
 
-  recmatsize <- recmat_size(RM,AUTO,theiler)
+  recmatsize <- rp_size(RM,AUTO,theiler)
 
   if(theiler>=0){
     RM <- bandReplace(RM,-theiler,theiler,1+max(RM),silent = silent)
@@ -975,7 +979,7 @@ crqa_radius <- function(RM = NULL,
                            tollo       = targetValue*(1-tol),
                            tolhi       = targetValue*(tol+1),
                            startRadius = startRadius,
-                           recmat.size = recmatsize,
+                           rp.size = recmatsize,
                            AUTO        = AUTO,
                            Converged   = Converged, check.names = FALSE)
 
@@ -989,11 +993,15 @@ crqa_radius <- function(RM = NULL,
       iter <- iter+1
       #p$tick()$print()
 
-      crpOut <- crqa_mat(RM = RM, threshold = tryRadius, AUTO=AUTO)
+      RMs <- di2bi(RM,radius = tryRadius, convMat = TRUE)
+      RT  <- Matrix::nnzero(RMs)
+      rp.size <- length(RMs)
+      Measure <- RT/rp.size
 
-      # Measure  <-  crpOut %>% tidyr::spread(measure,value) %>% .[[targetMeasure]]
-      Measure  <-  crpOut[[targetMeasure]]
-
+      # crpOut <- crqa_rp(RM = RMs, threshold = tryRadius, AUTO=AUTO)
+      #Measure  <-  crpOut[[targetMeasure]]
+      #crpOut <- data.frame(RR = RR, RT = RT, size = length(RMs))
+      #Measure <- RR
 
       iterList[iter,] <-    cbind.data.frame(iter        = iter,
                                              Measure     = Measure,
@@ -1002,7 +1010,7 @@ crqa_radius <- function(RM = NULL,
                                              tollo       = targetValue*(1-tol),
                                              tolhi       = targetValue*(tol+1),
                                              startRadius = startRadius,
-                                             recmat.size = recmatsize,
+                                             rp.size = recmatsize,
                                              AUTO        = AUTO,
                                              Converged   = Converged)
 
@@ -1232,7 +1240,7 @@ roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise =
 
 #' Get (C)RQA measures from a Recurrence Matrix
 #'
-#' Use `crqa_mat`
+#' Use `crqa_rp`
 #'
 #' @param RM A binary recurrence matrix
 #' @param radius Threshold for distance value that counts as a recurrence
@@ -1257,14 +1265,14 @@ roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise =
 #'
 #' @keywords internal
 #'
-crqa_mat_measures <- function(RM,
+crqa_rp_measures <- function(RM,
                               radius = NULL,
                               DLmin = 2,
                               VLmin = 2,
                               HLmin = 2,
-                              DLmax = length(diag(RM))-1,
-                              VLmax = length(diag(RM))-1,
-                              HLmax = length(diag(RM))-1,
+                              DLmax = length(Matrix::diag(RM))-1,
+                              VLmax = length(Matrix::diag(RM))-1,
+                              HLmax = length(Matrix::diag(RM))-1,
                               AUTO      = NULL,
                               chromatic = FALSE,
                               matrices  = FALSE,
@@ -1286,8 +1294,8 @@ crqa_mat_measures <- function(RM,
   tstart <- Sys.time()
   cl <- parallel::makeCluster(mc.cores)
   out    <- parallel::mclapply(1, function(i){
-    #crp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))], ncol=NCols, nrow = NRows),
-    crp_prep(RP = RM,
+    #crqa_rp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))], ncol=NCols, nrow = NRows),
+    crqa_rp_prep(RP = RM,
              radius= radius,
              DLmin = DLmin,
              VLmin = VLmin,
@@ -1305,7 +1313,7 @@ crqa_mat_measures <- function(RM,
   parallel::stopCluster(cl)
   tend  <- Sys.time()
   } else {
-    out <- crp_prep(RP = RM,
+    out <- crqa_rp_prep(RP = RM,
                radius= radius,
                DLmin = DLmin,
                VLmin = VLmin,
@@ -1331,7 +1339,7 @@ crqa_mat_measures <- function(RM,
     tstart <-Sys.time()
     cl <- parallel::makeCluster(mc.cores)
     bootOut <-  parallel::mclapply(1:Nboot, function(i){
-      replicate <- as.data.frame(crp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))],
+      replicate <- as.data.frame(crqa_rp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))],
                                                  ncol=NCols, nrow = NRows),
                                           radius= radius,
                                           DLmin = DLmin,
@@ -1417,14 +1425,14 @@ crqa_mat_measures <- function(RM,
 #' @family Recurrence Quantification Analysis
 #'
 #'
-crqa_mat <- function(RM,
+crqa_rp <- function(RM,
                      threshold = NULL,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(diag(RM))-1,
-                     VLmax = length(diag(RM))-1,
-                     HLmax = length(diag(RM))-1,
+                     DLmax = length(Matrix::diag(RM))-1,
+                     VLmax = length(Matrix::diag(RM))-1,
+                     HLmax = length(Matrix::diag(RM))-1,
                      AUTO      = NULL,
                      chromatic = FALSE,
                      matrices  = FALSE,
@@ -1435,12 +1443,15 @@ crqa_mat <- function(RM,
 
 
   # Input should be a distance matrix, or a matrix of zeroes and ones with radius = NULL, output is a list
-  # Fred Hasselman (me@fredhasselman.com) - August 2013
+  # Fred Hasselman - August 2013
 
   #require(parallel)
 
+  # check auto-recurrence and make sure Matrix has sparse triplet representation
+  RM <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
+
   if(is.null(AUTO)){
-    AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
+    AUTO <- attr(RM,"AUTO")
   }
 
   #uval <- unique(as.vector(RM))
@@ -1459,7 +1470,7 @@ crqa_mat <- function(RM,
   }
   #rm(RM)
 
-  out <- crqa_mat_measures(RM,
+  out <- crqa_rp_measures(RM,
                            radius = threshold,
                            DLmin = DLmin,
                            VLmin = VLmin,
@@ -1477,7 +1488,7 @@ crqa_mat <- function(RM,
   #
   #   if(is.null(Nboot)){Nboot = 1}
   #
-  #   out <- crqa_mat_measures(RM,
+  #   out <- crqa_rp_measures(RM,
   #                            radius= radius,
   #                            DLmin = DLmin,
   #                            VLmin = VLmin,
@@ -1500,7 +1511,7 @@ crqa_mat <- function(RM,
   #   if(Nboot>1){cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations.\n"))
   #     bootout <- col.ind  %>%
   #       bootstrap(Nboot) %>%
-  #       do(crqa_mat_measures(RM[row.ind,unlist(.)],
+  #       do(crqa_rp_measures(RM[row.ind,unlist(.)],
   #                            radius= radius,
   #                            DLmin = DLmin,
   #                            VLmin = VLmin,
@@ -1570,9 +1581,11 @@ est_emLag <- function(y,
                 ...){
 
   y   <- y[!is.na(y)]
-  tmi <- nonlinearTseries::mutualInformation(y,
-                                             lag.max = maxLag,
-                                             do.plot = FALSE)
+   tmi <- nonlinearTseries::mutualInformation(y,
+                                              lag.max = maxLag,
+                                              #n.partitions = floor((max(y)-min(y))/(2*stats::IQR(y)*length(y)^(-1/3))),
+                                              do.plot = FALSE
+                                             )
 
   lags <- numeric(length=length(selection.methods))
   cnt <- 0
@@ -1582,7 +1595,9 @@ est_emLag <- function(y,
                                               technique = "ami",
                                               selection.method = sm,
                                               lag.max = maxLag,
-                                              do.plot = FALSE))
+                                              do.plot = FALSE,
+                                              #n.partitions = floor((max(y)-min(y))/(2*stats::IQR(y)*length(y)^(-1/3)))
+                                              ))
     if(any(grepl("Error",lag$value))){lags[cnt] <- NA} else {lags[cnt] <- lag$value}
   }
 
@@ -1637,73 +1652,84 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
   )
 }
 
-#' nzdiags
+#' rp_nzdiags
 #'
-#' @description Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument \code{d}. Output mimics Matlab's \code{[B,d] = spdiags(A)} function.
+#' @description Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument \code{d}.
 #'
-#' @param A A binary (0,1) matrix.
-#' @param d An optional vecotor of diagonals to extract.
+#' @param RM A binary (0,1) matrix.
+#' @param d An optional vector of diagonals to extract.
+#' @param returnVectorList Return list
+#' @param returnNZtriplets Return a dataframe with coordinates of only nonzero elements in diagonals (default = \code{FALSE})
+#' @param silent Silent-ish mode
 #'
 #' @author Fred Hasselman
 #'
-#' @return A list object with nonzero diagonals
+#' @return A matrix object with nonzero diagonals as columns and/or a dataframe with coordinates of nonzero diagonal elements
 #'
 #' @export
 #'
 #' @family Distance matrix operations
 #'
-nzdiags <- function(A=NULL, d=NULL){
+rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=FALSE, silent = TRUE){
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
   #require(Matrix)
 
-  if(grepl("matrix",class(A),ignore.case = TRUE)){
+  if(grepl("matrix",class(RM),ignore.case = TRUE)){
 
-    if(all(A>0)){warning("All matrix elements are nonzero.")}
+    if(all(RM>0)){warning("All matrix elements are nonzero.")}
 
-    # create an indicator for all diagonals in the matrix
-    ind   <- col(A)-row(A)
+    s  <- Sys.time()
 
-    # Split the matrix!
-    spd <- split(A, ind)
+    nzdiags <- broom::tidy(RM)
+    nzdiags$ndiag <- nzdiags$column-nzdiags$row
+    nzdiags <- dplyr::arrange(nzdiags,ndiag)
 
-    if(is.null(d)){
-
+    if(!is.null(d)){
+      nd <- unique(nzdiags$ndiag)
       # Get diagonals which have nonzero elements
-      keepID <-plyr::ldply(spd, function(di) any(di>0))
-      nzdiag <- spd[keepID$V1]
-      # Indices of nonzero diagonals
-      dvec      <- as.numeric(keepID$.id[keepID$V1])
-
+      d <- nd[nd%in%sort(as.vector(d))]
     } else {
-
-      # Diagonals are specified
-      d <- sort(as.vector(d))
-      keepID <-  names(spd)%in%d
-      nzdiag <- spd[keepID]
+      d <- unique(nzdiags$ndiag)
     }
 
-    # Deal with uneven rows and cols
-    m  <- NROW(A)
-    n  <- NCOL(A)
+    indMat <- col(RM)-row(RM)
+
+    #RM <- Matrix::as.matrix(RM)
+
+    #cat("\nStart extraction of nonzero diagonals\n")
+    m  <- NROW(RM)
+    n  <- NCOL(RM)
     p  <- length(d)
-    if(is.logical(A)){
+    if(is.logical(RM)){
       B <- matrix(FALSE,nrow = min(c(m,n), na.rm = TRUE), ncol = p)
     } else {
       B <- matrix(0, nrow = min(c(m,n), na.rm = TRUE), ncol = p)
     }
 
     for(i in seq_along(d)){
-      B[zoo::index(nzdiag[[i]]),i] <- nzdiag[[i]]
+      B[nzdiags$row[nzdiags$ndiag==d[i]],i] <- nzdiags$value[nzdiags$ndiag==d[i]]
     }
     colnames(B) <- paste(d)
+    zID <- which(colSums(B)==0)
+    if(length(zID)>0){
+      B  <- B[,-zID]
+      nzdiags <- nzdiags[nzdiags$ndiag%in%zID,]
+      }
+    #dl <- plyr::llply(seq_along(toList),function(dd){RM[indMat==toList[[dd]]]}, .progress = plyr::progress_text(char = "o~o"))
+    e  <- Sys.time()
 
-    return(list(B = B,
-                d = dvec))
+    if(!silent){cat(paste0("\nTime: ", round(difftime(e,s, units = "mins"), digits=1)," min.\n"))}
+
+      if(returnNZtriplets){
+        return(list(B = B, nzdiags = nzdiags))
+      } else {
+        return(B)
+      }
   }
 }
 
 
-nzdiags_boot <- function(RP,d=NULL){
+rp_nzdiags_matlab <- function(RP,d=NULL){
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
   #require(Matrix)
 
@@ -1755,7 +1781,7 @@ nzdiags_boot <- function(RP,d=NULL){
 }
 
 
-nzdiags_chroma <- function(RP, d=NULL){
+rp_nzdiags_chroma <- function(RP, d=NULL){
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
   #require(Matrix)
 
@@ -1809,7 +1835,7 @@ nzdiags_chroma <- function(RP, d=NULL){
 
 
 
-#' lineDists
+#' Line length distributions
 #'
 #' @param RP A thresholded recurrence matrix (binary: 0 - 1)
 #' @param d Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \code{-50,50,100}.
@@ -1817,12 +1843,12 @@ nzdiags_chroma <- function(RP, d=NULL){
 #' @param invert Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
 #' @param AUTO Is this an AUTO RQA?
 #' @param chromatic Chromatic RQA?
-#' @param matrices Return Matrices?
+#' @param matrices Return the nonze ?
 #' @param doHalf Analyse half of the matrix?
 #'
+#' @description Extract lengths of diagonal, vertical and horizontal line segments from a recurrence matrix.
 #'
-#' @description Extract lengths of diagonal and vertical line segments from a recurrence matrix.
-#' @details Based on the Matlab function \code{lineDists} by Stefan Schinkel, Copyright (C) 2009 Stefan Schinkel, University of Potsdam, http://www.agnld.uni-potsdam.de
+#' @details Based on the Matlab function \code{linedists} by Stefan Schinkel, Copyright (C) 2009 Stefan Schinkel, University of Potsdam, http://www.agnld.uni-potsdam.de
 #'
 #' References:
 #' S. Schinkel, N. Marwan, O. Dimigen & J. Kurths (2009):
@@ -1833,12 +1859,19 @@ nzdiags_chroma <- function(RP, d=NULL){
 #' \url{http://www.agnld.uni-potsdam.de}
 #'
 #' @author Fred Hasselman
-#' @return A list object with distribution of line lengths.
+#' @return A list object with distributions of line lengths. If \code{matrices = TRUE} datafr are returned whose columns represent the nonzero diagonals, verticals, or, horizontals.
+#'
 #' @export
 #'
 #' @family Distance matrix operations
 #'
-lineDists <- function(RP,
+rp_lineDist <- function(RP,
+                        DLmin = 2,
+                        VLmin = 2,
+                        HLmin = 2,
+                        DLmax = length(Matrix::diag(RP))-1,
+                        VLmax = length(Matrix::diag(RP))-1,
+                        HLmax = length(Matrix::diag(RP))-1,
                       d         = NULL,
                       theiler   = NULL,
                       invert    = FALSE,
@@ -1858,30 +1891,33 @@ lineDists <- function(RP,
   }
   if(!is.null(theiler)){
     if(length(d)<length(-theiler:theiler)){warning("Ignoring theiler window...")}
-    RP <- double(band(x=RP,k1=-theiler,k2=theiler))
+    RP <- bandReplace(RP,-theiler,theiler,0)
   }
 
-  B <- nzdiags_boot(RP)
+  if(invert){RP <- Matrix::Matrix(1-RP)}
+
+  B <- rp_nzdiags(RP)
 
   # Get diagonal lines & pad with zeros
   diagonals   <- rbind.data.frame(rep(0,dim(B)[2]),
                                   B,
                                   rep(0,dim(B)[2])
-  )
-  #colnames(diagonals) <- paste(spdiagonals$d)
+                                  )
 
-  # get vertical Lines & pad with zeros
-  verticals <- rbind.data.frame(rep(0,dim(as.matrix(RP))[2]),
-                                as.matrix(RP),
-                                rep(0,dim(as.matrix(RP))[2])
-  )
+  # get nonzero vertical Lines & pad with zeros
+  V <- Matrix::as.matrix(RP)[,colSums(Matrix::as.matrix(RP))>0]
+  verticals <- rbind.data.frame(rep(0,dim(RP)[2]),
+                                V,
+                                rep(0,dim(RP)[2])
+                                )
   colnames(verticals) <- paste(1:ncol(verticals))
 
-  # get horizontal Lines & pad with zeros
-  horizontals <- rbind.data.frame(rep(0,dim(t(as.matrix(RP)))[2]),
-                                  t(as.matrix(RP)),
-                                  rep(0,dim(t(as.matrix(RP)))[2])
-  )
+  # get nonzero horizontal Lines & pad with zeros
+  H <- Matrix::t(Matrix::as.matrix(RP)[,rowSums(Matrix::as.matrix(RP))>0])
+  horizontals <- rbind.data.frame(rep(0,dim(H)[2]),
+                                  H,
+                                  rep(0,dim(H)[2])
+                                  )
   colnames(horizontals) <- paste(1:ncol(horizontals))
 
   # Get indices of line lengths
@@ -1889,15 +1925,26 @@ lineDists <- function(RP,
   verticals.ind   <- tidyr::gather(verticals,   key = vertical,  value = segment)
   horizontals.ind <- tidyr::gather(horizontals, key = horizontal,value = segment)
 
-  # Get consecutive nonzero segments from indices, their difference is the segment lentgh
-  diagonals.dist   <- which(diff(diagonals.ind$segment)==-1)-which(diff(diagonals.ind$segment)==1)
-  verticals.dist   <- which(diff(verticals.ind$segment)==-1)-which(diff(verticals.ind$segment)==1)
-  horizontals.dist <- which(diff(horizontals.ind$segment)==-1)-which(diff(horizontals.ind$segment)==1)
+  D <- diagonals.ind$segment
+  names(D) <- paste0(diagonals.ind$diagonal,ifelse(invert,"DT","D"))
+  V <- verticals.ind$segment
+  names(V) <- paste0(verticals.ind$vertical,ifelse(invert,"VT","V"))
+  H <- horizontals.ind$segment
+  names(H) <- paste0(horizontals.ind$horizontal,ifelse(invert,"HT","H"))
 
-  return(list(diagonals.dist   = diagonals.dist,
-              verticals.dist   = verticals.dist,
-              horizontals.dist = horizontals.dist)
-  )
+  # Get consecutive nonzero segments from indices, their difference is the segment length
+  # We added a row of 0s so we'll get sequences of -1, 1, -1
+  diagonals.dist   <- sort(which(diff(D)==-1)-which(diff(D)==1))
+  verticals.dist   <- sort(which(diff(V)==-1)-which(diff(V)==1))
+  horizontals.dist <- sort(which(diff(H)==-1)-which(diff(H)==1))
+
+  return(list(diagonals.dist   = diagonals.dist[diagonals.dist%[]%c(DLmin,DLmax)],
+              verticals.dist   = verticals.dist[verticals.dist%[]%c(VLmin,VLmax)],
+              horizontals.dist = horizontals.dist[horizontals.dist%[]%c(HLmin,HLmax)],
+              diagonals.mat = diagonals[-c(1,NROW(diagonals)),],
+              verticals.mat = verticals[-c(1,NROW(verticals)),],
+              horizontals.mat = horizontals[-c(1,NROW(horizontals)),])[c(TRUE,TRUE,TRUE,matrices,matrices,matrices)]
+         )
 }
 
 
@@ -1957,6 +2004,7 @@ dist_hamming <- function(X, Y=NULL, embedded=TRUE) {
 #' @export
 #'
 #' @family Distance matrix operations
+#'
 #' @author Fred Hasselman
 #'
 #'
@@ -1985,29 +2033,30 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 }
 
 
-
-#' Recurrence Matrix
+#' Create a Distance Matrix
 #'
 #' @param y1 A numeric vector or time series
 #' @param y2 A numeric vector or time series for cross recurrence
 #' @param emDim The embedding dimensions
 #' @param emLag The embedding lag
+#' @param emRad The threshold (radius) to apply to the distance matrix to create a binary matrix
 #' @param to.ts Should \code{y1} and \code{y2} be converted to time series objects?
 #' @param order.by If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.
 #' @param to.sparse Should sparse matrices be used?
 #' @param method Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})
-#' @param doPlot Plot the matrix by calling \code{\link{recmat_plot}} with defult settings
+#' @param doPlot Plot the matrix by calling \code{\link{rp_plot}} with defult settings
 #' @param silent Silent-ish mode
-#' @param ... Any paramters to pass to \code{\link{recmat_plot}} if \code{doPlot = TRUE}
+#' @param ... Any paramters to pass to \code{\link{rp_plot}} if \code{doPlot = TRUE}
 #'
-#' @return RM
+#' @return A (Coss-) Recurrence matrix
 #' @export
 #'
 #' @family Distance matrix operations
 #'
-recmat <- function(y1, y2=NULL,
+rp <- function(y1, y2=NULL,
                    emDim = 1,
                    emLag = 1,
+                   emRad = NULL,
                    to.ts = NULL,
                    order.by = NULL,
                    to.sparse = FALSE,
@@ -2037,6 +2086,7 @@ recmat <- function(y1, y2=NULL,
     }
   }
 
+
   et1 <- ts_embed(y1, emDim, emLag, silent = silent)
   et2 <- ts_embed(y2, emDim, emLag, silent = silent)
 
@@ -2050,47 +2100,147 @@ recmat <- function(y1, y2=NULL,
                       diag = ifelse(identical(et1,et2),FALSE,TRUE))
   }
 
-  #dmat <- as.data.frame(dmat)
+  # Remove proxy class
   dmat <- unclass(dmat)
-  if(all(!is.null(to.ts),!is.null(order.by))){
 
+  # Check a time index was requested
+  if(!is.null(to.ts)){
+    if(is.null(order.by)){
+      order.by <- lubridate::as_datetime(1:NROW(RM), origin = lubridate::ymd_hms(Sys.time()))
+    }
     dmat <-  switch(to.ts,
                     "xts" =  xts::xts(dmat, order.by = lubridate::as_datetime(order.by)),
                     "zoo" =  zoo::zoo(dmat, order.by = lubridate::as_datetime(order.by))
-    )
+                    )
   }
+  # Add names if ordered by time vector
   if(!is.null(order.by)){
     colnames(dmat) <- paste(order.by)
     rownames(dmat) <- paste(order.by)
   }
-  # if(is.null(to.ts)){
-  #   dmat <- Matrix(dmat)
-  # }
+
 
   if(to.sparse){
-    dmat <- Matrix::Matrix(dmat)
+    if(!is.null(emRad)){
+      dmat <- di2bi(dmat, radius = emRad, convMat = TRUE)
+    }
+    attributes(dmat)$emDims1  <- et1
+    attributes(dmat)$emDims2  <- et2
+    attributes(dmat)$emDims1.name <- colnames(y1)
+    attributes(dmat)$emDims2.name <- colnames(y2)
+    #dmat <- rp_checkfix(dmat, checkAUTO=TRUE, fixAUTO=TRUE)
+  } else {
+    if(!is.null(emRad)){
+      dmat <- di2bi(dmat, radius = emRad, convMat = FALSE)
+    }
+    attr(dmat,"emDims1") <- et1
+    attr(dmat,"emDims2") <- et2
+    attr(dmat,"emDims1.name") <- colnames(y1)
+    attr(dmat,"emDims2.name") <- colnames(y2)
   }
 
-  attr(dmat,"emDims1") <- et1
-  attr(dmat,"emDims2") <- et2
-  attr(dmat,"emDims1.name") <- colnames(y1)
-  attr(dmat,"emDims2.name") <- colnames(y2)
-  attr(dmat,"AUTO")   <- ifelse(identical(et1,et2),TRUE,FALSE)
+  dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
 
   if(doPlot){
     dotArgs <- list(...)
 
-    nameOK  <- names(dotArgs)%in%methods::formalArgs(recmat_plot)
+    nameOK  <- names(dotArgs)%in%methods::formalArgs(rp_plot)
     # Plot with defaults
     if(!all(dotArgs)){
-      dotArgs    <- formals(recmat_plot)
+      dotArgs    <- formals(rp_plot)
       nameOk <- rep(TRUE,length(dotArgs))
     }
 
     dotArgs$RM <- dmat
-    do.call(recmat_plot, dotArgs[nameOk])
+    do.call(rp_plot, dotArgs[nameOk])
   }
   return(dmat)
+}
+
+
+#' Copy Matrix Attributes
+#'
+#' Simple attribute copy used in \code{casnet} to convert between \code{matrix} and \code{Matrix} classes and back.
+#'
+#' @param source Source matrix
+#' @param target Target matrix
+#' @param source_remove Remove these attribute fields from the source before copying.
+#'
+#' @return The target matrix with attributes copied deom the source matrix.
+#' @export
+#'
+rp_copy_attributes <- function(source, target, source_remove = c("names", "row.names", "class","dim", "dimnames","x")){
+  attrList <- attributes(source)
+  attrList[source_remove] <- NULL
+  attributes(target) <- c(attributes(target), attrList)
+  return(target)
+}
+
+#' Check a Recurrence Matrix
+#'
+#' @param RM RM
+#' @param checkS4 checkS4
+#' @param checkAUTO checkAUTO
+#' @param checkSPARSE checkSPARSE
+#' @param fixS4 fixS4
+#' @param fixAUTO fixAUTO
+#' @param fixSPARSE fixSPARSE
+#'
+#' @return A checked and/or fixed matrix
+#' @export
+#' @keywords internal
+#'
+rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALSE, checkTSPARSE = FALSE,
+                            fixS4 = FALSE, fixAUTO = TRUE, fixSPARSE = FALSE, fixTSPARSE = FALSE){
+
+  dummy <- Matrix::Matrix(matrix(c(0,0)))
+  dummy <- rp_copy_attributes(source = RM, target =dummy)
+
+  # Always check S4
+  if(!checkS4){checkS4 <- TRUE}
+
+  yesS4   <- FALSE
+  yesAUTO <- FALSE
+  yesSPARSE <- FALSE
+  yesTSPARSE <- FALSE
+
+  if(checkS4){
+    yesS4 <- isS4(RM)
+  }
+  if(!yesS4&fixS4){
+    RM <- Matrix::Matrix(RM)
+  }
+
+  # check auto-recurrence
+  if(checkAUTO){
+    if(yesS4){
+      yesAUTO <- Matrix::isSymmetric(RM)
+    } else {
+      yesAUTO <- identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM)[lower.tri(RM)]))
+    }
+  }
+  if(fixAUTO){
+    attributes(RM)$AUTO    <- yesAUTO
+    attributes(dummy)$AUTO <- yesAUTO
+  }
+
+  if(checkTSPARSE){
+    if(class(RM)%in%names(getClass("TsparseMatrix")@subclasses)){
+      yesTSPARSE <- TRUE
+    }
+  }
+  if(fixTSPARSE&!yesTSPARSE){
+      if(!yesS4){
+        RM <- Matrix::Matrix(RM,sparse = TRUE)
+      }
+    Mtype <- gsub("CMatrix","TMatrix",class(RM))
+    eval(parse(text=paste0("RM <- as(RM,'",Mtype,"')")))
+  }
+
+
+ RM <- rp_copy_attributes(source = dummy, target =RM, source_remove = c("Dimnames", "i", "class","Dim", "p","x","factors"))
+
+ return(RM)
 }
 
 
@@ -2103,7 +2253,7 @@ recmat <- function(y1, y2=NULL,
 #' @param title A title for the plot
 #' @param xlab An x-axis label
 #' @param ylab An y-axis label
-#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{recmat}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
+#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{rp}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
 #' @param doPlot Draw the plot? (default = \code{TRUE})
 #' @param useGtable Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set set to FALSE to use package \code{patchwork}. This package is in development, see the warning for instructions on how to install it.
 #'
@@ -2112,7 +2262,7 @@ recmat <- function(y1, y2=NULL,
 #'
 #' @family Distance matrix operations
 #'
-recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE){
+rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE){
 
   # check patchwork
   if(!length(find.package("patchwork",quiet = TRUE))>0){
@@ -2121,42 +2271,51 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
   }
 
 
-  # check auto-recurrence
-  AUTO <- ifelse(identical(as.vector(RM[lower.tri(RM)]),as.vector(t(RM[lower.tri(RM)]))),TRUE,FALSE)
+  # check auto-recurrence and make sure Matrix has sparse triplet representation
+  RM   <- rp_checkfix(RM, checkAUTO = TRUE)
+  AUTO <- attr(RM,"AUTO")
 
   # prepare data
-  meltRP <- reshape2::melt(RM)
+  if(attr(RM,"package")%00%""%in%"Matrix"){
+    RM     <- rp_checkfix(RM, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
+    meltRP <- data.frame(Var1 = (RP@i+1), Var2 = (RP@j+1), value = as.numeric(RP@x))
+  } else {
+    meltRP <- reshape2::melt(as.matrix(RM))
+  }
 
   # check unthresholded
   if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
     unthresholded <- TRUE
   } else {
     unthresholded <- FALSE
-    if(!is.null(attr(RM,"emRadius"))){
-      radiusValue <- attr(RM,"emRadius")
+    if(!is.null(attr(RM,"emRad"))){
+      radiusValue <- attr(RM,"emRad")
     }
-    meltRP$value <- factor(meltRP$value)
+    meltRP$value <- factor(meltRP$value, levels = c(0,1), labels = c("0","1"))
   }
 
   # Get CRQA measures
   if(plotMeasures){
     if(is.na(radiusValue)){
-      radiusValue <- crqa_radius(RM,silent = TRUE)$Radius
+      if(!is.null(attributes(RM)$emRad)){
+        radiusValue <- attr(RM,"emRad")
+      } else {
+        radiusValue <- crqa_radius(RM,silent = TRUE)$Radius
+      }
     }
     if(unthresholded){
-      rpOUT   <- crqa_mat(RM, threshold = radiusValue, AUTO = AUTO)
+      rpOUT   <- crqa_rp(RM, threshold = radiusValue, AUTO = AUTO)
     } else {
-      rpOUT   <- crqa_mat(RM, AUTO = AUTO)
+      rpOUT   <- crqa_rp(RM, AUTO = AUTO)
     }
   }
 
   # main plot
   gRP <-  ggplot2::ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
     geom_raster(show.legend = FALSE) +
-    geom_abline(slope = 1,colour = "grey50", size = 1) +
+    geom_abline(slope = 1,colour = "grey50", size = 1)
     #ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
-    scale_x_continuous(expand = c(0,0)) +
-    scale_y_continuous(expand = c(0,0))
+
 
   if(unthresholded){
     gRP <- gRP + scale_fill_gradient2(low      = "red3",
@@ -2166,16 +2325,17 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
                                       midpoint = mean(meltRP$value, na.rm = TRUE),
                                       limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                                       space    = "Lab",
-                                      name     = "")
+                                      name     = "") +
+      scale_x_continuous(expand = c(0,0)) +
+      scale_y_continuous(expand = c(0,0))
 
-    rptheme <-     theme(panel.background = element_rect("white"),
-                         panel.grid.major  = element_blank(),
+    rptheme <-     theme(panel.grid.major  = element_blank(),
                          panel.grid.minor  = element_blank(),
-                         panel.border = element_blank(),
+                         #panel.border = element_rect(colour = "grey50"),
                          axis.ticks = element_blank(),
                          axis.text = element_blank(),
-                         axis.title.x = element_blank(),
-                         axis.title.y = element_blank(),
+                         # axis.title.x = element_blank(),
+                         # axis.title.y = element_blank(),
                          plot.margin = margin(0,0,0,0))
 
     # Create a custom legend ---
@@ -2191,7 +2351,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
     #resol <- resol[-1,]
 
     distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){crqa_radius(RM,targetValue = t,silent = TRUE, maxIter = 50, radiusOnFail = "percentile")})
-    #ldply(distrange[2:6],function(d) cbind(epsilon=d,RR=crqa_mat(RM = RM, threshold = d)$RR))
+    #ldply(distrange[2:6],function(d) cbind(epsilon=d,RR=crqa_rp(RM = RM, threshold = d)$RR))
 
     RecScale <- data.frame(RR=distrange$Measure,epsilon=distrange$Radius)
     RecScale <- RecScale %>% dplyr::add_row(epsilon=mean(c(0,distrange$Radius[1])),RR=mean(c(0,distrange$Measure[1])),.before = 1) %>% dplyr::add_row(epsilon=max(RM),RR=1)
@@ -2213,7 +2373,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
                            name     = "") +
       coord_equal(1, expand = FALSE) +
       theme_bw() +
-      theme(panel.background = element_rect("white"),
+      theme(panel.background = element_blank(),
             panel.grid.major  = element_blank(),
             panel.grid.minor  = element_blank(),
             legend.background = element_blank(),
@@ -2232,12 +2392,14 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
 
   } else { # unthresholded
 
-    gRP <- gRP + scale_fill_manual(values = c("white","black"),
-                                   na.value = scales::muted("slategray4"),
-                                   name  = "", guide = "none")
+    gRP <- gRP +  scale_fill_manual(name  = "", breaks = c(0,1),
+                                    values = c("0"="white","1"="black"),
+                                    na.translate = TRUE , na.value = scales::muted("slategray4"), guide = "none") +
+      scale_x_discrete(expand = c(0,0)) +
+      scale_y_discrete(expand = c(0,0))
 
     rptheme <-  theme(
-      panel.background = element_rect("white"),
+      panel.background = element_blank(),
       #panel.border = element_rect("grey50",fill=NA),
       panel.grid.major  = element_blank(),
       panel.grid.minor  = element_blank(),
@@ -2245,14 +2407,14 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
       legend.key = element_blank(),
       axis.ticks = element_blank(),
       axis.text = element_blank(),
-      axis.title.x =element_blank(),
-      axis.title.y =element_blank(),
+      # axis.title.x =element_blank(),
+      # axis.title.y =element_blank(),
       plot.margin = margin(0,0,0,0))
   }
 
 
   # Main plot
-  gRP <- gRP + xlab(xlab) + ylab(ylab) + rptheme + coord_fixed(expand = FALSE)
+  gRP <- gRP + rptheme + coord_fixed(expand = FALSE)
 
   gy1 <- gg_plotHolder()
   gy2 <- gg_plotHolder()
@@ -2283,6 +2445,29 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
       y1 <- tidyr::gather(y1,key="Dimension",value = "Value", -c("tm","tmna"))
       y1$Value <-  elascer(y1$Value)
 
+      # Y2
+      colnames(y2) <- paste0("Y",1:NCOL(y2))
+      y2$tm <- 1:NROW(y2)
+      y2$tmna <- 0
+      y2$tmna[is.na(y2[,1])] <- y2$tm[is.na(y2[,1])]
+      y2 <- tidyr::gather(y2,key="Dimension",value = "Value", -c("tm","tmna"))
+      y2$Value <-  elascer(y2$Value)
+
+
+    } else {
+      if(unthresholded){
+          y1 <- data.frame(Value=diag(RM),x=1:length(diag(RM)), Dimension = rep("LOS",length(diag(RM))))
+          y2 <- data.frame(Value=diag(RM),x=1:length(diag(RM)), Dimension = rep("LOS",length(diag(RM))))
+          xdims <- paste("LOS",xdims)
+          ydims <- paste("LOS",ydims)
+      } else {
+        plotDimensions <- FALSE
+      }
+      }
+    }
+
+  if(plotDimensions){
+
       gy1 <- ggplot2::ggplot(y1, aes(y=Value, x= tm,  group=Dimension)) +
         geom_line(aes(colour=Dimension), show.legend = FALSE) +
         xlab(xdims) + ylab("") +
@@ -2290,7 +2475,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
         scale_color_grey() +
         scale_x_continuous(expand = c(0,0)) +
         scale_y_continuous(expand = c(0,0)) +
-        theme(panel.background = element_rect("grey99"),
+        theme(panel.background = element_blank(),
               panel.grid.major  = element_blank(),
               panel.grid.minor  = element_blank(),
               legend.background = element_blank(),
@@ -2303,21 +2488,13 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
               plot.margin = margin(0,0,0,0, unit = "pt")) +
         coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
 
-      # Y2
-      colnames(y2) <- paste0("Y",1:NCOL(y2))
-      y2$tm <- 1:NROW(y2)
-      y2$tmna <- 0
-      y2$tmna[is.na(y2[,1])] <- y2$tm[is.na(y2[,1])]
-      y2 <- tidyr::gather(y2,key="Dimension",value = "Value", -c("tm","tmna"))
-      y2$Value <-  elascer(y2$Value)
-
       gy2 <- ggplot2::ggplot(y2, aes(y=Value, x=tm, group=Dimension)) +
         geom_line(aes(colour=Dimension), show.legend = FALSE) +
         ylab("") + xlab(ydims) +
         geom_vline(aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
         scale_color_grey() +
         scale_x_continuous(expand = c(0,0)) +
-        theme(panel.background = element_rect("grey99"),
+        theme(panel.background = element_blank(),
               panel.grid.major  = element_blank(),
               panel.grid.minor  = element_blank(),
               legend.background = element_blank(),
@@ -2331,9 +2508,6 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
         coord_flip(expand = FALSE) +
         scale_y_reverse(expand = c(0,0))
 
-    } else {
-      plotDimensions= FALSE
-    }
   } # plotdimensions
 
 
@@ -2345,7 +2519,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
     }
 
     rpOUTdat <- rpOUT %>%
-      dplyr::select(dplyr::one_of(c("Radius","RT","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>%
+      dplyr::select(dplyr::one_of(c("Radius","RP_N","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>%
       tidyr::gather(key=measure,value=value) %>%
       dplyr::mutate(x=rep(0,9),y=9:1)
 
@@ -2422,6 +2596,8 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
       gt<- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
+
+
     # gindex <- subset(g$layout, name == "layout")
     # g <- gtable::gtable_add_cols(g, grid::unit(.5, "grobwidth", data = g),0)
     # g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gA), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
@@ -2430,6 +2606,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
 
   #  gt <- gtable::gtable_add_col_space(gt,)
 
+    g <- gtable::gtable_add_padding(gt, unit(5, "pt"))
 
   } else {
 
@@ -2459,7 +2636,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
   if(doPlot){
     if(useGtable){
       grid::grid.newpage()
-      grid::grid.draw(gt)
+      grid::grid.draw(g)
     } else {
       graphics::plot.new()
       graphics::plot(g)
@@ -2469,7 +2646,7 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
 }
 
 
-#' recmat_size
+#' rp_size
 #'
 #' @param mat A Matrix object
 #' @param AUTO Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass \code{FALSE} to prevent this behaviour. If \code{NULL} (default) \code{AUTO} will take on the value of \code{isSymmetric(mat)}.
@@ -2485,11 +2662,11 @@ recmat_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radius
 #' library(Matrix)
 #' m <- Matrix(rnorm(10),10,10)
 #'
-#' recmat_size(m,TRUE,0)   # Subtract diagonal
-#' recmat_size(m,FALSE,0)  # Do not subtract diagonal
-#' recmat_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
-#' recmat_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
-recmat_size <- function(mat, AUTO=NULL, theiler = 0){
+#' rp_size(m,TRUE,0)   # Subtract diagonal
+#' rp_size(m,FALSE,0)  # Do not subtract diagonal
+#' rp_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
+#' rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
+rp_size <- function(mat, AUTO=NULL, theiler = 0){
   if(is.null(AUTO)){
     AUTO <- Matrix::isSymmetric(unname(mat))
   }
@@ -2498,16 +2675,16 @@ recmat_size <- function(mat, AUTO=NULL, theiler = 0){
 }
 
 
-#' crp_empty
+#' Empty results vector
 #'
-#' @return an empty crp
+#' @return an empty crqa_rp
 #' @keywords internal
 #' @export
 #'
-crp_empty <- function(){
+crqa_rp_empty <- function(){
   data.frame(
     Radius   = NA,
-    RT       = NA,
+    RP_N     = NA,
     RR       = NA,
     DET      = NA,
     MEAN_dl  = NA,
@@ -2542,7 +2719,7 @@ crp_empty <- function(){
     N_hl     = NA)
 }
 
-#' crp_calc
+#' crqa_rp_calc
 #'
 #' @param RM RM
 #' @param radius r
@@ -2560,41 +2737,50 @@ crp_empty <- function(){
 #' @export
 #' @keywords internal
 #'
-crp_calc <- function(RM,
+crqa_rp_calc <- function(RM,
                      radius= NULL,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(diag(RM))-1,
-                     VLmax = length(diag(RM))-1,
-                     HLmax = length(diag(RM))-1,
-                     AUTO      = FALSE,
+                     DLmax = length(Matrix::diag(RM))-1,
+                     VLmax = length(Matrix::diag(RM))-1,
+                     HLmax = length(Matrix::diag(RM))-1,
+                     AUTO      = NULL,
                      chromatic = FALSE,
                      matrices  = FALSE){
 
-  recmatsize <- recmat_size(RM, AUTO=AUTO)
+  recmatsize <- rp_size(RM, AUTO=AUTO)
+
+  if(is.null(radius)){
+    radius <- NA
+    if(!is.null(attributes(RM)$emRad)){
+      radius <- attributes(RM)$emRad
+    }
+  }
 
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
-    if(!is.null(radius)){
-      RM <- di2bi(RM,radius = radius)
+    if(!chromatic){
+      if(!is.na(radius)){
+        RM <- di2bi(RM,radius = radius)
+        } else {
+          stop("Need a thresholded recurrence matrix")
+        }
     }
-  } else {
-    radius <- NA
   }
 
   #Total nr. recurrent points
-  RT <- Matrix::nnzero(RM, na.counted = FALSE)
+  RP_N <- Matrix::nnzero(RM, na.counted = FALSE)
+
   #Proportion recurrence / Recurrence Rate
-  RR <- RT/recmatsize
+  RR <- RP_N/recmatsize
 
   if(RR==1){
     warning("Everything is recurring!\nReturning empty vector")
-
-    return(crp_empty())
+    return(crqa_rp_empty())
   }
 
   #Get line segments
-  lineSegments <- lineDists(RM)
+  lineSegments <- rp_lineDist(RM)
 
   dlines <- lineSegments$diagonals.dist
   vlines <- lineSegments$verticals.dist
@@ -2610,27 +2796,27 @@ crp_calc <- function(RM,
   freqvec_hl <- as.numeric(names(freq_hl))
 
   #Number of recurrent points on diagonal, vertical and horizontal lines
-  N_dl <- sum(freq_dl[dplyr::between(freqvec_dl,DLmin, DLmax)], na.rm = TRUE)
-  N_vl <- sum(freq_vl[dplyr::between(freqvec_vl,VLmin, VLmax)], na.rm = TRUE)
-  N_hl <- sum(freq_hl[dplyr::between(freqvec_hl,HLmin, HLmax)], na.rm = TRUE)
+  N_dl <- sum(dlines, na.rm = TRUE)
+  N_vl <- sum(vlines, na.rm = TRUE)
+  N_hl <- sum(hlines, na.rm = TRUE)
 
   #Determinism / Horizontal and Vertical Laminarity
-  DET    <- N_dl/RT
-  LAM_vl <- N_vl/RT
-  LAM_hl <- N_hl/RT
+  DET    <- N_dl/RP_N
+  LAM_vl <- N_vl/RP_N
+  LAM_hl <- N_hl/RP_N
 
   #anisotropy ratio
   ANI    <- (N_vl-N_hl)/N_dl
 
   # Singularities
-  SING_dl <- sum(freq_dl[dplyr::between(as.numeric(names(freq_dl)),1,(DLmin-1))],na.rm = TRUE)/RT
-  SING_vl <- sum(freq_vl[dplyr::between(as.numeric(names(freq_vl)),1,(VLmin-1))],na.rm = TRUE)/RT
-  SING_hl <- sum(freq_hl[dplyr::between(as.numeric(names(freq_hl)),1,(HLmin-1))],na.rm = TRUE)/RT
+  SING_dl <- (RP_N-N_dl)/N_dl
+  SING_vl <- (RP_N-N_vl)/N_vl
+  SING_hl <- (RP_N-N_hl)/N_hl
 
   #Array of probabilities that a certain line length will occur (all >1)
-  P_dl <- freq_dl[dplyr::between(as.numeric(names(freq_dl)), DLmin, DLmax)]/N_dl
-  P_vl <- freq_vl[dplyr::between(as.numeric(names(freq_vl)), VLmin, VLmax)]/N_vl
-  P_hl <- freq_hl[dplyr::between(as.numeric(names(freq_hl)), HLmin, HLmax)]/N_hl
+  P_dl <- freq_dl/N_dl
+  P_vl <- freq_vl/N_vl
+  P_hl <- freq_hl/N_hl
 
   #Entropy of line length distributions
   ENT_dl <- -1 * sum(P_dl * log(P_dl))
@@ -2653,9 +2839,9 @@ crp_calc <- function(RM,
   MAX_hl = max(freq_hl)
 
   # REPetetiveness
-  REP_tot <-(N_hl+N_vl-N_dl)/N_dl
-  REP_hl  <- N_hl/N_dl
-  REP_vl  <- N_vl/N_dl
+  REP_av <- ((N_hl/N_dl) + (N_vl/N_dl))/2
+  REP_hl  <-  N_hl/N_dl
+  REP_vl  <-  N_vl/N_dl
 
   #Coefficient of determination
   CoV_dl = stats::sd(freq_dl)/mean(freq_dl)
@@ -2667,13 +2853,10 @@ crp_calc <- function(RM,
   DIV_vl = 1/MAX_vl
   DIV_hl = 1/MAX_hl
 
-  crqaMeasures <- list()
-  crqaMatrices <- list()
-
   #Output
   out <- data.frame(
     Radius   = radius,
-    RT       = RT,
+    RP_N       = RP_N,
     RR       = RR,
     DET      = DET,
     MEAN_dl  = MEAN_dl,
@@ -2716,9 +2899,8 @@ crp_calc <- function(RM,
                           hlines = hlines,
                           freq_dl = freq_dl,
                           freq_vl = freq_vl,
-                          freq_hl = freq_hl)
-    )
-    )
+                          freq_hl = freq_hl))
+      )
   } else {
     return(out)
   }
@@ -2745,20 +2927,20 @@ crp_calc <- function(RM,
 #'
 #' @export
 #'
-crp_prep <- function(RP,
+crqa_rp_prep <- function(RP,
                      radius= NULL,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(diag(RP))-1,
-                     VLmax = length(diag(RP))-1,
-                     HLmax = length(diag(RP))-1,
+                     DLmax = length(Matrix::diag(RP))-1,
+                     VLmax = length(Matrix::diag(RP))-1,
+                     HLmax = length(Matrix::diag(RP))-1,
                      AUTO      = FALSE,
                      chromatic = FALSE,
                      matrices  = FALSE,
                      doHalf    = FALSE){
 
-  out<-crp_calc(RP,
+  out<-crqa_rp_calc(RP,
                 radius= radius,
                 DLmin = DLmin,
                 VLmin = VLmin,
@@ -2772,7 +2954,7 @@ crp_prep <- function(RP,
 
   if(doHalf){
     if(!AUTO){
-      outLo <- crp_calc(Matrix::tril(RP,-1),
+      outLo <- crqa_rp_calc(Matrix::tril(RP,-1),
                         radius= radius,
                         DLmin = DLmin,
                         VLmin = VLmin,
@@ -2784,7 +2966,7 @@ crp_prep <- function(RP,
                         chromatic = chromatic,
                         matrices  = matrices)
 
-      outUp <- crp_calc(Matrix::triu(RP,-1),
+      outUp <- crqa_rp_calc(Matrix::triu(RP,-1),
                         radius= radius,
                         DLmin = DLmin,
                         VLmin = VLmin,
@@ -3019,6 +3201,114 @@ crp_prep <- function(RP,
 
 # Networks ----
 
+#' Mutual Information Function
+#'
+#'  Calculate the lagged mutual information fucntion within (auto-mif) or between (cross-mif) time series, or, conditional on another time series (conditional-cross-mif). Alternatively, calculate the total information of a multivariate dataset for different lags.
+#'
+#' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function.
+#' @param lags The lags to evaluate mutual information.
+#' @param nbins The number of bins passed to \link{ts_discrete}
+#' @param surTest Either \code{FALSE} or an alpha level for conducting a test of significance using simple surrogates, e.g. \code{surTes = .05}. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin \code{j} when the current value is in bin \code{j} .
+#'
+#' @return The auto- or cross-mi function
+#' @export
+#'
+mif <- function(y, lags=-10:10, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRUE, doPlot = FALSE, surTest = FALSE){
+
+  cnt <- 0
+  N <- NROW(y)
+  mif_out <- numeric(length=length(lags))
+  for(i in lags) {
+    cnt <- cnt + 1
+    # shift y2 to left for neg lags
+    if(i < 0) {
+      ID2 <- -i:N
+      ID1 <- 1:(N-abs(i)+1)
+    }
+    if(i == 0) {
+      ID2 <- c(1:N)
+      ID1 <- c(1:N)
+    }
+    # shift y2 to right for pos lags
+    if(i > 0) {
+      ID2 <- 1:(N-i+1)
+      ID1 <- i:N
+    }
+    mif_out[cnt] <- mi_mat(y, ID1, ID2)
+  }
+
+  names(mif_out) <- paste(lags)
+  if(NCOL(y)==1){miType <- "I(X;X)"}
+  if(NCOL(y)==2){miType <- "I(X;Y)"}
+  if(NCOL(y)==3){miType <- "I(X;Y|Z)"}
+  if(NCOL(y)> 3){miType <- "I(X;Y;Z;...;N)"}
+  attr(y,"miType") <- miType
+
+  return(mif_out)
+}
+
+
+#' Mutual Information variations
+#'
+#' @param y Matrix
+#' @param ID1 ids
+#' @param ID2 ids
+#'
+#' @return mi
+#' @export
+#'
+mi_mat <- function(y, ID1, ID2){
+  Nc <- NCOL(y)
+  if(!is.null(dim(y))){
+    if(Nc == 1){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1]), Y = infotheo::discretize(y[ID2,1]))}
+    if(Nc == 2){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1]), Y = infotheo::discretize(y[ID2,2]))}
+    if(Nc == 3){out <- infotheo::condinformation(X = infotheo::discretize(y[ID1,1]), Y = infotheo::discretize(y[ID2,2]), S = infotheo::discretize(y[ID1,3]))}
+    if(Nc >  3){out <- infotheo::multiinformation(X = infotheo::discretize(y[ID1,]))}
+  return(out)
+  } else {
+    warning("Input should be a matrix or data frame.")
+  }
+}
+
+
+mi_ts <- function(y1,y2){
+
+    # y1 <-  ts_checkfix(y1,fixNumericVector = TRUE)
+    # y2 <-  ts_checkfix(y2,fixNumericVector = TRUE)
+
+    equal <- data.frame(ts_trimfill(y1,y2))
+    idNA1 <- is.na(equal[,1])
+    idNA2 <- is.na(equal[,2])
+
+    equal <- equal[!apply(apply(equal,1,is.na),2,any),]
+
+    ## init entropies
+    H_s <- H_u <- H_su <- 0
+
+     ## get ts length
+     TT <- NROW(equal)
+     bb <- max(equal)
+     ## get ts length
+
+     H_s <- H_u <- H_su <- 0
+     for(i in 1:bb) {
+       ## calculate entropy for 1st series
+       p_s <- sum(equal[,1] == i)/TT
+       if(p_s != 0) { H_s <- H_s - p_s*log(p_s, 2) }
+       ## calculate entropy for 2nd series
+       p_u <- sum(equal[,2] == i)/TT
+       if(p_u != 0) { H_u <- H_u - p_u*log(p_u, 2) }
+       for(j in 1:bb) {
+         ## calculate joint entropy
+         p_su <- sum(equal[,1]==i & equal[,2]==j)/TT
+         if(p_su != 0) { H_su <- H_su - p_su*log(p_su, 2) }
+       } ## end j loop
+     } ## end i loop
+     ## calc mutual info
+    return(MI <- H_s + H_u - H_su)
+   #  if(!normal) { return(MI) } else { return(MI/sqrt(H_s*H_u)) }
+}
+
 
 #' Inter-layer mutual information
 #'
@@ -3031,14 +3321,14 @@ crp_prep <- function(RP,
 #'
 #' @family Multiplex Networks
 #'
-il_mi <- function(g0,g1, probTable=FALSE){
+mif_interlayer <- function(g0,g1, probTable=FALSE){
   d0    <- igraph::degree_distribution(g0)
   d1    <- igraph::degree_distribution(g1)
 
   equal <- data.frame(ts_trimfill(d0,d1))
 
-  p01 <- graphics::hist(x = igraph::degree(g0),breaks = seq(-.5,(NROW(equal)-.5)),plot=F)$counts
-  p10 <- graphics::hist(x = igraph::degree(g1),breaks = seq(-.5,(NROW(equal)-.5)),plot=F)$counts
+  p01 <- graphics::hist(x = igraph::degree(g0),breaks = seq(-.5,(NROW(equal)-.5)),plot=FALSE)$counts
+  p10 <- graphics::hist(x = igraph::degree(g1),breaks = seq(-.5,(NROW(equal)-.5)),plot=FALSE)$counts
 
   equal$joint <-  (p01+p10) / sum(p01,p10,na.rm = TRUE)
   equal$degree <- seq_along(equal[,1])-1
@@ -3060,9 +3350,9 @@ il_mi <- function(g0,g1, probTable=FALSE){
 #'
 #' @param distmat Distance matrix
 #' @param radius The radius or threshold value
-#' @param convMat Should the matrix be converted to an object of type Matrix
+#' @param convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)
 #'
-#' @return A matrix with only 0s and 1s
+#' @return A (sparse) matrix with only 0s and 1s
 #'
 #' @export
 #'
@@ -3070,24 +3360,36 @@ il_mi <- function(g0,g1, probTable=FALSE){
 #'
 di2bi <- function(distmat, radius, convMat = FALSE){
 
+  matPack <- FALSE
+  # if already Matrix do not convert to matrix
   if(grepl("Matrix",class(distmat))){
-    distmat   <- as.matrix(distmat)
+    matPack <- TRUE
     convMat <- TRUE
   }
 
-  # RP <- NetComp::matrix_threshold(distmat,threshold = radius, minval = 1, maxval = 0)
-  #if(radius==0){#radius <- .Machine$double.eps}
+  # RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
+  # RP[as.matrix(distmat <= radius)] <- 1
 
-  RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
-  RP[distmat <= radius] <- 1
+  # Always use sparse representation for conversion to save memory load
+  ij  <- Matrix::which(distmat <= radius, arr.ind=TRUE)
 
-  if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
+  if(NROW(ij)>0){
 
+    xij <- data.frame(y =  sapply(seq_along(ij[,1]),function(r){distmat[ij[[r,1]],ij[[r,2]]]}), ij)
+    suppressWarnings(RP <- Matrix::sparseMatrix(x=rep(1,length(xij$y)),i=xij$row,j=xij$col, dims = dim(distmat)))
 
-  if(convMat){RP <- Matrix::Matrix(RP)}
+    # Simple check
+    if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
 
-  attributes(RP) <- attributes(distmat)
-  attr(RP,"emRadius") <- radius
+    } else {
+
+    RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
+  }
+
+  if(convMat&matPack){RP <- Matrix::as.matrix(RP)}
+
+  RP <- rp_copy_attributes(source = distmat,  target = RP)
+  attributes(RP)$emRad <- radius
 
   return(RP)
 }
@@ -3099,7 +3401,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 #'
 #' @param distmat Distance matrix
 #' @param radius The radius or threshold value
-#' @param convMat Should the matrix be converted to an object of type Matrix
+#' @param convMat convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)
 #'
 #' @return A matrix with 0s and leaves the values < threshold distance value
 #'
@@ -3109,21 +3411,34 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 #'
 di2we <- function(distmat, radius, convMat = FALSE){
 
+  matPack <- FALSE
   if(grepl("Matrix",class(distmat))){
-    distmat   <- as.matrix(distmat)
+    matPack <- TRUE
     convMat <- TRUE
   }
 
   # RP <- NetComp::matrix_threshold(distmat,threshold = radius, minval = 1, maxval = 0)
   if(radius==0) radius <- .Machine$double.eps
-  RP <- distmat #matrix(0,dim(distmat)[1],dim(distmat)[2])
-  RP[distmat <= radius] <- 0
+  # RP <- distmat #matrix(0,dim(distmat)[1],dim(distmat)[2])
+  # RP[distmat <= radius] <- 0
 
-  #  if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
+  if(NROW(ij)>0){
+    # Always use sparse representation for conversion to save memory load
+    xij <- data.frame(y =  sapply(seq_along(which(distmat > radius, arr.ind=TRUE)[,1]),function(r){distmat[ij[[r,1]],ij[[r,2]]]}), which(distmat > radius, arr.ind=TRUE))
+    suppressWarnings(RP <- Matrix::sparseMatrix(x=xij$y,i=xij$row,j=xij$col, dims = dim(distmat)))
 
-  if(convMat){RP <- Matrix::Matrix(RP)}
+    #  if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
 
-  attributes(RP) <- attributes(distmat)
+
+  } else {
+
+    RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
+  }
+
+  if(convMat&matPack){RP <- Matrix::as.matrix(RP)}
+
+  RP <- rp_copy_attributes(source = distmat,  target = RP)
+  attributes(RP)$emRad <- radius
 
   return(RP)
 }
@@ -3292,7 +3607,7 @@ sa2fd_sda <- function(sa, ...){return(1-sa)}
 #' \item{Marmelat, V., Torre, K., & Delignieres, D. (2012). Relative roughness: an index for testing the suitability of the monofractal model. \emph{Frontiers in Physiology, 3}, 208.}}
 #'
 #'
-RR <- function(y){
+fd_RR <- function(y){
   # lag.max = n gives autocovariance of lags 0 ... n,
   VAR  <- stats::acf(y, lag.max = 1, type = 'covariance', plot=FALSE)
   # RR formula
@@ -3311,10 +3626,13 @@ RR <- function(y){
 #' @param fs Sample rate (default = \code{NULL})
 #' @param standardise    standardise the series (default = \code{TRUE}).
 #' @param detrend    Subtract linear trend from the series (default = \code{TRUE}).
-#' @param doPlot    Return the log-log spectrum with linear fit (default = \code{FALSE}).
+#' @param doPlot    Return the log-log spectrum with linear fit (default = \code{TRUE}).
+#' @param returnPLAW Return the power law data (default = \code{FALSE})
+#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
 #' @param silent Run in silent-ish mode (default = \code{TRUE)})
 #'
 #' @author Fred Hasselman
+#'
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 #'
 #' @return A list object containing:
@@ -3325,8 +3643,6 @@ RR <- function(y){
 #' \item Information output by various functions.
 #' }
 #'
-#' @family FD estimators
-#'
 #' @family Fluctuation Analyses
 #'
 #' @export
@@ -3335,7 +3651,7 @@ RR <- function(y){
 #'
 #' A line is fitted on the periodogram in log-log coordinates. Two fit-ranges are used: The 25\% lowest frequencies and the Hurvich-Deo estimate (\code{\link[fractal]{HDEst}}).
 #'
-fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FALSE, silent = TRUE){
+fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE){
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
@@ -3421,7 +3737,9 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FA
 #' @param detrend Subtract linear trend from the series (default = TRUE)
 #' @param scales default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}
 #' @param fitRange Scale bins (\code{c(min,max)}) to use for fitting the scaling relation
-#' @param doPlot    Return the log-log spectrum with linear fit (default).
+#' @param doPlot    Return the log-log spectrum with linear fit (default = \code{TRUE}).
+#' @param returnPLAW Return the power law data (default = \code{FALSE})
+#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
 #' @param silent Silent-ish mode
 #'
 #' @author Fred Hasselman
@@ -3437,8 +3755,6 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = FA
 #'
 #' @export
 #'
-#' @family Fluctuation Analyses
-#'
 #' @family FD estimators
 #'
 fd_sda <- function(y,
@@ -3448,6 +3764,8 @@ fd_sda <- function(y,
                    scales = 2^(1:(log2(length(y)/2))),
                    fitRange = c(scales[1], scales[length(scales)-2]),
                    doPlot = FALSE,
+                   returnPLAW = FALSE,
+                   returnInfo = FALSE,
                    silent = TRUE){
 
   if(!stats::is.ts(y)){
@@ -3482,7 +3800,7 @@ fd_sda <- function(y,
     PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/out$scale, size = out$scale, bulk = out$sd),
     fullRange = list(sap = stats::coef(lmfit1)[2], H = 1+stats::coef(lmfit1)[2], FD = sa2fd_sda(stats::coef(lmfit1)[2]), fitlm1 = lmfit1),
     fitRange  = list(sap = stats::coef(lmfit2)[2], H = 1+stats::coef(lmfit2)[2], FD = sa2fd_sda(stats::coef(lmfit2)[2]), fitlm2 = lmfit2),
-    info = out)
+    info = out)[returnPLAW,TRUE,TRUE,returnInfo]
   )
 }
 
@@ -3505,6 +3823,9 @@ fd_sda <- function(y,
 #' @param overlap Turn DFA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})
 #' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
 #' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
+#' @param returnPLAW Return the power law data (default = \code{FALSE})
+#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param silent Silent-ish mode
 #' @param ... Other arguments
 #'
 #'
@@ -3524,9 +3845,8 @@ fd_sda <- function(y,
 #'
 #' @family Fluctuation Analyses
 #'
-#' @family FD estimators
 #'
-fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1], polyOrder=1, standardise = c("mean.sd","median.mad")[1], adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4, doPlot = FALSE, ...){
+fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1], polyOrder=1, standardise = c("mean.sd","median.mad")[1], adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4, doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE, ...){
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
@@ -3552,23 +3872,8 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
   }
 
   if(adjustSumOrder){
-
-    # Check global H
-    TSm      <- as.matrix(cbind(t=1:NROW(y),y=y))
-    Hglobal  <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder)
-    rm(TSm)
-
-    # Adjust TS by global H
-    Hadj <- 0
-    if((Hglobal>1.2)&(Hglobal<1.8)){
-      y <- diff(y)
-      Hadj=1}
-    if(Hglobal>1.8){
-      y <- diff(diff(y))
-      Hadj <- 2}
-    if(Hglobal<0.2){
-      y <- ts_integrate(ts_center(y))
-      Hadj <- -1}
+    y    <- ts_sumorder(y)
+    Hadj <- attr(y,"Hadj")
   }
 
   TSm    <- as.matrix(cbind(t=1:NROW(y),y=y))
@@ -3593,7 +3898,7 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
     )
     )
     ifultools::splitplot(2,1,2)
-    graphics::plot(DFAout$PLAW$F2 ~ DFAout$PLAW$scaleS, xlab="log(Bin Size)", ylab = "log(RMSE)", type="l")
+    graphics::plot(DFAout$PLAW$F2 ~ DFAout$PLAW$scaleS, xlab="log2(Bin Size)", ylab = "log2(RMSE)", type="l")
     graphics::lines(lmfit1$model$`DFAout$PLAW$scaleS`, stats::predict(lmfit1),lwd=3,col="darkred")
     graphics::lines(lmfit2$model$`DFAout$PLAW$scaleS[fitRange]`, stats::predict(lmfit2),lwd=3,col="darkblue")
     graphics::legend("topleft",c(paste0("Full (n = ",length(DFAout$PLAW$scaleS),")"), paste0("Range (n = ",length(DFAout$PLAW$scaleS[fitRange]),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
@@ -3605,13 +3910,89 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
     PLAW  =  DFAout$PLAW,
     fullRange = list(sap = lmfit1$coefficients[2], H = H1, FD = sa2fd_dfa(lmfit1$coefficients[2]), fitlm1 = lmfit1),
     fitRange  = list(sap = lmfit2$coefficients[2], H = H2, FD = sa2fd_dfa(lmfit2$coefficients[2]), fitlm2 = lmfit2),
-    info = list(fullRange=lmfit1,fitRange=lmfit2,segments=DFAout$segments))
+    info = list(fullRange=lmfit1,fitRange=lmfit2,segments=DFAout$segments))[returnPLAW,TRUE,TRUE,returnInfo]
   )
 }
 
 
+#' Calculate FD using Sevcik's method
+#'
+#' @param y A time series or numeric vector
+#' @param detrend Subtract linear trend from the series (default = \code{TRUE}).
+#' @param adjustSumOrder Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg) (default = \code{TRUE})
+#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
+#' @param returnPLAW Return the FD series (default = \code{FALSE})
+#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param silent Silent-ish mode
+#' @param ... Other arguments
+#'
+#' @author Fred Hasselman
+#'
+#' @return An FD estimate
+#'
+#' @export
+#'
+#' @references Sevcik, C. (1998). A procedure to Estimate the Fractal Dimension of Waveforms. Paper available at http://arxiv.org/pdf/1003.5266.pdf
+#'
+fd_sev <- function(y, detrend = FALSE, adjustSumOrder = FALSE, doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE, ...){
 
 
+
+  Hadj<-0
+  if(detrend){y <- ts_detrend(y)}
+  if(adjustSumOrder){
+    y <- ts_sumorder(y)
+    Hadj <- attr(y,"Hadj")
+    }
+
+  N <- NROW(y)
+  D.FD <- D.sd <- numeric(N)
+  D.L <- list()
+
+  L<-0
+ for(n in 1:N){
+  if(n>1){L <- cumsum(sqrt(diff(elascer(y[1:n]))^2 + (1/(n-1)^2)))}
+  D.FD[n] <- 1 + ((log(dplyr::last(L)+.Machine$double.eps) - log(2)) / log((2*(n-1))+.Machine$double.eps) )
+  D.sd[n] <- stats::var(L, na.rm = TRUE) / (dplyr::last(L)^2 * log((2*(n-1)^2)+.Machine$double.eps))
+
+  D.L[[n]] <- L
+
+ }
+
+  D.n <- lengths(D.sd)
+  D.SE <- D.sd / sqrt(D.n)
+  D.SE[is.na(D.SE)] <- 0
+
+
+  D.sd2 = ts_sd(D.FD,type = "unadjusted")
+lengths(D.L)
+  if(doPlot){
+
+    # dfU <- data.frame(time=seq(0,1,length.out = N),y=elascer(y))
+    # ggU <- ggplot(dfU,aes(x=time,y=y)) + geom_line() + scale_x_continuous(expand = c(0,0)) + scale_y_continuous(expand = c(0,0)) + coord_equal() + theme_bw() + theme(panel.grid = element_blank())
+    #
+    # dfOri <- data.frame(time=time(ts(y)),y=y)
+    # ggOri <- ggplot(dfOri,aes(x=time,y=y)) + geom_line() + scale_x_continuous(expand = c(0,0)) + scale_y_continuous(expand = c(0,0)) + theme_bw() + theme(panel.grid = element_blank())
+    #
+    # dfFD <- data.frame(time=time(ts(y)),FD=D.FD,ci_lo=D.FD-(1.96*D.SE),ci_hi=D.FD+(1.96*D.SE))
+    # ggFD <- ggplot(dfFD,aes(x=time,y=FD)) +  geom_ribbon(aes(ymin=ci_lo, ymax=ci_hi),colour="grey70", fill = "grey70")+ geom_line() +  scale_x_continuous(expand = c(0,0)) + scale_y_continuous("Fractal Dimension",breaks = c(0.8,1,1.1,1.2,1.5,1.8),expand = c(0,0), limits = c(.8,2)) + theme_bw() + theme(panel.grid.major.x  = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank())
+
+    graphics::plot.new()
+    old <- ifultools::splitplot(2,1,1)
+    #graphics::plot(y,ylab = "Y", main = paste0('FD: ', round(dplyr::last(D.FD), digits=2)))
+    graphics::plot(elascer(y)~ seq(0,1,length.out = N), ylab = "", xlab="", main = paste0('FD: ', round(dplyr::last(D.FD), digits=2)),xlim=c(0,1),ylim=c(0,1),pty="s", type="l")
+    ifultools::splitplot(2,1,2)
+    graphics::plot(D.FD ~ seq(0,1,length.out = N), xlab="Normalised time", ylab = "", type="l")
+    #graphics::legend("topleft",c(paste0("Full (n = ",length(DFAout$PLAW$scaleS),")"), paste0("Range (n = ",length(DFAout$PLAW$scaleS[fitRange]),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
+    graphics::par(old)
+
+  }
+
+  return(list(PLAW = D.FD,
+              fullRange  = list(sap = NA, H = NA, FD = dplyr::last(D.FD), fitlm1 = NA),
+              fitRange   = list(sap = NA, H = NA, FD = dplyr::last(D.FD), fitlm2 = NA),
+              info = list(FDseries=data.frame(y=y,FD=D.FD,sd=D.sd,sd2=D.sd2),L=D.L))[returnPLAW,TRUE,TRUE,returnInfo])
+}
 
 
 # Multi-Fractal DFA -----------------------------------------------------------------------------------------------
@@ -3697,7 +4078,8 @@ MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
 #' @export
 #' @keywords internal
 #'
-monoH <- function(TSm,scaleS,polyOrder=1, returnPLAW = FALSE, returnSegments = FALSE){
+monoH <- function(TSm,scaleS,polyOrder=1, returnPLAW = FALSE, returnSegments = FALSE, removeRMSbelow = .Machine$double.eps){
+
   dfaRMS_scale <- vector("list",length(scaleS))
 
   if(max(scaleS)>NROW(TSm)/2){
@@ -3706,9 +4088,12 @@ monoH <- function(TSm,scaleS,polyOrder=1, returnPLAW = FALSE, returnSegments = F
   F2 <- numeric(length(scaleS))
 
   for(ns in seq_along(scaleS)){
-    dfaRMS_scale[[ns]] <-plyr::ldply(ts_slice(TSm[,2],scaleS[ns]),function(sv){return(sqrt(mean(ts_detrend(sv,polyOrder=polyOrder))^2))})
-    F2[ns] <- mean(dfaRMS_scale[[ns]]$V1^2)^(1/2)
+    dfaRMS <- plyr::ldply(ts_slice(TSm[,2],scaleS[ns]), function(sv){return(sqrt(mean(ts_detrend(sv,polyOrder=polyOrder)^2,na.rm = TRUE)))})
+    dfaRMS$V1[dfaRMS$V1 <= removeRMSbelow^2] <- NA
+    dfaRMS_scale[[ns]] <- dfaRMS$V1
+    F2[ns] <- mean(dfaRMS_scale[[ns]]^2,na.rm = TRUE)^(1/2)
     if(is.infinite(log2(F2[ns]))){F2[ns] <- NA}
+    rm(dfaRMS)
   }
 
   PLAW <- data.frame(scaleS=log2(scaleS),F2 = log2(F2)%00%NA)
@@ -4386,6 +4771,151 @@ add_alpha <- function(col, alpha=1){
 }
 
 
+#' FisherZ for PACF
+#'
+#' @param r r
+#' @param n n
+#' @param lag lag
+#' @param siglevel siglevel
+#' @param sides sides
+#' @param type type
+#'
+#' @return dataframe
+#' @export
+#'
+#' @keywords internal
+#'
+pacf_fisherZ <-function(r, n, lag, siglevel=.05,sides=2,type=""){
+  z <- atanh(r)/sqrt(1/(n-3))
+  conf.low   <- tanh(atanh(r) - (qnorm(1-(siglevel/sides)) * sqrt((1/(n-3)))))
+  conf.high  <- tanh(atanh(r) + (qnorm(1-(siglevel/sides)) * sqrt((1/(n-3)))))
+  p<-2*(1-pnorm(abs(z)))
+  if(p<siglevel){
+    sig <-"yes"
+  } else {
+    sig <-"no"
+  }
+  return(data.frame(r=r,ciL=conf.low,ciU=conf.high,fZ=z,p=p,alpha=siglevel,sig=sig,lag=lag,n=n,type=type, stringsAsFactors = FALSE))
+}
+
+#' Plot ACF and PACF
+#'
+#' @param y A time series or numeric vector
+#' @param Lmax Maximum number of lags
+#' @param alpha Significance level
+#' @param doPlot Plot output
+#' @param returnCorFun Return the data
+#'
+#' @return Either an invisible ggplot2 object r a list containing the plot and the data
+#'
+#' @family Plot redundancy functions
+#'
+#' @export
+#'
+plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = TRUE, returnCorFun = TRUE){
+
+  siglevel <- alpha
+  df.acf <- acf(y,plot=FALSE, lag.max = Lmax)
+  df.pacf <- pacf(y,plot=FALSE, lag.max = Lmax)
+
+  dfN <- laply(1:Lmax, function(l) NROW(ts_embed(y,2,l))+1)
+
+  corfunACF  <- ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
+  corfunPACF <- ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
+  corfun     <- rbind(corfunACF,corfunPACF)
+
+  groupColours <-  scales::brewer_pal(palette="RdBu")(11)
+  cols <- c("yes"=groupColours[9],"no"=groupColours[3])
+
+  g <- ggplot(corfun,aes(x=lag,y=r)) +
+    geom_hline(yintercept = 0, colour="grey",size=1) +
+    geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),aes(x=x,y=y),colour="grey50") +
+    geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
+    geom_ribbon(aes(ymin=ciL,ymax=ciU),fill="grey70",colour="grey50") +
+    geom_path(colour="grey50") +
+    geom_point(aes(fill = sig, colour=sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
+    facet_grid(type ~.) +
+    scale_fill_manual(bquote(p < .(siglevel)),values = cols,
+                      labels =  list("yes"= expression(rho != 0),
+                                     "no" = expression(rho == 0))) +
+    scale_colour_manual(bquote(p < .(siglevel)),values = cols,
+                        labels =  list("yes"= expression(rho != 0),
+                                       "no" = expression(rho == 0))) +
+    scale_x_continuous(limits = c(0,Lmax),expand = c(0.01,0), breaks = seq(0,Lmax,by = round(Lmax/10))) +
+    scale_y_continuous(limits = c(-1,1)) +
+    theme_bw() + theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank())
+
+  if(doPlot){
+    plot.new()
+    plot(g)
+  }
+
+  if(returnCorFun){
+    return(list(corfun=corfun,
+                plot=invisible(g)))
+  } else {
+    return(invisible(g))
+  }
+}
+
+#' Plot various MI functions
+#'
+#' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function.
+#' @param lags Maximum number of lags
+#' @param alpha Significance level
+#' @param doPlot Plot output
+#' @param returnMIFun Return the data
+#'
+#' @return Either an invisible ggplot2 object r a list containing the plot and the data
+#'
+#' @family Plot redundancy functions
+#'
+#' @export
+#'
+plotRED_mif <- function(y, lags = max(round(NROW(y)/4),10), alpha=.05 ,doPlot = TRUE, returnMIFun = TRUE){
+
+  siglevel <- alpha
+
+
+  # corfunACF  <- ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
+  # corfunPACF <- ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
+  # corfun     <- rbind(corfunACF,corfunPACF)
+
+  groupColours <-  scales::brewer_pal(palette="RdBu")(11)
+  cols <- c("yes"=groupColours[9],"no"=groupColours[3])
+
+  g <- ggplot(corfun,aes(x=lag,y=r)) +
+    geom_hline(yintercept = 0, colour="grey",size=1) +
+    geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),aes(x=x,y=y),colour="grey50") +
+    geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
+    geom_ribbon(aes(ymin=ciL,ymax=ciU),fill="grey70",colour="grey50") +
+    geom_path(colour="grey50") +
+    geom_point(aes(fill = sig, colour=sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
+    facet_grid(type ~.) +
+    scale_fill_manual(bquote(p < .(siglevel)),values = cols,
+                      labels =  list("yes"= expression(rho != 0),
+                                     "no" = expression(rho == 0))) +
+    scale_colour_manual(bquote(p < .(siglevel)),values = cols,
+                        labels =  list("yes"= expression(rho != 0),
+                                       "no" = expression(rho == 0))) +
+    scale_x_continuous(limits = c(0,Lmax),expand = c(0.01,0), breaks = seq(0,Lmax,by = round(Lmax/10))) +
+    scale_y_continuous(limits = c(-1,1)) +
+    theme_bw() + theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank())
+
+  if(doPlot){
+    plot.new()
+    plot(g)
+  }
+
+  if(returnCorFun){
+    return(list(corfun=corfun,
+                plot=invisible(g)))
+  } else {
+    return(invisible(g))
+  }
+}
+
+
 # Complex Networks# graph2svg <- function(TDM,pname){
 #
 #   # Create weighted Term-Term matrix
@@ -4644,7 +5174,6 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 #'
 ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE){
 
-
   id <- ifelse(is.null(colnames(y)),ifelse(is.null(names(y)),deparse(substitute(y)),names(y)[1]),colnames(y)[1])
   y.ori <- y
   N  <- NROW(y)
@@ -4707,18 +5236,242 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
 }
 
 
+#' Discrete representation
+#'
+#'  Return a discrete representation of \code{y} by binning the observed values and returning the transfer probabilities.
+#'
+#' @param y Numeric vector or time series to be discretised.
+#' @param nbins Number of bins to use for calculating transfer probabilities (default = \code{ceiling(2*length(y)^(1/3))})
+#' @param keepNA If \code{TRUE}, any \code{NA} values will first be removed and later re-inserted into the discretised time series.
+#'
+#' @return A discretised version of \code{y}
+#'
+#' @export
+#'
+ts_discrete <- function(y, nbins=ceiling(2*length(x)^(1/3)), keepNA = TRUE){
+
+  idNA <- is.na(y)
+  y <- y[!idNA]
+
+  # Make a binvector
+  binvec <- seq(min(y)-0.001, max(x),length.out=nbins+1)
+  # Apply the bins
+  bins <- vector("numeric",NROW(y))
+  for(b in 1:nbins) {
+    bins[y%(]%c(binvec[b],binvec[b+1])] <- b
+  }
+
+  if(keepNA){
+    y <- rep(NA,length(idNA))
+    y[!idNA] <- bins
+  } else {
+    y <- bins
+  }
+
+  return(y)
+}
+
+
+ts_resample <- function(y, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRUE){
+
+  bins <- ts_discrete(y, nbins)
+  transmat <- matrix(0,nbins,nbins)
+  for(i in 1:nbins) {
+    for(j in 1:nbins) {
+      transmat[i,j] <- sum(bins[-NROW(y)]==i & bins[-1]==j)
+    }
+    if(sum(transmat[i,])>0) { transmat[i,] <- transmat[i,]/sum(transmat[i,]) }
+    else { transmat[i,] <- 1/nbins }
+  }
+
+}
+
+#' Derivative of time series
+#'
+#' Iteratively differenced series up to \code{order}. The same length as the original series is recovered by calculating the mean of two vectors for each iteration: One with a duplicated first value and one with a duplicated last value.
+#'
+#' @param y A timeseries object or numeric vector or a matrix in which columns are variables and rows are numeric values observed over time.
+#' @param order How many times should the difference iteration be applied? (default = \code{1})
+#' @param addColumns Should the derivative(s) be added to the input vector/matrix as columns? (default = \code{TRUE})
+#' @param keepDerivatives If \code{TRUE} and \code{order > 1}, all derivatives from \code{1:order} will be returned as a matrix )default = \code{FALSE})
+#' @param maskEdges Mask the values at the edges of the derivatives by any numeric type that is not \code{NULL} (default = \code{NULL})
+#' @param silent Silent-ish mode
+#'
+#' @return Depending on the setting of \code{addColumns} and the object type passed as \code{y}, a vector of equal length as \code{y} iteratively differenced by \code{order} times; a matrix with derivatives, or a matrix with original(s) and derivative(s).
+#'
+#' @note The values at the edges of the derivatives represent endpoint averages and should be excluded from any subsequent analyses. Set argument \code{maskEdges} to a value of your choice.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' # Get an intereting numeric vector from package DescTools
+#' y <- DescTools::Fibonacci(1:26)
+#'
+#' # Return the first order derivative as a vector
+#' ts_diff(y=y,addColumns=FALSE)
+#'
+#' # Return original and derivative as a matrix
+#' plot(ts_diff(y=y, addColumns=TRUE))
+#'
+#' # Works on multivariate data objects with mixed variable types
+#' df <- data.frame(x=letters, y=1:26, z=y)
+#'
+#' # Returns only derivatives of the numeric colunmns
+#' ts_diff(y=df,addColumns=FALSE)
+#'
+#' # Returns original data with derivatives of the numeric columns
+#' ts_diff(y = df, order=4, addColumns=TRUE)
+#'
+#' # Plot logistic S-curve and derivatives 1 to 3
+#' plot(ts(ts_diff(stats::plogis(seq(-5,5,.1)), order=3, keepDerivatives = TRUE)),  main="ts_derivative")
+#'
+ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, maskEdges = NULL, silent = TRUE){
+
+  N <- NCOL(y)
+  if(NROW(y)<N){
+    warning(paste0("Assuming variables in columns and observations in rows!\nDo you really have ",N," columns with time series of length ",NROW(y),"?"))
+  }
+
+  if(!is.null(maskEdges)){
+    if(is.numeric(maskEdges)|is.na(maskEdges)){
+      if(length(maskEdges)==1){
+        maskEdges <- as.numeric(maskEdges)
+      } else {
+        maskEdges = NULL
+      }
+    } else {
+      maskEdges = NULL
+    }
+  }
+
+  Nnum <- plyr::laply(y,is.numeric)
+  if(length(Nnum)<1){stop("Need at least one numeric vector!")}
+
+  if(N==1){
+    Nnum <- TRUE
+    dy <- as.matrix(y)
+  } else {
+    if(is.null(dimnames(y))){
+      dimnames(y) <- list(dimnames(y)[[1]], gsub("[[:punct:]]","", paste0(deparse(substitute(y)),1:NCOL(y))))
+    }
+    dy <- as.matrix(y[,(1:N)[Nnum]])
+  }
+  if(is.null(dimnames(dy)[[2]])){
+     dynames <- paste0("y",1:NCOL(dy))
+    } else {
+     dynames <- paste(dimnames(dy)[[2]])
+    }
+  dimnames(dy) <- list(dimnames(dy)[[1]],paste0(dynames,"_d",order))
+
+  if((N-NCOL(dy))>=0){
+    if(!silent){cat(paste0("\nCalulating derivative for ",NCOL(dy)," time series.\n"))}
+  }
+
+  keepDiffs <- list() # matrix(NA, nrow = NROW(dy),ncol = length(1:order)*NCOL(dy))
+  maskWhich <- list()
+  # Repeat the difference operation
+  for(o in 1:order){
+    dif <- diff(dy)
+    dy  <- cbind((rbind(dif[1,], dif)+rbind(dif,dif[NROW(dif),]))/2)
+    if(!is.null(maskEdges)){
+      maskWhich[[o]] <- c(1:o,(NROW(dy)-o):NROW(dy))
+    }
+    if(keepDerivatives){
+      keepDiffs[[o]] <- dy
+    }
+  }
+
+  if(keepDerivatives){
+  dy <- as.data.frame(keepDiffs)
+  colnames(dy) <- paste0(dynames,"_d",1:order)
+  }
+
+  if(!is.null(maskEdges)){
+    for(c in seq_along(maskWhich)){
+      dy[maskWhich[[c]],c] <- maskEdges
+      }
+  }
+
+  if(addColumns){
+    if(N==1){y<-as.matrix(y)}
+    out <- cbind(y,dy)
+    #class(out) <- class(y)
+    return(out)
+  } else {
+    if(N==1){
+      return(as.vector(dy))
+    } else {
+      return(dy)
+    }
+  }
+}
+
+
+#' Adjust time series by summation order
+#'
+#' Many fluctuation analyses assume a time series' Hurst exponent is within the range of \code{0.2 - 1.2}. If this is not the case it is sensible to make adjustments to the time series, as well as the resutling Hurst exponent.
+#'
+#' @param y A time series of numeric vector
+#' @param scaleS The scales to consider for \code{DFA1}
+#' @param polyOrder Order of polynomial for detrending in DFA (default = \code{1})
+#'
+#' @return The input vector, possibly adjusted based on \code{H} with an attribute \code{"Hadj"} containing an integer by which a Hurst exponent calculated from the series should be adjusted.
+#'
+#' @details Following recommendations by [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg), a global Hurst exponent is estimated using DFA and \code{y} is adjusted accordingly:
+#' \itemize{
+#' \item{\code{1.2 < H < 1.8} first derivative of y, atribute \code{Hadj = 1}}
+#' \item{\code{H > 1.8} second derivative of y, atribute \code{Hadj = 2}}
+#' \item{\code{H < 0.2} y is centered and integrated, atribute \code{Hadj = -1}}
+#' \item{\code{0.2 <= H <= 1.2 } y is unaltered, atribute \code{Hadj = 0}}
+#' }
+#'
+#' @references Ihlen, E. A. F. E. (2012). Introduction to multifractal detrended fluctuation analysis in Matlab. Frontiers in physiology, 3, 141.
+#'
+#' @export
+#'
+ts_sumorder <- function(y, scaleS = NULL, polyOrder = 1){
+
+  if(is.null(scaleS)){
+    scaleS <- round(2^(seq(4, floor(log2(NROW(y)/2)), by=((floor(log2(NROW(y)/2))-4)/30))))
+  }
+
+  # Check global H
+  TSm      <- as.matrix(cbind(t=1:NROW(y),y=y))
+  Hglobal  <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder)
+  rm(TSm)
+
+  # Adjust TS by global H
+  Hadj <- 0
+  if((Hglobal>1.2)&(Hglobal<1.8)){
+    y <- diff(y)
+    Hadj=1}
+  if(Hglobal>1.8){
+    y <- diff(diff(y))
+    Hadj <- 2}
+  if(Hglobal<0.2){
+    y <- ts_integrate(ts_center(y))
+    Hadj <- -1}
+
+  attr(y,"Hglobal") <- Hglobal
+  attr(y,"Hadj")    <- Hadj
+
+  return(y)
+}
 
 #' Check and/or Fix a vector
 #'
 #' @param y A time series object or numeric vector
-#' @param checkNumericVector checkVector
-#' @param checkTimeVector checkTimeVector
-#' @param checkPow2 checkPow2
+#' @param checkNumericVector is 1D numeric vector?
+#' @param checkTimeVector has time vector?
+#' @param checkWholeNumber contains only wholenumbers?
+#' @param checkPow2 length is power of 2?
 #' @param checkScale checkScale
 #' @param checkSummationOrder checkSummationOrder
 #' @param checkNonStationarity checkNonStationarity
 #' @param checkNonHomogeneity checkNonHomogeneity
-#' @param fixNumericVector fixVector
+#' @param fixNumericVector return a 1D numeric vector (WARNING: Data frames and Matrices with NCOL > 1 wil be converted to long form)
+#' @param fixWholeNumber fixWholeNumber
 #' @param fixTimeVector fixTimeVector
 #' @param fixPow2 foxPow2
 #' @param fixNA fixNA
@@ -4730,41 +5483,123 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
 #' @return A 'check' report and/or a 'fixed' vector y.
 #' @export
 #'
-ts_checkfix <- function(y, checkNumericVector = TRUE, checkTimeVector = TRUE, checkPow2 = TRUE, checkScale = TRUE, checkSummationOrder = TRUE, checkNonStationarity = TRUE, checkNonHomogeneity = TRUE, fixNumericVector = FALSE, fixTimeVector = FALSE, fixPow2 = FALSE, fixNA = TRUE, fixScale = FALSE, fixSummationOrder = FALSE, fixNonStationarity = FALSE, fixNonHomogeneity = FALSE){
+ts_checkfix <- function(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE, checkTimeVector = FALSE, checkPow2 = FALSE, checkScale = FALSE, checkSummationOrder = FALSE, checkNonStationarity = FALSE, checkNonHomogeneity = FALSE, fixNumericVector = FALSE, fixWholeNumbers = FALSE, fixTimeVector = FALSE, fixPow2 = FALSE, fixNA = TRUE, fixScale = FALSE, fixSummationOrder = FALSE, fixNonStationarity = FALSE, fixNonHomogeneity = FALSE){
 
   outtext <- list()
   pre <- "\ny"
   post <- "\n"
   i <- 0
 
+  whichClass <- class(y)
+  yesNumeric <- FALSE
+  yesWholeNumbers <- FALSE
+  yesTime    <- FALSE
+  yesPow2    <- FALSE
+  yesScaled  <- FALSE
+  yesNonStationary <- FALSE
+
+  # Numeric
+  tmptxt <- ""
+  txt <- "NUMERIC"
   if(checkNumericVector){
-    if(is.numeric(y)){txt <- "is numeric"} else {
-      txt <- "is NOT numeric"
-      if(fixNumericVector){
-        suppressWarnings(y <- as.numeric(y))
-        txt <- paste(txt,"... FIXED by as.numeric(y)")
-      }
+    if(is.numeric(y)){
+      txt <- c(txt,"is numeric")
+      yesNumeric <- TRUE
+    } else {
+      tmptxt <- "is NOT numeric"
     }
-    outtext[[i%++%1]] <- paste(pre,txt,post)
-    rm(txt)
   }
 
+    if(fixNumericVector&!yesNumeric){
+      if(is.null(dim(y))){
+        suppressWarnings(y <- as.numeric(unlist(y)))
+        } else {
+      if(dim(y)[[2]]==1){suppressWarnings(y <- as.numeric(y[,1]))
+        } else {
+      if(dim(y)[[2]]>1){suppressWarnings(y <- y %>%  gather(key=colname,value=value) %>%  as.numeric(value))
+        }
+        }
+          }
+      tmptxt <- paste(tmptxt,"... FIXED by as.numeric(y)")
+      yesNumeric <- TRUE
+    }
+    txt <- c(txt, tmptxt)
+    outtext[[i%++%1]] <- paste(pre,txt,post)
+    rm(txt,tmptxt)
+
+
+    # Wholenumber
+    tmptxt <- ""
+    txt <- "WHOLENUMBER"
+    if(all(is.wholenumber(y))){
+      txt <- c(txt,"only contains whole numbers")
+        yesWholeNumbers <- TRUE
+      } else {
+        tmptxt <- "does NOT only contain whole numbers"
+      }
+    if(fixWholeNumbers&!yesWholeNumbers){
+      suppressWarnings(y <- round(y))
+      tmptxt <- paste(tmptxt,"... FIXED by round(y)")
+      yesWholeNumbers <- TRUE
+    }
+    txt <- c(txt, tmptxt)
+    outtext[[i%++%1]] <- paste(pre,txt,post)
+    rm(txt,tmptxt)
+
+   # TimeVector
+    tmptxt <- ""
+    txt <- "TIMEVECTOR"
   if(checkTimeVector){
-    if(grepl("(ts|mts|xts|zoo)",class(y))){txt <-paste0("has a time vector:",stats::tsp(y))} else {
-      txt <- "does not have a time vector"
-      if(is.list(fixTimeVector)){
+    if(grepl("(ts|mts|xts|zoo)",whichClass)){
+      txt <-c(txt,"has a time vector:",stats::tsp(y))
+      yesTime <- TRUE
+      } else {
+      tmptxt <- "does not have a time vector"
+      }
+  }
+
+      if(is.list(fixTimeVector&!yesTime)){
         if(all(names(fixTimeVector)%in%names(formals(stats::ts)))){
           fixTimeVector$data <- NULL
           etxt <- paste0("stats::ts(data = y, ",paste0(names(fixTimeVector)," = ",fixTimeVector,collapse = ", "),")")
           y <- eval(parse(text = paste(etxt)))
-          txt <- paste(txt,"... FIXED by",etxt)
+          tmptxt <- paste(tmptxt,"... FIXED by",etxt)
+          yesTime <- TRUE
           rm(etxt)
-        }
+      } else {
+        y <- ts(y)
+        tmptxt <- paste(tmptxt,"... FIXED by ts(y)")
+        yesTime <- TRUE
       }
+      }
+      txt <- c(txt, tmptxt)
+      outtext[[i%++%1]] <- paste(pre,txt,post)
+      rm(txt,tmptxt)
+
+  # Stationarity
+      tmptxt <- ""
+  txt<-"NONSTATIONARY"
+  if(checkNonStationarity){
+    tst1 <- suppressWarnings(tseries::kpss.test(y,null = "Trend"))$p.value
+    tst2 <- 1-suppressWarnings(tseries::adf.test(y, alternative = "stationary"))$p.value
+    tst3 <- 1-suppressWarnings(tseries::pp.test(y, alternative = "stationary"))$p.value
+    result <- sum(c(tst1,tst2,tst3)<.05, na.rm = TRUE)
+    if(result>1){
+      txt <- c(txt,paste0(result,"is NOT stationary (",result,"/3 tests conclude y is stationary)"))
+      yesNonStationary <- TRUE
+    } else {
+      txt <- c(txt,paste0(result,"is stationary (",result,"/3 tests conclude y is not stationary)"))
     }
-    outtext[[i%++%1]] <- paste(pre,txt,post)
-    rm(txt)
   }
+  if(fixNonStationarity&!yesNonStationary){
+    y <- ts_detrend(y)
+  }
+  txt <- c(txt, tmptxt)
+  outtext[[i%++%1]] <- paste(pre,txt,post)
+  rm(txt,tmptxt)
+
+  return(y)
+
 }
 
 #' Trim or Fill Vectors
@@ -4838,7 +5673,7 @@ ts_trimfill <- function(x,y,action=c("fill","trim.cut","trim.NA")[1],type=c("end
 
     } else { # if ldiff > 0
       if(!silent){message("Vectors have equal length.")}
-      return(list(x=x,y=y))
+      out <- list(x=x,y=y)
     }
 
     names(out) <- c(oriMax,oriMin)
@@ -5237,11 +6072,11 @@ fltrIT <- function(TS,f){
 #' @description The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.
 #'
 #' @param x   Input vector or data frame.
-#' @param mn  Minimum value of original, defaults to \code{min(x, na.rm = TRUE)}.
-#' @param mx  Maximum value of original, defaults to \code{max(x, na.rm = TRUE)}.
+#' @param mn  Minimum value of original, defaults to \code{min(x, na.rm = TRUE)} if set to \code{NA}.
+#' @param mx  Maximum value of original, defaults to \code{max(x, na.rm = TRUE)} if set to \code{NA}.
 #' @param hi  Minimum value to rescale to, defaults to \code{0}.
 #' @param lo  Maximum value to rescale to, defaults to \code{1}.
-#'
+#' @param groupwise If \code{x} is a data frame with \code{2+} columns, \code{mn = NA} and/or \code{mx = NA} and \code{groupwise = TRUE}, scaling will occur
 #'
 #' @details Three uses:
 #' \enumerate{
@@ -5259,28 +6094,48 @@ fltrIT <- function(TS,f){
 #'
 #' elascer(somenumbers)
 #' elascer(somenumbers,mn=-100)
-#
 #' # Values < mn will return < lo (default=0)
 #' # Values > mx will return > hi (default=1)
 #' elascer(somenumbers,mn=-1,mx=99)
 #'
 #' elascer(somenumbers,lo=-1,hi=1)
-#' elascer(somenumbers,mn=-10,mx=101,lo=-1,hi=4)
-elascer <- function(x,mn=min(x,na.rm=T),mx=max(x,na.rm=T),lo=0,hi=1){
-  UNLIST = FALSE
-  if(!is.data.frame(x)){UNLIST=TRUE}
+#' elascer(somenumbers,lo=-1,hi=1, groupwise = TRUE)
+#'
+#' elascer(somenumbers,mn=-10,mx=100,lo=-1,hi=4)
+#' elascer(somenumbers,mn= NA,mx=100,lo=-1,hi=4, groupwise = TRUE)
+elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE){
+  doGroupwise <- FALSE
+  mnNA <- FALSE
+  mxNA <- FALSE
+  UNLIST      <- FALSE
+  if(length(dim(x))<2){UNLIST <- TRUE}
+  if(any(is.na(mn),is.na(mx))){
+    if(groupwise&NCOL(x)>1){doGroupwise <- TRUE}
+    if(is.na(mn)){
+      mnNA <- TRUE
+      mn <- min(x,na.rm=TRUE)
+      }
+    if(is.na(mx)){
+      mxNA <- TRUE
+      mx <- max(x,na.rm=TRUE)
+      }
+  }
   x <- as.data.frame(x)
   u <- x
   for(i in 1:NCOL(x)){
-    mn=min(x[,i],na.rm=T)
-    mx=max(x[,i],na.rm=T)
+    if(doGroupwise){
+      if(mnNA){mn<-min(x[,i],na.rm=TRUE)}
+      if(mxNA){mx<-max(x[,i],na.rm=TRUE)}
+    }
     if(mn>mx){warning("Minimum (mn) >= maximum (mx).")}
     if(lo>hi){warning("Lowest scale value (lo) >= highest scale value (hi).")}
-    ifelse(mn==mx,{u[,i]<-rep(mx,length(x[,i]))},{
-      u[,i]<-(((x[i]-mn)*(hi-lo))/(mx-mn))+lo
+    if(mn==mx){
+      u[,i]<-rep(mx,length(x[,i]))
+      } else {
+      u[,i]<-(((x[,i]-mn)*(hi-lo))/((mx-mn))+lo)
       id<-stats::complete.cases(u[,i])
       u[!id,i]<-0
-    })
+    }
   }
   if(UNLIST){
     u <- as.numeric(u[,1])

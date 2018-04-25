@@ -4,19 +4,20 @@
 \alias{elascer}
 \title{Elastic Scaler - A Flexible Rescale Function}
 \usage{
-elascer(x, mn = min(x, na.rm = T), mx = max(x, na.rm = T), lo = 0,
-  hi = 1)
+elascer(x, mn = NA, mx = NA, lo = 0, hi = 1, groupwise = FALSE)
 }
 \arguments{
 \item{x}{Input vector or data frame.}
 
-\item{mn}{Minimum value of original, defaults to \code{min(x, na.rm = TRUE)}.}
+\item{mn}{Minimum value of original, defaults to \code{min(x, na.rm = TRUE)} if set to \code{NA}.}
 
-\item{mx}{Maximum value of original, defaults to \code{max(x, na.rm = TRUE)}.}
+\item{mx}{Maximum value of original, defaults to \code{max(x, na.rm = TRUE)} if set to \code{NA}.}
 
 \item{lo}{Maximum value to rescale to, defaults to \code{1}.}
 
 \item{hi}{Minimum value to rescale to, defaults to \code{0}.}
+
+\item{groupwise}{If \code{x} is a data frame with \code{2+} columns, \code{mn = NA} and/or \code{mx = NA} and \code{groupwise = TRUE}, scaling will occur}
 }
 \value{
 scaled inout
@@ -43,5 +44,8 @@ elascer(somenumbers,mn=-100)
 elascer(somenumbers,mn=-1,mx=99)
 
 elascer(somenumbers,lo=-1,hi=1)
-elascer(somenumbers,mn=-10,mx=101,lo=-1,hi=4)
+elascer(somenumbers,lo=-1,hi=1, groupwise = TRUE)
+
+elascer(somenumbers,mn=-10,mx=100,lo=-1,hi=4)
+elascer(somenumbers,mn= NA,mx=100,lo=-1,hi=4, groupwise = TRUE)
 }
