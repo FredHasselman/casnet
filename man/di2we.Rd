@@ -4,12 +4,12 @@
 \alias{di2we}
 \title{Distance 2 weighted matrix}
 \usage{
-di2we(distmat, radius, convMat = FALSE)
+di2we(distmat, emRad, convMat = FALSE)
 }
 \arguments{
 \item{distmat}{Distance matrix}
 
-\item{radius}{The radius or threshold value}
+\item{emRad}{The radius or threshold value}
 
 \item{convMat}{convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)}
 }

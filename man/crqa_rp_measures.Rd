@@ -4,16 +4,16 @@
 \alias{crqa_rp_measures}
 \title{Get (C)RQA measures from a Recurrence Matrix}
 \usage{
-crqa_rp_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
+crqa_rp_measures(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RM)) - 1, VLmax = length(Matrix::diag(RM)) -
-  1, HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, chromatic = FALSE,
-  matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95,
-  doParallel = FALSE)
+  1, HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, theiler = NULL,
+  chromatic = FALSE, matrices = FALSE, doHalf = FALSE, Nboot = NULL,
+  CL = 0.95, doParallel = FALSE)
 }
 \arguments{
 \item{RM}{A binary recurrence matrix}
 
-\item{radius}{Threshold for distance value that counts as a recurrence}
+\item{emRad}{Threshold for distance value that counts as a recurrence}
 
 \item{DLmin}{Minimal diagonal line length}
 
@@ -28,6 +28,8 @@ crqa_rp_measures(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \item{HLmax}{Maximal horizontal line length}
 
 \item{AUTO}{Is this an AUTO RQA?}
+
+\item{theiler}{theiler}
 
 \item{chromatic}{Chromatic RQA?}
 

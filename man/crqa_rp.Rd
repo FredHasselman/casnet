@@ -4,16 +4,16 @@
 \alias{crqa_rp}
 \title{Get bootsrapped (C)RQA measures based on a recurrence matrix}
 \usage{
-crqa_rp(RM, threshold = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
+crqa_rp(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RM)) - 1, VLmax = length(Matrix::diag(RM)) -
-  1, HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, chromatic = FALSE,
-  matrices = FALSE, doHalf = FALSE, Nboot = NULL, CL = 0.95,
-  doParallel = FALSE)
+  1, HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, theiler = NULL,
+  chromatic = FALSE, matrices = FALSE, doHalf = FALSE, Nboot = NULL,
+  CL = 0.95, doParallel = FALSE)
 }
 \arguments{
-\item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})}
+\item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NULL})}
 
-\item{threshold}{Threshold for distance value that counts as a recurrence}
+\item{emRad}{Threshold for distance value that counts as a recurrence}
 
 \item{DLmin}{Minimal diagonal line length (default = \code{2})}
 

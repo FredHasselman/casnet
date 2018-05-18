@@ -4,7 +4,7 @@
 \alias{crqa_rp_calc}
 \title{crqa_rp_calc}
 \usage{
-crqa_rp_calc(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
+crqa_rp_calc(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RM)) - 1, VLmax = length(Matrix::diag(RM)) -
   1, HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, chromatic = FALSE,
   matrices = FALSE)
@@ -12,7 +12,7 @@ crqa_rp_calc(RM, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \arguments{
 \item{RM}{RM}
 
-\item{radius}{r}
+\item{emRad}{r}
 
 \item{DLmin}{d}
 

@@ -4,7 +4,7 @@
 \alias{rp_size}
 \title{rp_size}
 \usage{
-rp_size(mat, AUTO = NULL, theiler = 0)
+rp_size(mat, AUTO = NULL, theiler = NULL)
 }
 \arguments{
 \item{mat}{A Matrix object}

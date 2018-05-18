@@ -4,7 +4,7 @@
 \alias{crqa_rp_prep}
 \title{Prepare matrix}
 \usage{
-crqa_rp_prep(RP, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
+crqa_rp_prep(RP, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RP)) - 1, VLmax = length(Matrix::diag(RP)) -
   1, HLmax = length(Matrix::diag(RP)) - 1, AUTO = FALSE,
   chromatic = FALSE, matrices = FALSE, doHalf = FALSE)
@@ -12,7 +12,7 @@ crqa_rp_prep(RP, radius = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \arguments{
 \item{RP}{Recurrence plot}
 
-\item{radius}{Radiuc}
+\item{emRad}{Radiuc}
 
 \item{DLmin}{Minimal diagonal line length}
 

@@ -5,6 +5,7 @@
 \title{Plot (thresholded) distance matrix}
 \usage{
 rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
+  plotRadiusRRbar = TRUE, markEpochsLOI = NULL, markEpochsGrid = NULL,
   radiusValue = NA, title = "", xlab = "", ylab = "",
   plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE)
 }
@@ -14,6 +15,12 @@ rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
 \item{plotDimensions}{Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})}
 
 \item{plotMeasures}{Print common (C)RQA measures in the plot if the matrix is binary}
+
+\item{plotRadiusRRbar}{The \code{Radius-RR-bar} is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of \code{RR} values one would get if a certain distance threshold were chosen (\code{default = TRUE})}
+
+\item{markEpochsLOI}{Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (\code{default = NULL})}
+
+\item{markEpochsGrid}{Pass a list 2 numeric vectors, \code{markEpochsGrid[[1]]} should have length equal to NROW(RM) and \code{markEpochsGrid[[2]]} should have length equal to NCOL(RM). The values in the vectors represent different epochs associated with each time stamp, the change index will become 'breaks' on the \code{y} and \code{x} axis respectively (\code{default = NULL})}
 
 \item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
 

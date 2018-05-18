@@ -4,14 +4,14 @@
 \alias{roc_noise}
 \title{roc_noise}
 \usage{
-roc_noise(y, radius, emDim = 1, emLag = 1, noiseLevel = 0.75,
+roc_noise(y, emRad, emDim = 1, emLag = 1, noiseLevel = 0.75,
   standardise = c("mean.sd", "median.mad", "none")[3],
   noiseType = c("normal", "uniform")[1])
 }
 \arguments{
 \item{y}{y}
 
-\item{radius}{radius}
+\item{emRad}{radius}
 
 \item{emDim}{embedding Dims}
 

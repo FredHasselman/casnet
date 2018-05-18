@@ -621,7 +621,7 @@ crqa_cl <- function(y1,
 
   if(doPlot>1){
     if(doPlot==2){
-      plotList <- plyr::llply(wIndices, function(ind) rp_plot(di2bi(rp(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag),radius = emRad)))
+      plotList <- plyr::llply(wIndices, function(ind) rp_plot(di2bi(rp(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag),emRad = emRad)))
     }
     if(doPlot==3){plotList <- plyr::llply(wIndices, function(ind) rp_plot(rp(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag)))}
     multi_PLOT(plotList)
@@ -993,12 +993,12 @@ crqa_radius <- function(RM = NULL,
       iter <- iter+1
       #p$tick()$print()
 
-      RMs <- di2bi(RM,radius = tryRadius, convMat = TRUE)
+      RMs <- di2bi(RM,emRad = tryRadius, convMat = TRUE)
       RT  <- Matrix::nnzero(RMs)
       rp.size <- length(RMs)
       Measure <- RT/rp.size
 
-      # crpOut <- crqa_rp(RM = RMs, threshold = tryRadius, AUTO=AUTO)
+      # crpOut <- crqa_rp(RM = RMs, emRad = tryRadius, AUTO=AUTO)
       #Measure  <-  crpOut[[targetMeasure]]
       #crpOut <- data.frame(RR = RR, RT = RT, size = length(RMs))
       #Measure <- RR
@@ -1058,14 +1058,14 @@ crqa_radius <- function(RM = NULL,
       dfREC  <-  plyr::ldply(startRadius, function(r){roc_noise(y = y1,
                                                                emDim = emDim,
                                                                emLag = emLag,
-                                                               radius = r,
+                                                               emRad = r,
                                                                noiseLevel = noiseLevel,
                                                                standardise = standardise,
                                                                noiseType = noiseType)},
                              .progress = plyr::progress_text(char = "o~o"))
 
 
-      dfREC      <-  dplyr::arrange(dfREC,response,radius)
+      dfREC      <-  dplyr::arrange(dfREC,response,emRad)
       caseID    <- dfREC$response%in%"signal+noise"
       controlID <- dfREC$response%in%"noise"
 
@@ -1075,16 +1075,16 @@ crqa_radius <- function(RM = NULL,
                       T1  = pROC::roc(cases=dfREC$T1[caseID], controls=dfREC$T1[controlID]))
 
 
-       optimal.radius <- list(RR  = dfREC$radius[(dfREC$RR>=min(pROC::coords(rocREC$RR,
+       optimal.radius <- list(RR  = dfREC$emRad[(dfREC$RR>=min(pROC::coords(rocREC$RR,
                                                                                 "b",best.method="c",
                                                                                 ret="t")))][1],
-                              DET = dfREC$radius[(dfREC$DET  >=min(pROC::coords(rocREC$DET,
+                              DET = dfREC$emRad[(dfREC$DET  >=min(pROC::coords(rocREC$DET,
                                                                                 "b",best.method="c",
                                                                                 ret="t")))][1],
-                              LAM = dfREC$radius[(dfREC$LAM  >=min(pROC::coords(rocREC$LAM,
+                              LAM = dfREC$emRad[(dfREC$LAM  >=min(pROC::coords(rocREC$LAM,
                                                                                 "b",best.method="c",
                                                                                 ret="t")))][1],
-                              T1  = dfREC$radius[(dfREC$T1   >=min(pROC::coords(rocREC$T1,
+                              T1  = dfREC$emRad[(dfREC$T1   >=min(pROC::coords(rocREC$T1,
                                                                                 "b",best.method="c",
                                                                                 ret="t")))][1]
                               )
@@ -1205,7 +1205,7 @@ crqa_radius <- function(RM = NULL,
 #' roc_noise
 #'
 #' @param y y
-#' @param radius radius
+#' @param emRad radius
 #' @param emDim embedding Dims
 #' @param emLag embedding Lag
 #' @param noiseLevel noise Level
@@ -1216,7 +1216,7 @@ crqa_radius <- function(RM = NULL,
 #' @export
 #'
 #' @keywords internal
-roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise = c("mean.sd","median.mad","none")[3], noiseType = c("normal","uniform")[1]){
+roc_noise <- function(y, emRad, emDim=1, emLag=1, noiseLevel=.75, standardise = c("mean.sd","median.mad","none")[3], noiseType = c("normal","uniform")[1]){
   y <- dplyr::case_when(
     standardise == "mean.sd"   ~ ts_standardise(y, type="mean.sd"),
     standardise == "median.sd" ~ ts_standardise(y, type="median.mad"),
@@ -1228,10 +1228,10 @@ roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise =
     noiseType == "uniform" ~ sign(rnorm(1))*stats::runif(NROW(y), min=floor(min(y, na.rm = TRUE)), max = ceiling(max(y,na.rm = TRUE)))
     )
 
-  noise_out   <- crqa_cl(yn, emRad = radius, emDim=emDim, emLag=emLag)
-  measure_out <- crqa_cl((y  + noiseLevel * yn), emRad = radius, emDim=emDim, emLag=emLag)
+  noise_out   <- crqa_cl(yn, emRad = emRad, emDim=emDim, emLag=emLag)
+  measure_out <- crqa_cl((y  + noiseLevel * yn), emRad = emRad, emDim=emDim, emLag=emLag)
 
-  return(cbind.data.frame(radius   = radius,
+  return(cbind.data.frame(radius   = emRad,
                           response = c("signal+noise","noise"),
                           rbind(measure_out,noise_out)))
 }
@@ -1243,7 +1243,7 @@ roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise =
 #' Use `crqa_rp`
 #'
 #' @param RM A binary recurrence matrix
-#' @param radius Threshold for distance value that counts as a recurrence
+#' @param emRad Threshold for distance value that counts as a recurrence
 #' @param DLmin Minimal diagonal line length
 #' @param VLmin Minimal vertical line length
 #' @param HLmin Minimal horizontal line length
@@ -1251,6 +1251,7 @@ roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise =
 #' @param VLmax Maximal vertical line length
 #' @param HLmax Maximal horizontal line length
 #' @param AUTO Is this an AUTO RQA?
+#' @param theiler theiler
 #' @param chromatic Chromatic RQA?
 #' @param matrices Return Matrices?
 #' @param doHalf Analyse half of the matrix?
@@ -1266,7 +1267,7 @@ roc_noise <- function(y, radius, emDim=1, emLag=1, noiseLevel=.75, standardise =
 #' @keywords internal
 #'
 crqa_rp_measures <- function(RM,
-                              radius = NULL,
+                              emRad = NULL,
                               DLmin = 2,
                               VLmin = 2,
                               HLmin = 2,
@@ -1274,6 +1275,7 @@ crqa_rp_measures <- function(RM,
                               VLmax = length(Matrix::diag(RM))-1,
                               HLmax = length(Matrix::diag(RM))-1,
                               AUTO      = NULL,
+                              theiler = NULL,
                               chromatic = FALSE,
                               matrices  = FALSE,
                               doHalf    = FALSE,
@@ -1296,7 +1298,7 @@ crqa_rp_measures <- function(RM,
   out    <- parallel::mclapply(1, function(i){
     #crqa_rp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))], ncol=NCols, nrow = NRows),
     crqa_rp_prep(RP = RM,
-             radius= radius,
+             emRad= emRad,
              DLmin = DLmin,
              VLmin = VLmin,
              HLmin = HLmin,
@@ -1314,7 +1316,7 @@ crqa_rp_measures <- function(RM,
   tend  <- Sys.time()
   } else {
     out <- crqa_rp_prep(RP = RM,
-               radius= radius,
+               emRad= emRad,
                DLmin = DLmin,
                VLmin = VLmin,
                HLmin = HLmin,
@@ -1341,7 +1343,7 @@ crqa_rp_measures <- function(RM,
     bootOut <-  parallel::mclapply(1:Nboot, function(i){
       replicate <- as.data.frame(crqa_rp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))],
                                                  ncol=NCols, nrow = NRows),
-                                          radius= radius,
+                                          emRad= emRad,
                                           DLmin = DLmin,
                                           VLmin = VLmin,
                                           HLmin = HLmin,
@@ -1402,8 +1404,8 @@ crqa_rp_measures <- function(RM,
 #'
 #' A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures will be caluclated.
 #'
-#' @param RM A distance matrix, or a matrix of zeroes and ones (you must set \code{radius = NULL})
-#' @param threshold Threshold for distance value that counts as a recurrence
+#' @param RM A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NULL})
+#' @param emRad Threshold for distance value that counts as a recurrence
 #' @param DLmin Minimal diagonal line length (default = \code{2})
 #' @param VLmin Minimal vertical line length (default = \code{2})
 #' @param HLmin Minimal horizontal line length (default = \code{2})
@@ -1426,7 +1428,7 @@ crqa_rp_measures <- function(RM,
 #'
 #'
 crqa_rp <- function(RM,
-                     threshold = NULL,
+                     emRad = NULL,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
@@ -1434,6 +1436,7 @@ crqa_rp <- function(RM,
                      VLmax = length(Matrix::diag(RM))-1,
                      HLmax = length(Matrix::diag(RM))-1,
                      AUTO      = NULL,
+                     theiler   = NULL,
                      chromatic = FALSE,
                      matrices  = FALSE,
                      doHalf    = FALSE,
@@ -1442,7 +1445,7 @@ crqa_rp <- function(RM,
                      doParallel = FALSE){
 
 
-  # Input should be a distance matrix, or a matrix of zeroes and ones with radius = NULL, output is a list
+  # Input should be a distance matrix, or a matrix of zeroes and ones with emRad = NULL, output is a list
   # Fred Hasselman - August 2013
 
   #require(parallel)
@@ -1456,8 +1459,8 @@ crqa_rp <- function(RM,
 
   #uval <- unique(as.vector(RM))
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
-    if(!is.null(threshold)){
-      RM <- di2bi(RM,threshold)
+    if(!is.null(emRad)){
+      RM <- di2bi(RM,emRad)
     } else{
       if(!chromatic){
         stop("Expecting a binary (0,1) matrix.\nUse 'crqa_radius()', or set 'chromatic = TRUE'")
@@ -1465,31 +1468,28 @@ crqa_rp <- function(RM,
         stop("Chromatic RQA not implemented yet.")
       }
     }
-  } else {
-
-  }
+  # } else {
+  #
+   }
   #rm(RM)
 
-  out <- crqa_rp_measures(RM,
-                           radius = threshold,
-                           DLmin = DLmin,
-                           VLmin = VLmin,
-                           HLmin = HLmin,
-                           DLmax = DLmax,
-                           VLmax = VLmax,
-                           HLmax = HLmax,
-                           AUTO  = AUTO,
-                           chromatic = chromatic,
-                           matrices  = matrices,
-                           doHalf = doHalf,
-                           Nboot  = Nboot,
-                           CL     = CL)
+  out <- crqa_rp_calc(RM,
+                      emRad = emRad,
+                      DLmin = DLmin,
+                      VLmin = VLmin,
+                      HLmin = HLmin,
+                      DLmax = DLmax,
+                      VLmax = VLmax,
+                      HLmax = HLmax,
+                      AUTO  = AUTO,
+                      chromatic = chromatic,
+                      matrices  = matrices)
 
   #
   #   if(is.null(Nboot)){Nboot = 1}
   #
   #   out <- crqa_rp_measures(RM,
-  #                            radius= radius,
+  #                            emRad= emRad,
   #                            DLmin = DLmin,
   #                            VLmin = VLmin,
   #                            HLmin = HLmin,
@@ -1512,7 +1512,7 @@ crqa_rp <- function(RM,
   #     bootout <- col.ind  %>%
   #       bootstrap(Nboot) %>%
   #       do(crqa_rp_measures(RM[row.ind,unlist(.)],
-  #                            radius= radius,
+  #                            emRad= emRad,
   #                            DLmin = DLmin,
   #                            VLmin = VLmin,
   #                            HLmin = HLmin,
@@ -1631,7 +1631,7 @@ est_emLag <- function(y,
 #' @param y Time series or numeric vector
 #' @param delay Embedding lag
 #' @param maxDim Maximum number of embedding dimensions
-#' @param threshold See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
+#' @param emRad See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
 #' @param max.relative.change See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
 #' @param doPlot Plot
 #' @param ... Other arguments (not in use)
@@ -1641,11 +1641,11 @@ est_emLag <- function(y,
 #' @return Embedding dimensions
 #' @export
 #'
-est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max.relative.change = .1, doPlot = FALSE, ...){
+est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, emRad = .95, max.relative.change = .1, doPlot = FALSE, ...){
   cbind.data.frame(EmbeddingLag   = delay,
                    EmbeddingDim   = nonlinearTseries::estimateEmbeddingDim(y,
                                                          time.lag  = delay,
-                                                         threshold = threshold,
+                                                         emRad = emRad,
                                                          max.relative.change = max.relative.change,
                                                          max.embedding.dim = maxDim,
                                                          do.plot = doPlot)
@@ -2039,7 +2039,7 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 #' @param y2 A numeric vector or time series for cross recurrence
 #' @param emDim The embedding dimensions
 #' @param emLag The embedding lag
-#' @param emRad The threshold (radius) to apply to the distance matrix to create a binary matrix
+#' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary matrix
 #' @param to.ts Should \code{y1} and \code{y2} be converted to time series objects?
 #' @param order.by If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.
 #' @param to.sparse Should sparse matrices be used?
@@ -2122,7 +2122,7 @@ rp <- function(y1, y2=NULL,
 
   if(to.sparse){
     if(!is.null(emRad)){
-      dmat <- di2bi(dmat, radius = emRad, convMat = TRUE)
+      dmat <- di2bi(dmat, emRad = emRad, convMat = TRUE)
     }
     attributes(dmat)$emDims1  <- et1
     attributes(dmat)$emDims2  <- et2
@@ -2131,7 +2131,7 @@ rp <- function(y1, y2=NULL,
     #dmat <- rp_checkfix(dmat, checkAUTO=TRUE, fixAUTO=TRUE)
   } else {
     if(!is.null(emRad)){
-      dmat <- di2bi(dmat, radius = emRad, convMat = FALSE)
+      dmat <- di2bi(dmat, emRad = emRad, convMat = FALSE)
     }
     attr(dmat,"emDims1") <- et1
     attr(dmat,"emDims2") <- et2
@@ -2249,6 +2249,9 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param RM A distance matrix or recurrence matrix
 #' @param plotDimensions Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})
 #' @param plotMeasures Print common (C)RQA measures in the plot if the matrix is binary
+#' @param plotRadiusRRbar The \code{Radius-RR-bar} is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of \code{RR} values one would get if a certain distance threshold were chosen (\code{default = TRUE})
+#' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (\code{default = NULL})
+#' @param markEpochsGrid Pass a list 2 numeric vectors, \code{markEpochsGrid[[1]]} should have length equal to NROW(RM) and \code{markEpochsGrid[[2]]} should have length equal to NCOL(RM). The values in the vectors represent different epochs associated with each time stamp, the change index will become 'breaks' on the \code{y} and \code{x} axis respectively (\code{default = NULL})
 #' @param radiusValue If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.
 #' @param title A title for the plot
 #' @param xlab An x-axis label
@@ -2262,7 +2265,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #'
 #' @family Distance matrix operations
 #'
-rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE){
+rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, markEpochsLOI = NULL, markEpochsGrid = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE){
 
   # check patchwork
   if(!length(find.package("patchwork",quiet = TRUE))>0){
@@ -2281,6 +2284,10 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
     meltRP <- data.frame(Var1 = (RP@i+1), Var2 = (RP@j+1), value = as.numeric(RP@x))
   } else {
     meltRP <- reshape2::melt(as.matrix(RM))
+  }
+
+  if(any(is.na(meltRP$value))){
+    meltRP$value[is.na(meltRP$value)] <- max(meltRP$value, na.rm = TRUE) + 1
   }
 
   # check unthresholded
@@ -2304,7 +2311,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
       }
     }
     if(unthresholded){
-      rpOUT   <- crqa_rp(RM, threshold = radiusValue, AUTO = AUTO)
+      rpOUT   <- crqa_rp(RM, emRad = radiusValue, AUTO = AUTO)
     } else {
       rpOUT   <- crqa_rp(RM, AUTO = AUTO)
     }
@@ -2325,9 +2332,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
                                       midpoint = mean(meltRP$value, na.rm = TRUE),
                                       limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                                       space    = "Lab",
-                                      name     = "") +
-      scale_x_continuous(expand = c(0,0)) +
-      scale_y_continuous(expand = c(0,0))
+                                      name     = "")
 
     rptheme <-     theme(panel.grid.major  = element_blank(),
                          panel.grid.minor  = element_blank(),
@@ -2336,67 +2341,72 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
                          axis.text = element_blank(),
                          # axis.title.x = element_blank(),
                          # axis.title.y = element_blank(),
+                         legend.position = "top",
                          plot.margin = margin(0,0,0,0))
 
-    # Create a custom legend ---
-    distrange  <- round(seq(0,max(RM,na.rm = TRUE),length.out=7),2)
-    resol      <- sort(unique(round(as.vector(RM),2)))
-    if(length(resol)<7){
-      resol <- distrange
+    if(plotRadiusRRbar){
+      # Create a custom legend ---
+      distrange  <- round(seq(0,max(RM,na.rm = TRUE),length.out=7),2)
+      resol      <- sort(unique(round(as.vector(RM),2)))
+      if(length(resol)<7){
+        resol <- distrange
+      }
+      if(length(resol)>100){
+        resol <- round(seq(0,max(RM,na.rm = TRUE),length.out=100),2)
+      }
+      resol <- resol %>% tibble::as.tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
+      #resol <- resol[-1,]
+
+      distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){
+        suppressWarnings(crqa_radius(RM,targetValue = t,silent = TRUE, maxIter = 100, radiusOnFail = "percentile"))
+      })
+      #ldply(distrange[2:6],function(d) cbind(epsilon=d,RR=crqa_rp(RM = RM, emRad = d)$RR))
+
+      RecScale <- data.frame(RR=distrange$Measure,epsilon=distrange$Radius)
+      RecScale <- RecScale %>%
+        dplyr::add_row(epsilon=mean(c(0,distrange$Radius[1])),RR=mean(c(0,distrange$Measure[1])),.before = 1) %>%
+        dplyr::add_row(epsilon=max(RM),RR=1)
+
+      resol$y <- elascer(x = resol$y,lo = min(log(RecScale$RR),na.rm = TRUE), hi = max(log(RecScale$RR),na.rm = TRUE))
+      #resol$value <- log(resol$value)
+      resol <- resol[-1,]
+
+      gDist <-  ggplot2::ggplot(resol,aes(x=x,y=y,fill=value)) +
+        geom_tile(show.legend = FALSE) +
+        scale_y_continuous(name = "Recurrence Rate", breaks = log(RecScale$RR), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence hreshold",~ epsilon)), labels = paste(round(RecScale$epsilon,2)))) +
+        scale_fill_gradient2(low      = "red3",
+                             high     = "steelblue",
+                             mid      = "white",
+                             na.value = scales::muted("slategray4"),
+                             midpoint = mean(resol$value, na.rm = TRUE),
+                             #limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
+                             space    = "Lab",
+                             name     = "") +
+        coord_equal(1, expand = FALSE) +
+        theme_bw() +
+        theme(panel.background = element_blank(),
+              panel.grid.major  = element_blank(),
+              panel.grid.minor  = element_blank(),
+              legend.background = element_blank(),
+              legend.key = element_blank(),
+              panel.border = element_blank(),
+              axis.text.y  =  element_text(size = 8),
+              # axis.text.y.left  =  element_text(size = 8),
+              # axis.text.y.right =  element_text(size = 8),
+              axis.text.x  = element_blank(),
+              axis.ticks.x = element_blank(),
+              axis.title.x = element_blank(),
+              axis.title.y = element_text(hjust = 0, size = 10),
+              # axis.title.y.left = element_text(hjust = 0, size = 10),
+              # axis.title.y.right = element_text(hjust = 0, size = 10),
+              plot.margin = margin(0,5,0,5, unit = "pt"))
     }
-    if(length(resol)>100){
-      resol <- round(seq(0,max(RM,na.rm = TRUE),length.out=100),2)
-    }
-    resol <- resol %>% tibble::as.tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
-    #resol <- resol[-1,]
-
-    distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){crqa_radius(RM,targetValue = t,silent = TRUE, maxIter = 50, radiusOnFail = "percentile")})
-    #ldply(distrange[2:6],function(d) cbind(epsilon=d,RR=crqa_rp(RM = RM, threshold = d)$RR))
-
-    RecScale <- data.frame(RR=distrange$Measure,epsilon=distrange$Radius)
-    RecScale <- RecScale %>% dplyr::add_row(epsilon=mean(c(0,distrange$Radius[1])),RR=mean(c(0,distrange$Measure[1])),.before = 1) %>% dplyr::add_row(epsilon=max(RM),RR=1)
-
-    resol$y <- elascer(x = resol$y,lo = min(log(RecScale$RR),na.rm = TRUE), hi = max(log(RecScale$RR),na.rm = TRUE))
-    #resol$value <- log(resol$value)
-    resol <- resol[-1,]
-
-    gDist <-  ggplot2::ggplot(resol,aes(x=x,y=y,fill=value)) +
-      geom_tile(show.legend = FALSE) +
-      scale_y_continuous(name = "Recurrence Rate", breaks = log(RecScale$RR), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence hreshold",~ epsilon)), labels = paste(round(RecScale$epsilon,2)))) +
-      scale_fill_gradient2(low      = "red3",
-                           high     = "steelblue",
-                           mid      = "white",
-                           na.value = scales::muted("slategray4"),
-                           midpoint = mean(resol$value, na.rm = TRUE),
-                           #limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
-                           space    = "Lab",
-                           name     = "") +
-      coord_equal(1, expand = FALSE) +
-      theme_bw() +
-      theme(panel.background = element_blank(),
-            panel.grid.major  = element_blank(),
-            panel.grid.minor  = element_blank(),
-            legend.background = element_blank(),
-            legend.key = element_blank(),
-            panel.border = element_blank(),
-            axis.text.y  =  element_text(size = 8),
-            # axis.text.y.left  =  element_text(size = 8),
-            # axis.text.y.right =  element_text(size = 8),
-            axis.text.x  = element_blank(),
-            axis.ticks.x = element_blank(),
-            axis.title.x = element_blank(),
-            axis.title.y = element_text(hjust = 0, size = 10),
-            # axis.title.y.left = element_text(hjust = 0, size = 10),
-            # axis.title.y.right = element_text(hjust = 0, size = 10),
-            plot.margin = margin(0,5,0,5, unit = "pt"))
 
   } else { # unthresholded
 
     gRP <- gRP +  scale_fill_manual(name  = "", breaks = c(0,1),
                                     values = c("0"="white","1"="black"),
                                     na.translate = TRUE , na.value = scales::muted("slategray4"), guide = "none") +
-      scale_x_discrete(expand = c(0,0)) +
-      scale_y_discrete(expand = c(0,0))
 
     rptheme <-  theme(
       panel.background = element_blank(),
@@ -2407,6 +2417,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
       legend.key = element_blank(),
       axis.ticks = element_blank(),
       axis.text = element_blank(),
+      legend.position = "top",
       # axis.title.x =element_blank(),
       # axis.title.y =element_blank(),
       plot.margin = margin(0,0,0,0))
@@ -2414,11 +2425,61 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
 
 
   # Main plot
+
+  if(!is.null(markEpochsLOI)){
+    if(is.factor(markEpochsLOI)&length(markEpochsLOI)==max(c(NROW(RM),NCOL(RM)))){
+      #EcolI <- grey.colors(n=levels(markEpochsLOI))
+    gRP <- gRP + geom_abline(data = data.frame(EcolI = markEpochsLOI), slope = 1, colour = EcolI, size = 2, show.legend = TRUE)
+    } else {
+      warning("Variable passed to 'markEpochsLOI' is not a factor or doesn't have correct length.")
+    }
+  }
+
+  if(!is.null(markEpochsGrid)){
+    if(is.list(markEpochsGrid)&length(markEpochsGrid)==2){
+      gRP <- gRP +
+        geom_vline(data = data.frame(xb=markEpochsGrid[[1]]), aes(xintercept = diff(c((max(xb, na.rm = TRUE)+1),xb)!=0))) +
+        geom_hline(data = data.frame(yb=markEpochsGrid[[2]]), aes(yintercept = diff(c((max(yb, na.rm = TRUE)+1),yb)!=0)))
+    } else {
+      warning("Variable passed to 'markEpochsGrid' is not a list, and/or is not of length 2.")
+    }
+  }
+
+  if(plyr::is.discrete(meltRP$Var1)){
+    gRP <- gRP + scale_x_discrete(expand = c(0,0))
+  } else {
+    gRP <- gRP + scale_x_continuous(expand = c(0,0))
+  }
+  if(plyr::is.discrete(meltRP$Var2)){
+    gRP <- gRP + scale_y_discrete(expand = c(0,0))
+  } else {
+    gRP <- gRP + scale_y_continuous(expand = c(0,0))
+  }
   gRP <- gRP + rptheme + coord_fixed(expand = FALSE)
 
   gy1 <- gg_plotHolder()
   gy2 <- gg_plotHolder()
 
+  xdims <- ""
+  ydims <- ""
+
+  if(!is.null(attr(RM,"emDims1.name"))){
+    xdims <- ifelse(nchar(xlab)>0,xlab,attr(RM,"emDims1.name"))
+    if(AUTO){
+      ydims <- xdims
+    } else {
+      ydims <- ifelse(nchar(ylab)>0,ylab,attr(RM,"emDims2.name"))
+    }
+  }
+
+  if(nchar(xlab)>0){
+    xdims <- xlab
+  }
+  if(nchar(ylab)>0){
+    ydims <- ylab
+  }
+
+  gRP <- gRP + ylab(ydims) + xlab(xdims)
 
   if(plotDimensions){
 
@@ -2428,13 +2489,6 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
 
       y1 <- data.frame(t1=attr(RM,"emDims1"))
       y2 <- data.frame(t2=attr(RM,"emDims2"))
-
-      xdims <- ifelse(nchar(xlab)>0,xlab,attr(RM,"emDims1.name"))
-      if(AUTO){
-        ydims <- xdims
-      } else {
-        ydims <- ifelse(nchar(ylab)>0,ylab,attr(RM,"emDims2.name"))
-      }
 
       # Y1
 
@@ -2536,7 +2590,6 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
     # ,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
   }
 
-
   if(useGtable){
 
     gRP <- gRP + theme(panel.background = element_rect(colour="white"))
@@ -2548,7 +2601,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
       gry1<-ggplot2::ggplotGrob(gy1)
     }
 
-    if(unthresholded){
+    if(unthresholded&plotRadiusRRbar){
       grDist <- ggplot2::ggplotGrob(gDist)
     }
 
@@ -2556,9 +2609,14 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
       grA <- ggplot2::ggplotGrob(gA)
     }
 
-    if(plotDimensions&!plotMeasures&unthresholded){
+    if(plotDimensions&!plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
       gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+    }
+
+    if(plotDimensions&!plotMeasures&unthresholded&!plotRadiusRRbar){
+      mat <- matrix(list(gry2, grid::nullGrob(),g, gry1),nrow = 2)
+      gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
     if(plotDimensions&!plotMeasures&!unthresholded){
@@ -2566,19 +2624,29 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
       gt  <- gtable::gtable_matrix("bi_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1, .25), "null"),respect = TRUE)
     }
 
-    if(plotDimensions&plotMeasures&unthresholded){
+    if(plotDimensions&plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
       gt<- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
-    if(plotDimensions&plotMeasures&!unthresholded){
+    if(plotDimensions&plotMeasures&unthresholded&!plotRadiusRRbar){
       mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
-      gt<- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+      gt<- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
-    if(!plotDimensions&plotMeasures&unthresholded){
+    if(plotDimensions&plotMeasures&!unthresholded){
+      mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
+      gt<- gtable::gtable_matrix("bi_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+    }
+
+    if(!plotDimensions&plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(grA, g, grDist),nrow = 1)
       gt<- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+    }
+
+    if(!plotDimensions&plotMeasures&unthresholded&!plotRadiusRRbar){
+      mat <- matrix(list(grA, g),nrow = 1)
+      gt<- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
     if(!plotDimensions&plotMeasures&!unthresholded){
@@ -2586,9 +2654,14 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
       gt<- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
-    if(!plotDimensions&!plotMeasures&unthresholded){
+    if(!plotDimensions&!plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(g, grDist),nrow = 1)
       gt<- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+    }
+
+    if(!plotDimensions&!plotMeasures&unthresholded&!plotRadiusRRbar){
+      mat <- matrix(list(g),nrow = 1)
+      gt<- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
     if(!plotDimensions&!plotMeasures&!unthresholded){
@@ -2666,9 +2739,12 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE,  radiusValu
 #' rp_size(m,FALSE,0)  # Do not subtract diagonal
 #' rp_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
 #' rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
-rp_size <- function(mat, AUTO=NULL, theiler = 0){
+rp_size <- function(mat, AUTO=NULL, theiler = NULL){
   if(is.null(AUTO)){
     AUTO <- Matrix::isSymmetric(unname(mat))
+  }
+  if(!is.null(attributes(mat)$theiler)){
+    theiler <- attr(mat,"theiler")
   }
   return(cumprod(dim(mat))[2] - ifelse((AUTO&theiler==0),length(Matrix::diag(mat)),
                                        ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
@@ -2683,7 +2759,7 @@ rp_size <- function(mat, AUTO=NULL, theiler = 0){
 #'
 crqa_rp_empty <- function(){
   data.frame(
-    Radius   = NA,
+    emRad   = NA,
     RP_N     = NA,
     RR       = NA,
     DET      = NA,
@@ -2691,7 +2767,7 @@ crqa_rp_empty <- function(){
     MAX_dl   = NA,
     ENT_dl   = NA,
     ENTrel_dl= NA,
-    REP_tot  = NA,
+    REP_av  = NA,
     CoV_dl   = NA,
     DIV_dl   = NA,
     SING_dl  = NA,
@@ -2722,7 +2798,7 @@ crqa_rp_empty <- function(){
 #' crqa_rp_calc
 #'
 #' @param RM RM
-#' @param radius r
+#' @param emRad r
 #' @param DLmin d
 #' @param VLmin v
 #' @param HLmin h
@@ -2738,7 +2814,7 @@ crqa_rp_empty <- function(){
 #' @keywords internal
 #'
 crqa_rp_calc <- function(RM,
-                     radius= NULL,
+                     emRad = NULL,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
@@ -2751,22 +2827,20 @@ crqa_rp_calc <- function(RM,
 
   recmatsize <- rp_size(RM, AUTO=AUTO)
 
-  if(is.null(radius)){
-    radius <- NA
     if(!is.null(attributes(RM)$emRad)){
-      radius <- attributes(RM)$emRad
-    }
+      emRad <- attributes(RM)$emRad
+    } else {
+    emRad <- NA
   }
+
 
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
     if(!chromatic){
-      if(!is.na(radius)){
-        RM <- di2bi(RM,radius = radius)
-        } else {
           stop("Need a thresholded recurrence matrix")
+    } else {
+      stop("Chromatic not yet implemented")
         }
     }
-  }
 
   #Total nr. recurrent points
   RP_N <- Matrix::nnzero(RM, na.counted = FALSE)
@@ -2855,7 +2929,7 @@ crqa_rp_calc <- function(RM,
 
   #Output
   out <- data.frame(
-    Radius   = radius,
+    emRad   = emRad,
     RP_N       = RP_N,
     RR       = RR,
     DET      = DET,
@@ -2863,7 +2937,7 @@ crqa_rp_calc <- function(RM,
     MAX_dl   = MAX_dl,
     ENT_dl   = ENT_dl,
     ENTrel_dl= ENTrel_dl,
-    REP_tot  = REP_tot,
+    REP_av  = REP_av,
     CoV_dl   = CoV_dl,
     DIV_dl   = DIV_dl,
     SING_dl  = SING_dl,
@@ -2910,7 +2984,7 @@ crqa_rp_calc <- function(RM,
 #' Prepare matrix
 #'
 #' @param RP Recurrence plot
-#' @param radius Radiuc
+#' @param emRad Radiuc
 #' @param DLmin Minimal diagonal line length
 #' @param VLmin Minimal vertical line length
 #' @param HLmin Minimal horizontal line length
@@ -2928,7 +3002,7 @@ crqa_rp_calc <- function(RM,
 #' @export
 #'
 crqa_rp_prep <- function(RP,
-                     radius= NULL,
+                     emRad = NULL,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
@@ -2941,7 +3015,7 @@ crqa_rp_prep <- function(RP,
                      doHalf    = FALSE){
 
   out<-crqa_rp_calc(RP,
-                radius= radius,
+                emRad = emRad,
                 DLmin = DLmin,
                 VLmin = VLmin,
                 HLmin = HLmin,
@@ -2955,7 +3029,7 @@ crqa_rp_prep <- function(RP,
   if(doHalf){
     if(!AUTO){
       outLo <- crqa_rp_calc(Matrix::tril(RP,-1),
-                        radius= radius,
+                        emRad = emRad,
                         DLmin = DLmin,
                         VLmin = VLmin,
                         HLmin = HLmin,
@@ -2967,7 +3041,7 @@ crqa_rp_prep <- function(RP,
                         matrices  = matrices)
 
       outUp <- crqa_rp_calc(Matrix::triu(RP,-1),
-                        radius= radius,
+                        emRad= emRad,
                         DLmin = DLmin,
                         VLmin = VLmin,
                         HLmin = HLmin,
@@ -3261,7 +3335,8 @@ mi_mat <- function(y, ID1, ID2){
   Nc <- NCOL(y)
   if(!is.null(dim(y))){
     if(Nc == 1){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1]), Y = infotheo::discretize(y[ID2,1]))}
-    if(Nc == 2){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1]), Y = infotheo::discretize(y[ID2,2]))}
+    if(Nc == 2){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1], nbins = length(seq(-.5,(NROW(ID1)-.5)))),
+                                                Y = infotheo::discretize(y[ID2,2], nbins = length(seq(-.5,(NROW(ID2)-.5)))))}
     if(Nc == 3){out <- infotheo::condinformation(X = infotheo::discretize(y[ID1,1]), Y = infotheo::discretize(y[ID2,2]), S = infotheo::discretize(y[ID1,3]))}
     if(Nc >  3){out <- infotheo::multiinformation(X = infotheo::discretize(y[ID1,]))}
   return(out)
@@ -3349,7 +3424,7 @@ mif_interlayer <- function(g0,g1, probTable=FALSE){
 #' @description Distance matrix to binary matrix based on threshold value
 #'
 #' @param distmat Distance matrix
-#' @param radius The radius or threshold value
+#' @param emRad The radius or threshold value
 #' @param convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)
 #'
 #' @return A (sparse) matrix with only 0s and 1s
@@ -3358,7 +3433,7 @@ mif_interlayer <- function(g0,g1, probTable=FALSE){
 #'
 #' @family Distance matrix operations
 #'
-di2bi <- function(distmat, radius, convMat = FALSE){
+di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
   matPack <- FALSE
   # if already Matrix do not convert to matrix
@@ -3368,10 +3443,10 @@ di2bi <- function(distmat, radius, convMat = FALSE){
   }
 
   # RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
-  # RP[as.matrix(distmat <= radius)] <- 1
+  # RP[as.matrix(distmat <= emRad)] <- 1
 
   # Always use sparse representation for conversion to save memory load
-  ij  <- Matrix::which(distmat <= radius, arr.ind=TRUE)
+  ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
 
   if(NROW(ij)>0){
 
@@ -3388,8 +3463,8 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 
   if(convMat&matPack){RP <- Matrix::as.matrix(RP)}
 
-  RP <- rp_copy_attributes(source = distmat,  target = RP)
-  attributes(RP)$emRad <- radius
+  suppressWarnings(RP <- rp_copy_attributes(source = distmat,  target = RP))
+  attributes(RP)$emRad <- emRad
 
   return(RP)
 }
@@ -3400,7 +3475,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 #' Distance matrix to weighted matrix based on threshold value
 #'
 #' @param distmat Distance matrix
-#' @param radius The radius or threshold value
+#' @param emRad The radius or threshold value
 #' @param convMat convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)
 #'
 #' @return A matrix with 0s and leaves the values < threshold distance value
@@ -3409,7 +3484,7 @@ di2bi <- function(distmat, radius, convMat = FALSE){
 #'
 #' @family Distance matrix operations
 #'
-di2we <- function(distmat, radius, convMat = FALSE){
+di2we <- function(distmat, emRad, convMat = FALSE){
 
   matPack <- FALSE
   if(grepl("Matrix",class(distmat))){
@@ -3417,14 +3492,16 @@ di2we <- function(distmat, radius, convMat = FALSE){
     convMat <- TRUE
   }
 
-  # RP <- NetComp::matrix_threshold(distmat,threshold = radius, minval = 1, maxval = 0)
-  if(radius==0) radius <- .Machine$double.eps
+  # RP <- NetComp::matrix_threshold(distmat,threshold = emRad, minval = 1, maxval = 0)
+  if(emRad==0) emRad <- .Machine$double.eps
   # RP <- distmat #matrix(0,dim(distmat)[1],dim(distmat)[2])
-  # RP[distmat <= radius] <- 0
+  # RP[distmat <= emRad] <- 0
+
+  ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
 
   if(NROW(ij)>0){
     # Always use sparse representation for conversion to save memory load
-    xij <- data.frame(y =  sapply(seq_along(which(distmat > radius, arr.ind=TRUE)[,1]),function(r){distmat[ij[[r,1]],ij[[r,2]]]}), which(distmat > radius, arr.ind=TRUE))
+    xij <- data.frame(y =  sapply(seq_along(which(distmat > emRad, arr.ind=TRUE)[,1]),function(r){distmat[ij[[r,1]],ij[[r,2]]]}), which(distmat > emRad, arr.ind=TRUE))
     suppressWarnings(RP <- Matrix::sparseMatrix(x=xij$y,i=xij$row,j=xij$col, dims = dim(distmat)))
 
     #  if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
@@ -3438,7 +3515,7 @@ di2we <- function(distmat, radius, convMat = FALSE){
   if(convMat&matPack){RP <- Matrix::as.matrix(RP)}
 
   RP <- rp_copy_attributes(source = distmat,  target = RP)
-  attributes(RP)$emRad <- radius
+  attributes(RP)$emRad <- emRad
 
   return(RP)
 }

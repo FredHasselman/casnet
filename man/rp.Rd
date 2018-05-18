@@ -17,7 +17,7 @@ rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL, to.ts = NULL,
 
 \item{emLag}{The embedding lag}
 
-\item{emRad}{The threshold (radius) to apply to the distance matrix to create a binary matrix}
+\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary matrix}
 
 \item{to.ts}{Should \code{y1} and \code{y2} be converted to time series objects?}
 
