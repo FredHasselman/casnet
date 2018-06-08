@@ -6,8 +6,8 @@
 \usage{
 crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
   lagMethods = "first.minimum", emLag = NULL, nnSizes = c(2, 5, 10, 15),
-  nnRadius = 5, nnThres = 10, theiler = 0, diagPlot = TRUE,
-  silent = TRUE, ...)
+  nnRadius = 5, nnThres = 10, theiler = 0, estimateLags = TRUE,
+  estimateDimensions = TRUE, diagPlot = TRUE, silent = TRUE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series}
@@ -27,6 +27,10 @@ crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
 \item{nnThres}{Threshold for selecting optimal parameter in percentage points (default = \code{10})}
 
 \item{theiler}{Theiler window on distance matrix (default = \code{0})}
+
+\item{estimateLags}{Get optimal embedding lags}
+
+\item{estimateDimensions}{Get optimal embedding dimension}
 
 \item{diagPlot}{Plot the results}
 

@@ -4,7 +4,7 @@
 \alias{est_emDim}
 \title{Estimate number of embedding dimensions}
 \usage{
-est_emDim(y, delay = est_emLag(y), maxDim = 15, emRad = 0.95,
+est_emDim(y, delay = est_emLag(y), maxDim = 15, threshold = 0.95,
   max.relative.change = 0.1, doPlot = FALSE, ...)
 }
 \arguments{
@@ -14,13 +14,13 @@ est_emDim(y, delay = est_emLag(y), maxDim = 15, emRad = 0.95,
 
 \item{maxDim}{Maximum number of embedding dimensions}
 
-\item{emRad}{See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
-
 \item{max.relative.change}{See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
 
 \item{doPlot}{Plot}
 
 \item{...}{Other arguments (not in use)}
+
+\item{emRad}{See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
 }
 \value{
 Embedding dimensions

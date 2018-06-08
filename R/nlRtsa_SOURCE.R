@@ -480,7 +480,9 @@ crqa_cl <- function(y1,
     parallel::clusterEvalQ(cl,library(Matrix))
     parallel::clusterEvalQ(cl,library(casnet))
 
-    parallel::clusterExport(cl, varlist = c("data","emDim","emLag","emRad","DLmin","VLmin","theiler","win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp", "saveOut","path_out","file_ID","silent","targetValue", "useParallel"))
+   # parallel::clusterExport(cl, varlist = c("data","emDim","emLag","emRad","DLmin","VLmin","theiler","win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp", "saveOut","path_out","file_ID","silent","targetValue", "useParallel"))
+
+
 
       # cluster_library(c("devtools","utils","plyr","dplyr","tidyr","Matrix","pROC")) %>%
       # cluster_assign_value("crqa_cl_main", crqa_cl_main) %>%
@@ -505,7 +507,7 @@ crqa_cl <- function(y1,
       # cluster_assign_value("targetValue", targetValue) %>%
       # cluster_assign_value("useParallel", useParallel)
 
-  #  parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp","saveOut","path_out","file_ID","silent","..."))
+ #  parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp","saveOut","path_out","file_ID","silent","..."))
 
 
   start <- proc.time()
@@ -609,7 +611,11 @@ crqa_cl <- function(y1,
 
      rqa_measures <- rqa_rpvector <- rqa_diagdist <- rqa_horidist <- NA
   if(useParallel){
-    rqa_measures <-  tidyr::unnest(wList)
+    if(is.list(wList)){
+      rqa_measures <-  plyr::ldply(wList)
+    } else {
+      rqa_measures <-  tidyr::unnest(wList)
+    }
   } else {
     rqa_measures <-plyr::ldply(wList, function(l) l$measures) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
     rqa_rpvector <-plyr::ldply(wList, function(l) l$rpMAT) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
@@ -667,6 +673,8 @@ crqa_cl <- function(y1,
 #' @param nnThres  Threshold for selecting optimal parameter in percentage points (default = \code{10})
 #' @param theiler Theiler window on distance matrix (default = \code{0})
 #' @param diagPlot Plot the results
+#' @param estimateDimensions Get optimal embedding dimension
+#' @param estimateLags Get optimal embedding lags
 #' @param silent Silent-ish mode
 #' @param ... Other parameters passed to \code{\link[nonlinearTseries]{timeLag}}
 #'
@@ -692,6 +700,8 @@ crqa_parameters <- function(y,
                             nnRadius = 5,
                             nnThres  = 10,
                             theiler  = 0,
+                            estimateLags = TRUE,
+                            estimateDimensions = TRUE,
                             diagPlot = TRUE,
                             silent   = TRUE,
                             ...){
@@ -704,8 +714,13 @@ crqa_parameters <- function(y,
   #y <- ts_standardise(y, adjustN = FALSE)
 
   emDims  <-  1:maxDim
+
   if(is.null(emLag)){
-    emLags <- est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+    if(estimateDimensions){
+      emLags <- est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+    } else {
+      emLags <- cbind.data.frame(selection.method = "Not estimated", optimal.lag = NA)
+    }
   } else {
     emLags <- cbind.data.frame(selection.method = "User", optimal.lag = emLag)
   }
@@ -713,14 +728,16 @@ crqa_parameters <- function(y,
   # (fn.out <- tseriesChaos::false.nearest(lx, m=10, d=17, t=0, eps=sd(lx)/10, rt=20))
   # plot(fn.out[1,],type="b")
 
+if(estimateDimensions){
   lagList <- list()
   cnt = 0
   for(N in seq_along(nnSizes)){
     for(R in seq_along(nnRadius)){
       for(L in seq_along(emLags$selection.method)){
 
-      if(!is.na(emLags$optimal.lag[L])){
+     if(!is.na(emLags$optimal.lag[L])){
         cnt = cnt+1
+
         Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
       for(D in seq_along(emDims)){
         RM <- rp(y,y, emDim = emDims[[D]], emLag = emLags$optimal.lag[L])
@@ -743,7 +760,8 @@ crqa_parameters <- function(y,
                                   rtol = nnRadius[R],
                                   atol = nnSizes[N],
                                   olag = 1
-                                  )
+        )
+        }
 
         #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*sd(y))
         #Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
@@ -758,10 +776,10 @@ crqa_parameters <- function(y,
                                      Nn.sd  = Nn.sd,
                                      Nn.min = Nn.min,
                                      Nn.max = Nn.max)
-       }
-      }
-    }
-  }
+       } # L
+      } # R
+    } # N
+
 
   df        <- plyr::ldply(lagList)
  # df$Nn.pct <- df$Nn/df$Nn.max
@@ -782,7 +800,11 @@ crqa_parameters <- function(y,
   opt <- opt[opt$emDim==min(opt$emDim),][1,]
 
   opDim <- opt$emDim
-  opLag <- opt$emLag
+
+  } else { # if estimateDim
+    opDim <- NA
+  }
+
 
   #opDim <- min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE)
   # opLag <- tau(y,
@@ -1641,11 +1663,11 @@ est_emLag <- function(y,
 #' @return Embedding dimensions
 #' @export
 #'
-est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, emRad = .95, max.relative.change = .1, doPlot = FALSE, ...){
+est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max.relative.change = .1, doPlot = FALSE, ...){
   cbind.data.frame(EmbeddingLag   = delay,
                    EmbeddingDim   = nonlinearTseries::estimateEmbeddingDim(y,
                                                          time.lag  = delay,
-                                                         emRad = emRad,
+                                                         threshold = threshold,
                                                          max.relative.change = max.relative.change,
                                                          max.embedding.dim = maxDim,
                                                          do.plot = doPlot)
@@ -1887,7 +1909,7 @@ rp_lineDist <- function(RP,
 
   if(!is.null(d)){
     if(length(d)==1){d <- -d:d}
-    if(length(d)==2){d <-  d:d}
+    if(length(d)==2){d <-  d[1]:d[2]}
   }
   if(!is.null(theiler)){
     if(length(d)<length(-theiler:theiler)){warning("Ignoring theiler window...")}
@@ -1895,6 +1917,7 @@ rp_lineDist <- function(RP,
   }
 
   if(invert){RP <- Matrix::Matrix(1-RP)}
+
 
   B <- rp_nzdiags(RP)
 
@@ -2406,7 +2429,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
     gRP <- gRP +  scale_fill_manual(name  = "", breaks = c(0,1),
                                     values = c("0"="white","1"="black"),
-                                    na.translate = TRUE , na.value = scales::muted("slategray4"), guide = "none") +
+                                    na.translate = TRUE , na.value = scales::muted("slategray4"), guide = "none")
 
     rptheme <-  theme(
       panel.background = element_blank(),
@@ -2847,6 +2870,8 @@ crqa_rp_calc <- function(RM,
 
   #Proportion recurrence / Recurrence Rate
   RR <- RP_N/recmatsize
+
+  if(length(RR)==0){RR<-0}
 
   if(RR==1){
     warning("Everything is recurring!\nReturning empty vector")
@@ -3444,7 +3469,7 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
   # RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   # RP[as.matrix(distmat <= emRad)] <- 1
-
+  if(emRad==0) emRad <- .Machine$double.eps
   # Always use sparse representation for conversion to save memory load
   ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
 
@@ -3500,9 +3525,13 @@ di2we <- function(distmat, emRad, convMat = FALSE){
   ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
 
   if(NROW(ij)>0){
+
     # Always use sparse representation for conversion to save memory load
-    xij <- data.frame(y =  sapply(seq_along(which(distmat > emRad, arr.ind=TRUE)[,1]),function(r){distmat[ij[[r,1]],ij[[r,2]]]}), which(distmat > emRad, arr.ind=TRUE))
+    #xij <- data.frame(y =  sapply(which(distmat > emRad, arr.ind=TRUE)[,1],function(r){distmat[ij[[r,1]],ij[[r,2]]]}), which(distmat > emRad, arr.ind=TRUE))
+    xij <- data.frame(y =  sapply(seq_along(ij[,1]),function(r){distmat[ij[[r,1]],ij[[r,2]]]}), ij)
+
     suppressWarnings(RP <- Matrix::sparseMatrix(x=xij$y,i=xij$row,j=xij$col, dims = dim(distmat)))
+
 
     #  if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
 
@@ -4071,6 +4100,81 @@ lengths(D.L)
               info = list(FDseries=data.frame(y=y,FD=D.FD,sd=D.sd,sd2=D.sd2),L=D.L))[returnPLAW,TRUE,TRUE,returnInfo])
 }
 
+
+#' Allan Variance Analysis
+#'
+#' @param y A numeric vector or time series object
+#' @param fs Sample frequency in Hz
+#' @param doPlot Produce a plot of the Allan variance?
+#' @param useSD Use the standarddeviation instead of variance?
+#'
+#' @return A dataframe with the Allan Factor (variance), Alan standard deviation and error due to bin size
+#' @export
+#'
+fd_allan <- function(y, fs = tsp(hasTsp(y))[3], doPlot = FALSE, useSD=FALSE){
+
+    N <- NROW(y)
+    tau <- 1/fs
+    n <- ceiling((N - 1)/2)
+    p <- floor(log10(n)/log10(2))
+    av <- rep(0, p + 1)
+    time <- rep(0, p + 1)
+    error <- rep(0, p + 1)
+    for (i in 0:(p)) {
+      omega <- rep(0, floor(N/(2^i)))
+      TT <- (2^i) * tau
+      l <- 1
+      k <- 1
+      while (k <= floor(N/(2^i))) {
+        omega[k] <- sum(y[l:(l + ((2^i) - 1))])/(2^i)
+        l <- l + (2^i)
+        k <- k + 1
+      }
+      sumvalue <- 0
+      for (k in 1:(length(omega) - 1)) {
+        sumvalue <- sumvalue + (omega[k + 1] - omega[k])^2
+      }
+      av[i + 1] <- sumvalue/(2 * (length(omega) - 1))
+      time[i + 1] <- TT
+      error[i + 1] <- 1/sqrt(2 * ((N/(2^i)) - 1))
+    }
+
+    df <- data.frame(Tcluster = time, AT = av, ATsd= sqrt(av), error=error)
+    if(doPlot){
+      if(useSD){
+
+     g <-  ggplot(df,aes(x=Tcluster,y=ATsd)) +
+        geom_path() +
+        geom_pointrange(aes(ymin=ATsd-(ATsd*error),ymax=ATsd+(ATsd*error))) +
+       scale_y_continuous(trans = scales::log10_trans(),
+                          breaks = scales::trans_breaks("log10", function(x) 10^x),
+                          labels = scales::trans_format("log10", scales::math_format(10^.x))
+                          ) +
+       scale_x_continuous(trans = scales::log10_trans(),
+                          breaks = scales::trans_breaks("log10", function(x) 10^x),
+                          labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+        xlab("Cluster Times (T)") +
+        ylab("Allan Standard Deviation") +
+        theme_bw()
+
+     } else {
+       g <-  ggplot(df,aes(x=Tcluster,y=AT)) +
+         geom_path() +
+         geom_pointrange(aes(ymin=AT-(AT*error),ymax=AT+(AT*error))) +
+       scale_y_continuous(trans = scales::log10_trans(),
+                          breaks = scales::trans_breaks("log10", function(x) 10^x),
+                          labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+         scale_x_continuous(trans = scales::log10_trans(),
+                            breaks = scales::trans_breaks("log10", function(x) 10^x),
+                            labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+         xlab("Cluster Times (T)") +
+         ylab("Allan Factor")  +
+         theme_bw()
+     }
+     plot(g)
+    }
+    return(df)
+}
 
 # Multi-Fractal DFA -----------------------------------------------------------------------------------------------
 
@@ -5230,6 +5334,59 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 
 
 # HELPERS ----
+
+#' Find change indices
+#'
+#' @param y An indicator variable representing different levels of a variable or factor
+#' @param returnRectdata Return a dataframe suitable for shading a \code{ggplot2} graph with \code{\link[ggplot2]{geom_rect}}
+#' @param groupVar Pass a value (length 1) or variable (length of y) that can be used as a variable to join the indices by if \code{returnRectdata = TRUE}
+#' @param labelVar If \code{y} is not a character vector, provide a vector of labels equal to \code{length(y)}
+#' @param discretize If \code{y} is a continuous variable, setting \code{discretize = TRUE} will partition the values of \code{y} into \code{nbins} number of bins, each value of \code{y} will be replaced by its bin number.
+#' @param nbins Number of bins to use to change a continuous \code{y} (if \code{discretize = TRUE}) into a variable with \code{nbins} levels
+#'
+#' @return Either a vector with the indices of change in \code{y}, or, a data frame with variables \code{xmin,xmax,ymin,ymax,label}
+#'
+#' @export
+#'
+ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = NULL, discretize=FALSE, nbins = 5){
+
+  if(!is.character(y)){
+    y <- ts_checkfix(y,checkNumericVector = TRUE, fixNumericVector = TRUE, checkWholeNumbers = TRUE, fixWholeNumbers = TRUE)
+  }
+
+  if(length(unique(y))>10){
+    warning("More than 10 epochs detected!")
+  }
+
+  xmax <- c(which(diff(y)!=0),NROW(y))
+  xmin <- c(1,xmax)[1:NROW(xmax)]
+  group <- rep(1,length(xmin))
+
+  if(!is.null(groupVar)){
+    if(length(groupVar)==1){
+      group <- groupVar
+    } else {
+      if(length(groupVar)==length(y)){
+        group <- groupVar[xmax]
+      } else {
+        warning("Group values incorrect, using: groupVar = 1")
+      }
+    }
+  }
+
+  if(!is.null(labelVar)){
+    label <- labelVar[xmax]
+  } else {
+    label <- y[xmax]
+  }
+
+  if(returnRectdata){
+    return(data.frame(group = group, xmin = xmin, xmax = xmax, ymin = -Inf, ymax = +Inf, label = label))
+  } else {
+    return(c(1,xstart))
+  }
+}
+
 
 
 #' Delay embedding of a time series
