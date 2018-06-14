@@ -4,7 +4,7 @@
 \alias{mi_mat}
 \title{Mutual Information variations}
 \usage{
-mi_mat(y, ID1, ID2)
+mi_mat(y, ID1, ID2, discreteBins = ceiling(2 * NROW(ID1)^(1/3)))
 }
 \arguments{
 \item{y}{Matrix}
@@ -12,6 +12,8 @@ mi_mat(y, ID1, ID2)
 \item{ID1}{ids}
 
 \item{ID2}{ids}
+
+\item{discreteBins}{Number of bins to use to discretize the time series}
 }
 \value{
 mi

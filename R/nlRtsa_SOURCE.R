@@ -66,8 +66,6 @@ crqa_cl_main <- function(data,
   fixedRR <- FALSE
   if(is.na(emRad)){fixedRR=TRUE}
 
-
-
   file_ID <- file_ID%00%0
 
   RQAmeasures <- list(
@@ -109,8 +107,7 @@ crqa_cl_main <- function(data,
 
    if(is.na(emRad)){
       if(!is.na(targetValue)){
-         emRad <- crqa_radius(y1 = y1, emDim = emDim, emLag = emLag,
-                              targetValue = targetValue, radiusOnFail = "percentile",  tol = .2,silent = silent)
+         emRad <- crqa_radius(y1 = y1, emDim = emDim, emLag = emLag, targetValue = targetValue, radiusOnFail = "percentile", tol = .2, silent = silent)
          if(emRad$Converged){
            emRad <- emRad$Radius
          } else {
@@ -134,8 +131,7 @@ crqa_cl_main <- function(data,
   } else {
     if(is.na(emRad)){
       if(!is.na(targetValue)){
-        emRad <- crqa_radius(y1 = y1, y2 = y2, emDim = emDim, emLag = emLag,
-                             targetValue = targetValue, tol = .2, radiusOnFail = "percentile", silent = silent)
+        emRad <- crqa_radius(y1 = y1, y2 = y2, emDim = emDim, emLag = emLag, targetValue = targetValue, tol = .2, radiusOnFail = "percentile", silent = silent)
         if(emRad$Converged){
           emRad <- emRad$Radius
         } else {
@@ -168,8 +164,8 @@ crqa_cl_main <- function(data,
 
   measures     <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",measOUT)),header=TRUE))
   rpMAT        <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",plotOUT)),header=TRUE))
-  disthistDiag <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",histOUTdiag)),header=TRUE))
-  disthistHori <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",histOUThori)),header=TRUE))
+  disthistDiag <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",histOUTdiag)), header=FALSE, sep = " "))
+  disthistHori <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",histOUThori)), header=FALSE, sep = " "))
 
   if(all(is.null(measures$warning),is.data.frame(measures$value))){
     measures <- measures$value
@@ -185,13 +181,13 @@ crqa_cl_main <- function(data,
     rpMAT <- data.frame(y1=NA,y2=NA,dist=NA)
   }
 
-  if(all(is.null(disthistDiag$warning),is.data.frame(grepl("Error",paste(disthistDiag$value))))){
+  if(any(is.null(disthistDiag$warning),is.data.frame(grepl("Error",paste(disthistDiag$value))))){
     disthistDiag <- disthistDiag$value
   } else {
     disthistDiag <- data.frame(line.length=NA,freq=NA)
   }
 
-  if(all(is.null(disthistHori$warning),is.data.frame(grepl("Error",paste(disthistHori$value))))){
+  if(any(is.null(disthistHori$warning),is.data.frame(grepl("Error",paste(disthistHori$value))))){
     disthistHori <- disthistHori$value
   } else {
     disthistHori <- data.frame(line.length=NA,freq=NA)
@@ -238,13 +234,13 @@ crqa_cl_main <- function(data,
 #' @param step Stepsize for sliding windows (default = size of \code{win}, so no sliding window)
 #' @param JRP Wether to calculate a Joint Recurrence Plot (default = \code{FALSE})
 #' @param distNorm One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix
-#' @param standardise Standardise data
+#' @param standardise Standardise data: \code{"none"} (default), \code{"mean.sd"}, or \code{"median.mad"}
 #' @param returnMeasures Return the (C)RQA measures? (default = \code{TRUE})
 #' @param returnRPvector Return the recurrent points in a dataframe? (default = \code{FALSE})
 #' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})
 #' @param plot_recmat Produce a plot of the recurrence matrix by calling \code{\link{rp_plot}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})
 #' @param path_to_rp Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)
-#' @param saveOut Save the output to files? If \code{TRUE} and \code{pat_out = NA}, the current working directory will be used (default = \code{FALSE})
+#' @param saveOut Save the output to files? If \code{TRUE} and \code{path_out = NA}, the current working directory will be used (default = \code{FALSE})
 #' @param path_out Path to save output if \code{saveOut = TRUE} (default = \code{NULL})
 #' @param file_ID A file ID which will be a prefix to to the filename if \code{saveOut = TRUE} (default = \code{NULL}, an integer will be added tot the file name to ensure unique files)
 #' @param silent Do not display any messages (default = \code{TRUE})
@@ -441,15 +437,8 @@ crqa_cl <- function(y1,
   if(useParallel){
 
     if(names(dotArgs)%in%"logical"){logical <- logical} else {logical <- TRUE}
-  # doFuture::registerDoFuture()
-  # future::plan(multiprocess)
-  # #plan(batchjobs_slurm)
+
    cat("\n...using parallel processing...\n")
-  # wList<-list()
-  # #for(w in seq_along(dfList)){
-  #   Out %<-%  plyr::llply(dfList, function(dfw){crqa_cl_main(data = dfw, emDim = emDim, emLag = emLag, emRad = emRad, DLmin = DLmin, VLmin = VLmin, theiler = theiler, JRP = JRP, distNorm = distNorm, returnMeasures = returnMeasures, returnRPvector = returnRPvector, returnLineDist = returnLineDist, plot_recmat = plot_recmat, path_to_rp = path_to_rp, saveOut = saveOut, path_out = path_out, file_ID = file_ID, silent = silent, targetValue = targetValue)})
-  #  # wList[[w]] <- Out
-  #   wList <- Out
 
    # Only return measures
    returnRPvector <- FALSE
@@ -466,11 +455,7 @@ crqa_cl <- function(y1,
      cores_available <- 1
    }
 
-    #df_par   <- plyr::ldply(dfList, .id="window")
-    #group    <- rep(1:cores_available, each=(win+1), length.out=nrow(df_par))
-    #df_par$window   <- paste("Cluster:",group,"|",df_par$window)
     cl       <- parallel::makeCluster(cores_available)
-    #by_group <- df_par %>% multidplyr::partition(window, cluster = cl)
 
     parallel::clusterEvalQ(cl, library(devtools))
     parallel::clusterEvalQ(cl,library(utils))
@@ -481,8 +466,6 @@ crqa_cl <- function(y1,
     parallel::clusterEvalQ(cl,library(casnet))
 
    # parallel::clusterExport(cl, varlist = c("data","emDim","emLag","emRad","DLmin","VLmin","theiler","win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp", "saveOut","path_out","file_ID","silent","targetValue", "useParallel"))
-
-
 
       # cluster_library(c("devtools","utils","plyr","dplyr","tidyr","Matrix","pROC")) %>%
       # cluster_assign_value("crqa_cl_main", crqa_cl_main) %>%
@@ -538,38 +521,6 @@ crqa_cl <- function(y1,
   cat("\nCompleted in:\n")
   print(time_elapsed_parallel)
 
-
-
-  #
-  # wList <- by_group %>%
-  # dplyr::do(crqa_cl_main(data = .,
-  #                        emDim          = emDim,
-  #                        emLag          = emLag,
-  #                        emRad          = emRad,
-  #                        DLmin          = DLmin,
-  #                        VLmin          = VLmin,
-  #                        theiler        = theiler,
-  #                        JRP            = JRP,
-  #                        distNorm       = distNorm,
-  #                        returnMeasures = returnMeasures,
-  #                        returnRPvector = returnRPvector,
-  #                        returnLineDist = returnLineDist,
-  #                        plot_recmat    = plot_recmat,
-  #                        path_to_rp     = path_to_rp,
-  #                        saveOut        = saveOut,
-  #                        path_out       = path_out,
-  #                        file_ID        = file_ID,
-  #                        silent         = silent,
-  #                        targetValue    = targetValue,
-  #                        useParallel    = useParallel)) %>%
-  #   dplyr::collect()
-
-
-  # names(dfList)<-1:length(dfList)
- # evText <- ldply(seq_along(dfList), function(w) paste("getIt %<-% crqa_cl_main(data = dfList[[",w,"]], emDim = emDim, emLag = emLag, emRad = emRad, DLmin = DLmin, VLmin = VLmin, theiler = theiler, JRP = JRP, distNorm = distNorm, returnMeasures = returnMeasures, returnRPvector = returnRPvector, returnLineDist = returnLineDist, plot_recmat = plot_recmat, path_to_rp = path_to_rp, saveOut = saveOut, path_out = path_out, file_ID = file_ID, silent = silent, targetValue = targetValue)"))
-
-   # wList <- llply(evText, function(w){eval(parse(text = paste(w)))}, .progress = plyr::progress_text(char = "~o~"))
-
   } else {
 
     cat("\n...using sequential processing...\n")
@@ -598,7 +549,6 @@ crqa_cl <- function(y1,
         silent         = silent,
         targetValue    = targetValue)},
       .progress = plyr::progress_text(char = "o~o"))
-
 
     time_elapsed_parallel <- proc.time() - start # End clock
 
@@ -1293,9 +1243,9 @@ crqa_rp_measures <- function(RM,
                               DLmin = 2,
                               VLmin = 2,
                               HLmin = 2,
-                              DLmax = length(Matrix::diag(RM))-1,
-                              VLmax = length(Matrix::diag(RM))-1,
-                              HLmax = length(Matrix::diag(RM))-1,
+                              DLmax = length(Matrix::diag(RM)),
+                              VLmax = length(Matrix::diag(RM)),
+                              HLmax = length(Matrix::diag(RM)),
                               AUTO      = NULL,
                               theiler = NULL,
                               chromatic = FALSE,
@@ -1914,6 +1864,12 @@ rp_lineDist <- function(RP,
   if(!is.null(theiler)){
     if(length(d)<length(-theiler:theiler)){warning("Ignoring theiler window...")}
     RP <- bandReplace(RP,-theiler,theiler,0)
+  }
+
+  if(Matrix::isSymmetric(unname(RP))){
+    if(all(Matrix::diag(RP)==1)){
+     RP <- bandReplace(RP,0,0,0)
+    }
   }
 
   if(invert){RP <- Matrix::Matrix(1-RP)}
@@ -2766,8 +2722,12 @@ rp_size <- function(mat, AUTO=NULL, theiler = NULL){
   if(is.null(AUTO)){
     AUTO <- Matrix::isSymmetric(unname(mat))
   }
-  if(!is.null(attributes(mat)$theiler)){
-    theiler <- attr(mat,"theiler")
+  if(is.null(theiler)){
+    if(!is.null(attributes(mat)$theiler)){
+      theiler <- attr(mat,"theiler")
+    } else {
+      theiler <- 0
+    }
   }
   return(cumprod(dim(mat))[2] - ifelse((AUTO&theiler==0),length(Matrix::diag(mat)),
                                        ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
@@ -2841,9 +2801,9 @@ crqa_rp_calc <- function(RM,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(Matrix::diag(RM))-1,
-                     VLmax = length(Matrix::diag(RM))-1,
-                     HLmax = length(Matrix::diag(RM))-1,
+                     DLmax = length(Matrix::diag(RM)),
+                     VLmax = length(Matrix::diag(RM)),
+                     HLmax = length(Matrix::diag(RM)),
                      AUTO      = NULL,
                      chromatic = FALSE,
                      matrices  = FALSE){
@@ -2867,6 +2827,15 @@ crqa_rp_calc <- function(RM,
 
   #Total nr. recurrent points
   RP_N <- Matrix::nnzero(RM, na.counted = FALSE)
+
+  minDiag <- 0
+  if(Matrix::isSymmetric(unname(RM))){
+    if(all(Matrix::diag(RM)==1)){
+      minDiag <- length(Matrix::diag(RM))
+      }
+  }
+
+  RP_N <- RP_N-minDiag
 
   #Proportion recurrence / Recurrence Rate
   RR <- RP_N/recmatsize
@@ -2928,14 +2897,14 @@ crqa_rp_calc <- function(RM,
   ENTrel_hl = ENT_hl/(-1 * log(1/HLmax))
 
   #Meanline
-  MEAN_dl = mean(freq_dl)
-  MEAN_vl = mean(freq_vl)
-  MEAN_hl = mean(freq_hl)
+  MEAN_dl = mean(dlines, na.rm = TRUE)
+  MEAN_vl = mean(vlines, na.rm = TRUE)
+  MEAN_hl = mean(hlines, na.rm = TRUE)
 
   #Maxline
-  MAX_dl = max(freq_dl)
-  MAX_vl = max(freq_vl)
-  MAX_hl = max(freq_hl)
+  MAX_dl = max(freqvec_dl, na.rm = TRUE)
+  MAX_vl = max(freqvec_vl, na.rm = TRUE)
+  MAX_hl = max(freqvec_hl, na.rm = TRUE)
 
   # REPetetiveness
   REP_av <- ((N_hl/N_dl) + (N_vl/N_dl))/2
@@ -2943,9 +2912,9 @@ crqa_rp_calc <- function(RM,
   REP_vl  <-  N_vl/N_dl
 
   #Coefficient of determination
-  CoV_dl = stats::sd(freq_dl)/mean(freq_dl)
-  CoV_vl = stats::sd(freq_vl)/mean(freq_vl)
-  CoV_hl = stats::sd(freq_hl)/mean(freq_hl)
+  CoV_dl = stats::sd(dlines)/mean(dlines)
+  CoV_vl = stats::sd(vlines)/mean(vlines)
+  CoV_hl = stats::sd(hlines)/mean(hlines)
 
   #Divergence
   DIV_dl = 1/MAX_dl
@@ -2954,15 +2923,15 @@ crqa_rp_calc <- function(RM,
 
   #Output
   out <- data.frame(
-    emRad   = emRad,
-    RP_N       = RP_N,
+    emRad    = emRad,
+    RP_N     = RP_N,
     RR       = RR,
     DET      = DET,
     MEAN_dl  = MEAN_dl,
     MAX_dl   = MAX_dl,
     ENT_dl   = ENT_dl,
     ENTrel_dl= ENTrel_dl,
-    REP_av  = REP_av,
+    REP_av   = REP_av,
     CoV_dl   = CoV_dl,
     DIV_dl   = DIV_dl,
     SING_dl  = SING_dl,
@@ -3031,9 +3000,9 @@ crqa_rp_prep <- function(RP,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(Matrix::diag(RP))-1,
-                     VLmax = length(Matrix::diag(RP))-1,
-                     HLmax = length(Matrix::diag(RP))-1,
+                     DLmax = length(Matrix::diag(RP)),
+                     VLmax = length(Matrix::diag(RP)),
+                     HLmax = length(Matrix::diag(RP)),
                      AUTO      = FALSE,
                      chromatic = FALSE,
                      matrices  = FALSE,
@@ -3304,15 +3273,41 @@ crqa_rp_prep <- function(RP,
 #'
 #'  Calculate the lagged mutual information fucntion within (auto-mif) or between (cross-mif) time series, or, conditional on another time series (conditional-cross-mif). Alternatively, calculate the total information of a multivariate dataset for different lags.
 #'
-#' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function.
+#' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using package \code{\link{infotheo}}. If \code{y} is a 1D numeric vector (\code{auto-mutual information function}), \code{\link{mi_ts}} will be used.
 #' @param lags The lags to evaluate mutual information.
-#' @param nbins The number of bins passed to \link{ts_discrete}
+#' @param nbins The number of bins passed to \link{[infotheo]{discretize}} if y is a matrix or \code{\link{ts_discrete}}
 #' @param surTest Either \code{FALSE} or an alpha level for conducting a test of significance using simple surrogates, e.g. \code{surTes = .05}. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin \code{j} when the current value is in bin \code{j} .
 #'
 #' @return The auto- or cross-mi function
 #' @export
 #'
-mif <- function(y, lags=-10:10, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRUE, doPlot = FALSE, surTest = FALSE){
+#' @examples
+#'
+#' # Lags to evaluate mututal information
+#' lags <- -10:30
+#'
+#' # Auto-mutual information
+#' y1 <- sin(seq(0, 100, by = 1/8)*pi)
+#'
+#' (mif(data.frame(y1),lags = lags))
+#'
+#' # Cross-mututal information, y2 is a lagged version y1
+#' y2 <- y1[10:801]
+#'
+#' y <- data.frame(ts_trimfill(y1, y2, action = "trim.cut"))
+#' (mif(y),lags = lags)
+#'
+#' # Conditional mutual information, add some noise to y2 and add it as a 3rd column
+#' y$s <- y2+rnorm(NROW(y2))
+#' (mif(y,lags = lags))
+#'
+#' # Multi-information, the information of the entire multivariate series at each lag
+#' y$y3 <- cumsum(rnorm(NROW(y)))
+#'
+#' (mif(y,lags = lags))
+#'
+#'
+mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), keepNA = TRUE, doPlot = FALSE, surTest = FALSE){
 
   cnt <- 0
   N <- NROW(y)
@@ -3333,7 +3328,7 @@ mif <- function(y, lags=-10:10, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRU
       ID2 <- 1:(N-i+1)
       ID1 <- i:N
     }
-    mif_out[cnt] <- mi_mat(y, ID1, ID2)
+    mif_out[cnt] <- mi_mat(y, ID1, ID2, discreteBins = nbins)
   }
 
   names(mif_out) <- paste(lags)
@@ -3341,7 +3336,7 @@ mif <- function(y, lags=-10:10, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRU
   if(NCOL(y)==2){miType <- "I(X;Y)"}
   if(NCOL(y)==3){miType <- "I(X;Y|Z)"}
   if(NCOL(y)> 3){miType <- "I(X;Y;Z;...;N)"}
-  attr(y,"miType") <- miType
+  attr(mif_out,"miType") <- miType
 
   return(mif_out)
 }
@@ -3352,18 +3347,22 @@ mif <- function(y, lags=-10:10, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRU
 #' @param y Matrix
 #' @param ID1 ids
 #' @param ID2 ids
+#' @param discreteBins Number of bins to use to discretize the time series
 #'
 #' @return mi
 #' @export
 #'
-mi_mat <- function(y, ID1, ID2){
+mi_mat <- function(y, ID1, ID2, discreteBins = ceiling(2*NROW(ID1)^(1/3))){
   Nc <- NCOL(y)
   if(!is.null(dim(y))){
-    if(Nc == 1){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1]), Y = infotheo::discretize(y[ID2,1]))}
-    if(Nc == 2){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1], nbins = length(seq(-.5,(NROW(ID1)-.5)))),
-                                                Y = infotheo::discretize(y[ID2,2], nbins = length(seq(-.5,(NROW(ID2)-.5)))))}
-    if(Nc == 3){out <- infotheo::condinformation(X = infotheo::discretize(y[ID1,1]), Y = infotheo::discretize(y[ID2,2]), S = infotheo::discretize(y[ID1,3]))}
-    if(Nc >  3){out <- infotheo::multiinformation(X = infotheo::discretize(y[ID1,]))}
+    if(Nc == 1){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1], nbins = discreteBins),
+                                                Y = infotheo::discretize(y[ID2,1], nbins = discreteBins))}
+    if(Nc == 2){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1], nbins = discreteBins), #length(seq(-.5,(NROW(ID1)-.5)))),
+                                                Y = infotheo::discretize(y[ID2,2], nbins = discreteBins))} #length(seq(-.5,(NROW(ID2)-.5)))))}
+    if(Nc == 3){out <- infotheo::condinformation(X = infotheo::discretize(y[ID1,1], nbins = discreteBins),
+                                                 Y = infotheo::discretize(y[ID2,2], nbins = discreteBins),
+                                                 S = infotheo::discretize(y[ID1,3], nbins = discreteBins))}
+    if(Nc >  3){out <- infotheo::multiinformation(X = infotheo::discretize(y[ID1,], nbins = discreteBins))}
   return(out)
   } else {
     warning("Input should be a matrix or data frame.")
@@ -3371,16 +3370,23 @@ mi_mat <- function(y, ID1, ID2){
 }
 
 
-mi_ts <- function(y1,y2){
+mi_ts <- function(y1,y2=NULL, nbins=NA){
+
+  if(is.null(y2)){y2 <- y1}
 
     # y1 <-  ts_checkfix(y1,fixNumericVector = TRUE)
     # y2 <-  ts_checkfix(y2,fixNumericVector = TRUE)
 
-    equal <- data.frame(ts_trimfill(y1,y2))
+    equal <- data.frame(ts_trimfill(y1,y2,action = "trim.cut"))
     idNA1 <- is.na(equal[,1])
     idNA2 <- is.na(equal[,2])
 
     equal <- equal[!apply(apply(equal,1,is.na),2,any),]
+
+    if(is.na(nbins)){ nbins <- ceiling(2*NROW(equal)^(1/3))}
+
+    equal[,1]  <- ts_discrete(equal[,1], nbins = nbins)
+    equal[,2]  <- ts_discrete(equal[,2], nbins = nbins)
 
     ## init entropies
     H_s <- H_u <- H_su <- 0
@@ -5053,19 +5059,20 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
 #'
 #' @export
 #'
-plotRED_mif <- function(y, lags = max(round(NROW(y)/4),10), alpha=.05 ,doPlot = TRUE, returnMIFun = TRUE){
+plotRED_mif <- function(y, lags = max(round(NROW(y)/4),10), nbins = ceiling(2*NROW(y)^(1/3)), alpha=.05 ,doPlot = TRUE, returnMIFun = TRUE){
 
   siglevel <- alpha
 
-
-  # corfunACF  <- ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
-  # corfunPACF <- ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
-  # corfun     <- rbind(corfunACF,corfunPACF)
+  mifunMIF  <- mif(y = y, lags = lags, nbins = nbins)
+    #ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
+ mifunPMIF <-
+    #ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
+  mifun     <- rbind(corfunACF,corfunPACF)
 
   groupColours <-  scales::brewer_pal(palette="RdBu")(11)
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
 
-  g <- ggplot(corfun,aes(x=lag,y=r)) +
+  g <- ggplot(mifun,aes(x=lag,y=r)) +
     geom_hline(yintercept = 0, colour="grey",size=1) +
     geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),aes(x=x,y=y),colour="grey50") +
     geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
@@ -5482,13 +5489,13 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
 #'
 #' @export
 #'
-ts_discrete <- function(y, nbins=ceiling(2*length(x)^(1/3)), keepNA = TRUE){
+ts_discrete <- function(y, nbins=ceiling(2*NROW(y)^(1/3)), keepNA = TRUE){
 
   idNA <- is.na(y)
   y <- y[!idNA]
 
   # Make a binvector
-  binvec <- seq(min(y)-0.001, max(x),length.out=nbins+1)
+  binvec <- seq(min(y)-0.001, max(y),length.out=nbins+1)
   # Apply the bins
   bins <- vector("numeric",NROW(y))
   for(b in 1:nbins) {

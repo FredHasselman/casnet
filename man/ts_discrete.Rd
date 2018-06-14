@@ -4,7 +4,7 @@
 \alias{ts_discrete}
 \title{Discrete representation}
 \usage{
-ts_discrete(y, nbins = ceiling(2 * length(x)^(1/3)), keepNA = TRUE)
+ts_discrete(y, nbins = ceiling(2 * NROW(y)^(1/3)), keepNA = TRUE)
 }
 \arguments{
 \item{y}{Numeric vector or time series to be discretised.}

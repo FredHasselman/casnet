@@ -5,9 +5,9 @@
 \title{Prepare matrix}
 \usage{
 crqa_rp_prep(RP, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
-  DLmax = length(Matrix::diag(RP)) - 1, VLmax = length(Matrix::diag(RP)) -
-  1, HLmax = length(Matrix::diag(RP)) - 1, AUTO = FALSE,
-  chromatic = FALSE, matrices = FALSE, doHalf = FALSE)
+  DLmax = length(Matrix::diag(RP)), VLmax = length(Matrix::diag(RP)),
+  HLmax = length(Matrix::diag(RP)), AUTO = FALSE, chromatic = FALSE,
+  matrices = FALSE, doHalf = FALSE)
 }
 \arguments{
 \item{RP}{Recurrence plot}

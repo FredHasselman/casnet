@@ -4,8 +4,8 @@
 \alias{plotRED_mif}
 \title{Plot various MI functions}
 \usage{
-plotRED_mif(y, lags = max(round(NROW(y)/4), 10), alpha = 0.05,
-  doPlot = TRUE, returnMIFun = TRUE)
+plotRED_mif(y, lags = max(round(NROW(y)/4), 10), nbins = ceiling(2 *
+  NROW(y)^(1/3)), alpha = 0.05, doPlot = TRUE, returnMIFun = TRUE)
 }
 \arguments{
 \item{y}{A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function.}

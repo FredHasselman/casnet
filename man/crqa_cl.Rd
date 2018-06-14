@@ -40,7 +40,7 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{distNorm}{One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
 
-\item{standardise}{Standardise data}
+\item{standardise}{Standardise data: \code{"none"} (default), \code{"mean.sd"}, or \code{"median.mad"}}
 
 \item{returnMeasures}{Return the (C)RQA measures? (default = \code{TRUE})}
 
@@ -52,7 +52,7 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{path_to_rp}{Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)}
 
-\item{saveOut}{Save the output to files? If \code{TRUE} and \code{pat_out = NA}, the current working directory will be used (default = \code{FALSE})}
+\item{saveOut}{Save the output to files? If \code{TRUE} and \code{path_out = NA}, the current working directory will be used (default = \code{FALSE})}
 
 \item{path_out}{Path to save output if \code{saveOut = TRUE} (default = \code{NULL})}
 
