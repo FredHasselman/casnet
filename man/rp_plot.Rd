@@ -7,7 +7,7 @@
 rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
   plotRadiusRRbar = TRUE, markEpochsLOI = NULL, markEpochsGrid = NULL,
   radiusValue = NA, title = "", xlab = "", ylab = "",
-  plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE)
+  plotSurrogate = NA, returnOnlyObject = FALSE, useGtable = TRUE)
 }
 \arguments{
 \item{RM}{A distance matrix or recurrence matrix}
@@ -32,7 +32,7 @@ rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
 
 \item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{rp}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.}
 
-\item{doPlot}{Draw the plot? (default = \code{TRUE})}
+\item{returnOnlyObject}{Return the ggplot object only, do not draw the plot (default = \code{TRUE})}
 
 \item{useGtable}{Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set set to FALSE to use package \code{patchwork}. This package is in development, see the warning for instructions on how to install it.}
 }

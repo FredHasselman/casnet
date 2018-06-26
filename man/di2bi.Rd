@@ -11,6 +11,8 @@ di2bi(distmat, emRad, theiler = 0, convMat = FALSE)
 
 \item{emRad}{The radius or threshold value}
 
+\item{theiler}{= Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
+
 \item{convMat}{Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)}
 }
 \value{

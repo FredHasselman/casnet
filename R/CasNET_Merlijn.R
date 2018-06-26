@@ -56,7 +56,7 @@ if(win>0){ok=TRUE}
 
 
 if(doPlot){
-  plot.dc <- ggplot2::ggplot(reshape2::melt(mat.dc), aes(x=Var1, y=Var2, fill=value)) + ggplot2::geom_tile() +
+  plot.dc <- ggplot2::ggplot(reshape2::melt(mat.dc), aes_(x=~Var1, y=~Var2, fill=~value)) + ggplot2::geom_tile() +
     ggplot2::scale_fill_gradient2(low='blue', high='red', mid='yellow', midpoint=(max(mat.dc, na.rm=TRUE)/2), na.value='white') +
     ggplot2::theme_bw() +
     ggplot2::xlab('Days') +
@@ -275,7 +275,8 @@ crit_in = function(df, win, doPlot = TRUE){
   mat.ci[,ncol(mat.ci)] <- mat.ci[,ncol(mat.ci)]*10 #the last column, showing Critical Instability of all items has values of 10 instead of 1
 
 if(doPlot){
-  plot.ci <- ggplot2::ggplot(reshape2::melt(mat.ci), aes(x=Var1, y=Var2, fill=as.factor(value))) + ggplot2::geom_tile() +
+  plot.ci <- ggplot2::ggplot(reshape2::melt(mat.ci), aes_(x=~Var1, y=~Var2, fill=as.factor(~value))) +
+    ggplot2::geom_tile() +
     ggplot2::scale_fill_manual(values = c("NA", "grey", "black")) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "none") +

@@ -29,6 +29,8 @@ crqa_rp(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
+\item{theiler}{= Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
+
 \item{chromatic}{Force chromatic RQA? (default = \code{FALSE})}
 
 \item{matrices}{Return matrices? (default = \code{FALSE})}

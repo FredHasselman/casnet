@@ -760,7 +760,7 @@ if(estimateDimensions){
   # opLag <- tau(y,
   #              selection.methods = ami.method,
   #              maxLag =maxLag)$opLag[1]
-  #opLag <- df$emLag[which.min(min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE))]
+  opLag <- df$emLag[which.min(min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE))]
   #opRad = NULL
 
   df$emLag <- factor(df$emLag)
@@ -790,9 +790,8 @@ if(estimateDimensions){
   myPalNn <- myPal
   names(myPalNn) <- emLags$optimal.lag[!is.na(emLags$optimal.lag)]
 
-    gNdims <- ggplot2::ggplot(df, ggplot2::aes(y = Nn.pct, x = emDim, colour = emLag)) +
-      geom_rect( ggplot2::aes(xmin = startAt, xmax = stopAt, fill = f),
-                ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
+    gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
+      geom_rect( ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
       scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
       geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
       geom_hline(yintercept = c(0,100),   colour = "grey60") +
@@ -817,11 +816,11 @@ if(estimateDimensions){
             panel.grid.minor.y = element_blank()
       )
 
-    gDelay <- ggplot2::ggplot(dfMI, aes(y = ami, x = emDelay)) +
+    gDelay <- ggplot2::ggplot(dfMI, aes_(y = ~ami, x = ~emDelay)) +
       geom_line() +
-      geom_vline(data = emLags,  ggplot2::aes(colour=factor(selection.method),
-                                    xintercept = optimal.lag), alpha = .3) +
-      geom_point(data = emLags,  ggplot2::aes(x = optimal.lag, y = ami, colour = factor(selection.method)), size = 2) +
+      geom_vline(data = emLags,  ggplot2::aes_(colour=factor(~selection.method),
+                                    xintercept = ~optimal.lag), alpha = .3) +
+      geom_point(data = emLags,  ggplot2::aes_(x = ~optimal.lag, y = ~ami, colour = factor(~selection.method)), size = 2) +
       xlab("Embedding Lag") +
       ylab("Average Mututal Information") +
       scale_color_manual("Lag", values = myPalLag) +
@@ -1037,7 +1036,7 @@ crqa_radius <- function(RM = NULL,
                              .progress = plyr::progress_text(char = "o~o"))
 
 
-      dfREC      <-  dplyr::arrange(dfREC,response,emRad)
+      dfREC      <-  dplyr::arrange(dfREC,c(response,emRad))
       caseID    <- dfREC$response%in%"signal+noise"
       controlID <- dfREC$response%in%"noise"
 
@@ -1385,6 +1384,7 @@ crqa_rp_measures <- function(RM,
 #' @param VLmax Maximal vertical line length (default = length of diagonal -1)
 #' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
 #' @param AUTO Auto-recurrence? (default = \code{FALSE})
+#' @param theiler = Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})
 #' @param chromatic Force chromatic RQA? (default = \code{FALSE})
 #' @param matrices Return matrices? (default = \code{FALSE})
 #' @param doHalf Analyse half of the matrix? (default = \code{FALSE})
@@ -1603,7 +1603,7 @@ est_emLag <- function(y,
 #' @param y Time series or numeric vector
 #' @param delay Embedding lag
 #' @param maxDim Maximum number of embedding dimensions
-#' @param emRad See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
+#' @param threshold See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
 #' @param max.relative.change See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
 #' @param doPlot Plot
 #' @param ... Other arguments (not in use)
@@ -1810,12 +1810,18 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 #' Line length distributions
 #'
 #' @param RP A thresholded recurrence matrix (binary: 0 - 1)
+#' @param DLmin Minimal diagonal line length (default = \code{2})
+#' @param VLmin Minimal vertical line length (default = \code{2})
+#' @param HLmin Minimal horizontal line length (default = \code{2})
+#' @param DLmax Maximal diagonal line length (default = length of diagonal -1)
+#' @param VLmax Maximal vertical line length (default = length of diagonal -1)
+#' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
 #' @param d Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \code{-50,50,100}.
 #' @param theiler Size of the theiler window, e.g. \code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}.
 #' @param invert Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
 #' @param AUTO Is this an AUTO RQA?
 #' @param chromatic Chromatic RQA?
-#' @param matrices Return the nonze ?
+#' @param matrices Return the matrices ?
 #' @param doHalf Analyse half of the matrix?
 #'
 #' @description Extract lengths of diagonal, vertical and horizontal line segments from a recurrence matrix.
@@ -2032,7 +2038,7 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 #'
 #' @family Distance matrix operations
 #'
-rp <- function(y1, y2=NULL,
+rp <- function(y1, y2 = NULL,
                    emDim = 1,
                    emLag = 1,
                    emRad = NULL,
@@ -2204,7 +2210,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
   }
 
   if(checkTSPARSE){
-    if(class(RM)%in%names(getClass("TsparseMatrix")@subclasses)){
+    if(class(RM)%in%names(methods::getClass("TsparseMatrix")@subclasses)){
       yesTSPARSE <- TRUE
     }
   }
@@ -2236,7 +2242,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param xlab An x-axis label
 #' @param ylab An y-axis label
 #' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{rp}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
-#' @param doPlot Draw the plot? (default = \code{TRUE})
+#' @param returnOnlyObject Return the ggplot object only, do not draw the plot (default = \code{TRUE})
 #' @param useGtable Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set set to FALSE to use package \code{patchwork}. This package is in development, see the warning for instructions on how to install it.
 #'
 #' @return A nice plot of the recurrence matrix.
@@ -2244,7 +2250,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #'
 #' @family Distance matrix operations
 #'
-rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, markEpochsLOI = NULL, markEpochsGrid = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, doPlot = TRUE, useGtable = TRUE){
+rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, markEpochsLOI = NULL, markEpochsGrid = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, returnOnlyObject = FALSE, useGtable = TRUE){
 
   # check patchwork
   if(!length(find.package("patchwork",quiet = TRUE))>0){
@@ -2298,7 +2304,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
   # main plot
   gRP <-  ggplot2::ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
-    geom_raster(show.legend = FALSE) +
+    geom_raster(hjust = 0, vjust=0,show.legend = FALSE) +
     geom_abline(slope = 1,colour = "grey50", size = 1)
     #ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
 
@@ -2389,9 +2395,9 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
     rptheme <-  theme(
       panel.background = element_blank(),
-      #panel.border = element_rect("grey50",fill=NA),
+      panel.border = element_rect("grey50",fill=NA),
       panel.grid.major  = element_blank(),
-      panel.grid.minor  = element_blank(),
+      #panel.grid.minor  = element_blank(),
       legend.background = element_blank(),
       legend.key = element_blank(),
       axis.ticks = element_blank(),
@@ -2425,16 +2431,16 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   }
 
   if(plyr::is.discrete(meltRP$Var1)){
-    gRP <- gRP + scale_x_discrete(expand = c(0,0))
+    gRP <- gRP + scale_x_discrete(breaks=meltRP$Var1,expand = c(0,0))
   } else {
-    gRP <- gRP + scale_x_continuous(expand = c(0,0))
+    gRP <- gRP + scale_x_continuous(breaks=meltRP$Var1,expand = c(0,0))
   }
   if(plyr::is.discrete(meltRP$Var2)){
-    gRP <- gRP + scale_y_discrete(expand = c(0,0))
+    gRP <- gRP + scale_y_discrete(breaks=meltRP$Var2,expand = c(0,0))
   } else {
-    gRP <- gRP + scale_y_continuous(expand = c(0,0))
+    gRP <- gRP + scale_y_continuous(breaks=meltRP$Var2,expand = c(0,0))
   }
-  gRP <- gRP + rptheme + coord_fixed(expand = FALSE)
+  gRP <- gRP + rptheme + coord_equal(dim(RM)[1]/dim(RM)[2]) #coord_fixed(expand = FALSE)
 
   gy1 <- gg_plotHolder()
   gy2 <- gg_plotHolder()
@@ -2648,8 +2654,6 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
       gt<- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
-
-
     # gindex <- subset(g$layout, name == "layout")
     # g <- gtable::gtable_add_cols(g, grid::unit(.5, "grobwidth", data = g),0)
     # g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gA), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
@@ -2685,7 +2689,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   } # use gtable
 
 
-  if(doPlot){
+  if(!returnOnlyObject){
     if(useGtable){
       grid::grid.newpage()
       grid::grid.draw(g)
@@ -2693,8 +2697,8 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
       graphics::plot.new()
       graphics::plot(g)
     }
-    return(invisible(g))
   }
+  return(invisible(g))
 }
 
 
@@ -2801,9 +2805,9 @@ crqa_rp_calc <- function(RM,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = length(Matrix::diag(RM)),
-                     VLmax = length(Matrix::diag(RM)),
-                     HLmax = length(Matrix::diag(RM)),
+                     DLmax = length(Matrix::diag(RM))-1,
+                     VLmax = length(Matrix::diag(RM))-1,
+                     HLmax = length(Matrix::diag(RM))-1,
                      AUTO      = NULL,
                      chromatic = FALSE,
                      matrices  = FALSE){
@@ -3273,9 +3277,10 @@ crqa_rp_prep <- function(RP,
 #'
 #'  Calculate the lagged mutual information fucntion within (auto-mif) or between (cross-mif) time series, or, conditional on another time series (conditional-cross-mif). Alternatively, calculate the total information of a multivariate dataset for different lags.
 #'
-#' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using package \code{\link{infotheo}}. If \code{y} is a 1D numeric vector (\code{auto-mutual information function}), \code{\link{mi_ts}} will be used.
+#' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using functions in package \code{\link[infotheo]{infotheo}} for \code{lags} lagged versions of the time series.
 #' @param lags The lags to evaluate mutual information.
-#' @param nbins The number of bins passed to \link{[infotheo]{discretize}} if y is a matrix or \code{\link{ts_discrete}}
+#' @param nbins The number of bins passed to \code{\link[infotheo]{discretize}} if y is a matrix or \code{\link[casnet]{ts_discrete}}
+#' @param doPlot Produce a plot of the symbolic time series (default = \code{FALSE})
 #' @param surTest Either \code{FALSE} or an alpha level for conducting a test of significance using simple surrogates, e.g. \code{surTes = .05}. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin \code{j} when the current value is in bin \code{j} .
 #'
 #' @return The auto- or cross-mi function
@@ -3295,7 +3300,7 @@ crqa_rp_prep <- function(RP,
 #' y2 <- y1[10:801]
 #'
 #' y <- data.frame(ts_trimfill(y1, y2, action = "trim.cut"))
-#' (mif(y),lags = lags)
+#' (mif(y,lags = lags))
 #'
 #' # Conditional mutual information, add some noise to y2 and add it as a 3rd column
 #' y$s <- y2+rnorm(NROW(y2))
@@ -3303,11 +3308,10 @@ crqa_rp_prep <- function(RP,
 #'
 #' # Multi-information, the information of the entire multivariate series at each lag
 #' y$y3 <- cumsum(rnorm(NROW(y)))
-#'
 #' (mif(y,lags = lags))
 #'
 #'
-mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), keepNA = TRUE, doPlot = FALSE, surTest = FALSE){
+mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), doPlot = FALSE, surTest = FALSE){
 
   cnt <- 0
   N <- NROW(y)
@@ -3347,9 +3351,9 @@ mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), keepNA = TRUE,
 #' @param y Matrix
 #' @param ID1 ids
 #' @param ID2 ids
-#' @param discreteBins Number of bins to use to discretize the time series
+#' @param discreteBins Number of bins to use when discretizing the time series
 #'
-#' @return mi
+#' @return mi in nats
 #' @export
 #'
 mi_mat <- function(y, ID1, ID2, discreteBins = ceiling(2*NROW(ID1)^(1/3))){
@@ -3396,7 +3400,6 @@ mi_ts <- function(y1,y2=NULL, nbins=NA){
      bb <- max(equal)
      ## get ts length
 
-     H_s <- H_u <- H_su <- 0
      for(i in 1:bb) {
        ## calculate entropy for 1st series
        p_s <- sum(equal[,1] == i)/TT
@@ -3456,6 +3459,7 @@ mif_interlayer <- function(g0,g1, probTable=FALSE){
 #'
 #' @param distmat Distance matrix
 #' @param emRad The radius or threshold value
+#' @param theiler = Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})
 #' @param convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)
 #'
 #' @return A (sparse) matrix with only 0s and 1s
@@ -3475,7 +3479,7 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
   # RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   # RP[as.matrix(distmat <= emRad)] <- 1
-  if(emRad==0) emRad <- .Machine$double.eps
+  if(emRad==0){emRad <- .Machine$double.eps}
   # Always use sparse representation for conversion to save memory load
   ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
 
@@ -4117,7 +4121,7 @@ lengths(D.L)
 #' @return A dataframe with the Allan Factor (variance), Alan standard deviation and error due to bin size
 #' @export
 #'
-fd_allan <- function(y, fs = tsp(hasTsp(y))[3], doPlot = FALSE, useSD=FALSE){
+fd_allan <- function(y, fs = stats::tsp(stats::hasTsp(y))[3], doPlot = FALSE, useSD=FALSE){
 
     N <- NROW(y)
     tau <- 1/fs
@@ -4177,7 +4181,7 @@ fd_allan <- function(y, fs = tsp(hasTsp(y))[3], doPlot = FALSE, useSD=FALSE){
          ylab("Allan Factor")  +
          theme_bw()
      }
-     plot(g)
+      graphics::plot(g)
     }
     return(df)
 }
@@ -4231,7 +4235,7 @@ MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
   if(Hadj!=0){TSm  <- as.matrix(cbind(t=1:length(Y),y=cumsum(Y-mean(Y))))}
 
   for(ns in seq_along(scale)){
-    RMS_scale[[ns]] <-plyr::ldply(ts_slice(TSm,scaleS[ns]),function(sv){return(sqrt(mean(ts_detrend(sv[,2]))^2))})
+    RMS_scale[[ns]] <-plyr::ldply(ts_slice(TSm,scale[ns]),function(sv){return(sqrt(mean(ts_detrend(sv[,2]))^2))})
     for(nq in seq_along(qq)){
       qRMS[[nq]][1:length(RMS_scale[[ns]]$V1)] <- RMS_scale[[ns]]$V1^qq[nq]
       Fq[[nq]][ns] <- mean(qRMS[[nq]][1:length(RMS_scale[[ns]]$V1)])^(1/qq[nq])
@@ -4499,8 +4503,8 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
     }
   }
   if(doPlot){
-    plot.new()
-    plot(g)
+    graphics::plot.new()
+    graphics::plot(g)
   }
   if(returnOnlyWeights){
     return(E(g)$weight)
@@ -4574,8 +4578,8 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
   igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
   }
   if(doPlot){
-    plot.new()
-    plot(g)
+    graphics::plot.new()
+    graphics::plot(g)
   }
   return(invisible(g))
 }
@@ -4620,8 +4624,8 @@ plotNET_SW <- function(n=100,k=5,p=0.05, doPlot = TRUE){
   # igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
   if(doPlot){
-    plot.new()
-    plot(g)
+    graphics::plot.new()
+    graphics::plot(g)
   }
   return(invisible(g))
 }
@@ -4663,8 +4667,8 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
   igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
   if(doPlot){
-    plot.new()
-    plot(g)
+    graphics::plot.new()
+    graphics::plot(g)
   }
   return(invisible(g))
 }
@@ -4766,8 +4770,8 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
   } # group loop
 
   if(doPlot){
-    plot.new()
-    plot(g)
+    graphics::plot.new()
+    graphics::plot(g)
   }
   return(invisible(g))
 }
@@ -4892,8 +4896,8 @@ plotSUR_hist <- function(surrogateValues,
                           x = unique(df.dist$rank_dist_bin[rank_obs]),
                           y = 0)
 
-  breaks <- seq(1,max(df.dist$rank_dist_bin))
-  labels <- levels(df.dist$rank_dist_bin_label)
+  breaks <- seq(1,max(df.dist$rank_dist_bin),by=5)
+  labels <- levels(df.dist$rank_dist_bin_label)[breaks]
   # if(length(breaks)>=length(vec)/2){
   #   breaks <- breaks[round(seq(1,max(breaks),length.out=max(breaks)/2))]
   #   labels <- paste(signif(unique(vec)[breaks],3))
@@ -4974,9 +4978,9 @@ add_alpha <- function(col, alpha=1){
 #'
 pacf_fisherZ <-function(r, n, lag, siglevel=.05,sides=2,type=""){
   z <- atanh(r)/sqrt(1/(n-3))
-  conf.low   <- tanh(atanh(r) - (qnorm(1-(siglevel/sides)) * sqrt((1/(n-3)))))
-  conf.high  <- tanh(atanh(r) + (qnorm(1-(siglevel/sides)) * sqrt((1/(n-3)))))
-  p<-2*(1-pnorm(abs(z)))
+  conf.low   <- tanh(atanh(r) - (stats::qnorm(1-(siglevel/sides)) * sqrt((1/(n-3)))))
+  conf.high  <- tanh(atanh(r) + (stats::qnorm(1-(siglevel/sides)) * sqrt((1/(n-3)))))
+  p<-2*(1-stats::pnorm(abs(z)))
   if(p<siglevel){
     sig <-"yes"
   } else {
@@ -4984,6 +4988,98 @@ pacf_fisherZ <-function(r, n, lag, siglevel=.05,sides=2,type=""){
   }
   return(data.frame(r=r,ciL=conf.low,ciU=conf.high,fZ=z,p=p,alpha=siglevel,sig=sig,lag=lag,n=n,type=type, stringsAsFactors = FALSE))
 }
+
+#' Estimate the transition matrix for computing the critical threshold values on
+#' mutual information.
+#'
+#' \code{mutual_info} is a helper function for estimating the transition matrix
+#' used in creating resampled vectors for the (1 - alpha)\% critical threshold
+#' value on the mutual info.
+#'
+#' @param x A \code{vector} of values.
+#' @param n_bins The number of bins for the entropy calculation.
+#'
+#' @return A \code{list} with the following components:
+#' \describe{
+#' \item{\code{xn}}{An [n x 2] matrix of the original and discretized vectors.}
+#' \item{\code{MM}}{Transition probability matrix from bin-i to bin-j.}
+#' }
+#'
+#' @author Mark Scheuerell (https://mdscheuerell.github.io/muti/)
+#'
+#' @importFrom stats runif
+#' @export
+#' @keywords internal
+#'
+transM <- function(x,n_bins) {
+  ## helper function for estimating transition matrix used in
+  ## creating resampled ts for the CI on mutual info
+  ## replace NA with runif()
+  x[is.na(x)] <- runif(length(x[is.na(x)]),min(x,na.rm=TRUE),max(x,na.rm=TRUE))
+  ## length of ts
+  tt <- length(x)
+  ## get bins via slightly extended range
+  bins <- seq(min(x)-0.001,max(x),length.out=n_bins+1)
+  ## discretize ts
+  hin <- vector("numeric",tt)
+  for(b in 1:n_bins) {
+    hin[x > bins[b] & x <= bins[b+1]] <- b
+  }
+  ## matrix of raw-x & discrete-x
+  xn <- cbind(x,hin)
+  ## transition matrix from bin-i to bin-j
+  MM <- matrix(0,n_bins,n_bins)
+  for(i in 1:n_bins) {
+    for(j in 1:n_bins) {
+      MM[i,j] <- sum(hin[-tt]==i & hin[-1]==j)
+    }
+    if(sum(MM[i,])>0) { MM[i,] <- MM[i,]/sum(MM[i,]) }
+    else { MM[i,] <- 1/n_bins }
+  }
+  return(list(xn=xn,MM=MM))
+} ## end function
+
+#' Create new vector based on resampling of the original data.
+#'
+#' \code{newZ} creates new vector based on a transition matrix. It is a helper
+#'   function for \code{muti}.
+#'
+#' @param tM The output from \code{transM}; a \code{list} with elements \code{xn} and \code{MM}.
+#' @param n_bins The number of bins to use; passed from \code{muti}.
+#'
+#' @return A vector of resampled values.
+#'
+#' @author Mark Scheuerell (https://mdscheuerell.github.io/muti/)
+#'
+#' @importFrom stats rmultinom
+#' @export
+#' @keywords internal
+#'
+newZ <- function(tM, n_bins) {
+  ## helper function for creating new ts based on resampling
+  ## the original data
+  ## number of bins
+  # n_bins <- dim(tM$MM)[1]
+  ## length of ts
+  tt <- dim(tM$xn)[1]
+  ## random start index
+  tin <- sample(tt,1)
+  ## init zz
+  zz <- matrix(NA,tt,2)
+  ## get first sample
+  zz[1,] <- tM$xn[tin,]
+  ## loop over remaining samples
+  for(t in 2:tt) {
+    ## random transition bin
+    zz[t,2] <- seq(n_bins)[rmultinom(1,1,tM$MM[zz[t-1,2],])==1]
+    ## possible set of real values
+    pset <- tM$xn[tM$xn[,2] %in% zz[t,2],1]
+    if(length(pset)==0) { pset <- NA }
+    ## get next sample
+    zz[t,1] <- pset[sample(length(pset),1)]
+  }
+  return(zz[,1])
+} ## end function
 
 #' Plot ACF and PACF
 #'
@@ -5002,10 +5098,10 @@ pacf_fisherZ <-function(r, n, lag, siglevel=.05,sides=2,type=""){
 plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = TRUE, returnCorFun = TRUE){
 
   siglevel <- alpha
-  df.acf <- acf(y,plot=FALSE, lag.max = Lmax)
-  df.pacf <- pacf(y,plot=FALSE, lag.max = Lmax)
+  df.acf <- stats::acf(y,plot=FALSE, lag.max = Lmax)
+  df.pacf <- stats::pacf(y,plot=FALSE, lag.max = Lmax)
 
-  dfN <- laply(1:Lmax, function(l) NROW(ts_embed(y,2,l))+1)
+  dfN <- c(NROW(y), laply(1:Lmax, function(l) NROW(ts_embed(y,2,l))+1))
 
   corfunACF  <- ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
   corfunPACF <- ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
@@ -5033,8 +5129,8 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
     theme_bw() + theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank())
 
   if(doPlot){
-    plot.new()
-    plot(g)
+    graphics::plot.new()
+    graphics::plot(g)
   }
 
   if(returnCorFun){
@@ -5049,6 +5145,7 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
 #'
 #' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function.
 #' @param lags Maximum number of lags
+#' @param nbins The number of bins passed to \code{\link[infotheo]{discretize}} if y is a matrix or \code{\link[casnet]{ts_discrete}}
 #' @param alpha Significance level
 #' @param doPlot Plot output
 #' @param returnMIFun Return the data
@@ -5059,15 +5156,15 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
 #'
 #' @export
 #'
-plotRED_mif <- function(y, lags = max(round(NROW(y)/4),10), nbins = ceiling(2*NROW(y)^(1/3)), alpha=.05 ,doPlot = TRUE, returnMIFun = TRUE){
+plotRED_mif <- function(y, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*NROW(y)^(1/3)), alpha=.05 ,doPlot = TRUE, returnMIFun = TRUE){
 
   siglevel <- alpha
 
   mifunMIF  <- mif(y = y, lags = lags, nbins = nbins)
     #ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
- mifunPMIF <-
+ mifunPMIF <- mif(y = cbind(y,y[,1],y[,1]), lags = lags, nbins = nbins)
     #ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
-  mifun     <- rbind(corfunACF,corfunPACF)
+  mifun     <- rbind(mifunMIF,mifunPMIF)
 
   groupColours <-  scales::brewer_pal(palette="RdBu")(11)
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
@@ -5091,8 +5188,8 @@ plotRED_mif <- function(y, lags = max(round(NROW(y)/4),10), nbins = ceiling(2*NR
     theme_bw() + theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank())
 
   if(doPlot){
-    plot.new()
-    plot(g)
+    graphics::plot.new()
+    graphics::plot(g)
   }
 
   if(returnCorFun){
@@ -5512,6 +5609,190 @@ ts_discrete <- function(y, nbins=ceiling(2*NROW(y)^(1/3)), keepNA = TRUE){
   return(y)
 }
 
+#' Symbolic representation
+#'
+#'  Return a discrete representation of \code{y} by binning the observed values and returning the transfer probabilities.
+#'
+#' @param y Numeric vector or time series to be discretised.
+#' @param keepNA If \code{TRUE}, any \code{NA} values will first be removed and later re-inserted into the discretised time series.
+#' @param doPlot Create a plot of the symbolized series.
+#'
+#' @return A discretised version of \code{y}
+#'
+#' @export
+#'
+ts_symbolic <- function(y, keepNA = TRUE, doPlot = FALSE){
+
+  cl <- class(y)
+  cnames <- colnames(y)
+  if(is.null(cnames)){
+    cnames = paste0("Y",1:NCOL(y))
+  }
+
+  idNA <- plyr::colwise(.fun = is.na)(as.data.frame(y))
+  y <- as.data.frame(y)[stats::complete.cases(!idNA),]
+
+  sym <- symbolize(xy = y)
+
+  if(keepNA){
+    sym_num <- matrix(NA,nrow=NROW(idNA),ncol = NCOL(idNA))
+    for(c in 1:NCOL(y)){
+      sym_num[!idNA[,c],c] <- sym[,c]
+    }
+  } else {
+    sym_num <- sym
+  }
+
+  eval(parse(text=paste0("sym_num <- as.",cl,"(sym_num)")))
+
+  sym_label <- sym_num
+
+  if(!is.null(ncol(sym_num))){
+    for(c in 1:NCOL(y)){
+      sym_label[,c] <-  dplyr::case_when(
+        sym_num[,c]==1 ~ "trough",
+        sym_num[,c]==2 ~ "decrease",
+        sym_num[,c]==3 ~ "same",
+        sym_num[,c]==4 ~ "increase",
+        sym_num[,c]==5 ~ "peak",
+        is.na(sym_num[,c]) ~ NA_character_)
+    }
+  } else {
+    sym_label <-  dplyr::case_when(
+      sym_num==1 ~ "trough",
+      sym_num==2 ~ "decrease",
+      sym_num==3 ~ "same",
+      sym_num==4 ~ "increase",
+      sym_num==5 ~ "peak",
+      is.na(sym_num) ~ NA_character_)
+  }
+
+  if(class(sym_num)%in%"matrix"){
+    out <- sym_num
+    colnames(sym_num)  <- paste0(cnames,"_sym_num")
+    anames <- paste0(cnames,"_sym_label")
+    for(c in 1:NCOL(out)){
+      attr(out,anames[c]) <- factor(sym_label[,c],exclude=NULL)
+    }
+  } else {
+    if(!is.null(ncol(sym_num))){
+      for(c in 1:NCOL(sym_label)){
+        sym_label[,c] <- factor(sym_label[,c],exclude=NULL)
+      }
+      colnames(sym_num) <- paste0(cnames,"_sym_num")
+      colnames(sym_label) <- paste0(cnames,"_sym_label")
+      out <- cbind(sym_num,sym_label) #,stringsAsFactors = FALSE)
+    } else {
+      out <- factor(sym_label, exclude=NULL)
+      attr(out,"sym_numeric") <- sym_num
+    }
+  }
+
+
+  if(doPlot){
+
+    shp <- c("trough" = 25, "decrease" = 21, "same"=23,"increase" = 22, "peak" = 24,"missing" = 8)
+    col <- c("trough"="darkkhaki","decrease"="orange","same"="grey60","increase"="steelblue","peak"="olivedrab","missing"="red")
+    labs <- c("0" = "missing","1"="trough","2"="decrease","3"="same","4"="increase","5"="peak")
+
+    if(!is.null(ncol(sym_num))){
+      out$time <- 1:NROW(out)
+      df_p1 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_label"),"time") %>% tidyr::gather(key=lab_var, value=sym_label, -"time")
+       df_p1$sym_label[is.na(df_p1$sym_label)] <- "missing"
+      df_p2 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_num")) %>% tidyr::gather(key=num_var, value=sym_num)
+      df_p2[is.na(df_p2)] <- 0
+    df_plot <- cbind(df_p1,df_p2)
+    df_plot$num_var <- gsub("_sym_num","",df_plot$num_var)
+    } else {
+      df_plot <- data.frame(time = 1:NROW(out), sym_num= attr(out,"sym_numeric"), sym_label = out)
+      df_plot$sym_num[is.na(df_plot$sym_num)] <- 0
+      df_plot$sym_label[is.na(df_plot$sym_num)] <- "missing"
+    }
+
+
+   g <- ggplot(df_plot,aes(x=time,y=sym_num)) +
+      geom_line(color="grey80") +
+      geom_point(aes(shape=sym_label, color=sym_label, fill=sym_label),size=2)
+
+   if(!is.null(df_plot$num_var)){
+     if(length(unique(df_plot$num_var))>1){
+       g <- g + facet_grid(num_var~.)
+     }
+   }
+
+   g <- g +
+      scale_x_continuous("Time") +
+      scale_shape_manual("Symbolic value", values = shp) +
+      scale_color_manual("Symbolic value", values = col) +
+      scale_fill_manual("Symbolic value", values = col) +
+      scale_y_continuous("",labels = labs) +
+      theme_bw() + theme(panel.grid = element_blank())
+
+   graphics::plot(g)
+
+   return(list(data=out,plot=invisible(g)))
+  } else {
+    return(out)
+  }
+
+
+
+}
+
+#' Convert numeric vectors to symbolic vectors.
+#'
+#' \code{symbolize} converts numeric vectors to symbolic vectors. It is a helper
+#'   function for \code{muti}.
+#'
+#' @param xy An n x 2 \code{matrix} or \code{data.frame} containing the two
+#'   vectors of interest.
+#'
+#' @return An (n-2) x 2 \code{matrix} of integer symbols that indicate whether
+#'   the i-th value, based on the i-1 and i+1 values, is a "trough" (=1),
+#'   "decrease" (=2), "same" (=3), "increase" (=4), or "peak" (=5).
+#'
+#' @author Mark Scheuerell (https://mdscheuerell.github.io/muti/)
+#'
+symbolize <- function(xy) {
+  ## of interest and converts them from numeric to symbolic.
+  ## check input for errors
+  if(is.null(dim(xy))) {
+   xy <-  as.matrix(xy)
+  }
+  ## get ts length
+  TT <- dim(xy)[1]
+  ## init su matrix
+  su <- matrix(NA, TT, NCOL(xy))
+  ## convert to symbols
+  ## loop over 2 vars
+  for(i in 1:NCOL(xy)) {
+    for(t in 2:(TT-1)) {
+      ## if xy NA, also assign NA to su
+      if(any(is.na(xy[(t-1):(t+1),i]))) { su[t,i] <- NA }
+      ## else get correct symbol
+      else {
+        if(xy[t,i] == xy[t-1,i] | xy[t,i] == xy[t+1,i]) {
+          ## same
+          su[t,i] <- 3
+        }
+        if(xy[t,i] > xy[t-1,i]) {
+          ## peak
+          if(xy[t,i] > xy[t+1,i]) { su[t,i] <- 5 }
+          ## increase
+          else { su[t,i] <- 4 }
+        }
+        if(xy[t,i] < xy[t-1,i]) {
+          ## trough
+          if(xy[t,i] < xy[t+1,i]) { su[t,i] <- 1 }
+          ## decrease
+          else { su[t,i] <- 2 }
+        }
+      } ## end else
+    } ## end t loop
+  } ## end i loop
+  ## return su matrix
+  return(su)
+}
 
 ts_resample <- function(y, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRUE){
 
@@ -5705,14 +5986,14 @@ ts_sumorder <- function(y, scaleS = NULL, polyOrder = 1){
 #' @param y A time series object or numeric vector
 #' @param checkNumericVector is 1D numeric vector?
 #' @param checkTimeVector has time vector?
-#' @param checkWholeNumber contains only wholenumbers?
+#' @param checkWholeNumbers contains only wholenumbers?
 #' @param checkPow2 length is power of 2?
 #' @param checkScale checkScale
 #' @param checkSummationOrder checkSummationOrder
 #' @param checkNonStationarity checkNonStationarity
 #' @param checkNonHomogeneity checkNonHomogeneity
 #' @param fixNumericVector return a 1D numeric vector (WARNING: Data frames and Matrices with NCOL > 1 wil be converted to long form)
-#' @param fixWholeNumber fixWholeNumber
+#' @param fixWholeNumbers fixWholeNumber
 #' @param fixTimeVector fixTimeVector
 #' @param fixPow2 foxPow2
 #' @param fixNA fixNA
@@ -5808,7 +6089,7 @@ ts_checkfix <- function(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE,
           yesTime <- TRUE
           rm(etxt)
       } else {
-        y <- ts(y)
+        y <- stats::ts(y)
         tmptxt <- paste(tmptxt,"... FIXED by ts(y)")
         yesTime <- TRUE
       }
@@ -6637,15 +6918,3 @@ repmat <- function(X,m,n){
   }
   return (out)
 }
-
-#' @import DescTools
-NULL
-
-#' @importFrom magrittr %>%
-NULL
-
-#' @importFrom plyr .
-NULL
-
-#' @import ggplot2
-NULL

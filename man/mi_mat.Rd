@@ -13,10 +13,10 @@ mi_mat(y, ID1, ID2, discreteBins = ceiling(2 * NROW(ID1)^(1/3)))
 
 \item{ID2}{ids}
 
-\item{discreteBins}{Number of bins to use to discretize the time series}
+\item{discreteBins}{Number of bins to use when discretizing the time series}
 }
 \value{
-mi
+mi in nats
 }
 \description{
 Mutual Information variations

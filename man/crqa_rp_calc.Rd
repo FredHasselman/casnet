@@ -5,8 +5,8 @@
 \title{crqa_rp_calc}
 \usage{
 crqa_rp_calc(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
-  DLmax = length(Matrix::diag(RM)), VLmax = length(Matrix::diag(RM)),
-  HLmax = length(Matrix::diag(RM)), AUTO = NULL, chromatic = FALSE,
+  DLmax = length(Matrix::diag(RM)) - 1, VLmax = length(Matrix::diag(RM)) -
+  1, HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, chromatic = FALSE,
   matrices = FALSE)
 }
 \arguments{

@@ -3,7 +3,7 @@ knitr::opts_chunk$set(
   collapse = FALSE,
   comment = ">",
   fig.align = "center",
-  fig.width = 7 
+  fig.width = 10
 )
 
 ## ----RNG1, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE----

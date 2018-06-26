@@ -13,6 +13,18 @@ rp_lineDist(RP, DLmin = 2, VLmin = 2, HLmin = 2,
 \arguments{
 \item{RP}{A thresholded recurrence matrix (binary: 0 - 1)}
 
+\item{DLmin}{Minimal diagonal line length (default = \code{2})}
+
+\item{VLmin}{Minimal vertical line length (default = \code{2})}
+
+\item{HLmin}{Minimal horizontal line length (default = \code{2})}
+
+\item{DLmax}{Maximal diagonal line length (default = length of diagonal -1)}
+
+\item{VLmax}{Maximal vertical line length (default = length of diagonal -1)}
+
+\item{HLmax}{Maximal horizontal line length (default = length of diagonal -1)}
+
 \item{d}{Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \code{-50,50,100}.}
 
 \item{theiler}{Size of the theiler window, e.g. \code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}.}
@@ -23,7 +35,7 @@ rp_lineDist(RP, DLmin = 2, VLmin = 2, HLmin = 2,
 
 \item{chromatic}{Chromatic RQA?}
 
-\item{matrices}{Return the nonze ?}
+\item{matrices}{Return the matrices ?}
 
 \item{doHalf}{Analyse half of the matrix?}
 }

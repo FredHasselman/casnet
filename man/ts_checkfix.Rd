@@ -17,6 +17,8 @@ ts_checkfix(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE,
 
 \item{checkNumericVector}{is 1D numeric vector?}
 
+\item{checkWholeNumbers}{contains only wholenumbers?}
+
 \item{checkTimeVector}{has time vector?}
 
 \item{checkPow2}{length is power of 2?}
@@ -31,6 +33,8 @@ ts_checkfix(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE,
 
 \item{fixNumericVector}{return a 1D numeric vector (WARNING: Data frames and Matrices with NCOL > 1 wil be converted to long form)}
 
+\item{fixWholeNumbers}{fixWholeNumber}
+
 \item{fixTimeVector}{fixTimeVector}
 
 \item{fixPow2}{foxPow2}
@@ -44,10 +48,6 @@ ts_checkfix(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE,
 \item{fixNonStationarity}{fixNonStationarity}
 
 \item{fixNonHomogeneity}{fixNonHomogeneity}
-
-\item{checkWholeNumber}{contains only wholenumbers?}
-
-\item{fixWholeNumber}{fixWholeNumber}
 }
 \value{
 A 'check' report and/or a 'fixed' vector y.

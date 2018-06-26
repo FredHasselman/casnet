@@ -4,7 +4,8 @@
 \alias{fd_allan}
 \title{Allan Variance Analysis}
 \usage{
-fd_allan(y, fs = tsp(hasTsp(y))[3], doPlot = FALSE, useSD = FALSE)
+fd_allan(y, fs = stats::tsp(stats::hasTsp(y))[3], doPlot = FALSE,
+  useSD = FALSE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object}
