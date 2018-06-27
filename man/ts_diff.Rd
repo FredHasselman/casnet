@@ -50,6 +50,7 @@ ts_diff(y=df,addColumns=FALSE)
 ts_diff(y = df, order=4, addColumns=TRUE)
 
 # Plot logistic S-curve and derivatives 1 to 3
-plot(ts(ts_diff(stats::plogis(seq(-5,5,.1)), order=3, keepDerivatives = TRUE)),  main="ts_derivative")
+plot(ts(ts_diff(stats::plogis(seq(-5,5,.1)),
+order=3, keepDerivatives = TRUE)),  main="ts_derivative")
 
 }

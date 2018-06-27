@@ -5,7 +5,7 @@
 \title{Find Peaks or Wells}
 \usage{
 ts_peaks(y, window = 3, includeWells = FALSE,
-  minPeakDist = round(window/2), minPeakHeight = 0.2 * diff(range(x, na.rm =
+  minPeakDist = round(window/2), minPeakHeight = 0.2 * diff(range(y, na.rm =
   TRUE)))
 }
 \arguments{

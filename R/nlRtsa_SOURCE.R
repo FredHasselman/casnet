@@ -667,12 +667,15 @@ crqa_parameters <- function(y,
 
   if(is.null(emLag)){
     if(estimateDimensions){
-      emLags <- est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+      mi <- mif(data.frame(y),lags = 1:maxLag) #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+      emLag$first.minimum <- which(ts_symbolic(data.frame(mi))[,2]%in%"trough")[1]
+      emLag$global.minimum <- min(mi,na.rm = TRUE)
+      emLag$max.lag <- maxLag
     } else {
-      emLags <- cbind.data.frame(selection.method = "Not estimated", optimal.lag = NA)
+      emLags <- cbind.data.frame(selection.methods = "Not estimated", optimal.lag = NA)
     }
   } else {
-    emLags <- cbind.data.frame(selection.method = "User", optimal.lag = emLag)
+    emLags <- cbind.data.frame(selection.methods = "User", optimal.lag = emLag)
   }
 
   # (fn.out <- tseriesChaos::false.nearest(lx, m=10, d=17, t=0, eps=sd(lx)/10, rt=20))
@@ -818,9 +821,9 @@ if(estimateDimensions){
 
     gDelay <- ggplot2::ggplot(dfMI, aes_(y = ~ami, x = ~emDelay)) +
       geom_line() +
-      geom_vline(data = emLags,  ggplot2::aes_(colour=factor(~selection.method),
+      geom_vline(data = emLags,  ggplot2::aes_(colour=factor(emLags$selection.method),
                                     xintercept = ~optimal.lag), alpha = .3) +
-      geom_point(data = emLags,  ggplot2::aes_(x = ~optimal.lag, y = ~ami, colour = factor(~selection.method)), size = 2) +
+      geom_point(data = emLags,  ggplot2::aes_(x = ~optimal.lag, y = ~ami, colour = factor(emLags$selection.method)), size = 2) +
       xlab("Embedding Lag") +
       ylab("Average Mututal Information") +
       scale_color_manual("Lag", values = myPalLag) +
@@ -1036,7 +1039,7 @@ crqa_radius <- function(RM = NULL,
                              .progress = plyr::progress_text(char = "o~o"))
 
 
-      dfREC      <-  dplyr::arrange(dfREC,c(response,emRad))
+      dfREC      <-  dplyr::arrange(dfREC,dfREC$response,dfREC$emRad)
       caseID    <- dfREC$response%in%"signal+noise"
       controlID <- dfREC$response%in%"noise"
 
@@ -1346,17 +1349,17 @@ crqa_rp_measures <- function(RM,
     }
 
     rqout <-  dfrepl %>%
-      dplyr::group_by(measure) %>%
+      dplyr::group_by(dfrepl$measure) %>%
       dplyr::summarise(
         val          = NA,
-        ci.lower     = stats::quantile(value%00%NA, ci.lo, na.rm = TRUE),
-        ci.upper     = stats::quantile(value%00%NA, ci.hi, na.rm = TRUE),
-        BOOTmean     = mean(value%00%NA, na.rm = TRUE),
-        BOOTsd       = stats::sd(value%00%NA, na.rm = TRUE),
-        BOOTse       = BOOTsd/sqrt(Nboot),
-        BOOTvar      = stats::var(value%00%NA, na.rm = TRUE),
-        BOOTmedian   = stats::median(value%00%NA, na.rm = TRUE),
-        BOOTmad      = stats::mad(value%00%NA, na.rm = TRUE),
+        ci.lower     = stats::quantile(dfrepl$value%00%NA, ci.lo, na.rm = TRUE),
+        ci.upper     = stats::quantile(dfrepl$value%00%NA, ci.hi, na.rm = TRUE),
+        BOOTmean     = mean(dfrepl$value%00%NA, na.rm = TRUE),
+        BOOTsd       = stats::sd(dfrepl$value%00%NA, na.rm = TRUE),
+        BOOTse       = stats::sd(dfrepl$value%00%NA, na.rm = TRUE)/sqrt(Nboot),
+        BOOTvar      = stats::var(dfrepl$value%00%NA, na.rm = TRUE),
+        BOOTmedian   = stats::median(dfrepl$value%00%NA, na.rm = TRUE),
+        BOOTmad      = stats::mad(dfrepl$value%00%NA, na.rm = TRUE),
         BOOTn        = Nboot
       )
 
@@ -1365,7 +1368,7 @@ crqa_rp_measures <- function(RM,
 
     }
   } else {
-    rqout <- dfori %>% tidyr::spread(measure,value)
+    rqout <- dfori %>% tidyr::spread(dfori$measure,dfori$value)
   }
   return(rqout)
 }
@@ -1654,7 +1657,7 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
 
     nzdiags <- broom::tidy(RM)
     nzdiags$ndiag <- nzdiags$column-nzdiags$row
-    nzdiags <- dplyr::arrange(nzdiags,ndiag)
+    nzdiags <- dplyr::arrange(nzdiags,nzdiags$ndiag)
 
     if(!is.null(d)){
       nd <- unique(nzdiags$ndiag)
@@ -1906,9 +1909,9 @@ rp_lineDist <- function(RP,
   colnames(horizontals) <- paste(1:ncol(horizontals))
 
   # Get indices of line lengths
-  diagonals.ind   <- tidyr::gather(diagonals,   key = diagonal,  value = segment)
-  verticals.ind   <- tidyr::gather(verticals,   key = vertical,  value = segment)
-  horizontals.ind <- tidyr::gather(horizontals, key = horizontal,value = segment)
+  diagonals.ind   <- tidyr::gather(diagonals,   key = "diagonal",   value = "segment")
+  verticals.ind   <- tidyr::gather(verticals,   key = "vertical",   value = "segment")
+  horizontals.ind <- tidyr::gather(horizontals, key = "horizontal", value = "segment")
 
   D <- diagonals.ind$segment
   names(D) <- paste0(diagonals.ind$diagonal,ifelse(invert,"DT","D"))
@@ -2071,7 +2074,6 @@ rp <- function(y1, y2 = NULL,
     }
   }
 
-
   et1 <- ts_embed(y1, emDim, emLag, silent = silent)
   et2 <- ts_embed(y2, emDim, emLag, silent = silent)
 
@@ -2091,7 +2093,7 @@ rp <- function(y1, y2 = NULL,
   # Check a time index was requested
   if(!is.null(to.ts)){
     if(is.null(order.by)){
-      order.by <- lubridate::as_datetime(1:NROW(RM), origin = lubridate::ymd_hms(Sys.time()))
+      order.by <- lubridate::as_datetime(1:NROW(dmat), origin = lubridate::ymd_hms(Sys.time()))
     }
     dmat <-  switch(to.ts,
                     "xts" =  xts::xts(dmat, order.by = lubridate::as_datetime(order.by)),
@@ -2175,8 +2177,7 @@ rp_copy_attributes <- function(source, target, source_remove = c("names", "row.n
 #' @export
 #' @keywords internal
 #'
-rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALSE, checkTSPARSE = FALSE,
-                            fixS4 = FALSE, fixAUTO = TRUE, fixSPARSE = FALSE, fixTSPARSE = FALSE){
+rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALSE, checkTSPARSE = FALSE, fixS4 = FALSE, fixAUTO = TRUE, fixSPARSE = FALSE, fixTSPARSE = FALSE){
 
   dummy <- Matrix::Matrix(matrix(c(0,0)))
   dummy <- rp_copy_attributes(source = RM, target =dummy)
@@ -2184,9 +2185,9 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
   # Always check S4
   if(!checkS4){checkS4 <- TRUE}
 
-  yesS4   <- FALSE
-  yesAUTO <- FALSE
-  yesSPARSE <- FALSE
+  yesS4      <- FALSE
+  yesAUTO    <- FALSE
+  yesSPARSE  <- FALSE
   yesTSPARSE <- FALSE
 
   if(checkS4){
@@ -2223,7 +2224,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
   }
 
 
- RM <- rp_copy_attributes(source = dummy, target =RM, source_remove = c("Dimnames", "i", "class","Dim", "p","x","factors"))
+ RM <- rp_copy_attributes(source = dummy, target = RM, source_remove = c("Dimnames", "i", "class","Dim", "p","x","factors"))
 
  return(RM)
 }
@@ -2266,7 +2267,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   # prepare data
   if(attr(RM,"package")%00%""%in%"Matrix"){
     RM     <- rp_checkfix(RM, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
-    meltRP <- data.frame(Var1 = (RP@i+1), Var2 = (RP@j+1), value = as.numeric(RP@x))
+    meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
   } else {
     meltRP <- reshape2::melt(as.matrix(RM))
   }
@@ -2303,7 +2304,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   }
 
   # main plot
-  gRP <-  ggplot2::ggplot(aes(x=Var1, y=Var2, fill = value), data= meltRP) +
+  gRP <-  ggplot2::ggplot(aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
     geom_raster(hjust = 0, vjust=0,show.legend = FALSE) +
     geom_abline(slope = 1,colour = "grey50", size = 1)
     #ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
@@ -2356,7 +2357,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
       #resol$value <- log(resol$value)
       resol <- resol[-1,]
 
-      gDist <-  ggplot2::ggplot(resol,aes(x=x,y=y,fill=value)) +
+      gDist <-  ggplot2::ggplot(resol,aes_(x=~x,y=~y,fill=~value)) +
         geom_tile(show.legend = FALSE) +
         scale_y_continuous(name = "Recurrence Rate", breaks = log(RecScale$RR), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence hreshold",~ epsilon)), labels = paste(round(RecScale$epsilon,2)))) +
         scale_fill_gradient2(low      = "red3",
@@ -2414,7 +2415,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   if(!is.null(markEpochsLOI)){
     if(is.factor(markEpochsLOI)&length(markEpochsLOI)==max(c(NROW(RM),NCOL(RM)))){
       #EcolI <- grey.colors(n=levels(markEpochsLOI))
-    gRP <- gRP + geom_abline(data = data.frame(EcolI = markEpochsLOI), slope = 1, colour = EcolI, size = 2, show.legend = TRUE)
+    gRP <- gRP + geom_abline(data = data.frame(EcolI = markEpochsLOI), aes_(colour = ~EcolI), slope = 1, size = 2, show.legend = TRUE)
     } else {
       warning("Variable passed to 'markEpochsLOI' is not a factor or doesn't have correct length.")
     }
@@ -2423,8 +2424,8 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   if(!is.null(markEpochsGrid)){
     if(is.list(markEpochsGrid)&length(markEpochsGrid)==2){
       gRP <- gRP +
-        geom_vline(data = data.frame(xb=markEpochsGrid[[1]]), aes(xintercept = diff(c((max(xb, na.rm = TRUE)+1),xb)!=0))) +
-        geom_hline(data = data.frame(yb=markEpochsGrid[[2]]), aes(yintercept = diff(c((max(yb, na.rm = TRUE)+1),yb)!=0)))
+        geom_vline(data = data.frame(xb=markEpochsGrid[[1]]), aes_(xintercept = diff(c((max(~xb, na.rm = TRUE)+1),~xb)!=0))) +
+        geom_hline(data = data.frame(yb=markEpochsGrid[[2]]), aes_(yintercept = diff(c((max(~yb, na.rm = TRUE)+1),~yb)!=0)))
     } else {
       warning("Variable passed to 'markEpochsGrid' is not a list, and/or is not of length 2.")
     }
@@ -2507,10 +2508,10 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
   if(plotDimensions){
 
-      gy1 <- ggplot2::ggplot(y1, aes(y=Value, x= tm,  group=Dimension)) +
-        geom_line(aes(colour=Dimension), show.legend = FALSE) +
+      gy1 <- ggplot2::ggplot(y1, aes_(y=~Value, x= ~tm,  group= ~Dimension)) +
+        geom_line(aes_(colour=~Dimension), show.legend = FALSE) +
         xlab(xdims) + ylab("") +
-        geom_vline(aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+        geom_vline(aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
         scale_color_grey() +
         scale_x_continuous(expand = c(0,0)) +
         scale_y_continuous(expand = c(0,0)) +
@@ -2527,10 +2528,10 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
               plot.margin = margin(0,0,0,0, unit = "pt")) +
         coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
 
-      gy2 <- ggplot2::ggplot(y2, aes(y=Value, x=tm, group=Dimension)) +
-        geom_line(aes(colour=Dimension), show.legend = FALSE) +
+      gy2 <- ggplot2::ggplot(y2, aes_(y=~Value, x=~tm, group=~Dimension)) +
+        geom_line(aes_(colour=~Dimension), show.legend = FALSE) +
         ylab("") + xlab(ydims) +
-        geom_vline(aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+        geom_vline(aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
         scale_color_grey() +
         scale_x_continuous(expand = c(0,0)) +
         theme(panel.background = element_blank(),
@@ -2559,14 +2560,14 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
     rpOUTdat <- rpOUT %>%
       dplyr::select(dplyr::one_of(c("Radius","RP_N","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>%
-      tidyr::gather(key=measure,value=value) %>%
+      tidyr::gather(key="measure",value="value") %>%
       dplyr::mutate(x=rep(0,9),y=9:1)
 
     rpOUTdat <- cbind(rpOUTdat,rpOUTdat)
     rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
 
-    gA <-ggplot2::ggplot(rpOUTdat,aes(x=x,y=y)) +
-      geom_text(aes(label=label), family="mono", hjust="left", vjust="center", size=3, parse = FALSE) +
+    gA <-ggplot2::ggplot(rpOUTdat,aes_(x=~x,y=~y)) +
+      geom_text(aes_(label=~label), family="mono", hjust="left", vjust="center", size=3, parse = FALSE) +
       #scale_x_continuous(limits = c(0,.3)) +
       theme_void() +
       theme(plot.margin = margin(0,5,0,5, unit = "pt"))
@@ -2670,16 +2671,16 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
       if(unthresholded){
         g <- (gy2 + gRP + gDist + gg_plotHolder() + gy1 + gg_plotHolder() +
-                plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+                patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
 
       } else {
 
         if(plotMeasures){
           g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
-                  patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+                  patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
         } else {
           g <- (gy2 + gRP + gg_plotHolder() + gg_plotHolder() + gy1 + gg_plotHolder() +
-                  patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+                  patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
         }
       }
 
@@ -3055,8 +3056,8 @@ crqa_rp_prep <- function(RP,
     } else {
       warning("doHalf = TRUE and AUTO = TRUE. Results would be the same for lower and upper triangle!")
       out<- cbind.data.frame(full  = out,
-                             lower = crp_empty(),
-                             upper = crp_empty())
+                             lower = crqa_rp_empty(),
+                             upper = crqa_rp_empty())
     }
   }
   return(out)
@@ -3217,7 +3218,7 @@ crqa_rp_prep <- function(RP,
 #
 #   ##  colnames(meltRP)[1:2] <- matNAmes
 #
-#     grp <- ggplot(data = meltRP, aes(x = meltRP[,2],
+#     grp <- ggplot(data = meltRP, aes_(x = meltRP[,2],
 #                                      y = meltRP[,1],
 #                                      fill = value)) + geom_raster()
 #
@@ -4085,13 +4086,13 @@ lengths(D.L)
   if(doPlot){
 
     # dfU <- data.frame(time=seq(0,1,length.out = N),y=elascer(y))
-    # ggU <- ggplot(dfU,aes(x=time,y=y)) + geom_line() + scale_x_continuous(expand = c(0,0)) + scale_y_continuous(expand = c(0,0)) + coord_equal() + theme_bw() + theme(panel.grid = element_blank())
+    # ggU <- ggplot(dfU,aes_(x=time,y=y)) + geom_line() + scale_x_continuous(expand = c(0,0)) + scale_y_continuous(expand = c(0,0)) + coord_equal() + theme_bw() + theme(panel.grid = element_blank())
     #
     # dfOri <- data.frame(time=time(ts(y)),y=y)
-    # ggOri <- ggplot(dfOri,aes(x=time,y=y)) + geom_line() + scale_x_continuous(expand = c(0,0)) + scale_y_continuous(expand = c(0,0)) + theme_bw() + theme(panel.grid = element_blank())
+    # ggOri <- ggplot(dfOri,aes_(x=time,y=y)) + geom_line() + scale_x_continuous(expand = c(0,0)) + scale_y_continuous(expand = c(0,0)) + theme_bw() + theme(panel.grid = element_blank())
     #
     # dfFD <- data.frame(time=time(ts(y)),FD=D.FD,ci_lo=D.FD-(1.96*D.SE),ci_hi=D.FD+(1.96*D.SE))
-    # ggFD <- ggplot(dfFD,aes(x=time,y=FD)) +  geom_ribbon(aes(ymin=ci_lo, ymax=ci_hi),colour="grey70", fill = "grey70")+ geom_line() +  scale_x_continuous(expand = c(0,0)) + scale_y_continuous("Fractal Dimension",breaks = c(0.8,1,1.1,1.2,1.5,1.8),expand = c(0,0), limits = c(.8,2)) + theme_bw() + theme(panel.grid.major.x  = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank())
+    # ggFD <- ggplot(dfFD,aes_(x=time,y=FD)) +  geom_ribbon(aes_(ymin=ci_lo, ymax=ci_hi),colour="grey70", fill = "grey70")+ geom_line() +  scale_x_continuous(expand = c(0,0)) + scale_y_continuous("Fractal Dimension",breaks = c(0.8,1,1.1,1.2,1.5,1.8),expand = c(0,0), limits = c(.8,2)) + theme_bw() + theme(panel.grid.major.x  = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank())
 
     graphics::plot.new()
     old <- ifultools::splitplot(2,1,1)
@@ -4153,30 +4154,30 @@ fd_allan <- function(y, fs = stats::tsp(stats::hasTsp(y))[3], doPlot = FALSE, us
     if(doPlot){
       if(useSD){
 
-     g <-  ggplot(df,aes(x=Tcluster,y=ATsd)) +
+     g <-  ggplot(df,aes_(x=~Tcluster,y=~ATsd)) +
         geom_path() +
-        geom_pointrange(aes(ymin=ATsd-(ATsd*error),ymax=ATsd+(ATsd*error))) +
+        geom_pointrange(aes_(ymin=~ATsd-(~ATsd*~error),ymax=~ATsd+(~ATsd*~error))) +
        scale_y_continuous(trans = scales::log10_trans(),
                           breaks = scales::trans_breaks("log10", function(x) 10^x),
-                          labels = scales::trans_format("log10", scales::math_format(10^.x))
+                          labels = scales::trans_format("log10", scales::math_format())
                           ) +
        scale_x_continuous(trans = scales::log10_trans(),
                           breaks = scales::trans_breaks("log10", function(x) 10^x),
-                          labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+                          labels = scales::trans_format("log10", scales::math_format())) +
         xlab("Cluster Times (T)") +
         ylab("Allan Standard Deviation") +
         theme_bw()
 
      } else {
-       g <-  ggplot(df,aes(x=Tcluster,y=AT)) +
+       g <-  ggplot(df,aes_(x=~Tcluster,y=~AT)) +
          geom_path() +
-         geom_pointrange(aes(ymin=AT-(AT*error),ymax=AT+(AT*error))) +
+         geom_pointrange(aes_(ymin=~AT-(~AT*~error),ymax=~AT+(~AT*~error))) +
        scale_y_continuous(trans = scales::log10_trans(),
                           breaks = scales::trans_breaks("log10", function(x) 10^x),
-                          labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+                          labels = scales::trans_format("log10", scales::math_format())) +
          scale_x_continuous(trans = scales::log10_trans(),
                             breaks = scales::trans_breaks("log10", function(x) 10^x),
-                            labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+                            labels = scales::trans_format("log10", scales::math_format())) +
          xlab("Cluster Times (T)") +
          ylab("Allan Factor")  +
          theme_bw()
@@ -4438,7 +4439,7 @@ gg_theme <- function(type=c("clean","noax")){
 #'              heights=c(1.4, 4))
 gg_plotHolder <- function(){
   return(ggplot() +
-    geom_blank(aes(1,1)) +
+    geom_blank(aes_(1,1)) +
     theme(line = element_blank(),
           text  = element_blank(),
           title = element_blank(),
@@ -4497,9 +4498,9 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
   for(r in seq_along(edgl[,1])){
     row <- edgl[r,]
     if(as.numeric(groups[which(names(groups)==row[1])])==as.numeric(groups[which(names(groups)==row[2])])){
-     E(g)$weight[r] <- weigth.within + ifelse(preserve.weight.within, E(g)$weight[r]%00%0, 0)
+      igraph::E(g)$weight[r] <- weigth.within + ifelse(preserve.weight.within, igraph::E(g)$weight[r]%00%0, 0)
     } else {
-     E(g)$weight[r] <- weight.between + ifelse(preserve.weight.between, E(g)$weight[r]%00%0, 0)
+      igraph::E(g)$weight[r] <- weight.between + ifelse(preserve.weight.between, igraph::E(g)$weight[r]%00%0, 0)
     }
   }
   if(doPlot){
@@ -4507,7 +4508,7 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
     graphics::plot(g)
   }
   if(returnOnlyWeights){
-    return(E(g)$weight)
+    return(igraph::E(g)$weight)
   } else {
     return(invisible(g))
   }
@@ -4537,7 +4538,7 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
          hubscore = rev <- elascer(log1p(igraph::hub_score(g)$vector))
            )
   } else {
-    rev <- rep(as.numeric(nodesize),length(V(g)))
+    rev <- rep(as.numeric(nodesize),length(igraph::V(g)))
     }
 
   # set colors and sizes for vertices
@@ -4565,7 +4566,7 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
     igraph::V(g)$label.family = "Helvetica"
   }
 
-  if(ecount(g)>0){
+  if(igraph::ecount(g)>0){
   if(edgeweight%in%"weight"){
     igraph::E(g)$width <- elascer(igraph::E(g)$weight,lo = .8, hi = 5)
   } else {
@@ -4695,12 +4696,12 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
 #'
 plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=FALSE, alphaE=FALSE, groupColours=NULL, doPlot = TRUE){
 
-  if(length(groups)==gorder(g)){
+  if(length(groups)==igraph::gorder(g)){
     if(is.null(names(groups))){
       if(is.character(groups)){
         names(groups) <- groups
       } else {
-        names(groups) <- paste0(1:gorder(g))
+        names(groups) <- paste0(1:igraph::gorder(g))
       }
     }
     unigroups <- unique(groups)
@@ -4750,7 +4751,7 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
       }
 
       # Get ids for the edges that connect this group
-      id <- which(E(g)%in%E(g)[igraph::V(g)[groups==c]%--% igraph::V(g)[groups==c]])
+      id <- which(igraph::E(g)%in%igraph::E(g)[igraph::V(g)[groups==c]%--%igraph::V(g)[groups==c]])
 
 
       if(length(id)>0){
@@ -4779,12 +4780,12 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
 
 plotFA_loglog <- function(fd.OUT){
 
-  g <- ggplot2::ggplot(fd.OUT$PLAW, aes(x=size,y=bulk), na.rm=T) +
+  g <- ggplot2::ggplot(fd.OUT$PLAW, aes_(x=~size,y=~bulk), na.rm=T) +
     scale_x_log10(breaks = scales::log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$size)))+c(-1,1))),base=10),
-                  labels = scales::trans_format("log10", scales::math_format(10^.x)),
+                  labels = scales::trans_format("log10", scales::math_format()),
                   limits = range(round(log10(fd.OUT$PLAW$size)))+c(-1,1)) +
     scale_y_log10(breaks = scales::log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$bulk)))+c(-1,1))),base=10),
-                  labels = scales::trans_format("log10", scales::math_format(10^.x)),
+                  labels = scales::trans_format("log10", scales::math_format()),
                   limits = range(round(log10(fd.OUT$PLAW$bulk)))+c(-1,1)) +
     geom_point() +
     geom_abline(intercept = fd.OUT[[2]]$fitlm1$coefficients[[1]], slope = fd.OUT[[2]]$fitlm1$coefficients[[2]], colour = "red", size = 2) +
@@ -4911,10 +4912,10 @@ plotSUR_hist <- function(surrogateValues,
   # }
 
 
-  g <- ggplot2:: ggplot(df.dist,aes(x=rank_dist_bin)) +
+  g <- ggplot2:: ggplot(df.dist,aes_(x=~rank_dist_bin)) +
     geom_histogram(breaks= seq(1,(max(df.dist$rank_dist_bin)+1))-.5,colour="white") +
     geom_vline(xintercept = dist_lines, colour="steelblue") +
-    geom_point(data=obs, aes(x=x, y=y,colour=obs), size=5) +
+    geom_point(data=obs, aes_(x=~x, y=~y,colour=~obs), size=5) +
     scale_x_continuous(name = measureName, breaks = breaks, labels = labels) +
     scale_color_manual("Observed",values="red", breaks="obs", labels = pLabel) +
     ggtitle(label = title, subtitle = paste0(nsides,"-sided test with ",length(surrogateValues)," surrogate values. The observed value has (max) rank ",rank_obs,".")) +
@@ -5101,22 +5102,22 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
   df.acf <- stats::acf(y,plot=FALSE, lag.max = Lmax)
   df.pacf <- stats::pacf(y,plot=FALSE, lag.max = Lmax)
 
-  dfN <- c(NROW(y), laply(1:Lmax, function(l) NROW(ts_embed(y,2,l))+1))
+  dfN <- c(NROW(y), plyr::laply(1:Lmax, function(l) NROW(ts_embed(y,2,l))+1))
 
-  corfunACF  <- ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
-  corfunPACF <- ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
+  corfunACF  <- plyr::ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
+  corfunPACF <- plyr::ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
   corfun     <- rbind(corfunACF,corfunPACF)
 
   groupColours <-  scales::brewer_pal(palette="RdBu")(11)
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
 
-  g <- ggplot(corfun,aes(x=lag,y=r)) +
+  g <- ggplot(corfun,aes_(x=~lag,y=~r)) +
     geom_hline(yintercept = 0, colour="grey",size=1) +
-    geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),aes(x=x,y=y),colour="grey50") +
+    geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),aes_(x=~x,y=~y),colour="grey50") +
     geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
-    geom_ribbon(aes(ymin=ciL,ymax=ciU),fill="grey70",colour="grey50") +
+    geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
     geom_path(colour="grey50") +
-    geom_point(aes(fill = sig, colour=sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
+    geom_point(aes_(fill = ~sig, colour=~sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
     facet_grid(type ~.) +
     scale_fill_manual(bquote(p < .(siglevel)),values = cols,
                       labels =  list("yes"= expression(rho != 0),
@@ -5169,13 +5170,13 @@ plotRED_mif <- function(y, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*
   groupColours <-  scales::brewer_pal(palette="RdBu")(11)
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
 
-  g <- ggplot(mifun,aes(x=lag,y=r)) +
+  g <- ggplot(mifun,aes_(x=~lag,y=~r)) +
     geom_hline(yintercept = 0, colour="grey",size=1) +
-    geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),aes(x=x,y=y),colour="grey50") +
+    geom_line(data = data.frame(x=c(0,mifun$lag[1]),y=c(1,mifun$r[1])),aes_(x=~x,y=~y),colour="grey50") +
     geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
-    geom_ribbon(aes(ymin=ciL,ymax=ciU),fill="grey70",colour="grey50") +
+    geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
     geom_path(colour="grey50") +
-    geom_point(aes(fill = sig, colour=sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
+    geom_point(aes_(fill = ~sig, colour=~sig),pch=21, cex=(1 + .01*(NROW(~y)/~nbins))) +
     facet_grid(type ~.) +
     scale_fill_manual(bquote(p < .(siglevel)),values = cols,
                       labels =  list("yes"= expression(rho != 0),
@@ -5183,7 +5184,7 @@ plotRED_mif <- function(y, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*
     scale_colour_manual(bquote(p < .(siglevel)),values = cols,
                         labels =  list("yes"= expression(rho != 0),
                                        "no" = expression(rho == 0))) +
-    scale_x_continuous(limits = c(0,Lmax),expand = c(0.01,0), breaks = seq(0,Lmax,by = round(Lmax/10))) +
+    scale_x_continuous(limits = c(0,nbins),expand = c(0.01,0), breaks = seq(0,nbins,by = round(nbins/10))) +
     scale_y_continuous(limits = c(-1,1)) +
     theme_bw() + theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank())
 
@@ -5192,8 +5193,8 @@ plotRED_mif <- function(y, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*
     graphics::plot(g)
   }
 
-  if(returnCorFun){
-    return(list(corfun=corfun,
+  if(returnMIFun){
+    return(list(mifun=mifun,
                 plot=invisible(g)))
   } else {
     return(invisible(g))
@@ -5487,7 +5488,7 @@ ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = N
   if(returnRectdata){
     return(data.frame(group = group, xmin = xmin, xmax = xmax, ymin = -Inf, ymax = +Inf, label = label))
   } else {
-    return(c(1,xstart))
+    return(c(1,xmin))
   }
 }
 
@@ -5697,9 +5698,9 @@ ts_symbolic <- function(y, keepNA = TRUE, doPlot = FALSE){
 
     if(!is.null(ncol(sym_num))){
       out$time <- 1:NROW(out)
-      df_p1 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_label"),"time") %>% tidyr::gather(key=lab_var, value=sym_label, -"time")
+      df_p1 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_label"),"time") %>% tidyr::gather(key="lab_var", value="sym_label", -"time")
        df_p1$sym_label[is.na(df_p1$sym_label)] <- "missing"
-      df_p2 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_num")) %>% tidyr::gather(key=num_var, value=sym_num)
+      df_p2 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_num")) %>% tidyr::gather(key="num_var", value="sym_num")
       df_p2[is.na(df_p2)] <- 0
     df_plot <- cbind(df_p1,df_p2)
     df_plot$num_var <- gsub("_sym_num","",df_plot$num_var)
@@ -5710,9 +5711,9 @@ ts_symbolic <- function(y, keepNA = TRUE, doPlot = FALSE){
     }
 
 
-   g <- ggplot(df_plot,aes(x=time,y=sym_num)) +
+   g <- ggplot(df_plot,aes_(x=~time,y=~sym_num)) +
       geom_line(color="grey80") +
-      geom_point(aes(shape=sym_label, color=sym_label, fill=sym_label),size=2)
+      geom_point(aes_(shape=~sym_label, color=~sym_label, fill=~sym_label),size=2)
 
    if(!is.null(df_plot$num_var)){
      if(length(unique(df_plot$num_var))>1){
@@ -5794,7 +5795,7 @@ symbolize <- function(xy) {
   return(su)
 }
 
-ts_resample <- function(y, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRUE){
+ts_resample <- function(y, nbins = ceiling(2*length(y)^(1/3)), keepNA = TRUE){
 
   bins <- ts_discrete(y, nbins)
   transmat <- matrix(0,nbins,nbins)
@@ -5846,7 +5847,8 @@ ts_resample <- function(y, nbins = ceiling(2*length(x)^(1/3)), keepNA = TRUE){
 #' ts_diff(y = df, order=4, addColumns=TRUE)
 #'
 #' # Plot logistic S-curve and derivatives 1 to 3
-#' plot(ts(ts_diff(stats::plogis(seq(-5,5,.1)), order=3, keepDerivatives = TRUE)),  main="ts_derivative")
+#' plot(ts(ts_diff(stats::plogis(seq(-5,5,.1)),
+#' order=3, keepDerivatives = TRUE)),  main="ts_derivative")
 #'
 ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, maskEdges = NULL, silent = TRUE){
 
@@ -6038,7 +6040,7 @@ ts_checkfix <- function(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE,
         } else {
       if(dim(y)[[2]]==1){suppressWarnings(y <- as.numeric(y[,1]))
         } else {
-      if(dim(y)[[2]]>1){suppressWarnings(y <- y %>%  gather(key=colname,value=value) %>%  as.numeric(value))
+      if(dim(y)[[2]]>1){suppressWarnings(y <- y %>%  tidyr::gather(key="colname",value="value") %>%  as.numeric(.$value))
         }
         }
           }
@@ -6329,7 +6331,7 @@ ts_peaks <- function (y,
                         window        = 3,
                         includeWells  = FALSE,
                         minPeakDist   = round(window/2),
-                        minPeakHeight = .2*diff(range(x, na.rm = TRUE))){
+                        minPeakHeight = .2*diff(range(y, na.rm = TRUE))){
 
   fp <- function(y,window){
     shape <- diff(sign(diff(y, na.pad = FALSE)))
@@ -6358,7 +6360,7 @@ ts_peaks <- function (y,
 
   heightOK <- rep(FALSE,length(pks))
   for(p in seq_along(pks)){
-    if(abs(y[pks[p]] - mean(y[c(max(1,(pks[p]-window)):(pks[p]-1),(pks[p]+1):min((pks[p]+window),length(x)))])) >= minPeakHeight){
+    if(abs(y[pks[p]] - mean(y[c(max(1,(pks[p]-window)):(pks[p]-1),(pks[p]+1):min((pks[p]+window),length(y)))])) >= minPeakHeight){
       heightOK[p] <- TRUE
     }
   }
@@ -6543,17 +6545,17 @@ ts_integrate <-function(y){
 
 
 # Help lme4 get a better convergence
-nlopt <- function(par, fn, lower, upper, control) {
-  # Add to call: control = lmerControl(optimizer = "nloptwrap", calc.derivs = FALSE
-  .nloptr <<- res <- nloptr(par, fn, lb = lower, ub = upper,
-                            opts = list(algorithm = "NLOPT_LN_BOBYQA", print_level = 1,
-                                        maxeval = 1000, xtol_abs = 1e-6, ftol_abs = 1e-6))
-  list(par = res$solution,
-       fval = res$objective,
-       conv = if (res$status > 0) 0 else res$status,
-       message = res$message
-  )
-}
+# nlopt <- function(par, fn, lower, upper, control) {
+#   # Add to call: control = lmerControl(optimizer = "nloptwrap", calc.derivs = FALSE
+#   .nloptr <<- res <- nloptr(par, fn, lb = lower, ub = upper,
+#                             opts = list(algorithm = "NLOPT_LN_BOBYQA", print_level = 1,
+#                                         maxeval = 1000, xtol_abs = 1e-6, ftol_abs = 1e-6))
+#   list(par = res$solution,
+#        fval = res$objective,
+#        conv = if (res$status > 0) 0 else res$status,
+#        message = res$message
+#   )
+# }
 
 # Convert decimal point
 c2p <- function(text,N=1){
@@ -6709,16 +6711,16 @@ multi_PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
   } else {
     # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    grid::grid.newpage()
+    grid::pushViewport(grid::viewport(layout = grid::grid.layout(nrow(layout), ncol(layout))))
 
     # Make each plot, in the correct location
     for (i in 1:numPlots) {
       # Get the i,j matrix positions of the regions that contain this subplot
       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
 
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
+      print(plots[[i]], vp = grid::viewport(layout.pos.row = matchidx$row,
+                                            layout.pos.col = matchidx$col))
     }
   }
 }

@@ -1,13 +1,14 @@
 .onLoad <- function(libname, pkgname="casnet") {
-  if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
-    #cat("\nRU account detected...\n")
-    RU <- TRUE
+  #if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
+  if(grepl(pattern = "^([\\]|[/]){2,4}",x = system.file(package="casnet"))){
+    #packageStartupMessage("UNC location detected! 1. Will try to map to a drive letter 2. crqa_cl() will be run from a local temporary directory",appendLF = TRUE)
+    UNC <- TRUE
     ppath <- normalizePath(paste0("U:\\",paste0(strsplit(system.file(package="casnet"),"[/]")[[1]][-c(1,2)],collapse="/")), mustWork = TRUE)
     #execpath <- normalizePath(paste0(ppath,"/exec"), mustWork = TRUE)
     #execpath <- normalizePath(paste0("C:\\Users/",paste0(strsplit(system.file(package="casnet"),"[/]")[[1]][2],"/Documents",collapse="/")), mustWork = TRUE)
     execpath <- normalizePath(paste0("C:\\Temp"))
   } else {
-    RU <- FALSE
+    UNC <- FALSE
     ppath     <- system.file(package="casnet")
     execpath <- system.file("exec", package="casnet")
   }
@@ -16,7 +17,7 @@
   op.casnet <- list(
     casnet.path = ppath,
     casnet.path_to_rp = execpath,
-    casnet.isRU = RU,
+    casnet.isUNC = UNC,
     casnet.rp_prefix = casnet_OS_options$rp_prefix,
     casnet.rp_command = casnet_OS_options$rp_command,
     casnet.rp_URL = casnet_OS_options$URL,

@@ -8,6 +8,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom plyr .
 #' @import ggplot2
+#' @importFrom igraph %--%
 #'
 NULL
 
