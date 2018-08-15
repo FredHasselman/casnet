@@ -10,6 +10,7 @@ A collection of analytic tools for studying signals recorded from complex adapti
 * Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)
 * Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA)
 * Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks)
+* SOON: Multiplex Recurrence Networks
 
 
 ## Installing **casnet**
