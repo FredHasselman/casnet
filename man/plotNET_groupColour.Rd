@@ -5,7 +5,8 @@
 \title{Vertex Group Colours}
 \usage{
 plotNET_groupColour(g, groups, colourV = TRUE, alphaV = FALSE,
-  colourE = FALSE, alphaE = FALSE, groupColours = NULL, doPlot = TRUE)
+  colourE = FALSE, alphaE = FALSE, groupColours = NULL,
+  doPlot = TRUE)
 }
 \arguments{
 \item{g}{An igraph object}
@@ -36,3 +37,4 @@ Other tools for plotting networks: \code{\link{plotNET_BA}},
   \code{\link{plotNET_groupWeight}},
   \code{\link{plotNET_prep}}
 }
+\concept{tools for plotting networks}

@@ -4,8 +4,9 @@
 \alias{fd_psd}
 \title{Power Spectral Density Slope (PSD).}
 \usage{
-fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TRUE,
-  returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE)
+fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE,
+  doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE,
+  silent = TRUE)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -51,3 +52,4 @@ Other Fluctuation Analyses: \code{\link{MFDFA}},
 \author{
 Fred Hasselman
 }
+\concept{Fluctuation Analyses}

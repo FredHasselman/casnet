@@ -4,11 +4,13 @@
 \alias{crqa_rp}
 \title{Get bootsrapped (C)RQA measures based on a recurrence matrix}
 \usage{
-crqa_rp(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
-  DLmax = length(Matrix::diag(RM)) - 1, VLmax = length(Matrix::diag(RM)) -
-  1, HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, theiler = NULL,
-  chromatic = FALSE, matrices = FALSE, doHalf = FALSE, Nboot = NULL,
-  CL = 0.95, doParallel = FALSE)
+crqa_rp(RM, emRad = NA, DLmin = 2, VLmin = 2, HLmin = 2,
+  DLmax = length(Matrix::diag(RM)) - 1,
+  VLmax = length(Matrix::diag(RM)) - 1,
+  HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, theiler = NULL,
+  chromatic = FALSE, matrices = FALSE, doHalf = FALSE,
+  Nboot = NULL, CL = 0.95, targetValue = 0.05, doParallel = FALSE,
+  silent = TRUE)
 }
 \arguments{
 \item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NULL})}
@@ -41,7 +43,11 @@ crqa_rp(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 
 \item{CL}{Confidence limit for bootstrap results (default = \code{.95})}
 
-\item{doParallel}{Use parallel?}
+\item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR", tol = .2)} if \code{is.na(emRad)==TRUE}, it will estimate a radius (default = \code{.05}).}
+
+\item{doParallel}{Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr]{map2}} to assign data and \code{\link[parallel]{detectCores}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
+
+\item{silent}{Do not display any messages (default = \code{TRUE})}
 }
 \value{
 A list object containing (C)RQA measures (and matrices if requested)
@@ -54,3 +60,4 @@ Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
   \code{\link{crqa_parameters}}, \code{\link{crqa_radius}},
   \code{\link{crqa_rp_measures}}
 }
+\concept{Recurrence Quantification Analysis}

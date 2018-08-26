@@ -29,3 +29,4 @@ Other Distance matrix operations: \code{\link{bandReplace}},
 \author{
 Fred Hasselman
 }
+\concept{Distance matrix operations}

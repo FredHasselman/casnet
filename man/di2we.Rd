@@ -26,3 +26,4 @@ Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{rp_plot}}, \code{\link{rp_size}},
   \code{\link{rp}}
 }
+\concept{Distance matrix operations}

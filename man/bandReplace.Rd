@@ -40,3 +40,4 @@ Other Distance matrix operations: \code{\link{di2bi}},
 \author{
 Fred Hasselman
 }
+\concept{Distance matrix operations}

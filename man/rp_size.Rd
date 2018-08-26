@@ -36,3 +36,4 @@ Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{rp_nzdiags}}, \code{\link{rp_plot}},
   \code{\link{rp}}
 }
+\concept{Distance matrix operations}

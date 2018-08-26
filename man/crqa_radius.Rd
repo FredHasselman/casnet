@@ -4,12 +4,13 @@
 \alias{crqa_radius}
 \title{Find fixed or optimal radius}
 \usage{
-crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
-  type = c("fixed", "optimal")[1], startRadius = NULL, eachRadius = 1,
-  targetMeasure = c("RR", "DET", "LAM", "T1", "all")[1], targetValue = 0.05,
-  tol = 0.1, maxIter = 100, theiler = -1, histIter = FALSE,
-  noiseLevel = 0.75, noiseType = c("normal", "uniform")[1],
-  plotROC = FALSE, standardise = c("mean.sd", "median.mad", "none")[3],
+crqa_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1,
+  emDim = 1, type = c("fixed", "optimal")[1], startRadius = NULL,
+  eachRadius = 1, targetMeasure = c("RR", "DET", "LAM", "T1",
+  "all")[1], targetValue = 0.05, tol = 0.1, maxIter = 100,
+  theiler = -1, histIter = FALSE, noiseLevel = 0.75,
+  noiseType = c("normal", "uniform")[1], plotROC = FALSE,
+  standardise = c("mean.sd", "median.mad", "none")[3],
   radiusOnFail = c("tiny", "huge", "percentile")[1], silent = FALSE)
 }
 \arguments{
@@ -64,3 +65,4 @@ Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
   \code{\link{crqa_parameters}},
   \code{\link{crqa_rp_measures}}, \code{\link{crqa_rp}}
 }
+\concept{Recurrence Quantification Analysis}

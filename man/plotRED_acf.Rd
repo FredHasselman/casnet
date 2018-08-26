@@ -27,3 +27,4 @@ Plot ACF and PACF
 \seealso{
 Other Plot redundancy functions: \code{\link{plotRED_mif}}
 }
+\concept{Plot redundancy functions}

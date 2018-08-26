@@ -4,8 +4,8 @@
 \alias{ts_changeindex}
 \title{Find change indices}
 \usage{
-ts_changeindex(y, returnRectdata = TRUE, groupVar = NULL, labelVar = NULL,
-  discretize = FALSE, nbins = 5)
+ts_changeindex(y, returnRectdata = TRUE, groupVar = NULL,
+  labelVar = NULL, discretize = FALSE, nbins = 5)
 }
 \arguments{
 \item{y}{An indicator variable representing different levels of a variable or factor}

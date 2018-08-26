@@ -61,3 +61,4 @@ Other tools for plotting networks: \code{\link{plotNET_BA}},
   \code{\link{plotNET_groupColour}},
   \code{\link{plotNET_prep}}
 }
+\concept{tools for plotting networks}

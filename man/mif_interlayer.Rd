@@ -19,3 +19,4 @@ The inter-layer mutual information between \code{g1} and \code{g2}. If \code{pro
 \description{
 Inter-layer mutual information
 }
+\concept{Multiplex Networks}

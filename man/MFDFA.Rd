@@ -4,8 +4,8 @@
 \alias{MFDFA}
 \title{Multi-fractal Detrended Fluctuation Analysis}
 \usage{
-MFDFA(signal, qq = c(-10, -5:5, 10), mins = 6, maxs = 12, ressc = 30,
-  m = 1)
+MFDFA(signal, qq = c(-10, -5:5, 10), mins = 6, maxs = 12,
+  ressc = 30, m = 1)
 }
 \arguments{
 \item{signal}{An input signal.}
@@ -30,3 +30,4 @@ Multi-fractal Detrended Fluctuation Analysis
 Other Fluctuation Analyses: \code{\link{fd_RR}},
   \code{\link{fd_dfa}}, \code{\link{fd_psd}}
 }
+\concept{Fluctuation Analyses}

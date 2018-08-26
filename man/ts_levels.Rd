@@ -4,9 +4,9 @@
 \alias{ts_levels}
 \title{Detect levels in time series}
 \usage{
-ts_levels(y, minDataSplit = 12, minLevelDuration = round(minDataSplit/3),
-  changeSensitivity = 0.01, maxLevels = 30, method = c("anova", "poisson",
-  "class", "exp")[1])
+ts_levels(y, minDataSplit = 12,
+  minLevelDuration = round(minDataSplit/3), changeSensitivity = 0.01,
+  maxLevels = 30, method = c("anova", "poisson", "class", "exp")[1])
 }
 \arguments{
 \item{y}{A time series of numeric vector}
@@ -36,3 +36,4 @@ Other Time series operations: \code{\link{ts_center}},
 \author{
 Fred Hasselman
 }
+\concept{Time series operations}

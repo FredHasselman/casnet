@@ -7,8 +7,8 @@
 crqa_rp_measures(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RM)), VLmax = length(Matrix::diag(RM)),
   HLmax = length(Matrix::diag(RM)), AUTO = NULL, theiler = NULL,
-  chromatic = FALSE, matrices = FALSE, doHalf = FALSE, Nboot = NULL,
-  CL = 0.95, doParallel = FALSE)
+  chromatic = FALSE, matrices = FALSE, doHalf = FALSE,
+  Nboot = NULL, CL = 0.95, doParallel = FALSE)
 }
 \arguments{
 \item{RM}{A binary recurrence matrix}
@@ -51,4 +51,5 @@ Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
   \code{\link{crqa_parameters}}, \code{\link{crqa_radius}},
   \code{\link{crqa_rp}}
 }
+\concept{Recurrence Quantification Analysis}
 \keyword{internal}

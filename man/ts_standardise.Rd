@@ -31,3 +31,4 @@ Other Time series operations: \code{\link{ts_center}},
 \author{
 Fred Hasselman
 }
+\concept{Time series operations}

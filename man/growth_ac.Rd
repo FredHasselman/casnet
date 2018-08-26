@@ -34,3 +34,4 @@ Other autocatalytic growth functions: \code{\link{growth_ac_cond}}
 \author{
 Fred Hasselman
 }
+\concept{autocatalytic growth functions}

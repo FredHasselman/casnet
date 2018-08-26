@@ -48,3 +48,4 @@ Hasselman, F. (2013). When the blind curve is finite: dimension estimation and m
 \author{
 Fred Hasselman
 }
+\concept{FD estimators}

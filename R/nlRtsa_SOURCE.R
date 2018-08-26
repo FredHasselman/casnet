@@ -1393,7 +1393,9 @@ crqa_rp_measures <- function(RM,
 #' @param doHalf Analyse half of the matrix? (default = \code{FALSE})
 #' @param Nboot How many bootstrap replications? (default = \code{NULL})
 #' @param CL Confidence limit for bootstrap results (default = \code{.95})
-#' @param doParallel Use parallel?
+#' @param targetValue A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR", tol = .2)} if \code{is.na(emRad)==TRUE}, it will estimate a radius (default = \code{.05}).
+#' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr]{map2}} to assign data and \code{\link[parallel]{detectCores}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})
+#' @param silent Do not display any messages (default = \code{TRUE})
 
 #' @return A list object containing (C)RQA measures (and matrices if requested)
 #'
@@ -1403,21 +1405,23 @@ crqa_rp_measures <- function(RM,
 #'
 #'
 crqa_rp <- function(RM,
-                     emRad = NULL,
-                     DLmin = 2,
-                     VLmin = 2,
-                     HLmin = 2,
-                     DLmax = length(Matrix::diag(RM))-1,
-                     VLmax = length(Matrix::diag(RM))-1,
-                     HLmax = length(Matrix::diag(RM))-1,
-                     AUTO      = NULL,
-                     theiler   = NULL,
-                     chromatic = FALSE,
-                     matrices  = FALSE,
-                     doHalf    = FALSE,
-                     Nboot     = NULL,
-                     CL        = .95,
-                     doParallel = FALSE){
+                    emRad = NA,
+                    DLmin = 2,
+                    VLmin = 2,
+                    HLmin = 2,
+                    DLmax = length(Matrix::diag(RM))-1,
+                    VLmax = length(Matrix::diag(RM))-1,
+                    HLmax = length(Matrix::diag(RM))-1,
+                    AUTO      = NULL,
+                    theiler   = NULL,
+                    chromatic = FALSE,
+                    matrices  = FALSE,
+                    doHalf    = FALSE,
+                    Nboot     = NULL,
+                    CL        = .95,
+                    targetValue = .05,
+                    doParallel = FALSE,
+                    silent     = TRUE){
 
 
   # Input should be a distance matrix, or a matrix of zeroes and ones with emRad = NULL, output is a list
@@ -1430,6 +1434,35 @@ crqa_rp <- function(RM,
 
   if(is.null(AUTO)){
     AUTO <- attr(RM,"AUTO")
+  }
+
+  if(is.na(emRad)){
+    if(!is.null(attributes(RM)$emRad)){
+      emRad <- attributes(RM)$emRad
+    } else {
+      # Check for attributes
+      if(is.na(targetValue)){
+        targetValue <- .05
+      }
+      if(!is.null(attributes(RM)$emDim)){
+        emDim <- attributes(RM)$emDim
+      } else {
+        emdim <- 1
+      }
+      if(!is.null(attributes(RM)$emLag)){
+        emLag <- attributes(RM)$emLag
+      } else {
+        emLag <- 1
+      }
+
+      emRad <- crqa_radius(RM = RM,
+                           emDim = emDim, emLag = emLag, targetValue = targetValue, tol = .2, radiusOnFail = "percentile", silent = silent)
+      if(emRad$Converged){
+        emRad <- emRad$Radius
+      } else {
+        emRad <- stats::sd(RM,na.rm = TRUE)
+      }
+    }
   }
 
   #uval <- unique(as.vector(RM))
@@ -1655,8 +1688,11 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
 
     s  <- Sys.time()
 
-    nzdiags <- broom::tidy(RM)
-    nzdiags$ndiag <- nzdiags$column-nzdiags$row
+    nzdiagsM <- methods::as(RM, "dgTMatrix")
+    nzdiags  <- data.frame(row   = nzdiagsM@i,
+                           col   = nzdiagsM@j,
+                           value = nzdiagsM@x,
+                           ndiag = nzdiagsM@j-nzdiagsM@i)
     nzdiags <- dplyr::arrange(nzdiags,nzdiags$ndiag)
 
     if(!is.null(d)){
@@ -1668,8 +1704,7 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
     }
 
     indMat <- col(RM)-row(RM)
-
-    #RM <- Matrix::as.matrix(RM)
+    indMatV <- as.vector(indMat)
 
     #cat("\nStart extraction of nonzero diagonals\n")
     m  <- NROW(RM)
@@ -1680,11 +1715,12 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
     } else {
       B <- matrix(0, nrow = min(c(m,n), na.rm = TRUE), ncol = p)
     }
+    colnames(B) <- paste(d)
 
     for(i in seq_along(d)){
-      B[nzdiags$row[nzdiags$ndiag==d[i]],i] <- nzdiags$value[nzdiags$ndiag==d[i]]
+      B[(nzdiags$row[nzdiags$ndiag==d[i]])+1,i] <- nzdiags$value[nzdiags$ndiag==d[i]]
     }
-    colnames(B) <- paste(d)
+
     zID <- which(colSums(B)==0)
     if(length(zID)>0){
       B  <- B[,-zID]

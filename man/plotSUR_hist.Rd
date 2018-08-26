@@ -4,9 +4,9 @@
 \alias{plotSUR_hist}
 \title{Surrogate Test}
 \usage{
-plotSUR_hist(surrogateValues, observedValue, sides = c("two.sided", "greater",
-  "less")[1], binWidth = NULL, measureName = "", title = "",
-  doPlot = TRUE, returnOnlyPvalue = FALSE)
+plotSUR_hist(surrogateValues, observedValue, sides = c("two.sided",
+  "greater", "less")[1], binWidth = NULL, measureName = "",
+  title = "", doPlot = TRUE, returnOnlyPvalue = FALSE)
 }
 \arguments{
 \item{surrogateValues}{Vector of measures based on surrogate time series}

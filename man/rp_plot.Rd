@@ -5,9 +5,10 @@
 \title{Plot (thresholded) distance matrix}
 \usage{
 rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
-  plotRadiusRRbar = TRUE, markEpochsLOI = NULL, markEpochsGrid = NULL,
-  radiusValue = NA, title = "", xlab = "", ylab = "",
-  plotSurrogate = NA, returnOnlyObject = FALSE, useGtable = TRUE)
+  plotRadiusRRbar = TRUE, markEpochsLOI = NULL,
+  markEpochsGrid = NULL, radiusValue = NA, title = "", xlab = "",
+  ylab = "", plotSurrogate = NA, returnOnlyObject = FALSE,
+  useGtable = TRUE)
 }
 \arguments{
 \item{RM}{A distance matrix or recurrence matrix}
@@ -49,3 +50,4 @@ Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{rp_nzdiags}}, \code{\link{rp_size}},
   \code{\link{rp}}
 }
+\concept{Distance matrix operations}

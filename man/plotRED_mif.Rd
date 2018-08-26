@@ -29,3 +29,4 @@ Plot various MI functions
 \seealso{
 Other Plot redundancy functions: \code{\link{plotRED_acf}}
 }
+\concept{Plot redundancy functions}

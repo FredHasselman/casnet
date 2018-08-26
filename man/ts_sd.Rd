@@ -4,7 +4,8 @@
 \alias{ts_sd}
 \title{Standard Deviation estimates}
 \usage{
-ts_sd(y, na.rm = TRUE, type = c("Bessel", "unadjusted")[1], silent = TRUE)
+ts_sd(y, na.rm = TRUE, type = c("Bessel", "unadjusted")[1],
+  silent = TRUE)
 }
 \arguments{
 \item{y}{Time series or numeric vector}

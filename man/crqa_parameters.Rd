@@ -5,9 +5,10 @@
 \title{Find optimal (C)RQA parameters}
 \usage{
 crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
-  lagMethods = "first.minimum", emLag = NULL, nnSizes = c(2, 5, 10, 15),
-  nnRadius = 5, nnThres = 10, theiler = 0, estimateLags = TRUE,
-  estimateDimensions = TRUE, diagPlot = TRUE, silent = TRUE, ...)
+  lagMethods = "first.minimum", emLag = NULL, nnSizes = c(2, 5, 10,
+  15), nnRadius = 5, nnThres = 10, theiler = 0,
+  estimateLags = TRUE, estimateDimensions = TRUE, diagPlot = TRUE,
+  silent = TRUE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series}
@@ -57,3 +58,4 @@ Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},
   \code{\link{crqa_radius}},
   \code{\link{crqa_rp_measures}}, \code{\link{crqa_rp}}
 }
+\concept{Recurrence Quantification Analysis}

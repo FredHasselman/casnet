@@ -28,3 +28,4 @@ Other Time series operations: \code{\link{ts_detrend}},
 \author{
 Fred Hasselman
 }
+\concept{Time series operations}

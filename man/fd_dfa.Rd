@@ -6,10 +6,10 @@
 \usage{
 fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
   polyOrder = 1, standardise = c("mean.sd", "median.mad")[1],
-  adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)),
-  scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4,
-  doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE,
-  ...)
+  adjustSumOrder = TRUE, scaleMin = 4,
+  scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30,
+  scaleS = NA, overlap = 0, minData = 4, doPlot = TRUE,
+  returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -69,3 +69,4 @@ Other Fluctuation Analyses: \code{\link{MFDFA}},
 \author{
 Fred Hasselman
 }
+\concept{Fluctuation Analyses}

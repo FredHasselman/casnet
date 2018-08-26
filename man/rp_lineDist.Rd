@@ -5,8 +5,9 @@
 \title{Line length distributions}
 \usage{
 rp_lineDist(RP, DLmin = 2, VLmin = 2, HLmin = 2,
-  DLmax = length(Matrix::diag(RP)) - 1, VLmax = length(Matrix::diag(RP)) -
-  1, HLmax = length(Matrix::diag(RP)) - 1, d = NULL, theiler = NULL,
+  DLmax = length(Matrix::diag(RP)) - 1,
+  VLmax = length(Matrix::diag(RP)) - 1,
+  HLmax = length(Matrix::diag(RP)) - 1, d = NULL, theiler = NULL,
   invert = FALSE, AUTO = NULL, chromatic = FALSE, matrices = FALSE,
   doHalf = FALSE)
 }
@@ -66,3 +67,4 @@ Other Distance matrix operations: \code{\link{bandReplace}},
 \author{
 Fred Hasselman
 }
+\concept{Distance matrix operations}

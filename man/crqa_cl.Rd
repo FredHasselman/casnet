@@ -4,16 +4,17 @@
 \alias{crqa_cl}
 \title{Fast (C)RQA (command line crp)}
 \usage{
-crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
-  VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
-  (length(y1) + 1), length(y2)), na.rm = TRUE), step = win, JRP = FALSE,
-  distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-  standardise = c("none", "mean.sd", "median.mad")[1],
-  returnMeasures = TRUE, returnRPvector = FALSE, returnLineDist = FALSE,
-  plot_recmat = c("noplot", "rp", "distmat")[[1]],
-  path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
-  path_out = NULL, file_ID = NULL, silent = TRUE, surrogateTest = FALSE,
-  targetValue = 0.05, useParallel = FALSE, ...)
+crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA,
+  DLmin = 2, VLmin = 2, theiler = 0, win = min(length(y1),
+  ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm = TRUE),
+  step = win, JRP = FALSE, distNorm = c("EUCLIDEAN", "MAX", "MIN",
+  "OP")[[1]], standardise = c("none", "mean.sd", "median.mad")[1],
+  returnMeasures = TRUE, returnRPvector = FALSE,
+  returnLineDist = FALSE, plot_recmat = c("noplot", "rp",
+  "distmat")[[1]], path_to_rp = getOption("casnet.path_to_rp"),
+  saveOut = FALSE, path_out = NULL, file_ID = NULL, silent = TRUE,
+  surrogateTest = FALSE, targetValue = 0.05, useParallel = FALSE,
+  ...)
 }
 \arguments{
 \item{y1}{Time series 1}
@@ -137,3 +138,4 @@ Other Recurrence Quantification Analysis: \code{\link{crqa_parameters}},
   \code{\link{crqa_radius}},
   \code{\link{crqa_rp_measures}}, \code{\link{crqa_rp}}
 }
+\concept{Recurrence Quantification Analysis}

@@ -26,3 +26,4 @@ Relative Rougness is a ratio of local variance (autocovariance at lag-1) to glob
 Other Fluctuation Analyses: \code{\link{MFDFA}},
   \code{\link{fd_dfa}}, \code{\link{fd_psd}}
 }
+\concept{Fluctuation Analyses}

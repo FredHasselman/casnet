@@ -4,9 +4,9 @@
 \alias{rp}
 \title{Create a Distance Matrix}
 \usage{
-rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL, to.ts = NULL,
-  order.by = NULL, to.sparse = FALSE, method = "Euclidean",
-  doPlot = FALSE, silent = TRUE, ...)
+rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
+  to.ts = NULL, order.by = NULL, to.sparse = FALSE,
+  method = "Euclidean", doPlot = FALSE, silent = TRUE, ...)
 }
 \arguments{
 \item{y1}{A numeric vector or time series}
@@ -46,3 +46,4 @@ Other Distance matrix operations: \code{\link{bandReplace}},
   \code{\link{rp_nzdiags}}, \code{\link{rp_plot}},
   \code{\link{rp_size}}
 }
+\concept{Distance matrix operations}

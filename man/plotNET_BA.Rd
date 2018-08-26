@@ -29,3 +29,4 @@ Other tools for plotting networks: \code{\link{plotNET_SW}},
   \code{\link{plotNET_groupWeight}},
   \code{\link{plotNET_prep}}
 }
+\concept{tools for plotting networks}

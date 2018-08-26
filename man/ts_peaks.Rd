@@ -5,8 +5,8 @@
 \title{Find Peaks or Wells}
 \usage{
 ts_peaks(y, window = 3, includeWells = FALSE,
-  minPeakDist = round(window/2), minPeakHeight = 0.2 * diff(range(y, na.rm =
-  TRUE)))
+  minPeakDist = round(window/2), minPeakHeight = 0.2 * diff(range(y,
+  na.rm = TRUE)))
 }
 \arguments{
 \item{y}{A time series or numeric vector}
@@ -34,3 +34,4 @@ Other Time series operations: \code{\link{ts_center}},
 \author{
 Fred Hasselman
 }
+\concept{Time series operations}
