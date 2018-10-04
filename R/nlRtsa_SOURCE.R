@@ -644,7 +644,7 @@ crqa_cl <- function(y1,
 crqa_parameters <- function(y,
                             maxDim   = 10,
                             maxLag   = floor(length(y)/(maxDim+1)),
-                            lagMethods = "first.minimum",
+                            lagMethods = c("first.minimum","global.minimum","max.lag"),
                             emLag     = NULL,
                             nnSizes  = c(2,5,10,15),
                             nnRadius = 5,
@@ -667,15 +667,32 @@ crqa_parameters <- function(y,
 
   if(is.null(emLag)){
     if(estimateDimensions){
-      mi <- mif(data.frame(y),lags = 1:maxLag) #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
-      emLag$first.minimum <- which(ts_symbolic(data.frame(mi))[,2]%in%"trough")[1]
-      emLag$global.minimum <- min(mi,na.rm = TRUE)
-      emLag$max.lag <- maxLag
+      mi <- mif(data.frame(y),lags = 1:maxLag)
+      #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+      emLags <- cbind.data.frame(selection.methods = lagMethods, lag = NA)
+      for(m in seq_along(emLags$selection.methods)){
+        if(emLags$selection.methods[m]=="first.minimum"){
+          emLags$lag[m] <- which(ts_symbolic(data.frame(mi))[,2]%in%"trough")[1]%00%NA
+          emLags$ami[m] <- mi[emLags$lag[m]]
+        }
+        if(emLags$selection.methods[m]=="global.minimum"){
+          emLags$lag[m] <- as.numeric(which.min(mi))
+          emLags$ami[m] <- mi[emLags$lag[m]]
+        }
+        if(emLags$selection.methods[m]=="max.lag"){
+          emLags$lag[m] <- maxLag
+          emLags$ami[m] <- mi[emLags$lag[m]]
+        }
+      }
     } else {
-      emLags <- cbind.data.frame(selection.methods = "Not estimated", optimal.lag = NA)
+      emLags <- cbind.data.frame(selection.methods = "Not estimated", lag = NA, ami = NA)
     }
   } else {
-    emLags <- cbind.data.frame(selection.methods = "User", optimal.lag = emLag)
+    if(NROW(emLag==1)){
+     emLags <- cbind.data.frame(selection.methods = "User", lag = emLag, ami = 0)
+    } else {
+      stop("emLag must have 1 numeric value")
+    }
   }
 
   # (fn.out <- tseriesChaos::false.nearest(lx, m=10, d=17, t=0, eps=sd(lx)/10, rt=20))
@@ -688,12 +705,12 @@ if(estimateDimensions){
     for(R in seq_along(nnRadius)){
       for(L in seq_along(emLags$selection.method)){
 
-     if(!is.na(emLags$optimal.lag[L])){
+     if(!is.na(emLags$lag[L])){
         cnt = cnt+1
 
         Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
       for(D in seq_along(emDims)){
-        RM <- rp(y,y, emDim = emDims[[D]], emLag = emLags$optimal.lag[L])
+        RM <- rp(y,y, emDim = emDims[[D]], emLag = emLags$lag[L])
         RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
         Nn.min[D] <- min(RM, na.rm = TRUE)
         Nn.max[D] <- max(RM, na.rm = TRUE)
@@ -709,7 +726,7 @@ if(estimateDimensions){
 
         fnnSeries <- fractal::FNN(x = as.numeric(y),
                                   dimension = maxDim,
-                                  tlag = emLags$optimal.lag[L],
+                                  tlag = emLags$lag[L],
                                   rtol = nnRadius[R],
                                   atol = nnSizes[N],
                                   olag = 1
@@ -723,7 +740,7 @@ if(estimateDimensions){
                                      Nsize = nnSizes[N],
                                      Nradius = nnRadius[R],
                                      emLag.method = emLags$selection.method[[L]],
-                                     emLag = emLags$optimal.lag[L],
+                                     emLag = emLags$lag[L],
                                      emDim = emDims,
                                      Nn.mean = Nn.mean,
                                      Nn.sd  = Nn.sd,
@@ -776,22 +793,24 @@ if(estimateDimensions){
                       stopAt = c(graphics::hist(emDims,plot=FALSE)$mids,max(emDims)+.5),
                       f=factor(seq_along(c(.5, graphics::hist(emDims,plot=FALSE)$mids))%%2))
 
-    tmi <-  nonlinearTseries::mutualInformation(y, lag.max = maxLag, n.partitions = , do.plot = FALSE)
+    #tmi <-  nonlinearTseries::mutualInformation(y, lag.max = maxLag, n.partitions = , do.plot = FALSE)
 
-    dfMI <- data.frame(emDelay = tmi$time.lag[-1],
-                       ami     = tmi$mutual.information[-1])
+    tmi <- mif(data.frame(y),lags = 1:maxLag)
+
+    dfMI <- data.frame(emDelay = as.numeric(names(tmi)),
+                       ami     = as.numeric(tmi))
 
 
     #  RColorBrewer::brewer.pal(n = length(unique(df$emLag) name = "Set2")
 
     # use: alpha()
 
-   Ncol <- length(emLags$selection.method[!is.na(emLags$optimal.lag)])
+   Ncol <- length(emLags$selection.method[!is.na(emLags$lag)])
    myPal <- RColorBrewer::brewer.pal(Ncol,"Set2")
   myPalLag <- myPal
-  names(myPalLag) <- emLags$selection.method[!is.na(emLags$optimal.lag)]
+  names(myPalLag) <- emLags$selection.method[!is.na(emLags$lag)]
   myPalNn <- myPal
-  names(myPalNn) <- emLags$optimal.lag[!is.na(emLags$optimal.lag)]
+  names(myPalNn) <- emLags$lag[!is.na(emLags$lag)]
 
     gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
       geom_rect( ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
@@ -819,11 +838,11 @@ if(estimateDimensions){
             panel.grid.minor.y = element_blank()
       )
 
-    gDelay <- ggplot2::ggplot(dfMI, aes_(y = ~ami, x = ~emDelay)) +
+    gDelay <- ggplot2::ggplot(dfMI, ggplot2::aes_(y = ~ami, x = ~emDelay)) +
       geom_line() +
       geom_vline(data = emLags,  ggplot2::aes_(colour=factor(emLags$selection.method),
-                                    xintercept = ~optimal.lag), alpha = .3) +
-      geom_point(data = emLags,  ggplot2::aes_(x = ~optimal.lag, y = ~ami, colour = factor(emLags$selection.method)), size = 2) +
+                                    xintercept = ~lag), alpha = .3) +
+      geom_point(data = emLags,  ggplot2::aes_(x = ~lag, y = ~ami, colour = factor(emLags$selection.method)), size = 2) +
       xlab("Embedding Lag") +
       ylab("Average Mututal Information") +
       scale_color_manual("Lag", values = myPalLag) +
@@ -846,15 +865,15 @@ if(estimateDimensions){
     grid::grid.newpage()
     grid::grid.draw(g)
 
+  } else {
+    g <- NA
   }
 
   return(list(optimLag  = opLag,
               optimDim  = opDim,
-              #optimRad  = opRad,
               optimRow  = opt,
               optimData = df,
-              diagPlot = invisible(g))[TRUE,TRUE,TRUE,TRUE,diagPlot]
-  )
+              diagPlot = invisible(g)))
 }
 
 

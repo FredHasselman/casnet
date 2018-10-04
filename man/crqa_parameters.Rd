@@ -5,10 +5,10 @@
 \title{Find optimal (C)RQA parameters}
 \usage{
 crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
-  lagMethods = "first.minimum", emLag = NULL, nnSizes = c(2, 5, 10,
-  15), nnRadius = 5, nnThres = 10, theiler = 0,
-  estimateLags = TRUE, estimateDimensions = TRUE, diagPlot = TRUE,
-  silent = TRUE, ...)
+  lagMethods = c("first.minimum", "global.minimum", "max.lag"),
+  emLag = NULL, nnSizes = c(2, 5, 10, 15), nnRadius = 5,
+  nnThres = 10, theiler = 0, estimateLags = TRUE,
+  estimateDimensions = TRUE, diagPlot = TRUE, silent = TRUE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series}
