@@ -5549,6 +5549,44 @@ ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = N
 
 
 
+#' Time series to Duration series
+#'
+#' @param y A time series, numeric vector, or categorical variable.
+#' @param timeVec A vector, same length as \code{y} containing timestamps, or, sample indices.
+#' @param fs Optional sampling frequency if timeVec represents sample indices. An extra column \code{duration.fs} will be added which represents \code{1/fs * duration in samples}
+#' @param tolerance A number \code{tol} indicating a range \code{[y-tol,y+tol]} to consider the same value. Useful when \code{y} is continuous (\code{default = 0})
+#'
+#' @return
+#' @export
+#'
+#' @examples
+ts_duration <- function(y, timeVec = stats::time(y),fs = stats::frequency(y), tolerance = 0){
+  tID <- seq_along(y)[-1]
+
+  same <- list()
+  same[[1]] <- data.frame(y=y[1], t.start = timeVec[1], t.end = timeVec[1],
+                          duration.time = 0,
+                          duration.samples = 1,
+                          duration.fs = fs,
+                          keep = TRUE)
+  for(i in tID){
+    if(y[i]%[]%c((y[i-1]-tolerance),(y[i-1]+tolerance))){
+      same[[i]] <- data.frame(y=y[i],  t.start = same[[i-1]]$t.start, t.end = timeVec[i], duration.time = 0, duration.samples = (same[[i-1]]$duration.samples+1), duration.fs = fs, keep = TRUE)
+      same[[i-1]]$keep <- FALSE
+    } else {
+      same[[i]] <- data.frame(y=y[i], t.start = timeVec[i], t.end = timeVec[i],duration.time = 0, duration.samples = 1,  duration.fs = fs, keep = TRUE)
+    }
+  }
+  same.out <- plyr::ldply(same)
+  same.out <- same.out[same.out$keep,1:6]
+  if(!is.null(fs)){same.out$duration.fs = (1/fs)*same.out$duration.samples}
+  same.out$duration.time = (same.out$t.end - same.out$t.start)
+  row.names(same.out) <- paste(seq_along(same.out$t.start))
+  return(same.out)
+}
+
+
+
 #' Delay embedding of a time series
 #'
 #' Create a state vector based on an embedding lag and a number of embedding dimanesions.
@@ -5883,7 +5921,7 @@ ts_resample <- function(y, nbins = ceiling(2*length(y)^(1/3)), keepNA = TRUE){
 #'
 #' @examples
 #'
-#' # Get an intereting numeric vector from package DescTools
+#' # Get an interesting numeric vector from package DescTools
 #' y <- DescTools::Fibonacci(1:26)
 #'
 #' # Return the first order derivative as a vector
