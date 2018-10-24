@@ -31,7 +31,7 @@ The values at the edges of the derivatives represent endpoint averages and shoul
 }
 \examples{
 
-# Get an intereting numeric vector from package DescTools
+# Get an interesting numeric vector from package DescTools
 y <- DescTools::Fibonacci(1:26)
 
 # Return the first order derivative as a vector
