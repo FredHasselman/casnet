@@ -2947,9 +2947,9 @@ crqa_rp_calc <- function(RM,
   P_hl <- freq_hl/N_hl
 
   #Entropy of line length distributions
-  ENT_dl <- -1 * sum(P_dl * log(P_dl))
-  ENT_vl <- -1 * sum(P_vl * log(P_vl))
-  ENT_hl <- -1 * sum(P_hl * log(P_hl))
+  ENT_dl <- -1 * sum(P_dl * log(P_dl), na.rm = TRUE)
+  ENT_vl <- -1 * sum(P_vl * log(P_vl), na.rm = TRUE)
+  ENT_hl <- -1 * sum(P_hl * log(P_hl), na.rm = TRUE)
 
   #Relative Entropy (Entropy / Max entropy)
   ENTrel_dl = ENT_dl/(-1 * log(1/DLmax))
@@ -5928,13 +5928,14 @@ ts_discrete <- function(y, nbins=ceiling(2*NROW(y)^(1/3)), keepNA = TRUE){
 #'
 #' @param y Numeric vector or time series to be discretised.
 #' @param keepNA If \code{TRUE}, any \code{NA} values will first be removed and later re-inserted into the discretised time series.
+#' @param usePlateaus Treat consequative "same" values after "peak" or "trough" as a "peak"/"trough".
 #' @param doPlot Create a plot of the symbolized series.
 #'
 #' @return A discretised version of \code{y}
 #'
 #' @export
 #'
-ts_symbolic <- function(y, keepNA = TRUE, doPlot = FALSE){
+ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
 
   cl <- class(y)
   cnames <- colnames(y)
@@ -5946,6 +5947,25 @@ ts_symbolic <- function(y, keepNA = TRUE, doPlot = FALSE){
   y <- as.data.frame(y)[stats::complete.cases(!idNA),]
 
   sym <- symbolize(xy = y)
+
+
+  if(is.null(dim(y))) {
+    ymat <-  as.matrix(y)
+  } else {
+    ymat <- y
+    }
+  for(i in 1:NCOL(sym)) {
+     t = NROW(sym)
+    if(ymat[t-1,i]>ymat[t,i]){
+      sym[t,i] <- 2
+    }
+     if(ymat[t-1,i]<ymat[t,i]){
+       sym[t,i] <- 4
+     }
+     if(ymat[t-1,i]==ymat[t,i]){
+       sym[t,i] <- 3
+     }
+  }
 
   if(keepNA){
     sym_num <- matrix(NA,nrow=NROW(idNA),ncol = NCOL(idNA))
@@ -5969,6 +5989,7 @@ ts_symbolic <- function(y, keepNA = TRUE, doPlot = FALSE){
         sym_num[,c]==4 ~ "increase",
         sym_num[,c]==5 ~ "peak",
         is.na(sym_num[,c]) ~ NA_character_)
+      if(usePlateaus){sym_label[,c] <- symHelper(sym_label[,c])}
     }
   } else {
     sym_label <-  dplyr::case_when(
@@ -5978,7 +5999,13 @@ ts_symbolic <- function(y, keepNA = TRUE, doPlot = FALSE){
       sym_num==4 ~ "increase",
       sym_num==5 ~ "peak",
       is.na(sym_num) ~ NA_character_)
+    if(usePlateaus){sym_label <- symHelper(sym_label)}
   }
+
+  id <- gregexpr("((increase){1}\\s(same)+\\s(trough){1})+", yc)
+
+  yc<-paste0(y,collapse=" ")
+  substr(yc,9,9+18-1)
 
   if(class(sym_num)%in%"matrix"){
     out <- sym_num
@@ -6052,6 +6079,45 @@ ts_symbolic <- function(y, keepNA = TRUE, doPlot = FALSE){
 
 }
 
+
+symHelper <- function(sym_num){
+  out <- sym_num
+  i <- 1
+  same <- 0
+  while(i<=length(sym_num)){
+    if(sym_num[i]%in%c("increase","decrease")){
+      samesame <- TRUE
+      r <- i+1
+      same <- 0
+      while(samesame){
+        if(sym_num[r]%in%"same"){
+          same <- same+1
+          r <- r+1
+        } else {
+          samesame <- FALSE
+        }
+      }
+      if(same>0){
+
+        if(all(!sym_num[i]%in%c("increase"),sym_num[i+same+1]%in%c("peak","increase"))){
+          out[i:(i+same)] <- "trough"
+        } else {
+          if(all(!sym_num[i]%in%c("decrease")&sym_num[i+same+1]%in%c("trough","decrease"))){
+            out[i:(i+same)] <- "peak"
+          }
+        }
+      }
+    }
+    if(same>0){
+      i <- (i+same)
+    } else {
+      i <- i+1
+    }
+  }
+  return(out)
+}
+
+
 #' Convert numeric vectors to symbolic vectors.
 #'
 #' \code{symbolize} converts numeric vectors to symbolic vectors. It is a helper
@@ -6081,7 +6147,8 @@ symbolize <- function(xy) {
   for(i in 1:NCOL(xy)) {
     for(t in 2:(TT-1)) {
       ## if xy NA, also assign NA to su
-      if(any(is.na(xy[(t-1):(t+1),i]))) { su[t,i] <- NA }
+      if(any(is.na(xy[(t-1):(t+1),i]))) {
+        su[t,i] <- NA }
       ## else get correct symbol
       else {
         if(xy[t,i] == xy[t-1,i] | xy[t,i] == xy[t+1,i]) {
@@ -6885,21 +6952,31 @@ as.numeric.factor <- function(x){
  names(out) <- as.character(x)
 }
 
-# Convert character vector to named numeric vector
+
+#' Convert character vector to a named numeric vector
+#'
+#' @param x A character vector
+#' @param sort.unique Should the unique character values be sorted? (\code{default = FALSE})
+#'
+#' @return A named numeric vector
+#' @export
+#'
 as.numeric.character <- function(x, sort.unique = FALSE){
-  x <- as.character(x)
+  IDna <- is.na(x)
+  x <- as.character(x[!IDna])
   labels.char     <- unique(as.character(x))
-  if(sort.unique){labels <- sort(labels.char)}
+  if(sort.unique){labels.char <- sort(labels.char)}
   labels.num <- seq_along(labels.char)
   names(x) <- x
   xx <- x
   plyr::laply(labels.num, function(num){
-    xx[xx%in%labels[num]]<<-num}
-    )
+    xx[xx%in%labels.char[num]]<<-num}
+  )
   xx<-as.numeric(xx)
   names(xx) <- x
   return(xx)
 }
+
 
 
 
