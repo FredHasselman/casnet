@@ -185,11 +185,12 @@ set_command_line_rp <- function(){
   }
 
   # Get the file from internet
-  LOG <- try(utils::download.file(url = URL, mode = "wb", cacheOK = FALSE, destfile = normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)))
+  LOG <- try(utils::download.file(url = URL, mode = "wb", cacheOK = FALSE, destfile = normalizePath(file.path(execPath,rp_command), mustWork = FALSE)))
 
   if(LOG==0){
     if(!os%in%"windows"){
-      callr::rcmd(cmd="chmod",cmdargs = paste0("a+x ",rp_command), wd = normalizePath(execPath, mustWork = FALSE))
+      #callr::rcmd(cmd="chmod",cmdargs = paste0("a+x ",rp_command), wd = normalizePath(execPath, mustWork = FALSE))
+      system2(command = "chmod", args = paste0("a+x ",normalizePath(file.path(execPath,rp_command), mustWork = FALSE)))
     }
     message(paste0("Detected: ",sys,"\n  Copied: ",URL," to ",rp_command," in ",execPath," as the commandline CRP executable"))
     rio::export(data.frame(url=c(URL,copyright_text)),normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
@@ -199,8 +200,10 @@ set_command_line_rp <- function(){
       sysCommand <- c(syscopy,paste(normalizePath(paste0(sourcePath,"/commandline_rp/",sys,"/",exe)), normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)))
 
       if(all(nchar(sysCommand)>0)){
-        callr::rcmd(cmd = sysCommand[[1]], cmdargs = sysCommand[[2]], wd = sourcePath, show = TRUE)
-        callr::rcmd(sysCommand[[3]], cmdargs = sysCommand[[4]], wd = sourcePath, show = TRUE)
+        #callr::rcmd(cmd = sysCommand[[1]], cmdargs = sysCommand[[2]], wd = sourcePath, show = TRUE)
+        system2(command = sysCommand[[1]], args = sysCommand[[2]])
+        #callr::rcmd(sysCommand[[3]], cmdargs = sysCommand[[4]], wd = sourcePath, show = TRUE)
+        system2(command = sysCommand[[3]], args = sysCommand[[4]])
         utils::write.table(data.frame(sysCommand=c(paste(sysCommand[[1]], sysCommand[[2]]), paste(sysCommand[[3]], sysCommand[[4]]),copyright_text)), normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
       }
     } else {

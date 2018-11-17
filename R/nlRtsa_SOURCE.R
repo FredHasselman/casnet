@@ -96,12 +96,12 @@ crqa_cl_main <- function(data,
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
   utils::write.table(as.data.frame(y1), tmpf1, col.names = FALSE, row.names = FALSE, sep = "\t")
 
-  fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
-
-  plotOUT     <- normalizePath(file.path(path_out,paste0("RQAplot_",     file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
-  measOUT     <- normalizePath(file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
-  histOUTdiag <- normalizePath(file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
-  histOUThori <- normalizePath(file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt"),fsep = fileSep), mustWork = FALSE)
+#  fileSep <- ifelse(any(path_out%in%"/"),"/","\\")
+file_ID=1
+  plotOUT     <- file.path(normalizePath(path_out,mustWork = TRUE),paste0("RQAplot_",     file_ID, ".txt"))
+  measOUT     <- normalizePath(file.path(path_out,paste0("RQAmeasures_", file_ID, ".txt")), mustWork = FALSE)
+  histOUTdiag <- normalizePath(file.path(path_out,paste0("RQAhist_diag_",file_ID, ".txt")), mustWork = FALSE)
+  histOUThori <- normalizePath(file.path(path_out,paste0("RQAhist_hori_",file_ID, ".txt")), mustWork = FALSE)
 
   if(any(is.null(y2))|any(is.na(y2%00%NA))){
 
@@ -160,8 +160,9 @@ crqa_cl_main <- function(data,
   #closeAllConnections()
 
   ## RCMD
-  callr::rcmd(cmd = paste0(getOption("casnet.rp_prefix"),getOption("casnet.rp_command")), cmdargs = opts, wd = normalizePath(path.expand(path_to_rp), mustWork = FALSE), show = silent)
+   #callr::rcmd_copycat(cmd = paste0(getOption("casnet.rp_command")), cmdargs = opts, wd = file.path(normalizePath(path_to_rp, mustWork = FALSE)), show = silent, echo = TRUE)
 
+  system2(command = file.path(path_to_rp,getOption("casnet.rp_command")), args = opts)
 
   measures     <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",measOUT)),header=TRUE))
   rpMAT        <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",plotOUT)),header=TRUE))
