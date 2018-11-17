@@ -160,7 +160,8 @@ crqa_cl_main <- function(data,
   #closeAllConnections()
 
   ## RCMD
-  devtools::RCMD(paste0(getOption("casnet.rp_prefix"),getOption("casnet.rp_command")), options = opts, path = normalizePath(path.expand(path_to_rp), mustWork = FALSE), quiet = silent)
+  callr::rcmd(cmd = paste0(getOption("casnet.rp_prefix"),getOption("casnet.rp_command")), cmdargs = opts, wd = normalizePath(path.expand(path_to_rp), mustWork = FALSE), show = silent)
+
 
   measures     <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",measOUT)),header=TRUE))
   rpMAT        <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",plotOUT)),header=TRUE))
@@ -259,7 +260,7 @@ crqa_cl_main <- function(data,
 #' \itemize{
 #' \item \emph{Copy failed} - Every time the function \code{crqa_cl()} is called it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you delete the log file, and call the function, another copy of the executable will be attempted.
 #' \item \emph{Copy still fails and/or no permission to copy} - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as the argument \code{path_to_rp} in the \code{crqa_cl} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}. If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page and copy to a directory you have access to. Then follow the instruction to set \code{path_to_rp}.
-#' \item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[devtools]{RCMD}} and makes use of the \code{\link{normalizePath}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return an empty character vector, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")} and fill in the prefix that is correct for your OS
+#' \item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[callr]{rcmd}} and makes use of the \code{\link{normalizePath}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return an empty character vector, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")} and fill in the prefix that is correct for your OS
 #' }
 #'
 #' @return A list object containing 1-3 elements, depending on arguments requesting output.
@@ -457,7 +458,7 @@ crqa_cl <- function(y1,
 
     cl       <- parallel::makeCluster(cores_available)
 
-    parallel::clusterEvalQ(cl, library(devtools))
+    parallel::clusterEvalQ(cl, library(callr))
     parallel::clusterEvalQ(cl,library(utils))
     parallel::clusterEvalQ(cl,library(plyr))
     parallel::clusterEvalQ(cl,library(tidyverse))
@@ -3684,6 +3685,7 @@ SWtestE <- function(g,p=1,N=20){
 #' Import GrdWare files
 #'
 #' @param gwf_name Name of the GridWare project file. A directory named \code{../gwf_name_trjs} must be present at the location of the project file.
+#' @param delta_t Time between two samples or sampling frequency
 #' @param returnOnlyData Just return the data, do not return a list object with data, variable info and preferences.
 #' @param saveLongFormat Save the long format trajectory data as a \code{.csv} file in the same location as \code{gwf_name}
 #'
@@ -3776,8 +3778,9 @@ ssg_gwf2long <- function(gwf_name, delta_t = 0.01,returnOnlyData = TRUE, saveLon
 #'
 ssg_winnowing <- function(durations, screeCut){
 
+
   durations$duration.time[is.na(durations$duration.time)] <- 0
-  winnowing <- durations %>% dplyr::filter(duration.time>0)
+  winnowing <- durations %>% dplyr::filter_(~duration.time>0)
   Ncells <- NROW(winnowing)
   winnowingList <- scree <- heterogeneity <- list()
   removed <- 0
@@ -3791,7 +3794,7 @@ ssg_winnowing <- function(durations, screeCut){
   while(removed!=(Ncells-1)){
     run <- run +1
 
-    winnowing <- winnowing %>% dplyr::filter(duration.time>min(winnowing$duration.time, na.rm = TRUE))
+    winnowing <- winnowing %>% dplyr::filter_(~duration.time>min(winnowing$duration.time, na.rm = TRUE))
     removed <- Ncells - NROW(winnowing)
     exp <- sum(winnowing$duration.time, na.rm = TRUE)/NROW(winnowing)
 
@@ -5762,8 +5765,9 @@ ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = N
 #' @examples
 #'
 #' # Create data with events and their timecodes
-#' coderActivity <- data.frame(event = c("stare","stare","drink coffee","type","type","stare"),onset = c(0,5,10,15,20,25))
-#' ts_duration(y = coderActivity$event, timeVec = coderActivity$onset)
+#' coder <- data.frame(beh=c("stare","stare","coffee","type","type","stare"),t=c(0,5,10,15,20,25))
+#'
+#' ts_duration(y = coder$beh, timeVec = coder$t)
 ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), tolerance = 0){
 
   tID <- seq_along(y)[-1]
@@ -5775,7 +5779,7 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
       y.n <- as.numeric(y)
     }
     if(all(is.na(y.n))){
-      y.n <- as.numeric.character(y)
+      y.n <- as.numeric_character(y)
     }
   } else {
     y.n <- as.numeric(y)
@@ -6946,8 +6950,7 @@ ts_integrate <-function(y){
 #' @return A numeric vector with factor levels as names.
 #' @export
 #'
-#' @examples
-as.numeric.factor <- function(x){
+as.numeric_factor <- function(x){
  out <-  as.numeric(levels(x))[x]
  names(out) <- as.character(x)
 }
@@ -6961,7 +6964,7 @@ as.numeric.factor <- function(x){
 #' @return A named numeric vector
 #' @export
 #'
-as.numeric.character <- function(x, sort.unique = FALSE){
+as.numeric_character <- function(x, sort.unique = FALSE){
   IDna <- is.na(x)
   x <- as.character(x[!IDna])
   labels.char     <- unique(as.character(x))

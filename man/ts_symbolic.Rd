@@ -4,12 +4,14 @@
 \alias{ts_symbolic}
 \title{Symbolic representation}
 \usage{
-ts_symbolic(y, keepNA = TRUE, doPlot = FALSE)
+ts_symbolic(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE)
 }
 \arguments{
 \item{y}{Numeric vector or time series to be discretised.}
 
 \item{keepNA}{If \code{TRUE}, any \code{NA} values will first be removed and later re-inserted into the discretised time series.}
+
+\item{usePlateaus}{Treat consequative "same" values after "peak" or "trough" as a "peak"/"trough".}
 
 \item{doPlot}{Create a plot of the symbolized series.}
 }

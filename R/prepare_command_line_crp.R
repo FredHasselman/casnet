@@ -189,7 +189,7 @@ set_command_line_rp <- function(){
 
   if(LOG==0){
     if(!os%in%"windows"){
-      devtools::RCMD(cmd="chmod",options=paste0("a+x ",rp_command), path=normalizePath(execPath, mustWork = FALSE))
+      callr::rcmd(cmd="chmod",cmdargs = paste0("a+x ",rp_command), wd = normalizePath(execPath, mustWork = FALSE))
     }
     message(paste0("Detected: ",sys,"\n  Copied: ",URL," to ",rp_command," in ",execPath," as the commandline CRP executable"))
     rio::export(data.frame(url=c(URL,copyright_text)),normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
@@ -199,8 +199,8 @@ set_command_line_rp <- function(){
       sysCommand <- c(syscopy,paste(normalizePath(paste0(sourcePath,"/commandline_rp/",sys,"/",exe)), normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)))
 
       if(all(nchar(sysCommand)>0)){
-        devtools::RCMD(sysCommand[[1]], options = sysCommand[[2]], path = sourcePath, quiet = TRUE)
-        devtools::RCMD(sysCommand[[3]], options = sysCommand[[4]], path = sourcePath, quiet = TRUE)
+        callr::rcmd(cmd = sysCommand[[1]], cmdargs = sysCommand[[2]], wd = sourcePath, show = TRUE)
+        callr::rcmd(sysCommand[[3]], cmdargs = sysCommand[[4]], wd = sourcePath, show = TRUE)
         utils::write.table(data.frame(sysCommand=c(paste(sysCommand[[1]], sysCommand[[2]]), paste(sysCommand[[3]], sysCommand[[4]]),copyright_text)), normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
       }
     } else {

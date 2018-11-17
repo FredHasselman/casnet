@@ -1,3 +1,5 @@
+Meta
+doc
 # History files
 .Rhistory
 .Rapp.history
@@ -31,8 +33,6 @@ exec/linux_i686/rp_i686.dms
 # Files copied during build
 exec/rp
 exec/rp_instal_log.txt
-
 build/*.*
 build/package_data/*.*
-
 commandline_rp/*.*

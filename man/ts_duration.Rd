@@ -16,6 +16,16 @@ ts_duration(y, timeVec = stats::time(y), fs = stats::frequency(y),
 
 \item{tolerance}{A number \code{tol} indicating a range \code{[y-tol,y+tol]} to consider the same value. Useful when \code{y} is continuous (\code{default = 0})}
 }
+\value{
+A data frame
+}
 \description{
 Time series to Duration series
+}
+\examples{
+
+# Create data with events and their timecodes
+coder <- data.frame(beh=c("stare","stare","coffee","type","type","stare"),t=c(0,5,10,15,20,25))
+
+ts_duration(y = coder$beh, timeVec = coder$t)
 }

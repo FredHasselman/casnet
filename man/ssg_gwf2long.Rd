@@ -10,6 +10,8 @@ ssg_gwf2long(gwf_name, delta_t = 0.01, returnOnlyData = TRUE,
 \arguments{
 \item{gwf_name}{Name of the GridWare project file. A directory named \code{../gwf_name_trjs} must be present at the location of the project file.}
 
+\item{delta_t}{Time between two samples or sampling frequency}
+
 \item{returnOnlyData}{Just return the data, do not return a list object with data, variable info and preferences.}
 
 \item{saveLongFormat}{Save the long format trajectory data as a \code{.csv} file in the same location as \code{gwf_name}}
