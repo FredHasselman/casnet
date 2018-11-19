@@ -1983,13 +1983,21 @@ rp_lineDist <- function(RP,
   verticals.dist   <- sort(which(diff(V)==-1)-which(diff(V)==1))
   horizontals.dist <- sort(which(diff(H)==-1)-which(diff(H)==1))
 
-  return(list(diagonals.dist   = diagonals.dist[diagonals.dist%[]%c(DLmin,DLmax)],
-              verticals.dist   = verticals.dist[verticals.dist%[]%c(VLmin,VLmax)],
-              horizontals.dist = horizontals.dist[horizontals.dist%[]%c(HLmin,HLmax)],
+  diagonals.dist   <- diagonals.dist[diagonals.dist%[]%c(DLmin,DLmax)]
+  verticals.dist   <- verticals.dist[verticals.dist%[]%c(VLmin,VLmax)]
+  horizontals.dist <- horizontals.dist[horizontals.dist%[]%c(HLmin,HLmax)]
+
+  if(length(diagonals.dist)==0){diagonals.dist <- NA}
+  if(length(verticals.dist)==0){verticals.dist <- NA}
+  if(length(horizontals.dist)==0){horizontals.dist <- NA}
+
+  return(list(diagonals.dist   = diagonals.dist,
+              verticals.dist   = verticals.dist,
+              horizontals.dist = horizontals.dist,
               diagonals.mat = diagonals[-c(1,NROW(diagonals)),],
               verticals.mat = verticals[-c(1,NROW(verticals)),],
               horizontals.mat = horizontals[-c(1,NROW(horizontals)),])[c(TRUE,TRUE,TRUE,matrices,matrices,matrices)]
-         )
+  )
 }
 
 
@@ -2611,9 +2619,10 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   if(plotMeasures){
 
     rpOUT    <- round(rpOUT,3)
-    if(is.na(rpOUT$Radius)){
-      rpOUT$Radius <- round(radiusValue,3)
+    if(is.na(rpOUT$emRad)){
+      rpOUT$emRad <- round(radiusValue,3)
     }
+
 
     rpOUTdat <- rpOUT %>%
       dplyr::select(dplyr::one_of(c("Radius","RP_N","RR","DET","MEAN_dl","ENT_dl","LAM_vl","TT_vl","ENT_vl"))) %>%
@@ -2926,9 +2935,9 @@ crqa_rp_calc <- function(RM,
   freqvec_hl <- as.numeric(names(freq_hl))
 
   #Number of recurrent points on diagonal, vertical and horizontal lines
-  N_dl <- sum(dlines, na.rm = TRUE)
-  N_vl <- sum(vlines, na.rm = TRUE)
-  N_hl <- sum(hlines, na.rm = TRUE)
+  N_dl <- sum(freq_dl, na.rm = TRUE)
+  N_vl <- sum(freq_vl, na.rm = TRUE)
+  N_hl <- sum(freq_hl, na.rm = TRUE)
 
   #Determinism / Horizontal and Vertical Laminarity
   DET    <- N_dl/RP_N
@@ -2939,10 +2948,16 @@ crqa_rp_calc <- function(RM,
   ANI    <- (N_vl-N_hl)/N_dl
 
   # Singularities
-  SING_dl <- (RP_N-N_dl)/N_dl
-  SING_vl <- (RP_N-N_vl)/N_vl
-  SING_hl <- (RP_N-N_hl)/N_hl
+  SING <- rp_lineDist(RM,
+                      DLmin = 1, DLmax = DLmax,
+                      VLmin = 1, VLmax = VLmax,
+                      HLmin = 1, HLmax = HLmax,
+                      theiler = theiler, AUTO = AUTO)
 
+  # table(SING_N$verticals.dist)
+  # table(SING_N$horizontals.dist)
+  SING_N  <-  table(SING$diagonals.dist)[1]
+  SING_rate <- SING_N / RP_N
   #Array of probabilities that a certain line length will occur (all >1)
   P_dl <- freq_dl/N_dl
   P_vl <- freq_vl/N_vl
@@ -2988,6 +3003,8 @@ crqa_rp_calc <- function(RM,
     emRad    = emRad,
     RP_N     = RP_N,
     RR       = RR,
+    SING_N   = SING_N,
+    SING_rate = SING_rate,
     DET      = DET,
     MEAN_dl  = MEAN_dl,
     MAX_dl   = MAX_dl,
@@ -2996,7 +3013,6 @@ crqa_rp_calc <- function(RM,
     REP_av   = REP_av,
     CoV_dl   = CoV_dl,
     DIV_dl   = DIV_dl,
-    SING_dl  = SING_dl,
     N_dl     = N_dl,
     ANI      = ANI,
     LAM_vl   = LAM_vl,
@@ -3007,7 +3023,6 @@ crqa_rp_calc <- function(RM,
     CoV_vl   = CoV_vl,
     REP_vl   = REP_vl,
     DIV_vl   = DIV_vl,
-    SING_vl  = SING_vl,
     N_vl     = N_vl,
     LAM_hl   = LAM_hl,
     TT_hl    = MEAN_hl,
@@ -3017,7 +3032,6 @@ crqa_rp_calc <- function(RM,
     CoV_hl   = CoV_hl,
     REP_hl   = REP_hl,
     DIV_hl   = DIV_hl,
-    SING_hl  = SING_hl,
     N_hl     = N_hl)
 
   if(matrices){
