@@ -1510,6 +1510,7 @@ crqa_rp <- function(RM,
                       DLmax = DLmax,
                       VLmax = VLmax,
                       HLmax = HLmax,
+                      theiler = theiler,
                       AUTO  = AUTO,
                       chromatic = chromatic,
                       matrices  = matrices)
@@ -1869,7 +1870,7 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 
 #' Line length distributions
 #'
-#' @param RP A thresholded recurrence matrix (binary: 0 - 1)
+#' @param RM A thresholded recurrence matrix (binary: 0 - 1)
 #' @param DLmin Minimal diagonal line length (default = \code{2})
 #' @param VLmin Minimal vertical line length (default = \code{2})
 #' @param HLmin Minimal horizontal line length (default = \code{2})
@@ -1903,25 +1904,27 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 #'
 #' @family Distance matrix operations
 #'
-rp_lineDist <- function(RP,
+rp_lineDist <- function(RM,
                         DLmin = 2,
                         VLmin = 2,
                         HLmin = 2,
                         DLmax = length(Matrix::diag(RP))-1,
                         VLmax = length(Matrix::diag(RP))-1,
                         HLmax = length(Matrix::diag(RP))-1,
-                      d         = NULL,
-                      theiler   = NULL,
-                      invert    = FALSE,
-                      AUTO      = NULL,
-                      chromatic = FALSE,
-                      matrices  = FALSE,
-                      doHalf    = FALSE){
+                        d         = NULL,
+                        theiler   = NULL,
+                        invert    = FALSE,
+                        AUTO      = NULL,
+                        chromatic = FALSE,
+                        matrices  = FALSE,
+                        doHalf    = FALSE){
 
   # For boot()
   # RP <- RP[indices,]
 
-  if(!all(as.vector(RP)==0|as.vector(RP)==1)){stop("Matrix should be a binary (0,1) matrix!!")}
+  if(invert){RM <- Matrix::Matrix(1-RM)}
+
+  if(!all(as.vector(RM)==0|as.vector(RM)==1)){stop("Matrix should be a binary (0,1) matrix!!")}
 
   if(!is.null(d)){
     if(length(d)==1){d <- -d:d}
@@ -1929,40 +1932,49 @@ rp_lineDist <- function(RP,
   }
   if(!is.null(theiler)){
     if(length(d)<length(-theiler:theiler)){warning("Ignoring theiler window...")}
-    RP <- bandReplace(RP,-theiler,theiler,0)
+    RM <- bandReplace(RM,-theiler,theiler,0)
   }
 
-  if(Matrix::isSymmetric(unname(RP))){
-    if(all(Matrix::diag(RP)==1)){
-     RP <- bandReplace(RP,0,0,0)
+  if(Matrix::isSymmetric(unname(RM))){
+    if(all(Matrix::diag(RM)==1)){
+      RP <- bandReplace(RM,0,0,0)
     }
+  } else {
+    RP <- RM
   }
-
-  if(invert){RP <- Matrix::Matrix(1-RP)}
-
 
   B <- rp_nzdiags(RP)
+  V <- Matrix::as.matrix(RP)[,colSums(Matrix::as.matrix(RP))>0]
+
+  if(Matrix::isSymmetric(unname(RM))){
+    if(all(Matrix::diag(RM)==1)){
+      RP <- bandReplace(Matrix::t(RM),0,0,0)
+    }
+  } else {
+    RP <- Matrix::t(RM)
+  }
+
+  H <- Matrix::as.matrix(RP)[,colSums(Matrix::as.matrix(RP))>0]
+  rm(RP)
 
   # Get diagonal lines & pad with zeros
   diagonals   <- rbind.data.frame(rep(0,dim(B)[2]),
                                   B,
                                   rep(0,dim(B)[2])
-                                  )
+  )
 
   # get nonzero vertical Lines & pad with zeros
-  V <- Matrix::as.matrix(RP)[,colSums(Matrix::as.matrix(RP))>0]
-  verticals <- rbind.data.frame(rep(0,dim(RP)[2]),
+  verticals <- rbind.data.frame(rep(0,dim(V)[2]),
                                 V,
-                                rep(0,dim(RP)[2])
-                                )
+                                rep(0,dim(V)[2])
+  )
   colnames(verticals) <- paste(1:ncol(verticals))
 
   # get nonzero horizontal Lines & pad with zeros
-  H <- Matrix::t(Matrix::as.matrix(RP)[,rowSums(Matrix::as.matrix(RP))>0])
   horizontals <- rbind.data.frame(rep(0,dim(H)[2]),
                                   H,
                                   rep(0,dim(H)[2])
-                                  )
+  )
   colnames(horizontals) <- paste(1:ncol(horizontals))
 
   # Get indices of line lengths
@@ -2859,6 +2871,7 @@ crqa_rp_empty <- function(){
 #' @param DLmax dd
 #' @param VLmax vv
 #' @param HLmax hh
+#' @param theiler t
 #' @param AUTO a
 #' @param chromatic c
 #' @param matrices m
@@ -2875,6 +2888,7 @@ crqa_rp_calc <- function(RM,
                      DLmax = length(Matrix::diag(RM))-1,
                      VLmax = length(Matrix::diag(RM))-1,
                      HLmax = length(Matrix::diag(RM))-1,
+                     theiler = 0,
                      AUTO      = NULL,
                      chromatic = FALSE,
                      matrices  = FALSE){

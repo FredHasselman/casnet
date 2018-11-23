@@ -4,7 +4,7 @@
 \alias{rp_lineDist}
 \title{Line length distributions}
 \usage{
-rp_lineDist(RP, DLmin = 2, VLmin = 2, HLmin = 2,
+rp_lineDist(RM, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RP)) - 1,
   VLmax = length(Matrix::diag(RP)) - 1,
   HLmax = length(Matrix::diag(RP)) - 1, d = NULL, theiler = NULL,
@@ -12,7 +12,7 @@ rp_lineDist(RP, DLmin = 2, VLmin = 2, HLmin = 2,
   doHalf = FALSE)
 }
 \arguments{
-\item{RP}{A thresholded recurrence matrix (binary: 0 - 1)}
+\item{RM}{A thresholded recurrence matrix (binary: 0 - 1)}
 
 \item{DLmin}{Minimal diagonal line length (default = \code{2})}
 

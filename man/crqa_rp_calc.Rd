@@ -7,7 +7,7 @@
 crqa_rp_calc(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RM)) - 1,
   VLmax = length(Matrix::diag(RM)) - 1,
-  HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL,
+  HLmax = length(Matrix::diag(RM)) - 1, theiler = 0, AUTO = NULL,
   chromatic = FALSE, matrices = FALSE)
 }
 \arguments{
@@ -26,6 +26,8 @@ crqa_rp_calc(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \item{VLmax}{vv}
 
 \item{HLmax}{hh}
+
+\item{theiler}{t}
 
 \item{AUTO}{a}
 
