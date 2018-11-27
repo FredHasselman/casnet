@@ -1908,9 +1908,9 @@ rp_lineDist <- function(RM,
                         DLmin = 2,
                         VLmin = 2,
                         HLmin = 2,
-                        DLmax = length(Matrix::diag(RP))-1,
-                        VLmax = length(Matrix::diag(RP))-1,
-                        HLmax = length(Matrix::diag(RP))-1,
+                        DLmax = length(Matrix::diag(RM))-1,
+                        VLmax = length(Matrix::diag(RM))-1,
+                        HLmax = length(Matrix::diag(RM))-1,
                         d         = NULL,
                         theiler   = NULL,
                         invert    = FALSE,
@@ -2949,9 +2949,9 @@ crqa_rp_calc <- function(RM,
   freqvec_hl <- as.numeric(names(freq_hl))
 
   #Number of recurrent points on diagonal, vertical and horizontal lines
-  N_dl <- sum(freq_dl, na.rm = TRUE)
-  N_vl <- sum(freq_vl, na.rm = TRUE)
-  N_hl <- sum(freq_hl, na.rm = TRUE)
+  N_dl <- sum(freqvec_dl*freq_dl, na.rm = TRUE)
+  N_vl <- sum(freqvec_vl*freq_vl, na.rm = TRUE)
+  N_hl <- sum(freqvec_hl*freq_hl, na.rm = TRUE)
 
   #Determinism / Horizontal and Vertical Laminarity
   DET    <- N_dl/RP_N
@@ -2972,10 +2972,11 @@ crqa_rp_calc <- function(RM,
   # table(SING_N$horizontals.dist)
   SING_N  <-  table(SING$diagonals.dist)[1]
   SING_rate <- SING_N / RP_N
+
   #Array of probabilities that a certain line length will occur (all >1)
-  P_dl <- freq_dl/N_dl
-  P_vl <- freq_vl/N_vl
-  P_hl <- freq_hl/N_hl
+  P_dl <- freq_dl/sum(freq_dl, na.rm = TRUE)
+  P_vl <- freq_vl/sum(freq_vl, na.rm = TRUE)
+  P_hl <- freq_hl/sum(freq_hl, na.rm = TRUE)
 
   #Entropy of line length distributions
   ENT_dl <- -1 * sum(P_dl * log(P_dl), na.rm = TRUE)
@@ -3015,6 +3016,7 @@ crqa_rp_calc <- function(RM,
   #Output
   out <- data.frame(
     emRad    = emRad,
+    RP_EN    = recmatsize,
     RP_N     = RP_N,
     RR       = RR,
     SING_N   = SING_N,
