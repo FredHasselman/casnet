@@ -1590,6 +1590,100 @@ crqa_rp <- function(RM,
 
 
 
+#' Diagonal Recurrence Profile
+#'
+#' @param RM A binary recurrence matrix
+#' @param diagWin Window around the line of synchrony
+#' @param xname xlab
+#' @param yname ylab
+#' @param DLmin DLmin
+#' @param VLmin VLmin
+#' @param HLmin HLmin
+#' @param DLmax DLmax
+#' @param VLmax VLmax
+#' @param HLmax HLmax
+#' @param AUTO ARTO
+#' @param chromatic chromatic
+#' @param matrices matrices
+#'
+#' @return
+#' @export
+#'
+#' @examples
+crqa_diagPofile <- function(RM,
+                            diagWin = 0,
+                            xname = "",
+                            yname = "",
+                            DLmin = 2,
+                            VLmin = 2,
+                            HLmin = 2,
+                            DLmax = length(Matrix::diag(RM))-1,
+                            VLmax = length(Matrix::diag(RM))-1,
+                            HLmax = length(Matrix::diag(RM))-1,
+                            AUTO      = NULL,
+                            chromatic = FALSE,
+                            matrices  = FALSE){
+
+
+  if(!all(as.vector(RM)==0|as.vector(RM)==1)){
+    stop("Expecting a binary (0,1) matrix.")
+  }
+
+  # check auto-recurrence and make sure Matrix has sparse triplet representation
+  RM <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
+
+  if(is.null(AUTO)){
+    AUTO <- attr(RM,"AUTO")
+  }
+
+  if(is.numeric(diagWin)){
+    if(diagWin>0){
+      diagWin <- seq(-diagWin,diagWin)
+    } else {
+      diagWin <- NULL
+    }
+  } else {
+    stop("Diagonal window must be 1 positive integer!!")
+  }
+
+  B <- rp_nzdiags(RM,d=diagWin,returnNZ = FALSE)
+  diagID <- 1:NCOL(B)
+  names(diagID) <- colnames(B)
+
+  dp <- plyr::ldply(diagID, function(i){
+    data.frame(RR = sum(B[,i]==1, na.rm = TRUE)/(NROW(B)-abs(as.numeric(colnames(B)[i]))))
+  }, .id = "Diagonal")
+
+  dp$group  <- 1
+  dp$labels <- paste(dp$Diagonal)
+  dp$labels[dp$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
+  dp$labels.f <- factor(dp$labels,levels = dp$labels,ordered = TRUE)
+
+  if(length(levels(dp$labels.f))>21){
+    breaks <- dp$labels[c(seq(1,which(dp$Diagonal==-1),length.out = 10),which(dp$Diagonal==-1),seq(which(dp$Diagonal==1),which.max(dp$Diagonal),length.out = 10))]
+  } else {
+    breaks <- dp$labels
+  }
+
+  x1<-(which.min(as.numeric(paste(dp$Diagonal))))
+  x2<-(which.max(as.numeric(paste(dp$Diagonal))))
+
+  g <- ggplot2::ggplot(dp, ggplot2::aes_(x=~labels.f,y=~RR, group = ~group)) +
+    ggplot2::geom_path(alpha=.7) +
+    ggplot2::geom_vline(xintercept = which(dp$labels.f%in%c("LOS","LOI")), size=1, colour = "grey50") +
+    ggplot2::geom_point(pch=21,fill="grey50",size=3) +
+    ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,1)) +
+    ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks) +
+    ggplot2::geom_label(x=x1,y=1,label=paste0("Recurrences due to\n ",xname),hjust="left") +
+    ggplot2::geom_label(x=x2,y=1,label=paste0("Recurrences due to\n ",yname),hjust="right") +
+    ggplot2::theme_bw()
+
+  return(invisible(g))
+
+}
+
+
+
 #' Estimate embedding lag (tau)
 #'
 #' A wrapper for nonlinearTseries::timemLag
@@ -1690,6 +1784,7 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 #' @param d An optional vector of diagonals to extract.
 #' @param returnVectorList Return list
 #' @param returnNZtriplets Return a dataframe with coordinates of only nonzero elements in diagonals (default = \code{FALSE})
+#' @param removeNZ Remove nonzero diagonals if \code{TRUE}. If \code{FALSE} returns the full diagonals matrix. Use e.g. to plot diagonal recurrence profiles (default = \code{TRUE})
 #' @param silent Silent-ish mode
 #'
 #' @author Fred Hasselman
@@ -1700,7 +1795,7 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 #'
 #' @family Distance matrix operations
 #'
-rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=FALSE, silent = TRUE){
+rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=FALSE, removeNZ = TRUE,silent = TRUE){
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
   #require(Matrix)
 
@@ -1745,21 +1840,24 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
 
     zID <- which(colSums(B)==0)
     if(length(zID)>0){
-      B  <- B[,-zID]
-      nzdiags <- nzdiags[nzdiags$ndiag%in%zID,]
+      if(removeNZ){
+        B  <- B[,-zID]
+        nzdiags <- nzdiags[nzdiags$ndiag%in%zID,]
       }
+    }
     #dl <- plyr::llply(seq_along(toList),function(dd){RM[indMat==toList[[dd]]]}, .progress = plyr::progress_text(char = "o~o"))
     e  <- Sys.time()
 
     if(!silent){cat(paste0("\nTime: ", round(difftime(e,s, units = "mins"), digits=1)," min.\n"))}
 
-      if(returnNZtriplets){
-        return(list(B = B, nzdiags = nzdiags))
-      } else {
-        return(B)
-      }
+    if(returnNZtriplets){
+      return(list(B = B, nzdiags = nzdiags))
+    } else {
+      return(B)
+    }
   }
 }
+
 
 
 rp_nzdiags_matlab <- function(RP,d=NULL){
