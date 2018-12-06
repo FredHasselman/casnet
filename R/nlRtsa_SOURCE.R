@@ -1611,7 +1611,7 @@ crqa_rp <- function(RM,
 #'
 #' @examples
 crqa_diagPofile <- function(RM,
-                            diagWin = 0,
+                            diagWin = NULL,
                             xname = "",
                             yname = "",
                             DLmin = 2,
@@ -1640,15 +1640,22 @@ crqa_diagPofile <- function(RM,
     if(diagWin>0){
       diagWin <- seq(-diagWin,diagWin)
     } else {
-      diagWin <- NULL
+      diagWin <- seq(-1*NCOL(RM),NCOL(RM))
     }
   } else {
     stop("Diagonal window must be 1 positive integer!!")
   }
 
-  B <- rp_nzdiags(RM,d=diagWin,returnNZ = FALSE)
+  #rp_lineDist(RM,d = diagWin, matrices = TRUE)
+  B <- rp_nzdiags(RM,removeNZ = FALSE)
   diagID <- 1:NCOL(B)
   names(diagID) <- colnames(B)
+  if(length(diagWin)<NCOL(B)){
+    cID <- which(colnames(B)%in%diagWin)
+    B <- B[,cID]
+    diagID <- seq_along(cID)
+    names(diagID) <- colnames(B)
+  }
 
   dp <- plyr::ldply(diagID, function(i){
     data.frame(RR = sum(B[,i]==1, na.rm = TRUE)/(NROW(B)-abs(as.numeric(colnames(B)[i]))))
@@ -1681,6 +1688,7 @@ crqa_diagPofile <- function(RM,
   return(invisible(g))
 
 }
+
 
 
 
@@ -3527,6 +3535,10 @@ mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), doPlot = FALSE
   if(NCOL(y)==3){miType <- "I(X;Y|Z)"}
   if(NCOL(y)> 3){miType <- "I(X;Y;Z;...;N)"}
   attr(mif_out,"miType") <- miType
+
+  # if(doPlot){
+  #   plotRED_mif()
+  # }
 
   return(mif_out)
 }
@@ -5557,21 +5569,25 @@ plotRED_mif <- function(y, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*
   groupColours <-  scales::brewer_pal(palette="RdBu")(11)
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
 
-  g <- ggplot(mifun,aes_(x=~lag,y=~r)) +
+  mifun_long <- data.frame(lag =  c(as.numeric(names(mifunMIF)),as.numeric(names(mifunPMIF))),
+                           mi = c(mifunMIF,mifunPMIF),
+                           type = c(rep(attributes(mifunMIF)$miType,NROW(mifunMIF)),rep(attributes(mifunPMIF)$miType,NROW(mifunPMIF))))
+
+  g <- ggplot(mifun_long,aes_(x=~lag,y=~mi)) +
     geom_hline(yintercept = 0, colour="grey",size=1) +
-    geom_line(data = data.frame(x=c(0,mifun$lag[1]),y=c(1,mifun$r[1])),aes_(x=~x,y=~y),colour="grey50") +
+    geom_line(data = data.frame(x=c(0,mifun_long$lag[1]),y=c(1,mifun_long$mi[1])),aes_(x=~x,y=~y),colour="grey50") +
     geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
-    geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
+    #geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
     geom_path(colour="grey50") +
-    geom_point(aes_(fill = ~sig, colour=~sig),pch=21, cex=(1 + .01*(NROW(~y)/~nbins))) +
+    geom_point(pch=21, cex=(1 + .01*(NROW(y)/nbins))) +
     facet_grid(type ~.) +
-    scale_fill_manual(bquote(p < .(siglevel)),values = cols,
-                      labels =  list("yes"= expression(rho != 0),
-                                     "no" = expression(rho == 0))) +
-    scale_colour_manual(bquote(p < .(siglevel)),values = cols,
-                        labels =  list("yes"= expression(rho != 0),
-                                       "no" = expression(rho == 0))) +
-    scale_x_continuous(limits = c(0,nbins),expand = c(0.01,0), breaks = seq(0,nbins,by = round(nbins/10))) +
+    # scale_fill_manual(bquote(p < .(siglevel)),values = cols,
+    #                   labels =  list("yes"= expression(rho != 0),
+    #                                  "no" = expression(rho == 0))) +
+    # scale_colour_manual(bquote(p < .(siglevel)),values = cols,
+    #                     labels =  list("yes"= expression(rho != 0),
+    #                                    "no" = expression(rho == 0))) +
+    scale_x_continuous(limits = c(0,length(lags)),expand = c(0.01,0), breaks = seq(0,length(lags),by = round(length(lags)/10))) +
     scale_y_continuous(limits = c(-1,1)) +
     theme_bw() + theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank())
 
@@ -6135,10 +6151,10 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
     if(usePlateaus){sym_label <- symHelper(sym_label)}
   }
 
-  id <- gregexpr("((increase){1}\\s(same)+\\s(trough){1})+", yc)
-
-  yc<-paste0(y,collapse=" ")
-  substr(yc,9,9+18-1)
+  # id <- gregexpr("((increase){1}\\s(same)+\\s(trough){1})+", yc)
+  #
+  # yc<-paste0(y,collapse=" ")
+  # substr(yc,9,9+18-1)
 
   if(class(sym_num)%in%"matrix"){
     out <- sym_num
@@ -6150,7 +6166,7 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
   } else {
     if(!is.null(ncol(sym_num))){
       for(c in 1:NCOL(sym_label)){
-        sym_label[,c] <- factor(sym_label[,c],exclude=NULL)
+        sym_label[,c]  <- factor(sym_label[,c],exclude=NULL)
       }
       colnames(sym_num) <- paste0(cnames,"_sym_num")
       colnames(sym_label) <- paste0(cnames,"_sym_label")
@@ -6171,7 +6187,7 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
     if(!is.null(ncol(sym_num))){
       out$time <- 1:NROW(out)
       df_p1 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_label"),"time") %>% tidyr::gather(key="lab_var", value="sym_label", -"time")
-       df_p1$sym_label[is.na(df_p1$sym_label)] <- "missing"
+       #df_p1$sym_label[is.na(df_p1$sym_label)] <- "missing"
       df_p2 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_num")) %>% tidyr::gather(key="num_var", value="sym_num")
       df_p2[is.na(df_p2)] <- 0
     df_plot <- cbind(df_p1,df_p2)
@@ -6179,7 +6195,7 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
     } else {
       df_plot <- data.frame(time = 1:NROW(out), sym_num= attr(out,"sym_numeric"), sym_label = out)
       df_plot$sym_num[is.na(df_plot$sym_num)] <- 0
-      df_plot$sym_label[is.na(df_plot$sym_num)] <- "missing"
+      #levels(df_plot$sym_label)[is.na(df_plot$sym_num)] <- "missing"
     }
 
 
@@ -6264,6 +6280,9 @@ symHelper <- function(sym_num){
 #'   "decrease" (=2), "same" (=3), "increase" (=4), or "peak" (=5).
 #'
 #' @author Mark Scheuerell (https://mdscheuerell.github.io/muti/)
+#' @export
+#'
+#' @keywords internal
 #'
 symbolize <- function(xy) {
   ## of interest and converts them from numeric to symbolic.
