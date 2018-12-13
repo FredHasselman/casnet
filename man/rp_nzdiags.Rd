@@ -5,7 +5,7 @@
 \title{rp_nzdiags}
 \usage{
 rp_nzdiags(RM = NULL, d = NULL, returnVectorList = TRUE,
-  returnNZtriplets = FALSE, silent = TRUE)
+  returnNZtriplets = FALSE, removeNZ = TRUE, silent = TRUE)
 }
 \arguments{
 \item{RM}{A binary (0,1) matrix.}
@@ -15,6 +15,8 @@ rp_nzdiags(RM = NULL, d = NULL, returnVectorList = TRUE,
 \item{returnVectorList}{Return list}
 
 \item{returnNZtriplets}{Return a dataframe with coordinates of only nonzero elements in diagonals (default = \code{FALSE})}
+
+\item{removeNZ}{Remove nonzero diagonals if \code{TRUE}. If \code{FALSE} returns the full diagonals matrix. Use e.g. to plot diagonal recurrence profiles (default = \code{TRUE})}
 
 \item{silent}{Silent-ish mode}
 }

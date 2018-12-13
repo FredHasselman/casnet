@@ -1606,10 +1606,10 @@ crqa_rp <- function(RM,
 #' @param chromatic chromatic
 #' @param matrices matrices
 #'
-#' @return
+#' @return A plot and/or the data for the plot
+#'
 #' @export
 #'
-#' @examples
 crqa_diagPofile <- function(RM,
                             diagWin = NULL,
                             xname = "",

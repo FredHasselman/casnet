@@ -5,9 +5,9 @@
 \title{Line length distributions}
 \usage{
 rp_lineDist(RM, DLmin = 2, VLmin = 2, HLmin = 2,
-  DLmax = length(Matrix::diag(RP)) - 1,
-  VLmax = length(Matrix::diag(RP)) - 1,
-  HLmax = length(Matrix::diag(RP)) - 1, d = NULL, theiler = NULL,
+  DLmax = length(Matrix::diag(RM)) - 1,
+  VLmax = length(Matrix::diag(RM)) - 1,
+  HLmax = length(Matrix::diag(RM)) - 1, d = NULL, theiler = NULL,
   invert = FALSE, AUTO = NULL, chromatic = FALSE, matrices = FALSE,
   doHalf = FALSE)
 }

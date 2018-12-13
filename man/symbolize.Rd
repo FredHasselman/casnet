@@ -22,3 +22,4 @@ An (n-2) x 2 \code{matrix} of integer symbols that indicate whether
 \author{
 Mark Scheuerell (https://mdscheuerell.github.io/muti/)
 }
+\keyword{internal}
