@@ -98,7 +98,7 @@ DC_F = function(df, win, xmin, xmax, col_first, col_last){
   ew_data_F <- data.frame(ew_data_F)
   newrows = data.frame(subset(df[1,]))
   newrows[,] <- 0
-  newrows[,1] <- NA
+  newrows[,1] <- 0
   data <- rbind(df, newrows)
   data <- rbind(data, newrows)
 
