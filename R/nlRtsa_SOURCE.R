@@ -1817,15 +1817,19 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
     nzdiags  <- data.frame(row   = nzdiagsM@i,
                            col   = nzdiagsM@j,
                            value = nzdiagsM@x,
-                           ndiag = nzdiagsM@j-nzdiagsM@i)
+                           ndiag = (nzdiagsM@j)-(nzdiagsM@i))
     nzdiags <- dplyr::arrange(nzdiags,nzdiags$ndiag)
 
-    if(!is.null(d)){
-      nd <- unique(nzdiags$ndiag)
-      # Get diagonals which have nonzero elements
-      d <- nd[nd%in%sort(as.vector(d))]
+    if(removeNZ){
+      if(!is.null(d)){
+        nd <- unique(nzdiags$ndiag)
+        # Get diagonals which have nonzero elements
+        d <- nd[nd%in%sort(as.vector(d))]
+      } else {
+        d <- unique(nzdiags$ndiag)
+      }
     } else {
-      d <- unique(nzdiags$ndiag)
+      d <-  c(-1*rev(1:(NCOL(nzdiagsM)-1)),0,1:(NCOL(nzdiagsM)-1))
     }
 
     indMat <- col(RM)-row(RM)
@@ -1846,7 +1850,7 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
       B[(nzdiags$row[nzdiags$ndiag==d[i]])+1,i] <- nzdiags$value[nzdiags$ndiag==d[i]]
     }
 
-    zID <- which(colSums(B)==0)
+    zID <- which(Matrix::colSums(Matrix::as.matrix(B))==0)
     if(length(zID)>0){
       if(removeNZ){
         B  <- B[,-zID]
@@ -1863,6 +1867,8 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
     } else {
       return(B)
     }
+  } else {
+    stop("Input to rp_nzdiags is not a matrix-like object.")
   }
 }
 
@@ -2028,9 +2034,15 @@ rp_lineDist <- function(RM,
   # For boot()
   # RP <- RP[indices,]
 
-  if(invert){RM <- Matrix::Matrix(1-RM)}
-
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){stop("Matrix should be a binary (0,1) matrix!!")}
+
+  if(invert){
+    RM <- Matrix::Matrix(1-RM,sparse = TRUE)
+    if(Matrix::isSymmetric(unname(RM))){
+      RM <- bandReplace(RM,0,0,1)
+    }
+  }
+
 
   if(!is.null(d)){
     if(length(d)==1){d <- -d:d}
@@ -2419,8 +2431,9 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param plotDimensions Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})
 #' @param plotMeasures Print common (C)RQA measures in the plot if the matrix is binary
 #' @param plotRadiusRRbar The \code{Radius-RR-bar} is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of \code{RR} values one would get if a certain distance threshold were chosen (\code{default = TRUE})
+#' @param drawGrid Draw a grid on the recurrence plot (\code{default = FALSE})
 #' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (\code{default = NULL})
-#' @param markEpochsGrid Pass a list 2 numeric vectors, \code{markEpochsGrid[[1]]} should have length equal to NROW(RM) and \code{markEpochsGrid[[2]]} should have length equal to NCOL(RM). The values in the vectors represent different epochs associated with each time stamp, the change index will become 'breaks' on the \code{y} and \code{x} axis respectively (\code{default = NULL})
+#' @param Chromatic If \code{TRUE} and there are more than two discrete values in \code{RM}, give recurrent points a distinct colour. If \code{RM} was returned by \code{crqa_rp(..., chromatic = TRUE)}, the recurrence plot will colour-code recurrent points according to the category values in \code{attributes(RM)$chromaticRP} (\code{default = FALSE})
 #' @param radiusValue If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.
 #' @param title A title for the plot
 #' @param xlab An x-axis label
@@ -2434,7 +2447,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #'
 #' @family Distance matrix operations
 #'
-rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, markEpochsLOI = NULL, markEpochsGrid = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, returnOnlyObject = FALSE, useGtable = TRUE){
+rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, drawGrid = FALSE, markEpochsLOI = NULL, Chromatic = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, returnOnlyObject = FALSE, useGtable = TRUE){
 
   # check patchwork
   if(!length(find.package("patchwork",quiet = TRUE))>0){
@@ -2455,19 +2468,63 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
     meltRP <- reshape2::melt(as.matrix(RM))
   }
 
+  hasNA <- FALSE
   if(any(is.na(meltRP$value))){
+    hasNA <- TRUE
     meltRP$value[is.na(meltRP$value)] <- max(meltRP$value, na.rm = TRUE) + 1
   }
 
   # check unthresholded
+  showL <- FALSE
   if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
     unthresholded <- TRUE
+    if(!is.null(markEpochsLOI)){
+      warning("Can't show epochs on an unthresholded Recurrence Plot!")
+    }
+
   } else {
+
     unthresholded <- FALSE
+
     if(!is.null(attr(RM,"emRad"))){
       radiusValue <- attr(RM,"emRad")
     }
-    meltRP$value <- factor(meltRP$value, levels = c(0,1), labels = c("0","1"))
+
+    # Check epochs
+    if(!is.null(markEpochsLOI)){
+      if(is.factor(markEpochsLOI)&length(markEpochsLOI)==max(c(NROW(RM),NCOL(RM)))){
+
+        start <- max(meltRP$value, na.rm = TRUE) + 1
+
+        cpal <- paletteer::paletteer_d(package = "rcartocolor",palette = "Safe", n = nlevels(markEpochsLOI))
+        #cpal <- paletteer::paletteer_d(package = "ggthemes",palette = "tableau_colorblind10",n = nlevels(markEpochsLOI),direction = 1)
+
+        if(hasNA){
+        colvec <- c("#FFFFFF","#000000","#FF0000", cpal)
+        names(colvec) <- c("0","1","NA",levels(markEpochsLOI))
+
+        } else {
+          colvec <- c("#FFFFFF","#000000", cpal) #viridis::viridis_pal()(nlevels(markEpochsLOI)))
+          names(colvec) <- c("0","1",levels(markEpochsLOI))
+        }
+
+        N <- max(c(NROW(RM),NCOL(RM)))
+        for(i in 1:N){
+          j <- i
+          meltRP$value[meltRP$Var1==i&meltRP$Var2==j] <- start + as.numeric_character(markEpochsLOI)[i]
+        }
+
+        meltRP$value <- factor(meltRP$value, levels = sort(unique(meltRP$value)), labels = names(colvec))
+        showL <- TRUE
+
+      } else {
+        warning("Variable passed to 'markEpochsLOI' is not a factor or doesn't have correct length.")
+      }
+    } else {
+      colvec <- c("#FFFFFF","#000000")
+      names(colvec) <- c("0","1")
+      meltRP$value <- factor(meltRP$value, levels = c(0,1), labels = c("0","1"))
+    }
   }
 
   # Get CRQA measures
@@ -2486,12 +2543,12 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
     }
   }
 
-  # main plot
+
+  # main plot ----
   gRP <-  ggplot2::ggplot(aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
-    geom_raster(hjust = 0, vjust=0,show.legend = FALSE) +
+    geom_raster(hjust = 0, vjust=0, show.legend = showL) +
     geom_abline(slope = 1,colour = "grey50", size = 1)
     #ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
-
 
   if(unthresholded){
     gRP <- gRP + scale_fill_gradient2(low      = "red3",
@@ -2502,16 +2559,6 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
                                       limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                                       space    = "Lab",
                                       name     = "")
-
-    rptheme <-     theme(panel.grid.major  = element_blank(),
-                         panel.grid.minor  = element_blank(),
-                         #panel.border = element_rect(colour = "grey50"),
-                         axis.ticks = element_blank(),
-                         axis.text = element_blank(),
-                         # axis.title.x = element_blank(),
-                         # axis.title.y = element_blank(),
-                         legend.position = "top",
-                         plot.margin = margin(0,0,0,0))
 
     if(plotRadiusRRbar){
       # Create a custom legend ---
@@ -2572,47 +2619,85 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
     }
 
   } else { # unthresholded
-
-    gRP <- gRP +  scale_fill_manual(name  = "", breaks = c(0,1),
-                                    values = c("0"="white","1"="black"),
-                                    na.translate = TRUE , na.value = scales::muted("slategray4"), guide = "none")
-
-    rptheme <-  theme(
-      panel.background = element_blank(),
-      panel.border = element_rect("grey50",fill=NA),
-      panel.grid.major  = element_blank(),
-      #panel.grid.minor  = element_blank(),
-      legend.background = element_blank(),
-      legend.key = element_blank(),
-      axis.ticks = element_blank(),
-      axis.text = element_blank(),
-      legend.position = "top",
-      # axis.title.x =element_blank(),
-      # axis.title.y =element_blank(),
-      plot.margin = margin(0,0,0,0))
   }
 
+  rptheme <- theme_bw() + theme(panel.background = element_blank(),
+                                panel.grid.minor  = element_blank(),
+                                panel.border = element_rect("grey50",fill=NA),
+                                legend.key = element_rect(colour = "grey90"),
+                                axis.ticks = element_blank(),
+                                axis.text = element_blank(),
+                                plot.margin = margin(0,0,0,0))
 
-  # Main plot
+  if(drawGrid){
+    rptheme <- rptheme +  theme(panel.grid.major  = element_line("grey70",size = .1),
+                                panel.ontop = TRUE)
+  } else {
+    rptheme <- rptheme +  theme(panel.grid.major  = element_blank(),
+                                panel.ontop = FALSE)
+  }
 
+  if(showL){
+    rptheme <- rptheme +  theme(legend.position = c(1.1,1),
+                                legend.direction = "vertical",
+                                legend.background = element_rect(fill="grey90"),
+                                legend.justification = "top")
+  }
+
+  # Expand main plot ----
   if(!is.null(markEpochsLOI)){
-    if(is.factor(markEpochsLOI)&length(markEpochsLOI)==max(c(NROW(RM),NCOL(RM)))){
-      #EcolI <- grey.colors(n=levels(markEpochsLOI))
-    gRP <- gRP + geom_abline(data = data.frame(EcolI = markEpochsLOI), aes_(colour = ~EcolI), slope = 1, size = 2, show.legend = TRUE)
-    } else {
-      warning("Variable passed to 'markEpochsLOI' is not a factor or doesn't have correct length.")
-    }
+        gRP <- gRP +  scale_fill_manual(name  = "Key:",
+                                    values = colvec,
+                                    na.translate = TRUE ,
+                                    na.value = scales::muted("slategray4"),
+                                    guide = "legend",
+                                    limits = levels(meltRP$value))
+          # theme(panel.ontop = TRUE,
+          #       legend.position = "top",
+          #       legend.background = element_rect(colour =  "grey50"))
+    #geom_line(data = Edata, aes_(x=~x,y=~y,colour = ~value), size = 2, show.legend = TRUE) +
+
+  } else {
+    gRP <- gRP +  ggplot2::scale_fill_manual(name  = "", breaks = c(0,1),
+                                    values = colvec,
+                                    na.translate = TRUE ,
+                                    na.value = scales::muted("slategray4"),
+                                    guide = "none")
   }
 
-  if(!is.null(markEpochsGrid)){
-    if(is.list(markEpochsGrid)&length(markEpochsGrid)==2){
-      gRP <- gRP +
-        geom_vline(data = data.frame(xb=markEpochsGrid[[1]]), aes_(xintercept = diff(c((max(~xb, na.rm = TRUE)+1),~xb)!=0))) +
-        geom_hline(data = data.frame(yb=markEpochsGrid[[2]]), aes_(yintercept = diff(c((max(~yb, na.rm = TRUE)+1),~yb)!=0)))
-    } else {
-      warning("Variable passed to 'markEpochsGrid' is not a list, and/or is not of length 2.")
-    }
-  }
+  # if(!is.null(markEpochsGrid)){
+  #   if(is.list(markEpochsGrid)&length(markEpochsGrid)==2){
+  #
+  #     markEpochsGrid[[1]] <- factor(markEpochsGrid[[1]])
+  #     markEpochsGrid[[2]] <- factor(markEpochsGrid[[2]])
+  #
+  #     cpalV <- paletteer::paletteer_d(package = "rcartocolor",palette = "Safe", n = nlevels(markEpochsGrid[[1]]))
+  #     names(cpalV) <- levels(markEpochsGrid[[1]])
+  #
+  #     dataV <- data.frame(t= as.numeric_character(markEpochsGrid[[1]]), xb=markEpochsGrid[[1]],col=NA)
+  #     for(c in unique(dataV$t)){
+  #       dataV$col[dataV$t%in%c] <- cpalV[c]
+  #     }
+  #
+  #     cpalH <- paletteer::paletteer_d(package = "rcartocolor",palette = "Vivid", n = nlevels(markEpochsGrid[[2]]))
+  #     names(cpalH) <- levels(markEpochsGrid[[2]])
+  #
+  #     dataH <- data.frame(t= as.numeric_character(markEpochsGrid[[2]]), yb=markEpochsGrid[[2]],col=NA)
+  #     for(c in unique(dataV$t)){
+  #       dataH$col[dataH$t%in%c] <- cpalH[c]
+  #     }
+#
+#       gRP <- gRP +
+#         #geom_vline(data = dataV, aes_(xintercept = diff(c((max(~t, na.rm = TRUE)+1),~xb)!=0)), colour = dataV$col) +
+#         #geom_hline(data = dataH, aes_(yintercept = diff(c((max(~t, na.rm = TRUE)+1),~yb)!=0)), colour = dataH$col) +
+#         ggplot2::geom_vline(data = dataV, aes(xintercept = diff(c((max(t)+1),t))!=0), colour = dataV$col) +
+#         ggplot2::geom_hline(data = dataH, aes(yintercept = diff(c((max(t)+1),t))!=0), colour = dataH$col) +
+#         ggplot2::theme(panel.ontop = TRUE)
+#
+#     } else {
+#       warning("Variable passed to 'markEpochsGrid' is not a list, and/or is not of length 2.")
+#     }
+#   }
 
   if(plyr::is.discrete(meltRP$Var1)){
     gRP <- gRP + scale_x_discrete(breaks=meltRP$Var1,expand = c(0,0))
@@ -2762,7 +2847,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
   if(useGtable){
 
-    gRP <- gRP + theme(panel.background = element_rect(colour="white"))
+    gRP <- gRP #+ theme(panel.background = element_rect(colour="white"))
 
     g <- ggplot2::ggplotGrob(gRP)
 
@@ -3466,6 +3551,172 @@ crqa_rp_prep <- function(RP,
 
 
 # Networks ----
+
+
+#' Recurrence Time Spectrum
+#'
+#' Get the recurrence time distribution from a recurrence network.
+#'
+#' @param RM A thresholded recurrence matrix generated by function \code{rp()}
+#' @param fitRange If \code{NULL} the entire range will be used for log-log slope.
+#' @param doPlot Should a plot of the recurrence time spectrum be produced?
+#' @param returnPowerLaw Return results of log-log regression
+#' @param minscale Minimum scale
+#'
+#' @return A vector of frequencies of recurrence times and a plot (if requested).
+#' @export
+#'
+#'
+rn_recspec <- function(RM, fitRange = NULL, doPlot = TRUE, returnPowerLaw = FALSE){
+
+  if(is.null(attributes(RM)$emRad)){
+    stop("Wrong RM format: Create a thresholded recurrence matrix using function rp()")
+  }
+
+  g1 <- igraph::graph_from_adjacency_matrix(RM, mode="upper", diag = FALSE, weighted = NULL)
+
+  edgeFrame <- igraph::as_data_frame(g1,"edges")
+  edgeFrame$rectime <- edgeFrame$to-edgeFrame$from
+
+  #d <- density(edgeFrame$rectime, kernel = "cosine")
+  #plot(d)
+  d <- table(edgeFrame$rectime)
+  ddata <- data.frame(x = as.numeric(names(d)), y = as.numeric(d))
+  # ddata <- data.frame(x = d$x[d$x>=0], y = d$y[d$x>=0])
+  ddata$x[ddata$x==0] <- ddata$x[ddata$x==0]+.Machine$double.eps
+  ddata$y[ddata$y==0] <- ddata$y[ddata$y==0]+.Machine$double.eps
+  ddata$x_l <- log2(ddata$x)
+  ddata$y_l <- log2(ddata$y)
+
+  ddata <- arrange(ddata,x)
+
+  lfit <- lm(log(ddata$y) ~ log(ddata$x))
+
+
+
+  fit <- fd_psd(y = ddata$x, returnPLAW = TRUE,doPlot = TRUE)
+
+
+
+  ddata <- ddata[-1,]
+
+  nr     <- 50
+  lsfit  <- stats::lm(ddata$y_l[1:nr] ~ ddata$x_l[1:nr])
+  alpha   <- stats::coef(lsfit)[2]
+
+  ddata$x_p <- ddata$y_p <- NA
+  ddata$x_p[1:nr] <- ddata$x_l[1:nr]
+  ddata$y_p[1:nr] <- predict(lsfit)
+
+  breaks_x <- scales::log_breaks(n=abs(diff(range(round(log2(ddata$x)))+c(-1,1))),base=2)(ddata$x)
+  labels_x <- scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_x)
+
+  breaks_y <- scales::log_breaks(n=abs(diff(range(round(log2(ddata$y)))+c(-1,1))),base=2)(ddata$y)
+  labels_y <- scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_y)
+
+  g <- ggplot2::ggplot(ddata, aes_(x=~x_l,y=~y_l)) +
+    scale_x_continuous(breaks = log2(breaks_x),
+                       labels = labels_x,  expand = c(0,0)) + # limits = lims_x) +
+    scale_y_continuous(breaks = log2(breaks_y),
+                       labels = labels_y, expand = c(0,0)) + # limits = lims_y) +
+    geom_point() +
+    geom_line(aes(x=x_p,y=y_p), colour = "red3") +
+    ylab("Recurrence Times (log2)")+xlab("Frequency of Occurrence (log2)") +
+    geom_label(aes(x=ddata$x_l[25],y=ddata$y_l[25],label=round(alpha,2))) +
+    annotation_logticks() +
+    theme_bw()
+
+  return(g)
+
+
+
+}
+
+
+#' Recurrence Time Scaleogram
+#'
+#' Display a recurrence network in a space representing Time (x-axis) x Scale (y-axis). The scale axis will be determined by the latency between the occurence of a value in the (embedded) time series vector and its recurrences in the future (i.e. only the upper triangle of the recurrence matrix will be displayed, excluding the diagonal).
+#'
+#' @param RM A thresholded recurrence matrix generated by function \code{rp()}
+#'
+#' @return A \code{ggraph}  graph object
+#' @export
+#'
+rn_scaleoGram <- function(RM){
+
+  if(is.null(attributes(RM)$emRad)){
+    stop("Wrong RM format: Create a thresholded recurrence matrix using function rp()")
+  }
+
+  g1 <- igraph::graph_from_adjacency_matrix(RM, mode="upper", diag = FALSE, weighted = NULL)
+
+  edgeFrame <- igraph::as_data_frame(g1,"edges")
+  edgeFrame$rectime <- edgeFrame$to-edgeFrame$from
+  edgeFrame$rectime_bin <- cut(x = edgeFrame$rectime, ordered_result = TRUE, breaks = round(seq.int(1, max(edgeFrame$rectime), length.out = 11)), dig.lab = 3, include.lowest = TRUE, labels = FALSE)
+
+  #edgeFrame$rectime_bin <- as.numeric_character(edgeFrame$rectime_bin)
+  # table(edgeFrame$rectime_bin)
+  # range(edgeFrame$rectime[edgeFrame$rectime_bin==1])
+  #
+  # edgeFrame$vcol <- "#000000"
+  # edgeFrame <- arrange(edgeFrame,edgeFrame$from,edgeFrame$rectime)
+  #edgeFrame$scale.vertex <- interaction(edgeFrame$rectime,edgeFrame$from)
+
+  timepoints <- data.frame(name = as.numeric(V(g1)), degree =  igraph::degree(g1))
+  vertexFrame <- left_join(x = expand.grid(name=timepoints$name, rt_scale = c(0,sort(unique(edgeFrame$rectime)))), y = timepoints, by = "name")
+
+  #Change Names
+  vertexFrame$name <- paste0(vertexFrame$name,".",vertexFrame$rt_scale)
+  edgeFrame$from <- paste0(edgeFrame$from,".0")
+  edgeFrame$to   <- paste0(edgeFrame$to,".",edgeFrame$rectime)
+
+  colvec <- paletteer::paletteer_c(package = "scico",palette = "vik",n = length(unique(edgeFrame$rectime)))
+  names(colvec) <- sort(unique(edgeFrame$rectime))
+  edgeFrame$colour <- NA
+  for(c in names(colvec)){
+    edgeFrame$colour[edgeFrame$rectime%in%c] <- colvec[names(colvec)%in%c]
+  }
+
+  g2 <- igraph::graph_from_data_frame(edgeFrame, directed = FALSE, vertices = vertexFrame)
+  E(g2)$color <- edgeFrame$colour
+  #g2 <- delete.vertices(g2,V(g2))
+
+  scaleogram <- ggraph::create_layout(g2,layout = "linear")
+  scaleogram$x <- as.numeric(laply(as.character(scaleogram$name),function(s) strsplit(s,"[.]")[[1]][1]))
+  scaleogram$y <- as.numeric(laply(as.character(scaleogram$name),function(s) strsplit(s,"[.]")[[1]][2]))
+  #scaleogram$rt_scale <- factor(scaleogram$y)
+  #attributes(scaleogram)
+
+  y1 <- data.frame(t1=attr(RM,"emDims1"))
+
+  # Y1
+  colnames(y1) <- paste0("X",1:NCOL(y1))
+  y1$tm  <- 1:NROW(y1)
+  y1$tmna <- 0
+  y1$tmna[is.na(y1[,1])] <- y1$tm[is.na(y1[,1])]
+  y1 <- tidyr::gather(y1,key="Dimension",value = "Value", -c("tm","tmna"))
+  y1$Value <-  elascer(y1$Value,lo = -round(max(E(g2)$rectime)/8),hi = 0)
+
+  gg <- ggraph::ggraph(scaleogram) +
+    #geom_node_point(colour = "grey60", size=.1, alpha = .3) +
+    ggraph::geom_edge_diagonal(aes(edge_colour = rectime, group = rectime), edge_alpha=.1,lineend = "round", linejoin = "round") +
+    geom_line(data = y1, aes_(y=~Value, x= ~tm, colour = ~Dimension, group = ~Dimension), show.legend = FALSE, size = .1) +
+    scale_color_grey() +
+    geom_hline(yintercept = 0, colour = "grey70") +
+    ggraph::scale_edge_color_gradient2("Recurrence Time", low = paste(colvec[1]), mid = paste(colvec[round(length(colvec)/2)]), high = paste(colvec[length(colvec)]), midpoint = round(length(colvec)/2)) +
+    scale_x_continuous("Time", expand = c(0,0),
+                       breaks = round(seq.int(1,max(V(g1)),length.out = 10)),
+                       limits = c(0,max(as.numeric(V(g1))))) +
+    scale_y_continuous("Recurrence Time", expand = c(0,0),
+                       breaks = c(-round(max(E(g2)$rectime)/8),sort(unique(E(g2)$rectime))[round(seq.int(1,length(unique(E(g2)$rectime)), length.out = 10))]),
+                       labels = c("",paste(sort(unique(E(g2)$rectime))[round(seq.int(1,length(unique(E(g2)$rectime)), length.out = 10))])),
+                       limits = c(-round(max(E(g2)$rectime)/8),max(E(g2)$rectime))) +
+    theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank())
+
+  return(gg)
+
+}
+
 
 #' Mutual Information Function
 #'
@@ -4196,7 +4447,7 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TR
   # if(N==npad) npad = 0
   # psd  <- stats::spec.pgram(y, fast = FALSE, demean=FALSE, detrend=FALSE, plot=FALSE, pad=npad, taper=0.5)
 
-  Tukey <- sapa::taper(type="raised cosine", flatness = 0.5, n.sample = npad)
+  Tukey <- sapa::taper(type="raised cosine", flatness = 0.5, n.sample = N)
   psd   <- sapa::SDF(y, taper. = Tukey, npad = npad)
 
   powspec <- cbind.data.frame(freq.norm = attr(psd, "frequency")[-1], size = attr(psd, "frequency")[-1]*stats::frequency(y), bulk = as.matrix(psd)[-1])
@@ -4210,7 +4461,6 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TR
   # General guideline: fit over 25% frequencies
   # If signal is continuous (sampled) consider Wijnants et al. (2013) log-log fitting procedure
   nr <- fractal::HDEst(NFT = length(powspec$bulk[1:nr]), sdf = as.vector(powspec$bulk[1:nr]))
-
 
   exp1 <- fractal::hurstSpec(y, sdf.method="direct", freq.max = 0.25, taper.=Tukey )
   if(nr>=length(powspec$freq.norm)){nr <- length(powspec$freq.norm)-1}
