@@ -3620,8 +3620,18 @@ rn <- function(y1, y2 = NULL,
 
   dmat <- rp(y1 = y1, y2 = y2,
            emDim = emDim, emLag = emLag, emRad = emRad,
-           to.ts = to.ts, order.by = order.by, to.sparse = to.sparse, to.weighted = weighted,
+           to.ts = to.ts, order.by = order.by, to.sparse = to.sparse, weighted = weighted,
            method = method, doPlot = FALSE, silent = silent)
+
+  if(to.sparse){
+    attributes(dmat)$directed <- directed
+    attributes(dmat)$includeDiagonal <- includeDiagonal
+  } else {
+    attr(dmat,"directed") <- directed
+    attr(dmat,"includeDiagonal") <- includeDiagonal
+  }
+
+
 
   if(doPlot){
     dotArgs <- list(...)
@@ -3692,6 +3702,8 @@ rn_recSpec <- function(RN, fitRange = NULL, doPlot = TRUE, returnOnlyObject = FA
     }
   }
 
+  diagonal <- attributes(RN)
+
   g1 <- igraph::graph_from_adjacency_matrix(RN, mode="upper", diag = FALSE, weighted = NULL)
 
   edgeFrame <- igraph::as_data_frame(g1,"edges")
@@ -3755,7 +3767,7 @@ rn_recSpec <- function(RN, fitRange = NULL, doPlot = TRUE, returnOnlyObject = FA
 #'
 #' @family Distance matrix operations (recurrence plot)
 #'
-rn_scaleoGram <- function(RN, returnOnlyObject = TRUE){
+rn_scaleoGram <- function(RN, returnOnlyObject = FALSE){
 
   if(is.null(attributes(RN)$emRad)){
     stop("Wrong RN format: Create a thresholded recurrence matrix using function rn()")
