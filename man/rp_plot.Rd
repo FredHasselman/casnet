@@ -2,11 +2,11 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{rp_plot}
 \alias{rp_plot}
-\title{Plot (thresholded) distance matrix}
+\title{Plot (thresholded) distance matrix as a recurrence plot}
 \usage{
 rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
-  plotRadiusRRbar = TRUE, markEpochsLOI = NULL,
-  markEpochsGrid = NULL, radiusValue = NA, title = "", xlab = "",
+  plotRadiusRRbar = TRUE, drawGrid = FALSE, markEpochsLOI = NULL,
+  Chromatic = NULL, radiusValue = NA, title = "", xlab = "",
   ylab = "", plotSurrogate = NA, returnOnlyObject = FALSE,
   useGtable = TRUE)
 }
@@ -19,9 +19,11 @@ rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
 
 \item{plotRadiusRRbar}{The \code{Radius-RR-bar} is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of \code{RR} values one would get if a certain distance threshold were chosen (\code{default = TRUE})}
 
+\item{drawGrid}{Draw a grid on the recurrence plot (\code{default = FALSE})}
+
 \item{markEpochsLOI}{Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (\code{default = NULL})}
 
-\item{markEpochsGrid}{Pass a list 2 numeric vectors, \code{markEpochsGrid[[1]]} should have length equal to NROW(RM) and \code{markEpochsGrid[[2]]} should have length equal to NCOL(RM). The values in the vectors represent different epochs associated with each time stamp, the change index will become 'breaks' on the \code{y} and \code{x} axis respectively (\code{default = NULL})}
+\item{Chromatic}{If \code{TRUE} and there are more than two discrete values in \code{RM}, give recurrent points a distinct colour. If \code{RM} was returned by \code{crqa_rp(..., chromatic = TRUE)}, the recurrence plot will colour-code recurrent points according to the category values in \code{attributes(RM)$chromaticRP} (\code{default = FALSE})}
 
 \item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
 
@@ -41,13 +43,14 @@ rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
 A nice plot of the recurrence matrix.
 }
 \description{
-Plot (thresholded) distance matrix
+Plot (thresholded) distance matrix as a recurrence plot
 }
 \seealso{
-Other Distance matrix operations: \code{\link{bandReplace}},
+Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rp_lineDist}},
+  \code{\link{dist_hamming}}, \code{\link{rn_recSpec}},
+  \code{\link{rn_scaleoGram}}, \code{\link{rp_lineDist}},
   \code{\link{rp_nzdiags}}, \code{\link{rp_size}},
   \code{\link{rp}}
 }
-\concept{Distance matrix operations}
+\concept{Distance matrix operations (recurrence plot)}

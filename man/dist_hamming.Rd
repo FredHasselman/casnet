@@ -20,8 +20,9 @@ A hamming-distance matrix of X, or X and Y. Useful for ordered and unordered cat
 Calculate Hamming distance
 }
 \seealso{
-Other Distance matrix operations: \code{\link{bandReplace}},
+Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{di2we}},
+  \code{\link{rn_recSpec}}, \code{\link{rn_scaleoGram}},
   \code{\link{rp_lineDist}}, \code{\link{rp_nzdiags}},
   \code{\link{rp_plot}}, \code{\link{rp_size}},
   \code{\link{rp}}
@@ -29,4 +30,4 @@ Other Distance matrix operations: \code{\link{bandReplace}},
 \author{
 Fred Hasselman
 }
-\concept{Distance matrix operations}
+\concept{Distance matrix operations (recurrence plot)}

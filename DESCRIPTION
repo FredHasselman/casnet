@@ -53,7 +53,9 @@ Imports:
     tibble,
     broom,
     callr,
-    readr
+    readr,
+    paletteer,
+    ggraph
 Suggests: knitr,
     rmarkdown,
     graphics,

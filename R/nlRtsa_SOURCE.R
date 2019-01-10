@@ -1801,7 +1801,7 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 #'
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
 #'
 rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=FALSE, removeNZ = TRUE,silent = TRUE){
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
@@ -2014,7 +2014,7 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 #'
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
 #'
 rp_lineDist <- function(RM,
                         DLmin = 2,
@@ -2140,7 +2140,7 @@ rp_lineDist <- function(RM,
 #' @return A hamming-distance matrix of X, or X and Y. Useful for ordered and unordered categorical data.
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
 #' @author Fred Hasselman
 #'
 dist_hamming <- function(X, Y=NULL, embedded=TRUE) {
@@ -2186,7 +2186,7 @@ dist_hamming <- function(X, Y=NULL, embedded=TRUE) {
 #'
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
 #'
 #' @author Fred Hasselman
 #'
@@ -2222,19 +2222,31 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 #' @param y2 A numeric vector or time series for cross recurrence
 #' @param emDim The embedding dimensions
 #' @param emLag The embedding lag
-#' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary matrix
+#' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})
 #' @param to.ts Should \code{y1} and \code{y2} be converted to time series objects?
 #' @param order.by If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.
 #' @param to.sparse Should sparse matrices be used?
+#' @param weighted If \code{FALSE} a binary matrix will be returned. If \code{TRUE} every value larger than \code{emRad} will be \code{0}, but values smaller than \code{emRad} will be retained (default = \code{FALSE})
 #' @param method Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})
 #' @param doPlot Plot the matrix by calling \code{\link{rp_plot}} with defult settings
 #' @param silent Silent-ish mode
 #' @param ... Any paramters to pass to \code{\link{rp_plot}} if \code{doPlot = TRUE}
 #'
-#' @return A (Coss-) Recurrence matrix
+#' @return A (Coss-) Recurrence matrix with attributes:
+#' \enumerate{
+#' \item \code{emdims1} and \code{emdims2} - A matrix of surrogate dimensions
+#' \item \code{emdims1.name} and \code{emdims2.name} - Names of surrogate dimensions
+#' \item \code{method} and \code{call} - The distance \code{method} used by \code{\link[proxy]{dist}}
+#' \item \code{weighetd} - Whether a weighted matrix is returned
+#' \item \code{emDim}, \code{emLag} and \code{emRad} - The embedding parameters
+#' \item \code{AUTO} - Whether the matrix represents AUTO recurrence
+#'  }
+#'
+#'
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
+#'
 #'
 rp <- function(y1, y2 = NULL,
                    emDim = 1,
@@ -2243,6 +2255,7 @@ rp <- function(y1, y2 = NULL,
                    to.ts = NULL,
                    order.by = NULL,
                    to.sparse = FALSE,
+                   weighted = FALSE,
                    method = "Euclidean",
                    doPlot = FALSE,
                    silent = TRUE,
@@ -2301,24 +2314,32 @@ rp <- function(y1, y2 = NULL,
     rownames(dmat) <- paste(order.by)
   }
 
+    if(!is.null(emRad)){
+      if(weighted){
+        dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse)
+      } else {
+        dmat <- di2bi(dmat, emRad = emRad, convMat = to.sparse)
+      }
+    }
 
   if(to.sparse){
-    if(!is.null(emRad)){
-      dmat <- di2bi(dmat, emRad = emRad, convMat = TRUE)
-    }
     attributes(dmat)$emDims1  <- et1
     attributes(dmat)$emDims2  <- et2
     attributes(dmat)$emDims1.name <- colnames(y1)
     attributes(dmat)$emDims2.name <- colnames(y2)
-    #dmat <- rp_checkfix(dmat, checkAUTO=TRUE, fixAUTO=TRUE)
+    attributes(dmat)$weighted <- weighted
+    attributes(dmat)$emLag <- emLag
+    attributes(dmat)$emDim <- emDim
+    attributes(dmat)$emRad <- emRad%00%NA
   } else {
-    if(!is.null(emRad)){
-      dmat <- di2bi(dmat, emRad = emRad, convMat = FALSE)
-    }
     attr(dmat,"emDims1") <- et1
     attr(dmat,"emDims2") <- et2
     attr(dmat,"emDims1.name") <- colnames(y1)
     attr(dmat,"emDims2.name") <- colnames(y2)
+    attr(dmat,"weighted") <- weighted
+    attr(dmat,"emLag") <- emLag
+    attr(dmat,"emDim") <- emDim
+    attr(dmat,"emRad") <- emRad%00%NA
   }
 
   dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
@@ -2336,6 +2357,7 @@ rp <- function(y1, y2 = NULL,
     dotArgs$RM <- dmat
     do.call(rp_plot, dotArgs[nameOk])
   }
+
   return(dmat)
 }
 
@@ -2425,7 +2447,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 }
 
 
-#' Plot (thresholded) distance matrix
+#' Plot (thresholded) distance matrix as a recurrence plot
 #'
 #' @param RM A distance matrix or recurrence matrix
 #' @param plotDimensions Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})
@@ -2445,7 +2467,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @return A nice plot of the recurrence matrix.
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
 #'
 rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, drawGrid = FALSE, markEpochsLOI = NULL, Chromatic = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, returnOnlyObject = FALSE, useGtable = TRUE){
 
@@ -2981,7 +3003,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 #' @return Matrix size for computation of recurrence measures.
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
 #'
 #' @examples
 #' # Create a 10 by 10 matrix
@@ -3552,28 +3574,125 @@ crqa_rp_prep <- function(RP,
 
 # Networks ----
 
+#' Create a Recurrence Network Matrix
+#'
+#' This function serves as a wrapper for function \code{rp()}, it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)
+#'
+#' @param y1 A numeric vector or time series
+#' @param y2 A numeric vector or time series for cross recurrence
+#' @param emDim The embedding dimensions
+#' @param emLag The embedding lag
+#' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary matrix
+#' @param directed Should the matrix be considered to represent a directed network? (default = \code{FALSE})
+#' @param weighted Should the matrix be considered to represent a weighted network? (default = \code{FALSE})
+#' @param includeDiagonal Should the diagonal of the matrix be included when creating the network (default = \code{FALSE})
+#' @param to.ts Should \code{y1} and \code{y2} be converted to time series objects?
+#' @param order.by If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.
+#' @param to.sparse Should sparse matrices be used?
+#' @param method Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})
+#' @param returnGraph Return an \code{\link[igraph]{igraph}} object (default = \code{TRUE})
+#' @param doPlot Plot the matrix and its network representation by calling \code{\link{rp_plot}} and \code{\link{rn_plot}} with default settings
+#' @param silent Silent-ish mode (default = \code{TRUE})
+#' @param ... Any paramters to pass to \code{\link{rn_plot}} if \code{doPlot = TRUE}
+#'
+#' @return A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidence) matrix.
+#'
+#' @export
+#'
+#' @family Distance matrix operations (recurrence network)
+#'
+#'
+rn <- function(y1, y2 = NULL,
+               emDim = 1,
+               emLag = 1,
+               emRad = NULL,
+               directed = FALSE,
+               weighted = FALSE,
+               includeDiagonal = FALSE,
+               to.ts = NULL,
+               order.by = NULL,
+               to.sparse = FALSE,
+               method = "Euclidean",
+               returnGraph = TRUE,
+               doPlot = FALSE,
+               silent = TRUE,
+               ...){
+
+  dmat <- rp(y1 = y1, y2 = y2,
+           emDim = emDim, emLag = emLag, emRad = emRad,
+           to.ts = to.ts, order.by = order.by, to.sparse = to.sparse, to.weighted = weighted,
+           method = method, doPlot = FALSE, silent = silent)
+
+  if(doPlot){
+    dotArgs <- list(...)
+
+    nameOK  <- names(dotArgs)%in%methods::formalArgs(rn_plot)
+    # Plot with defaults
+    if(!all(dotArgs)){
+      dotArgs    <- formals(rn_plot)
+      nameOk <- rep(TRUE,length(dotArgs))
+    }
+
+    dotArgs$RN <- dmat
+    do.call(rn_plot, dotArgs[nameOk])
+  }
+
+  return(dmat)
+}
+
+
+#' Plot (thresholded) distance matrix as a network
+#'
+#' @param RN A distance matrix or recurrence matrix
+#' @param title A title for the plot
+#' @param xlab An x-axis label
+#' @param ylab An y-axis label
+#' @param returnOnlyObject Return the \code{ggplot} / \code{ggraph} object only, do not draw the plot (default = \code{FALSE})
+#' @param useGtable Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set to FALSE (default = \code{TRUE})
+#'
+#' @return A nice plot of the recurrence network
+#' @export
+#'
+#' @family Distance matrix operations (recurrence network)
+#'
+rn_plot <- function(RN, title = "", xlab = "", ylab="", returnOnlyObject = FALSE, useGtable = TRUE){
+  rp_plot(RN)
+}
+
 
 #' Recurrence Time Spectrum
 #'
 #' Get the recurrence time distribution from a recurrence network.
 #'
-#' @param RM A thresholded recurrence matrix generated by function \code{rp()}
-#' @param fitRange If \code{NULL} the entire range will be used for log-log slope.
+#' @param RN A thresholded recurrence matrix generated by function \code{rn()}
+#' @param fitRange If \code{NULL} the entire range will be used for log-log slope. If a 2-element vector of integers, this will represent the range of recurrence times to use for fitting the log=log slope (e.g. \code{c(1,50)} would fit the first 50 recurrence times).
 #' @param doPlot Should a plot of the recurrence time spectrum be produced?
+#' @param returnOnlyObject Return the \code{ggplot} / \code{ggraph} object only, do not draw the plot (default = \code{FALSE})
 #' @param returnPowerLaw Return results of log-log regression
-#' @param minscale Minimum scale
 #'
-#' @return A vector of frequencies of recurrence times and a plot (if requested).
+#' @return A vector of frequencies of recurrence times and a plot (if requested)
+#'
 #' @export
 #'
+#' @family Distance matrix operations (recurrence plot)
 #'
-rn_recspec <- function(RM, fitRange = NULL, doPlot = TRUE, returnPowerLaw = FALSE){
+rn_recSpec <- function(RN, fitRange = NULL, doPlot = TRUE, returnOnlyObject = FALSE, returnPowerLaw = FALSE){
 
-  if(is.null(attributes(RM)$emRad)){
-    stop("Wrong RM format: Create a thresholded recurrence matrix using function rp()")
+  if(is.null(attributes(RN)$weighted)){
+    stop("Wrong RN format: Create a thresholded recurrence matrix using function rn()")
   }
 
-  g1 <- igraph::graph_from_adjacency_matrix(RM, mode="upper", diag = FALSE, weighted = NULL)
+  if(is.null(fitRange)){
+    nr <- 1:NROW(RN)
+  } else {
+    if(length(fitRange)==2&all(is.integer(fitRange))){
+      nr <- fitRange[1]:fitRange[2]
+    } else {
+      stop("Wrong fitRange format: Either NULL or a 2-integer vector.")
+    }
+  }
+
+  g1 <- igraph::graph_from_adjacency_matrix(RN, mode="upper", diag = FALSE, weighted = NULL)
 
   edgeFrame <- igraph::as_data_frame(g1,"edges")
   edgeFrame$rectime <- edgeFrame$to-edgeFrame$from
@@ -3587,48 +3706,39 @@ rn_recspec <- function(RM, fitRange = NULL, doPlot = TRUE, returnPowerLaw = FALS
   ddata$y[ddata$y==0] <- ddata$y[ddata$y==0]+.Machine$double.eps
   ddata$x_l <- log2(ddata$x)
   ddata$y_l <- log2(ddata$y)
-
-  ddata <- arrange(ddata,x)
-
-  lfit <- lm(log(ddata$y) ~ log(ddata$x))
-
-
-
-  fit <- fd_psd(y = ddata$x, returnPLAW = TRUE,doPlot = TRUE)
-
-
-
   ddata <- ddata[-1,]
+  ddata <- dplyr::arrange_(ddata,~x)
 
-  nr     <- 50
-  lsfit  <- stats::lm(ddata$y_l[1:nr] ~ ddata$x_l[1:nr])
-  alpha   <- stats::coef(lsfit)[2]
+  lfit  <- stats::lm(ddata$y_l[nr] ~ ddata$x[nr])
+  alpha <- stats::coef(lfit)[2]
 
-  ddata$x_p <- ddata$y_p <- NA
-  ddata$x_p[1:nr] <- ddata$x_l[1:nr]
-  ddata$y_p[1:nr] <- predict(lsfit)
+  ddata$x_p     <- ddata$y_p <- NA
+  ddata$x_p[nr] <- ddata$x_l[nr]
+  ddata$y_p[nr] <- stats::predict(lfit)
 
   breaks_x <- scales::log_breaks(n=abs(diff(range(round(log2(ddata$x)))+c(-1,1))),base=2)(ddata$x)
-  labels_x <- scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_x)
+  labels_x <- eval(quote(scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_x)))
 
   breaks_y <- scales::log_breaks(n=abs(diff(range(round(log2(ddata$y)))+c(-1,1))),base=2)(ddata$y)
-  labels_y <- scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_y)
+  labels_y <- eval(quote(scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_y)))
 
-  g <- ggplot2::ggplot(ddata, aes_(x=~x_l,y=~y_l)) +
+  g <- ggplot2::ggplot(ddata, ggplot2::aes_(x=~x_l,y=~y_l)) +
     scale_x_continuous(breaks = log2(breaks_x),
                        labels = labels_x,  expand = c(0,0)) + # limits = lims_x) +
     scale_y_continuous(breaks = log2(breaks_y),
                        labels = labels_y, expand = c(0,0)) + # limits = lims_y) +
     geom_point() +
-    geom_line(aes(x=x_p,y=y_p), colour = "red3") +
+    geom_line(ggplot2::aes_(x=~x_p,y=~y_p), colour = "red3") +
     ylab("Recurrence Times (log2)")+xlab("Frequency of Occurrence (log2)") +
-    geom_label(aes(x=ddata$x_l[25],y=ddata$y_l[25],label=round(alpha,2))) +
+    #geom_label(aes(x=ddata$x_l[25],y=ddata$y_l[25],label=round(alpha,2))) +
     annotation_logticks() +
     theme_bw()
 
-  return(g)
-
-
+  if(!returnOnlyObject){
+    grid::grid.newpage()
+    grid::grid.draw(g)
+  }
+  return(invisible(g))
 
 }
 
@@ -3637,18 +3747,21 @@ rn_recspec <- function(RM, fitRange = NULL, doPlot = TRUE, returnPowerLaw = FALS
 #'
 #' Display a recurrence network in a space representing Time (x-axis) x Scale (y-axis). The scale axis will be determined by the latency between the occurence of a value in the (embedded) time series vector and its recurrences in the future (i.e. only the upper triangle of the recurrence matrix will be displayed, excluding the diagonal).
 #'
-#' @param RM A thresholded recurrence matrix generated by function \code{rp()}
+#' @param RN A thresholded recurrence matrix generated by function \code{rn()}
+#' @param returnOnlyObject Return the \code{ggplot} / \code{ggraph} object only, do not draw the plot (default = \code{FALSE})
 #'
-#' @return A \code{ggraph}  graph object
+#' @return A \code{ggraph} graph object
 #' @export
 #'
-rn_scaleoGram <- function(RM){
+#' @family Distance matrix operations (recurrence plot)
+#'
+rn_scaleoGram <- function(RN, returnOnlyObject = TRUE){
 
-  if(is.null(attributes(RM)$emRad)){
-    stop("Wrong RM format: Create a thresholded recurrence matrix using function rp()")
+  if(is.null(attributes(RN)$emRad)){
+    stop("Wrong RN format: Create a thresholded recurrence matrix using function rn()")
   }
 
-  g1 <- igraph::graph_from_adjacency_matrix(RM, mode="upper", diag = FALSE, weighted = NULL)
+  g1 <- igraph::graph_from_adjacency_matrix(RN, mode="upper", diag = FALSE, weighted = NULL)
 
   edgeFrame <- igraph::as_data_frame(g1,"edges")
   edgeFrame$rectime <- edgeFrame$to-edgeFrame$from
@@ -3662,8 +3775,8 @@ rn_scaleoGram <- function(RM){
   # edgeFrame <- arrange(edgeFrame,edgeFrame$from,edgeFrame$rectime)
   #edgeFrame$scale.vertex <- interaction(edgeFrame$rectime,edgeFrame$from)
 
-  timepoints <- data.frame(name = as.numeric(V(g1)), degree =  igraph::degree(g1))
-  vertexFrame <- left_join(x = expand.grid(name=timepoints$name, rt_scale = c(0,sort(unique(edgeFrame$rectime)))), y = timepoints, by = "name")
+  timepoints <- data.frame(name = as.numeric(igraph::V(g1)), degree =  igraph::degree(g1))
+  vertexFrame <- dplyr::left_join(x = expand.grid(name=timepoints$name, rt_scale = c(0,sort(unique(edgeFrame$rectime)))), y = timepoints, by = "name")
 
   #Change Names
   vertexFrame$name <- paste0(vertexFrame$name,".",vertexFrame$rt_scale)
@@ -3678,16 +3791,15 @@ rn_scaleoGram <- function(RM){
   }
 
   g2 <- igraph::graph_from_data_frame(edgeFrame, directed = FALSE, vertices = vertexFrame)
-  E(g2)$color <- edgeFrame$colour
-  #g2 <- delete.vertices(g2,V(g2))
+  igraph::E(g2)$color <- edgeFrame$colour
 
-  scaleogram <- ggraph::create_layout(g2,layout = "linear")
-  scaleogram$x <- as.numeric(laply(as.character(scaleogram$name),function(s) strsplit(s,"[.]")[[1]][1]))
-  scaleogram$y <- as.numeric(laply(as.character(scaleogram$name),function(s) strsplit(s,"[.]")[[1]][2]))
+  scaleogram <- ggraph::create_layout(g2, layout = "linear")
+  scaleogram$x <- as.numeric(plyr::laply(as.character(scaleogram$name),function(s) strsplit(s,"[.]")[[1]][1]))
+  scaleogram$y <- as.numeric(plyr::laply(as.character(scaleogram$name),function(s) strsplit(s,"[.]")[[1]][2]))
   #scaleogram$rt_scale <- factor(scaleogram$y)
   #attributes(scaleogram)
 
-  y1 <- data.frame(t1=attr(RM,"emDims1"))
+  y1 <- data.frame(t1=attr(RN,"emDims1"))
 
   # Y1
   colnames(y1) <- paste0("X",1:NCOL(y1))
@@ -3695,26 +3807,30 @@ rn_scaleoGram <- function(RM){
   y1$tmna <- 0
   y1$tmna[is.na(y1[,1])] <- y1$tm[is.na(y1[,1])]
   y1 <- tidyr::gather(y1,key="Dimension",value = "Value", -c("tm","tmna"))
-  y1$Value <-  elascer(y1$Value,lo = -round(max(E(g2)$rectime)/8),hi = 0)
+  y1$Value <-  elascer(y1$Value,lo = -round(max(igraph::E(g2)$rectime)/8),hi = 0)
 
-  gg <- ggraph::ggraph(scaleogram) +
+  g <- ggraph::ggraph(scaleogram) +
     #geom_node_point(colour = "grey60", size=.1, alpha = .3) +
-    ggraph::geom_edge_diagonal(aes(edge_colour = rectime, group = rectime), edge_alpha=.1,lineend = "round", linejoin = "round") +
-    geom_line(data = y1, aes_(y=~Value, x= ~tm, colour = ~Dimension, group = ~Dimension), show.legend = FALSE, size = .1) +
-    scale_color_grey() +
-    geom_hline(yintercept = 0, colour = "grey70") +
+    ggraph::geom_edge_diagonal(aes_(edge_colour = ~rectime, group = ~rectime), edge_alpha=.1,lineend = "round", linejoin = "round") +
+    ggplot2::geom_line(data = y1, ggplot2::aes_(y=~Value, x= ~tm, colour = ~Dimension, group = ~Dimension), show.legend = FALSE, size = .1) +
+    ggplot2::scale_color_grey() +
+    ggplot2::geom_hline(yintercept = 0, colour = "grey70") +
     ggraph::scale_edge_color_gradient2("Recurrence Time", low = paste(colvec[1]), mid = paste(colvec[round(length(colvec)/2)]), high = paste(colvec[length(colvec)]), midpoint = round(length(colvec)/2)) +
-    scale_x_continuous("Time", expand = c(0,0),
-                       breaks = round(seq.int(1,max(V(g1)),length.out = 10)),
-                       limits = c(0,max(as.numeric(V(g1))))) +
-    scale_y_continuous("Recurrence Time", expand = c(0,0),
-                       breaks = c(-round(max(E(g2)$rectime)/8),sort(unique(E(g2)$rectime))[round(seq.int(1,length(unique(E(g2)$rectime)), length.out = 10))]),
-                       labels = c("",paste(sort(unique(E(g2)$rectime))[round(seq.int(1,length(unique(E(g2)$rectime)), length.out = 10))])),
-                       limits = c(-round(max(E(g2)$rectime)/8),max(E(g2)$rectime))) +
-    theme_bw() + theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank())
+    ggplot2::scale_x_continuous("Time", expand = c(0,0),
+                       breaks = round(seq.int(1,max(igraph::V(g1)),length.out = 10)),
+                       limits = c(0,max(as.numeric(igraph::V(g1))))) +
+    ggplot2::scale_y_continuous("Recurrence Time", expand = c(0,0),
+                       breaks = c(-round(max(igraph::E(g2)$rectime)/8),sort(unique(igraph::E(g2)$rectime))[round(seq.int(1,length(unique(igraph::E(g2)$rectime)), length.out = 10))]),
+                       labels = c("", paste(sort(unique(igraph::E(g2)$rectime))[round(seq.int(1,length(unique(igraph::E(g2)$rectime)), length.out = 10))])),
+                       limits = c(-round(max(igraph::E(g2)$rectime)/8),max(igraph::E(g2)$rectime))) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(panel.grid.minor = ggplot2::element_blank(), panel.grid.major.x = ggplot2::element_blank())
 
-  return(gg)
-
+  if(!returnOnlyObject){
+      grid::grid.newpage()
+      grid::grid.draw(g)
+  }
+  return(invisible(g))
 }
 
 
@@ -3915,7 +4031,7 @@ mif_interlayer <- function(g0,g1, probTable=FALSE){
 #'
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
 #'
 di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
@@ -3966,7 +4082,7 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 #'
 #' @export
 #'
-#' @family Distance matrix operations
+#' @family Distance matrix operations (recurrence plot)
 #'
 di2we <- function(distmat, emRad, convMat = FALSE){
 

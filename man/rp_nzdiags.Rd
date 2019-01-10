@@ -27,13 +27,14 @@ A matrix object with nonzero diagonals as columns and/or a dataframe with coordi
 Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument \code{d}.
 }
 \seealso{
-Other Distance matrix operations: \code{\link{bandReplace}},
+Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rp_lineDist}},
+  \code{\link{dist_hamming}}, \code{\link{rn_recSpec}},
+  \code{\link{rn_scaleoGram}}, \code{\link{rp_lineDist}},
   \code{\link{rp_plot}}, \code{\link{rp_size}},
   \code{\link{rp}}
 }
 \author{
 Fred Hasselman
 }
-\concept{Distance matrix operations}
+\concept{Distance matrix operations (recurrence plot)}

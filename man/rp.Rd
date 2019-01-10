@@ -6,7 +6,8 @@
 \usage{
 rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
   to.ts = NULL, order.by = NULL, to.sparse = FALSE,
-  method = "Euclidean", doPlot = FALSE, silent = TRUE, ...)
+  weighted = FALSE, method = "Euclidean", doPlot = FALSE,
+  silent = TRUE, ...)
 }
 \arguments{
 \item{y1}{A numeric vector or time series}
@@ -17,13 +18,15 @@ rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 
 \item{emLag}{The embedding lag}
 
-\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary matrix}
+\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
 
 \item{to.ts}{Should \code{y1} and \code{y2} be converted to time series objects?}
 
 \item{order.by}{If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.}
 
 \item{to.sparse}{Should sparse matrices be used?}
+
+\item{weighted}{If \code{FALSE} a binary matrix will be returned. If \code{TRUE} every value larger than \code{emRad} will be \code{0}, but values smaller than \code{emRad} will be retained (default = \code{FALSE})}
 
 \item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
@@ -34,16 +37,25 @@ rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 \item{...}{Any paramters to pass to \code{\link{rp_plot}} if \code{doPlot = TRUE}}
 }
 \value{
-A (Coss-) Recurrence matrix
+A (Coss-) Recurrence matrix with attributes:
+\enumerate{
+\item \code{emdims1} and \code{emdims2} - A matrix of surrogate dimensions
+\item \code{emdims1.name} and \code{emdims2.name} - Names of surrogate dimensions
+\item \code{method} and \code{call} - The distance \code{method} used by \code{\link[proxy]{dist}}
+\item \code{weighetd} - Whether a weighted matrix is returned
+\item \code{emDim}, \code{emLag} and \code{emRad} - The embedding parameters
+\item \code{AUTO} - Whether the matrix represents AUTO recurrence
+ }
 }
 \description{
 Create a Distance Matrix
 }
 \seealso{
-Other Distance matrix operations: \code{\link{bandReplace}},
+Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rp_lineDist}},
+  \code{\link{dist_hamming}}, \code{\link{rn_recSpec}},
+  \code{\link{rn_scaleoGram}}, \code{\link{rp_lineDist}},
   \code{\link{rp_nzdiags}}, \code{\link{rp_plot}},
   \code{\link{rp_size}}
 }
-\concept{Distance matrix operations}
+\concept{Distance matrix operations (recurrence plot)}
