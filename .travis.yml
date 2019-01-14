@@ -5,3 +5,7 @@ sudo: false
 cache: packages
 before_install:
   - tlmgr install index
+brew_packages:
+  - udunits
+apt_packages:
+  - libudunits2-dev
