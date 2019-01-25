@@ -1605,6 +1605,7 @@ crqa_rp <- function(RM,
 #' @param AUTO ARTO
 #' @param chromatic chromatic
 #' @param matrices matrices
+#' @param doPlot Plot
 #'
 #' @return A plot and/or the data for the plot
 #'
@@ -1622,7 +1623,8 @@ crqa_diagPofile <- function(RM,
                             HLmax = length(Matrix::diag(RM))-1,
                             AUTO      = NULL,
                             chromatic = FALSE,
-                            matrices  = FALSE){
+                            matrices  = FALSE,
+                            doPlot = TRUE){
 
 
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
@@ -1657,36 +1659,48 @@ crqa_diagPofile <- function(RM,
     names(diagID) <- colnames(B)
   }
 
+  #winRR <- sum(B==1, na.rm = TRUE)
   dp <- plyr::ldply(diagID, function(i){
-    data.frame(RR = sum(B[,i]==1, na.rm = TRUE)/(NROW(B)-abs(as.numeric(colnames(B)[i]))))
+    data.frame(index = i, RR = sum(B[,i]==1, na.rm = TRUE)/ (NROW(B)-abs(as.numeric(colnames(B)[i]))))
   }, .id = "Diagonal")
 
   dp$group  <- 1
   dp$labels <- paste(dp$Diagonal)
   dp$labels[dp$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
-  dp$labels.f <- factor(dp$labels,levels = dp$labels,ordered = TRUE)
+  dp$labels <- factor(dp$labels,levels = dp$labels,ordered = TRUE)
 
-  if(length(levels(dp$labels.f))>21){
-    breaks <- dp$labels[c(seq(1,which(dp$Diagonal==-1),length.out = 10),which(dp$Diagonal==-1),seq(which(dp$Diagonal==1),which.max(dp$Diagonal),length.out = 10))]
-  } else {
-    breaks <- dp$labels
-  }
+
+  if(doPlot){
+
+    if(length(levels(dp$labels.f))>21){
+      ext <- max(min(abs(dp$Diagonal),na.rm = TRUE),abs(max(dp$Diagonal,na.rm = TRUE)))
+      breaks <- which(dp$labels.f%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
+    } else {
+      breaks <- dp$labels
+    }
 
   x1<-(which.min(as.numeric(paste(dp$Diagonal))))
   x2<-(which.max(as.numeric(paste(dp$Diagonal))))
+  yL<-max(as.numeric(paste(dp$RR)),na.rm = TRUE)+0.1
 
-  g <- ggplot2::ggplot(dp, ggplot2::aes_(x=~labels.f,y=~RR, group = ~group)) +
+  g <- ggplot2::ggplot(dp, ggplot2::aes_(x=~labels,y=~RR, group = ~group)) +
     ggplot2::geom_path(alpha=.7) +
-    ggplot2::geom_vline(xintercept = which(dp$labels.f%in%c("LOS","LOI")), size=1, colour = "grey50") +
+    ggplot2::geom_vline(xintercept = which(dp$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
     ggplot2::geom_point(pch=21,fill="grey50",size=3) +
-    ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,1)) +
+    ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
     ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks) +
-    ggplot2::geom_label(x=x1,y=1,label=paste0("Recurrences due to\n ",xname),hjust="left") +
-    ggplot2::geom_label(x=x2,y=1,label=paste0("Recurrences due to\n ",yname),hjust="right") +
+    ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left") +
+    ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right") +
     ggplot2::theme_bw()
 
-  return(invisible(g))
+  print(g)
+  return(invisible(list(plot = g, data = dp)))
 
+  } else {
+
+    return(invisible(dp))
+
+  }
 }
 
 
@@ -1805,7 +1819,6 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 #'
 rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=FALSE, removeNZ = TRUE,silent = TRUE){
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
-  #require(Matrix)
 
   if(grepl("matrix",class(RM),ignore.case = TRUE)){
 
@@ -1995,7 +2008,7 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 #' @param AUTO Is this an AUTO RQA?
 #' @param chromatic Chromatic RQA?
 #' @param matrices Return the matrices ?
-#' @param doHalf Analyse half of the matrix?
+#'
 #'
 #' @description Extract lengths of diagonal, vertical and horizontal line segments from a recurrence matrix.
 #'
@@ -2028,8 +2041,7 @@ rp_lineDist <- function(RM,
                         invert    = FALSE,
                         AUTO      = NULL,
                         chromatic = FALSE,
-                        matrices  = FALSE,
-                        doHalf    = FALSE){
+                        matrices  = FALSE){
 
   # For boot()
   # RP <- RP[indices,]
@@ -3145,8 +3157,13 @@ crqa_rp_calc <- function(RM,
     return(crqa_rp_empty())
   }
 
+
   #Get line segments
-  lineSegments <- rp_lineDist(RM)
+  lineSegments <- rp_lineDist(RM,
+                              DLmin = DLmin, DLmax = DLmax,
+                              VLmin = VLmin, VLmax = VLmax,
+                              HLmin = HLmin, HLmax = HLmax,
+                              theiler = theiler, AUTO = AUTO)
 
   dlines <- lineSegments$diagonals.dist
   vlines <- lineSegments$verticals.dist
@@ -3161,18 +3178,24 @@ crqa_rp_calc <- function(RM,
   freqvec_vl <- as.numeric(names(freq_vl))
   freqvec_hl <- as.numeric(names(freq_hl))
 
+  # Number of lines
+  N_dl <- sum(freq_dl, na.rm = TRUE)
+  N_vl <- sum(freq_vl, na.rm = TRUE)
+  N_hl <- sum(freq_hl, na.rm = TRUE)
+
   #Number of recurrent points on diagonal, vertical and horizontal lines
-  N_dl <- sum(freqvec_dl*freq_dl, na.rm = TRUE)
-  N_vl <- sum(freqvec_vl*freq_vl, na.rm = TRUE)
-  N_hl <- sum(freqvec_hl*freq_hl, na.rm = TRUE)
+  N_dlp <- sum(freqvec_dl*freq_dl, na.rm = TRUE)
+  N_vlp <- sum(freqvec_vl*freq_vl, na.rm = TRUE)
+  N_hlp <- sum(freqvec_hl*freq_hl, na.rm = TRUE)
 
   #Determinism / Horizontal and Vertical Laminarity
-  DET    <- N_dl/RP_N
-  LAM_vl <- N_vl/RP_N
-  LAM_hl <- N_hl/RP_N
+  DET    <- N_dlp/RP_N
+  LAM_vl <- N_vlp/RP_N
+  LAM_hl <- N_hlp/RP_N
 
   #anisotropy ratio
-  ANI    <- (N_vl-N_hl)/N_dl
+  #ANI    <- ((N_vlp-N_hlp)/N_dlp)%00%NA
+  ANI    <- (N_vlp/N_hlp)%00%NA
 
   # Singularities
   SING <- rp_lineDist(RM,
@@ -3187,14 +3210,14 @@ crqa_rp_calc <- function(RM,
   SING_rate <- SING_N / RP_N
 
   #Array of probabilities that a certain line length will occur (all >1)
-  P_dl <- freq_dl/sum(freq_dl, na.rm = TRUE)
-  P_vl <- freq_vl/sum(freq_vl, na.rm = TRUE)
-  P_hl <- freq_hl/sum(freq_hl, na.rm = TRUE)
+  P_dl <- freq_dl/N_dl
+  P_vl <- freq_vl/N_vl
+  P_hl <- freq_hl/N_hl
 
   #Entropy of line length distributions
-  ENT_dl <- -1 * sum(P_dl * log(P_dl), na.rm = TRUE)
-  ENT_vl <- -1 * sum(P_vl * log(P_vl), na.rm = TRUE)
-  ENT_hl <- -1 * sum(P_hl * log(P_hl), na.rm = TRUE)
+  ENT_dl <- -1 * sum(P_dl * log(P_dl))
+  ENT_vl <- -1 * sum(P_vl * log(P_vl))
+  ENT_hl <- -1 * sum(P_hl * log(P_hl))
 
   #Relative Entropy (Entropy / Max entropy)
   ENTrel_dl = ENT_dl/(-1 * log(1/DLmax))
@@ -3212,9 +3235,9 @@ crqa_rp_calc <- function(RM,
   MAX_hl = max(freqvec_hl, na.rm = TRUE)
 
   # REPetetiveness
-  REP_av <- ((N_hl/N_dl) + (N_vl/N_dl))/2
-  REP_hl  <-  N_hl/N_dl
-  REP_vl  <-  N_vl/N_dl
+  REP_av <- ((N_hlp/N_dlp) + (N_vlp/N_dlp))/2
+  REP_hl  <-  N_hlp/N_dlp
+  REP_vl  <-  N_vlp/N_dlp
 
   #Coefficient of determination
   CoV_dl = stats::sd(dlines)/mean(dlines)
@@ -3228,40 +3251,42 @@ crqa_rp_calc <- function(RM,
 
   #Output
   out <- data.frame(
-    emRad    = emRad,
-    RP_EN    = recmatsize,
-    RP_N     = RP_N,
-    RR       = RR,
-    SING_N   = SING_N,
+    emRad     = emRad,
+    RP_N      = RP_N,
+    RR        = RR,
+    SING_N    = SING_N,
     SING_rate = SING_rate,
-    DET      = DET,
-    MEAN_dl  = MEAN_dl,
-    MAX_dl   = MAX_dl,
-    ENT_dl   = ENT_dl,
-    ENTrel_dl= ENTrel_dl,
-    REP_av   = REP_av,
-    CoV_dl   = CoV_dl,
-    DIV_dl   = DIV_dl,
-    N_dl     = N_dl,
-    ANI      = ANI,
-    LAM_vl   = LAM_vl,
-    TT_vl    = MEAN_vl,
-    MAX_vl   = MAX_vl,
-    ENT_vl   = ENT_vl,
-    ENTrel_vl= ENTrel_vl,
-    CoV_vl   = CoV_vl,
-    REP_vl   = REP_vl,
-    DIV_vl   = DIV_vl,
-    N_vl     = N_vl,
-    LAM_hl   = LAM_hl,
-    TT_hl    = MEAN_hl,
-    MAX_hl   = MAX_hl,
-    ENT_hl   = ENT_hl,
-    ENTrel_hl= ENTrel_hl,
-    CoV_hl   = CoV_hl,
-    REP_hl   = REP_hl,
-    DIV_hl   = DIV_hl,
-    N_hl     = N_hl)
+    DIV_dl    = DIV_dl,
+    REP_av    = REP_av,
+    ANI       = ANI,
+    N_dl      = N_dl,
+    N_dlp     = N_dlp,
+    DET       = DET,
+    MEAN_dl   = MEAN_dl,
+    MAX_dl    = MAX_dl,
+    ENT_dl    = ENT_dl,
+    ENTrel_dl = ENTrel_dl,
+    CoV_dl    = CoV_dl,
+    N_vl      = N_vl,
+    N_vlp     = N_vlp,
+    LAM_vl    = LAM_vl,
+    TT_vl     = MEAN_vl,
+    MAX_vl    = MAX_vl,
+    ENT_vl    = ENT_vl,
+    ENTrel_vl = ENTrel_vl,
+    CoV_vl    = CoV_vl,
+    REP_vl    = REP_vl,
+    #    DIV_vl   = DIV_vl,
+    N_hlp     = N_hlp,
+    N_hl      = N_hl,
+    LAM_hl    = LAM_hl,
+    TT_hl     = MEAN_hl,
+    MAX_hl    = MAX_hl,
+    ENT_hl    = ENT_hl,
+    ENTrel_hl = ENTrel_hl,
+    CoV_hl    = CoV_hl,
+    REP_hl    = REP_hl)
+  #    DIV_hl   = DIV_hl)
 
   if(matrices){
     return(list(

@@ -8,7 +8,7 @@ crqa_diagPofile(RM, diagWin = NULL, xname = "", yname = "",
   DLmin = 2, VLmin = 2, HLmin = 2, DLmax = length(Matrix::diag(RM))
   - 1, VLmax = length(Matrix::diag(RM)) - 1,
   HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL,
-  chromatic = FALSE, matrices = FALSE)
+  chromatic = FALSE, matrices = FALSE, doPlot = TRUE)
 }
 \arguments{
 \item{RM}{A binary recurrence matrix}
@@ -36,6 +36,8 @@ crqa_diagPofile(RM, diagWin = NULL, xname = "", yname = "",
 \item{chromatic}{chromatic}
 
 \item{matrices}{matrices}
+
+\item{doPlot}{Plot}
 }
 \value{
 A plot and/or the data for the plot

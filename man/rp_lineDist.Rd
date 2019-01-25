@@ -8,8 +8,7 @@ rp_lineDist(RM, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RM)) - 1,
   VLmax = length(Matrix::diag(RM)) - 1,
   HLmax = length(Matrix::diag(RM)) - 1, d = NULL, theiler = NULL,
-  invert = FALSE, AUTO = NULL, chromatic = FALSE, matrices = FALSE,
-  doHalf = FALSE)
+  invert = FALSE, AUTO = NULL, chromatic = FALSE, matrices = FALSE)
 }
 \arguments{
 \item{RM}{A thresholded recurrence matrix (binary: 0 - 1)}
@@ -37,8 +36,6 @@ rp_lineDist(RM, DLmin = 2, VLmin = 2, HLmin = 2,
 \item{chromatic}{Chromatic RQA?}
 
 \item{matrices}{Return the matrices ?}
-
-\item{doHalf}{Analyse half of the matrix?}
 }
 \value{
 A list object with distributions of line lengths. If \code{matrices = TRUE} datafr are returned whose columns represent the nonzero diagonals, verticals, or, horizontals.
