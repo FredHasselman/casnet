@@ -4,46 +4,50 @@
 \alias{crqa_parameters}
 \title{Find optimal (C)RQA parameters}
 \usage{
-crqa_parameters(y, maxDim = 10, maxLag = floor(length(y)/(maxDim + 1)),
-  lagMethods = c("first.minimum", "global.minimum", "max.lag"),
-  emLag = NULL, nnSizes = c(2, 5, 10, 15), nnRadius = 5,
-  nnThres = 10, theiler = 0, estimateLags = TRUE,
-  estimateDimensions = TRUE, diagPlot = TRUE, silent = TRUE, ...)
+crqa_parameters(y, emLag = NULL, maxLag = floor(length(y)/(maxDim +
+  1)), lagMethods = c("first.minimum", "global.minimum", "max.lag"),
+  estimateDimensions = "preferSmallestInLargestHood", maxDim = 10,
+  nnSizes = c(2, 5, 10, 15), nnRadius = 5, nnThres = 10,
+  theiler = 0, diagPlot = TRUE, silent = TRUE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series}
 
-\item{maxDim}{Maximum number of embedding dimensions (default = \code{10})}
+\item{emLag}{Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If \code{NULL} the lags based on the mutual information in \code{lagMethods} will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = \code{NULL})}
 
-\item{maxLag}{Maximum embedding lag to consider. Defaults to \code{floor(length(y)/(maxDim+1))}.}
+\item{maxLag}{Maximum embedding lag to consider. Default value is: \code{floor(length(y)/(maxDim+1))}}
 
-\item{lagMethods}{A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")}
+\item{lagMethods}{A character vector with one or more of the following strings: \code{"first.minimum","global.minimum","max.lag"}. If \code{emLag} represents a valid lag this value will  be reported as "user.lag" (default = \code{c("first.minimum","global.minimum","max.lag")})}
 
-\item{emLag}{Optimal embedding lag (delay), e.g., provided by optimising algorithm. Leave empty to estimate (default = \code{NULL})}
+\item{estimateDimensions}{Decide on an optimal embedding dimension relative to the values in \code{maxDim} and \code{lagMethods}, according to a number of preferences passed as a character vector. The order in which the preferences appear in the vector affects the selection procedure, with index \code{1} being most important preference. The following options are available: \itemize{
+\item{\code{preferNone} - No optimal number will be picked all other preferences will be ignored}
+\item{\code{preferSmallestDim} - Pick smallest number of dimensions associated with a percentage NN below \code{nnThres}}
+\item{\code{preferSmallestNN} - Pick the number of dimensions that is associated with the smallest percentage NN below \code{nnThres}}
+\item{\code{preferSmallestLag} - If the value of \code{nnThres} does not lead to a unique preference for a pair of dimension and lag values, use the pair with the smallest lag}
+\item{\code{preferSmallestInLargestHood} - The default option: If no unique pair can be found, prefer pairs with smallest values for lag, dimensions, percentage NN for the largest NN size}
+}}
 
-\item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5)})}
+\item{maxDim}{Maximum number of embedding dimensions to consider (default = \code{10})}
 
-\item{nnRadius}{If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{c(5,10)})}
+\item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5,10,15)})}
 
-\item{nnThres}{Threshold for selecting optimal parameter in percentage points (default = \code{10})}
+\item{nnRadius}{If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{5})}
+
+\item{nnThres}{Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = \code{10})}
 
 \item{theiler}{Theiler window on distance matrix (default = \code{0})}
 
-\item{estimateLags}{Get optimal embedding lags}
-
-\item{estimateDimensions}{Get optimal embedding dimension}
-
-\item{diagPlot}{Plot the results}
+\item{diagPlot}{Produce a diagnostic plot the results (default = \code{TRUE})}
 
 \item{silent}{Silent-ish mode}
 
 \item{...}{Other parameters passed to \code{\link[nonlinearTseries]{timeLag}}}
 }
 \value{
-A list object containing the optimal values and iteration history.
+A list object containing the optimal values (as indicated by the user) and iteration history.
 }
 \description{
-A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
+A wrapper for various algorithms used to find optimal value pair for the embedding delay and the number of embedding dimensions
 }
 \details{
 A number of functions are called to determie optimal parameters for delay embedding a time series:

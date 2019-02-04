@@ -4,31 +4,51 @@
 \alias{fd_sda}
 \title{Standardised Dispersion Analysis (SDA).}
 \usage{
-fd_sda(y, fs = NULL, standardise = TRUE, detrend = FALSE,
-  scales = 2^(1:(log2(length(y)/2))), fitRange = c(scales[1],
-  scales[length(scales) - 2]), doPlot = FALSE, returnPLAW = FALSE,
-  returnInfo = FALSE, silent = TRUE)
+fd_sda(y, fs = NULL, standardise = c("mean.sd", "median.mad")[1],
+  detrend = FALSE, polyOrder = 1, adjustSumOrder = FALSE,
+  scaleMin = 2, scaleMax = floor(log2(NROW(y)/2)),
+  scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4,
+  doPlot = TRUE, returnPlot = FALSE, returnPLAW = FALSE,
+  returnInfo = FALSE, silent = TRUE, noTitle = FALSE, tsName = "y")
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
 
 \item{fs}{Sample rate (default = NULL)}
 
-\item{standardise}{standardise the series (default = TRUE)}
+\item{standardise}{standardise the series (default = "mean.sd")}
 
-\item{detrend}{Subtract linear trend from the series (default = TRUE)}
+\item{detrend}{Subtract linear trend from the series (default = FALSE)}
 
-\item{scales}{default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}}
+\item{polyOrder}{Order of detrending polynomial}
 
-\item{fitRange}{Scale bins (\code{c(min,max)}) to use for fitting the scaling relation}
+\item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
 
-\item{doPlot}{Return the log-log spectrum with linear fit (default = \code{TRUE}).}
+\item{scaleMin}{Minimium scale to use}
+
+\item{scaleMax}{Maximum scale to use}
+
+\item{scaleResolution}{The scales at which the standardised fluctuations are calculated as: \code{(scaleMax-scaleMin)/scaleResolution}}
+
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.}
+
+\item{overlap}{Turn SDA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2} (default = \code{0})}
+
+\item{minData}{Minimum number of data points in a bin needed to calculate standardised dispersion}
+
+\item{doPlot}{Output the log-log scale versus fluctuation plot with linear fit by calling function \code{plotFD_loglog()} (default = \code{TRUE})}
+
+\item{returnPlot}{Return ggplot2 object (default = \code{FALSE})}
 
 \item{returnPLAW}{Return the power law data (default = \code{FALSE})}
 
-\item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
+\item{returnInfo}{Return all the data used in SDA (default = \code{FALSE})}
 
 \item{silent}{Silent-ish mode}
+
+\item{noTitle}{Do not generate a title (only the subtitle)}
+
+\item{tsName}{Name of y added as a subtitle to the plot}
 }
 \value{
 A list object containing:
@@ -45,7 +65,13 @@ fd_sda
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
+\seealso{
+Other Fluctuation Analyses: \code{\link{MFDFA}},
+  \code{\link{fd_RR}}, \code{\link{fd_allan}},
+  \code{\link{fd_dfa}}, \code{\link{fd_psd}},
+  \code{\link{fd_sev}}
+}
 \author{
 Fred Hasselman
 }
-\concept{FD estimators}
+\concept{Fluctuation Analyses}

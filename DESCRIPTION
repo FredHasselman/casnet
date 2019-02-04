@@ -55,7 +55,8 @@ Imports:
     callr,
     readr,
     paletteer,
-    ggraph
+    ggraph,
+    boot
 Suggests: knitr,
     rmarkdown,
     graphics,

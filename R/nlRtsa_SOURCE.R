@@ -613,24 +613,29 @@ crqa_cl <- function(y1,
 
 #' Find optimal (C)RQA parameters
 #'
-#' A wrapper for various algorithms used to find optimal embedding delay, number of embedding dimensions and radius.
+#' A wrapper for various algorithms used to find optimal value pair for the embedding delay and the number of embedding dimensions
 #'
 #' @param y A numeric vector or time series
-#' @param maxDim Maximum number of embedding dimensions (default = \code{10})
-#' @param maxLag Maximum embedding lag to consider. Defaults to \code{floor(length(y)/(maxDim+1))}.
-#' @param emLag Optimal embedding lag (delay), e.g., provided by optimising algorithm. Leave empty to estimate (default = \code{NULL})
-#' @param lagMethods A range of embedding lags to consider when calling \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"}, valid options are c("first.e.decay", "first.zero", "first.minimum")
-#' @param nnSizes  Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5)})
-#' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{c(5,10)})
-#' @param nnThres  Threshold for selecting optimal parameter in percentage points (default = \code{10})
+#' @param emLag Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If \code{NULL} the lags based on the mutual information in \code{lagMethods} will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = \code{NULL})
+#' @param lagMethods A character vector with one or more of the following strings: \code{"first.minimum","global.minimum","max.lag"}. If \code{emLag} represents a valid lag this value will  be reported as "user.lag" (default = \code{c("first.minimum","global.minimum","max.lag")})
+#' @param maxLag Maximum embedding lag to consider. Default value is: \code{floor(length(y)/(maxDim+1))}
+#' @param estimateDimensions Decide on an optimal embedding dimension relative to the values in \code{maxDim} and \code{lagMethods}, according to a number of preferences passed as a character vector. The order in which the preferences appear in the vector affects the selection procedure, with index \code{1} being most important preference. The following options are available: \itemize{
+#' \item{\code{preferNone} - No optimal number will be picked all other preferences will be ignored}
+#' \item{\code{preferSmallestDim} - Pick smallest number of dimensions associated with a percentage NN below \code{nnThres}}
+#' \item{\code{preferSmallestNN} - Pick the number of dimensions that is associated with the smallest percentage NN below \code{nnThres}}
+#' \item{\code{preferSmallestLag} - If the value of \code{nnThres} does not lead to a unique preference for a pair of dimension and lag values, use the pair with the smallest lag}
+#' \item{\code{preferSmallestInLargestHood} - The default option: If no unique pair can be found, prefer pairs with smallest values for lag, dimensions, percentage NN for the largest NN size}
+#' }
+#' @param maxDim Maximum number of embedding dimensions to consider (default = \code{10})
+#' @param nnSizes Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5,10,15)})
+#' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{5})
+#' @param nnThres Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = \code{10})
 #' @param theiler Theiler window on distance matrix (default = \code{0})
-#' @param diagPlot Plot the results
-#' @param estimateDimensions Get optimal embedding dimension
-#' @param estimateLags Get optimal embedding lags
+#' @param diagPlot Produce a diagnostic plot the results (default = \code{TRUE})
 #' @param silent Silent-ish mode
 #' @param ... Other parameters passed to \code{\link[nonlinearTseries]{timeLag}}
 #'
-#' @return A list object containing the optimal values and iteration history.
+#' @return A list object containing the optimal values (as indicated by the user) and iteration history.
 #'
 #' @details A number of functions are called to determie optimal parameters for delay embedding a time series:
 #'
@@ -644,16 +649,15 @@ crqa_cl <- function(y1,
 #' @export
 #'
 crqa_parameters <- function(y,
-                            maxDim   = 10,
+                            emLag     = NULL,
                             maxLag   = floor(length(y)/(maxDim+1)),
                             lagMethods = c("first.minimum","global.minimum","max.lag"),
-                            emLag     = NULL,
+                            estimateDimensions = "preferSmallestInLargestHood",
+                            maxDim   = 10,
                             nnSizes  = c(2,5,10,15),
                             nnRadius = 5,
                             nnThres  = 10,
                             theiler  = 0,
-                            estimateLags = TRUE,
-                            estimateDimensions = TRUE,
                             diagPlot = TRUE,
                             silent   = TRUE,
                             ...){
@@ -667,42 +671,48 @@ crqa_parameters <- function(y,
 
   emDims  <-  1:maxDim
 
-  if(is.null(emLag)){
-    if(estimateDimensions){
-      mi <- mif(data.frame(y),lags = 1:maxLag)
-      #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
-      emLags <- cbind.data.frame(selection.methods = lagMethods, lag = NA)
-      for(m in seq_along(emLags$selection.methods)){
-        if(emLags$selection.methods[m]=="first.minimum"){
-          emLags$lag[m] <- which(ts_symbolic(data.frame(mi))[,2]%in%"trough")[1]%00%NA
-          emLags$ami[m] <- mi[emLags$lag[m]]
-        }
-        if(emLags$selection.methods[m]=="global.minimum"){
-          emLags$lag[m] <- as.numeric(which.min(mi))
-          emLags$ami[m] <- mi[emLags$lag[m]]
-        }
-        if(emLags$selection.methods[m]=="max.lag"){
-          emLags$lag[m] <- maxLag
-          emLags$ami[m] <- mi[emLags$lag[m]]
-        }
-      }
-    } else {
-      emLags <- cbind.data.frame(selection.methods = "Not estimated", lag = NA, ami = NA)
-    }
-  } else {
+  doLags <- c(1:maxLag)
+  if(!is.null(emLag)){
     if(NROW(emLag==1)){
-     emLags <- cbind.data.frame(selection.methods = "User", lag = emLag, ami = 0)
+      lagMethods <- c(lagMethods, "user.lag") #  lag = emLag, ami = 0)
+      doLags <- unique(sort(c(1:maxLag,emLag)))
     } else {
       stop("emLag must have 1 numeric value")
     }
   }
 
+    if(nchar(estimateDimensions)>1){
+      mi <- mif(data.frame(y),lags = doLags)
+      #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+      emLags <- cbind.data.frame(selection.methods = lagMethods, lag = NA)
+      for(m in seq_along(emLags$selection.methods)){
+        if(emLags$selection.methods[m]=="first.minimum"){
+          emLags$lag[m] <- which(ts_symbolic(data.frame(mi))[,2]%in%"trough")[1]%00%NA
+        }
+        if(emLags$selection.methods[m]=="global.minimum"){
+          emLags$lag[m] <- as.numeric(which.min(mi))
+        }
+        if(emLags$selection.methods[m]=="max.lag"){
+          emLags$lag[m] <- maxLag
+        }
+        if(emLags$selection.methods[m]=="user.lag"){
+          emLags$lag[m] <- emLag
+        }
+        emLags$ami[m] <- mi[emLags$lag[m]]
+      }
+    } else {
+      emLags <- cbind.data.frame(selection.methods = "Not estimated", lag = NA, ami = NA)
+    }
+
+
   # (fn.out <- tseriesChaos::false.nearest(lx, m=10, d=17, t=0, eps=sd(lx)/10, rt=20))
   # plot(fn.out[1,],type="b")
 
-if(estimateDimensions){
+if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallestNN", "preferSmallestLag", "preferSmallestInLargestHood"))){
+
   lagList <- list()
   cnt = 0
+
   for(N in seq_along(nnSizes)){
     for(R in seq_along(nnRadius)){
       for(L in seq_along(emLags$selection.method)){
@@ -759,19 +769,29 @@ if(estimateDimensions){
   opt <-plyr::ldply(unique(df$emLag), function(n){
     id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
     if(length(id)>0){
-      idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
-      if(length(idmin)>0){
-        return(df[idmin,])
-      }
+      #idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
+      # if(length(idmin)>0){
+      #   return(df[idmin,])
+      #}
+      df <- df[id,]
+      return(df[!duplicated(df),])
     } else {
       return(df[which.min(df$Nn.pct[(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag"))]),])
     }
   }
   )
 
-  opt <- opt[opt$emDim==min(opt$emDim),][1,]
+ opt <- switch(estimateDimensions,
+         preferNone = opt[!duplicated(opt),],
+         preferSmallestDim = opt[min(opt$emDim, na.rm=TRUE),],
+         preferSmallestNN = opt[min(opt$NN.pct, na.rm=TRUE),],
+         preferSmallestLag = opt[min(opt$emLag, na.rm=TRUE),],
+         preferSmallestInLargestHood = opt[(min(opt$emLag, na.rm=TRUE)&min(opt$emDim, na.rm=TRUE)&max(opt$Nsize, na.rm = TRUE)),]
+         )
 
-  opDim <- opt$emDim
+  #opt <- opt[opt$emDim==min(opt$emDim),][1,]
+  opDim <- min(unique(opt$emDim), na.rm = TRUE)
+  #opt <- opt[!duplicated(opt),]
 
   } else { # if estimateDim
     opDim <- NA
@@ -782,8 +802,10 @@ if(estimateDimensions){
   # opLag <- tau(y,
   #              selection.methods = ami.method,
   #              maxLag =maxLag)$opLag[1]
-  opLag <- df$emLag[which.min(min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE))]
+  opLag <- min(unique(opt$emLag), na.rm = TRUE)
   #opRad = NULL
+
+  opt <- opt[all(opt$emDim==opDim,opt$emLag==opLag),]
 
   df$emLag <- factor(df$emLag)
   df$Nns   <- interaction(df$Nsize,df$Nradius)
@@ -3702,8 +3724,12 @@ rn_plot <- function(RN, title = "", xlab = "", ylab="", returnOnlyObject = FALSE
 #' @param RN A thresholded recurrence matrix generated by function \code{rn()}
 #' @param fitRange If \code{NULL} the entire range will be used for log-log slope. If a 2-element vector of integers, this will represent the range of recurrence times to use for fitting the log=log slope (e.g. \code{c(1,50)} would fit the first 50 recurrence times).
 #' @param doPlot Should a plot of the recurrence time spectrum be produced?
-#' @param returnOnlyObject Return the \code{ggplot} / \code{ggraph} object only, do not draw the plot (default = \code{FALSE})
-#' @param returnPowerLaw Return results of log-log regression
+#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
+#' @param returnPLAW Return the power law data (default = \code{FALSE})
+#' @param returnInfo Return all the data used in SDA (default = \code{FALSE})
+#' @param silent Silent-ish mode
+#' @param noTitle Do not generate a title (only the subtitle)
+#' @param tsName Name of y added as a subtitle to the plot
 #'
 #' @return A vector of frequencies of recurrence times and a plot (if requested)
 #'
@@ -3711,71 +3737,125 @@ rn_plot <- function(RN, title = "", xlab = "", ylab="", returnOnlyObject = FALSE
 #'
 #' @family Distance matrix operations (recurrence plot)
 #'
-rn_recSpec <- function(RN, fitRange = NULL, doPlot = TRUE, returnOnlyObject = FALSE, returnPowerLaw = FALSE){
+rn_recSpec <- function(RN,
+                       fitRange = NULL,
+                       doPlot = TRUE,
+                       returnPlot = FALSE,
+                       returnPLAW = FALSE,
+                       returnInfo = FALSE,
+                       silent = TRUE,
+                       noTitle = FALSE,
+                       tsName="y"){
 
   if(is.null(attributes(RN)$weighted)){
     stop("Wrong RN format: Create a thresholded recurrence matrix using function rn()")
   }
 
-  if(is.null(fitRange)){
-    nr <- 1:NROW(RN)
-  } else {
-    if(length(fitRange)==2&all(is.integer(fitRange))){
-      nr <- fitRange[1]:fitRange[2]
-    } else {
-      stop("Wrong fitRange format: Either NULL or a 2-integer vector.")
-    }
-  }
 
-  diagonal <- attributes(RN)
+  diagonal <- attributes(RN)$includeDiagonal
+  weighted <- NULL
+  if(attributes(RN)$weighted){weighted <- TRUE}
 
-  g1 <- igraph::graph_from_adjacency_matrix(RN, mode="upper", diag = FALSE, weighted = NULL)
+  g1 <- igraph::graph_from_adjacency_matrix(RN, mode="upper", diag = diagonal, weighted = weighted)
 
   edgeFrame <- igraph::as_data_frame(g1,"edges")
   edgeFrame$rectime <- edgeFrame$to-edgeFrame$from
 
   #d <- density(edgeFrame$rectime, kernel = "cosine")
   #plot(d)
-  d <- table(edgeFrame$rectime)
-  ddata <- data.frame(x = as.numeric(names(d)), y = as.numeric(d))
-  # ddata <- data.frame(x = d$x[d$x>=0], y = d$y[d$x>=0])
-  ddata$x[ddata$x==0] <- ddata$x[ddata$x==0]+.Machine$double.eps
-  ddata$y[ddata$y==0] <- ddata$y[ddata$y==0]+.Machine$double.eps
-  ddata$x_l <- log2(ddata$x)
-  ddata$y_l <- log2(ddata$y)
-  ddata <- ddata[-1,]
-  ddata <- dplyr::arrange_(ddata,~x)
+  #d <- table(edgeFrame$rectime)
+  d <- graphics::hist(edgeFrame$rectime,breaks = (0:NROW(RN))+0.5, plot = FALSE)$count
+  names(d) <- paste(1:NROW(RN))
+  d <- d[d>0]
 
-  lfit  <- stats::lm(ddata$y_l[nr] ~ ddata$x[nr])
-  alpha <- stats::coef(lfit)[2]
-
-  ddata$x_p     <- ddata$y_p <- NA
-  ddata$x_p[nr] <- ddata$x_l[nr]
-  ddata$y_p[nr] <- stats::predict(lfit)
-
-  breaks_x <- scales::log_breaks(n=abs(diff(range(round(log2(ddata$x)))+c(-1,1))),base=2)(ddata$x)
-  labels_x <- eval(quote(scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_x)))
-
-  breaks_y <- scales::log_breaks(n=abs(diff(range(round(log2(ddata$y)))+c(-1,1))),base=2)(ddata$y)
-  labels_y <- eval(quote(scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_y)))
-
-  g <- ggplot2::ggplot(ddata, ggplot2::aes_(x=~x_l,y=~y_l)) +
-    scale_x_continuous(breaks = log2(breaks_x),
-                       labels = labels_x,  expand = c(0,0)) + # limits = lims_x) +
-    scale_y_continuous(breaks = log2(breaks_y),
-                       labels = labels_y, expand = c(0,0)) + # limits = lims_y) +
-    geom_point() +
-    geom_line(ggplot2::aes_(x=~x_p,y=~y_p), colour = "red3") +
-    ylab("Recurrence Times (log2)")+xlab("Frequency of Occurrence (log2)") +
-    #geom_label(aes(x=ddata$x_l[25],y=ddata$y_l[25],label=round(alpha,2))) +
-    annotation_logticks() +
-    theme_bw()
-
-  if(!returnOnlyObject){
-    grid::grid.newpage()
-    grid::grid.draw(g)
+  if(is.null(fitRange)){
+    nr <- 1:round(length(d)/4)
+  } else {
+    if(length(fitRange)==2&is.numeric(fitRange)){
+      nr <- fitRange[1]:fitRange[2]
+    } else {
+      stop("Wrong fitRange format: Either NULL or a 2-integer vector.")
+    }
   }
-  return(invisible(g))
+
+  nr <- which(nr%in%names(d))
+
+  ddata <- data.frame(size = as.numeric(names(d)), bulk = as.numeric(d))
+  ddata <- dplyr::arrange_(ddata,~size)
+
+  lmfit1  <- stats::lm(log2(ddata$bulk) ~ log2(ddata$size))
+  alpha1 <- stats::coef(lmfit1)[2]
+
+  lmfit2  <- stats::lm(log2(ddata$bulk[nr]) ~ log2(ddata$size[nr]))
+  alpha2 <- stats::coef(lmfit2)[2]
+
+  outList <- list(
+    PLAW  =  ddata,
+    fullRange = list(sap = alpha1,
+                     # H = 1+stats::coef(lmfit1)[2] + Hadj,
+                     # FD = sa2fd_sda(stats::coef(lmfit1)[2]),
+                     fitlm1 = lmfit1,
+                     method = paste0("Full range (n = ",length(ddata$size),")\nSlope = ",round(stats::coef(lmfit1)[2],2))), #" | FD = ",round(sa2fd_sda(stats::coef(lmfit1)[2]),2))),
+    fitRange  = list(sap = stats::coef(lmfit2)[2],
+                     # H = 1+stats::coef(lmfit2)[2] + Hadj,
+                     # FD = sa2fd_sda(stats::coef(lmfit2)[2]),
+                     fitlm2 = lmfit2,
+                     method = paste0("Fit range (n = ",length(ddata$size[nr]),")\nSlope = ",round(stats::coef(lmfit2)[2],2))), # | FD = ",round(sa2fd_sda(stats::coef(lmfit2)[2]),2))),
+    info = edgeFrame,
+    plot = NA)
+
+  if(doPlot|returnPlot){
+    if(noTitle){
+      title <- ""
+    } else {
+      title <- "log-log regression (SDA)"
+    }
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2", xlabel = "Recurrence Times", ylabel = "Frequency")
+    if(doPlot){
+      grid::grid.newpage()
+      grid::grid.draw(g)
+    }
+    if(returnPlot){
+      outList$plot <- invisible(g)
+    }
+  }
+
+  if(returnInfo){returnPLAW<-TRUE}
+
+  return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+
+
+#if(doPlot){
+#
+#   breaks_x <- scales::log_breaks(n=abs(diff(range(round(log2(ddata$x)))+c(-1,1))),base=2)(ddata$x)
+#   labels_x <- eval(quote(scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_x)))
+#
+#   breaks_y <- scales::log_breaks(n=abs(diff(range(round(log2(ddata$y)))+c(-1,1))),base=2)(ddata$y)
+#   labels_y <- eval(quote(scales::trans_format("log2", scales::math_format(2^.x,format=scales::number_format(accuracy = .1)))(breaks_y)))
+#
+#   g <- ggplot2::ggplot(ddata, ggplot2::aes_(x=~x_l,y=~y_l)) +
+#     scale_x_continuous(breaks = log2(breaks_x),
+#                        labels = labels_x,  expand = c(0,0)) + # limits = lims_x) +
+#     scale_y_continuous(breaks = log2(breaks_y),
+#                        labels = labels_y, expand = c(0,0)) + # limits = lims_y) +
+#     geom_point() +
+#     geom_line(ggplot2::aes_(x=~x_p,y=~y_p), colour = "red3") +
+#     ylab("Recurrence Times (log2)")+xlab("Frequency of Occurrence (log2)") +
+#     #geom_label(aes(x=ddata$x_l[25],y=ddata$y_l[25],label=round(alpha,2))) +
+#     annotation_logticks() +
+#     theme_bw()
+
+#   grid::grid.newpage()
+#   grid::grid.draw(g)
+# }
+#
+# if(returnOnlyObject){
+#   return(invisible(g))
+# }
+#
+#   if(returnPowerLaw){
+#     return(ddata)
+#   }
 
 }
 
@@ -4534,6 +4614,7 @@ fd_RR <- function(y){
   RelR   <- 2*(1-VAR$acf[2] / VAR$acf[1])
   # Add some attributes to the output
   attributes(RelR) <- list(localAutoCoVariance = VAR$acf[2], globalAutoCoVariance = VAR$acf[1])
+
   return(RelR)
 }
 
@@ -4546,10 +4627,14 @@ fd_RR <- function(y){
 #' @param fs Sample rate (default = \code{NULL})
 #' @param standardise    standardise the series (default = \code{TRUE}).
 #' @param detrend    Subtract linear trend from the series (default = \code{TRUE}).
+#' @param fitMethod Method to decide on a frequency range for log-log fit. Can be one of: "lowest25","Wijnants","Hurvich-Deo" (default). See details for more info.
 #' @param doPlot    Return the log-log spectrum with linear fit (default = \code{TRUE}).
+#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
 #' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
-#' @param silent Run in silent-ish mode (default = \code{TRUE)})
+#' @param returnInfo Return all the data used in SDA (default = \code{FALSE})
+#' @param silent Run in silent-ish mode (default = \code{TRUE)}
+#' @param noTitle Do not generate a title (only the subtitle)
+#' @param tsName Name of y added as a subtitle to the plot
 #'
 #' @author Fred Hasselman
 #'
@@ -4569,9 +4654,25 @@ fd_RR <- function(y){
 #'
 #' @details Calls function \code{\link[sapa]{SDF}} to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), \code{SDF} is called using a Tukey window (\code{raised cosine \link[sapa]{taper}}).
 #'
-#' A line is fitted on the periodogram in log-log coordinates. Two fit-ranges are used: The 25\% lowest frequencies and the Hurvich-Deo estimate (\code{\link[fractal]{HDEst}}).
+#' A line is fitted on the periodogram in log-log coordinates. The full ramge is fitted as well as one of three fit-ranges:
+#' \itemize{
+#' \item{\code{lowest25} - The 25\% lowest frequencies}
+#' \item{\code{Wijnants} - The 50 lowest frequencies (Wijnants et al., 2012)}
+#' \item{\code{HurvichDeo} - The Hurvich-Deo estimate, see (\code{\link[fractal]{HDEst}})}
+#' }
 #'
-fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE){
+fd_psd <- function(y,
+                   fs = NULL,
+                   standardise = TRUE,
+                   detrend = TRUE,
+                   fitMethod = c("lowest25","Wijnants","Hurvich-Deo")[3],
+                   doPlot = TRUE,
+                   returnPlot = FALSE,
+                   returnPLAW = FALSE,
+                   returnInfo = FALSE,
+                   silent = TRUE,
+                   noTitle = FALSE,
+                   tsName="y"){
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
@@ -4613,38 +4714,60 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TR
 
   # General guideline: fit over 25% frequencies
   # If signal is continuous (sampled) consider Wijnants et al. (2013) log-log fitting procedure
-  nr <- fractal::HDEst(NFT = length(powspec$bulk[1:nr]), sdf = as.vector(powspec$bulk[1:nr]))
+  nr <- switch(fitMethod,
+    "lowest25" = which.min(powspec$size>=0.25),
+    "Hurvich-Deo" = fractal::HDEst(NFT = length(powspec$bulk), sdf = as.vector(powspec$bulk)),
+    "Wijnants" = 50
+  )
 
-  exp1 <- fractal::hurstSpec(y, sdf.method="direct", freq.max = 0.25, taper.=Tukey )
   if(nr>=length(powspec$freq.norm)){nr <- length(powspec$freq.norm)-1}
+  exp1 <- fractal::hurstSpec(y, sdf.method="direct", freq.max = powspec$freq.norm[length(powspec$freq.norm)-1], taper.=Tukey )
   exp2 <- fractal::hurstSpec(y, sdf.method="direct", freq.max = powspec$freq.norm[nr], taper.=Tukey)
 
   ifelse((glob > 0.2), {
-    lmfit1 <- stats::lm(log(rev(powspec$bulk[powspec$size<=0.25])) ~ log(rev(powspec$size[powspec$size<=0.25])))
+    lmfit1 <- stats::lm(log(rev(powspec$bulk)) ~ log(rev(powspec$size)))
     lmfit2 <- stats::lm(log(rev(powspec$bulk[1:nr])) ~ log(rev(powspec$size[1:nr])))
   },{
-    lmfit1 <- stats::lm(log(powspec$bulk[powspec$size<=0.25]) ~ log(powspec$size[powspec$size<=0.25]))
+    lmfit1 <- stats::lm(log(powspec$bulk) ~ log(powspec$size))
     lmfit2 <- stats::lm(log(powspec$bulk[1:nr]) ~ log(powspec$size[1:nr]))
   })
 
-  if(doPlot){
-    old<- ifultools::splitplot(2,1,1)
-    graphics::plot(y,ylab = "Y", main = paste0('Lowest 25%    sap: ', round(stats::coef(lmfit1)[2],digits=2), ' | H:', round(exp1,digits=2), ' | FD:',round(sa2fd_psd(stats::coef(lmfit1)[2]),digits=2),'\nHurvic-Deo    sap: ', round(stats::coef(lmfit2)[2],digits=2), ' | H:', round(exp2,digits=2), ' | FD:',round(sa2fd_psd(stats::coef(lmfit2)[2]),digits=2)))
-    ifultools::splitplot(2,1,2)
-    graphics::plot(log(powspec$bulk) ~ log(powspec$size), xlab="log(Frequency)", ylab = "log(Power)")
-    graphics::lines(log(powspec$size[powspec$size<=0.25]), stats::predict(lmfit1),lwd=3,col="darkred")
-    graphics::lines(log(powspec$size[1:nr]), stats::predict(lmfit2),lwd=3,col="darkblue")
-    graphics::legend("bottomleft",c(paste0("lowest 25% (n = ",sum(powspec$size<=0.25),")"), paste0("Hurvic-Deo estimate (n = ",nr,")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
-    graphics::par(old)
-  }
-
-  return(list(
+  outList <- list(
     PLAW  = powspec,
-    low25 = list(sap = stats::coef(lmfit1)[2], H = exp1, FD = sa2fd_psd(stats::coef(lmfit1)[2]), fitlm1 = lmfit1),
-    HD    = list(sap = stats::coef(lmfit2)[2], H = exp2, FD = sa2fd_psd(stats::coef(lmfit2)[2]), fitlm2 = lmfit2),
-    info  = psd)
-  )
+    fullRange = list(sap = stats::coef(lmfit1)[2],
+                     H = exp1,
+                     FD = sa2fd_psd(stats::coef(lmfit1)[2]),
+                     fitlm1 = lmfit1,
+                     method = paste0("All frequencies (n = ",length(powspec$freq.norm),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",sa2fd_psd(stats::coef(lmfit1)[2]))),
+    fitRange  = list(sap = stats::coef(lmfit2)[2],
+                     H = exp2,
+                     FD = sa2fd_psd(stats::coef(lmfit2)[2]),
+                     fitlm2 = lmfit2,
+                     method = paste0(fitMethod," (n = ",nr,")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",sa2fd_psd(stats::coef(lmfit2)[2]))),
+    info = psd,
+    plot = NA)
+
+  if(doPlot|returnPlot){
+      if(noTitle){
+        title <- ""
+      } else {
+        title <- "log-log regression (PSD)"
+      }
+      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Normalised Frequency", ylabel = "Power")
+      if(doPlot){
+        grid::grid.newpage()
+        grid::grid.draw(g)
+      }
+      if(returnPlot){
+        outList$plot <- invisible(g)
+      }
+    }
+
+    if(returnInfo){returnPLAW<-TRUE}
+
+    return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
 }
+
 
 #' fd_sda
 #'
@@ -4652,14 +4775,23 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TR
 #'
 #' @param y    A numeric vector or time series object.
 #' @param fs Sample rate (default = NULL)
-#' @param standardise standardise the series (default = TRUE)
-#' @param detrend Subtract linear trend from the series (default = TRUE)
-#' @param scales default = \code{fractal::dispersion(y)$scale}, see \code{\link[fractal]{dispersion}}
-#' @param fitRange Scale bins (\code{c(min,max)}) to use for fitting the scaling relation
-#' @param doPlot    Return the log-log spectrum with linear fit (default = \code{TRUE}).
+#' @param standardise standardise the series (default = "mean.sd")
+#' @param detrend Subtract linear trend from the series (default = FALSE)
+#' @param polyOrder Order of detrending polynomial
+#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})
+#' @param scaleMax   Maximum scale to use
+#' @param scaleMin   Minimium scale to use
+#' @param scaleResolution  The scales at which the standardised fluctuations are calculated as: \code{(scaleMax-scaleMin)/scaleResolution}
+#' @param scaleS If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.
+#' @param overlap Turn SDA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2} (default = \code{0})
+#' @param minData Minimum number of data points in a bin needed to calculate standardised dispersion
+#' @param doPlot   Output the log-log scale versus fluctuation plot with linear fit by calling function \code{plotFD_loglog()} (default = \code{TRUE})
+#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
 #' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param returnInfo Return all the data used in SDA (default = \code{FALSE})
 #' @param silent Silent-ish mode
+#' @param noTitle Do not generate a title (only the subtitle)
+#' @param tsName Name of y added as a subtitle to the plot
 #'
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
@@ -4674,55 +4806,110 @@ fd_psd <- function(y, fs = NULL, standardise = TRUE, detrend = TRUE, doPlot = TR
 #'
 #' @export
 #'
-#' @family FD estimators
+#' @family Fluctuation Analyses
 #'
 fd_sda <- function(y,
                    fs = NULL,
-                   standardise = TRUE,
+                   standardise = c("mean.sd","median.mad")[1],
                    detrend = FALSE,
-                   scales = 2^(1:(log2(length(y)/2))),
-                   fitRange = c(scales[1], scales[length(scales)-2]),
-                   doPlot = FALSE,
+                   polyOrder=1,
+                   adjustSumOrder = FALSE,
+                   scaleMin = 2,
+                   scaleMax = floor(log2(NROW(y)/2)),
+                   scaleResolution = 30,
+                   scaleS = NA,
+                   overlap = 0,
+                   minData = 4,
+                   doPlot = TRUE,
+                   returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
-                   silent = TRUE){
+                   silent = TRUE,
+                   noTitle = FALSE,
+                   tsName="y"){
+
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
     y <- stats::ts(y, frequency = fs)
-   if(!silent){cat("\n\nfd.sda:\tSample rate was set to 1.\n\n")}
+    if(!silent){cat("\n\nfd.sda:\tSample rate was set to 1.\n\n")}
   }
 
   N             <- length(y)
   # Simple linear detrending.
-  if(detrend){y <- ts_detrend(y)} # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
+  if(detrend){y <- ts_detrend(y,polyOrder = polyOrder)} # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
   # standardise using N instead of N-1.
-  if(standardise){y <- ts_standardise(y,type="mean.sd",adjustN = FALSE)}
-
-  bins          <- which(fitRange[1]==scales):which(fitRange[2]==scales)
-  out           <- fractal::dispersion(y, front = FALSE)
-  lmfit1        <- stats::lm(log(out$sd) ~ log(out$scale))
-  lmfit2        <- stats::lm(log(out$sd[bins]) ~ log(out$scale[bins]))
-
-  if(doPlot){
-    old<- ifultools::splitplot(2,1,1)
-    graphics::plot(y,ylab = "Y", main = paste0('Full    sap: ', round(stats::coef(lmfit1)[2],digits=2), ' | H:', round(1+stats::coef(lmfit1)[2],digits=2), ' | FD:',round(sa2fd_sda(stats::coef(lmfit1)[2]),digits=2),'\nRange    sap: ', round(stats::coef(lmfit2)[2],digits=2), ' | H:', round(1+stats::coef(lmfit1)[2],digits=2), ' | FD:',round(sa2fd_sda(stats::coef(lmfit2)[2]),digits=2)))
-    ifultools::splitplot(2,1,2)
-    graphics::plot(log(out$sd) ~ log(out$scale), xlab="log(Bin Size)", ylab = "log(SD)")
-    graphics::lines(lmfit1$model$`log(out$scale)`,stats::predict(lmfit1),lwd=3,col="darkred")
-    graphics::lines(lmfit2$model$`log(out$scale[bins])`, stats::predict(lmfit2),lwd=3,col="darkblue")
-    graphics::legend("bottomleft",c(paste0("Full (n = ",length(out$scale),")"), paste0("Range (n = ",length(bins),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
-    graphics::par(old)
+  if(is.na(scaleS)){
+    scaleS <- unique(round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution)))))
   }
 
-  return(list(
-    PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/out$scale, size = out$scale, bulk = out$sd),
-    fullRange = list(sap = stats::coef(lmfit1)[2], H = 1+stats::coef(lmfit1)[2], FD = sa2fd_sda(stats::coef(lmfit1)[2]), fitlm1 = lmfit1),
-    fitRange  = list(sap = stats::coef(lmfit2)[2], H = 1+stats::coef(lmfit2)[2], FD = sa2fd_sda(stats::coef(lmfit2)[2]), fitlm2 = lmfit2),
-    info = out)[returnPLAW,TRUE,TRUE,returnInfo]
-  )
-}
+  if(max(scaleS)>(NROW(y)/2)){
+    scaleS <- scaleS[scaleS<=(NROW(y)/2)]
+  }
 
+  if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
+    message("Something wrong with vector passed to scaleS.... \nUsing default: (scaleMax-scaleMin)/scaleResolution")
+  }
+
+  # Standardise by N
+  if(any(standardise%in%c("mean.sd","median.mad"))){
+    y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
+  }
+
+  if(adjustSumOrder){
+    y       <- ts_sumorder(y, scaleS = scaleS, polyOrder = polyOrder, minData = minData)
+    Hadj    <- attr(y,"Hadj")
+    Hglobal <- attr(y,"Hglobal.excl")
+  } else {
+    Hadj    <- 0
+    Hglobal <- NA
+  }
+
+  out <- fractal::dispersion(y, front = FALSE)
+
+  fitRange <- which(lengths(lapply(out$scale, function(s){ts_slice(y,s)}))>=minData)
+
+  lmfit1        <- stats::lm(log(out$sd) ~ log(out$scale))
+  lmfit2        <- stats::lm(log(out$sd[fitRange]) ~ log(out$scale[fitRange]))
+
+  outList <- list(
+    PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/out$scale,
+                              size = out$scale,
+                              bulk = out$sd),
+    fullRange = list(sap = stats::coef(lmfit1)[2],
+                     H = 1+stats::coef(lmfit1)[2] + Hadj,
+                     FD = sa2fd_sda(stats::coef(lmfit1)[2]),
+                     fitlm1 = lmfit1,
+                     method = paste0("Full range (n = ",length(out$scale),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",round(sa2fd_sda(stats::coef(lmfit1)[2]),2))),
+    fitRange  = list(sap = stats::coef(lmfit2)[2],
+                     H = 1+stats::coef(lmfit2)[2] + Hadj,
+                     FD = sa2fd_sda(stats::coef(lmfit2)[2]),
+                     fitlm2 = lmfit2,
+                     method = paste0("Fit range (n = ",length(out$scale[fitRange]),")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",round(sa2fd_sda(stats::coef(lmfit2)[2]),2))),
+    info = out,
+    plot = NA)
+
+  if(doPlot|returnPlot){
+    if(noTitle){
+      title <- ""
+    } else {
+      title <- "log-log regression (SDA)"
+      }
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion")
+    if(doPlot){
+    grid::grid.newpage()
+    grid::grid.draw(g)
+    }
+    if(returnPlot){
+      outList$plot <- invisible(g)
+    }
+  }
+
+  if(returnInfo){returnPLAW<-TRUE}
+
+  return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+
+}
 
 
 #' fd_dfa
@@ -4734,7 +4921,7 @@ fd_sda <- function(y,
 #' @param removeTrend Method to use for detrending, see \code{\link[fractal]{DFA}} (default = "poly")
 #' @param polyOrder Order of polynomial trend to remove if \code{removeTrend = "poly"}
 #' @param standardise Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")
-#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg) (default = \code{TRUE})
+#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})
 #' @param scaleMax   Maximum scale to use
 #' @param scaleMin   Minimium scale to use
 #' @param scaleResolution  The scales at which detrended fluctuation will be evaluated will are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}
@@ -4742,10 +4929,12 @@ fd_sda <- function(y,
 #' @param overlap Turn DFA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})
 #' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
 #' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
+#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
 #' @param returnPLAW Return the power law data (default = \code{FALSE})
 #' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
 #' @param silent Silent-ish mode
-#' @param ... Other arguments
+#' @param noTitle Do not generate a title (only the subtitle)
+#' @param tsName Name of y added as a subtitle to the plot
 #'
 #'
 #' @return Estimate of Hurst exponent (slope of \code{log(bin)} vs. \code{log(RMSE))} and an FD estimate based on Hasselman(2013)
@@ -4765,7 +4954,27 @@ fd_sda <- function(y,
 #' @family Fluctuation Analyses
 #'
 #'
-fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1], polyOrder=1, standardise = c("mean.sd","median.mad")[1], adjustSumOrder = TRUE, scaleMin = 4, scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4, doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE, ...){
+fd_dfa <- function(y,
+                   fs = NULL,
+                   removeTrend = c("poly","adaptive","bridge")[1],
+                   polyOrder=1,
+                   standardise = c("none","mean.sd","median.mad")[2],
+                   adjustSumOrder = FALSE,
+                   scaleMin = 2,
+                   scaleMax = floor(log2(NROW(y)/2)),
+                   scaleResolution = 30,
+                   scaleS = NA,
+                   overlap = 0,
+                   minData = 4,
+                   doPlot = TRUE,
+                   returnPlot = FALSE,
+                   returnPLAW = FALSE,
+                   returnInfo = FALSE,
+                   silent = TRUE,
+                   noTitle = FALSE,
+                   tsName="y"){
+
+  y_ori <- y
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
@@ -4774,15 +4983,15 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
   }
 
   if(is.na(scaleS)){
-    scaleS <- round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution))))
+    scaleS <- unique(round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution)))))
   }
 
-  if(max(scaleS)>NROW(y)/2){
-    scaleS <- scaleS[scaleS<=NROW(y)/2]
+  if(max(scaleS)>(NROW(y)/2)){
+    scaleS <- scaleS[scaleS<=(NROW(y)/2)]
   }
 
-  if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(4,NROW(y)/2))){
-      message("Something wrong with vector passed to scaleS.... \nUsing default: (scaleMax-scaleMin)/scaleResolution")
+  if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
+    message("Something wrong with vector passed to scaleS.... \nUsing default: (scaleMax-scaleMin)/scaleResolution")
   }
 
   # Standardise by N
@@ -4790,60 +4999,122 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
     y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
   }
 
+
   if(adjustSumOrder){
-    y    <- ts_sumorder(y)
-    Hadj <- attr(y,"Hadj")
+    y       <- ts_sumorder(y_ori, scaleS = scaleS, polyOrder = polyOrder, minData = minData)
+    Hadj    <- attr(y,"Hadj")
+    Hglobal <- attr(y,"Hglobal.excl")
+  } else {
+    Hadj    <- 0
+    Hglobal <- NA
+  }
+
+  # Integrate the series
+  if(standardise%in%"none"){
+    y <- ts_integrate(ts_center(y))
+  } else {
+    y <- ts_integrate(y)
   }
 
   TSm    <- as.matrix(cbind(t=1:NROW(y),y=y))
   DFAout <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder, returnPLAW = TRUE, returnSegments = TRUE)
 
-   fitRange <- which(lapply(DFAout$segments,NROW)>=minData)
+  fitRange <- which(lapply(DFAout$segments,NROW)>=minData)
 
-   lmfit1        <- stats::lm(DFAout$PLAW$F2 ~ DFAout$PLAW$scaleS, na.action=stats::na.omit)
-   H1  <- lmfit1$coefficients[2] + Hadj
-   lmfit2        <- stats::lm(DFAout$PLAW$F2[fitRange] ~ DFAout$PLAW$scaleS[fitRange], na.action=stats::na.omit)
-   H2  <- lmfit2$coefficients[2] + Hadj
+  lmfit1        <- stats::lm(DFAout$PLAW$bulk.log2 ~ DFAout$PLAW$size.log2, na.action=stats::na.omit)
+  H1  <- lmfit1$coefficients[2] + Hadj
+  lmfit2        <- stats::lm(DFAout$PLAW$bulk.log2[fitRange] ~ DFAout$PLAW$size.log2[fitRange], na.action=stats::na.omit)
+  H2  <- lmfit2$coefficients[2] + Hadj
 
-  if(doPlot){
-    graphics::plot.new()
-    old <- ifultools::splitplot(2,1,1)
-    graphics::plot(y,ylab = "Y", main = paste0('Full    sap: ', round(lmfit1$coefficients[2], digits=2), ' | H:',
-                                     round(H1,digits=2), ' | FD:',
-                                     round(sa2fd_dfa(stats::coef(lmfit1)[2]),digits=2),'\nRange    sap: ',
-                                     round(lmfit2$coefficients[2],digits=2), ' | H:',
-                                     round(H2,digits=2), ' | FD:',
-                                     round(sa2fd_dfa(lmfit2$coefficients[2],digits=2),digits=2)
-    )
-    )
-    ifultools::splitplot(2,1,2)
-    graphics::plot(DFAout$PLAW$F2 ~ DFAout$PLAW$scaleS, xlab="log2(Bin Size)", ylab = "log2(RMSE)", type="l")
-    graphics::lines(lmfit1$model$`DFAout$PLAW$scaleS`, stats::predict(lmfit1),lwd=3,col="darkred")
-    graphics::lines(lmfit2$model$`DFAout$PLAW$scaleS[fitRange]`, stats::predict(lmfit2),lwd=3,col="darkblue")
-    graphics::legend("topleft",c(paste0("Full (n = ",length(DFAout$PLAW$scaleS),")"), paste0("Range (n = ",length(DFAout$PLAW$scaleS[fitRange]),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
-    graphics::par(old)
+  outList <- list(
+    PLAW  =  DFAout$PLAW,
+    fullRange = list(y = y,
+                     sap = lmfit1$coefficients[2],
+                     Hadj = Hadj,
+                     H = H1,
+                     FD = sa2fd_dfa(lmfit1$coefficients[2]),
+                     fitlm1 = lmfit1,
+                     method = paste0("Full range (n = ",NROW(DFAout$PLAW$size),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit1)[2]))),
+    fitRange  = list(y = y,
+                     sap = lmfit2$coefficients[2],
+                     H = H2,
+                     Hadj = Hadj,
+                     FD = sa2fd_dfa(lmfit2$coefficients[2]),
+                     fitlm2 = lmfit2,
+                     method = paste0("Exclude large bin sizes (n = ",NROW(fitRange),")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit2)[2]))),
+    info = list(fullRange=lmfit1,fitRange=lmfit2,segments=DFAout$segments),
+    plot = NA)
+
+#if(doPlot|returnPlot){
+
+  #if(noTitle){title <- ""} else {title <- "Time series"}
+
+  # tsData <- data.frame(y=c(as.numeric(y_ori),as.numeric(y)),
+  #                      x=c(time(y),time(y)),
+  #                      label = c(rep(tsName,NROW(y_ori)),rep(paste(tsName," profile"),NROW(y))),
+  #                      stringsAsFactors = FALSE)
+  #
+  #
+  # g1 <- ggplot2::ggplot(tsData,ggplot2::aes_(x=~x,y=~y)) +
+  #   ggplot2::geom_line() +
+  #   ggplot2::facet_grid(label ~ ., scales = "free") +
+  #   ggplot2::scale_x_continuous("Time", expand=c(0,0)) +
+  #   ggplot2::scale_y_continuous("", expand=c(0,0)) +
+  #   ggplot2::ggtitle(label = title, subtitle = paste0("Standardisation: ",standardise, " | Summation order",ifelse(is.na(Hglobal),"",paste0(" (H = ",round(Hglobal,digits = 2),")"))," adjustment: ", Hadj," | Detrending method: ",removeTrend)) +
+  #   ggplot2::theme_bw() +
+  #   ggplot2::theme(strip.text = ggplot2::element_text(face="bold"))
+
+
+  #if(noTitle){title <- ""} else {title <- "log-log plot"}
+
+  # g2 <- plotFA_loglog(outList, title = title, subtitle = paste0("Full range: Slope = ",round(outList$fullRange$sap,digits=2)," | H = ",round(outList$fullRange$H,digits = 2), " | Hasselman's informed FD = ",round(outList$fullRange$FD,digits = 2),"\nExcl large: Slope = ",round(outList$fitRange$sap,digits = 2)," | H = ",round(outList$fitRange$H,digits = 2), " | Hasselman's informed FD = ",round(outList$fitRange$FD,digits = 2)) ,logBase = "2")
+
+  # if(doPlot){
+  #   multi_PLOT(g1,g2)
+  #   }
+  # }
+  #
+  # if(returnPlot){
+  #   outList$plots <- list(g1=g1, g2=g2)
+  # }
+
+  if(doPlot|returnPlot){
+    if(noTitle){
+      title <- ""
+    } else {
+      title <- "log-log regression (DFA)"
+    }
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation")
+    if(doPlot){
+      grid::grid.newpage()
+      grid::grid.draw(g)
+    }
+    if(returnPlot){
+      outList$plot <- invisible(g)
+    }
   }
 
+  if(returnInfo){returnPLAW<-TRUE}
 
-  return(list(
-    PLAW  =  DFAout$PLAW,
-    fullRange = list(sap = lmfit1$coefficients[2], H = H1, FD = sa2fd_dfa(lmfit1$coefficients[2]), fitlm1 = lmfit1),
-    fitRange  = list(sap = lmfit2$coefficients[2], H = H2, FD = sa2fd_dfa(lmfit2$coefficients[2]), fitlm2 = lmfit2),
-    info = list(fullRange=lmfit1,fitRange=lmfit2,segments=DFAout$segments))[returnPLAW,TRUE,TRUE,returnInfo]
-  )
+  return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+
 }
+
 
 
 #' Calculate FD using Sevcik's method
 #'
 #' @param y A time series or numeric vector
 #' @param detrend Subtract linear trend from the series (default = \code{TRUE}).
-#' @param adjustSumOrder Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg) (default = \code{TRUE})
+#' @param adjustSumOrder Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{TRUE})
+#' @param smallNapprox Force use of small sample approximation (default for N < 128)
 #' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
-#' @param returnPLAW Return the FD series (default = \code{FALSE})
+#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
+#' @param returnPLAW Return the power law data (default = \code{FALSE})
 #' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
 #' @param silent Silent-ish mode
-#' @param ... Other arguments
+#' @param noTitle Do not generate a title (only the subtitle)
+#' @param tsName Name of y added as a subtitle to the plot
 #'
 #' @author Fred Hasselman
 #'
@@ -4851,11 +5122,21 @@ fd_dfa <- function(y, fs = NULL, removeTrend = c("poly","adaptive","bridge")[1],
 #'
 #' @export
 #'
+#' @family Fluctuation Analyses
+#'
 #' @references Sevcik, C. (1998). A procedure to Estimate the Fractal Dimension of Waveforms. Paper available at http://arxiv.org/pdf/1003.5266.pdf
 #'
-fd_sev <- function(y, detrend = FALSE, adjustSumOrder = FALSE, doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE, ...){
-
-
+fd_sev <- function(y,
+                   detrend = FALSE,
+                   adjustSumOrder = FALSE,
+                   smallNapprox = FALSE,
+                   doPlot = TRUE,
+                   returnPlot = FALSE,
+                   returnPLAW = FALSE,
+                   returnInfo = FALSE,
+                   silent = TRUE,
+                   noTitle = FALSE,
+                   tsName="y"){
 
   Hadj<-0
   if(detrend){y <- ts_detrend(y)}
@@ -4865,27 +5146,85 @@ fd_sev <- function(y, detrend = FALSE, adjustSumOrder = FALSE, doPlot = TRUE, re
     }
 
   N <- NROW(y)
-  D.FD <- D.sd <- numeric(N)
+
+  D <- data.frame(L = numeric(N),FD = numeric(N),var = numeric(N), n = numeric(N))
+
+ # This is an implementation of Sevcik's program, which I  optimised for speed...
+ #
+ # ymin <- y[1]
+ # ymax <- y[1]
+ #
+ # L <- 0
+ # for(n in 2:N){
+ #   if(y[n]>ymax){ymax <- y[n]}
+ #   if(y[n]<ymin){ymin <- y[n]}
+ #
+ #   if(n>1){
+ #     L <- 0
+ #     for(i in 1:n){
+ #       yy = (y[i] - ymin) / (ymax - ymin)
+ #       if(i>1){
+ #         L <- L + sqrt((yy -yant)^2 + (1 /(n-1))^2)
+ #       }
+ #       yant <- y
+ #     }
+ #   }
+ #
+ #   #L <- cumsum(sqrt(diff(elascer(y[1:n]))^2 + (1/(n-1)^2)))
+ #   #l <- dplyr::last(L)
+ #   if(L==0){L <- L +.Machine$double.eps}
+ #   if(N<128|smallNapprox){
+ #     D$FD[n] <- 1 + ((log(L) - log(2)) / log(2*(n-1)))
+ #   } else {
+ #     D$FD[n] <- 1 + (log(L) / log(2*(n-1)))
+ #   }
+ #  D$var[n] <- (stats::var(diff(y[1:n]), na.rm = TRUE) * (n-1)) / (L^2 * log(2*(n-1)^2))
+ #  D$L[n] <- L
+ #  D$n[n] <- n
+ #  rm(L)
+ # }
+
+  # Also store each cumulative sum profile
   D.L <- list()
 
-  L<-0
- for(n in 1:N){
-  if(n>1){L <- cumsum(sqrt(diff(elascer(y[1:n]))^2 + (1/(n-1)^2)))}
-  D.FD[n] <- 1 + ((log(dplyr::last(L)+.Machine$double.eps) - log(2)) / log((2*(n-1))+.Machine$double.eps) )
-  D.sd[n] <- stats::var(L, na.rm = TRUE) / (dplyr::last(L)^2 * log((2*(n-1)^2)+.Machine$double.eps))
+  for(n in 2:N){
+    L <- cumsum(sqrt(diff(elascer(y[1:n]))^2 + (1/(n-1)^2)))
+    l <- dplyr::last(L)
+    if(l==0){l <- l +.Machine$double.eps}
+    if(N<128|smallNapprox){
+      D$FD[n] <- 1 + ((log(l) - log(2)) / log(2*(n-1)))
+    } else {
+      D$FD[n] <- 1 + (log(l) / log(2*(n-1)))
+    }
+   D$var[n] <- (stats::var(diff(y[1:n]), na.rm = TRUE) * (n-1)) / (l^2 * log(2*(n-1)^2))
+   D$L[n] <- l
+   D$n[n] <- n
+   D.L[[n]] <- L
+   rm(L)
+  }
 
-  D.L[[n]] <- L
+  D.sd <- ts_sd(D$FD, type = "unadjusted")
+  D$SE <- sqrt(D$var/(D$n-1))
 
- }
+  #D.H <- lm(D$FD[D$n>=N*.25]~log(D$n[D$n>=N*.25]))
 
-  D.n <- lengths(D.sd)
-  D.SE <- D.sd / sqrt(D.n)
-  D.SE[is.na(D.SE)] <- 0
+  fitlm1 <- fitlm2 <- list()
+  fitlm1$fitted.values <- D$n
+  fitlm2$fitted.values <- D$n[1:round(N/2)]
+
+ outList <- list(PLAW = data.frame(bulk = D$FD, size = D$n),
+     fullRange  = list(sap = NA, H = NA,
+                       FD = dplyr::last(D$FD),
+                       fitlm1 = fitlm1,
+                       method = paste0("Lengths (n = ",N),")\n FD = ", round(dplyr::last(D$FD),2)),
+     fitRange   = list(sap = NA, H = NA, FD = dplyr::last(D$FD[round(D$FD/2)]),
+                       fitlm2 = fitlm2,
+                       method = paste0("Lengths (n = ",round(N/2),")\n FD = ", round(D$FD[round(N/2)],2))),
+     plot = NA,
+     info = list(D = D, L = D.L))
 
 
-  D.sd2 = ts_sd(D.FD,type = "unadjusted")
-lengths(D.L)
-  if(doPlot){
+ # if(doPlot){
 
     # dfU <- data.frame(time=seq(0,1,length.out = N),y=elascer(y))
     # ggU <- ggplot(dfU,aes_(x=time,y=y)) + geom_line() + scale_x_continuous(expand = c(0,0)) + scale_y_continuous(expand = c(0,0)) + coord_equal() + theme_bw() + theme(panel.grid = element_blank())
@@ -4896,21 +5235,35 @@ lengths(D.L)
     # dfFD <- data.frame(time=time(ts(y)),FD=D.FD,ci_lo=D.FD-(1.96*D.SE),ci_hi=D.FD+(1.96*D.SE))
     # ggFD <- ggplot(dfFD,aes_(x=time,y=FD)) +  geom_ribbon(aes_(ymin=ci_lo, ymax=ci_hi),colour="grey70", fill = "grey70")+ geom_line() +  scale_x_continuous(expand = c(0,0)) + scale_y_continuous("Fractal Dimension",breaks = c(0.8,1,1.1,1.2,1.5,1.8),expand = c(0,0), limits = c(.8,2)) + theme_bw() + theme(panel.grid.major.x  = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank())
 
-    graphics::plot.new()
-    old <- ifultools::splitplot(2,1,1)
-    #graphics::plot(y,ylab = "Y", main = paste0('FD: ', round(dplyr::last(D.FD), digits=2)))
-    graphics::plot(elascer(y)~ seq(0,1,length.out = N), ylab = "", xlab="", main = paste0('FD: ', round(dplyr::last(D.FD), digits=2)),xlim=c(0,1),ylim=c(0,1),pty="s", type="l")
-    ifultools::splitplot(2,1,2)
-    graphics::plot(D.FD ~ seq(0,1,length.out = N), xlab="Normalised time", ylab = "", type="l")
-    #graphics::legend("topleft",c(paste0("Full (n = ",length(DFAout$PLAW$scaleS),")"), paste0("Range (n = ",length(DFAout$PLAW$scaleS[fitRange]),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
-    graphics::par(old)
+    # graphics::plot.new()
+    # old <- ifultools::splitplot(2,1,1)
+    # #graphics::plot(y,ylab = "Y", main = paste0('FD: ', round(dplyr::last(D.FD), digits=2)))
+    # graphics::plot(elascer(y)~ seq(0,1,length.out = N), ylab = "", xlab="", main = paste0('FD: ', round(dplyr::last(D.FD), digits=2)),xlim=c(0,1),ylim=c(0,1),pty="s", type="l")
+    # ifultools::splitplot(2,1,2)
+    # graphics::plot(D.FD ~ seq(0,1,length.out = N), xlab="Normalised time", ylab = "", type="l")
+    # #graphics::legend("topleft",c(paste0("Full (n = ",length(DFAout$PLAW$scaleS),")"), paste0("Range (n = ",length(DFAout$PLAW$scaleS[fitRange]),")")), lwd=c(3,3),col=c("darkred","darkblue"), cex = .8)
+    # graphics::par(old)
 
-  }
 
-  return(list(PLAW = D.FD,
-              fullRange  = list(sap = NA, H = NA, FD = dplyr::last(D.FD), fitlm1 = NA),
-              fitRange   = list(sap = NA, H = NA, FD = dplyr::last(D.FD), fitlm2 = NA),
-              info = list(FDseries=data.frame(y=y,FD=D.FD,sd=D.sd,sd2=D.sd2),L=D.L))[returnPLAW,TRUE,TRUE,returnInfo])
+    if(doPlot|returnPlot){
+      if(noTitle){
+        title <- ""
+      } else {
+        title <- "Sevcik's method (planar extent)"
+      }
+      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "no",xlabel = "Time series length", ylabel = "Fractal Dimension")
+      if(doPlot){
+        grid::grid.newpage()
+        grid::grid.draw(g)
+      }
+      if(returnPlot){
+        outList$plot <- invisible(g)
+      }
+    }
+
+    if(returnInfo){returnPLAW<-TRUE}
+
+    return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
 }
 
 
@@ -4923,6 +5276,7 @@ lengths(D.L)
 #'
 #' @return A dataframe with the Allan Factor (variance), Alan standard deviation and error due to bin size
 #' @export
+#' @family Fluctuation Analyses
 #'
 fd_allan <- function(y, fs = stats::tsp(stats::hasTsp(y))[3], doPlot = FALSE, useSD=FALSE){
 
@@ -5072,7 +5426,7 @@ MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
 #' @export
 #' @keywords internal
 #'
-monoH <- function(TSm,scaleS,polyOrder=1, returnPLAW = FALSE, returnSegments = FALSE, removeRMSbelow = .Machine$double.eps){
+monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments = FALSE, removeRMSbelow = .Machine$double.eps){
 
   dfaRMS_scale <- vector("list",length(scaleS))
 
@@ -5090,8 +5444,9 @@ monoH <- function(TSm,scaleS,polyOrder=1, returnPLAW = FALSE, returnSegments = F
     rm(dfaRMS)
   }
 
-  PLAW <- data.frame(scaleS=log2(scaleS),F2 = log2(F2)%00%NA)
-  H <- stats::lm(F2~scaleS,data = PLAW,na.action=stats::na.omit)$coefficients[2]
+  PLAW <- data.frame(size=scaleS%00%NA, bulk = F2%00%NA,
+                     size.log2=log2(scaleS)%00%NA, bulk.log2 = log2(F2)%00%NA)
+  H <- stats::lm(bulk.log2~size.log2, data = PLAW, na.action=stats::na.omit)$coefficients[2]
   if(any(returnPLAW,returnSegments)){
     return(list(H = H,
                 PLAW = PLAW,
@@ -5580,25 +5935,100 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
 }
 
 
-plotFA_loglog <- function(fd.OUT){
 
-  g <- ggplot2::ggplot(fd.OUT$PLAW, aes_(x=~size,y=~bulk), na.rm=T) +
-    scale_x_log10(breaks = scales::log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$size)))+c(-1,1))),base=10),
-                  labels = scales::trans_format("log10", scales::math_format()),
-                  limits = range(round(log10(fd.OUT$PLAW$size)))+c(-1,1)) +
-    scale_y_log10(breaks = scales::log_breaks(n=abs(diff(range(round(log10(fd.OUT$PLAW$bulk)))+c(-1,1))),base=10),
-                  labels = scales::trans_format("log10", scales::math_format()),
-                  limits = range(round(log10(fd.OUT$PLAW$bulk)))+c(-1,1)) +
-    geom_point() +
-    geom_abline(intercept = fd.OUT[[2]]$fitlm1$coefficients[[1]], slope = fd.OUT[[2]]$fitlm1$coefficients[[2]], colour = "red", size = 2) +
-    ggtitle(paste("Regression over ",length(fd.OUT[[2]]$fitlm1$fitted.values)," frequencies/bins",sep=""))+
-    xlab("Frequency (log10)")+ylab("Power (log10)") +
-    annotation_logticks() +
-    annotate("text",x=10^-2,y=10^5,label=paste("Slope = ",round(fd.OUT[[2]]$alpha,digits=2),sep="")) +
-    gg_theme("clean")
+#' Plot output from fluctuation analyses based on log-log regression
+#'
+#' @param fd.OUT Output from one of the \code{fd_} functions that use log-log regression to get scaling exponents.
+#' @param title Plot title
+#' @param subtitle Plot subtitle
+#' @param xlabel x label
+#' @param ylabel y label
+#' @param logBase base of the log used
+#'
+#' @return A ggplot object
+#'
+#' @export
+#'
+plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="Bin size",ylabel="Fluctuation",logBase=c("e","2","10")[1]){
+
+  if(!all(c("PLAW","fullRange","fitRange")%in%names(fd.OUT))){
+    stop("Object fd.OUT should have 3 fields: PLAW, fullRange and fitRange")
+  }
+
+  if(logBase=="e"){
+    logFormat <- "log"
+    logBaseNum <- exp(1)
+  } else {
+    logFormat <- paste0("log",logBase)
+    logBaseNum <- as.numeric(logBase)
+  }
+
+  logSlopes <- data.frame(x = c(fd.OUT$PLAW$size[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)],
+                                fd.OUT$PLAW$size[1:NROW(fd.OUT[[3]]$fitlm2$fitted.values)]),
+                          y = c(fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)],
+                                fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[3]]$fitlm2$fitted.values)]),
+                          Method = c(rep(fd.OUT[[2]]$method,NROW(fd.OUT[[2]]$fitlm1$fitted.values)),
+                                     rep(fd.OUT[[3]]$method,NROW(fd.OUT[[3]]$fitlm2$fitted.values))))
+
+  g <- ggplot2::ggplot(data.frame(fd.OUT$PLAW), ggplot2::aes_(x=~size,y=~bulk), na.rm=TRUE) +
+    ggplot2::geom_point() +
+    ggplot2::ggtitle(label = title, subtitle = subtitle)
+
+  if(logBase=="e"){
+    g <- g +
+      ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
+      ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
+                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
+                                  labels =  scales::trans_format(logFormat,scales::math_format(expr = expression(paste(e^.x)))),
+                                  trans = scales::log_trans(base = logBaseNum)) +
+      ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
+                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
+                                  labels = scales::trans_format(logFormat,scales::math_format(expr = expression(paste(e^.x)))),
+                                  trans = scales::log_trans(base = logBaseNum)) +
+      ggplot2::annotation_logticks()
+  }
+
+  if(logBase=="2"){
+    g <- g +
+      ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
+      ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
+                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
+                                  labels = scales::trans_format(logFormat, scales::math_format(expr = expression(paste(2^.x)))),
+                                  trans = scales::log_trans(base = logBaseNum)) +
+      ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
+                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
+                                  labels = scales::trans_format(logFormat,scales::math_format(expr = expression(paste(2^.x)))),
+                                  trans = scales::log_trans(base = logBaseNum)) +
+      ggplot2::annotation_logticks()
+  }
+
+  if(logBase=="10"){
+    g <- g +
+      ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
+      ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
+                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
+                                  labels = scales::trans_format(logFormat, scales::math_format(expr = expression(10^.x))),
+                                  trans = scales::log_trans(base = logBaseNum)) +
+      ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
+                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
+                                  labels = scales::trans_format(logFormat,scales::math_format(expr = expression(10^.x))),
+                                  trans = scales::log_trans(base = logBaseNum)) +
+      ggplot2::annotation_logticks()
+  }
+
+  if(logBase=="no"){
+    g <- g +
+      ggplot2::geom_vline(data = data.frame(x = c(NROW(fd.OUT[[2]]$fitlm1$fitted.values),NROW(fd.OUT[[3]]$fitlm2$fitted.values)),Method = c(fd.OUT[[2]]$method,fd.OUT[[3]]$method)),  ggplot2::aes_(xintercept=~x, colour = ~Method)) +
+      ggplot2::scale_x_continuous(name = xlabel) + ggplot2::scale_y_continuous(name = ylabel)
+  }
+
+  g <- g +
+    ggplot2::theme_bw() +
+    ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
+                   legend.text = element_text(margin = margin(t = 5,b = 5, unit = "pt"), vjust = .5))
+
   return(g)
 }
-
 
 
 #' Surrogate Test
@@ -6246,6 +6676,83 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 
 # Time Series HELPERS ----
 
+#' Permutation Test: Block Randomisation
+#'
+#' @param y1 Time series 1
+#' @param y2 Time series 2
+#' @param Nperms Number of permutations (default = \code{99})
+#' @param sim Value passed to the \code{sim} argument of \code{\link[boot]{tsboot}} valid options are: \code{"model","fixed","geom","scramble"} (default = \code{"geom"})
+#' @param l Block sizes to use, see \code{\link[boot]{tsboot}} for details (default = \code{3})
+#' @param alpha Alpha level for deciding significance  (default = \code{0.05})
+#' @param returnBootObject Return the \code{boot} object (default = \code{FALSE})
+#' @param ... Other arguments passed to function \code{\link[boot]{tsboot}}
+#'
+#' @return A data frame with the difference time series and variables indicating N and significance.
+#'
+#' @export
+#'
+ts_permtest_block <- function(y1, y2, Nperms = 99, sim = "geom", l = 3, alpha = .05, returnBootObject = FALSE, ...){
+
+  tsSame <- function(y){
+    y
+  }
+
+  dotArgs <- list(...)
+#  Args <- methods::formalArgs(boot::tsboot)
+#   Args <- Args[!Args%in%c("tseries","statistic","R","l","sim")]
+#   nameOK  <- names(dotArgs)%in%Args
+#   if(!all(nameOK)){
+#     dotArgs    <- formals(boot::tsboot)
+#     nameOk <- rep(TRUE,length(dotArgs))
+#   }
+#
+#   dotArgs$RM <- dmat
+#   do.call(rp_plot, dotArgs[nameOk])
+# }
+
+  #dat <- ts(data.frame(y1 = y1, y2=y2))
+
+  ts.boot1 <- boot::tsboot(tseries = stats::ts(y1), statistic = tsSame, R = Nperms, sim = sim, l = l)
+  ts.boot2 <- boot::tsboot(tseries = stats::ts(y2), statistic = tsSame, R = Nperms, sim = sim, l = l)
+
+  ts.boot <- ts.boot1
+  ts.boot$t0 <- y1-y2
+  ts.boot$t <- ts.boot1$t-ts.boot2$t
+
+  out <- list()
+  for(t in 1:NROW(y1)){
+    if(ts.boot$t0[t] < 0){
+      Ds <- sum(ts.boot$t[,t] <= ts.boot$t0[t], na.rm = TRUE) # how many <= to the observed diff <= 0?
+    } else {
+      Ds <- sum(ts.boot$t[,t] >= ts.boot$t0[t], na.rm = TRUE) # how many >= to the observed diff > 0?
+    }
+    SD <- stats::sd(c(ts.boot$t[,t],ts.boot$t0[t]), na.rm = TRUE)
+    out[[t]] <- data.frame(time = t,
+                           Ori  = ts.boot$t0[t],
+                           Dsum = Ds,
+                           p = Ds / (Nperms + 1),
+                           alpha = alpha,
+                           sig = NA,
+                           Nperms  = Nperms,
+                           Mean = mean(ts.boot$t[,t],na.rm = TRUE),
+                           SD = SD,
+                           SE = SD/sqrt(NROW(y1)+1)
+    )
+  }
+
+  df_sig     <- plyr::ldply(out)
+  df_sig$sig <- df_sig$p < alpha
+
+  if(returnBootObject){
+    return(list(df_sig = df_sig, bootOut = ts.boot))
+  } else {
+    return(df_sig = df_sig)
+  }
+
+}
+
+
+
 #' Find change indices
 #'
 #' @param y An indicator variable representing different levels of a variable or factor
@@ -6866,6 +7373,7 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
 }
 
 
+
 #' Adjust time series by summation order
 #'
 #' Many fluctuation analyses assume a time series' Hurst exponent is within the range of \code{0.2 - 1.2}. If this is not the case it is sensible to make adjustments to the time series, as well as the resutling Hurst exponent.
@@ -6873,10 +7381,11 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
 #' @param y A time series of numeric vector
 #' @param scaleS The scales to consider for \code{DFA1}
 #' @param polyOrder Order of polynomial for detrending in DFA (default = \code{1})
+#' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
 #'
 #' @return The input vector, possibly adjusted based on \code{H} with an attribute \code{"Hadj"} containing an integer by which a Hurst exponent calculated from the series should be adjusted.
 #'
-#' @details Following recommendations by [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg), a global Hurst exponent is estimated using DFA and \code{y} is adjusted accordingly:
+#' @details Following recommendations by \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)}, a global Hurst exponent is estimated using DFA and \code{y} is adjusted accordingly:
 #' \itemize{
 #' \item{\code{1.2 < H < 1.8} first derivative of y, atribute \code{Hadj = 1}}
 #' \item{\code{H > 1.8} second derivative of y, atribute \code{Hadj = 2}}
@@ -6888,31 +7397,46 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
 #'
 #' @export
 #'
-ts_sumorder <- function(y, scaleS = NULL, polyOrder = 1){
+ts_sumorder <- function(y, scaleS = NULL, polyOrder = 1, minData = 4){
 
   if(is.null(scaleS)){
-    scaleS <- round(2^(seq(4, floor(log2(NROW(y)/2)), by=((floor(log2(NROW(y)/2))-4)/30))))
+    scaleS <- unique(round(2^(seq(2, floor(log2(NROW(y)/2)), by=((floor(log2(NROW(y)/2))-2)/30)))))
   }
 
   # Check global H
-  TSm      <- as.matrix(cbind(t=1:NROW(y),y=y))
-  Hglobal  <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder)
+  TSm      <- as.matrix(cbind(t=1:NROW(y),y=ts_integrate(ts_center(y))))
+  Hglobal  <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder, returnPLAW = TRUE, returnSegments = TRUE)
   rm(TSm)
+
+  fitRange <- which(lapply(Hglobal$segments,NROW)>=minData)
+
+  lmfit1        <- stats::lm(Hglobal$PLAW$bulk ~ Hglobal$PLAW$size.log2, na.action=stats::na.omit)
+  H1  <- lmfit1$coefficients[2]
+  lmfit2        <- stats::lm(Hglobal$PLAW$bulk.log2[fitRange] ~ Hglobal$PLAW$size.log2[fitRange], na.action=stats::na.omit)
+  H2  <- lmfit2$coefficients[2]
+
 
   # Adjust TS by global H
   Hadj <- 0
-  if((Hglobal>1.2)&(Hglobal<1.8)){
-    y <- diff(y)
-    Hadj=1}
-  if(Hglobal>1.8){
-    y <- diff(diff(y))
-    Hadj <- 2}
-  if(Hglobal<0.2){
+  if(H2%(]%c(1.2,1.8)){
+    y <- ts_diff(y,addColumns = FALSE)
+    Hadj=1
+  }
+  if(H2>1.8){
+    y <- ts_diff(ts_diff(y, addColumns = FALSE), addColumns = FALSE)
+    Hadj <- 2
+  }
+  if(H2%[]%c(0.2,1.2)){
+    Hadj <- 0
+  }
+  if(H2 < 0.2){
     y <- ts_integrate(ts_center(y))
-    Hadj <- -1}
+    Hadj <- -1
+  }
 
-  attr(y,"Hglobal") <- Hglobal
-  attr(y,"Hadj")    <- Hadj
+  attr(y,"Hglobal.full") <- H1
+  attr(y,"Hglobal.excl") <- H2
+  attr(y,"Hadj")         <- Hadj
 
   return(y)
 }

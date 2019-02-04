@@ -5,8 +5,9 @@
 \title{Power Spectral Density Slope (PSD).}
 \usage{
 fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE,
-  doPlot = TRUE, returnPLAW = FALSE, returnInfo = FALSE,
-  silent = TRUE)
+  fitMethod = c("lowest25", "Wijnants", "Hurvich-Deo")[3],
+  doPlot = TRUE, returnPlot = FALSE, returnPLAW = FALSE,
+  returnInfo = FALSE, silent = TRUE, noTitle = FALSE, tsName = "y")
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -17,13 +18,21 @@ fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE,
 
 \item{detrend}{Subtract linear trend from the series (default = \code{TRUE}).}
 
+\item{fitMethod}{Method to decide on a frequency range for log-log fit. Can be one of: "lowest25","Wijnants","Hurvich-Deo" (default). See details for more info.}
+
 \item{doPlot}{Return the log-log spectrum with linear fit (default = \code{TRUE}).}
+
+\item{returnPlot}{Return ggplot2 object (default = \code{FALSE})}
 
 \item{returnPLAW}{Return the power law data (default = \code{FALSE})}
 
-\item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
+\item{returnInfo}{Return all the data used in SDA (default = \code{FALSE})}
 
-\item{silent}{Run in silent-ish mode (default = \code{TRUE)})}
+\item{silent}{Run in silent-ish mode (default = \code{TRUE)}}
+
+\item{noTitle}{Do not generate a title (only the subtitle)}
+
+\item{tsName}{Name of y added as a subtitle to the plot}
 }
 \value{
 A list object containing:
@@ -40,14 +49,21 @@ Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope.
 \details{
 Calls function \code{\link[sapa]{SDF}} to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), \code{SDF} is called using a Tukey window (\code{raised cosine \link[sapa]{taper}}).
 
-A line is fitted on the periodogram in log-log coordinates. Two fit-ranges are used: The 25\% lowest frequencies and the Hurvich-Deo estimate (\code{\link[fractal]{HDEst}}).
+A line is fitted on the periodogram in log-log coordinates. The full ramge is fitted as well as one of three fit-ranges:
+\itemize{
+\item{\code{lowest25} - The 25\% lowest frequencies}
+\item{\code{Wijnants} - The 50 lowest frequencies (Wijnants et al., 2012)}
+\item{\code{HurvichDeo} - The Hurvich-Deo estimate, see (\code{\link[fractal]{HDEst}})}
+}
 }
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
 Other Fluctuation Analyses: \code{\link{MFDFA}},
-  \code{\link{fd_RR}}, \code{\link{fd_dfa}}
+  \code{\link{fd_RR}}, \code{\link{fd_allan}},
+  \code{\link{fd_dfa}}, \code{\link{fd_sda}},
+  \code{\link{fd_sev}}
 }
 \author{
 Fred Hasselman

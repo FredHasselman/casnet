@@ -28,6 +28,8 @@ Multi-fractal Detrended Fluctuation Analysis
 }
 \seealso{
 Other Fluctuation Analyses: \code{\link{fd_RR}},
-  \code{\link{fd_dfa}}, \code{\link{fd_psd}}
+  \code{\link{fd_allan}}, \code{\link{fd_dfa}},
+  \code{\link{fd_psd}}, \code{\link{fd_sda}},
+  \code{\link{fd_sev}}
 }
 \concept{Fluctuation Analyses}

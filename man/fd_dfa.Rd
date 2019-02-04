@@ -5,11 +5,12 @@
 \title{Detrended Fluctuation Analysis (DFA)}
 \usage{
 fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
-  polyOrder = 1, standardise = c("mean.sd", "median.mad")[1],
-  adjustSumOrder = TRUE, scaleMin = 4,
+  polyOrder = 1, standardise = c("none", "mean.sd", "median.mad")[2],
+  adjustSumOrder = FALSE, scaleMin = 2,
   scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30,
   scaleS = NA, overlap = 0, minData = 4, doPlot = TRUE,
-  returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE, ...)
+  returnPlot = FALSE, returnPLAW = FALSE, returnInfo = FALSE,
+  silent = TRUE, noTitle = FALSE, tsName = "y")
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -22,7 +23,7 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
 
 \item{standardise}{Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
-\item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg) (default = \code{TRUE})}
+\item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
 
 \item{scaleMin}{Minimium scale to use}
 
@@ -38,13 +39,17 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
 
 \item{doPlot}{Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).}
 
+\item{returnPlot}{Return ggplot2 object (default = \code{FALSE})}
+
 \item{returnPLAW}{Return the power law data (default = \code{FALSE})}
 
 \item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
 
 \item{silent}{Silent-ish mode}
 
-\item{...}{Other arguments}
+\item{noTitle}{Do not generate a title (only the subtitle)}
+
+\item{tsName}{Name of y added as a subtitle to the plot}
 }
 \value{
 Estimate of Hurst exponent (slope of \code{log(bin)} vs. \code{log(RMSE))} and an FD estimate based on Hasselman(2013)
@@ -64,7 +69,9 @@ Hasselman, F. (2013). When the blind curve is finite: dimension estimation and m
 }
 \seealso{
 Other Fluctuation Analyses: \code{\link{MFDFA}},
-  \code{\link{fd_RR}}, \code{\link{fd_psd}}
+  \code{\link{fd_RR}}, \code{\link{fd_allan}},
+  \code{\link{fd_psd}}, \code{\link{fd_sda}},
+  \code{\link{fd_sev}}
 }
 \author{
 Fred Hasselman

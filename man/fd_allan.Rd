@@ -22,3 +22,10 @@ A dataframe with the Allan Factor (variance), Alan standard deviation and error 
 \description{
 Allan Variance Analysis
 }
+\seealso{
+Other Fluctuation Analyses: \code{\link{MFDFA}},
+  \code{\link{fd_RR}}, \code{\link{fd_dfa}},
+  \code{\link{fd_psd}}, \code{\link{fd_sda}},
+  \code{\link{fd_sev}}
+}
+\concept{Fluctuation Analyses}

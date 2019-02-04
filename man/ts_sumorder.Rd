@@ -4,7 +4,7 @@
 \alias{ts_sumorder}
 \title{Adjust time series by summation order}
 \usage{
-ts_sumorder(y, scaleS = NULL, polyOrder = 1)
+ts_sumorder(y, scaleS = NULL, polyOrder = 1, minData = 4)
 }
 \arguments{
 \item{y}{A time series of numeric vector}
@@ -12,6 +12,8 @@ ts_sumorder(y, scaleS = NULL, polyOrder = 1)
 \item{scaleS}{The scales to consider for \code{DFA1}}
 
 \item{polyOrder}{Order of polynomial for detrending in DFA (default = \code{1})}
+
+\item{minData}{Minimum number of data points in a bin needed to calculate detrended fluctuation}
 }
 \value{
 The input vector, possibly adjusted based on \code{H} with an attribute \code{"Hadj"} containing an integer by which a Hurst exponent calculated from the series should be adjusted.
@@ -20,7 +22,7 @@ The input vector, possibly adjusted based on \code{H} with an attribute \code{"H
 Many fluctuation analyses assume a time series' Hurst exponent is within the range of \code{0.2 - 1.2}. If this is not the case it is sensible to make adjustments to the time series, as well as the resutling Hurst exponent.
 }
 \details{
-Following recommendations by [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg), a global Hurst exponent is estimated using DFA and \code{y} is adjusted accordingly:
+Following recommendations by \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)}, a global Hurst exponent is estimated using DFA and \code{y} is adjusted accordingly:
 \itemize{
 \item{\code{1.2 < H < 1.8} first derivative of y, atribute \code{Hadj = 1}}
 \item{\code{H > 1.8} second derivative of y, atribute \code{Hadj = 2}}
