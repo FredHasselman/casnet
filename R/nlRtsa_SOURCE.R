@@ -297,7 +297,7 @@ file_ID=1
 #'
 #' The full copyright statement on the website is as follows:
 #'
-#' © 2004-2017 SOME RIGHTS RESERVED
+#' (C) 2004-2017 SOME RIGHTS RESERVED
 #'
 #' University of Potsdam, Interdisciplinary Center for Dynamics of Complex Systems, Germany
 #'
@@ -2072,7 +2072,7 @@ rp_lineDist <- function(RM,
 
   if(invert){
     RM <- Matrix::Matrix(1-RM,sparse = TRUE)
-    if(Matrix::isSymmetric(unname(RM))){
+    if(Matrix::isSymmetric(Matrix::unname(RM))){
       RM <- bandReplace(RM,0,0,1)
     }
   }
@@ -2087,7 +2087,7 @@ rp_lineDist <- function(RM,
     RM <- bandReplace(RM,-theiler,theiler,0)
   }
 
-  if(Matrix::isSymmetric(unname(RM))){
+  if(Matrix::isSymmetric(Matrix::unname(RM))){
     if(all(Matrix::diag(RM)==1)){
       RP <- bandReplace(RM,0,0,0)
     }
@@ -2098,7 +2098,7 @@ rp_lineDist <- function(RM,
   B <- rp_nzdiags(RP)
   V <- Matrix::as.matrix(RP)[,colSums(Matrix::as.matrix(RP))>0]
 
-  if(Matrix::isSymmetric(unname(RM))){
+  if(Matrix::isSymmetric(Matrix::unname(RM))){
     if(all(Matrix::diag(RM)==1)){
       RP <- bandReplace(Matrix::t(RM),0,0,0)
     }
@@ -2496,20 +2496,21 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param ylab An y-axis label
 #' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{rp}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
 #' @param returnOnlyObject Return the ggplot object only, do not draw the plot (default = \code{TRUE})
-#' @param useGtable Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set set to FALSE to use package \code{patchwork}. This package is in development, see the warning for instructions on how to install it.
 #'
 #' @return A nice plot of the recurrence matrix.
 #' @export
 #'
 #' @family Distance matrix operations (recurrence plot)
 #'
-rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, drawGrid = FALSE, markEpochsLOI = NULL, Chromatic = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, returnOnlyObject = FALSE, useGtable = TRUE){
+rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, drawGrid = FALSE, markEpochsLOI = NULL, Chromatic = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, returnOnlyObject = FALSE){
 
-  # check patchwork
-  if(!length(find.package("patchwork",quiet = TRUE))>0){
-    warning("Package patchwork is not installed...\n1. Install Xcode from App Store (MacOS) or rwintools.exe from CRAN (Windows) \n2. Install patchwork: devtools::install_github('thomasp85/patchwork')\n3. Install casnet: devtools::install_github('FredHasselman/casnet')\n....Using gtable instead, with limited options\n")
-    useGtable=TRUE
-  }
+  useGtable <- TRUE
+
+  # # check patchwork
+  # if(!length(find.package("patchwork",quiet = TRUE))>0){
+  #   warning("Package patchwork is not installed...\n1. Install Xcode from App Store (MacOS) or rwintools.exe from CRAN (Windows) \n2. Install patchwork: devtools::install_github('thomasp85/patchwork')\n3. Install casnet: devtools::install_github('FredHasselman/casnet')\n....Using gtable instead, with limited options\n")
+  #   useGtable=TRUE
+  # }
 
 
   # check auto-recurrence and make sure Matrix has sparse triplet representation
@@ -2599,12 +2600,10 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
     }
   }
 
-
   # main plot ----
   gRP <-  ggplot2::ggplot(aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
     geom_raster(hjust = 0, vjust=0, show.legend = showL) +
     geom_abline(slope = 1,colour = "grey50", size = 1)
-    #ggtitle(label=title, subtitle = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")) +
 
   if(unthresholded){
     gRP <- gRP + scale_fill_gradient2(low      = "red3",
@@ -2700,6 +2699,11 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
                                 legend.justification = "top")
   }
 
+  if(plotDimensions){
+    rptheme <- rptheme + theme(axis.title.y =element_blank(),
+                               axis.title.x =element_blank())
+  }
+
   # Expand main plot ----
   if(!is.null(markEpochsLOI)){
         gRP <- gRP +  scale_fill_manual(name  = "Key:",
@@ -2789,7 +2793,6 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
     ydims <- ylab
   }
 
-  gRP <- gRP + ylab(ydims) + xlab(xdims)
 
   if(plotDimensions){
 
@@ -2828,13 +2831,15 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
         plotDimensions <- FALSE
       }
       }
-    }
+  } else {
+    gRP <- gRP + ylab(ydims) + xlab(xdims)
+  }
 
   if(plotDimensions){
 
       gy1 <- ggplot2::ggplot(y1, aes_(y=~Value, x= ~tm,  group= ~Dimension)) +
         geom_line(aes_(colour=~Dimension), show.legend = FALSE) +
-        xlab(xdims) + ylab("") +
+        xlab(xdims) + ylab(" ") +
         geom_vline(aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
         scale_color_grey() +
         scale_x_continuous(expand = c(0,0)) +
@@ -2846,6 +2851,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
               legend.key = element_blank(),
               panel.border = element_blank(),
               axis.text = element_blank(),
+              axis.line = element_blank(),
               axis.ticks = element_blank(),
               axis.title.x =element_text(colour = "black",angle = 0, vjust = +3),
               axis.title.y =element_blank(),
@@ -2854,7 +2860,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
       gy2 <- ggplot2::ggplot(y2, aes_(y=~Value, x=~tm, group=~Dimension)) +
         geom_line(aes_(colour=~Dimension), show.legend = FALSE) +
-        ylab("") + xlab(ydims) +
+        ylab(" ") + xlab(ydims) +
         geom_vline(aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
         scale_color_grey() +
         scale_x_continuous(expand = c(0,0)) +
@@ -2865,6 +2871,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
               legend.key = element_blank(),
               panel.border = element_blank(),
               axis.text = element_blank(),
+              axis.line = element_blank(),
               axis.ticks = element_blank(),
               axis.title.x =element_blank(),
               axis.title.y =element_text(colour = "black",angle = 90, vjust = -2),
@@ -2879,8 +2886,10 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
     rpOUT    <- round(rpOUT,3)
     if(is.na(rpOUT$emRad)){
-      rpOUT$emRad <- round(radiusValue,3)
-    }
+      rpOUT$Radius <- round(radiusValue,3)
+    } else {
+      rpOUT$Radius <- rpOUT$emRad
+      }
 
 
     rpOUTdat <- rpOUT %>%
@@ -2888,7 +2897,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
       tidyr::gather(key="measure",value="value") %>%
       dplyr::mutate(x=rep(0,9),y=9:1)
 
-    rpOUTdat <- cbind(rpOUTdat,rpOUTdat)
+    #rpOUTdat <- cbind(rpOUTdat,rpOUTdat)
     rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
 
     gA <-ggplot2::ggplot(rpOUTdat,aes_(x=~x,y=~y)) +
@@ -2903,7 +2912,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
   if(useGtable){
 
-    gRP <- gRP #+ theme(panel.background = element_rect(colour="white"))
+    #gRP <- gRP #+ theme(panel.background = element_rect(colour="white"))
 
     g <- ggplot2::ggplotGrob(gRP)
 
@@ -2919,6 +2928,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
     if(plotMeasures){
       grA <- ggplot2::ggplotGrob(gA)
     }
+
 
     if(plotDimensions&!plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
@@ -2937,47 +2947,47 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
     if(plotDimensions&plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
-      gt<- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
     if(plotDimensions&plotMeasures&unthresholded&!plotRadiusRRbar){
       mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
-      gt<- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
     if(plotDimensions&plotMeasures&!unthresholded){
       mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
-      gt<- gtable::gtable_matrix("bi_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("bi_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
     }
 
     if(!plotDimensions&plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(grA, g, grDist),nrow = 1)
-      gt<- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
     if(!plotDimensions&plotMeasures&unthresholded&!plotRadiusRRbar){
       mat <- matrix(list(grA, g),nrow = 1)
-      gt<- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
     if(!plotDimensions&plotMeasures&!unthresholded){
       mat <- matrix(list(grA, g),nrow = 1)
-      gt<- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
     if(!plotDimensions&!plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(g, grDist),nrow = 1)
-      gt<- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
     if(!plotDimensions&!plotMeasures&unthresholded&!plotRadiusRRbar){
       mat <- matrix(list(g),nrow = 1)
-      gt<- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
     if(!plotDimensions&!plotMeasures&!unthresholded){
       mat <- matrix(list(g),nrow = 1)
-      gt<- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+      gt  <- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
     # gindex <- subset(g$layout, name == "layout")
@@ -2986,34 +2996,46 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
     #rm(gindex)
     #}
 
+    if(nchar(title)>0){
+      grT <- ggplot2::ggplot(data.frame(x=1,y=1)) +
+        ggplot2::geom_text(ggplot2::aes_(x=~x,y=~y), label=title) +
+        theme_void() +
+        theme(plot.margin = margin(0,0,0,0, unit = "pt"))
+      gt  <- gtable::gtable_add_rows(x = gt, heights =  unit(c(.1),"null"), pos=0)
+      l <- sum(c(plotDimensions,plotMeasures))+1
+      gt  <- gtable::gtable_add_grob(x = gt, grobs = ggplot2::ggplotGrob(grT), name = "Title", t=1, l=l)
+    }
+
   #  gt <- gtable::gtable_add_col_space(gt,)
 
     g <- gtable::gtable_add_padding(gt, unit(5, "pt"))
 
-  } else {
+  }
 
-    if(plotDimensions){
 
-      if(unthresholded){
-        g <- (gy2 + gRP + gDist + gg_plotHolder() + gy1 + gg_plotHolder() +
-                patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
-
-      } else {
-
-        if(plotMeasures){
-          g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
-                  patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
-        } else {
-          g <- (gy2 + gRP + gg_plotHolder() + gg_plotHolder() + gy1 + gg_plotHolder() +
-                  patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
-        }
-      }
-
-    } else {
-      g <- gRP
-    }
-  } # use gtable
-
+  # else {
+  #
+  #   if(plotDimensions){
+  #
+  #     if(unthresholded){
+  #       g <- (gy2 + gRP + gDist + gg_plotHolder() + gy1 + gg_plotHolder() +
+  #               patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+  #
+  #     } else {
+  #
+  #       if(plotMeasures){
+  #         g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
+  #                 patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+  #       } else {
+  #         g <- (gy2 + gRP + gg_plotHolder() + gg_plotHolder() + gy1 + gg_plotHolder() +
+  #                 patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
+  #       }
+  #     }
+  #
+  #   } else {
+  #     g <- gRP
+  #   }
+  # } # use gtable
 
   if(!returnOnlyObject){
     if(useGtable){
@@ -3050,7 +3072,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 #' rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
 rp_size <- function(mat, AUTO=NULL, theiler = NULL){
   if(is.null(AUTO)){
-    AUTO <- Matrix::isSymmetric(unname(mat))
+    AUTO <- Matrix::isSymmetric(Matrix::unname(mat))
   }
   if(is.null(theiler)){
     if(!is.null(attributes(mat)$theiler)){
@@ -3161,7 +3183,7 @@ crqa_rp_calc <- function(RM,
   RP_N <- Matrix::nnzero(RM, na.counted = FALSE)
 
   minDiag <- 0
-  if(Matrix::isSymmetric(unname(RM))){
+  if(Matrix::isSymmetric(Matrix::unname(RM))){
     if(all(Matrix::diag(RM)==1)){
       minDiag <- length(Matrix::diag(RM))
       }
@@ -4180,7 +4202,7 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
   if(convMat&matPack){RP <- Matrix::as.matrix(RP)}
 
-  suppressWarnings(RP <- rp_copy_attributes(source = distmat,  target = RP))
+  suppressMessages(RP <- rp_copy_attributes(source = distmat,  target = RP))
   attributes(RP)$emRad <- emRad
 
   return(RP)
@@ -4554,7 +4576,7 @@ sa2fd_psd <- function(sa, ...){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)
 #'
 #' @details The DFA slope (H) will be converted to a dimension estimate using:
 #'
-#' \deqn{D_{DFA}\approx 2-(\tanh(\log(3)*sa)) }{D_{DFA} ≈ 2-(tanh(log(3)*sa)) }
+#' \deqn{D_{DFA}\approx 2-(\tanh(\log(3)*sa)) }{D_{DFA} ~ 2-(tanh(log(3)*sa)) }
 #'
 #'
 #' @author Fred Hasselman
@@ -4593,7 +4615,7 @@ sa2fd_sda <- function(sa, ...){return(1-sa)}
 #'
 #' Relative Rougness is a ratio of local variance (autocovariance at lag-1) to global variance (autocovariance at lag-0) that can be used to classify different 'noises'.
 #'
-#'\deqn{RR = 2 * \left[1 − \frac{\gamma(y)}{Var(y)}\right]}{RR = 2 * [ 1 − autoCov-1(y) / Var(y) ]}
+#'\deqn{RR = 2 * \left[1 - \frac{\gamma(y)}{Var(y)}\right]}{RR = 2 * [ 1 - autoCov-1(y) / Var(y) ]}
 #'
 #' @param y A numeric vector.
 #'
@@ -6076,7 +6098,7 @@ plotSUR_hist <- function(surrogateValues,
     }
   }
 
-  alpha <- nsides/length(vec)
+  alpha <- signif(nsides/length(vec),1)
 
   rank_dist_bin_lab  <- ggplot2::cut_width(vec, width=binWidth, center = 0, closed = "left")
   if(length(levels(rank_dist_bin_lab))>10*length(vec)){warning("Too many levels? Change binWidth!")}
@@ -6183,7 +6205,7 @@ plotSUR_hist <- function(surrogateValues,
 
 #' Add transparency to a colour
 #'
-#' @param col A colour name, hexadecimal string or positive integer \code{i}, such that palette()[i]
+#' @param col A colour name, hexadecimal string or positive integer `i`, such that `palette()[i]`
 #' @param alpha Alpha transparency value
 #'
 #' @return An rgb colour with transparency
@@ -6234,7 +6256,7 @@ pacf_fisherZ <-function(r, n, lag, siglevel=.05,sides=2,type=""){
 #'
 #' @return A \code{list} with the following components:
 #' \describe{
-#' \item{\code{xn}}{An [n x 2] matrix of the original and discretized vectors.}
+#' \item{\code{xn}}{An `[n x 2]` matrix of the original and discretized vectors.}
 #' \item{\code{MM}}{Transition probability matrix from bin-i to bin-j.}
 #' }
 #'
@@ -6678,8 +6700,11 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 
 #' Permutation Test: Block Randomisation
 #'
-#' @param y1 Time series 1
-#' @param y2 Time series 2
+#' Use block randomistion to get a permutation test evaluation of the deviation of an observed value at each time point from a target value. To do block permutation without any tests, pass `NULL` for argument `targetValue`.
+#'
+#' @param y1 Time series 1. The goal of the permutation test will be to decide whether the difference `y1-targetValue != 0` for each time point, given `alpha`.
+#' @param y2 An optional second time series. If this timeseries is provided then the goal of the permutation test will be the to decide wether the difference `y2-y1 != targetValue` for each time point, given `alpha`.
+#' @param targetValue The target value for the permutation test. If `NULL`, the function will return a data frame with the block randomised surrogates  columns (default = `0`)
 #' @param Nperms Number of permutations (default = \code{99})
 #' @param sim Value passed to the \code{sim} argument of \code{\link[boot]{tsboot}} valid options are: \code{"model","fixed","geom","scramble"} (default = \code{"geom"})
 #' @param l Block sizes to use, see \code{\link[boot]{tsboot}} for details (default = \code{3})
@@ -6691,7 +6716,7 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 #'
 #' @export
 #'
-ts_permtest_block <- function(y1, y2, Nperms = 99, sim = "geom", l = 3, alpha = .05, returnBootObject = FALSE, ...){
+ts_permtest_block <- function(y1, y2 = NULL, targetValue = 0, Nperms = 99, sim = "geom", l = 3, alpha = .05, returnBootObject = FALSE, ...){
 
   tsSame <- function(y){
     y
@@ -6712,28 +6737,46 @@ ts_permtest_block <- function(y1, y2, Nperms = 99, sim = "geom", l = 3, alpha = 
 
   #dat <- ts(data.frame(y1 = y1, y2=y2))
 
-  ts.boot1 <- boot::tsboot(tseries = stats::ts(y1), statistic = tsSame, R = Nperms, sim = sim, l = l)
-  ts.boot2 <- boot::tsboot(tseries = stats::ts(y2), statistic = tsSame, R = Nperms, sim = sim, l = l)
+  returnOnlyPerms <- FALSE
+  if(is.null(targetValue)){
+    targetValue <- 0
+    returnOnlyPerms <- TRUE
+  }
 
+  ts.boot1 <- boot::tsboot(tseries = stats::ts(y1), statistic = tsSame, R = Nperms, sim = sim, l = l)
   ts.boot <- ts.boot1
-  ts.boot$t0 <- y1-y2
-  ts.boot$t <- ts.boot1$t-ts.boot2$t
+
+  if(!is.null(y2)){
+    if(NROW(y2)!=NROW(y1)){stop("y1 and y2 have different lengths.")}
+    ts.boot2 <- boot::tsboot(tseries = stats::ts(y2), statistic = tsSame, R = Nperms, sim = sim, l = l)
+    ts.boot$t0 <- y1-y2
+    ts.boot$t <- ts.boot1$t-ts.boot2$t
+  } else {
+      ts.boot$t0 <- y1-targetValue
+      ts.boot$t  <- ts.boot1$t-targetValue
+      targetValue <- 0
+    }
+
+  if(!returnOnlyPerms){
 
   out <- list()
   for(t in 1:NROW(y1)){
-    if(ts.boot$t0[t] < 0){
-      Ds <- sum(ts.boot$t[,t] <= ts.boot$t0[t], na.rm = TRUE) # how many <= to the observed diff <= 0?
+    if(ts.boot$t0[t] < targetValue){dir <- "lesser"} else {dir <- "greater"}
+    if(dir%in%"lesser"){
+      Ds <- sum(ts.boot$t[,t] <= ts.boot$t0[t], na.rm = TRUE) # how many <= to the observed diff <= targetValue?
     } else {
-      Ds <- sum(ts.boot$t[,t] >= ts.boot$t0[t], na.rm = TRUE) # how many >= to the observed diff > 0?
+      Ds <- sum(ts.boot$t[,t] >= ts.boot$t0[t], na.rm = TRUE) # how many >= to the observed diff > targetValue?
     }
     SD <- stats::sd(c(ts.boot$t[,t],ts.boot$t0[t]), na.rm = TRUE)
     out[[t]] <- data.frame(time = t,
                            Ori  = ts.boot$t0[t],
-                           Dsum = Ds,
-                           p = Ds / (Nperms + 1),
+                           targetValue = targetValue,
+                           Nperms     = Nperms,
+                           Ori.Diff   = dir,
+                           Ori.Rank   = Ds,
+                           Ori.Rank.p = Ds / (Nperms + 1),
                            alpha = alpha,
                            sig = NA,
-                           Nperms  = Nperms,
                            Mean = mean(ts.boot$t[,t],na.rm = TRUE),
                            SD = SD,
                            SE = SD/sqrt(NROW(y1)+1)
@@ -6741,12 +6784,25 @@ ts_permtest_block <- function(y1, y2, Nperms = 99, sim = "geom", l = 3, alpha = 
   }
 
   df_sig     <- plyr::ldply(out)
-  df_sig$sig <- df_sig$p < alpha
+  df_sig$sig <- df_sig$Ori.Rank.p < alpha
 
   if(returnBootObject){
     return(list(df_sig = df_sig, bootOut = ts.boot))
   } else {
     return(df_sig = df_sig)
+  }
+
+  } else {
+    if(!is.null(y2)){
+      out <- list(y1_RND = t(ts.boot1$t),
+                  y2_RND = t(ts.boot2$t))
+      names(out) <- c(deparse(substitute(y1)),deparse(substitute(y2)))
+      plyr::ldply(out,.id="Source")
+    } else {
+      out <- list(y1_RND = t(ts.boot1$t))
+      names(out) <- deparse(substitute(y1))
+      return(plyr::ldply(out,.id="Source"))
+    }
   }
 
 }
@@ -8392,8 +8448,8 @@ is.wholenumber <- function(x, tol = .Machine$double.eps^0.5){
 #' Repeat Copies of a Matrix
 #'
 #' @param X A matrix
-#' @param m Multiply dim(X)[1] m times
-#' @param n Multiply dim(X)[2] n times
+#' @param m Multiply `dim(X)[1]` m times
+#' @param n Multiply `dim(X)[2]` n times
 #'
 #' @return A repeated matrix
 #' @export

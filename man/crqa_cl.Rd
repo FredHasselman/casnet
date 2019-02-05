@@ -65,7 +65,7 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA,
 
 \item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}. This is useful for windowed analysis, it will estimate a new radius for each window.}
 
-\item{useParallel}{Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr]{map2}} to assign data and \code{\link[parallel]{detectCores}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
+\item{useParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr]{map2}} to assign data and \code{\link[parallel]{detectCores}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
 
 \item{...}{Additional parameters (currently not used)}
 }
@@ -75,25 +75,25 @@ A list object containing 1-3 elements, depending on arguments requesting output.
 \enumerate{
 \item \code{rqa_measures} - A list of the (C)RQA measures returned if \code{returnMeasures = TRUE}:
 \itemize{
- \item RR = 'Recurrence rate'
- \item DET = 'Determinism'
- \item DET_RR = 'Ratio DET/RR'
- \item LAM = 'Laminarity'
- \item LAM_DET = 'Ratio LAM/DET'
- \item L_max = 'maximal diagonal line length'
- \item L_mean = 'mean diagonal line length'
- \item L_entr = 'Entropy of diagonal line length distribution'
- \item DIV =  'Divergence (1/L_max)'
- \item V_max = 'maximal vertical line length'
- \item TT = 'Trapping time'
- \item V_entr = 'Entropy of vertical line length distribution'
- \item T1 = 'Recurrence times 1st type'
- \item T2 = 'Recurrence times 2nd type'
- \item W_max = 'Max interval length'
- \item W_mean = 'Mean of interval lengths'
- \item W_entr = 'Entropy of interval length distribution'
- \item W_prob = 'Probability of interval'
- \item F_min = 'F min'
+\item RR = 'Recurrence rate'
+\item DET = 'Determinism'
+\item DET_RR = 'Ratio DET/RR'
+\item LAM = 'Laminarity'
+\item LAM_DET = 'Ratio LAM/DET'
+\item L_max = 'maximal diagonal line length'
+\item L_mean = 'mean diagonal line length'
+\item L_entr = 'Entropy of diagonal line length distribution'
+\item DIV =  'Divergence (1/L_max)'
+\item V_max = 'maximal vertical line length'
+\item TT = 'Trapping time'
+\item V_entr = 'Entropy of vertical line length distribution'
+\item T1 = 'Recurrence times 1st type'
+\item T2 = 'Recurrence times 2nd type'
+\item W_max = 'Max interval length'
+\item W_mean = 'Mean of interval lengths'
+\item W_entr = 'Entropy of interval length distribution'
+\item W_prob = 'Probability of interval'
+\item F_min = 'F min'
 }
 \item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{rp_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
 \item \code{rqa_diagdist} - The distribution of diagonal line lengths
@@ -112,7 +112,7 @@ The platform specific \code{rp} command line executables were created by Norbert
 
 The full copyright statement on the website is as follows:
 
-© 2004-2017 SOME RIGHTS RESERVED
+(C) 2004-2017 SOME RIGHTS RESERVED
 
 University of Potsdam, Interdisciplinary Center for Dynamics of Complex Systems, Germany
 

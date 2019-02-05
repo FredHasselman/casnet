@@ -6,9 +6,9 @@
 \title{Random Number Sequences}
 \format{A data frame with 24200 rows and 3 variables:
 \describe{
-  \item{ID}{Participant ID}
-  \item{time}{Temporal order}
-  \item{number}{A number between 1 and 9}
+\item{ID}{Participant ID}
+\item{time}{Temporal order}
+\item{number}{A number between 1 and 9}
 }}
 \source{
 \url{https://www.frontiersin.org/articles/10.3389/fnhum.2015.00319/full}

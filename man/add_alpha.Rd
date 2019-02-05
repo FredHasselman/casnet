@@ -7,7 +7,7 @@
 add_alpha(col, alpha = 1)
 }
 \arguments{
-\item{col}{A colour name, hexadecimal string or positive integer \code{i}, such that palette()[i]}
+\item{col}{A colour name, hexadecimal string or positive integer \code{i}, such that \code{palette()[i]}}
 
 \item{alpha}{Alpha transparency value}
 }

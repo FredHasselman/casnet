@@ -17,13 +17,15 @@ TRY ... CATCH
 }
 \details{
 In longer simulations, aka computer experiments,
- you may want to
- 1) catch all errors and warnings (and continue)
- 2) store the error or warning messages
+you may want to
+\enumerate{
+\item catch all errors and warnings (and continue)
+\item store the error or warning messages
+}
 
- Here's a solution  (see \R-help mailing list, Dec 9, 2010):
+Here's a solution  (see \R-help mailing list, Dec 9, 2010):
 
-Catch *and* save both errors and warnings, and in the case of
+Catch \emph{and} save both errors and warnings, and in the case of
 a warning, also keep the computed result.
 }
 \author{

@@ -10,5 +10,5 @@ get_os()
 A string, "osx", "windows", "linux"
 }
 \description{
-Some systems not tested, but based on the cran page: [check flavors](https://cran.r-project.org/web/checks/check_flavors.html)
+Some systems not tested, but based on the cran page: \href{https://cran.r-project.org/web/checks/check_flavors.html}{check flavors}
 }

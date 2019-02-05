@@ -15,7 +15,7 @@ transM(x, n_bins)
 \value{
 A \code{list} with the following components:
 \describe{
-\item{\code{xn}}{An [n x 2] matrix of the original and discretized vectors.}
+\item{\code{xn}}{An \code{[n x 2]} matrix of the original and discretized vectors.}
 \item{\code{MM}}{Transition probability matrix from bin-i to bin-j.}
 }
 }

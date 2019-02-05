@@ -6,9 +6,10 @@ bibliography: bibliography.bib
 csl: apa.csl
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{cl_RQA}
+  %\VignetteIndexEntry{Using the CRQA command line interface (crqa_cl)}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 editor_options: 
   chunk_output_type: console
 ---
@@ -18,9 +19,11 @@ knitr::opts_chunk$set(
   collapse = FALSE,
   comment = ">",
   fig.align = "center",
-  fig.width = 10
+  fig.width = 7,
+  width = 500
 )
 ```
+
 
 ## **An R interface to Marwan's commandline recurrence plots**
 
@@ -78,9 +81,9 @@ The data are unordered categorical, that is, the differences between the integer
 * Embedding dimension = 1
 * Radius = 0 (any number $\leq$ 1 will do)
 
-In the code block below the functions `crqa_cl()`, `recmat()`, `di2bi()` and `recmat_plot()` are used to perform RQA on 2 participants in the dataset.
+In the code block below the functions `crqa_cl()`, `rp()`, and `rp_plot()` are used to perform RQA on 2 participants in the dataset.
 
-```{r RNG2, message=FALSE, warning=FALSE, cache=TRUE, collapse=FALSE, include=FALSE, echo=TRUE, paged.print=FALSE}
+```{r RNG2, message=FALSE, warning=FALSE, cache=TRUE, collapse=FALSE, include=TRUE, echo=TRUE, paged.print=FALSE}
 # Run the RQA analysis
 y_1  <- RNG$number[RNG$ID==163]
 y_2 <-  RNG$number[RNG$ID==291]
@@ -88,17 +91,13 @@ crqa_1 <- crqa_cl(y1 = y_1, emDim  = 1, emLag = 1, emRad= 1)
 crqa_2 <- crqa_cl(y1 = y_2, emDim  = 1, emLag = 1, emRad= 1)
 
 ## Plot the recurrence matrix
-# Get the matrix
-rp_1 <- rp(y1=y_1, y2=y_1, emDim = 1, emLag = 1)
-rp_2 <- rp(y1=y_2, y2=y_2, emDim = 1, emLag = 1)
-
-# Turn it into a recurrence matrix
-rp_1 <- di2bi(rp_1,emRad = 1)
-rp_2 <- di2bi(rp_2,emRad = 1)
+# Get the recurrence matrix
+rp_1 <- rp(y1=y_1, y2=y_1, emDim = 1, emLag = 1, emRad = 1)
+rp_2 <- rp(y1=y_2, y2=y_2, emDim = 1, emLag = 1, emRad = 1)
 
 # Get the plots
-g_1 <- rp_plot(rp_1, plotDimensions = TRUE, returnOnlyObject = TRUE)
-g_2 <- rp_plot(rp_2, plotDimensions = TRUE, returnOnlyObject = TRUE)
+g_1 <- rp_plot(rp_1, plotDimensions = TRUE, returnOnlyObject = TRUE, title = "ID 163")
+g_2 <- rp_plot(rp_2, plotDimensions = TRUE, returnOnlyObject = TRUE, title = "ID 291")
 ```
 
 Below the data and plots are rearranged for ease of comparison.
@@ -106,7 +105,7 @@ Below the data and plots are rearranged for ease of comparison.
 ```{r RNG3, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, paged.print=FALSE}
 library(cowplot)
 # The recurrence plots
-cowplot::plot_grid(g_1, g_2, labels = c("ID 163", "ID 291"), align = "h")
+cowplot::plot_grid(g_1, g_2)
 
 # The RQA measures
 cbind.data.frame(subj163=t(crqa_1), subj291=t(crqa_2))
@@ -131,18 +130,21 @@ crqa_1rnd <- crqa_cl(y1 = y_1rnd, emDim  = 1, emLag = 1, emRad= 1)
 crqa_2rnd <- crqa_cl(y1 = y_2rnd, emDim  = 1, emLag = 1, emRad= 1)
 
 # Create the recurrence matrix
-rp_1 <- di2bi(rp(y1=y_1rnd, y2=y_1rnd, emDim = 1, emLag = 1),emRad = 1)
-rp_2 <- di2bi(rp(y1=y_2rnd, y2=y_2rnd, emDim = 1, emLag = 1),emRad = 1)
+rp_1 <- rp(y1=y_1rnd, y2=y_1rnd, emDim = 1, emLag = 1,emRad = 1)
+rp_2 <- rp(y1=y_2rnd, y2=y_2rnd, emDim = 1, emLag = 1,emRad = 1)
 
-# Get the RPs in one statement
-g_1rnd <- rp_plot(rp_1, plotDimensions = TRUE, returnOnlyObject = TRUE)
-g_2rnd <- rp_plot(rp_2, plotDimensions = TRUE, returnOnlyObject = TRUE)
+# Get the RPs
+g_1rnd <- rp_plot(rp_1, plotDimensions = TRUE, returnOnlyObject = TRUE, title = "ID 163 shuffled")
+g_2rnd <- rp_plot(rp_2, plotDimensions = TRUE, returnOnlyObject = TRUE, title = "ID 291 shuffled")
 
 # Display recurrence plots
-cowplot::plot_grid(g_1rnd, g_2rnd, labels = c("ID 163 shuffled", "ID 291 shuffled"), align = "h")
+cowplot::plot_grid(g_1rnd, g_2rnd, align = "h")
 
-# Display the RQA measures
-cbind.data.frame(subj163=t(crqa_1), subj163rnd=t(crqa_1rnd), subj291=t(crqa_2),  subj291rnd=t(crqa_2rnd))
+# Display the RQA measures for ID 163
+cbind.data.frame(subj163=t(crqa_1), subj163rnd=t(crqa_1rnd))
+
+# Display the RQA measures for ID 291
+cbind.data.frame(subj291=t(crqa_2),  subj291rnd=t(crqa_2rnd))
 ```
 
 Note that the number of recurrent points (`RR`) does not change whe we shuffle the data. What changes is the number of recurrent points that form line structures in the recurrence plot. Randomising the number sequences causes vertical line structures to appear in the recurrence plot (`LAM`, `V_max`, `V_entr`, `TT`), this is what we would expect if the data generating process were indeed a random process. Having no such structures means there were hardly any sequences consisting of repetitions of the same number. Participants may have adopted a strategy to avoid such sequences because they erroneously believed this to be a feature of non-random sequences.
@@ -174,31 +176,31 @@ crqa_2rnd_sur[NROW(crqa_2rnd_sur)+1,] <- crqa_2
 
 Use function `plorSUR_hist()` to get a p-value and plot the distributions. The red dots indicate the observed values.
 
-```{r RNG5a, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, paged.print=FALSE}
+```{r RNG5a, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, paged.print=FALSE, fig.height=8}
 # Get point estimates for p-values based on rank of observation (discrete distribution)
 #   99 = (1 / alpha) - 1
 # 99+1 = (1 / alpha)
 alpha = 1/100
 
-p_1 <- plotSUR_hist(surrogateValues = crqa_1rnd_sur$DET, observedValue = crqa_1$DET, measureName = "DET",doPlot = FALSE)
-p_2 <-plotSUR_hist(surrogateValues = crqa_2rnd_sur$DET, observedValue = crqa_2$DET, measureName = "DET", doPlot = FALSE)
+p_1 <- plotSUR_hist(surrogateValues = crqa_1rnd_sur$DET, observedValue = crqa_1$DET, measureName = "DET", doPlot = FALSE)
+p_2 <- plotSUR_hist(surrogateValues = crqa_2rnd_sur$DET, observedValue = crqa_2$DET, measureName = "DET", doPlot = FALSE)
 
-cowplot::plot_grid(p_1$surrogates_plot, p_2$surrogates_plot, labels = c("ID 163","ID 291"), align = "h")
+cowplot::plot_grid(p_1$surrogates_plot, p_2$surrogates_plot, labels = c("ID 163","ID 291"), ncol = 1)
 ```
 
 
 To get the full picture, let's look at those missing repetitions of the same numbers.
 
-```{r RNG6, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, paged.print=FALSE}
+```{r RNG6, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, paged.print=FALSE, fig.height=8}
 # Get point estimates for p-values based on rank of observation (discrete distribution)
 #   99 = (1 / alpha) - 1
 # 99+1 = (1 / alpha)
 alpha = 1/100
 
-p_1 <- plotSUR_hist(surrogateValues = crqa_1rnd_sur$LAM, observedValue = crqa_1$LAM)
-p_2 <- plotSUR_hist(surrogateValues = crqa_2rnd_sur$LAM, observedValue = crqa_2$LAM)
+p_1 <- plotSUR_hist(surrogateValues = crqa_1rnd_sur$LAM, observedValue = crqa_1$LAM, measureName = "LAM", doPlot = FALSE)
+p_2 <- plotSUR_hist(surrogateValues = crqa_2rnd_sur$LAM, observedValue = crqa_2$LAM, measureName = "LAM", doPlot = FALSE)
 
-cowplot::plot_grid(p_1$surrogates_plot, p_2$surrogates_plot, labels = c("ID 163","ID 291"), align = "h")
+cowplot::plot_grid(p_1$surrogates_plot, p_2$surrogates_plot, labels = c("ID 163","ID 291"), ncol = 1)
 ```
 
 If we were naive to the orgin of these number sequences, the results for **LAM**inarity should make us doubt that they represent indendent draws from a discrete uniform distribution of the type $X \sim \mathcal{U}(1,9)$. If we had to decide which sequence was more, or, less random, then based on the **DET**erminism result, we would conclude that participant 163 produced a sequence that is less random than participant 291, the observed value of the former is at the right extreme of a distribution of `DET` values calculated from 99 realisations of the data constrained by $H_0$.

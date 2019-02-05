@@ -16,7 +16,7 @@ The Relative Roughness of y, the values of local and global variance are returne
 Relative Rougness is a ratio of local variance (autocovariance at lag-1) to global variance (autocovariance at lag-0) that can be used to classify different 'noises'.
 }
 \details{
-\deqn{RR = 2 * \left[1 − \frac{\gamma(y)}{Var(y)}\right]}{RR = 2 * [ 1 − autoCov-1(y) / Var(y) ]}
+\deqn{RR = 2 * \left[1 - \frac{\gamma(y)}{Var(y)}\right]}{RR = 2 * [ 1 - autoCov-1(y) / Var(y) ]}
 }
 \references{
 \itemize{

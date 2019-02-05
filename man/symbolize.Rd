@@ -12,12 +12,12 @@ vectors of interest.}
 }
 \value{
 An (n-2) x 2 \code{matrix} of integer symbols that indicate whether
-  the i-th value, based on the i-1 and i+1 values, is a "trough" (=1),
-  "decrease" (=2), "same" (=3), "increase" (=4), or "peak" (=5).
+the i-th value, based on the i-1 and i+1 values, is a "trough" (=1),
+"decrease" (=2), "same" (=3), "increase" (=4), or "peak" (=5).
 }
 \description{
 \code{symbolize} converts numeric vectors to symbolic vectors. It is a helper
-  function for \code{muti}.
+function for \code{muti}.
 }
 \author{
 Mark Scheuerell (https://mdscheuerell.github.io/muti/)

@@ -9,9 +9,9 @@ repmat(X, m, n)
 \arguments{
 \item{X}{A matrix}
 
-\item{m}{Multiply dim(X)[1] m times}
+\item{m}{Multiply \code{dim(X)[1]} m times}
 
-\item{n}{Multiply dim(X)[2] n times}
+\item{n}{Multiply \code{dim(X)[2]} n times}
 }
 \value{
 A repeated matrix

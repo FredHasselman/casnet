@@ -16,7 +16,7 @@ A vector of resampled values.
 }
 \description{
 \code{newZ} creates new vector based on a transition matrix. It is a helper
-  function for \code{muti}.
+function for \code{muti}.
 }
 \author{
 Mark Scheuerell (https://mdscheuerell.github.io/muti/)

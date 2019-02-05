@@ -44,7 +44,7 @@ crqa_rp_measures(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
 \item{doParallel}{Use parallel?}
 }
 \description{
-Use `crqa_rp`
+Use \code{crqa_rp}
 }
 \seealso{
 Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},

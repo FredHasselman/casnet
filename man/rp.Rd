@@ -45,7 +45,7 @@ A (Coss-) Recurrence matrix with attributes:
 \item \code{weighetd} - Whether a weighted matrix is returned
 \item \code{emDim}, \code{emLag} and \code{emRad} - The embedding parameters
 \item \code{AUTO} - Whether the matrix represents AUTO recurrence
- }
+}
 }
 \description{
 Create a Distance Matrix

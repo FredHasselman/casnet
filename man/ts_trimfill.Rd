@@ -24,7 +24,7 @@ ts_trimfill(x, y, action = c("fill", "trim.cut", "trim.NA")[1],
 A list with two vectors of equal length.
 }
 \description{
-Trim the largest vector by cutting it, or filling it with `NA`.
+Trim the largest vector by cutting it, or filling it with \code{NA}.
 Fill the shortest vector with padding.
 }
 \seealso{

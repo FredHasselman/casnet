@@ -4,13 +4,15 @@
 \alias{ts_permtest_block}
 \title{Permutation Test: Block Randomisation}
 \usage{
-ts_permtest_block(y1, y2, Nperms = 99, sim = "geom", l = 3,
-  alpha = 0.05, returnBootObject = FALSE, ...)
+ts_permtest_block(y1, y2 = NULL, targetValue = 0, Nperms = 99,
+  sim = "geom", l = 3, alpha = 0.05, returnBootObject = FALSE, ...)
 }
 \arguments{
-\item{y1}{Time series 1}
+\item{y1}{Time series 1. The goal of the permutation test will be to decide whether the difference \code{y1-targetValue != 0} for each time point, given \code{alpha}.}
 
-\item{y2}{Time series 2}
+\item{y2}{An optional second time series. If this timeseries is provided then the goal of the permutation test will be the to decide wether the difference \code{y2-y1 != targetValue} for each time point, given \code{alpha}.}
+
+\item{targetValue}{The target value for the permutation test. If \code{NULL}, the function will return a data frame with the block randomised surrogates  columns (default = \code{0})}
 
 \item{Nperms}{Number of permutations (default = \code{99})}
 
@@ -28,5 +30,5 @@ ts_permtest_block(y1, y2, Nperms = 99, sim = "geom", l = 3,
 A data frame with the difference time series and variables indicating N and significance.
 }
 \description{
-Permutation Test: Block Randomisation
+Use block randomistion to get a permutation test evaluation of the deviation of an observed value at each time point from a target value. To do block permutation without any tests, pass \code{NULL} for argument \code{targetValue}.
 }
