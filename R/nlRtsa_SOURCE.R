@@ -5293,14 +5293,29 @@ fd_sev <- function(y,
 #'
 #' @param y A numeric vector or time series object
 #' @param fs Sample frequency in Hz
-#' @param doPlot Produce a plot of the Allan variance?
 #' @param useSD Use the standarddeviation instead of variance?
+#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
+#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
+#' @param returnPLAW Return the power law data (default = \code{FALSE})
+#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param silent Silent-ish mode
+#' @param noTitle Do not generate a title (only the subtitle)
+#' @param tsName Name of y added as a subtitle to the plot
 #'
 #' @return A dataframe with the Allan Factor (variance), Alan standard deviation and error due to bin size
 #' @export
 #' @family Fluctuation Analyses
 #'
-fd_allan <- function(y, fs = stats::tsp(stats::hasTsp(y))[3], doPlot = FALSE, useSD=FALSE){
+fd_allan <- function(y,
+                     fs = stats::tsp(stats::hasTsp(y))[3],
+                     useSD=FALSE,
+                     doPlot = TRUE,
+                     returnPlot = FALSE,
+                     returnPLAW = FALSE,
+                     returnInfo = FALSE,
+                     silent = TRUE,
+                     noTitle = FALSE,
+                     tsName="y"){
 
     N <- NROW(y)
     tau <- 1/fs
@@ -5328,41 +5343,95 @@ fd_allan <- function(y, fs = stats::tsp(stats::hasTsp(y))[3], doPlot = FALSE, us
       error[i + 1] <- 1/sqrt(2 * ((N/(2^i)) - 1))
     }
 
-    df <- data.frame(Tcluster = time, AT = av, ATsd= sqrt(av), error=error)
-    if(doPlot){
-      if(useSD){
-
-     g <-  ggplot(df,aes_(x=~Tcluster,y=~ATsd)) +
-        geom_path() +
-        geom_pointrange(aes_(ymin=~ATsd-(~ATsd*~error),ymax=~ATsd+(~ATsd*~error))) +
-       scale_y_continuous(trans = scales::log10_trans(),
-                          breaks = scales::trans_breaks("log10", function(x) 10^x),
-                          labels = scales::trans_format("log10", scales::math_format())
-                          ) +
-       scale_x_continuous(trans = scales::log10_trans(),
-                          breaks = scales::trans_breaks("log10", function(x) 10^x),
-                          labels = scales::trans_format("log10", scales::math_format())) +
-        xlab("Cluster Times (T)") +
-        ylab("Allan Standard Deviation") +
-        theme_bw()
-
-     } else {
-       g <-  ggplot(df,aes_(x=~Tcluster,y=~AT)) +
-         geom_path() +
-         geom_pointrange(aes_(ymin=~AT-(~AT*~error),ymax=~AT+(~AT*~error))) +
-       scale_y_continuous(trans = scales::log10_trans(),
-                          breaks = scales::trans_breaks("log10", function(x) 10^x),
-                          labels = scales::trans_format("log10", scales::math_format())) +
-         scale_x_continuous(trans = scales::log10_trans(),
-                            breaks = scales::trans_breaks("log10", function(x) 10^x),
-                            labels = scales::trans_format("log10", scales::math_format())) +
-         xlab("Cluster Times (T)") +
-         ylab("Allan Factor")  +
-         theme_bw()
-     }
-      graphics::plot(g)
+    if(useSD){
+      df <- data.frame(bulk = time, size = av, error=error)
+    } else {
+      df <- data.frame(bulk = time, size = sqrt(av), error=error)
     }
-    return(df)
+
+    lmfit1        <- stats::lm(log10(df$bulk) ~ log10(df$size), na.action=stats::na.omit)
+    H1  <- lmfit1$coefficients[2]
+    lmfit2        <- stats::lm(log10(df$bulk) ~ log10(df$size), na.action=stats::na.omit)
+    H2  <- lmfit2$coefficients[2]
+
+
+
+    outList <- list(
+      PLAW  =  df,
+      fullRange = list(y = y,
+                       sap = lmfit1$coefficients[2],
+                       AF = H1,
+                       FD = NA,
+                       fitlm1 = lmfit1,
+                       method = paste0("Full range (n = ",NROW(df),")\nSlope = ",round(stats::coef(lmfit1)[2],2))),
+      fitRange  = list(y = y,
+                       sap = lmfit2$coefficients[2],
+                       AF = H2,
+                       FD = NA,
+                       fitlm2 = lmfit2,
+                       method = paste0("Full range (n = ",NROW(df),")\nSlope = ",round(stats::coef(lmfit2)[2],2))),
+      info = df,
+      plot = NA)
+
+    if(doPlot|returnPlot){
+      if(noTitle){
+        title <- ""
+      } else {
+        if(useSD){
+          title <- "log-log regression (Allan Deviation)"
+        } else {
+          title <- "log-log regression (Allan Variance)"
+        }
+      }
+      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Scale", ylabel = "Allan Variance")
+      if(doPlot){
+        grid::grid.newpage()
+        grid::grid.draw(g)
+      }
+      if(returnPlot){
+        outList$plot <- invisible(g)
+      }
+    }
+
+    if(returnInfo){returnPLAW<-TRUE}
+
+    return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+
+    #
+    # if(doPlot){
+    #   if(useSD){
+    #
+    #  g <-  ggplot(df,aes_(x=~Tcluster,y=~ATsd)) +
+    #     geom_path() +
+    #     geom_pointrange(aes_(ymin=~ATsd-(~ATsd*~error),ymax=~ATsd+(~ATsd*~error))) +
+    #    scale_y_continuous(trans = scales::log10_trans(),
+    #                       breaks = scales::trans_breaks("log10", function(x) 10^x),
+    #                       labels = scales::trans_format("log10", scales::math_format())
+    #                       ) +
+    #    scale_x_continuous(trans = scales::log10_trans(),
+    #                       breaks = scales::trans_breaks("log10", function(x) 10^x),
+    #                       labels = scales::trans_format("log10", scales::math_format())) +
+    #     xlab("Cluster Times (T)") +
+    #     ylab("Allan Standard Deviation") +
+    #     theme_bw()
+    #
+    #  } else {
+    #    g <-  ggplot(df,aes_(x=~Tcluster,y=~AT)) +
+    #      geom_path() +
+    #      geom_pointrange(aes_(ymin=~AT-(~AT*~error),ymax=~AT+(~AT*~error))) +
+    #    scale_y_continuous(trans = scales::log10_trans(),
+    #                       breaks = scales::trans_breaks("log10", function(x) 10^x),
+    #                       labels = scales::trans_format("log10", scales::math_format())) +
+    #      scale_x_continuous(trans = scales::log10_trans(),
+    #                         breaks = scales::trans_breaks("log10", function(x) 10^x),
+    #                         labels = scales::trans_format("log10", scales::math_format())) +
+    #      xlab("Cluster Times (T)") +
+    #      ylab("Allan Factor")  +
+    #      theme_bw()
+    #  }
+    #   graphics::plot(g)
+    # }
+    # return(df)
 }
 
 # Multi-Fractal DFA -----------------------------------------------------------------------------------------------
@@ -5985,6 +6054,18 @@ plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="B
     logBaseNum <- as.numeric(logBase)
   }
 
+ logLabels <- function (expr, format = force)
+  {
+    quoted <- substitute(expr)
+    subs <- function(x) {
+      do.call("substitute", list(quoted, list(.x = as.name(x))))
+    }
+    function(x) {
+      x <- format(x)
+      lapply(x, subs)
+    }
+  }
+
   logSlopes <- data.frame(x = c(fd.OUT$PLAW$size[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)],
                                 fd.OUT$PLAW$size[1:NROW(fd.OUT[[3]]$fitlm2$fitted.values)]),
                           y = c(fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)],
@@ -5997,31 +6078,19 @@ plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="B
     ggplot2::ggtitle(label = title, subtitle = subtitle)
 
   if(logBase=="e"){
-    g <- g +
-      ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
-      ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
-                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
-                                  labels =  scales::trans_format(logFormat,scales::math_format(expr = expression(paste(e^.x)))),
-                                  trans = scales::log_trans(base = logBaseNum)) +
-      ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
-                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
-                                  labels = scales::trans_format(logFormat,scales::math_format(expr = expression(paste(e^.x)))),
-                                  trans = scales::log_trans(base = logBaseNum)) +
-      ggplot2::annotation_logticks()
+  evalT<-
+    paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
+      ggplot2::scale_y_continuous(name = "',paste0(ylabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) + ggplot2::annotation_logticks()')
+
+  eval(parse(text = evalT))
   }
 
   if(logBase=="2"){
-    g <- g +
-      ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
-      ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
-                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
-                                  labels = scales::trans_format(logFormat, scales::math_format(expr = expression(paste(2^.x)))),
-                                  trans = scales::log_trans(base = logBaseNum)) +
-      ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
-                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
-                                  labels = scales::trans_format(logFormat,scales::math_format(expr = expression(paste(2^.x)))),
-                                  trans = scales::log_trans(base = logBaseNum)) +
-      ggplot2::annotation_logticks()
+    evalT<-
+      paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
+             ggplot2::scale_y_continuous(name = "',paste0(ylabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) + ggplot2::annotation_logticks()')
+
+    eval(parse(text = evalT))
   }
 
   if(logBase=="10"){
@@ -6029,11 +6098,11 @@ plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="B
       ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
       ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
                                   breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
-                                  labels = scales::trans_format(logFormat, scales::math_format(expr = expression(10^.x))),
+                                  labels = scales::trans_format(logFormat, scales::math_format()),
                                   trans = scales::log_trans(base = logBaseNum)) +
       ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
                                   breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
-                                  labels = scales::trans_format(logFormat,scales::math_format(expr = expression(10^.x))),
+                                  labels = scales::trans_format(logFormat,scales::math_format()),
                                   trans = scales::log_trans(base = logBaseNum)) +
       ggplot2::annotation_logticks()
   }
