@@ -68,4 +68,3 @@ Suggests: knitr,
     tidyverse,
     patchwork
 VignetteBuilder: knitr
-Remotes: thomasp85/patchwork

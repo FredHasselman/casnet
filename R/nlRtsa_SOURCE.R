@@ -1624,7 +1624,7 @@ crqa_rp <- function(RM,
 #' @param DLmax DLmax
 #' @param VLmax VLmax
 #' @param HLmax HLmax
-#' @param AUTO ARTO
+#' @param AUTO AUTO
 #' @param chromatic chromatic
 #' @param matrices matrices
 #' @param doPlot Plot
@@ -6116,9 +6116,14 @@ plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="B
   g <- g +
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
-                   legend.text = element_text(margin = margin(t = 5,b = 5, unit = "pt"), vjust = .5))
+                   legend.text = element_text(margin = margin(t = 5,b = 5, unit = "pt"), vjust = .5),
+                    text = element_text(size = 10)) #,family = "Calibri"))
 
-  return(g)
+
+    graphics::plot.new()
+    graphics::plot(g)
+
+  return(invisible(g))
 }
 
 

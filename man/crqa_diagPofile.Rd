@@ -31,7 +31,7 @@ crqa_diagPofile(RM, diagWin = NULL, xname = "", yname = "",
 
 \item{HLmax}{HLmax}
 
-\item{AUTO}{ARTO}
+\item{AUTO}{AUTO}
 
 \item{chromatic}{chromatic}
 
