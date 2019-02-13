@@ -6114,6 +6114,7 @@ plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="B
   }
 
   g <- g +
+    ggplot2::scale_color_manual(values = c("red3","steelblue")) +
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
                    legend.text = element_text(margin = margin(t = 5,b = 5, unit = "pt"), vjust = .5),
@@ -8387,137 +8388,9 @@ try_CATCH <- function(expr){
 }
 
 
-#' Rose tinted infix
-#'
-#'
-#' @param x If \code{x} is any of \code{Inf,-Inf,NA,NaN,NULL,length(x)==0}, it will return \code{y}; otherwise it returns \code{x}.
-#' @param y The value to return in case of catastrophy \code{>00<}
-#'
-#' @export
-#' @author Fred Hasselman
-#' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
-#' @seealso purrrr::%||%
-#' @examples
-#' Inf %00% NA
-#'
-#' numeric(0) %00% ''
-#'
-#' NA %00% 0
-#'
-#' NaN %00% NA
-#'
-#' NULL %00% NA
-`%00%` <- function(x,y){
-  if(length(x)==0){
-    x <- y
-  } else{
-
-    for(i in seq_along(x)){
-      l0<-isna<-isnan<-isinf<-isnll<-isTryError<-FALSE
-      if(length(x[i])==0){
-        l0=TRUE
-      } else {
-        if(all(is.na(x[i])))       isna =TRUE
-        if(all(is.nan(x[i])))      isnan=TRUE
-        if(all(is.infinite(x[i]))) isinf=TRUE
-        if(all(is.null(x[i])))     isnll=TRUE
-        if(all(class(x[i])%in%"try-error")) isTryError=TRUE
-      }
-      if(any(l0,isna,isnan,isinf,isnll,isTryError)){x[i]<-y}
-    }
-  }
-  return(x)
-}
-
-
 is.wholenumber <- function(x, tol = .Machine$double.eps^0.5){
   return(abs(x - round(x)) < tol)
 }
-
-#' Signed increment
-#'
-#' Increment an integer counter by an arbitrary (signed) interval.
-#'
-#' @param counter If \code{counter} and \code{increment} are both a (signed) integers \code{counter} will change by the value of \code{increment}.
-#' @param increment An integer value \eqn{\neq 0} to add to \code{counter}
-#'
-#' @export
-#' @author Fred Hasselman
-#' @examples
-#'
-#' # Notice the difference between passing an object and a value for counter
-#'
-#' # Value
-#' (10 %+-% -5)
-#' (10 %+-% -5)
-#'
-#' # Object
-#' i <- 10
-#' (i %+-% -5)
-#' (i %+-% -5)
-#'
-#' # This means we can use the infix in a while ... statement
-#' while(i > -3) i %+-% -5
-#' # WARNING: As is the case for any while ... statement, be careful not to create an infinite loop!
-#'
-`%+-%` <- function(counter, increment){
-  if(is.na(counter%00%NA)|is.na(increment%00%NA)|!is.wholenumber(counter)|!is.wholenumber(increment)|increment==0){
-    stop("Don't know how to work with counter and/or increment argument.\n Did you use integers?")
-  } else{
-    result <- counter + increment
-    if(counter>0&result<=0){warning("Positive valued counter changed sign (counter <= 0)!")}
-    if(counter<0&result>=0){warning("Negative valued counter changed sign (counter >= 0)!")}
-    obj <- try_CATCH(as.numeric(deparse(substitute(counter))))
-    if(is.na(obj$value)){
-      eval(parse(text=paste(deparse(substitute(counter))," <<- result")))
-    } else {
-      return(result)
-    }
-  }
-}
-
-
-#' Positive increment
-#'
-#' Increment a counter by an arbitrary interval greater than 0.
-#'
-#' @param counter If \code{counter} \eqn{\ge 0} and \code{increment} \eqn{> 0} and are both integers, \code{counter} will change by the value of \code{increment}.
-#' @param increment An integer value \eqn{> 0} to add to \code{counter}
-#'
-#' @export
-#' @author Fred Hasselman
-#' @description When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.
-#' @examples
-#'
-#' # Notice the difference between passing an object and a value for counter
-#'
-#' # Value
-#' (0 %++% 5)
-#' (0 %++% 5)
-#'
-#' # Object
-#' i <- 0
-#' (i %+-% 5)
-#' (i %+-% 5)
-#'
-#' # This means we can use the infix in a while ... statement
-#' while(i < 20) i %+-% 5
-#' # WARNING: As is the case for any while ... statement, be careful not to create an infinite loop!
-#'
-`%++%` <- function(counter,increment){
-  if(is.na(counter%00%NA)|is.na(increment%00%NA)|!is.wholenumber(counter)|!is.wholenumber(increment)|increment<=0|counter<0){
-    stop("Don't know how to work with counter and/or increment argument.\n Did you use integers?")
-  } else{
-    result <- counter + increment
-    obj <- try_CATCH(as.numeric(deparse(substitute(counter))))
-    if(is.na(obj$value)){
-      eval(parse(text=paste(deparse(substitute(counter))," <<- result")))
-    } else {
-      return(result)
-    }
-  }
-}
-
 
 #' Repeat Copies of a Matrix
 #'
