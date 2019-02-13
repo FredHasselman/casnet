@@ -12,6 +12,14 @@ A collection of analytic tools for studying signals recorded from complex adapti
     - Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA).
     - Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks, Multiplex Networks).
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/FredHasselman/casnet}
+  \item Report bugs at \url{https://github.com/FredHasselman/casnet/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Fred Hasselman \email{f.hasselman@pwo.ru.nl} (0000-0003-1384-8361)
 

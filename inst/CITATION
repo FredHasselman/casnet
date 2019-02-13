@@ -2,13 +2,13 @@ citHeader("To cite casnet in publications use:")
 
 citEntry(entry = "Manual",
    title = "casnet: A toolbox for studying Complex Adaptive Systems and NETworks",
-   author = person("Fred", "Hasselman", role = "aut", email = "f.hasselman@bsi.ru.nl"),
+   author = c(person("Fred", "Hasselman", role = "aut", email = "f.hasselman@bsi.ru.nl"),person("Merlijn", "Olthof", email = "m.olthof@pwo.ru.nl", role = "ctb")),
    year = "2017",
-   note = "R package version 0.1.0",
+   note = "R package version 0.1.3",
    url = "https://github.com/FredHasselman/casnet",
    key = "casnet-package",
  textVersion  =
   paste("Fred Hasselman (2017).",
         "casnet: A toolbox for studying Complex Adaptive Systems and NETworks",
-        "URL https://github.com/FredHasselman/casnet.")
+        "URL https://github.com/FredHasselman/casnet")
 )
