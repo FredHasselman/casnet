@@ -66,10 +66,8 @@ Suggests: knitr,
     stats,
     utils,
     devtools,
-    tidyverse,
-    patchwork
+    tidyverse
 VignetteBuilder: knitr
 Language: en-US
 URL: https://github.com/FredHasselman/casnet
 BugReports: https://github.com/FredHasselman/casnet/issues
-Remotes: github::FredHasselman/invctr
