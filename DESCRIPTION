@@ -72,5 +72,4 @@ VignetteBuilder: knitr
 Language: en-US
 URL: https://github.com/FredHasselman/casnet
 BugReports: https://github.com/FredHasselman/casnet/issues
-Remotes:  
-    FredHasselman/invctr
+Remotes: github::FredHasselman/invctr
