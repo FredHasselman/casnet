@@ -1753,7 +1753,6 @@ df <- tidyr::gather(dy_m,key=variable,value = RR, -c(Diagonal,sdRRrnd, labels))
   g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal,y=~RR, colour = ~variable)) +
     ggplot2::geom_line(alpha=.7) +
     ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
-    #ggplot2::geom_point(pch=21,fill="grey50",size=3) +
     ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
     ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks) +
     ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left") +
