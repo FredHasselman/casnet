@@ -837,21 +837,21 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
   names(myPalNn) <- emLags$lag[!is.na(emLags$lag)]
 
     gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
-      geom_rect( ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
-      scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
-      geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
-      geom_hline(yintercept = c(0,100),   colour = "grey60") +
-      geom_hline(yintercept = 50, colour = "grey90") +
-      geom_line(position  = position_dodge(.4)) +
-      geom_point(position = position_dodge(.4)) +
-      annotate("text",x=maxDim/3,y=nnThres, label="threshold", size = .8) +
-      xlab("Embedding Dimension") + ylab("Nearest neigbours (% of max.)") +
-      facet_wrap(~Nns.f, ncol=2) +
-      scale_x_continuous(breaks=emDims) +
-      scale_y_continuous(breaks = c(nnThres,50,100)) +
-      scale_color_manual("Lag", values = myPalNn ) +
-      theme_minimal() +
-      theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
+      ggplot2::geom_rect( ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
+      ggplot2::scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
+      ggplot2::geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
+      ggplot2::geom_hline(yintercept = c(0,100),   colour = "grey60") +
+      ggplot2::geom_hline(yintercept = 50, colour = "grey90") +
+      ggplot2::geom_line(position  = position_dodge(.4)) +
+      ggplot2::geom_point(position = position_dodge(.4)) +
+      ggplot2::annotate("text",x=maxDim/3,y=nnThres, label="threshold", size = .8) +
+      ggplot2::xlab("Embedding Dimension") + ylab("Nearest neigbours (% of max.)") +
+      ggplot2::facet_wrap(~Nns.f, ncol=2) +
+      ggplot2::scale_x_continuous(breaks=emDims) +
+      ggplot2::scale_y_continuous(breaks = c(nnThres,50,100)) +
+      ggplot2::scale_color_manual("Lag", values = myPalNn ) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
             strip.text.x = element_text(colour = "black", face = "bold"),
             panel.spacing = unit(1, "lines"),
             legend.background = element_rect(colour = "grey90",fill = "grey90"),
@@ -863,15 +863,15 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
       )
 
     gDelay <- ggplot2::ggplot(dfMI, ggplot2::aes_(y = ~ami, x = ~emDelay)) +
-      geom_line() +
-      geom_vline(data = emLags,  ggplot2::aes_(colour=factor(emLags$selection.method),
+      ggplot2::geom_line() +
+      ggplot2::geom_vline(data = emLags,  ggplot2::aes_(colour=factor(emLags$selection.method),
                                     xintercept = ~lag), alpha = .3) +
-      geom_point(data = emLags,  ggplot2::aes_(x = ~lag, y = ~ami, colour = factor(emLags$selection.method)), size = 2) +
-      xlab("Embedding Lag") +
-      ylab("Average Mututal Information") +
-      scale_color_manual("Lag", values = myPalLag) +
-      theme_bw() +
-      theme(legend.position = c(.95, .95),
+      ggplot2::geom_point(data = emLags,  ggplot2::aes_(x = ~lag, y = ~ami, colour = factor(emLags$selection.method)), size = 2) +
+      ggplot2::xlab("Embedding Lag") +
+      ggplot2::ylab("Average Mututal Information") +
+      ggplot2::scale_color_manual("Lag", values = myPalLag) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(legend.position = c(.95, .95),
             legend.justification = c("right", "top"),
             legend.box.just = "right",
             legend.margin = margin(6, 6, 6, 6),
@@ -1624,6 +1624,10 @@ crqa_rp <- function(RM,
 #' @param DLmax DLmax
 #' @param VLmax VLmax
 #' @param HLmax HLmax
+#' @param doShuffle Should a shuffled baseline be calculated (default = `FALSE`)
+#' @param y1 The original `y1` time series
+#' @param y2 The original `y2` time series
+#' @param Nshuffle How many shuffled versions to make up the baseline.
 #' @param AUTO AUTO
 #' @param chromatic chromatic
 #' @param matrices matrices
@@ -1643,6 +1647,10 @@ crqa_diagPofile <- function(RM,
                             DLmax = length(Matrix::diag(RM))-1,
                             VLmax = length(Matrix::diag(RM))-1,
                             HLmax = length(Matrix::diag(RM))-1,
+                            doShuffle = FALSE,
+                            y1        = NA,
+                            y2        = NA,
+                            Nshuffle  = 100,
                             AUTO      = NULL,
                             chromatic = FALSE,
                             matrices  = FALSE,
@@ -1670,8 +1678,31 @@ crqa_diagPofile <- function(RM,
     stop("Diagonal window must be 1 positive integer!!")
   }
 
+  if(doShuffle){
+    if(any(is.na(y1),is.na(y2))){
+      stop("Need series y1 and y2 in order to do the shuffle!!")
+    } else {
+      TSrnd <- tseries::surrogate(x=y1, ns=Nshuffle, fft=FALSE, amplitude = FALSE)
+    }
+    emDim <- attr(RM,"emDim")
+    emLag <- attr(RM,"emLag")
+    emRad <- attr(RM,"emRad")
+    RMrnd <- plyr::llply(1:NCOL(TSrnd), function(c) rp(y1 = TSrnd[,c], y2, emDim = emDim, emLag = emLag, emRad = emRad))
+  }
+
+RMs <- out <- list()
+RMs[[1]] <- RM
+if(doShuffle){
+ RMs[2:(Nshuffle+1)] <- RMrnd
+ names(RMs) <- c("obs",paste0("Shuffled", 1:Nshuffle))
+} else {
+  names(RMs) <- "obs"
+}
+
+for(r in seq_along(RMs)){
+
   #rp_lineDist(RM,d = diagWin, matrices = TRUE)
-  B <- rp_nzdiags(RM,removeNZ = FALSE)
+  B <- rp_nzdiags(RMs[[r]],removeNZ = FALSE)
   diagID <- 1:NCOL(B)
   names(diagID) <- colnames(B)
   if(length(diagWin)<NCOL(B)){
@@ -1682,33 +1713,47 @@ crqa_diagPofile <- function(RM,
   }
 
   #winRR <- sum(B==1, na.rm = TRUE)
-  dp <- plyr::ldply(diagID, function(i){
+  df <- plyr::ldply(diagID, function(i){
     data.frame(index = i, RR = sum(B[,i]==1, na.rm = TRUE)/ (NROW(B)-abs(as.numeric(colnames(B)[i]))))
   }, .id = "Diagonal")
 
-  dp$group  <- 1
-  dp$labels <- paste(dp$Diagonal)
-  dp$labels[dp$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
-  dp$labels <- factor(dp$labels,levels = dp$labels,ordered = TRUE)
+  df$group  <- 1
+  df$labels <- paste(df$Diagonal)
+  df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
+  df$labels <- factor(df$labels,levels = df$labels,ordered = TRUE)
 
+  out[[r]] <- df
+
+}
+names(out) <- names(RMs)
+dy <- plyr::ldply(out)
+df_shuf <- dplyr::filter(dy,.id!="obs")
+dy_m <- df_shuf %>% dplyr::group_by(Diagonal,labels) %>% dplyr::summarise(meanRRrnd = mean(RR),sdRRrnd   = stats::sd(RR))
+dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+dy_m$y_obs <- dy$RR[dy$.id=="obs"]
+
+df <- tidyr::gather(dy_m,key=variable,value = RR, -c(Diagonal,sdRRrnd, labels))
 
   if(doPlot){
 
-    if(length(levels(dp$labels.f))>21){
-      ext <- max(min(abs(dp$Diagonal),na.rm = TRUE),abs(max(dp$Diagonal,na.rm = TRUE)))
-      breaks <- which(dp$labels.f%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
+    if(length(levels(df$labels))>21){
+      ext <- max(min(abs(df$Diagonal),na.rm = TRUE),abs(max(df$Diagonal,na.rm = TRUE)))
+      breaks <- which(df$labels%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
     } else {
-      breaks <- dp$labels
+      breaks <- df$labels
     }
 
-  x1<-(which.min(as.numeric(paste(dp$Diagonal))))
-  x2<-(which.max(as.numeric(paste(dp$Diagonal))))
-  yL<-max(as.numeric(paste(dp$RR)),na.rm = TRUE)+0.1
+  x1<-(which.min(as.numeric(paste(df$Diagonal))))
+  x2<-(which.max(as.numeric(paste(df$Diagonal))))
+  yL<-max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
+  df$Diagonal <- as.numeric(df$Diagonal)
 
-  g <- ggplot2::ggplot(dp, ggplot2::aes_(x=~labels,y=~RR, group = ~group)) +
-    ggplot2::geom_path(alpha=.7) +
-    ggplot2::geom_vline(xintercept = which(dp$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
-    ggplot2::geom_point(pch=21,fill="grey50",size=3) +
+
+  g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal,y=~RR, colour = ~variable)) +
+    ggplot2::geom_line(alpha=.7) +
+    ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
+    #ggplot2::geom_point(pch=21,fill="grey50",size=3) +
     ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
     ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks) +
     ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left") +
@@ -1716,11 +1761,11 @@ crqa_diagPofile <- function(RM,
     ggplot2::theme_bw()
 
   print(g)
-  return(invisible(list(plot = g, data = dp)))
+  return(invisible(list(plot = g, data = spread(df,key = variable, value = RR))))
 
   } else {
 
-    return(invisible(dp))
+    return(invisible(spread(df,key = variable, value = RR)))
 
   }
 }
@@ -6117,8 +6162,8 @@ plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="B
     ggplot2::scale_color_manual(values = c("red3","steelblue")) +
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
-                   legend.text = element_text(margin = margin(t = 5,b = 5, unit = "pt"), vjust = .5),
-                    text = element_text(size = 10)) #,family = "Calibri"))
+                   legend.text = ggplot2::element_text(margin = ggplot2::margin(t = 5,b = 5, unit = "pt"), vjust = .5),
+                    text = ggplot2::element_text(size = 10)) #,family = "Calibri"))
 
 
     graphics::plot.new()
@@ -6440,23 +6485,24 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
   groupColours <-  scales::brewer_pal(palette="RdBu")(11)
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
 
-  g <- ggplot(corfun,aes_(x=~lag,y=~r)) +
-    geom_hline(yintercept = 0, colour="grey",size=1) +
-    geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),aes_(x=~x,y=~y),colour="grey50") +
-    geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
-    geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
-    geom_path(colour="grey50") +
-    geom_point(aes_(fill = ~sig, colour=~sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
-    facet_grid(type ~.) +
-    scale_fill_manual(bquote(p < .(siglevel)),values = cols,
+  g <- ggplot2::ggplot(corfun,ggplot2::aes_(x=~lag,y=~r)) +
+    ggplot2::geom_hline(yintercept = 0, colour="grey",size=1) +
+    ggplot2::geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),ggplot2::aes_(x=~x,y=~y),colour="grey50") +
+    ggplot2::geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
+    ggplot2::geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
+    ggplot2::geom_path(colour="grey50") +
+    ggplot2::geom_point(aes_(fill = ~sig, colour=~sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
+    ggplot2::facet_grid(type ~.) +
+    ggplot2::scale_fill_manual(bquote(p < .(siglevel)),values = cols,
                       labels =  list("yes"= expression(rho != 0),
                                      "no" = expression(rho == 0))) +
-    scale_colour_manual(bquote(p < .(siglevel)),values = cols,
+    ggplot2::scale_colour_manual(bquote(p < .(siglevel)),values = cols,
                         labels =  list("yes"= expression(rho != 0),
                                        "no" = expression(rho == 0))) +
-    scale_x_continuous(limits = c(0,Lmax),expand = c(0.01,0), breaks = seq(0,Lmax,by = round(Lmax/10))) +
-    scale_y_continuous(limits = c(-1,1)) +
-    theme_bw() + theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank())
+    ggplot2::scale_x_continuous(limits = c(0,Lmax),expand = c(0.01,0), breaks = seq(0,Lmax,by = round(Lmax/10))) +
+    ggplot2::scale_y_continuous(limits = c(-1,1)) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(panel.grid.minor.y = ggplot2::element_blank(), panel.grid.minor.x = ggplot2::element_blank())
 
   if(doPlot){
     graphics::plot.new()
@@ -6503,23 +6549,24 @@ plotRED_mif <- function(y, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*
                            mi = c(mifunMIF,mifunPMIF),
                            type = c(rep(attributes(mifunMIF)$miType,NROW(mifunMIF)),rep(attributes(mifunPMIF)$miType,NROW(mifunPMIF))))
 
-  g <- ggplot(mifun_long,aes_(x=~lag,y=~mi)) +
-    geom_hline(yintercept = 0, colour="grey",size=1) +
-    geom_line(data = data.frame(x=c(0,mifun_long$lag[1]),y=c(1,mifun_long$mi[1])),aes_(x=~x,y=~y),colour="grey50") +
-    geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
+  g <- ggplot2::ggplot(mifun_long,ggplot2::aes_(x=~lag,y=~mi)) +
+    ggplot2::geom_hline(yintercept = 0, colour="grey",size=1) +
+    ggplot2::geom_line(data = data.frame(x=c(0,mifun_long$lag[1]),y=c(1,mifun_long$mi[1])),ggplot2::aes_(x=~x,y=~y),colour="grey50") +
+    ggplot2::geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
     #geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
-    geom_path(colour="grey50") +
-    geom_point(pch=21, cex=(1 + .01*(NROW(y)/nbins))) +
-    facet_grid(type ~.) +
+    ggplot2::geom_path(colour="grey50") +
+    ggplot2::geom_point(pch=21, cex=(1 + .01*(NROW(y)/nbins))) +
+    ggplot2::facet_grid(type ~.) +
     # scale_fill_manual(bquote(p < .(siglevel)),values = cols,
     #                   labels =  list("yes"= expression(rho != 0),
     #                                  "no" = expression(rho == 0))) +
     # scale_colour_manual(bquote(p < .(siglevel)),values = cols,
     #                     labels =  list("yes"= expression(rho != 0),
     #                                    "no" = expression(rho == 0))) +
-    scale_x_continuous(limits = c(0,length(lags)),expand = c(0.01,0), breaks = seq(0,length(lags),by = round(length(lags)/10))) +
-    scale_y_continuous(limits = c(-1,1)) +
-    theme_bw() + theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank())
+    ggplot2::scale_x_continuous(limits = c(0,length(lags)),expand = c(0.01,0), breaks = seq(0,length(lags),by = round(length(lags)/10))) +
+    ggplot2::scale_y_continuous(limits = c(-1,1)) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(panel.grid.minor.y = ggplot2::element_blank(), panel.grid.minor.x = ggplot2::element_blank())
 
   if(doPlot){
     graphics::plot.new()

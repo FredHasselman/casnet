@@ -7,8 +7,9 @@
 crqa_diagPofile(RM, diagWin = NULL, xname = "", yname = "",
   DLmin = 2, VLmin = 2, HLmin = 2, DLmax = length(Matrix::diag(RM))
   - 1, VLmax = length(Matrix::diag(RM)) - 1,
-  HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL,
-  chromatic = FALSE, matrices = FALSE, doPlot = TRUE)
+  HLmax = length(Matrix::diag(RM)) - 1, doShuffle = FALSE, y1 = NA,
+  y2 = NA, Nshuffle = 100, AUTO = NULL, chromatic = FALSE,
+  matrices = FALSE, doPlot = TRUE)
 }
 \arguments{
 \item{RM}{A binary recurrence matrix}
@@ -30,6 +31,14 @@ crqa_diagPofile(RM, diagWin = NULL, xname = "", yname = "",
 \item{VLmax}{VLmax}
 
 \item{HLmax}{HLmax}
+
+\item{doShuffle}{Should a shuffled baseline be calculated (default = \code{FALSE})}
+
+\item{y1}{The original \code{y1} time series}
+
+\item{y2}{The original \code{y2} time series}
+
+\item{Nshuffle}{How many shuffled versions to make up the baseline.}
 
 \item{AUTO}{AUTO}
 

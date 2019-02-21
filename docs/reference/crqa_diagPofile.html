@@ -93,7 +93,12 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/FredHasselman/casnet">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -107,7 +112,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Diagonal Recurrence Profile</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
     <div class="hidden name"><code>crqa_diagPofile.Rd</code></div>
     </div>
 
@@ -120,8 +125,9 @@
     <pre class="usage"><span class='fu'>crqa_diagPofile</span>(<span class='no'>RM</span>, <span class='kw'>diagWin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>xname</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>yname</span> <span class='kw'>=</span> <span class='st'>""</span>,
   <span class='kw'>DLmin</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>VLmin</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>HLmin</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>DLmax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='kw pkg'>Matrix</span><span class='kw ns'>::</span><span class='fu'>diag</span>(<span class='no'>RM</span>))
   - <span class='fl'>1</span>, <span class='kw'>VLmax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='kw pkg'>Matrix</span><span class='kw ns'>::</span><span class='fu'>diag</span>(<span class='no'>RM</span>)) - <span class='fl'>1</span>,
-  <span class='kw'>HLmax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='kw pkg'>Matrix</span><span class='kw ns'>::</span><span class='fu'>diag</span>(<span class='no'>RM</span>)) - <span class='fl'>1</span>, <span class='kw'>AUTO</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>chromatic</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>matrices</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>HLmax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='kw pkg'>Matrix</span><span class='kw ns'>::</span><span class='fu'>diag</span>(<span class='no'>RM</span>)) - <span class='fl'>1</span>, <span class='kw'>doShuffle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>y1</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>y2</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>Nshuffle</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>AUTO</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>chromatic</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>matrices</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -165,6 +171,22 @@
     <tr>
       <th>HLmax</th>
       <td><p>HLmax</p></td>
+    </tr>
+    <tr>
+      <th>doShuffle</th>
+      <td><p>Should a shuffled baseline be calculated (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>y1</th>
+      <td><p>The original <code>y1</code> time series</p></td>
+    </tr>
+    <tr>
+      <th>y2</th>
+      <td><p>The original <code>y2</code> time series</p></td>
+    </tr>
+    <tr>
+      <th>Nshuffle</th>
+      <td><p>How many shuffled versions to make up the baseline.</p></td>
     </tr>
     <tr>
       <th>AUTO</th>

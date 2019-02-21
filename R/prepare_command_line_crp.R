@@ -31,7 +31,9 @@
   )
   toset <- !(names(op.casnet) %in% names(op))
   if(any(toset)) options(op.casnet[toset])
-  for(p in c("grDevices","graphics","stats","utils","Matrix","plyr","dplyr","ggplot2","broom","invctr")){requireNamespace(p, quietly = TRUE)}
+  for(p in c("grDevices","graphics","stats","utils","Matrix","plyr","dplyr","ggplot2","broom","invctr")){
+    requireNamespace(p, quietly = TRUE)
+    }
   invisible()
 }
 
@@ -103,11 +105,11 @@ set_os_options <- function(os = get_os()){
 
     sys <- "windows_x86"
     exe <- "rp_x86.exe"
-#    if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
-#      URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/"
-#    } else {
-      URL <- "http://tocsy.pik-potsdam.de/RP/rp_x86.exe"
- #     }
+    #    if(grepl("CNAS.RU.NL",system.file(package="casnet"))){
+    #      URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/"
+    #    } else {
+    URL <- "http://tocsy.pik-potsdam.de/RP/rp_x86.exe"
+    #     }
   }
 
   # Linux
@@ -160,11 +162,11 @@ set_command_line_rp <- function(){
   os                <- get_os()
   casnet_OS_options <- set_os_options()
 
-#  if(getOption("casnet.isRU")){
-#    URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/rp_86.exe"
-#  } else {
-   URL <- casnet_OS_options$URL
-#    }
+  #  if(getOption("casnet.isRU")){
+  #    URL <- "https://darwin.pwo.ru.nl/skunkworks/courseware/1718_DCS/crp_cl/windows_x86/rp_86.exe"
+  #  } else {
+  URL <- casnet_OS_options$URL
+  #    }
   sys <- casnet_OS_options$sys
   exe <- casnet_OS_options$exe
   rp_prefix  <- casnet_OS_options$rep_prefix
