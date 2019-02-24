@@ -93,7 +93,12 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/FredHasselman/casnet">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -107,7 +112,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get bootsrapped (C)RQA measures based on a recurrence matrix</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
     <div class="hidden name"><code>crqa_rp.Rd</code></div>
     </div>
 
@@ -194,7 +199,7 @@
     </tr>
     <tr>
       <th>doParallel</th>
-      <td><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://purrr.tidyverse.org/reference/map2.html'>map2</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></td>
+      <td><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://www.rdocumentation.org/packages/purrr/topics/map2'>map2</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>silent</th>

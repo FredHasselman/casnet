@@ -93,7 +93,12 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/FredHasselman/casnet">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -107,7 +112,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Mutual Information Function</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
     <div class="hidden name"><code>mif.Rd</code></div>
     </div>
 
@@ -193,31 +198,31 @@
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
 <span class='no'>y</span>$<span class='no'>s</span> <span class='kw'>&lt;-</span> <span class='no'>y2</span>+<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y2</span>))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.830520 1.715604 1.940416 1.832557 1.974417 2.002907 1.951660 2.099005 
+#&gt; 1.808994 1.715093 1.922049 1.844053 2.001774 2.015249 1.959424 2.050946 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.874508 1.898738 1.898738 1.898738 1.992674 1.973167 1.984187 2.028415 
+#&gt; 1.837244 1.863161 1.863161 1.863161 1.981409 1.948618 1.933928 2.028668 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 2.014763 1.805288 1.770597 1.738796 2.515509 1.828203 1.881798 1.887196 
+#&gt; 2.016915 1.790998 1.752539 1.687093 2.475703 1.796621 1.873929 1.861375 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.926025 1.891705 1.826433 1.846328 1.979244 1.974676 1.944581 2.159440 
+#&gt; 1.903849 1.902230 1.814849 1.826678 1.949864 1.958285 1.926041 2.127642 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 1.950676 1.953824 1.867650 1.867220 1.949576 1.773019 1.911076 1.884060 
+#&gt; 1.925229 1.909716 1.868772 1.844328 1.916569 1.795793 1.923447 1.861611 
 #&gt;       30 
-#&gt; 1.896432 
+#&gt; 1.871509 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
 <span class='no'>y</span>$<span class='no'>y3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cumsum'>cumsum</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 4.998750 4.992366 4.991085 4.991244 5.140503 5.133317 5.125449 5.122795 
+#&gt; 4.995877 4.989931 4.986886 4.988814 5.135218 5.138595 5.137748 5.133324 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.123652 5.121344 5.121344 5.121344 5.125435 5.122795 5.127237 5.130071 
+#&gt; 5.130662 5.128346 5.128346 5.128346 5.130693 5.129814 5.130751 5.140627 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.133629 4.985397 4.992326 4.993420 5.000756 5.000300 4.999887 4.998764 
+#&gt; 5.138913 4.985397 4.987028 4.988115 4.994342 4.999196 4.998782 5.002990 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 5.001949 5.147985 5.143610 5.143184 5.140654 5.143272 5.142186 5.145669 
+#&gt; 5.012191 5.139076 5.141826 5.144970 5.147810 5.148645 5.152946 5.151056 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.151750 5.157816 5.166819 5.171274 5.017457 5.013560 5.023969 5.026702 
+#&gt; 5.157144 5.161417 5.159608 5.162249 5.010228 5.013560 5.020344 5.019444 
 #&gt;       30 
 #&gt; 5.024764 
 #&gt; attr(,"miType")

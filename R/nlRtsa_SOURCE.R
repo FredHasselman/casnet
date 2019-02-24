@@ -1734,6 +1734,7 @@ dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
 dy_m$y_obs <- dy$RR[dy$.id=="obs"]
 
 df <- tidyr::gather(dy_m,key=variable,value = RR, -c(Diagonal,sdRRrnd, labels))
+df$Diagonal <- as.numeric(df$Diagonal)
 
   if(doPlot){
 
@@ -1747,7 +1748,7 @@ df <- tidyr::gather(dy_m,key=variable,value = RR, -c(Diagonal,sdRRrnd, labels))
   x1<-(which.min(as.numeric(paste(df$Diagonal))))
   x2<-(which.max(as.numeric(paste(df$Diagonal))))
   yL<-max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
-  df$Diagonal <- as.numeric(df$Diagonal)
+
 
 
   g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal,y=~RR, colour = ~variable)) +
@@ -1760,11 +1761,14 @@ df <- tidyr::gather(dy_m,key=variable,value = RR, -c(Diagonal,sdRRrnd, labels))
     ggplot2::theme_bw()
 
   print(g)
-  return(invisible(list(plot = g, data = spread(df,key = variable, value = RR))))
+
+  if(doShuffle){df <- spread(df,key = variable, value = RR)}
+  return(invisible(list(plot = g, data = df)))
 
   } else {
 
-    return(invisible(spread(df,key = variable, value = RR)))
+    if(doShuffle){df <- spread(df,key = variable, value = RR)}
+    return(df)
 
   }
 }
