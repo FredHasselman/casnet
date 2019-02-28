@@ -8,7 +8,7 @@ fd_sda(y, fs = NULL, standardise = c("mean.sd", "median.mad")[1],
   detrend = FALSE, polyOrder = 1, adjustSumOrder = FALSE,
   scaleMin = 2, scaleMax = floor(log2(NROW(y)/2)),
   scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4,
-  doPlot = TRUE, returnPlot = FALSE, returnPLAW = FALSE,
+  doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
   returnInfo = FALSE, silent = TRUE, noTitle = FALSE, tsName = "y")
 }
 \arguments{

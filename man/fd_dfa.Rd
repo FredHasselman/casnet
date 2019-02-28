@@ -8,7 +8,7 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
   polyOrder = 1, standardise = c("none", "mean.sd", "median.mad")[2],
   adjustSumOrder = FALSE, scaleMin = 2,
   scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30,
-  scaleS = NA, overlap = 0, minData = 4, doPlot = TRUE,
+  scaleS = NA, overlap = 0, minData = 4, doPlot = FALSE,
   returnPlot = FALSE, returnPLAW = FALSE, returnInfo = FALSE,
   silent = TRUE, noTitle = FALSE, tsName = "y")
 }

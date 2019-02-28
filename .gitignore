@@ -1,3 +1,4 @@
+inst/doc
 Meta
 doc
 # History files
@@ -36,3 +37,4 @@ exec/rp_instal_log.txt
 build/*.*
 build/package_data/*.*
 commandline_rp/*.*
+.DS_Store

@@ -6,7 +6,7 @@
 \usage{
 fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE,
   fitMethod = c("lowest25", "Wijnants", "Hurvich-Deo")[3],
-  doPlot = TRUE, returnPlot = FALSE, returnPLAW = FALSE,
+  doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
   returnInfo = FALSE, silent = TRUE, noTitle = FALSE, tsName = "y")
 }
 \arguments{

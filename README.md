@@ -6,7 +6,7 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
 
-# **casnet**: An R toolbox for studying Complex Adaptive Systems and NETworks
+# **casnet**: An R toolbox for studying Complex Adaptive Systems and NETworks <img src="man/figures/logo.png" align="right" alt="" width="120" />
 
 A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
 

@@ -4,7 +4,7 @@
 \alias{plotFD_loglog}
 \title{Plot output from fluctuation analyses based on log-log regression}
 \usage{
-plotFD_loglog(fd.OUT, title = "log-log regresion", subtitle = "",
+plotFD_loglog(fd.OUT, title = "log-log regression", subtitle = "",
   xlabel = "Bin size", ylabel = "Fluctuation", logBase = c("e", "2",
   "10")[1])
 }

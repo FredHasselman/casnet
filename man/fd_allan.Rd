@@ -5,7 +5,7 @@
 \title{Allan Variance Analysis}
 \usage{
 fd_allan(y, fs = stats::tsp(stats::hasTsp(y))[3], useSD = FALSE,
-  doPlot = TRUE, returnPlot = FALSE, returnPLAW = FALSE,
+  doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
   returnInfo = FALSE, silent = TRUE, noTitle = FALSE, tsName = "y")
 }
 \arguments{

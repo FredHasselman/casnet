@@ -1,0 +1,30 @@
+---
+title: "Quantifying Scaling Phenomena in Time Series"
+author: "Fred Hasselman"
+date: "`r Sys.Date()`"
+bibliography: bibliography.bib
+csl: apa.csl
+output: 
+  html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Quantifying Scaling Phenomena in Time Series}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = ">",
+  fig.align = "center",
+  fig.width = 7,
+  width = 500
+)
+library(invctr)
+```
+
+
+

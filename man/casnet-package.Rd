@@ -6,6 +6,8 @@
 \alias{casnet-package}
 \title{casnet: A Toolbox for Studying Complex Adaptive Systems and NETworks}
 \description{
+\if{html}{\figure{logo.png}{options: align='right'}}
+
 A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
     - Recurrence Quantification Analyses (CrossRQA, Categorical RQA, Chromatic RQA, Anisotropic RQA).
     - Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum).

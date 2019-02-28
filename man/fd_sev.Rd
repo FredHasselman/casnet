@@ -5,7 +5,7 @@
 \title{Calculate FD using Sevcik's method}
 \usage{
 fd_sev(y, detrend = FALSE, adjustSumOrder = FALSE,
-  smallNapprox = FALSE, doPlot = TRUE, returnPlot = FALSE,
+  smallNapprox = FALSE, doPlot = FALSE, returnPlot = FALSE,
   returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE,
   noTitle = FALSE, tsName = "y")
 }

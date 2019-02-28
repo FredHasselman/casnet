@@ -4736,7 +4736,7 @@ fd_psd <- function(y,
                    standardise = TRUE,
                    detrend = TRUE,
                    fitMethod = c("lowest25","Wijnants","Hurvich-Deo")[3],
-                   doPlot = TRUE,
+                   doPlot = FALSE,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
@@ -4890,7 +4890,7 @@ fd_sda <- function(y,
                    scaleS = NA,
                    overlap = 0,
                    minData = 4,
-                   doPlot = TRUE,
+                   doPlot = FALSE,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
@@ -5036,7 +5036,7 @@ fd_dfa <- function(y,
                    scaleS = NA,
                    overlap = 0,
                    minData = 4,
-                   doPlot = TRUE,
+                   doPlot = FALSE,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
@@ -5091,10 +5091,10 @@ fd_dfa <- function(y,
 
   fitRange <- which(lapply(DFAout$segments,NROW)>=minData)
 
-  lmfit1        <- stats::lm(DFAout$PLAW$bulk.log2 ~ DFAout$PLAW$size.log2, na.action=stats::na.omit)
-  H1  <- lmfit1$coefficients[2] + Hadj
-  lmfit2        <- stats::lm(DFAout$PLAW$bulk.log2[fitRange] ~ DFAout$PLAW$size.log2[fitRange], na.action=stats::na.omit)
-  H2  <- lmfit2$coefficients[2] + Hadj
+  lmfit1 <- stats::lm(DFAout$PLAW$bulk.log2 ~ DFAout$PLAW$size.log2, na.action=stats::na.omit)
+  H1     <- lmfit1$coefficients[2] + Hadj
+  lmfit2 <- stats::lm(DFAout$PLAW$bulk.log2[fitRange] ~ DFAout$PLAW$size.log2[fitRange], na.action=stats::na.omit)
+  H2     <- lmfit2$coefficients[2] + Hadj
 
   outList <- list(
     PLAW  =  DFAout$PLAW,
@@ -5200,7 +5200,7 @@ fd_sev <- function(y,
                    detrend = FALSE,
                    adjustSumOrder = FALSE,
                    smallNapprox = FALSE,
-                   doPlot = TRUE,
+                   doPlot = FALSE,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
@@ -5357,7 +5357,7 @@ fd_sev <- function(y,
 fd_allan <- function(y,
                      fs = stats::tsp(stats::hasTsp(y))[3],
                      useSD=FALSE,
-                     doPlot = TRUE,
+                     doPlot = FALSE,
                      returnPlot = FALSE,
                      returnPLAW = FALSE,
                      returnInfo = FALSE,
@@ -5572,6 +5572,7 @@ monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments
   if(max(scaleS)>NROW(TSm)/2){
     scaleS <- scaleS[scaleS<=NROW(TSm)/2]
   }
+
   F2 <- numeric(length(scaleS))
 
   for(ns in seq_along(scaleS)){
@@ -6088,7 +6089,7 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
 #'
 #' @export
 #'
-plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="Bin size",ylabel="Fluctuation",logBase=c("e","2","10")[1]){
+plotFD_loglog <- function(fd.OUT,title="log-log regression",subtitle="",xlabel="Bin size",ylabel="Fluctuation",logBase=c("e","2","10")[1]){
 
   if(!all(c("PLAW","fullRange","fitRange")%in%names(fd.OUT))){
     stop("Object fd.OUT should have 3 fields: PLAW, fullRange and fitRange")
@@ -6163,10 +6164,12 @@ plotFD_loglog <- function(fd.OUT,title="log-log regresion",subtitle="",xlabel="B
 
   g <- g +
     ggplot2::scale_color_manual(values = c("red3","steelblue")) +
+    ggplot2::scale_fill_manual(values = c("red3","steelblue")) +
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
                    legend.text = ggplot2::element_text(margin = ggplot2::margin(t = 5,b = 5, unit = "pt"), vjust = .5),
-                    text = ggplot2::element_text(size = 10)) #,family = "Calibri"))
+                   plot.margin = ggplot2::margin(t = 5,b = 5, r = 5,l = 5, unit = "pt"),
+                    text = ggplot2::element_text(size = 10, family = "Calibri"))
 
 
     graphics::plot.new()
@@ -8198,6 +8201,171 @@ ts_integrate <-function(y){
 
 
 # HELPERS ----
+
+
+#' Generate noise series with power law scaling exponent
+#'
+#' @param y Time series to use as a 'model'. If specified, `N` will be `N = length(y)`, and the series will be constructed based on `stats::fft(y)`.
+#' @param alpha The log-log spectral slope, the scaling exponent.
+#' @param N Length of the time series
+#' @param normalise Forces scaling of the output to the range `[-1, 1]`, consequently the power law will not necessarily extend right down to `0Hz`.
+#' @param randomPower If `TRUE` phases will be deterministic, uniformly distributed in `[-pi,pi]`. If `FALSE`, the spectrum will be stochastic with a Chi-square distribution. If `y` is not `NULL` this argument will be ignored.
+#'
+#' @return Time series with a power law of alpha.
+#' @export
+#'
+#' @note Adapted from a Matlab script called `powernoise.m`. The script contained the following commented text:
+#'
+#' With no option strings specified, the power spectrum is
+#  deterministic, and the phases are uniformly distributed in the range
+#  -pi to +pi. The power law extends all the way down to 0Hz (DC)
+#  component. By specifying the 'randpower' option string however, the
+#  power spectrum will be stochastic with Chi-square distribution. The
+#  'normalize' option string forces scaling of the output to the range
+#  [-1, 1], consequently the power law will not necessarily extend
+#  right down to 0Hz.
+#
+#  (cc) Max Little, 2008. This software is licensed under the
+#  Attribution-Share Alike 2.5 Generic Creative Commons license:
+#  http://creativecommons.org/licenses/by-sa/2.5/
+#  If you use this work, please cite:
+#  Little MA et al. (2007), "Exploiting nonlinear recurrence and fractal
+#  scaling properties for voice disorder detection", Biomed Eng Online, 6:23
+#
+#  As of 20080323 markup
+#  If you use this work, consider saying hi on comp.dsp
+#  Dale B. Dalrymple
+#'
+noise_powerlaw <- function(y = NULL,alpha=-1,N=100, standardise = FALSE, randomPower = FALSE){
+
+  if(!is.null(y)){
+    N <- length(y)
+  }
+
+  f  <- (2:(N2+1))
+  N2 <- floor(N/2)-1
+  A2 <- 1/(f^(alpha/2))
+
+  if(!is.null(y)){
+
+    p2 <- stats::fft(y)[f]
+    d2 <- A2 * p2
+
+  } else {
+
+    if(!randomPower){
+      p2 <- (runif(n = N2)-0.5)*2*pi
+      d2 <- A2*exp(1i*p2)
+    } else {
+      # 20080323 update
+      p2 <- complex(real= stats::rnorm(n = N2), imaginary = stats::rnorm(n = N2))
+      d2 <- A2*p2
+    }
+  }
+  d <- c(1, d2, 1/((N2+2)^alpha), rev(Conj(d2)))
+  x <- Re(stats::fft(d, inverse = TRUE)/length(d))
+
+  if (standardise){
+    x <- ((x - min(x))/(max(x) - min(x)) - 0.5) * 2
+  }
+
+  return(x)
+}
+
+#' Generate fractional Gaussian noise
+#'
+#' @param H Hurst exponent
+#' @param N Length of noise series
+#' @param mu Mean
+#' @param sigma SD
+#'
+#' @return fGn
+#' @export
+#'
+noise_fGn <- function(H=0.5, N = 100, mu = NULL, sigma = NULL){
+
+  # Determine whether fGn or fBn should be produced.
+  if(H%)[%c(0,1)){stop("H must be in (0,1] for fGn!")}
+  fBn = 0
+
+  # Calculate the fGn.
+  if (H == 0.5){
+    y <- rnorm(N)  # If H=0.5, then fGn is equivalent to white Gaussian noise.
+    } else {
+    # If this function was already in memory before being called this time,
+    # AND the values for N and H are the same as the last time it was
+    # called, then the following (persistent) variables do not need to be
+    # recalculated.  This was done to improve the speed of this function,
+    # especially when many samples of a single fGn (or fBn) process are
+    # needed by the calling function.
+    # persistent Zmag Nfft Nlast Hlast
+    #    if isempty(Zmag) | isempty(Nfft) | isempty(Nlast) |isempty(Hlast) | N ~= Nlast #| H ~= Hlast
+    # The persistent variables must be (re-)calculated.
+    Nfft = 2^ceil(log2(2*(N-1)))
+    NfftHalf = round(Nfft/2);
+    k = c(0:NfftHalf, (NfftHalf-1):-1:1)
+    Zmag = 0.5 * ( (k+1)^(2*H) - 2.*k.^(2*H) + (abs(k-1))^(2*H) )
+    rm(k)
+    Zmag = Re(stats::fft(Zmag))
+    if ( any(Zmag < 0) ){
+      stop('The fast Fourier transform of the circulant covariance had negative values.')
+    }
+    Zmag = sqrt(Zmag);
+    # Store N and H values in persistent variables for use during subsequent calls to this function.
+    Nlast = N
+    Hlast = H
+
+    #Z = Zmag*(rnorm(1,Nfft) + i*randn(1,Nfft))
+    Z <- Zmag*complex(real= stats::rnorm(n = Nfft), imaginary = stats::rnorm(n = Nfft))
+    y <- Re(stats::fft(Z,inverse = TRUE)/length(Z)) * sqrt(Nfft)
+    rm(Z)
+    y[1:N] <- y
+
+    }
+
+    # Change the standard deviation.
+    if(!is.null(sigma)){
+      y = y * sigma
+    }
+    # Change the mean.
+  if(!is.null(mu)){
+      y = y + mu
+  }
+
+  return(y)
+
+}
+
+
+#' Generate fractional Brownian motion
+#'
+#' @param H Hurst exponent
+#' @param N Length of noise series
+#' @param mu Mean
+#' @param sigma SD
+#'
+#' @return fBm
+#' @export
+#'
+noise_fBm <- function(H=1.5, N = 100, mu = NULL, sigma = NULL){
+
+  # Determine whether fGn or fBn should be produced.
+  if(H%)[%c(1,2)){stop("H must be in (1,2] for fBm!")}
+
+ y <- noise_fGn(H = H, mu = NULL,sigma = NULL)
+
+ # Change the standard deviation.
+ if(!is.null(sigma)){
+   y = y * sigma
+ }
+ # Change the mean.
+ if(!is.null(mu)){
+   y = y + mu
+ }
+
+ return(cumsum(y))
+}
+
 
 #' Convert numeric factor to numeric vector
 #'
