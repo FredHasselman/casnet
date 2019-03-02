@@ -6095,6 +6095,9 @@ plotFD_loglog <- function(fd.OUT,title="log-log regression",subtitle="",xlabel="
     stop("Object fd.OUT should have 3 fields: PLAW, fullRange and fitRange")
   }
 
+  if(class(fd.OUT$fullRange$H))
+
+
   if(logBase=="e"){
     logFormat <- "log"
     logBaseNum <- exp(1)
@@ -6126,40 +6129,48 @@ plotFD_loglog <- function(fd.OUT,title="log-log regression",subtitle="",xlabel="
     ggplot2::geom_point() +
     ggplot2::ggtitle(label = title, subtitle = subtitle)
 
-  if(logBase=="e"){
-  evalT<-
-    paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
-      ggplot2::scale_y_continuous(name = "',paste0(ylabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) + ggplot2::annotation_logticks()')
+  # if(logBase=="e"){
+  # evalT<-
+  #   paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
+  #     ggplot2::scale_y_continuous(name = "',paste0(ylabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) + ggplot2::annotation_logticks()')
+  #
+  # eval(parse(text = evalT))
+  # }
+  #
+  # if(logBase=="2"){
+  #   evalT<-
+  #     paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
+  #            ggplot2::scale_y_continuous(name = "',paste0(ylabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) + ggplot2::annotation_logticks()')
+  #
+  #   eval(parse(text = evalT))
+  # }
+  #
 
-  eval(parse(text = evalT))
-  }
+  breaksX <- unique(fd.OUT$PLAW$size[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)])
+  breaksY <- unique(fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)])
 
-  if(logBase=="2"){
-    evalT<-
-      paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
-             ggplot2::scale_y_continuous(name = "',paste0(ylabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) + ggplot2::annotation_logticks()')
+  if(length(breaksX)>10){breaksX <- breaksX[seq.int(1,length(breaksX),length.out = 10)]}
+  if(length(breaksY)>10){breaksY <- breaksY[seq.int(1,length(breaksY),length.out = 10)]}
 
-    eval(parse(text = evalT))
-  }
-
-  if(logBase=="10"){
+  if(logBase!="no"){
     g <- g +
       ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
       ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
-                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
-                                  labels = scales::trans_format(logFormat, scales::math_format()),
+                                  breaks = breaksX,
+                                  labels = scales::number_format(accuracy = 1),
                                   trans = scales::log_trans(base = logBaseNum)) +
       ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
-                                  breaks = scales::trans_breaks(logFormat, function(x) logBaseNum^x),
-                                  labels = scales::trans_format(logFormat,scales::math_format()),
-                                  trans = scales::log_trans(base = logBaseNum)) +
-      ggplot2::annotation_logticks()
-  }
+                                  breaks = breaksY,
+                                  labels = scales::number_format(accuracy = .01),
+                                  trans = scales::log_trans(base = logBaseNum))
+  } else {
 
-  if(logBase=="no"){
-    g <- g +
+ # if(logBase=="no"){
+
+  g <- g +
       ggplot2::geom_vline(data = data.frame(x = c(NROW(fd.OUT[[2]]$fitlm1$fitted.values),NROW(fd.OUT[[3]]$fitlm2$fitted.values)),Method = c(fd.OUT[[2]]$method,fd.OUT[[3]]$method)),  ggplot2::aes_(xintercept=~x, colour = ~Method)) +
-      ggplot2::scale_x_continuous(name = xlabel) + ggplot2::scale_y_continuous(name = ylabel)
+      ggplot2::scale_x_continuous(name = xlabel, breaks = breaksX) +
+      ggplot2::scale_y_continuous(name = ylabel, breaks = breaksY)
   }
 
   g <- g +
@@ -6168,8 +6179,7 @@ plotFD_loglog <- function(fd.OUT,title="log-log regression",subtitle="",xlabel="
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
                    legend.text = ggplot2::element_text(margin = ggplot2::margin(t = 5,b = 5, unit = "pt"), vjust = .5),
-                   plot.margin = ggplot2::margin(t = 5,b = 5, r = 5,l = 5, unit = "pt"),
-                    text = ggplot2::element_text(size = 10, family = "Calibri"))
+                   plot.margin = ggplot2::margin(t = 5,b = 5, r = 5,l = 5, unit = "pt"))
 
 
     graphics::plot.new()
