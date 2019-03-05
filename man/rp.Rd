@@ -6,8 +6,8 @@
 \usage{
 rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
   to.ts = NULL, order.by = NULL, to.sparse = FALSE,
-  weighted = FALSE, method = "Euclidean", doPlot = FALSE,
-  silent = TRUE, ...)
+  weighted = FALSE, method = "Euclidean", targetValue = 0.05,
+  doPlot = FALSE, silent = TRUE, ...)
 }
 \arguments{
 \item{y1}{A numeric vector or time series}
@@ -29,6 +29,8 @@ rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 \item{weighted}{If \code{FALSE} a binary matrix will be returned. If \code{TRUE} every value larger than \code{emRad} will be \code{0}, but values smaller than \code{emRad} will be retained (default = \code{FALSE})}
 
 \item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+
+\item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
 \item{doPlot}{Plot the matrix by calling \code{\link{rp_plot}} with defult settings}
 

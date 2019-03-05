@@ -6,7 +6,8 @@
 \usage{
 fd_allan(y, fs = stats::tsp(stats::hasTsp(y))[3], useSD = FALSE,
   doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
-  returnInfo = FALSE, silent = TRUE, noTitle = FALSE, tsName = "y")
+  returnInfo = FALSE, silent = FALSE, noTitle = FALSE,
+  tsName = "y")
 }
 \arguments{
 \item{y}{A numeric vector or time series object}

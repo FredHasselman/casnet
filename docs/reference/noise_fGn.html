@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Allan Variance Analysis — fd_allan • casnet</title>
+<title>Generate fractional Gaussian noise — noise_fGn • casnet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Allan Variance Analysis — fd_allan" />
+<meta property="og:title" content="Generate fractional Gaussian noise — noise_fGn" />
 
-<meta property="og:description" content="Allan Variance Analysis" />
+<meta property="og:description" content="Generate fractional Gaussian noise" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -116,77 +116,43 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Allan Variance Analysis</h1>
+    <h1>Generate fractional Gaussian noise</h1>
     <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
-    <div class="hidden name"><code>fd_allan.Rd</code></div>
+    <div class="hidden name"><code>noise_fGn.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Allan Variance Analysis</p>
+    <p>Generate fractional Gaussian noise</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>fd_allan</span>(<span class='no'>y</span>, <span class='kw'>fs</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/tsp'>tsp</a></span>(<span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/tsp'>hasTsp</a></span>(<span class='no'>y</span>))[<span class='fl'>3</span>], <span class='kw'>useSD</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</pre>
+    <pre class="usage"><span class='fu'>noise_fGn</span>(<span class='kw'>H</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>N</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>mu</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>y</th>
-      <td><p>A numeric vector or time series object</p></td>
+      <th>H</th>
+      <td><p>Hurst exponent</p></td>
     </tr>
     <tr>
-      <th>fs</th>
-      <td><p>Sample frequency in Hz</p></td>
+      <th>N</th>
+      <td><p>Length of noise series</p></td>
     </tr>
     <tr>
-      <th>useSD</th>
-      <td><p>Use the standarddeviation instead of variance?</p></td>
+      <th>mu</th>
+      <td><p>Mean</p></td>
     </tr>
     <tr>
-      <th>doPlot</th>
-      <td><p>Return the log-log scale versus fluctuation plot with linear fit (default = <code>TRUE</code>).</p></td>
-    </tr>
-    <tr>
-      <th>returnPlot</th>
-      <td><p>Return ggplot2 object (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>returnPLAW</th>
-      <td><p>Return the power law data (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>returnInfo</th>
-      <td><p>Return all the data used in DFA (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>silent</th>
-      <td><p>Silent-ish mode</p></td>
-    </tr>
-    <tr>
-      <th>noTitle</th>
-      <td><p>Do not generate a title (only the subtitle)</p></td>
-    </tr>
-    <tr>
-      <th>tsName</th>
-      <td><p>Name of y added as a subtitle to the plot</p></td>
+      <th>sigma</th>
+      <td><p>SD</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A dataframe with the Allan Factor (variance), Alan standard deviation and error due to bin size</p>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other Fluctuation Analyses: <code><a href='MFDFA.html'>MFDFA</a></code>,
-  <code><a href='fd_RR.html'>fd_RR</a></code>, <code><a href='fd_dfa.html'>fd_dfa</a></code>,
-  <code><a href='fd_psd.html'>fd_psd</a></code>, <code><a href='fd_sda.html'>fd_sda</a></code>,
-  <code><a href='fd_sev.html'>fd_sev</a></code></p></div>
+    <p>fGn</p>
     
 
   </div>
@@ -196,8 +162,6 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-
-      <li><a href="#see-also">See also</a></li>
           </ul>
 
   </div>

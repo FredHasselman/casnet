@@ -7,7 +7,8 @@
 fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE,
   fitMethod = c("lowest25", "Wijnants", "Hurvich-Deo")[3],
   doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
-  returnInfo = FALSE, silent = TRUE, noTitle = FALSE, tsName = "y")
+  returnInfo = FALSE, silent = FALSE, noTitle = FALSE,
+  tsName = "y")
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}

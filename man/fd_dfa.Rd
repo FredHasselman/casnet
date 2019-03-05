@@ -10,7 +10,7 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
   scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30,
   scaleS = NA, overlap = 0, minData = 4, doPlot = FALSE,
   returnPlot = FALSE, returnPLAW = FALSE, returnInfo = FALSE,
-  silent = TRUE, noTitle = FALSE, tsName = "y")
+  silent = FALSE, noTitle = FALSE, tsName = "y")
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}

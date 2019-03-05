@@ -131,7 +131,7 @@
   <span class='kw'>DLmin</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>VLmin</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>HLmin</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>DLmax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='kw pkg'>Matrix</span><span class='kw ns'>::</span><span class='fu'>diag</span>(<span class='no'>RM</span>))
   - <span class='fl'>1</span>, <span class='kw'>VLmax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='kw pkg'>Matrix</span><span class='kw ns'>::</span><span class='fu'>diag</span>(<span class='no'>RM</span>)) - <span class='fl'>1</span>,
   <span class='kw'>HLmax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='kw pkg'>Matrix</span><span class='kw ns'>::</span><span class='fu'>diag</span>(<span class='no'>RM</span>)) - <span class='fl'>1</span>, <span class='kw'>doShuffle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>y1</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>y2</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>Nshuffle</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>AUTO</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>chromatic</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>y2</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>Nshuffle</span> <span class='kw'>=</span> <span class='fl'>19</span>, <span class='kw'>AUTO</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>chromatic</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>matrices</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -147,11 +147,11 @@
     </tr>
     <tr>
       <th>xname</th>
-      <td><p>xlab</p></td>
+      <td><p>Label for x-axis</p></td>
     </tr>
     <tr>
       <th>yname</th>
-      <td><p>ylab</p></td>
+      <td><p>Label for y-axis</p></td>
     </tr>
     <tr>
       <th>DLmin</th>
@@ -191,7 +191,7 @@
     </tr>
     <tr>
       <th>Nshuffle</th>
-      <td><p>How many shuffled versions to make up the baseline.</p></td>
+      <td><p>How many shuffled versions to make up the baseline? The default is <code>19</code>, which is the minimum for a one-sided surrogate test.</p></td>
     </tr>
     <tr>
       <th>AUTO</th>

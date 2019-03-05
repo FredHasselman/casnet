@@ -59,14 +59,16 @@ Imports:
     ggraph,
     boot,
     invctr (>= 0.1.0)
-Suggests: knitr,
+Suggests: 
+    knitr,
     rmarkdown,
     graphics,
     grDevices,
     stats,
     utils,
     devtools,
-    tidyverse
+    tidyverse,
+    testthat
 VignetteBuilder: knitr
 Language: en-US
 URL: https://github.com/FredHasselman/casnet

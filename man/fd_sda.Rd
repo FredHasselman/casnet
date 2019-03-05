@@ -9,7 +9,8 @@ fd_sda(y, fs = NULL, standardise = c("mean.sd", "median.mad")[1],
   scaleMin = 2, scaleMax = floor(log2(NROW(y)/2)),
   scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4,
   doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
-  returnInfo = FALSE, silent = TRUE, noTitle = FALSE, tsName = "y")
+  returnInfo = FALSE, silent = FALSE, noTitle = FALSE,
+  tsName = "y")
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}

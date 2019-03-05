@@ -8,7 +8,7 @@ crqa_diagPofile(RM, diagWin = NULL, xname = "", yname = "",
   DLmin = 2, VLmin = 2, HLmin = 2, DLmax = length(Matrix::diag(RM))
   - 1, VLmax = length(Matrix::diag(RM)) - 1,
   HLmax = length(Matrix::diag(RM)) - 1, doShuffle = FALSE, y1 = NA,
-  y2 = NA, Nshuffle = 100, AUTO = NULL, chromatic = FALSE,
+  y2 = NA, Nshuffle = 19, AUTO = NULL, chromatic = FALSE,
   matrices = FALSE, doPlot = TRUE)
 }
 \arguments{
@@ -16,9 +16,9 @@ crqa_diagPofile(RM, diagWin = NULL, xname = "", yname = "",
 
 \item{diagWin}{Window around the line of synchrony}
 
-\item{xname}{xlab}
+\item{xname}{Label for x-axis}
 
-\item{yname}{ylab}
+\item{yname}{Label for y-axis}
 
 \item{DLmin}{DLmin}
 
@@ -38,7 +38,7 @@ crqa_diagPofile(RM, diagWin = NULL, xname = "", yname = "",
 
 \item{y2}{The original \code{y2} time series}
 
-\item{Nshuffle}{How many shuffled versions to make up the baseline.}
+\item{Nshuffle}{How many shuffled versions to make up the baseline? The default is \code{19}, which is the minimum for a one-sided surrogate test.}
 
 \item{AUTO}{AUTO}
 

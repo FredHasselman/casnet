@@ -13,7 +13,7 @@ crqa_rp(RM, emRad = NA, DLmin = 2, VLmin = 2, HLmin = 2,
   silent = TRUE)
 }
 \arguments{
-\item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NULL})}
+\item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NA})}
 
 \item{emRad}{Threshold for distance value that counts as a recurrence}
 

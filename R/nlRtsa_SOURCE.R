@@ -386,7 +386,7 @@ crqa_cl <- function(y1,
   }
 
   if(surrogateTest){
-    surrogateSeries <- tseries::surrogate(y1,ns=39,fft = TRUE, amplitude = TRUE)
+    surrogateSeries <- tseries::surrogate(y1,ns=39, fft = TRUE, amplitude = TRUE)
   }
 
   windowedAnalysis <- FALSE
@@ -403,6 +403,13 @@ crqa_cl <- function(y1,
 
 
   if(windowedAnalysis){
+
+    # Check window length vs. embedding
+    if(win < (emLag*emDim)){
+
+      stop(paste0("The size of win = ", win, " must be larger than the product of emLag = ",emLag, " and emDim = ", emDim))
+
+    } else {
 
   # Adjust time series lengths
   if((dplyr::last(wIndex)+win-NROW(df))>0){
@@ -423,6 +430,7 @@ crqa_cl <- function(y1,
   wIndices <- plyr::llply(wIndex, function(w){seq(w,w+(win))})
   names(wIndices) <- paste0("window: ",seq_along(wIndices)," | start: ",wIndex," | stop: ",wIndex+win)
 
+  }
   } else {
 
     wIndices <- list(wIndex)
@@ -1421,7 +1429,7 @@ crqa_rp_measures <- function(RM,
 #'
 #' A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures will be caluclated.
 #'
-#' @param RM A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NULL})
+#' @param RM A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NA})
 #' @param emRad Threshold for distance value that counts as a recurrence
 #' @param DLmin Minimal diagonal line length (default = \code{2})
 #' @param VLmin Minimal vertical line length (default = \code{2})
@@ -1616,8 +1624,8 @@ crqa_rp <- function(RM,
 #'
 #' @param RM A binary recurrence matrix
 #' @param diagWin Window around the line of synchrony
-#' @param xname xlab
-#' @param yname ylab
+#' @param xname Label for x-axis
+#' @param yname Label for y-axis
 #' @param DLmin DLmin
 #' @param VLmin VLmin
 #' @param HLmin HLmin
@@ -1627,7 +1635,7 @@ crqa_rp <- function(RM,
 #' @param doShuffle Should a shuffled baseline be calculated (default = `FALSE`)
 #' @param y1 The original `y1` time series
 #' @param y2 The original `y2` time series
-#' @param Nshuffle How many shuffled versions to make up the baseline.
+#' @param Nshuffle How many shuffled versions to make up the baseline? The default is `19`, which is the minimum for a one-sided surrogate test.
 #' @param AUTO AUTO
 #' @param chromatic chromatic
 #' @param matrices matrices
@@ -1650,7 +1658,7 @@ crqa_diagPofile <- function(RM,
                             doShuffle = FALSE,
                             y1        = NA,
                             y2        = NA,
-                            Nshuffle  = 100,
+                            Nshuffle  = 19,
                             AUTO      = NULL,
                             chromatic = FALSE,
                             matrices  = FALSE,
@@ -1682,27 +1690,36 @@ crqa_diagPofile <- function(RM,
     if(any(is.na(y1),is.na(y2))){
       stop("Need series y1 and y2 in order to do the shuffle!!")
     } else {
+      cat("Calculating diagonal recurrence profiles... \n")
       TSrnd <- tseries::surrogate(x=y1, ns=Nshuffle, fft=FALSE, amplitude = FALSE)
     }
     emDim <- attr(RM,"emDim")
     emLag <- attr(RM,"emLag")
     emRad <- attr(RM,"emRad")
-    RMrnd <- plyr::llply(1:NCOL(TSrnd), function(c) rp(y1 = TSrnd[,c], y2, emDim = emDim, emLag = emLag, emRad = emRad))
+  } else {
+    Nshuffle <- 0
   }
 
-RMs <- out <- list()
-RMs[[1]] <- RM
+out <- vector(mode = "list", length = Nshuffle+1)
+
 if(doShuffle){
- RMs[2:(Nshuffle+1)] <- RMrnd
- names(RMs) <- c("obs",paste0("Shuffled", 1:Nshuffle))
+ names(out) <- c("obs",paste0("Shuffled", 1:Nshuffle))
 } else {
-  names(RMs) <- "obs"
+  names(out) <- "obs"
 }
 
-for(r in seq_along(RMs)){
+for(r in 1:(Nshuffle+1)){
 
+  if(r==1){
+    RMd <- RM
+    rm(RM)
+  } else {
+    RMd <- rp(y1 = y1, y2 = TSrnd[,r-1],emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+  }
   #rp_lineDist(RM,d = diagWin, matrices = TRUE)
-  B <- rp_nzdiags(RMs[[r]],removeNZ = FALSE)
+  B <- rp_nzdiags(RMd, removeNZ = FALSE)
+  rm(RMd)
+
   diagID <- 1:NCOL(B)
   names(diagID) <- colnames(B)
   if(length(diagWin)<NCOL(B)){
@@ -1723,9 +1740,12 @@ for(r in seq_along(RMs)){
   df$labels <- factor(df$labels,levels = df$labels,ordered = TRUE)
 
   out[[r]] <- df
+  rm(df,BcID,diagID)
+
+  cat(paste("\nProfile"),r)
 
 }
-names(out) <- names(RMs)
+
 dy <- plyr::ldply(out)
 df_shuf <- dplyr::filter(dy,.id!="obs")
 dy_m <- df_shuf %>% dplyr::group_by(Diagonal,labels) %>% dplyr::summarise(meanRRrnd = mean(RR),sdRRrnd   = stats::sd(RR))
@@ -2310,6 +2330,7 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 #' @param to.sparse Should sparse matrices be used?
 #' @param weighted If \code{FALSE} a binary matrix will be returned. If \code{TRUE} every value larger than \code{emRad} will be \code{0}, but values smaller than \code{emRad} will be retained (default = \code{FALSE})
 #' @param method Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})
+#' @param targetValue A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.
 #' @param doPlot Plot the matrix by calling \code{\link{rp_plot}} with defult settings
 #' @param silent Silent-ish mode
 #' @param ... Any paramters to pass to \code{\link{rp_plot}} if \code{doPlot = TRUE}
@@ -2339,6 +2360,7 @@ rp <- function(y1, y2 = NULL,
                    to.sparse = FALSE,
                    weighted = FALSE,
                    method = "Euclidean",
+                   targetValue  = .05,
                    doPlot = FALSE,
                    silent = TRUE,
                    ...){
@@ -2397,6 +2419,9 @@ rp <- function(y1, y2 = NULL,
   }
 
     if(!is.null(emRad)){
+      if(is.na(emRad)){
+        emRad <- crqa_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue)$Radius
+      }
       if(weighted){
         dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse)
       } else {
@@ -4740,14 +4765,14 @@ fd_psd <- function(y,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
-                   silent = TRUE,
+                   silent = FALSE,
                    noTitle = FALSE,
                    tsName="y"){
 
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
     y <- stats::ts(y, frequency = fs)
-   if(!silent){cat("\n\nfd.psd:\tSample rate was set to 1.\n\n")}
+   if(!silent){cat("\n\nfd_psd:\tSample rate was set to 1.\n\n")}
   }
 
   N <- length(y)
@@ -4815,7 +4840,12 @@ fd_psd <- function(y,
                      fitlm2 = lmfit2,
                      method = paste0(fitMethod," (n = ",nr,")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",sa2fd_psd(stats::coef(lmfit2)[2]))),
     info = psd,
-    plot = NA)
+    plot = NA,
+    analysis = list(
+      name = "Power Spectral Density Slope",
+      logBaseFit = "log",
+      logBasePlot = 10)
+    )
 
   if(doPlot|returnPlot){
       if(noTitle){
@@ -4823,19 +4853,25 @@ fd_psd <- function(y,
       } else {
         title <- "log-log regression (PSD)"
       }
+    if(doPlot){
+
       g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Normalised Frequency", ylabel = "Power")
-      if(doPlot){
-        grid::grid.newpage()
-        grid::grid.draw(g)
-      }
+
       if(returnPlot){
-        outList$plot <- invisible(g)
+        outList$plot <- g
       }
+     }
     }
 
     if(returnInfo){returnPLAW<-TRUE}
 
-    return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+  if(silent==FALSE){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+    cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method,"\n\n",outList$fitRange$method))
+    cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+  }
+
+    return(invisible(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot,TRUE)]))
 }
 
 
@@ -4894,7 +4930,7 @@ fd_sda <- function(y,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
-                   silent = TRUE,
+                   silent = FALSE,
                    noTitle = FALSE,
                    tsName="y"){
 
@@ -4902,7 +4938,7 @@ fd_sda <- function(y,
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
     y <- stats::ts(y, frequency = fs)
-    if(!silent){cat("\n\nfd.sda:\tSample rate was set to 1.\n\n")}
+    if(!silent){cat("\n\nfd_sda:\tSample rate was set to 1.\n\n")}
   }
 
   N             <- length(y)
@@ -4957,27 +4993,37 @@ fd_sda <- function(y,
                      fitlm2 = lmfit2,
                      method = paste0("Fit range (n = ",length(out$scale[fitRange]),")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",round(sa2fd_sda(stats::coef(lmfit2)[2]),2))),
     info = out,
-    plot = NA)
+    plot = NA,
+    analysis = list(
+      name = "Standardised Dispersion Analysis",
+      logBaseFit = "log",
+      logBasePlot = "e")
+    )
 
   if(doPlot|returnPlot){
     if(noTitle){
       title <- ""
     } else {
       title <- "log-log regression (SDA)"
-      }
-    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion")
+    }
+
     if(doPlot){
-    grid::grid.newpage()
-    grid::grid.draw(g)
-    }
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion")
     if(returnPlot){
-      outList$plot <- invisible(g)
+      outList$plot <- g
     }
+   }
   }
 
   if(returnInfo){returnPLAW<-TRUE}
 
-  return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+   if(!silent){
+  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+  cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method,"\n\n",outList$fitRange$method))
+  cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+ }
+
+  return(invisible(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot, TRUE)]))
 
 }
 
@@ -5040,7 +5086,7 @@ fd_dfa <- function(y,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
-                   silent = TRUE,
+                   silent = FALSE,
                    noTitle = FALSE,
                    tsName="y"){
 
@@ -5049,7 +5095,7 @@ fd_dfa <- function(y,
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
     y <- stats::ts(y, frequency = fs)
-    cat("\n\nfd.dfa:\tSample rate was set to 1.\n\n")
+    cat("\n\nfd_dfa:\tSample rate was set to 1.\n\n")
   }
 
   if(is.na(scaleS)){
@@ -5113,7 +5159,12 @@ fd_dfa <- function(y,
                      fitlm2 = lmfit2,
                      method = paste0("Exclude large bin sizes (n = ",NROW(fitRange),")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit2)[2]))),
     info = list(fullRange=lmfit1,fitRange=lmfit2,segments=DFAout$segments),
-    plot = NA)
+    plot = NA,
+    analysis = list(
+      name = "Detrended FLuctuation Analysis",
+      logBaseFit = "log2",
+      logBasePlot = "2")
+    )
 
 #if(doPlot|returnPlot){
 
@@ -5154,19 +5205,23 @@ fd_dfa <- function(y,
     } else {
       title <- "log-log regression (DFA)"
     }
-    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation")
     if(doPlot){
-      grid::grid.newpage()
-      grid::grid.draw(g)
-    }
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation")
     if(returnPlot){
-      outList$plot <- invisible(g)
+      outList$plot <- g
+      }
     }
   }
 
   if(returnInfo){returnPLAW<-TRUE}
 
-  return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+  if(!silent){
+  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+  cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method,"\n\n",outList$fitRange$method))
+  cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+}
+
+  return(invisible(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot,TRUE)]))
 
 }
 
@@ -5204,7 +5259,7 @@ fd_sev <- function(y,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
                    returnInfo = FALSE,
-                   silent = TRUE,
+                   silent = FALSE,
                    noTitle = FALSE,
                    tsName="y"){
 
@@ -5291,7 +5346,12 @@ fd_sev <- function(y,
                        fitlm2 = fitlm2,
                        method = paste0("Lengths (n = ",round(N/2),")\n FD = ", round(D$FD[round(N/2)],2))),
      plot = NA,
-     info = list(D = D, L = D.L))
+     info = list(D = D, L = D.L),
+     analysis = list(
+       name = "Planar Extent - Sevcik's method",
+       logBaseFit = "no",
+       logBasePlot = "no")
+     )
 
 
  # if(doPlot){
@@ -5327,13 +5387,19 @@ fd_sev <- function(y,
         grid::grid.draw(g)
       }
       if(returnPlot){
-        outList$plot <- invisible(g)
+        outList$plot <- g
       }
     }
 
     if(returnInfo){returnPLAW<-TRUE}
 
-    return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+ if(!silent){
+ cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+ cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method,"\n\n",outList$fitRange$method))
+ cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+}
+
+    return(invisible(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot,TRUE)]))
 }
 
 
@@ -5361,7 +5427,7 @@ fd_allan <- function(y,
                      returnPlot = FALSE,
                      returnPLAW = FALSE,
                      returnInfo = FALSE,
-                     silent = TRUE,
+                     silent = FALSE,
                      noTitle = FALSE,
                      tsName="y"){
 
@@ -5419,7 +5485,12 @@ fd_allan <- function(y,
                        fitlm2 = lmfit2,
                        method = paste0("Full range (n = ",NROW(df),")\nSlope = ",round(stats::coef(lmfit2)[2],2))),
       info = df,
-      plot = NA)
+      plot = NA,
+      analysis = list(
+        name = "Allan Variance/Deviation",
+        logBaseFit = "log10",
+        logBasePlot = 10)
+      )
 
     if(doPlot|returnPlot){
       if(noTitle){
@@ -5437,13 +5508,18 @@ fd_allan <- function(y,
         grid::grid.draw(g)
       }
       if(returnPlot){
-        outList$plot <- invisible(g)
+        outList$plot <- g
       }
     }
 
     if(returnInfo){returnPLAW<-TRUE}
 
-    return(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot)])
+    if(!silent){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+    cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method))
+    cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+}
+    return(invisible(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot,TRUE)]))
 
     #
     # if(doPlot){
@@ -6089,22 +6165,40 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
 #'
 #' @export
 #'
-plotFD_loglog <- function(fd.OUT,title="log-log regression",subtitle="",xlabel="Bin size",ylabel="Fluctuation",logBase=c("e","2","10")[1]){
+plotFD_loglog <- function(fd.OUT,title="",subtitle="",xlabel="Bin size",ylabel="Fluctuation",logBase=NA){
 
   if(!all(c("PLAW","fullRange","fitRange")%in%names(fd.OUT))){
     stop("Object fd.OUT should have 3 fields: PLAW, fullRange and fitRange")
   }
 
-  if(class(fd.OUT$fullRange$H))
+  if(nchar(title)==0){
+    title <- fd.OUT$analysis$name
+  }
+  if(is.na(logBase)){
+    logBase <- fd.OUT$analysis$logBasePlot
+  }
 
-
-  if(logBase=="e"){
+  if(logBase%in%"e"){
     logFormat <- "log"
     logBaseNum <- exp(1)
-  } else {
+    yAcc <- .1
+    xAcc <- 1
+  }
+
+  if(logBase%in%"2"){
     logFormat <- paste0("log",logBase)
     logBaseNum <- as.numeric(logBase)
+    yAcc <- .1
+    xAcc <- 1
   }
+
+  if(logBase%in%"10"){
+    logFormat <- paste0("log",logBase)
+    logBaseNum <- as.numeric(logBase)
+    yAcc <- .1
+    xAcc <- .01
+  }
+
 
  logLabels <- function (expr, format = force)
   {
@@ -6157,11 +6251,11 @@ plotFD_loglog <- function(fd.OUT,title="log-log regression",subtitle="",xlabel="
       ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
       ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
                                   breaks = breaksX,
-                                  labels = scales::number_format(accuracy = 1),
+                                  labels = scales::number_format(accuracy = xAcc),
                                   trans = scales::log_trans(base = logBaseNum)) +
       ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
                                   breaks = breaksY,
-                                  labels = scales::number_format(accuracy = .01),
+                                  labels = scales::number_format(accuracy = yAcc),
                                   trans = scales::log_trans(base = logBaseNum))
   } else {
 
@@ -8212,6 +8306,20 @@ ts_integrate <-function(y){
 
 # HELPERS ----
 
+testRPsize <- function(N, method = c("cl","rp")){
+  y <- rnorm(N)
+  if(method=="cl"){
+    start <- proc.time()
+    suppressMessages(out <- crqa_cl(y1 = y))
+    time_elapsed <- proc.time() - start # End clock
+  } else {
+    RM <- rp(rnorm(N))
+    out <- crqa_rp(RM)
+  }
+
+  cat(paste("\nCompleted in:\n"))
+  print(time_elapsed_parallel)
+}
 
 #' Generate noise series with power law scaling exponent
 #'

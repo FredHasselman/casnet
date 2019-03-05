@@ -6,7 +6,7 @@
 \usage{
 fd_sev(y, detrend = FALSE, adjustSumOrder = FALSE,
   smallNapprox = FALSE, doPlot = FALSE, returnPlot = FALSE,
-  returnPLAW = FALSE, returnInfo = FALSE, silent = TRUE,
+  returnPLAW = FALSE, returnInfo = FALSE, silent = FALSE,
   noTitle = FALSE, tsName = "y")
 }
 \arguments{

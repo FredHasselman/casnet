@@ -129,8 +129,8 @@
 
     <pre class="usage"><span class='fu'>rp</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>emDim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emRad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>to.ts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>to.sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -174,6 +174,10 @@
     <tr>
       <th>method</th>
       <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://www.rdocumentation.org/packages/proxy/topics/dist'>dist</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>targetValue</th>
+      <td><p>A value passed to <code><a href='crqa_radius.html'>crqa_radius(...,type="fixed", targetMeasure="RR")</a></code> if <code>is.na(emRad)==TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
