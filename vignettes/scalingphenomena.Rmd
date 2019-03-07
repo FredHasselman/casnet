@@ -7,6 +7,7 @@ csl: apa.csl
 output: 
   html_vignette:
     toc: true
+    md_extensions: +bracketed_spans
 vignette: >
   %\VignetteIndexEntry{Quantifying Scaling Phenomena in Time Series}
   %\VignetteEncoding{UTF-8}
@@ -27,4 +28,12 @@ library(invctr)
 ```
 
 
+## **Temporal Scale Invariance**
+
+> “If you have not found the 1/f spectrum, it is because you have not waited long enough. You have not looked at low enough frequencies.”     
+> [- Machlup (1981)]{style="float:right"}
+
+As @machlup1981 noted
+
+## **References**
 

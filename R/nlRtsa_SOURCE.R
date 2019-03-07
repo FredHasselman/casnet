@@ -846,14 +846,15 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
 
     gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
       ggplot2::geom_rect( ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
-      ggplot2::scale_fill_manual(values = alpha(c("grey", "white"),.2), guide=FALSE) +
+      ggplot2::scale_fill_manual(values = scales::alpha(c("grey", "white"),.2), guide=FALSE) +
       ggplot2::geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
       ggplot2::geom_hline(yintercept = c(0,100),   colour = "grey60") +
       ggplot2::geom_hline(yintercept = 50, colour = "grey90") +
-      ggplot2::geom_line(position  = position_dodge(.4)) +
-      ggplot2::geom_point(position = position_dodge(.4)) +
+      ggplot2::geom_line(position  = ggplot2::position_dodge(.4)) +
+      ggplot2::geom_point(position = ggplot2::position_dodge(.4)) +
       ggplot2::annotate("text",x=maxDim/3,y=nnThres, label="threshold", size = .8) +
-      ggplot2::xlab("Embedding Dimension") + ylab("Nearest neigbours (% of max.)") +
+      ggplot2::xlab("Embedding Dimension") +
+      ggplot2::ylab("Nearest neigbours (% of max.)") +
       ggplot2::facet_wrap(~Nns.f, ncol=2) +
       ggplot2::scale_x_continuous(breaks=emDims) +
       ggplot2::scale_y_continuous(breaks = c(nnThres,50,100)) +
@@ -1740,7 +1741,7 @@ for(r in 1:(Nshuffle+1)){
   df$labels <- factor(df$labels,levels = df$labels,ordered = TRUE)
 
   out[[r]] <- df
-  rm(df,BcID,diagID)
+  rm(df,B,cID,diagID)
 
   cat(paste("\nProfile"),r)
 
@@ -1753,7 +1754,7 @@ dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
 dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
 dy_m$y_obs <- dy$RR[dy$.id=="obs"]
 
-df <- tidyr::gather(dy_m,key=variable,value = RR, -c(Diagonal,sdRRrnd, labels))
+df <- tidyr::gather(dy_m,key=variable, value = RR, -c(Diagonal,sdRRrnd, labels))
 df$Diagonal <- as.numeric(df$Diagonal)
 
   if(doPlot){
@@ -1768,26 +1769,32 @@ df$Diagonal <- as.numeric(df$Diagonal)
   x1<-(which.min(as.numeric(paste(df$Diagonal))))
   x2<-(which.max(as.numeric(paste(df$Diagonal))))
   yL<-max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
+  col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
+  siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
 
 
 
-  g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal,y=~RR, colour = ~variable)) +
-    ggplot2::geom_line(alpha=.7) +
+  g <- ggplot2::ggplot(df_m, ggplot2::aes_(x=~Diagonal)) +
+    ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
+    ggplot2::geom_line(aes_(y=~meanRRrnd), colour = "grey40", size = .5) +
+    ggplot2::geom_line(aes_(y=~y_obs), colour = "black", size = 1) +
     ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
     ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
     ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks) +
-    ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left") +
-    ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right") +
+    ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
+    ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
+    # ggplot2::scale_colour_manual(values = col) +
+    # ggplot2::scale_size_manual(values = siz) +
     ggplot2::theme_bw()
 
   print(g)
 
-  if(doShuffle){df <- spread(df,key = variable, value = RR)}
+  if(doShuffle){df <- tidyr::spread(df,key = variable, value = RR)}
   return(invisible(list(plot = g, data = df)))
 
   } else {
 
-    if(doShuffle){df <- spread(df,key = variable, value = RR)}
+    if(doShuffle){df <- tidyr::spread(df,key = variable, value = RR)}
     return(df)
 
   }
@@ -2586,6 +2593,9 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   # }
 
 
+  colvec <- c("#FFFFFF","#000000")
+  names(colvec) <- c("0","1")
+
   # check auto-recurrence and make sure Matrix has sparse triplet representation
   RM   <- rp_checkfix(RM, checkAUTO = TRUE)
   AUTO <- attr(RM,"AUTO")
@@ -2608,6 +2618,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   showL <- FALSE
   if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)){
     unthresholded <- TRUE
+
     if(!is.null(markEpochsLOI)){
       warning("Can't show epochs on an unthresholded Recurrence Plot!")
     }
@@ -2779,24 +2790,28 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
   # Expand main plot ----
   if(!is.null(markEpochsLOI)){
+    if(!unthresholded){
         gRP <- gRP +  scale_fill_manual(name  = "Key:",
                                     values = colvec,
                                     na.translate = TRUE ,
                                     na.value = scales::muted("slategray4"),
                                     guide = "legend",
                                     limits = levels(meltRP$value))
+        }
           # theme(panel.ontop = TRUE,
           #       legend.position = "top",
           #       legend.background = element_rect(colour =  "grey50"))
     #geom_line(data = Edata, aes_(x=~x,y=~y,colour = ~value), size = 2, show.legend = TRUE) +
 
   } else {
-    gRP <- gRP +  ggplot2::scale_fill_manual(name  = "", breaks = c(0,1),
+    if(!unthresholded){
+      gRP <- gRP +  ggplot2::scale_fill_manual(name  = "", breaks = c(0,1),
                                     values = colvec,
                                     na.translate = TRUE ,
                                     na.value = scales::muted("slategray4"),
                                     guide = "none")
-  }
+      }
+    }
 
   # if(!is.null(markEpochsGrid)){
   #   if(is.list(markEpochsGrid)&length(markEpochsGrid)==2){
