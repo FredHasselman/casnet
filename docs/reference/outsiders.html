@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Outside interval — outsiders • casnet</title>
+<title>Outside closed interval — %][% • casnet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,12 @@
 
 
 
-<meta property="og:title" content="Outside interval — outsiders" />
+<meta property="og:title" content="Outside closed interval — %][%" />
 
-<meta property="og:description" content="Decide if a value x falls outside an interval j[1],j[2] that can be open or closed on the left and/or the right. Either a logical vector equal to x, or the actual values are extracted," />
+<meta property="og:description" content="See invctr::%][% for details.
+See invctr::%)[% for details." />
+
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -88,6 +91,9 @@
     <li>
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
+    <li>
+      <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -111,67 +117,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Outside interval</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/invictor.R'><code>R/invictor.R</code></a></small>
+    <h1>Outside closed interval</h1>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/utils-invctr.R'><code>R/utils-invctr.R</code></a></small>
     <div class="hidden name"><code>outsiders.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Decide if a value <code>x</code> falls outside an interval <code>j[1],j[2]</code> that can be open or closed on the left and/or the right. Either a logical vector equal to <code>x</code>, or the actual values are extracted,</p>
+    <p>See <code>invctr::<a href='https://www.rdocumentation.org/packages/invctr/topics/outsiders'>%][%</a></code> for details.</p>
+<p>See <code>invctr::<a href='https://www.rdocumentation.org/packages/invctr/topics/outsiders'>%)[%</a></code> for details.</p>
     
     </div>
 
-    <pre class="usage"><span class='no'>x</span> <span class='kw'>%][%</span> <span class='no'>j</span>
+        
 
-<span class='no'>x</span> <span class='kw'>%)(%</span> <span class='no'>j</span></pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>x</th>
-      <td><p>A vector</p></td>
-    </tr>
-    <tr>
-      <th>j</th>
-      <td><p>A range</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>logical vector of length x, or, values of x outside the range j</p>
-    
-    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
-
-    <p>Package <code>DescTools</code> provides similar functions</p>
-    
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'># Closed interval</span>
-<span class='fl'>5</span><span class='kw'>%][%</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fl'>5</span><span class='kw'>%].[%</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>5</span>)</div><div class='output co'>#&gt; <span class='error'>Error in 5 %].[% c(1, 5): could not find function "%].[%"</span></div><div class='input'>
-<span class='co'># Open interval</span>
-<span class='fl'>5</span><span class='kw'>%)(%</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>5</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='fl'>5</span><span class='kw'>%).(%</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>5</span>)</div><div class='output co'>#&gt; <span class='error'>Error in 5 %).(% c(1, 5): could not find function "%).(%"</span></div><div class='input'>
-<span class='co'># Half-losed interval left</span>
-<span class='fl'>5</span><span class='kw'>%](%</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>5</span>)</div><div class='output co'>#&gt; <span class='error'>Error in 5 %](% c(1, 5): could not find function "%](%"</span></div><div class='input'><span class='fl'>5</span><span class='kw'>%].(%</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>5</span>)</div><div class='output co'>#&gt; <span class='error'>Error in 5 %].(% c(1, 5): could not find function "%].(%"</span></div><div class='input'>
-<span class='co'># Half-losed interval right</span>
-<span class='fl'>5</span><span class='kw'>%)[%</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>5</span>)</div><div class='output co'>#&gt; <span class='error'>Error in 5 %)[% c(1, 5): could not find function "%)[%"</span></div><div class='input'><span class='fl'>5</span><span class='kw'>%).[%</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>5</span>)</div><div class='output co'>#&gt; <span class='error'>Error in 5 %).[% c(1, 5): could not find function "%).[%"</span></div><div class='input'>
-
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#note">Note</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+                </ul>
 
   </div>
 </div>

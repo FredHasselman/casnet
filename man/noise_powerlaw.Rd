@@ -14,9 +14,9 @@ noise_powerlaw(y = NULL, alpha = -1, N = 100, standardise = FALSE,
 
 \item{N}{Length of the time series}
 
-\item{randomPower}{If \code{TRUE} phases will be deterministic, uniformly distributed in \code{[-pi,pi]}. If \code{FALSE}, the spectrum will be stochastic with a Chi-square distribution. If \code{y} is not \code{NULL} this argument will be ignored.}
+\item{standardise}{Forces scaling of the output to the range \code{[-1, 1]}, consequently the power law will not necessarily extend right down to \code{0Hz}.}
 
-\item{normalise}{Forces scaling of the output to the range \code{[-1, 1]}, consequently the power law will not necessarily extend right down to \code{0Hz}.}
+\item{randomPower}{If \code{TRUE} phases will be deterministic, uniformly distributed in \code{[-pi,pi]}. If \code{FALSE}, the spectrum will be stochastic with a Chi-square distribution. If \code{y} is not \code{NULL} this argument will be ignored.}
 }
 \value{
 Time series with a power law of alpha.

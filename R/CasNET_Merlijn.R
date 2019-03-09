@@ -56,7 +56,9 @@ if(win>0){ok=TRUE}
 
 
 if(doPlot){
-  plot.dc <- ggplot2::ggplot(reshape2::melt(mat.dc), aes_(x=~Var1, y=~Var2, fill=~value)) + ggplot2::geom_tile() +
+
+  plot.dc <- ggplot2::ggplot(reshape2::melt(mat.dc), ggplot2::aes_(x=~Var1, y=~Var2, fill=~value)) +
+    ggplot2::geom_tile() +
     ggplot2::scale_fill_gradient2(low='blue', high='red', mid='yellow', midpoint=(max(mat.dc, na.rm=TRUE)/2), na.value='white') +
     ggplot2::theme_bw() +
     ggplot2::xlab('Days') +
@@ -69,6 +71,7 @@ if(doPlot){
 
   graphics::plot.new()
   graphics::plot(plot.dc)
+
   return(list(df.comp = df.comp,
               plot.dc = plot.dc))
 } else {
@@ -275,18 +278,20 @@ crit_in = function(df, win, doPlot = TRUE){
   mat.ci[,ncol(mat.ci)] <- mat.ci[,ncol(mat.ci)]*10 #the last column, showing Critical Instability of all items has values of 10 instead of 1
 
 if(doPlot){
-  plot.ci <- ggplot2::ggplot(reshape2::melt(mat.ci), aes_(x=~Var1, y=~Var2, fill=as.factor(~value))) +
+
+  plot.ci <- ggplot2::ggplot(reshape2::melt(mat.ci), ggplot2::aes_(x=~Var1, y=~Var2, fill=as.factor(~value))) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_manual(values = c("NA", "grey", "black")) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "none") +
     ggplot2::xlab('Days') +
     ggplot2::ylab('Items')+
-    ggplot2::theme(panel.grid.minor = element_line(colour="NA", size=0.5)) +
     ggplot2::scale_y_continuous(minor_breaks=seq(0.5, ncol(mat.ci), 1), breaks=seq(0.5, ncol(mat.ci)+0.5, 1), label=c(0:(ncol(mat.ci)-1),"Sum")) +
     ggplot2::scale_x_continuous(minor_breaks=seq(0.5,nrow(mat.ci),1), breaks=seq(0.5,nrow(mat.ci)+0.5,1), label=c(0:nrow(mat.ci))) +
     ggplot2::ggtitle('Critical Instability Plot') +
-    ggplot2::coord_cartesian(ylim=c(0.5,(ncol(mat.ci)+0.5)), xlim=c(win-0.5,nrow(mat.ci)+0.5), expand=F)
+    ggplot2::coord_cartesian(ylim=c(0.5,(ncol(mat.ci)+0.5)), xlim=c(win-0.5,nrow(mat.ci)+0.5), expand=FALSE) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(panel.grid.minor = element_line(colour="NA", size=0.5),
+                   legend.position = "none",
+                   )
 
    graphics::plot.new()
    graphics::plot(plot.ci)

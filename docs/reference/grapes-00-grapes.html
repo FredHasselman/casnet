@@ -32,7 +32,9 @@
 
 <meta property="og:title" content="Rose tinted infix — %00%" />
 
-<meta property="og:description" content="When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place." />
+<meta property="og:description" content="See invctr::%00% for details." />
+
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -88,6 +90,9 @@
     <li>
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
+    <li>
+      <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -112,57 +117,24 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Rose tinted infix</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/invictor.R'><code>R/invictor.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/utils-invctr.R'><code>R/utils-invctr.R</code></a></small>
     <div class="hidden name"><code>grapes-00-grapes.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>When your functions wear these rose tinted glasses, the world will appear to be a nicer, fluffier place.</p>
+    <p>See <code>invctr::<a href='https://www.rdocumentation.org/packages/invctr/topics/grapes-00-grapes'>%00%</a></code> for details.</p>
     
     </div>
 
-    <pre class="usage"><span class='no'>x</span> <span class='kw'>%00%</span> <span class='no'>y</span></pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>x</th>
-      <td><p>If (an element of) <code>x</code> is any of <code>Inf,-Inf,NA,NaN,NULL,length(x)==0</code>, it will return/replace the value of <code>y</code>; otherwise <code>x</code>.</p></td>
-    </tr>
-    <tr>
-      <th>y</th>
-      <td><p>The value to return/replace for <code>x</code> in case of catastrophy <code>&gt;00&lt;</code></p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+        
 
-    <div class='dont-index'><p>purrrr::<!-- %||% --></p></div>
-    
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='fl'>Inf</span> <span class='kw'>%00%</span> <span class='fl'>NA</span></div><div class='output co'>#&gt; [1] NA</div><div class='input'>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/numeric'>numeric</a></span>(<span class='fl'>0</span>) <span class='kw'>%00%</span> <span class='st'>''</span></div><div class='output co'>#&gt; [1] ""</div><div class='input'>
-<span class='fl'>NA</span> <span class='kw'>%00%</span> <span class='fl'>0</span></div><div class='output co'>#&gt; [1] 0</div><div class='input'>
-<span class='fl'>NaN</span> <span class='kw'>%00%</span> <span class='fl'>NA</span></div><div class='output co'>#&gt; [1] NA</div><div class='input'>
-<span class='kw'>NULL</span> <span class='kw'>%00%</span> <span class='fl'>NA</span></div><div class='output co'>#&gt; [1] NA</div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+                </ul>
 
-    <h2>Author</h2>
-    <p>Fred Hasselman</p>
   </div>
 </div>
 

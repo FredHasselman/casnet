@@ -58,7 +58,8 @@ Imports:
     paletteer,
     ggraph,
     boot,
-    invctr (>= 0.1.0)
+    invctr,
+    cowplot
 Suggests: 
     knitr,
     rmarkdown,

@@ -23,7 +23,7 @@ A data frame
 Time series to Duration series
 }
 \examples{
-
+library(invctr)
 # Create data with events and their timecodes
 coder <- data.frame(beh=c("stare","stare","coffee","type","type","stare"),t=c(0,5,10,15,20,25))
 

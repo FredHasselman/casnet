@@ -1,3 +1,7 @@
+#' @import ggplot2
+#' @import igraph
+NULL
+
 # (C)RQA ------------------------
 
 #' crqa_cl_main
@@ -845,7 +849,7 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
   names(myPalNn) <- emLags$lag[!is.na(emLags$lag)]
 
     gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
-      ggplot2::geom_rect( ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
+      ggplot2::geom_rect(ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
       ggplot2::scale_fill_manual(values = scales::alpha(c("grey", "white"),.2), guide=FALSE) +
       ggplot2::geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
       ggplot2::geom_hline(yintercept = c(0,100),   colour = "grey60") +
@@ -862,7 +866,7 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
       ggplot2::theme_minimal() +
       ggplot2::theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
             strip.text.x = element_text(colour = "black", face = "bold"),
-            panel.spacing = unit(1, "lines"),
+            panel.spacing = ggplot2::unit(1, "lines"),
             legend.background = element_rect(colour = "grey90",fill = "grey90"),
             legend.title = element_text(face = "bold"),
             legend.key = element_rect(colour = "grey90", fill = "grey90"),
@@ -1251,7 +1255,7 @@ roc_noise <- function(y, emRad, emDim=1, emLag=1, noiseLevel=.75, standardise = 
 
   yn <- dplyr::case_when(
     noiseType == "normal"  ~ stats::rnorm(NROW(y), mean=round(mean(y, na.rm = TRUE),3), sd=stats::sd(y,na.rm = TRUE)),
-    noiseType == "uniform" ~ sign(rnorm(1))*stats::runif(NROW(y), min=floor(min(y, na.rm = TRUE)), max = ceiling(max(y,na.rm = TRUE)))
+    noiseType == "uniform" ~ sign(stats::rnorm(1))*stats::runif(NROW(y), min=floor(min(y, na.rm = TRUE)), max = ceiling(max(y,na.rm = TRUE)))
     )
 
   noise_out   <- crqa_cl(yn, emRad = emRad, emDim=emDim, emLag=emLag)
@@ -1748,13 +1752,13 @@ for(r in 1:(Nshuffle+1)){
 }
 
 dy <- plyr::ldply(out)
-df_shuf <- dplyr::filter(dy,.id!="obs")
-dy_m <- df_shuf %>% dplyr::group_by(Diagonal,labels) %>% dplyr::summarise(meanRRrnd = mean(RR),sdRRrnd   = stats::sd(RR))
+df_shuf <- dplyr::filter_(~dy, ~.id!="obs")
+dy_m <- df_shuf %>% dplyr::group_by_(~Diagonal,~labels) %>% dplyr::summarise_(meanRRrnd = mean(~RR),sdRRrnd = stats::sd(~RR))
 dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
 dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
 dy_m$y_obs <- dy$RR[dy$.id=="obs"]
 
-df <- tidyr::gather(dy_m,key=variable, value = RR, -c(Diagonal,sdRRrnd, labels))
+df <- tidyr::gather(dy_m,key=~variable, value = ~RR, -c(~Diagonal,~sdRRrnd, ~labels))
 df$Diagonal <- as.numeric(df$Diagonal)
 
   if(doPlot){
@@ -1774,10 +1778,10 @@ df$Diagonal <- as.numeric(df$Diagonal)
 
 
 
-  g <- ggplot2::ggplot(df_m, ggplot2::aes_(x=~Diagonal)) +
+  g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
     ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
-    ggplot2::geom_line(aes_(y=~meanRRrnd), colour = "grey40", size = .5) +
-    ggplot2::geom_line(aes_(y=~y_obs), colour = "black", size = 1) +
+    ggplot2::geom_line(ggplot2::aes_(y=~meanRRrnd), colour = "grey40", size = .5) +
+    ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
     ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
     ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
     ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks) +
@@ -1789,12 +1793,15 @@ df$Diagonal <- as.numeric(df$Diagonal)
 
   print(g)
 
-  if(doShuffle){df <- tidyr::spread(df,key = variable, value = RR)}
+  if(doShuffle){
+    df <- tidyr::spread(df,key = ~variable, value = ~RR)
+    }
+
   return(invisible(list(plot = g, data = df)))
 
   } else {
 
-    if(doShuffle){df <- tidyr::spread(df,key = variable, value = RR)}
+    if(doShuffle){df <- tidyr::spread(df,key = ~variable, value = ~RR)}
     return(df)
 
   }
@@ -2685,12 +2692,12 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   }
 
   # main plot ----
-  gRP <-  ggplot2::ggplot(aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
-    geom_raster(hjust = 0, vjust=0, show.legend = showL) +
-    geom_abline(slope = 1,colour = "grey50", size = 1)
+  gRP <-  ggplot2::ggplot(ggplot2::aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
+    ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL) +
+    ggplot2::geom_abline(slope = 1,colour = "grey50", size = 1)
 
   if(unthresholded){
-    gRP <- gRP + scale_fill_gradient2(low      = "red3",
+    gRP <- gRP + ggplot2::scale_fill_gradient2(low      = "red3",
                                       high     = "steelblue",
                                       mid      = "white",
                                       na.value = scales::muted("slategray4"),
@@ -2726,10 +2733,10 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
       #resol$value <- log(resol$value)
       resol <- resol[-1,]
 
-      gDist <-  ggplot2::ggplot(resol,aes_(x=~x,y=~y,fill=~value)) +
-        geom_tile(show.legend = FALSE) +
-        scale_y_continuous(name = "Recurrence Rate", breaks = log(RecScale$RR), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence hreshold",~ epsilon)), labels = paste(round(RecScale$epsilon,2)))) +
-        scale_fill_gradient2(low      = "red3",
+      gDist <-  ggplot2::ggplot(resol,ggplot2::aes_(x=~x,y=~y,fill=~value)) +
+        ggplot2::geom_tile(show.legend = FALSE) +
+        ggplot2::scale_y_continuous(name = "Recurrence Rate", breaks = log(RecScale$RR), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence hreshold",~ epsilon)), labels = paste(round(RecScale$epsilon,2)))) +
+        ggplot2::scale_fill_gradient2(low      = "red3",
                              high     = "steelblue",
                              mid      = "white",
                              na.value = scales::muted("slategray4"),
@@ -2737,9 +2744,9 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
                              #limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                              space    = "Lab",
                              name     = "") +
-        coord_equal(1, expand = FALSE) +
-        theme_bw() +
-        theme(panel.background = element_blank(),
+        ggplot2::coord_equal(1, expand = FALSE) +
+        ggplot2::theme_bw() +
+        ggplot2::theme(panel.background = element_blank(),
               panel.grid.major  = element_blank(),
               panel.grid.minor  = element_blank(),
               legend.background = element_blank(),
@@ -2760,7 +2767,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   } else { # unthresholded
   }
 
-  rptheme <- theme_bw() + theme(panel.background = element_blank(),
+  rptheme <- ggplot2::theme_bw() + ggplot2::theme(panel.background = element_blank(),
                                 panel.grid.minor  = element_blank(),
                                 panel.border = element_rect("grey50",fill=NA),
                                 legend.key = element_rect(colour = "grey90"),
@@ -2791,7 +2798,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
   # Expand main plot ----
   if(!is.null(markEpochsLOI)){
     if(!unthresholded){
-        gRP <- gRP +  scale_fill_manual(name  = "Key:",
+        gRP <- gRP +  ggplot2::scale_fill_manual(name  = "Key:",
                                     values = colvec,
                                     na.translate = TRUE ,
                                     na.value = scales::muted("slategray4"),
@@ -2848,16 +2855,16 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 #   }
 
   if(plyr::is.discrete(meltRP$Var1)){
-    gRP <- gRP + scale_x_discrete(breaks=meltRP$Var1,expand = c(0,0))
+    gRP <- gRP + ggplot2::scale_x_discrete(breaks=meltRP$Var1,expand = c(0,0))
   } else {
-    gRP <- gRP + scale_x_continuous(breaks=meltRP$Var1,expand = c(0,0))
+    gRP <- gRP + ggplot2::scale_x_continuous(breaks=meltRP$Var1,expand = c(0,0))
   }
   if(plyr::is.discrete(meltRP$Var2)){
-    gRP <- gRP + scale_y_discrete(breaks=meltRP$Var2,expand = c(0,0))
+    gRP <- gRP + ggplot2::scale_y_discrete(breaks=meltRP$Var2,expand = c(0,0))
   } else {
-    gRP <- gRP + scale_y_continuous(breaks=meltRP$Var2,expand = c(0,0))
+    gRP <- gRP + ggplot2::scale_y_continuous(breaks=meltRP$Var2,expand = c(0,0))
   }
-  gRP <- gRP + rptheme + coord_equal(dim(RM)[1]/dim(RM)[2]) #coord_fixed(expand = FALSE)
+  gRP <- gRP + rptheme + ggplot2::coord_equal(dim(RM)[1]/dim(RM)[2]) #coord_fixed(expand = FALSE)
 
   gy1 <- gg_plotHolder()
   gy2 <- gg_plotHolder()
@@ -2925,14 +2932,14 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 
   if(plotDimensions){
 
-      gy1 <- ggplot2::ggplot(y1, aes_(y=~Value, x= ~tm,  group= ~Dimension)) +
-        geom_line(aes_(colour=~Dimension), show.legend = FALSE) +
-        xlab(xdims) + ylab(" ") +
-        geom_vline(aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
-        scale_color_grey() +
-        scale_x_continuous(expand = c(0,0)) +
-        scale_y_continuous(expand = c(0,0)) +
-        theme(panel.background = element_blank(),
+      gy1 <- ggplot2::ggplot(y1, ggplot2::aes_(y=~Value, x= ~tm,  group= ~Dimension)) +
+        ggplot2::geom_line(aes_(colour=~Dimension), show.legend = FALSE) +
+        ggplot2::xlab(xdims) + ggplot2::ylab(" ") +
+        ggplot2::geom_vline(ggplot2::aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+        ggplot2::scale_color_grey() +
+        ggplot2::scale_x_continuous(expand = c(0,0)) +
+        ggplot2::scale_y_continuous(expand = c(0,0)) +
+        ggplot2::theme(panel.background = element_blank(),
               panel.grid.major  = element_blank(),
               panel.grid.minor  = element_blank(),
               legend.background = element_blank(),
@@ -2944,15 +2951,15 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
               axis.title.x =element_text(colour = "black",angle = 0, vjust = +3),
               axis.title.y =element_blank(),
               plot.margin = margin(0,0,0,0, unit = "pt")) +
-        coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
+        ggplot2::coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
 
-      gy2 <- ggplot2::ggplot(y2, aes_(y=~Value, x=~tm, group=~Dimension)) +
-        geom_line(aes_(colour=~Dimension), show.legend = FALSE) +
-        ylab(" ") + xlab(ydims) +
-        geom_vline(aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
-        scale_color_grey() +
-        scale_x_continuous(expand = c(0,0)) +
-        theme(panel.background = element_blank(),
+      gy2 <- ggplot2::ggplot(y2, ggplot2::aes_(y=~Value, x=~tm, group=~Dimension)) +
+        ggplot2::geom_line(ggplot2::aes_(colour=~Dimension), show.legend = FALSE) +
+        ggplot2::ylab(" ") + ggplot2::xlab(ydims) +
+        ggplot2::geom_vline(ggplot2::aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+        ggplot2::scale_color_grey() +
+        ggplot2::scale_x_continuous(expand = c(0,0)) +
+        ggplot2::theme(panel.background = element_blank(),
               panel.grid.major  = element_blank(),
               panel.grid.minor  = element_blank(),
               legend.background = element_blank(),
@@ -2964,8 +2971,8 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
               axis.title.x =element_blank(),
               axis.title.y =element_text(colour = "black",angle = 90, vjust = -2),
               plot.margin = margin(0,0,0,0, unit = "pt")) +
-        coord_flip(expand = FALSE) +
-        scale_y_reverse(expand = c(0,0))
+        ggplot2::coord_flip(expand = FALSE) +
+        ggplot2::scale_y_reverse(expand = c(0,0))
 
   } # plotdimensions
 
@@ -2988,11 +2995,11 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
     #rpOUTdat <- cbind(rpOUTdat,rpOUTdat)
     rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
 
-    gA <-ggplot2::ggplot(rpOUTdat,aes_(x=~x,y=~y)) +
-      geom_text(aes_(label=~label), family="mono", hjust="left", vjust="center", size=3, parse = FALSE) +
+    gA <-ggplot2::ggplot(rpOUTdat,ggplot2::aes_(x=~x,y=~y)) +
+      ggplot2::geom_text(ggplot2::aes_(label=~label), family="mono", hjust="left", vjust="center", size=3, parse = FALSE) +
       #scale_x_continuous(limits = c(0,.3)) +
-      theme_void() +
-      theme(plot.margin = margin(0,5,0,5, unit = "pt"))
+      ggplot2::theme_void() +
+      ggplot2::theme(plot.margin = margin(0,5,0,5, unit = "pt"))
 
     #geom="text", label = paste("Radius:",rpOUT$Radius,"\nRec points:",rpOUT$RT,"\nRR",rpOUT$RR,"\nDET:",rpOUT$DET,"\nMEAN_dl:",rpOUT$MEAN_dl,"\nENT_dl:",rpOUT$ENT_dl,"\nLAM_vl:",rpOUT$LAM_vl, "\nTT_vl:",rpOUT$TT_vl,"\nENTR_vl:",rpOUT$ENT_vl)) + theme_minimal() + theme(text = element_text(family = "mono"))
     # ,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
@@ -5826,9 +5833,9 @@ gg_theme <- function(type=c("clean","noax")){
 #'              widths=c(4, 1.4),
 #'              heights=c(1.4, 4))
 gg_plotHolder <- function(){
-  return(ggplot() +
-    geom_blank(aes_(1,1)) +
-    theme(line = element_blank(),
+  return(ggplot2::ggplot() +
+    ggplot2::geom_blank(ggplot2::aes_(1,1)) +
+      ggplot2::theme(line = element_blank(),
           text  = element_blank(),
           title = element_blank(),
           plot.background = element_blank(),
@@ -6330,7 +6337,7 @@ plotSUR_hist <- function(surrogateValues,
     stop("Use one of: 'two.sided', 'greater' or 'less' for argument 'sides'")
   }
 
-  vec            <- sort(c(surrogateValues, as.vector(observedValue)))
+  vec <- sort(c(surrogateValues, as.vector(observedValue)))
 
   if(is.null(binWidth)){
     if(all(is.wholenumber(vec))){
@@ -7121,7 +7128,7 @@ ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = N
 #' @export
 #'
 #' @examples
-#'
+#' library(invctr)
 #' # Create data with events and their timecodes
 #' coder <- data.frame(beh=c("stare","stare","coffee","type","type","stare"),t=c(0,5,10,15,20,25))
 #'
@@ -8321,27 +8328,13 @@ ts_integrate <-function(y){
 
 # HELPERS ----
 
-testRPsize <- function(N, method = c("cl","rp")){
-  y <- rnorm(N)
-  if(method=="cl"){
-    start <- proc.time()
-    suppressMessages(out <- crqa_cl(y1 = y))
-    time_elapsed <- proc.time() - start # End clock
-  } else {
-    RM <- rp(rnorm(N))
-    out <- crqa_rp(RM)
-  }
-
-  cat(paste("\nCompleted in:\n"))
-  print(time_elapsed_parallel)
-}
 
 #' Generate noise series with power law scaling exponent
 #'
 #' @param y Time series to use as a 'model'. If specified, `N` will be `N = length(y)`, and the series will be constructed based on `stats::fft(y)`.
 #' @param alpha The log-log spectral slope, the scaling exponent.
 #' @param N Length of the time series
-#' @param normalise Forces scaling of the output to the range `[-1, 1]`, consequently the power law will not necessarily extend right down to `0Hz`.
+#' @param standardise Forces scaling of the output to the range `[-1, 1]`, consequently the power law will not necessarily extend right down to `0Hz`.
 #' @param randomPower If `TRUE` phases will be deterministic, uniformly distributed in `[-pi,pi]`. If `FALSE`, the spectrum will be stochastic with a Chi-square distribution. If `y` is not `NULL` this argument will be ignored.
 #'
 #' @return Time series with a power law of alpha.
@@ -8423,7 +8416,7 @@ noise_fGn <- function(H=0.5, N = 100, mu = NULL, sigma = NULL){
 
   # Calculate the fGn.
   if (H == 0.5){
-    y <- rnorm(N)  # If H=0.5, then fGn is equivalent to white Gaussian noise.
+    y <- stats::rnorm(N)  # If H=0.5, then fGn is equivalent to white Gaussian noise.
     } else {
     # If this function was already in memory before being called this time,
     # AND the values for N and H are the same as the last time it was
@@ -8434,19 +8427,19 @@ noise_fGn <- function(H=0.5, N = 100, mu = NULL, sigma = NULL){
     # persistent Zmag Nfft Nlast Hlast
     #    if isempty(Zmag) | isempty(Nfft) | isempty(Nlast) |isempty(Hlast) | N ~= Nlast #| H ~= Hlast
     # The persistent variables must be (re-)calculated.
-    Nfft = 2^ceil(log2(2*(N-1)))
-    NfftHalf = round(Nfft/2);
-    k = c(0:NfftHalf, (NfftHalf-1):-1:1)
-    Zmag = 0.5 * ( (k+1)^(2*H) - 2.*k.^(2*H) + (abs(k-1))^(2*H) )
+    Nfft <- 2^ceiling(log2(2*(N-1)))
+    NfftHalf <- round(Nfft/2);
+    k <- c(0:NfftHalf, (NfftHalf-1):-1:1)
+    Zmag <- 0.5 * ( (k+1)^(2*H) - 2.*k^(2*H) + (abs(k-1))^(2*H) )
     rm(k)
-    Zmag = Re(stats::fft(Zmag))
+    Zmag <- Re(stats::fft(Zmag))
     if ( any(Zmag < 0) ){
       stop('The fast Fourier transform of the circulant covariance had negative values.')
     }
-    Zmag = sqrt(Zmag);
+    Zmag <- sqrt(Zmag);
     # Store N and H values in persistent variables for use during subsequent calls to this function.
-    Nlast = N
-    Hlast = H
+    Nlast <- N
+    Hlast <- H
 
     #Z = Zmag*(rnorm(1,Nfft) + i*randn(1,Nfft))
     Z <- Zmag*complex(real= stats::rnorm(n = Nfft), imaginary = stats::rnorm(n = Nfft))
