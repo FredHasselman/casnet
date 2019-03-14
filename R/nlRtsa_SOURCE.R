@@ -51,7 +51,7 @@ crqa_cl_main <- function(data,
                          returnMeasures = TRUE,
                          returnRPvector = FALSE,
                          returnLineDist = FALSE,
-                         plot_recmat = c("noplot","rp","distmat")[[1]],
+                         doPlot = c("noplot","rp","distmat")[[1]],
                          path_to_rp = getOption("casnet.path_to_rp"),
                          saveOut    = FALSE,
                          path_out   = NULL,
@@ -446,7 +446,7 @@ crqa_cl <- function(y1,
   } # If windowed
 
   #cl <- parallel::makeCluster(mc.cores)
-  #parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp","saveOut","path_out","file_ID","silent","..."))
+  #parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp","saveOut","path_out","file_ID","silent","..."))
 
   # Create the data, for all windows,need this for parallel, but also speeds up processing in general.
   dfList <- plyr::llply(wIndices, function(ind){cbind(y1 = df[ind,1],y2 = df[ind,2])})
@@ -482,7 +482,7 @@ crqa_cl <- function(y1,
     parallel::clusterEvalQ(cl,library(Matrix))
     parallel::clusterEvalQ(cl,library(casnet))
 
-   # parallel::clusterExport(cl, varlist = c("data","emDim","emLag","emRad","DLmin","VLmin","theiler","win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp", "saveOut","path_out","file_ID","silent","targetValue", "useParallel"))
+   # parallel::clusterExport(cl, varlist = c("data","emDim","emLag","emRad","DLmin","VLmin","theiler","win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp", "saveOut","path_out","file_ID","silent","targetValue", "useParallel"))
 
       # cluster_library(c("devtools","utils","plyr","dplyr","tidyr","Matrix","pROC")) %>%
       # cluster_assign_value("crqa_cl_main", crqa_cl_main) %>%
@@ -498,7 +498,7 @@ crqa_cl <- function(y1,
       # cluster_assign_value("returnMeasures", returnMeasures)  %>%
       # cluster_assign_value("returnRPvector", returnRPvector)  %>%
       # cluster_assign_value("returnLineDist", returnLineDist)  %>%
-      # cluster_assign_value("plot_recmat", plot_recmat)  %>%
+      # cluster_assign_value("doPlot", doPlot)  %>%
       # cluster_assign_value("path_to_rp", path_to_rp)  %>%
       # cluster_assign_value("saveOut", saveOut)  %>%
       # cluster_assign_value("path_out", path_out)  %>%
@@ -507,7 +507,7 @@ crqa_cl <- function(y1,
       # cluster_assign_value("targetValue", targetValue) %>%
       # cluster_assign_value("useParallel", useParallel)
 
- #  parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","plot_recmat","path_to_rp","saveOut","path_out","file_ID","silent","..."))
+ #  parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp","saveOut","path_out","file_ID","silent","..."))
 
 
   start <- proc.time()
@@ -523,7 +523,7 @@ crqa_cl <- function(y1,
                                                                        returnMeasures = returnMeasures,
                                                                        returnRPvector = returnRPvector,
                                                                        returnLineDist = returnLineDist,
-                                                                       plot_recmat    = plot_recmat,
+                                                                       doPlot    = doPlot,
                                                                        path_to_rp     = path_to_rp,
                                                                        saveOut        = saveOut,
                                                                        path_out       = path_out,
@@ -558,7 +558,7 @@ crqa_cl <- function(y1,
         returnMeasures = returnMeasures,
         returnRPvector = returnRPvector,
         returnLineDist = returnLineDist,
-        plot_recmat    = plot_recmat,
+        doPlot    = doPlot,
         path_to_rp     = path_to_rp,
         saveOut        = saveOut,
         path_out       = path_out,
