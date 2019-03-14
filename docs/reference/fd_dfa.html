@@ -127,11 +127,11 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>fd_dfa</span>(<span class='no'>y</span>, <span class='kw'>fs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>removeTrend</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"poly"</span>, <span class='st'>"adaptive"</span>, <span class='st'>"bridge"</span>)[<span class='fl'>1</span>],
-  <span class='kw'>polyOrder</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>standardise</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span>)[<span class='fl'>2</span>],
-  <span class='kw'>adjustSumOrder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>scaleMin</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>scaleMax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>floor</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Log'>log2</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)/<span class='fl'>2</span>)), <span class='kw'>scaleResolution</span> <span class='kw'>=</span> <span class='fl'>30</span>,
-  <span class='kw'>scaleS</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>minData</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+    <pre class="usage"><span class='fu'>fd_dfa</span>(<span class='no'>y</span>, <span class='kw'>fs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>removeTrend</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"no"</span>, <span class='st'>"poly"</span>, <span class='st'>"adaptive"</span>,
+  <span class='st'>"bridge"</span>)[<span class='fl'>2</span>], <span class='kw'>polyOrder</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>standardise</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>,
+  <span class='st'>"median.mad"</span>)[<span class='fl'>2</span>], <span class='kw'>adjustSumOrder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>scaleMin</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>scaleMax</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>floor</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Log'>log2</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)/<span class='fl'>2</span>)), <span class='kw'>scaleResolution</span> <span class='kw'>=</span> (<span class='no'>scaleMax</span> -
+  <span class='no'>scaleMin</span>), <span class='kw'>scaleS</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>minData</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</pre>
     
@@ -164,15 +164,15 @@
     </tr>
     <tr>
       <th>scaleMin</th>
-      <td><p>Minimium scale to use</p></td>
+      <td><p>Minimium scale (as a power of 2) to use</p></td>
     </tr>
     <tr>
       <th>scaleMax</th>
-      <td><p>Maximum scale to use</p></td>
+      <td><p>Maximum scale (as a power of 2) to use</p></td>
     </tr>
     <tr>
       <th>scaleResolution</th>
-      <td><p>The scales at which detrended fluctuation will be evaluated will are calculatd as: <code>(scaleMax-scaleMin)/scaleResolution</code></p></td>
+      <td><p>The scales at which detrended fluctuation will be evaluated are calculatd as: <code>(scaleMax-scaleMin)/scaleResolution</code>. The default value yields no resolution of scales: <code>(scaleMax-scaleMin)</code>. Common values</p></td>
     </tr>
     <tr>
       <th>scaleS</th>

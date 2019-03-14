@@ -133,9 +133,9 @@
   <span class='kw'>step</span> <span class='kw'>=</span> <span class='no'>win</span>, <span class='kw'>JRP</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>distNorm</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"EUCLIDEAN"</span>, <span class='st'>"MAX"</span>, <span class='st'>"MIN"</span>,
   <span class='st'>"OP"</span>)<span class='kw'>[[</span><span class='fl'>1</span>]], <span class='kw'>standardise</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span>)[<span class='fl'>1</span>],
   <span class='kw'>returnMeasures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>returnRPvector</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnLineDist</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>plot_recmat</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"noplot"</span>, <span class='st'>"rp"</span>,
-  <span class='st'>"distmat"</span>)<span class='kw'>[[</span><span class='fl'>1</span>]], <span class='kw'>path_to_rp</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"casnet.path_to_rp"</span>),
-  <span class='kw'>saveOut</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>path_out</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>file_ID</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>returnLineDist</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"noplot"</span>, <span class='st'>"rp"</span>, <span class='st'>"distmat"</span>)<span class='kw'>[[</span><span class='fl'>1</span>]],
+  <span class='kw'>path_to_rp</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"casnet.path_to_rp"</span>), <span class='kw'>saveOut</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>path_out</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>file_ID</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>surrogateTest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>useParallel</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>...</span>)</pre>
     
@@ -207,7 +207,7 @@
       <td><p>Return the distribution of diagonal and horizontal line length distances (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
-      <th>plot_recmat</th>
+      <th>doPlot</th>
       <td><p>Produce a plot of the recurrence matrix by calling <code><a href='rp_plot.html'>rp_plot</a></code>, values can be <code>"rp"</code> (the thresholded recurrence matrix),<code>"distmat"</code> (the unthresholded recurrence matrix) or <code>"noplot"</code> (default = <code>"noplot"</code>)</p></td>
     </tr>
     <tr>

@@ -1,5 +1,8 @@
 #' @import ggplot2
 #' @import igraph
+#' @import invctr
+#' @importFrom dplyr group_by filter summarise mutate case_when
+#' @importFrom tidyr gather spread unnest
 NULL
 
 # (C)RQA ------------------------
@@ -94,7 +97,7 @@ crqa_cl_main <- function(data,
     F_min   = 'F min'
   )
 
-  if(plot_recmat%in%"distmat"){-1 * emRad}
+  if(doPlot%in%"distmat"){-1 * emRad}
 
   tmpd  <- tempdir()
   tmpf1 <- tempfile(tmpdir = tmpd, fileext = ".dat")
@@ -244,7 +247,7 @@ file_ID=1
 #' @param returnMeasures Return the (C)RQA measures? (default = \code{TRUE})
 #' @param returnRPvector Return the recurrent points in a dataframe? (default = \code{FALSE})
 #' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})
-#' @param plot_recmat Produce a plot of the recurrence matrix by calling \code{\link{rp_plot}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})
+#' @param doPlot Produce a plot of the recurrence matrix by calling \code{\link{rp_plot}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})
 #' @param path_to_rp Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)
 #' @param saveOut Save the output to files? If \code{TRUE} and \code{path_out = NA}, the current working directory will be used (default = \code{FALSE})
 #' @param path_out Path to save output if \code{saveOut = TRUE} (default = \code{NULL})
@@ -316,30 +319,30 @@ file_ID=1
 #' @export
 #'
 crqa_cl <- function(y1,
-                    y2    = NULL,
-                    emDim  = 1,
-                    emLag  = 1,
-                    emRad  = NA,
-                    DLmin =  2,
-                    VLmin =  2,
+                    y2      = NULL,
+                    emDim   = 1,
+                    emLag   = 1,
+                    emRad   = NA,
+                    DLmin   = 2,
+                    VLmin   = 2,
                     theiler = 0,
-                    win     = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
-                    step    = win,
-                    JRP     = FALSE,
+                    win            = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
+                    step           = win,
+                    JRP            = FALSE,
                     distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-                    standardise   = c("none","mean.sd","median.mad")[1],
+                    standardise    = c("none","mean.sd","median.mad")[1],
                     returnMeasures = TRUE,
                     returnRPvector = FALSE,
                     returnLineDist = FALSE,
-                    plot_recmat = c("noplot","rp","distmat")[[1]],
-                    path_to_rp = getOption("casnet.path_to_rp"),
-                    saveOut    = FALSE,
-                    path_out   = NULL,
-                    file_ID    = NULL,
-                    silent     = TRUE,
-                    surrogateTest = FALSE,
-                    targetValue  = .05,
-                    useParallel   = FALSE,
+                    doPlot         = c("noplot","rp","distmat")[[1]],
+                    path_to_rp     = getOption("casnet.path_to_rp"),
+                    saveOut        = FALSE,
+                    path_out       = NULL,
+                    file_ID        = NULL,
+                    silent         = TRUE,
+                    surrogateTest  = FALSE,
+                    targetValue    = .05,
+                    useParallel    = FALSE,
                     ...){
 
   if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"/rp_install_log.txt"), mustWork = FALSE))){
@@ -587,7 +590,7 @@ crqa_cl <- function(y1,
     rqa_horidist <-plyr::ldply(wList, function(l) l$hori_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
   }
 
-  doPlot <- which(plot_recmat%in%c("noplot","rp","distmat"))
+  doPlot <- which(doPlot%in%c("noplot","rp","distmat"))
 
   if(doPlot>1){
     if(doPlot==2){
@@ -1631,43 +1634,43 @@ crqa_rp <- function(RM,
 #' @param diagWin Window around the line of synchrony
 #' @param xname Label for x-axis
 #' @param yname Label for y-axis
-#' @param DLmin DLmin
-#' @param VLmin VLmin
-#' @param HLmin HLmin
-#' @param DLmax DLmax
-#' @param VLmax VLmax
-#' @param HLmax HLmax
+#' @param DLmin Minimal diagonal line length (default = \code{2})
+#' @param VLmin Minimal vertical line length (default = \code{2})
+#' @param HLmin Minimal horizontal line length (default = \code{2})
+#' @param DLmax Maximal diagonal line length (default = length of diagonal -1)
+#' @param VLmax Maximal vertical line length (default = length of diagonal -1)
+#' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
 #' @param doShuffle Should a shuffled baseline be calculated (default = `FALSE`)
 #' @param y1 The original `y1` time series
 #' @param y2 The original `y2` time series
 #' @param Nshuffle How many shuffled versions to make up the baseline? The default is `19`, which is the minimum for a one-sided surrogate test.
-#' @param AUTO AUTO
-#' @param chromatic chromatic
-#' @param matrices matrices
+#' @param AUTO Auto-recurrence? (default = \code{FALSE})
+#' @param chromatic Force chromatic RQA? (default = \code{FALSE})
+#' @param matrices Return matrices? (default = \code{FALSE})
 #' @param doPlot Plot
 #'
 #' @return A plot and/or the data for the plot
 #'
 #' @export
 #'
-crqa_diagPofile <- function(RM,
-                            diagWin = NULL,
-                            xname = "",
-                            yname = "",
-                            DLmin = 2,
-                            VLmin = 2,
-                            HLmin = 2,
-                            DLmax = length(Matrix::diag(RM))-1,
-                            VLmax = length(Matrix::diag(RM))-1,
-                            HLmax = length(Matrix::diag(RM))-1,
-                            doShuffle = FALSE,
-                            y1        = NA,
-                            y2        = NA,
-                            Nshuffle  = 19,
-                            AUTO      = NULL,
-                            chromatic = FALSE,
-                            matrices  = FALSE,
-                            doPlot = TRUE){
+crqa_diagProfile <- function(RM,
+                             diagWin = NULL,
+                             xname = "X-axis",
+                             yname = "Y-axis",
+                             DLmin = 2,
+                             VLmin = 2,
+                             HLmin = 2,
+                             DLmax = length(Matrix::diag(RM))-1,
+                             VLmax = length(Matrix::diag(RM))-1,
+                             HLmax = length(Matrix::diag(RM))-1,
+                             doShuffle = FALSE,
+                             y1        = NA,
+                             y2        = NA,
+                             Nshuffle  = 19,
+                             AUTO      = NULL,
+                             chromatic = FALSE,
+                             matrices  = FALSE,
+                             doPlot    = TRUE){
 
 
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
@@ -1696,7 +1699,10 @@ crqa_diagPofile <- function(RM,
       stop("Need series y1 and y2 in order to do the shuffle!!")
     } else {
       cat("Calculating diagonal recurrence profiles... \n")
-      TSrnd <- tseries::surrogate(x=y1, ns=Nshuffle, fft=FALSE, amplitude = FALSE)
+      TSrnd <- tseries::surrogate(x=y2, ns=Nshuffle, fft=FALSE, amplitude = FALSE)
+      if(Nshuffle==1){
+        TSrnd <- matrix(TSrnd,ncol=1)
+      }
     }
     emDim <- attr(RM,"emDim")
     emLag <- attr(RM,"emLag")
@@ -1705,103 +1711,115 @@ crqa_diagPofile <- function(RM,
     Nshuffle <- 0
   }
 
-out <- vector(mode = "list", length = Nshuffle+1)
+  out <- vector(mode = "list", length = Nshuffle+1)
 
-if(doShuffle){
- names(out) <- c("obs",paste0("Shuffled", 1:Nshuffle))
-} else {
-  names(out) <- "obs"
-}
-
-for(r in 1:(Nshuffle+1)){
-
-  if(r==1){
-    RMd <- RM
-    rm(RM)
+  if(doShuffle){
+    names(out) <- c("obs",paste0("Shuffled", 1:Nshuffle))
   } else {
-    RMd <- rp(y1 = y1, y2 = TSrnd[,r-1],emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+    names(out) <- "obs"
   }
-  #rp_lineDist(RM,d = diagWin, matrices = TRUE)
-  B <- rp_nzdiags(RMd, removeNZ = FALSE)
-  rm(RMd)
 
-  diagID <- 1:NCOL(B)
-  names(diagID) <- colnames(B)
-  if(length(diagWin)<NCOL(B)){
-    cID <- which(colnames(B)%in%diagWin)
-    B <- B[,cID]
-    diagID <- seq_along(cID)
+  for(r in seq_along(out)){
+
+    if(r==1){
+      RMd <- RM
+      rm(RM)
+    } else {
+      RMd <- rp(y1 = y1, y2 = TSrnd[,(r-1)],emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+    }
+    #rp_lineDist(RM,d = diagWin, matrices = TRUE)
+    B <- rp_nzdiags(RMd, removeNZ = FALSE)
+    rm(RMd)
+
+    diagID <- 1:NCOL(B)
     names(diagID) <- colnames(B)
+    if(length(diagWin)<NCOL(B)){
+      cID <- which(colnames(B)%in%diagWin)
+      B <- B[,cID]
+      diagID <- seq_along(cID)
+      names(diagID) <- colnames(B)
+    }
+
+    #winRR <- sum(B==1, na.rm = TRUE)
+    df <- plyr::ldply(diagID, function(i){
+      data.frame(index = i, RR = sum(B[,i]==1, na.rm = TRUE)/ (NROW(B)-abs(as.numeric(colnames(B)[i]))))
+    }, .id = "Diagonal")
+
+    df$group  <- 1
+    df$labels <- paste(df$Diagonal)
+    df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
+    df$labels <- factor(df$labels,levels = df$labels,ordered = TRUE)
+
+    out[[r]] <- df
+    rm(df,B,cID,diagID)
+
+    cat(paste("\nProfile"),r)
+
   }
 
-  #winRR <- sum(B==1, na.rm = TRUE)
-  df <- plyr::ldply(diagID, function(i){
-    data.frame(index = i, RR = sum(B[,i]==1, na.rm = TRUE)/ (NROW(B)-abs(as.numeric(colnames(B)[i]))))
-  }, .id = "Diagonal")
+  dy      <- plyr::ldply(out)
+  if(doShuffle){
+    df_shuf <- dplyr::filter(dy, .id!="obs")
+  } else {
+    df_shuf <- dy
+  }
 
-  df$group  <- 1
-  df$labels <- paste(df$Diagonal)
-  df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
-  df$labels <- factor(df$labels,levels = df$labels,ordered = TRUE)
+  dy_m <- df_shuf %>%
+    dplyr::group_by(Diagonal,labels) %>%
+    dplyr::summarise(meanRRrnd = mean(RR), sdRRrnd = stats::sd(RR))
 
-  out[[r]] <- df
-  rm(df,B,cID,diagID)
+  dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+  dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+  dy_m$y_obs <- dy$RR[dy$.id=="obs"]
 
-  cat(paste("\nProfile"),r)
-
-}
-
-dy <- plyr::ldply(out)
-df_shuf <- dplyr::filter_(~dy, ~.id!="obs")
-dy_m <- df_shuf %>% dplyr::group_by_(~Diagonal,~labels) %>% dplyr::summarise_(meanRRrnd = mean(~RR),sdRRrnd = stats::sd(~RR))
-dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
-dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
-dy_m$y_obs <- dy$RR[dy$.id=="obs"]
-
-df <- tidyr::gather(dy_m,key=~variable, value = ~RR, -c(~Diagonal,~sdRRrnd, ~labels))
-df$Diagonal <- as.numeric(df$Diagonal)
+  df <- tidyr::gather(dy_m,key=variable, value = RR, -c(Diagonal,sdRRrnd, labels, ciLO, ciHI, y_obs))
+  df$Diagonal <- as.numeric(df$Diagonal)
 
   if(doPlot){
 
-    if(length(levels(df$labels))>21){
-      ext <- max(min(abs(df$Diagonal),na.rm = TRUE),abs(max(df$Diagonal,na.rm = TRUE)))
-      breaks <- which(df$labels%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
+    Diags <- as.numeric(levels(df$labels))
+    if(length(diagWin)>21){
+      ext <- max(min(abs(Diags),na.rm = TRUE),abs(max(Diags,na.rm = TRUE)))
+      breaks <- which(Diags%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
+      labels <- sort(unique(c(Diags[breaks],0)))
+      breaks <- sort(unique(c(breaks,median(breaks))))
     } else {
-      breaks <- df$labels
+      labels <- sort(unique(c(Diags[breaks],0)))
+      breaks <- seq_along(labels)
     }
 
-  x1<-(which.min(as.numeric(paste(df$Diagonal))))
-  x2<-(which.max(as.numeric(paste(df$Diagonal))))
-  yL<-max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
-  col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
-  siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
+    x1<-(which.min(as.numeric(paste(df$Diagonal))))+(length(diagWin)*.1)
+    x2<-(which.max(as.numeric(paste(df$Diagonal))))-(length(diagWin)*.1)
+    yL<-max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
+    col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
+    siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
 
 
 
-  g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
-    ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
-    ggplot2::geom_line(ggplot2::aes_(y=~meanRRrnd), colour = "grey40", size = .5) +
-    ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
-    ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
-    ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
-    ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks) +
-    ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
-    ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
-    # ggplot2::scale_colour_manual(values = col) +
-    # ggplot2::scale_size_manual(values = siz) +
-    ggplot2::theme_bw()
+    g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
+      ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
+      ggplot2::geom_line(ggplot2::aes_(y=~RR), colour = "grey40", size = .5) +
+      #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
+      ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
+      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
+      ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
+      ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
+      ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
+      # ggplot2::scale_colour_manual(values = col) +
+      # ggplot2::scale_size_manual(values = siz) +
+      ggplot2::theme_bw()
 
-  print(g)
+    print(g)
 
-  if(doShuffle){
-    df <- tidyr::spread(df,key = ~variable, value = ~RR)
+    if(doShuffle){
+      df <- tidyr::spread(df,key = variable, value = RR)
     }
 
-  return(invisible(list(plot = g, data = df)))
+    return(invisible(list(plot = g, data = df)))
 
   } else {
 
-    if(doShuffle){df <- tidyr::spread(df,key = ~variable, value = ~RR)}
+    if(doShuffle){df <- tidyr::spread(df,key = variable, value = RR)}
     return(df)
 
   }
@@ -4522,7 +4540,7 @@ ssg_winnowing <- function(durations, screeCut){
 
 
   durations$duration.time[is.na(durations$duration.time)] <- 0
-  winnowing <- durations %>% dplyr::filter_(~duration.time>0)
+  winnowing <- durations %>% dplyr::filter(duration.time>0)
   Ncells <- NROW(winnowing)
   winnowingList <- scree <- heterogeneity <- list()
   removed <- 0
@@ -4536,7 +4554,7 @@ ssg_winnowing <- function(durations, screeCut){
   while(removed!=(Ncells-1)){
     run <- run +1
 
-    winnowing <- winnowing %>% dplyr::filter_(~duration.time>min(winnowing$duration.time, na.rm = TRUE))
+    winnowing <- winnowing %>% dplyr::filter(duration.time>min(winnowing$duration.time, na.rm = TRUE))
     removed <- Ncells - NROW(winnowing)
     exp <- sum(winnowing$duration.time, na.rm = TRUE)/NROW(winnowing)
 
@@ -4701,9 +4719,6 @@ sa2fd_dfa <- function(sa, ...){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 #'
 sa2fd_sda <- function(sa, ...){return(1-sa)}
 
-
-
-# Relative Roughness ----
 
 
 #' Relative Roughness
@@ -5060,9 +5075,9 @@ fd_sda <- function(y,
 #' @param polyOrder Order of polynomial trend to remove if \code{removeTrend = "poly"}
 #' @param standardise Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")
 #' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})
-#' @param scaleMax   Maximum scale to use
-#' @param scaleMin   Minimium scale to use
-#' @param scaleResolution  The scales at which detrended fluctuation will be evaluated will are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}
+#' @param scaleMax   Maximum scale (as a power of 2) to use
+#' @param scaleMin   Minimium scale (as a power of 2) to use
+#' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}. The default value yields no resolution of scales: `(scaleMax-scaleMin)`. Common values
 #' @param scaleS If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.
 #' @param overlap Turn DFA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})
 #' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
@@ -5094,13 +5109,13 @@ fd_sda <- function(y,
 #'
 fd_dfa <- function(y,
                    fs = NULL,
-                   removeTrend = c("poly","adaptive","bridge")[1],
+                   removeTrend = c("no","poly","adaptive","bridge")[2],
                    polyOrder=1,
                    standardise = c("none","mean.sd","median.mad")[2],
                    adjustSumOrder = FALSE,
                    scaleMin = 2,
                    scaleMax = floor(log2(NROW(y)/2)),
-                   scaleResolution = 30,
+                   scaleResolution = (scaleMax-scaleMin),
                    scaleS = NA,
                    overlap = 0,
                    minData = 4,
@@ -5117,7 +5132,7 @@ fd_dfa <- function(y,
   if(!stats::is.ts(y)){
     if(is.null(fs)){fs <- 1}
     y <- stats::ts(y, frequency = fs)
-    cat("\n\nfd_dfa:\tSample rate was set to 1.\n\n")
+    if(!silent){cat("\n\nfd_dfa:\tSample rate was set to 1.\n\n")}
   }
 
   if(is.na(scaleS)){
@@ -5129,7 +5144,7 @@ fd_dfa <- function(y,
   }
 
   if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
-    message("Something wrong with vector passed to scaleS.... \nUsing default: (scaleMax-scaleMin)/scaleResolution")
+    message("Something wrong with vector passed to scaleS.... \nUsing defaults: (scaleMax-scaleMin)/scaleResolution")
   }
 
   # Standardise by N
@@ -5149,7 +5164,7 @@ fd_dfa <- function(y,
 
   # Integrate the series
   if(standardise%in%"none"){
-    y <- ts_integrate(ts_center(y))
+    y <- ts_integrate(ts_center(y)) # need negative values in profile
   } else {
     y <- ts_integrate(y)
   }
@@ -5172,7 +5187,8 @@ fd_dfa <- function(y,
                      H = H1,
                      FD = sa2fd_dfa(lmfit1$coefficients[2]),
                      fitlm1 = lmfit1,
-                     method = paste0("Full range (n = ",NROW(DFAout$PLAW$size),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit1)[2]))),
+                     method = paste0("Full range (n = ",NROW(DFAout$PLAW$size),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit1)[2])),
+                     fitRange = r),
     fitRange  = list(y = y,
                      sap = lmfit2$coefficients[2],
                      H = H2,
@@ -5188,38 +5204,6 @@ fd_dfa <- function(y,
       logBasePlot = "2")
     )
 
-#if(doPlot|returnPlot){
-
-  #if(noTitle){title <- ""} else {title <- "Time series"}
-
-  # tsData <- data.frame(y=c(as.numeric(y_ori),as.numeric(y)),
-  #                      x=c(time(y),time(y)),
-  #                      label = c(rep(tsName,NROW(y_ori)),rep(paste(tsName," profile"),NROW(y))),
-  #                      stringsAsFactors = FALSE)
-  #
-  #
-  # g1 <- ggplot2::ggplot(tsData,ggplot2::aes_(x=~x,y=~y)) +
-  #   ggplot2::geom_line() +
-  #   ggplot2::facet_grid(label ~ ., scales = "free") +
-  #   ggplot2::scale_x_continuous("Time", expand=c(0,0)) +
-  #   ggplot2::scale_y_continuous("", expand=c(0,0)) +
-  #   ggplot2::ggtitle(label = title, subtitle = paste0("Standardisation: ",standardise, " | Summation order",ifelse(is.na(Hglobal),"",paste0(" (H = ",round(Hglobal,digits = 2),")"))," adjustment: ", Hadj," | Detrending method: ",removeTrend)) +
-  #   ggplot2::theme_bw() +
-  #   ggplot2::theme(strip.text = ggplot2::element_text(face="bold"))
-
-
-  #if(noTitle){title <- ""} else {title <- "log-log plot"}
-
-  # g2 <- plotFA_loglog(outList, title = title, subtitle = paste0("Full range: Slope = ",round(outList$fullRange$sap,digits=2)," | H = ",round(outList$fullRange$H,digits = 2), " | Hasselman's informed FD = ",round(outList$fullRange$FD,digits = 2),"\nExcl large: Slope = ",round(outList$fitRange$sap,digits = 2)," | H = ",round(outList$fitRange$H,digits = 2), " | Hasselman's informed FD = ",round(outList$fitRange$FD,digits = 2)) ,logBase = "2")
-
-  # if(doPlot){
-  #   multi_PLOT(g1,g2)
-  #   }
-  # }
-  #
-  # if(returnPlot){
-  #   outList$plots <- list(g1=g1, g2=g2)
-  # }
 
   if(doPlot|returnPlot){
     if(noTitle){
@@ -5247,6 +5231,314 @@ fd_dfa <- function(y,
 
 }
 
+
+# switch dim
+#
+# case 1        #------------------- 1D boxcount ---------------------#
+#
+# n(p+1) = sum(c);
+# for g=(p-1):-1:0
+# siz = 2^(p-g);
+# siz2 = round(siz/2);
+# for i=1:siz:(width-siz+1)
+# c(i) = ( c(i) || c(i+siz2));
+# end
+# n(g+1) = sum(c(1:siz:(width-siz+1)));
+# end
+#
+# case 3         #------------------- 3D boxcount ---------------------#
+#
+# n(p+1) = sum(c(:));
+# for g=(p-1):-1:0
+# siz = 2^(p-g);
+# siz2 = round(siz/2);
+# for i=1:siz:(width-siz+1),
+# for j=1:siz:(width-siz+1),
+# for k=1:siz:(width-siz+1),
+# c(i,j,k)=( c(i,j,k) || c(i+siz2,j,k) || c(i,j+siz2,k) ...
+# || c(i+siz2,j+siz2,k) || c(i,j,k+siz2) || c(i+siz2,j,k+siz2) ...
+# || c(i,j+siz2,k+siz2) || c(i+siz2,j+siz2,k+siz2));
+# end
+# end
+# end
+# n(g+1) = sum(sum(sum(c(1:siz:(width-siz+1),1:siz:(width-siz+1),1:siz:(width-siz+1)))));
+# end
+#
+# end
+
+#' 2D Boxcount for 1D signal
+#'
+#' @param y A numeric vector or time series object.
+#' @param unitSquare Create unit square image of `y`? This is required for estimating FD of time series (default = `TRUE`)
+#' @param image2D A matrix representing a 2D image, argument `y` and `unitSquare` will be ignored (default = `NA`)
+#' @param resolution The resolution used to embed the timeseries in 2D, a factor by which the dimensions the matrix will be multiplied (default = `2`)
+#' @param removeTrend If `TRUE`, will call \link[casnet]{ts_detrend} on `y` (default = `FALSE`)
+#' @param polyOrder Order of polynomial trend to remove if \code{removeTrend = `TRUE`}
+#' @param standardise Standardise `y` using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = `none`)
+#' @param adjustSumOrder Adjust the order of the time series (by summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = `FALSE``)
+#' @param scaleMax Maximum scale value (as `2^scale`) to use (default = `max` of `log2(nrows)` and `log2(ncols)`)
+#' @param scaleMin Minimium scale value (as `2^scale`) to use (default = `0`)
+#' @param scaleS If not `NA`, pass a numeric vector listing the scales (as a power of `2`) on which to evaluate the boxcount. Arguments `scaleMax`, `scaleMin`, and `scaleResolution` will be ignored (default = `NA`)
+#' @param minData Minimum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMin`)
+#' @param maxData Maximum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMax`)
+#' @param doPlot Return the log-log scale versus bulk plot with linear fit (default = \code{TRUE}).
+#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
+#' @param returnPLAW Return the power law data (default = \code{FALSE})
+#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param returnLocalScaling Return estimates of FD for each scale
+#' @param silent Silent-ish mode (default = `TRUE`)
+#' @param noTitle Do not generate a title (only the subtitle)
+#' @param tsName Name of y added as a subtitle to the plot (default = `y`)
+#'
+#' @return The boxcount fractal dimension and the 'local' boscount fractal dimension
+#'
+#' @note This function was inspired by the `Matlab` function `boxcount.m` [written by F. Moisy](http://www.fast.u-psud.fr/~moisy/ml/boxcount/html/demo.html). `Fred Hasselman` adapted the function for `R` for the purpose of the unit square boxcount analysis for 1D time series. The original Matlab toolbox has more options and contains more functions (e.g. `1D` and `3D` boxcount).
+#'
+#' @export
+#'
+#' @examples
+#'
+#' fd_boxcount2D(y = rnorm(100))
+#'
+#'
+fd_boxcount2D <- function(y,
+                          unitSquare = TRUE,
+                          image2D = NA,
+                          resolution = 2,
+                          removeTrend = FALSE,
+                          polyOrder = 1,
+                          standardise = c("none","mean.sd","median.mad")[1],
+                          adjustSumOrder = FALSE,
+                          scaleMin = 0,
+                          scaleMax = floor(log2(NROW(y)*resolution)),
+                          scaleS = NA,
+                          minData = 2^(scaleMin+1),
+                          maxData = 2^(scaleMax-1),
+                          doPlot = FALSE,
+                          returnPlot = FALSE,
+                          returnPLAW = FALSE,
+                          returnInfo = FALSE,
+                          returnLocalScaling = FALSE,
+                          silent = FALSE,
+                          noTitle = FALSE,
+                          tsName="y"
+                          ){
+
+  # scaleResolution The range of scales at which the boxcount will be evaluated are calculatd as: `(scaleMax-scaleMin)/scaleResolution`.  (default = `(scaleMax-scaleMin)`)
+
+  scaleResolution <- (scaleMax-scaleMin)
+
+  if(is.na(image2D)){
+
+    if(removeTrend){
+      y <- ts_detrend(y, polyOrder = polyOrder)
+    }
+
+    if(standardise%in%(c("mean.sd","median.mad"))){
+      y <- ts_standardise(y, type=standardise)
+    }
+
+    if(adjustSumOrder){
+      y       <- ts_sumorder(y_ori, scaleS = 2^(4:floor(log2(NROW(y)/2))), polyOrder = polyOrder, minData = 4)
+      Hadj    <- attr(y,"Hadj")
+      Hglobal <- attr(y,"Hglobal.excl")
+    } else {
+      Hadj    <- 0
+      Hglobal <- NA
+    }
+
+    cat("\n\nRaterizing time series... ")
+    image2D <- ts_rasterize(y = y, unitSquare = unitSquare, toSparse = TRUE)
+
+  } else {
+
+    unitSquare <- FALSE
+
+  }
+
+  cat("Done!\n")
+  # Just to be sure we have a 2D matrix
+  image2D <- as(drop(image2D), 'lgCMatrix')
+  N <- dim(image2D)
+  if(length(N)!=2){
+    stop('Matrix dimension must be 2!')
+  }
+
+  if(unitSquare){
+    if(identical(N[1],N[2])){
+      N <- N[1]
+    } else {
+      stop("Need a square matrix, because unitSquare = TRUE")
+    }
+  } else {
+    N <- max(N)
+  }
+
+  if(!any(is.na(scaleS))&is.numeric(scaleS)){
+    scaleS   <- unique(sort(scaleS))
+    scaleMin <- min(scaleS, na.rm = TRUE)
+    if(scaleMin < 0){
+      scaleMin  <- 0
+      scaleS[1] <- 0
+      }
+    scaleMax <- max(scaleS, na.rm = TRUE)
+  } else {
+    scaleS <- unique(round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution)))))
+    }
+
+  Nscales  <- length(scaleS)
+
+  if(scaleMax > stats::nextn(N,2)){warning("scaleMax should not be larger than the next power of 2 of largest dimension!")}
+
+  # Need padding?
+  p <- log(N)/log(2)
+  if(p!=round(p) || any(dim(image2D)!=2^scaleMax)){
+    pu     <- ceiling(p)
+    width  <- 2^pu
+    mz    <- pracma::zeros(width, width)
+    mz[1:dim(image2D)[1], 1:dim(image2D)[2]] <- Matrix::as.matrix(image2D)
+    image2D  <- as(mz, 'lgCMatrix')
+    scaleMax <- pu
+    N        <- max(dim(image2D))
+    scaleS   <- unique(sort(c(scaleS,2^floor(p), 2^scaleMax)))
+    Nscales  <- length(scaleS)
+    rm(mz,p,pu)
+  }
+
+  #unique(round(2^(seqscaleMax-scaleMin)/scaleResolution rev(seq(0,p-1,1))
+
+  # if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
+  #   message("Something wrong with vector passed to scaleS.... \nUsing defaults: (scaleMax-scaleMin)/scaleResolution")
+  # }
+
+  #image2D <- matrix(as.logical(image2D),ncol=N,nrow=N)
+  boxeS   <- unique(rev(signif(log2(scaleS[1:Nscales-1]),2)))
+  Nscales <- length(boxeS)
+
+  # 2D boxcount
+
+  cat("Performing 2D boxcount...")
+
+  # pre-allocate the number of boxes of size r
+  n <- numeric(Nscales+1)
+  n[Nscales+1] <- sum(image2D, na.rm = TRUE)
+  width <- 2^scaleMax
+  for(g in boxeS){
+    siz  <- 2^(scaleMax-g)
+    siz2 <- round(siz/2)
+    for(i in seq(1,(width-siz+1),siz)){
+      for(j in seq(1,(width-siz+1),siz)){
+        image2D[i,j] <- ( image2D[i,j] || image2D[i+siz2,j] || image2D[i,j+siz2] || image2D[i+siz2,j+siz2])
+      }
+    }
+    n[g+1] <- sum(sum(image2D[seq(1,(width-siz+1),siz),seq(1,(width-siz+1),siz)]))
+  }
+
+  n <- rev(n)
+  r <- scaleS
+
+  lmfit1 <- lm(-log(n)~log(r)) #lmfit1 <- mean(-diff(log(n))/diff(log(r)))
+
+  fitRange <- which(r%[]%c(minData,maxData))
+  lmfit2   <- lm(-log(n[fitRange])~log(r[fitRange])) #mean(-diff(log(n[fitRange]))/diff(log(r[fitRange])))
+
+  localFit <- -pracma::gradient(log(n))/pracma::gradient(log(r))
+
+  cat("Done!\n")
+
+  outList <- list(
+    PLAW  =  data.frame(size = r, bulk = n),
+    fullRange = list(y = y,
+                     sap = lmfit1$coefficients[2],
+                     Hadj = Hadj,
+                     H = NA,
+                     FD = lmfit1$coefficients[2],
+                     fitlm1 = lmfit1,
+                     method = paste0("Full range (n = ",NROW(r),")\nFD = ",signif(lmfit1$coefficients[2],3)),
+                     fitRange = r),
+    fitRange  = list(y = y,
+                     sap = lmfit2$coefficients[2],
+                     H = NA,
+                     Hadj = Hadj,
+                     FD = lmfit2$coefficients[2],
+                     fitlm2 = lmfit2,
+                     method = paste0("Exclude scales (n = ",NROW(fitRange),")\nFD = ",signif(lmfit2$coefficients[2],3)),
+                     fitRange = r[fitRange]),
+    info = list(fullRange=lmfit1,fitRange=lmfit2, localFit = localFit),
+    plot = NA,
+    analysis = list(
+      name = "2D boxcount of 1D curve",
+      logBaseFit = "log",
+      logBasePlot = "2")
+  )
+
+
+  if(doPlot|returnPlot){
+    if(noTitle){
+      title <- ""
+    } else {
+      title <- "log-log regression (2D Boxcount)"
+    }
+    if(doPlot){
+      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Box Size (log)", ylabel = "Box Count (-log)")
+
+      if(returnLocalScaling){
+
+        logFormat <- "log2"
+        logBaseNum <- 2
+
+        yAcc <- .01
+        xAcc <- 1
+
+        breaksX <- unique(outList$PLAW$size[1:NROW(outList[[2]]$fitlm1$fitted.values)])
+        breaksY <- unique(localFit)
+
+        if(length(breaksX)>10){breaksX <- breaksX[seq.int(1,length(breaksX),length.out = 10)]}
+        if(length(breaksY)>10){breaksY <- breaksY[seq.int(1,length(breaksY),length.out = 10)]}
+
+        gl <- ggplot2::ggplot(data.frame(size=r, bulk=localFit), ggplot2::aes_(x=~size,y=~bulk), na.rm=TRUE) +
+          ggplot2::geom_point(colour = "red3") +
+          ggplot2::geom_line(colour = "steelblue") +
+          ggplot2::ggtitle(label = title, subtitle = "Local Dimension") +
+          ggplot2::scale_x_continuous(name = paste0("Box Size (",logFormat,")"),
+                                          breaks = breaksX,
+                                          labels = scales::number_format(accuracy = xAcc),
+                                          trans = scales::log_trans(base = logBaseNum)) +
+         ggplot2::scale_y_continuous(name = "Local Dimension [ - d log(count) / d log(size) ]",
+                                          breaks = breaksY,
+                                          labels = scales::number_format(accuracy = yAcc),
+                                     limits = c(1,2)) +
+          ggplot2::scale_color_manual(values = c("red3","steelblue")) +
+          ggplot2::theme_bw() +
+          ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
+                         legend.text = ggplot2::element_text(margin = ggplot2::margin(t = 5,b = 5, unit = "pt"), vjust = .5),
+                         plot.margin = ggplot2::margin(t = 5,b = 5, r = 5,l = 5, unit = "pt"))
+
+        graphics::plot(gl)
+
+      }
+      if(returnPlot){
+        if(returnLocalScaling){
+          outList$plot <- list(global = g, local = gl)
+        } else {
+        outList$plot <- g
+        }
+      }
+    }
+  }
+
+  if(returnInfo){returnPLAW <- TRUE}
+
+  if(!silent){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+    cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method,"\n\n",outList$fitRange$method))
+    cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+  }
+
+  return(invisible(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot,TRUE)]))
+
+
+}
 
 
 #' Calculate FD using Sevcik's method
@@ -6187,7 +6479,7 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
 #'
 #' @export
 #'
-plotFD_loglog <- function(fd.OUT,title="",subtitle="",xlabel="Bin size",ylabel="Fluctuation",logBase=NA){
+plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylabel="Fluctuation", logBase=NA){
 
   if(!all(c("PLAW","fullRange","fitRange")%in%names(fd.OUT))){
     stop("Object fd.OUT should have 3 fields: PLAW, fullRange and fitRange")
@@ -6234,12 +6526,23 @@ plotFD_loglog <- function(fd.OUT,title="",subtitle="",xlabel="Bin size",ylabel="
     }
   }
 
+ if(fd.OUT$analysis$name%in%"2D boxcount of 1D curve"){
+
+  logSlopes <- data.frame(x = c(fd.OUT$PLAW$size[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)],
+                                fd.OUT$ullRange$fitRange,fd.OUT$fitRange$fitRange),
+                          y = c(fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)],
+                                fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[3]]$fitlm2$fitted.values)]),
+                          Method = c(rep(fd.OUT[[2]]$method,NROW(fd.OUT[[2]]$fitlm1$fitted.values)),
+                                     rep(fd.OUT[[3]]$method,NROW(fd.OUT[[3]]$fitlm2$fitted.values))))
+  } else {
+
   logSlopes <- data.frame(x = c(fd.OUT$PLAW$size[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)],
                                 fd.OUT$PLAW$size[1:NROW(fd.OUT[[3]]$fitlm2$fitted.values)]),
                           y = c(fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)],
                                 fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[3]]$fitlm2$fitted.values)]),
                           Method = c(rep(fd.OUT[[2]]$method,NROW(fd.OUT[[2]]$fitlm1$fitted.values)),
                                      rep(fd.OUT[[3]]$method,NROW(fd.OUT[[3]]$fitlm2$fitted.values))))
+  }
 
   g <- ggplot2::ggplot(data.frame(fd.OUT$PLAW), ggplot2::aes_(x=~size,y=~bulk), na.rm=TRUE) +
     ggplot2::geom_point() +
@@ -8310,6 +8613,58 @@ ts_integrate <-function(y){
   return(yc)
 }
 
+
+
+#' Turn a 1D time series vector into a 2D curve
+#'
+#' @param y A 1D time series object or numeric verctor.
+#' @param unitSquare Convert the series to a unit square? (default = `FALSE`)
+#' @param toSparse Convert to sparse Matrix (default = `FALSE`)
+#' @param resolution Factor by which dimensions will be multiplied (default = `2`)
+#'
+#' @return A (sparse) matrix representing the time series as a curve in 2D space
+#' @export
+#'
+#' @examples
+#'
+#' y <- rnorm(100)
+#' plot(ts(y))
+#'
+#' y_img <- ts_rasterize(y)
+#' image(y_img,col=c("white","black"))
+#'
+#'
+ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2){
+
+  if(!is.vector(y, mode = "numeric")){
+    stop('Expecting a numeric vector')
+    }
+
+  N <- NROW(y)
+  x <- stats::time(y)
+
+  if(unitSquare){
+    y <- elascer(as.numeric(y))
+    x <- elascer(as.numeric(x))
+    r <- raster::raster(ncols = N*resolution, nrows = N*resolution, xmn = 0, xmx = 1, ymn = 0, ymx = 1)
+  } else {
+    r  <- raster::raster(ncols = N*resolution, nrows = length(unique(y))*resolution, xmn = min(x, na.rm = TRUE), xmx = max(x, na.rm = TRUE), ymn = min(y, na.rm = TRUE), ymx = max(y, na.rm = TRUE))
+  }
+
+  xy <- cbind(xc=x,yc=y)
+  lns <- raster::spLines(xy)
+  rm(x,y,xy)
+
+  spm <- t(raster::as.matrix(raster::rasterize(lns, r, background = 0)))
+  rm(lns,r)
+
+  if(toSparse){
+    spm <- Matrix::as.matrix(spm, sparse = TRUE)
+  }
+
+  return(spm)
+
+}
 
 
 # Help lme4 get a better convergence

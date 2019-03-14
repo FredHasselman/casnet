@@ -10,9 +10,9 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA,
   step = win, JRP = FALSE, distNorm = c("EUCLIDEAN", "MAX", "MIN",
   "OP")[[1]], standardise = c("none", "mean.sd", "median.mad")[1],
   returnMeasures = TRUE, returnRPvector = FALSE,
-  returnLineDist = FALSE, plot_recmat = c("noplot", "rp",
-  "distmat")[[1]], path_to_rp = getOption("casnet.path_to_rp"),
-  saveOut = FALSE, path_out = NULL, file_ID = NULL, silent = TRUE,
+  returnLineDist = FALSE, doPlot = c("noplot", "rp", "distmat")[[1]],
+  path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
+  path_out = NULL, file_ID = NULL, silent = TRUE,
   surrogateTest = FALSE, targetValue = 0.05, useParallel = FALSE,
   ...)
 }
@@ -49,7 +49,7 @@ crqa_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA,
 
 \item{returnLineDist}{Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})}
 
-\item{plot_recmat}{Produce a plot of the recurrence matrix by calling \code{\link{rp_plot}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})}
+\item{doPlot}{Produce a plot of the recurrence matrix by calling \code{\link{rp_plot}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})}
 
 \item{path_to_rp}{Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)}
 

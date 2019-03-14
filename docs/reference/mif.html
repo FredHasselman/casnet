@@ -203,33 +203,33 @@
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
 <span class='no'>y</span>$<span class='no'>s</span> <span class='kw'>&lt;-</span> <span class='no'>y2</span>+<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y2</span>))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.808994 1.715093 1.922049 1.844053 2.001774 2.015249 1.959424 2.050946 
+#&gt; 1.806437 1.742122 1.954461 1.911217 2.026751 1.998231 1.962196 2.057494 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.837244 1.863161 1.863161 1.863161 1.981409 1.948618 1.933928 2.028668 
+#&gt; 1.848577 1.901638 1.901638 1.901638 2.031723 2.020401 2.015092 2.029880 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 2.016915 1.790998 1.752539 1.687093 2.475703 1.796621 1.873929 1.861375 
+#&gt; 2.009266 1.825264 1.782250 1.728230 2.519283 1.874205 1.949011 1.905341 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.903849 1.902230 1.814849 1.826678 1.949864 1.958285 1.926041 2.127642 
+#&gt; 1.903610 1.940582 1.873953 1.891167 2.042295 2.011517 2.019724 2.167911 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 1.925229 1.909716 1.868772 1.844328 1.916569 1.795793 1.923447 1.861611 
+#&gt; 1.987653 1.965229 1.885521 1.950227 1.974920 1.852788 1.984743 1.903030 
 #&gt;       30 
-#&gt; 1.871509 
+#&gt; 1.890839 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
 <span class='no'>y</span>$<span class='no'>y3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cumsum'>cumsum</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 4.995877 4.989931 4.986886 4.988814 5.135218 5.138595 5.137748 5.133324 
+#&gt; 5.016021 5.005412 5.005879 5.006019 5.155924 5.148056 5.152468 5.150442 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.130662 5.128346 5.128346 5.128346 5.130693 5.129814 5.130751 5.140627 
+#&gt; 5.147758 5.141919 5.141919 5.141919 5.147128 5.151534 5.148321 5.149423 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.138913 4.985397 4.987028 4.988115 4.994342 4.999196 4.998782 5.002990 
+#&gt; 5.155431 5.001936 5.005355 5.001160 5.013817 5.011606 5.016533 5.015431 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 5.012191 5.139076 5.141826 5.144970 5.147810 5.148645 5.152946 5.151056 
+#&gt; 5.016858 5.155785 5.158557 5.159262 5.156753 5.159392 5.157210 5.160712 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.157144 5.161417 5.159608 5.162249 5.010228 5.013560 5.020344 5.019444 
+#&gt; 5.159621 5.160296 5.156003 5.160444 5.012035 5.009940 5.016720 5.014001 
 #&gt;       30 
-#&gt; 5.024764 
+#&gt; 5.013862 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y;Z;...;N)"</div><div class='input'>
 

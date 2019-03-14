@@ -4,11 +4,11 @@
 \alias{fd_dfa}
 \title{Detrended Fluctuation Analysis (DFA)}
 \usage{
-fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
-  polyOrder = 1, standardise = c("none", "mean.sd", "median.mad")[2],
-  adjustSumOrder = FALSE, scaleMin = 2,
-  scaleMax = floor(log2(NROW(y)/2)), scaleResolution = 30,
-  scaleS = NA, overlap = 0, minData = 4, doPlot = FALSE,
+fd_dfa(y, fs = NULL, removeTrend = c("no", "poly", "adaptive",
+  "bridge")[2], polyOrder = 1, standardise = c("none", "mean.sd",
+  "median.mad")[2], adjustSumOrder = FALSE, scaleMin = 2,
+  scaleMax = floor(log2(NROW(y)/2)), scaleResolution = (scaleMax -
+  scaleMin), scaleS = NA, overlap = 0, minData = 4, doPlot = FALSE,
   returnPlot = FALSE, returnPLAW = FALSE, returnInfo = FALSE,
   silent = FALSE, noTitle = FALSE, tsName = "y")
 }
@@ -25,11 +25,11 @@ fd_dfa(y, fs = NULL, removeTrend = c("poly", "adaptive", "bridge")[1],
 
 \item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
 
-\item{scaleMin}{Minimium scale to use}
+\item{scaleMin}{Minimium scale (as a power of 2) to use}
 
-\item{scaleMax}{Maximum scale to use}
+\item{scaleMax}{Maximum scale (as a power of 2) to use}
 
-\item{scaleResolution}{The scales at which detrended fluctuation will be evaluated will are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}}
+\item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}. The default value yields no resolution of scales: \code{(scaleMax-scaleMin)}. Common values}
 
 \item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.}
 
