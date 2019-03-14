@@ -1784,8 +1784,9 @@ crqa_diagProfile <- function(RM,
       labels <- sort(unique(c(Diags[breaks],0)))
       breaks <- sort(unique(c(breaks,median(breaks))))
     } else {
-      labels <- sort(unique(c(Diags[breaks],0)))
       breaks <- seq_along(labels)
+      labels <- sort(unique(c(Diags[breaks],0)))
+
     }
 
     x1<-(which.min(as.numeric(paste(df$Diagonal))))+(length(diagWin)*.1)
