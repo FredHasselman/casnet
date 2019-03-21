@@ -1,8 +1,10 @@
 #' @import ggplot2
 #' @import igraph
 #' @import invctr
+#' @importFrom magrittr %>%
 #' @importFrom dplyr group_by filter summarise mutate case_when
 #' @importFrom tidyr gather spread unnest
+#' @importFrom rlang .data
 NULL
 
 # (C)RQA ------------------------
@@ -1759,20 +1761,20 @@ crqa_diagProfile <- function(RM,
 
   dy      <- plyr::ldply(out)
   if(doShuffle){
-    df_shuf <- dplyr::filter(dy, .id!="obs")
+    df_shuf <- dplyr::filter(dy, .data$.id!="obs")
   } else {
     df_shuf <- dy
   }
 
   dy_m <- df_shuf %>%
-    dplyr::group_by(Diagonal,labels) %>%
-    dplyr::summarise(meanRRrnd = mean(RR), sdRRrnd = stats::sd(RR))
+    dplyr::group_by(.data$Diagonal,.data$labels) %>%
+    dplyr::summarise(meanRRrnd = mean(.data$RR), sdRRrnd = stats::sd(.data$RR))
 
   dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
   dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
   dy_m$y_obs <- dy$RR[dy$.id=="obs"]
 
-  df <- tidyr::gather(dy_m,key=variable, value = RR, -c(Diagonal,sdRRrnd, labels, ciLO, ciHI, y_obs))
+  df <- tidyr::gather(dy_m, key=variable, value = RR, -c(.data$Diagonal,.data$sdRRrnd, .data$labels, .data$ciLO, .data$ciHI, .data$y_obs))
   df$Diagonal <- as.numeric(df$Diagonal)
 
   if(doPlot){
@@ -1782,7 +1784,7 @@ crqa_diagProfile <- function(RM,
       ext <- max(min(abs(Diags),na.rm = TRUE),abs(max(Diags,na.rm = TRUE)))
       breaks <- which(Diags%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
       labels <- sort(unique(c(Diags[breaks],0)))
-      breaks <- sort(unique(c(breaks,median(breaks))))
+      breaks <- sort(unique(c(breaks,stats::median(breaks))))
     } else {
       breaks <- seq_along(labels)
       labels <- sort(unique(c(Diags[breaks],0)))
@@ -1813,14 +1815,14 @@ crqa_diagProfile <- function(RM,
     print(g)
 
     if(doShuffle){
-      df <- tidyr::spread(df,key = variable, value = RR)
+      df <- tidyr::spread(df,key = .data$variable, value = .data$RR)
     }
 
     return(invisible(list(plot = g, data = df)))
 
   } else {
 
-    if(doShuffle){df <- tidyr::spread(df,key = variable, value = RR)}
+    if(doShuffle){df <- tidyr::spread(df,key = .data$variable, value = .data$RR)}
     return(df)
 
   }
@@ -5188,8 +5190,7 @@ fd_dfa <- function(y,
                      H = H1,
                      FD = sa2fd_dfa(lmfit1$coefficients[2]),
                      fitlm1 = lmfit1,
-                     method = paste0("Full range (n = ",NROW(DFAout$PLAW$size),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit1)[2])),
-                     fitRange = r),
+                     method = paste0("Full range (n = ",NROW(DFAout$PLAW$size),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit1)[2]))),
     fitRange  = list(y = y,
                      sap = lmfit2$coefficients[2],
                      H = H2,
@@ -5272,7 +5273,7 @@ fd_dfa <- function(y,
 #' @param y A numeric vector or time series object.
 #' @param unitSquare Create unit square image of `y`? This is required for estimating FD of time series (default = `TRUE`)
 #' @param image2D A matrix representing a 2D image, argument `y` and `unitSquare` will be ignored (default = `NA`)
-#' @param resolution The resolution used to embed the timeseries in 2D, a factor by which the dimensions the matrix will be multiplied (default = `2`)
+#' @param resolution The resolution used to embed the timeseries in 2D, a factor by which the dimensions the matrix will be multiplied (default = `1`)
 #' @param removeTrend If `TRUE`, will call \link[casnet]{ts_detrend} on `y` (default = `FALSE`)
 #' @param polyOrder Order of polynomial trend to remove if \code{removeTrend = `TRUE`}
 #' @param standardise Standardise `y` using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = `none`)
@@ -5302,10 +5303,10 @@ fd_dfa <- function(y,
 #' fd_boxcount2D(y = rnorm(100))
 #'
 #'
-fd_boxcount2D <- function(y,
+fd_boxcount2D <- function(y = NA,
                           unitSquare = TRUE,
                           image2D = NA,
-                          resolution = 2,
+                          resolution = 1,
                           removeTrend = FALSE,
                           polyOrder = 1,
                           standardise = c("none","mean.sd","median.mad")[1],
@@ -5359,7 +5360,7 @@ fd_boxcount2D <- function(y,
 
   cat("Done!\n")
   # Just to be sure we have a 2D matrix
-  image2D <- as(drop(image2D), 'lgCMatrix')
+  image2D <- methods::as(drop(image2D), 'lgCMatrix')
   N <- dim(image2D)
   if(length(N)!=2){
     stop('Matrix dimension must be 2!')
@@ -5398,10 +5399,10 @@ fd_boxcount2D <- function(y,
     width  <- 2^pu
     mz    <- pracma::zeros(width, width)
     mz[1:dim(image2D)[1], 1:dim(image2D)[2]] <- Matrix::as.matrix(image2D)
-    image2D  <- as(mz, 'lgCMatrix')
+    image2D  <- methods::as(mz, 'lgCMatrix')
     scaleMax <- pu
     N        <- max(dim(image2D))
-    scaleS   <- unique(sort(c(scaleS,2^floor(p), 2^scaleMax)))
+    scaleS   <- unique(sort(c(scaleS, 2^floor(p), 2^scaleMax)))
     Nscales  <- length(scaleS)
     rm(mz,p,pu)
   }
@@ -5421,9 +5422,10 @@ fd_boxcount2D <- function(y,
   cat("Performing 2D boxcount...")
 
   # pre-allocate the number of boxes of size r
-  n <- numeric(Nscales+1)
+  n            <- numeric(Nscales+1)
   n[Nscales+1] <- sum(image2D, na.rm = TRUE)
-  width <- 2^scaleMax
+  width        <- 2^scaleMax
+
   for(g in boxeS){
     siz  <- 2^(scaleMax-g)
     siz2 <- round(siz/2)
@@ -5438,10 +5440,10 @@ fd_boxcount2D <- function(y,
   n <- rev(n)
   r <- scaleS
 
-  lmfit1 <- lm(-log(n)~log(r)) #lmfit1 <- mean(-diff(log(n))/diff(log(r)))
+  lmfit1 <- stats::lm(-log(n)~log(r)) #lmfit1 <- mean(-diff(log(n))/diff(log(r)))
 
   fitRange <- which(r%[]%c(minData,maxData))
-  lmfit2   <- lm(-log(n[fitRange])~log(r[fitRange])) #mean(-diff(log(n[fitRange]))/diff(log(r[fitRange])))
+  lmfit2   <- stats::lm(-log(n[fitRange])~log(r[fitRange])) #mean(-diff(log(n[fitRange]))/diff(log(r[fitRange])))
 
   localFit <- -pracma::gradient(log(n))/pracma::gradient(log(r))
 
@@ -8688,7 +8690,7 @@ ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 #' Generate noise series with power law scaling exponent
 #'
 #' @param y Time series to use as a 'model'. If specified, `N` will be `N = length(y)`, and the series will be constructed based on `stats::fft(y)`.
-#' @param alpha The log-log spectral slope, the scaling exponent.
+#' @param alpha The log-log spectral slope, the scaling exponent. Use `0` for white noise, negative numbers for anti-persistant noises: `-1` for \eqn{\frac{1}{f}} noise, positive numbers for persistent noises, e.g. `1` for blue noise.
 #' @param N Length of the time series
 #' @param standardise Forces scaling of the output to the range `[-1, 1]`, consequently the power law will not necessarily extend right down to `0Hz`.
 #' @param randomPower If `TRUE` phases will be deterministic, uniformly distributed in `[-pi,pi]`. If `FALSE`, the spectrum will be stochastic with a Chi-square distribution. If `y` is not `NULL` this argument will be ignored.
@@ -8696,7 +8698,7 @@ ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 #' @return Time series with a power law of alpha.
 #' @export
 #'
-#' @note Adapted from a Matlab script called `powernoise.m`. The script contained the following commented text:
+#' @note Adapted from a Matlab script called `powernoise.m` by Max Little. The script contained the following commented text:
 #'
 #' With no option strings specified, the power spectrum is
 #  deterministic, and the phases are uniformly distributed in the range
@@ -8718,15 +8720,18 @@ ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 #  If you use this work, consider saying hi on comp.dsp
 #  Dale B. Dalrymple
 #'
-noise_powerlaw <- function(y = NULL,alpha=-1,N=100, standardise = FALSE, randomPower = FALSE){
+noise_powerlaw <- function(y = NULL, alpha=-1, N=100, standardise = FALSE, randomPower = FALSE){
 
   if(!is.null(y)){
     N <- length(y)
   }
 
-  f  <- (2:(N2+1))
-  N2 <- floor(N/2)-1
-  A2 <- 1/(f^(alpha/2))
+  alpha <- -alpha
+
+  # Nyquist
+  N2 = floor(N/2)-1
+  f = (2:(N2+1))
+  A2 = 1/(f^(alpha/2))
 
   if(!is.null(y)){
 

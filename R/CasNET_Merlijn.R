@@ -277,9 +277,12 @@ crit_in = function(df, win, doPlot = TRUE){
   colnames(mat.ci) <- c(1:ncol(mat.ci))
   mat.ci[,ncol(mat.ci)] <- mat.ci[,ncol(mat.ci)]*10 #the last column, showing Critical Instability of all items has values of 10 instead of 1
 
+  df.plot <-  reshape2::melt(mat.ci)
+  df.plot$value <- factor(df.plot$value)
+
 if(doPlot){
 
-  plot.ci <- ggplot2::ggplot(reshape2::melt(mat.ci), ggplot2::aes_(x=~Var1, y=~Var2, fill=as.factor(~value))) +
+  plot.ci <- ggplot2::ggplot(df.plot, ggplot2::aes_(x=~Var1, y=~Var2, fill=~value)) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_manual(values = c("NA", "grey", "black")) +
     ggplot2::xlab('Days') +

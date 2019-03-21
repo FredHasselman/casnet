@@ -214,7 +214,10 @@ If we were naive to the orgin of these number sequences, the results for **LAM**
 
 
 
-### Sliding window analyses
+### Diagonal Recurrence Profile
+
+
+## **Lagged RQA: Sliding window analyses**
 
 
 

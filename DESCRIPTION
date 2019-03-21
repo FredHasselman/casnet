@@ -47,7 +47,7 @@ Imports:
     pROC,
     purrr,
     rpart,
-    rlang,
+    rlang (>= 0.1.2),
     infotheo,
     methods,
     RColorBrewer,
@@ -59,7 +59,8 @@ Imports:
     ggraph,
     boot,
     invctr,
-    cowplot
+    cowplot,
+    raster
 Suggests: 
     knitr,
     rmarkdown,
@@ -69,7 +70,8 @@ Suggests:
     utils,
     devtools,
     tidyverse,
-    testthat
+    testthat,
+    roxygen2
 VignetteBuilder: knitr
 Language: en-US
 URL: https://github.com/FredHasselman/casnet

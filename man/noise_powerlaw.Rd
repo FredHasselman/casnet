@@ -10,7 +10,7 @@ noise_powerlaw(y = NULL, alpha = -1, N = 100, standardise = FALSE,
 \arguments{
 \item{y}{Time series to use as a 'model'. If specified, \code{N} will be \code{N = length(y)}, and the series will be constructed based on \code{stats::fft(y)}.}
 
-\item{alpha}{The log-log spectral slope, the scaling exponent.}
+\item{alpha}{The log-log spectral slope, the scaling exponent. Use \code{0} for white noise, negative numbers for anti-persistant noises: \code{-1} for \eqn{\frac{1}{f}} noise, positive numbers for persistent noises, e.g. \code{1} for blue noise.}
 
 \item{N}{Length of the time series}
 
@@ -25,7 +25,7 @@ Time series with a power law of alpha.
 Generate noise series with power law scaling exponent
 }
 \note{
-Adapted from a Matlab script called \code{powernoise.m}. The script contained the following commented text:
+Adapted from a Matlab script called \code{powernoise.m} by Max Little. The script contained the following commented text:
 
 With no option strings specified, the power spectrum is
 }
