@@ -5,7 +5,7 @@
 \title{Plot ACF and PACF}
 \usage{
 plotRED_acf(y, Lmax = max(round(NROW(y)/4), 10), alpha = 0.05,
-  doPlot = TRUE, returnCorFun = TRUE)
+  doPlot = TRUE, returnCorFun = FALSE)
 }
 \arguments{
 \item{y}{A time series or numeric vector}

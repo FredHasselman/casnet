@@ -19,10 +19,10 @@ plotNET_SW(n = 100, k = 5, p = 0.05, doPlot = TRUE)
 A Strogatz-Watts small-world igraph object
 }
 \description{
-A wrapper around \code{\link[igraph]{sample_smallworld}} with \code{dim=1}
+A wrapper around \code{\link[igraph:sample_smallworld]{igraph::sample_smallworld()}} with \code{dim=1}
 }
 \seealso{
-\code{\link[igraph]{sample_smallworld}}
+\code{\link[igraph:sample_smallworld]{igraph::sample_smallworld()}}
 
 Other tools for plotting networks: \code{\link{plotNET_BA}},
   \code{\link{plotNET_groupColour}},

@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -127,8 +133,8 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>ts_permtest_block</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>Nperms</span> <span class='kw'>=</span> <span class='fl'>99</span>,
-  <span class='kw'>sim</span> <span class='kw'>=</span> <span class='st'>"geom"</span>, <span class='kw'>l</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>returnBootObject</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>ts_permtest_block</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>Nperms</span> <span class='kw'>=</span> <span class='fl'>19</span>,
+  <span class='kw'>sim</span> <span class='kw'>=</span> <span class='st'>"geom"</span>, <span class='kw'>l</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>returnBootObject</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,15 +153,15 @@
     </tr>
     <tr>
       <th>Nperms</th>
-      <td><p>Number of permutations (default = <code>99</code>)</p></td>
+      <td><p>Number of permutations (default = <code>19</code>)</p></td>
     </tr>
     <tr>
       <th>sim</th>
-      <td><p>Value passed to the <code>sim</code> argument of <code><a href='https://www.rdocumentation.org/packages/boot/topics/tsboot'>tsboot</a></code> valid options are: <code>"model","fixed","geom","scramble"</code> (default = <code>"geom"</code>)</p></td>
+      <td><p>Value passed to the <code>sim</code> argument of <code><a href='https://www.rdocumentation.org/packages/boot/topics/tsboot'>boot::tsboot()</a></code> valid options are: <code>"model","fixed","geom","scramble"</code> (default = <code>"geom"</code>)</p></td>
     </tr>
     <tr>
       <th>l</th>
-      <td><p>Block sizes to use, see <code><a href='https://www.rdocumentation.org/packages/boot/topics/tsboot'>tsboot</a></code> for details (default = <code>3</code>)</p></td>
+      <td><p>Block sizes to use, see <code><a href='https://www.rdocumentation.org/packages/boot/topics/tsboot'>boot::tsboot()</a></code> for details (default = <code>3</code>)</p></td>
     </tr>
     <tr>
       <th>alpha</th>
@@ -167,13 +173,27 @@
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other arguments passed to function <code><a href='https://www.rdocumentation.org/packages/boot/topics/tsboot'>tsboot</a></code></p></td>
+      <td><p>Other arguments passed to function <code><a href='https://www.rdocumentation.org/packages/boot/topics/tsboot'>boot::tsboot()</a></code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A data frame with the difference time series and variables indicating N and significance.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other Time series operations: <code><a href='ts_center.html'>ts_center</a></code>,
+  <code><a href='ts_changeindex.html'>ts_changeindex</a></code>, <code><a href='ts_checkfix.html'>ts_checkfix</a></code>,
+  <code><a href='ts_detrend.html'>ts_detrend</a></code>, <code><a href='ts_diff.html'>ts_diff</a></code>,
+  <code><a href='ts_discrete.html'>ts_discrete</a></code>, <code><a href='ts_duration.html'>ts_duration</a></code>,
+  <code><a href='ts_embed.html'>ts_embed</a></code>, <code><a href='ts_integrate.html'>ts_integrate</a></code>,
+  <code><a href='ts_levels.html'>ts_levels</a></code>, <code><a href='ts_peaks.html'>ts_peaks</a></code>,
+  <code><a href='ts_permtest_transmat.html'>ts_permtest_transmat</a></code>,
+  <code><a href='ts_rasterize.html'>ts_rasterize</a></code>, <code><a href='ts_sd.html'>ts_sd</a></code>,
+  <code><a href='ts_slice.html'>ts_slice</a></code>, <code><a href='ts_standardise.html'>ts_standardise</a></code>,
+  <code><a href='ts_sumorder.html'>ts_sumorder</a></code>, <code><a href='ts_symbolic.html'>ts_symbolic</a></code>,
+  <code><a href='ts_trimfill.html'>ts_trimfill</a></code>, <code><a href='ts_windower.html'>ts_windower</a></code></p></div>
     
 
   </div>
@@ -183,6 +203,8 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#see-also">See also</a></li>
           </ul>
 
   </div>

@@ -24,9 +24,9 @@ fd_boxcount2D(y = NA, unitSquare = TRUE, image2D = NA,
 
 \item{removeTrend}{If \code{TRUE}, will call \link[casnet]{ts_detrend} on \code{y} (default = \code{FALSE})}
 
-\item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = `TRUE`}}
+\item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = }TRUE``}
 
-\item{standardise}{Standardise \code{y} using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = \code{none})}
+\item{standardise}{Standardise \code{y} using \code{\link[casnet:ts_standardise]{casnet::ts_standardise()}} with \code{adjustN = FALSE} (default = \code{none})}
 
 \item{adjustSumOrder}{Adjust the order of the time series (by summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = `FALSE``)}
 

@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -135,7 +141,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>y</th>
-      <td><p>A <code>Nx1</code> matrix for auto-mif, a <code>Nx2</code> matrix or data frame for cross-mif, a <code>Nx3</code> matrix or data frame for mif between col 1 and 2 conditional on col 3; or a <code>NxM</code> matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using functions in package <code><a href='https://www.rdocumentation.org/packages/infotheo/topics/infotheo'>infotheo</a></code> for <code>lags</code> lagged versions of the time series.</p></td>
+      <td><p>A <code>Nx1</code> matrix for auto-mif, a <code>Nx2</code> matrix or data frame for cross-mif, a <code>Nx3</code> matrix or data frame for mif between col 1 and 2 conditional on col 3; or a <code>NxM</code> matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using functions in package <code><a href='https://www.rdocumentation.org/packages/infotheo/topics/infotheo'>infotheo::infotheo()</a></code> for <code>lags</code> lagged versions of the time series.</p></td>
     </tr>
     <tr>
       <th>lags</th>
@@ -143,7 +149,7 @@
     </tr>
     <tr>
       <th>nbins</th>
-      <td><p>The number of bins passed to <code><a href='https://www.rdocumentation.org/packages/infotheo/topics/discretize'>discretize</a></code> if y is a matrix or <code><a href='ts_discrete.html'>ts_discrete</a></code></p></td>
+      <td><p>The number of bins passed to <code><a href='https://www.rdocumentation.org/packages/infotheo/topics/discretize'>infotheo::discretize()</a></code> if y is a matrix or <code><a href='ts_discrete.html'>casnet::ts_discrete()</a></code></p></td>
     </tr>
     <tr>
       <th>doPlot</th>
@@ -158,6 +164,11 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>The auto- or cross-mi function</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other Redundancy measures (mutual information): <code><a href='mi_mat.html'>mi_mat</a></code>,
+  <code><a href='mif_interlayer.html'>mif_interlayer</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -203,33 +214,33 @@
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
 <span class='no'>y</span>$<span class='no'>s</span> <span class='kw'>&lt;-</span> <span class='no'>y2</span>+<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y2</span>))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.806437 1.742122 1.954461 1.911217 2.026751 1.998231 1.962196 2.057494 
+#&gt; 1.824487 1.744000 1.983888 1.878350 2.000039 1.997520 2.003551 2.057971 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.848577 1.901638 1.901638 1.901638 2.031723 2.020401 2.015092 2.029880 
+#&gt; 1.883325 1.902833 1.902833 1.902833 2.040702 1.983402 1.984676 2.005857 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 2.009266 1.825264 1.782250 1.728230 2.519283 1.874205 1.949011 1.905341 
+#&gt; 2.022351 1.786048 1.787322 1.762830 2.511825 1.857320 1.916479 1.900262 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.903610 1.940582 1.873953 1.891167 2.042295 2.011517 2.019724 2.167911 
+#&gt; 1.934479 1.925594 1.890592 1.891668 2.027751 1.999994 1.979257 2.161102 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 1.987653 1.965229 1.885521 1.950227 1.974920 1.852788 1.984743 1.903030 
+#&gt; 2.004768 1.966695 1.916750 1.919306 1.983114 1.870310 1.956632 1.897670 
 #&gt;       30 
-#&gt; 1.890839 
+#&gt; 1.925018 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
 <span class='no'>y</span>$<span class='no'>y3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cumsum'>cumsum</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 5.016021 5.005412 5.005879 5.006019 5.155924 5.148056 5.152468 5.150442 
+#&gt; 5.011812 4.997671 4.996383 4.996535 5.149310 5.151574 5.143682 5.140343 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.147758 5.141919 5.141919 5.141919 5.147128 5.151534 5.148321 5.149423 
+#&gt; 5.137672 5.137097 5.137097 5.137097 5.134198 5.133324 5.138442 5.144145 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.155431 5.001936 5.005355 5.001160 5.013817 5.011606 5.016533 5.015431 
+#&gt; 5.147721 4.987161 4.992326 4.993420 5.006067 5.010936 5.012313 5.018315 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 5.016858 5.155785 5.158557 5.159262 5.156753 5.159392 5.157210 5.160712 
+#&gt; 5.016186 5.144422 5.140042 5.146757 5.147810 5.152227 5.158326 5.163626 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.159621 5.160296 5.156003 5.160444 5.012035 5.009940 5.016720 5.014001 
+#&gt; 5.160740 5.161417 5.159608 5.164054 5.012035 5.013560 5.025781 5.025573 
 #&gt;       30 
-#&gt; 5.013862 
+#&gt; 5.032717 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y;Z;...;N)"</div><div class='input'>
 
@@ -241,6 +252,8 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

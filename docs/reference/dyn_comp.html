@@ -32,7 +32,7 @@
 
 <meta property="og:title" content="Dynamic Complexity — dyn_comp" />
 
-<meta property="og:description" content="Calculates Dynamic Complexity, a complexity index for short and coarse-grained time series (Schiepek &amp;amp; Strunk, 2010; Schiepek, 2003; Haken &amp;amp; Schiepek 2006)." />
+<meta property="og:description" content="Calculate DynComp" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -91,6 +91,9 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -117,62 +120,72 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Dynamic Complexity</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/CasNET_Merlijn.R'><code>R/CasNET_Merlijn.R</code></a></small>
+    
     <div class="hidden name"><code>dyn_comp.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Calculates Dynamic Complexity, a complexity index for short and coarse-grained time series (Schiepek &amp; Strunk, 2010; Schiepek, 2003; Haken &amp; Schiepek 2006).</p>
+    <p>Calculate DynComp</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>dyn_comp</span>(<span class='no'>df</span>, <span class='no'>col_first</span>, <span class='no'>col_last</span>, <span class='no'>scale_min</span>, <span class='no'>scale_max</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>df</span>),
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>dyn_comp</span>(<span class='no'>df</span>, <span class='no'>col_first</span>, <span class='no'>col_last</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>df</span>), <span class='kw'>fromScaleMin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fromScaleMax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>toScaleMin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>toScaleMax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>df</th>
-      <td><p>A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.</p></td>
+      <td><p>df multivariate time series data - rows=time 1 person  cols = vars</p></td>
     </tr>
     <tr>
       <th>col_first</th>
-      <td><p>The first column of the dataframe that should be analyzed.</p></td>
+      <td><p>col_first</p></td>
     </tr>
     <tr>
       <th>col_last</th>
-      <td><p>The last column of the dataframe that should be analyzed.</p></td>
-    </tr>
-    <tr>
-      <th>scale_min</th>
-      <td><p>Theoretical minimum value of thescale.</p></td>
-    </tr>
-    <tr>
-      <th>scale_max</th>
-      <td><p>Theoretical maximum value of the scale.</p></td>
+      <td><p>col_last</p></td>
     </tr>
     <tr>
       <th>win</th>
-      <td><p>Window size (default = <code><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW(df)</a></code></p></td>
+      <td><p>win</p></td>
+    </tr>
+    <tr>
+      <th>fromScaleMin</th>
+      <td><p>dat scale xmin</p></td>
+    </tr>
+    <tr>
+      <th>fromScaleMax</th>
+      <td><p>data scale xmax</p></td>
+    </tr>
+    <tr>
+      <th>toScaleMin</th>
+      <td><p>theoretical scale min</p></td>
+    </tr>
+    <tr>
+      <th>toScaleMax</th>
+      <td><p>theoretical scale min</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
-      <td><p>If <code>TRUE</code> shows a plot and returns an invisible <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></code> object. If <code>FALSE</code>, plot will be drawn and no object will be returned (default = <code>FALSE</code>)</p></td>
+      <td><p>Show a plot</p></td>
+    </tr>
+    <tr>
+      <th>col_time</th>
+      <td><p>if col time use it otherwise assume ....</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If <code>doPlot = TRUE</code>, a list object containing a dataframe of dynamic complexity values and a <code>ggplot2</code> object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016). If <code>doPlot = FALSE</code> the dataframe is returned.</p>
+    <p>A list object</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Schiepek, G., &amp; Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. Biological cybernetics, 102(3), 197-207.</p>
-<p>Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. European Journal of Psychological Assessment, 19, 175-184.</p>
-<p>Haken, H. &amp; Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.</p>
-<p>Schiepek, G. K., St?ger-Schmidinger, B., Aichhorn, W., Sch?ller, H., &amp; Aas, B. (2016). Systemic case formulation, individualized process monitoring, and state dynamics in a case of dissociative identity disorder. Frontiers in psychology, 7, 1545.</p>
+    <p>Guenther</p>
     
 
   </div>
@@ -187,7 +200,7 @@
           </ul>
 
     <h2>Author</h2>
-    <p>Merlijn Olthof</p>
+    <p>Merlijn Olthoff</p>
   </div>
 </div>
 

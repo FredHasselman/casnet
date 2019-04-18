@@ -18,7 +18,7 @@ rn_plot(RN, title = "", xlab = "", ylab = "",
 
 \item{returnOnlyObject}{Return the \code{ggplot} / \code{ggraph} object only, do not draw the plot (default = \code{FALSE})}
 
-\item{useGtable}{Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set to FALSE (default = \code{TRUE})}
+\item{useGtable}{Use package \code{\link[=gtable]{gtable()}}. If this results in errors (e.g. viewport settings), set to FALSE (default = \code{TRUE})}
 }
 \value{
 A nice plot of the recurrence network
@@ -27,6 +27,8 @@ A nice plot of the recurrence network
 Plot (thresholded) distance matrix as a network
 }
 \seealso{
-Other Distance matrix operations (recurrence network): \code{\link{rn}}
+Other Distance matrix operations (recurrence network): \code{\link{di2bi}},
+  \code{\link{di2we}}, \code{\link{rn_recSpec}},
+  \code{\link{rn_scaleoGram}}, \code{\link{rn}}
 }
 \concept{Distance matrix operations (recurrence network)}

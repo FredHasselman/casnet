@@ -32,7 +32,7 @@
 
 <meta property="og:title" content="Critical Instability — crit_in" />
 
-<meta property="og:description" content="Computes significant peaks in the dynamic complexity time series. Example: Schiepek, Tominschek &amp;amp; Heinzel, 2014." />
+<meta property="og:description" content="Critical Instability" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -91,6 +91,9 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -117,45 +120,34 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Critical Instability</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/CasNET_Merlijn.R'><code>R/CasNET_Merlijn.R</code></a></small>
+    
     <div class="hidden name"><code>crit_in.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Computes significant peaks in the dynamic complexity time series. Example: Schiepek, Tominschek &amp; Heinzel, 2014.</p>
+    <p>Critical Instability</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>crit_in</span>(<span class='no'>df</span>, <span class='no'>win</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>crit_in</span>(<span class='no'>df</span>, <span class='no'>win</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>df</th>
-      <td><p>A dataframe of dynamic complexity values, e.g. output data from dyn_comp</p></td>
+      <td><p>Data frame with output fro `dyn_comp()``</p></td>
     </tr>
     <tr>
       <th>win</th>
-      <td><p>Window size over which dynamic complexity was calculated (neccesary for plot)</p></td>
-    </tr>
-    <tr>
-      <th>doPlot</th>
-      <td><p>If <code>TRUE</code> shows a plot and returns a <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></code> object in a list. If <code>FALSE</code>, no plot will be drawn and no object will be returned (default = <code>FALSE</code>)</p></td>
+      <td><p>Window used</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list with a dataframe of binary critical instability indices and a summed critical intability index, a ggplot object containing a critical instability diagram.</p>
-    
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Schiepek, G., &amp; Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. Biological cybernetics, 102(3), 197-207.</p>
-<p>Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. European Journal of Psychological Assessment, 19, 175-184.</p>
-<p>Haken, H. &amp; Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.</p>
-<p>Schiepek, G. K., Tominschek, I., &amp; Heinzel, S. (2014). Self-organization in psychotherapy: testing the synergetic model of change processes. Frontiers in psychology, 5, 1089.</p>
+    <p>Critical instability</p>
     
 
   </div>
@@ -165,12 +157,8 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-
-      <li><a href="#references">References</a></li>
           </ul>
 
-    <h2>Author</h2>
-    <p>Merlijn Olthof</p>
   </div>
 </div>
 

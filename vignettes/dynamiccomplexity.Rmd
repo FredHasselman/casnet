@@ -1,0 +1,357 @@
+---
+title: "Applied Synergetics: Dynamic Complexity in a Clinical Case Study"
+author: "Merlijn Olthof & Fred Hasselman"
+date: "`r Sys.Date()`"
+bibliography: bibliography.bib
+csl: apa.csl
+output: 
+  html_vignette:
+    toc: true
+vignette: >
+  %\VignetteEncoding{UTF-8}
+  \usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{Applied Synergetics: Dynamic Complexity in a Clinical Case Study}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+	fig.align = "center",
+	fig.height = 6,
+	fig.width = 7,
+	message = FALSE,
+	warning = FALSE,
+	collapse = FALSE,
+	comment = ">",
+	width = 500
+)
+library(invctr)
+library(casnet)
+library(plyr)
+library(tidyverse)
+```
+
+
+# **Applied Synergetics: Dynamic Complexity**
+
+
+## Early Warning Signals in a Clinical Case Study
+
+Dynamic assessment, for example, ecological momentary assesment (EMA), is used more frequently in scientific studies on mental health. Process monitoring with dynamic assessment can empower patients and benefits self-insight (van Os et al., 2017). Additionally, EMA time series can be analysed and the results can be used to inform the treatment process. 
+
+In this vignette, we'll use complex systems theory and methodology developed to analyse fluctuations in rating scale time series to perform a quantitative case study for real patient data. We'll analyze publicly available EMA data from 1 patient that was drawn from a personalized psychotherapy study (cf. Fisher & Boswell, 2016) and was analysed by several different teams in a 'Many Analysists' study: [*Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology*](https://doi.org/10.31234/osf.io/c8vp7) by Bastiaansen et al. (2019).
+
+The main purpose of the vignette is to showcase the *Dynamic Complexity functions* family in `casnet`. The choice for the imputation method is explained in the vignette *Dealing with missing values in time series*.
+
+
+### Load clincal case data from OSF
+
+Load the data used by Bastiaansen et al. (2019) from the Open Science Framework.
+
+```{r}
+# Load data from OSF https://osf.io/tcnpd/
+if(!require("osfr")) {
+  install.packages("osfr", dependencies = TRUE)
+  library("osfr")
+}
+
+df <- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)
+```
+
+### Dealing with missing values
+
+Most variables were measured three times in one day. We'll check the time series for missing values using package `imputeTS`.
+ 
+```{r,fig.height=10}
+if(!require("imputeTS")){
+  install.packages("imputeTS", dependencies = TRUE)
+  library("imputeTS")
+}
+
+# We want to use these variables
+# Note: the infix function '%ci%' is from package 'invctr'
+vars <- c(seq("energetic"%ci%df,"procrast"%ci%df),"avoid_people"%ci%df)
+
+df_vars <- df[,vars]
+
+# Plot the timeseries with NAs in red
+op <- par(mfrow = c(ceiling(length(vars)/4),4),mar =c(2,2,2,2))
+l_ply(seq_along(vars), function(c){
+  imputeTS::plotNA.distribution(x = as.numeric(df_vars[,c]), 
+                                main=colnames(df_vars)[c], 
+                                xlab = "",ylab = "")
+  })
+par(op)
+```
+
+`NA` values seem to occur at the same time points across variables. This indicates the participant might have been unable to respond at those times and was not selectively omitting questions. See the vignette [Dealing with missing values in time series](~/library/casnet/doc/imputemissingsata.html)
+
+It's a good practice to always compare results based on imputation to non-imputed data, se we'll create two datasets:
+
+1. Remove all `NA` values
+2. Ipute missing data using the *Multivariate Imputation by Chained Equations* method implemented in package `mice`.
+
+From the description of the package:
+> The mice package implements a method to deal with missing data. The package creates multiple imputations (replacement values) for multivariate missing data. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by a separate model.
+
+The function `mice()` will try to select an imputation method based on the variable type if we leave the `method` argument empty. Here we'll use `method = "cart"` to impute all missing data using *Classification And Regression Trees*. The same results can be obtained using the *Random Forest* method.
+
+```{r fig.height=4}
+library(mice)
+
+# 1. Remove NA 
+out.NA <- df_vars[complete.cases(df_vars),]
+
+# 2. Classification And Regression Trees / Random Forests
+# RF and CART return (identical) discrete numbers
+imp.cart  <- mice(df_vars, method = 'cart', printFlag = FALSE)
+out.cart  <- complete(imp.cart)
+
+
+# Plot the timeseries with NAs in red
+for(c in c("angry"%ci%df_vars,"ruminate"%ci%df_vars)){
+  cat("Remove NA\n")
+  imputeTS::plotNA.imputations(x.withNA = as.numeric(df_vars[,c]),
+                               x.withImputations = as.numeric(df_vars[,c]%00%0),
+                               main = paste(colnames(df_vars)[c],"NA removed"), xlab = "", ylab = "")
+
+  cat("Classification And Regression Trees\n")
+  imputeTS::plotNA.imputations(x.withNA = as.numeric(df_vars[,c]),
+                               x.withImputations = as.numeric(out.cart[,c]),
+                               main = paste(colnames(df_vars)[c],"CART"), xlab = "", ylab = "")
+}
+
+```
+
+
+## Phase transitions as sudden gains and losses
+
+A (sudden) qualitative change in the behavioural regime of a system is often considered to be a shift from one relatively stable attractor-state to another. This shift is referred to as a phase, or, order transition. Phase transitions are preceded by a period of destabilization in which the stability of the existing attractor-state decreases (as a consequence of changing control parameters). During destabilization, the system loses its resilience to external influences (i.e. resistance to perturbation). Thas is often reflected by an increase in fluctuations and disorder in the behaviour of the system (critical fluctuations) and an increase in the time it takes to return to attractor-states from which the sytem it perturbed (critical slowing down). Destabilization ends abruptly when the system makes a phase transition towards a new stable state. Critical fluctuations and critical slowing down can therefore serve as early-warning signals (EWS) for imminent phase transitions. 
+
+Onset of pathology (e.g. psychosis), relapse in addiction, suicide attempts, sudden gains and losses, etc. Destabilization is most of the time a good thing in treatment: The goal of treatment is to change (destabilize) the existing stable, delibitating state into another stable state that is less problematic. During destabilization, the patient is expexted to be increasingly sensitive to external influences, or, perturbations (e.g. treatment). Destabilization could turn out to be a period in which an intervention has optimal results. 
+
+### State variables
+
+Often, the purpose of detecting early warning signals is to predict changes in a state variable, for example a test for depressive symptoms, or, a broad assesment by a therapist, measured once a week. Here we do not have clear apriori state variables, we'll use the less densely measured variables on sleep quality as potential states. These variables were measured once per day:
+
+* `hours` (how many hours did you sleep last night?)
+* `difficult` (experienced difficulty falling or staying asleep)
+* `unsatisfy` (experienced restless or unsatisfying sleep)
+
+We'll assume these variables indicate a "global sate" of the system.
+
+```{r}
+# Use the date information in the dataset to create time series objects
+dates      <- df$start[!is.na(df$unsatisfy)]
+days       <- as.Date(dates, "%m/%d/%Y")
+hours      <- df$hours[!is.na(df$hours)]
+difficult  <- df$difficult[!is.na(df$difficult)]
+unsatisfy  <- df$unsatisfy[!is.na(df$unsatisfy)]
+
+df_sleep <- data.frame(days = days,
+                       hours_sleep = hours,
+                       difficult_sleep = difficult,
+                       unsatisfy_sleep = unsatisfy) %>% 
+  tidyr::gather(key = variable, value = quality_sleep, -days, factor_key = TRUE)
+
+ggplot(df_sleep, aes(x = days, y = quality_sleep)) +
+  geom_line(linetype = 2) +
+  geom_point(pch=16, size=2, colour = "steelblue") +
+  facet_grid(variable~., scales = "free_y") +
+  scale_x_date(breaks = unique(days)) +
+  theme_bw() + theme(panel.grid.minor = element_blank(),
+                     axis.text.x = element_text(angle = 90, vjust =0.5))
+
+```
+
+
+### Detecting periods of relative stability using recursive partitioning
+
+We can use function `ts_levels()` to evaluate whether there are sudden jumps (gains or losses) in the data. The method uses function `rpart::rpart()` and has several arguments that control when a level should be considered, that is, how many datapoints should a level last minimally; how much must the signal change before a new level is considered, etc. Check the manual pages for more details. ` 
+
+The value of `minDataSplit` tells the algorithm how many data points need to be in a segment before a change of level is considered. Here we choose `minDataSplit = 6`, which is 2 days.
+
+```{r echo=TRUE}
+minSplit = 6
+lvl1 <- ts_levels(hours, minDataSplit = minSplit)
+lvl2 <- ts_levels(difficult, minDataSplit = minSplit) 
+lvl3 <- ts_levels(unsatisfy, minDataSplit = minSplit) 
+
+# ggplot likes the long data format
+df_sleep$level <-  
+  data.frame(days = days,
+             hours_sleep_lvl = lvl1$pred$p,
+             difficult_sleep_lvl = lvl2$pred$p,
+             unsatisfy_sleep_lvl = lvl3$pred$p) %>% 
+  tidyr::gather(key = variable_lvl, value = level, -days, factor_key = TRUE) %>%
+  dplyr::select("level") %>%
+  unlist(.)
+  
+ggplot(df_sleep, aes(x = days)) +
+  geom_line(aes(y = quality_sleep), linetype = 2) +
+  geom_point(aes(y = quality_sleep), pch=16, size=2, colour = "steelblue") +
+  geom_line(aes(y = level), colour = "red3") +
+  facet_grid(variable~., scales = "free_y") +
+  scale_x_date(breaks = unique(days)) +
+  theme_bw() +  theme(panel.grid.minor = element_blank(),
+                     axis.text.x = element_text(angle = 90, vjust =0.5))
+
+```
+
+There appear to be more or less synchronous `jumps` and `stages`, or, `levels` in the raw data of variables `difficult` and `unsatisfy`. The levels in variable `hours`, representing hours of sleep seem to show the inverted pattern.
+
+
+## Detecting Early Warning Signals (EWS) using Dynamic Complexity
+
+Now it is time to analyze the dynamic complexity of the ESM time series and see if we can find early-warning signals. 
+
+We need to make sure all variables are on the same scale, for this dataset there's no need to transform, all data are on a scale of `0-100`.
+
+Use `dc_win()` to calculate Dynamic Complexity. The function can also call `plotDC_res()` to produce a *Complexity Resonance Diagram*. 
+
+```{r}
+win = 6
+
+# NA removed 
+dc.caseNA <- dc_win(out.NA, win = win, col_first=1, col_last=NCOL(out.NA), scale_min=0, scale_max=100, doPlot = TRUE, colOrder = TRUE)
+```
+
+There are several options for sorting the variables on the y-axis by setting the `colOrder` argument. If set to `TRUE` like the figure above the order variables appear as columns in the dataframe will be used. Setting it to `FALSE` will sort by vasriable name.
+
+We can use the `df` field of the `dc_win()` output as input for `plotDC_res()`. 
+
+```{r}
+plotDC_res(df_win = dc.caseNA$df, win = win, doPlot = TRUE, colOrder = FALSE)
+```
+
+An interesting option is to sort by the mean value of Dynamic Complexity, to do so set the `colOrder` argument to `NA`.
+
+```{r}
+plotDC_res(df_win = dc.caseNA$df, win = win, doPlot = TRUE, colOrder = NA)
+```
+
+Let's compare to the `cart` imputation by MICE.
+
+```{r}
+# CART with observed scale
+dc.caseIMP <- dc_win(out.cart, win=win, col_first=1, col_last=NCOL(out.cart), scale_min=0, scale_max=100, colOrder = TRUE)
+
+plotDC_res(df_win = dc.caseIMP, win = win, doPlot = TRUE, colOrder = NA, title = "Complexity Resonance Diagram (CART)")
+```
+
+There are some differences, and this is expected of course when imputing or removing `NA`s. To see how these differences may affect the inference of periods of destabilisation we run the *Cumulative Complexity Peak* analysis on both datasets.
+
+
+#### Cumulative Complexity Peaks
+
+The Cumulative Complexity Peak analysis identifies time points in which Dynamic Complexity in multiple items is high and therefore should be considered a period of destabilisation. First, it identifies for each time point which peaks are significantly `> 0`, by calculating Z-scores for each column (time point) and comparing to a critical Z-value (one-sided). Then, the number of significant peaks  for each time point is determined and this distribution is again transformed into Z-scores and evaluated for `> 0`.
+
+If we plot 2 versions of the analysis, the differences between the methods are apparent, but overall both methods seem to recover the same periods of destabilisation.
+
+```{r}
+# Use the date information in the dataset to create time series objects
+datesNA <- df$start[complete.cases(df_vars)]
+daysNA  <- as.Date(datesNA, "%m/%d/%Y")
+
+ccp.caseNA <- dc_ccp(df_win = dc.caseNA$df, win = win)
+plotDC_ccp(df_ccp = ccp.caseNA, win = win, colOrder = NA, title = "Cumulative Complexity Peak Plot (Remove missing values)", useTimeVector = daysNA)
+
+
+datesIMP         <- df$start
+dateTimesIMP  <- strptime(datesIMP, "%m/%d/%Y %H:%M")
+ccp.caseIMP <- dc_ccp(df_win = dc.caseIMP, win = win)
+# Change the time stamp fromat
+plotDC_ccp(df_ccp = ccp.caseIMP, win = win, colOrder = NA, 
+           useTimeVector = dateTimesIMP, timeStamp = "31-01-99",
+           title = "Cumulative Complexity Peak Plot (CART)")
+```
+
+We can query which timepoints a Complexity Peaks were registered.
+
+```{r}
+# Remove NA
+dateTimesNA  <- strptime(datesNA, "%m/%d/%Y %H:%M")
+dateTimesNA[ccp.caseNA$sig.peaks>0]
+
+#  CART
+dateTimesIMP[ccp.caseIMP$sig.peaks>0]
+```
+
+## Plot 'state' versus complexity 
+
+One could look for a single variable that best predicts level changes, e.g. by looking at crosscorrelation functions, or by extracting peak-complexity times and gain/loss events can average the time course of dynamic complexity in a number of ways. Here we use the 
+
+
+```{r}
+# Dates for state variables
+dates       <- df$start[!is.na(df$unsatisfy)]
+dateTimesS  <- strptime(dates, "%m/%d/%Y %H:%M")
+
+caseNA <- laply(1:NROW(dc.caseNA$df), function(r){
+ suppressWarnings(mean(as.numeric(dc.caseNA$df[r,1:NCOL(dc.caseNA$df)]*ccp.caseNA[r,1:NCOL(dc.caseNA$df)]), na.rm = TRUE)%00%NA)
+  })
+
+# Add all data in a data frame
+dc.mean <- data.frame(time = dateTimesIMP,
+                      `remove.NA` = NA, 
+                      `impute.cart` = elascer(laply(1:NROW(dc.caseIMP), function(r){
+                        suppressWarnings(mean(as.numeric(dc.caseIMP[r,1:(NCOL(dc.caseIMP)-1)]*ccp.caseIMP[r,1:(NCOL(dc.caseIMP)-1)]), na.rm = TRUE)%00%NA)}))
+                      )
+dc.mean$`remove.NA`[paste(dc.mean$time)%in%dateTimesNA] <- elascer(caseNA)
+
+dc.lvl <- data.frame(time = dateTimesIMP,
+                        lvl1 = NA, 
+                        lvl2 = NA, 
+                        lvl3 = NA)
+
+dc.lvl$lvl1[dc.lvl$time%in%as.POSIXct(dateTimesS)] <- elascer(lvl1$pred$p)
+dc.lvl$lvl2[dc.lvl$time%in%as.POSIXct(dateTimesS)] <- elascer(lvl2$pred$p)
+dc.lvl$lvl3[dc.lvl$time%in%as.POSIXct(dateTimesS)] <- elascer(lvl3$pred$p)
+
+dc.lvl1 <- cbind(dc.mean, lvl1 = dc.lvl$lvl1) %>% gather(key = method, value = DC, -time, -lvl1)
+dc.lvl2 <- cbind(dc.mean, lvl2 = dc.lvl$lvl2) %>% gather(key = method, value = DC, -time, -lvl2)
+dc.lvl3 <- cbind(dc.mean, lvl3 = dc.lvl$lvl3) %>% gather(key = method, value = DC, -time, -lvl3)
+
+dc.lvl1$DC[dc.lvl1$DC==0] <- NA
+dc.lvl2$DC[dc.lvl2$DC==0] <- NA
+dc.lvl3$DC[dc.lvl3$DC==0] <- NA
+
+lvl1 <- dc.lvl[complete.cases(dc.lvl$lvl1),c(1,2)] 
+colnames(lvl1)[2] <- "lvl"
+lvl2 <- dc.lvl[complete.cases(dc.lvl$lvl2),c(1,3)]
+colnames(lvl2)[2] <- "lvl"
+lvl3 <- dc.lvl[complete.cases(dc.lvl$lvl3),c(1,4)]
+colnames(lvl3)[2] <- "lvl"
+```
+
+
+Look for max complexity peaks around level changes.
+
+```{r}
+dclv <- list(dc.lvl1,dc.lvl2,dc.lvl3)
+lv   <- list(lvl1,lvl2,lvl3)
+
+for(d in seq_along(dclv)){
+  
+  g <- ggplot(dclv[[d]], aes(x = time, y = DC), size=1) +
+    geom_path(data = lv[[d]], aes(x= time, y = lvl), colour = "red3", size = 1)  +
+    geom_path(size=1) +
+    facet_grid(method~.) +
+    scale_y_continuous("Dynamic Complexity vs. Level (arbitrary units)") +
+    ggtitle(label = "Hours sleep") +
+    theme_bw() +  theme(#panel.grid.minor =  = element_blank(),
+      axis.text.x = element_text(angle = 90, vjust =0.5))
+  plot(g)
+}
+
+```   
+
+
+
+## **References**
+
+Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F., Boker, S. M., Ceulemans, E., Chen, M., … Bringmann, L. F. (2019, March 21). Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology. https://doi.org/10.31234/osf.io/c8vp7
+
+Fisher, A. J., & Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. Assessment, 23(4), 496–506. https://doi.org/10.1177/1073191116638735-Fisher

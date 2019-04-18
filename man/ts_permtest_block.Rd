@@ -4,8 +4,8 @@
 \alias{ts_permtest_block}
 \title{Permutation Test: Block Randomisation}
 \usage{
-ts_permtest_block(y1, y2 = NULL, targetValue = 0, Nperms = 99,
-  sim = "geom", l = 3, alpha = 0.05, returnBootObject = FALSE, ...)
+ts_permtest_block(y1, y2 = NULL, targetValue = 0, Nperms = 19,
+  sim = "geom", l = 3, alpha = 0.05, returnBootObject = FALSE)
 }
 \arguments{
 \item{y1}{Time series 1. The goal of the permutation test will be to decide whether the difference \code{y1-targetValue != 0} for each time point, given \code{alpha}.}
@@ -14,17 +14,17 @@ ts_permtest_block(y1, y2 = NULL, targetValue = 0, Nperms = 99,
 
 \item{targetValue}{The target value for the permutation test. If \code{NULL}, the function will return a data frame with the block randomised surrogates  columns (default = \code{0})}
 
-\item{Nperms}{Number of permutations (default = \code{99})}
+\item{Nperms}{Number of permutations (default = \code{19})}
 
-\item{sim}{Value passed to the \code{sim} argument of \code{\link[boot]{tsboot}} valid options are: \code{"model","fixed","geom","scramble"} (default = \code{"geom"})}
+\item{sim}{Value passed to the \code{sim} argument of \code{\link[boot:tsboot]{boot::tsboot()}} valid options are: \code{"model","fixed","geom","scramble"} (default = \code{"geom"})}
 
-\item{l}{Block sizes to use, see \code{\link[boot]{tsboot}} for details (default = \code{3})}
+\item{l}{Block sizes to use, see \code{\link[boot:tsboot]{boot::tsboot()}} for details (default = \code{3})}
 
 \item{alpha}{Alpha level for deciding significance  (default = \code{0.05})}
 
 \item{returnBootObject}{Return the \code{boot} object (default = \code{FALSE})}
 
-\item{...}{Other arguments passed to function \code{\link[boot]{tsboot}}}
+\item{...}{Other arguments passed to function \code{\link[boot:tsboot]{boot::tsboot()}}}
 }
 \value{
 A data frame with the difference time series and variables indicating N and significance.
@@ -32,3 +32,17 @@ A data frame with the difference time series and variables indicating N and sign
 \description{
 Use block randomistion to get a permutation test evaluation of the deviation of an observed value at each time point from a target value. To do block permutation without any tests, pass \code{NULL} for argument \code{targetValue}.
 }
+\seealso{
+Other Time series operations: \code{\link{ts_center}},
+  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
+  \code{\link{ts_detrend}}, \code{\link{ts_diff}},
+  \code{\link{ts_discrete}}, \code{\link{ts_duration}},
+  \code{\link{ts_embed}}, \code{\link{ts_integrate}},
+  \code{\link{ts_levels}}, \code{\link{ts_peaks}},
+  \code{\link{ts_permtest_transmat}},
+  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
+  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
+  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
+  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
+}
+\concept{Time series operations}

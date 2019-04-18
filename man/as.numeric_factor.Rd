@@ -2,16 +2,31 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{as.numeric_factor}
 \alias{as.numeric_factor}
-\title{Convert numeric factor to numeric vector}
+\title{Numeric factor to numeric vector}
 \usage{
-as.numeric_factor(x)
+as.numeric_factor(x, keepNA = FALSE)
 }
 \arguments{
 \item{x}{A factor based on numeric values.}
+
+\item{keepNA}{Keep NA values (\code{TRUE}), or remove them (default = \code{FALSE})}
 }
 \value{
 A numeric vector with factor levels as names.
 }
 \description{
-Convert numeric factor to numeric vector
+Converts a factor with numeric levels to a numeric vector, using the values of the levels.
+}
+\examples{
+
+f <- factor(round(runif(10,0,9)))
+as.numeric_factor(f)
+
+# Add NAs
+f <- factor(c(round(runif(9,0,9)),NA))
+as.numeric_factor(f)
+as.numeric_factor(f, keepNA = TRUE)
+
+
+
 }

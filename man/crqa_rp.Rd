@@ -45,7 +45,7 @@ crqa_rp(RM, emRad = NA, DLmin = 2, VLmin = 2, HLmin = 2,
 
 \item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR", tol = .2)} if \code{is.na(emRad)==TRUE}, it will estimate a radius (default = \code{.05}).}
 
-\item{doParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr]{map2}} to assign data and \code{\link[parallel]{detectCores}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
+\item{doParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr:map2]{purrr::map2()}} to assign data and \code{\link[parallel:detectCores]{parallel::detectCores()}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
 
 \item{silent}{Do not display any messages (default = \code{TRUE})}
 }

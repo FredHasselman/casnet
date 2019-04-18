@@ -1,39 +1,8 @@
-#' @import ggplot2
-#' @import igraph
-#' @import invctr
-#' @importFrom magrittr %>%
-#' @importFrom dplyr group_by filter summarise mutate case_when
-#' @importFrom tidyr gather spread unnest
-#' @importFrom rlang .data
-NULL
-
 # (C)RQA ------------------------
 
 #' crqa_cl_main
 #'
-#' @param y1 y1
-#' @param y2 y1
-#' @param emDim y1
-#' @param emLag y1
-#' @param emRad y1
-#' @param DLmin y1
-#' @param VLmin y1
-#' @param theiler y1
-#' @param win y1
-#' @param step y1
-#' @param JRP y1
-#' @param distNorm y1
-#' @param returnMeasures y1
-#' @param returnRPvector y1
-#' @param returnLineDist y1
-#' @param returnDistance y1
-#' @param path_to_rp y1
-#' @param saveOut y1
-#' @param path_out y1
-#' @param file_ID y1
-#' @param silent y1
-#' @param targetValue y1
-#' @param ...
+#' @inheritDotParams crqa_cl
 #'
 #' @keywords internal
 #'
@@ -234,49 +203,49 @@ file_ID=1
 #' This function will run the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} executable provided by Norbert Marwan.
 #'
 #' @param y1 Time series 1
-#' @param y2 Time series 2 for Cross Recurrence Analysis (default = \code{NULL})
-#' @param emDim Embedding dimensions (default = \code{1})
-#' @param emLag Embedding lag (default = \code{1})
-#' @param emRad Radius on distance matrix (default = \code{1})
-#' @param DLmin Minimum length of diagonal structure to be considered a line (default = \code{2})
-#' @param VLmin Minimum length of vertical structure to be considered a line (default = \code{2})
-#' @param theiler Theiler window (default = \code{0})
-#' @param win Window to calculate the (C)RQA (default = minimum of length of \code{y1} or \code{y2})
-#' @param step Stepsize for sliding windows (default = size of \code{win}, so no sliding window)
-#' @param JRP Wether to calculate a Joint Recurrence Plot (default = \code{FALSE})
-#' @param distNorm One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix
-#' @param standardise Standardise data: \code{"none"} (default), \code{"mean.sd"}, or \code{"median.mad"}
-#' @param returnMeasures Return the (C)RQA measures? (default = \code{TRUE})
-#' @param returnRPvector Return the recurrent points in a dataframe? (default = \code{FALSE})
-#' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})
-#' @param doPlot Produce a plot of the recurrence matrix by calling \code{\link{rp_plot}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})
-#' @param path_to_rp Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)
-#' @param saveOut Save the output to files? If \code{TRUE} and \code{path_out = NA}, the current working directory will be used (default = \code{FALSE})
-#' @param path_out Path to save output if \code{saveOut = TRUE} (default = \code{NULL})
-#' @param file_ID A file ID which will be a prefix to to the filename if \code{saveOut = TRUE} (default = \code{NULL}, an integer will be added tot the file name to ensure unique files)
-#' @param silent Do not display any messages (default = \code{TRUE})
-#' @param surrogateTest Perform surrogate tests. If \code{TRUE}, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments \code{ns = 39, fft = TRUE, amplitude = TRUE})
-#' @param targetValue A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}. This is useful for windowed analysis, it will estimate a new radius for each window.
-#' @param useParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr]{map2}} to assign data and \code{\link[parallel]{detectCores}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})
+#' @param y2 Time series 2 for Cross Recurrence Analysis (default = `NULL`)
+#' @param emDim Embedding dimensions (default = `1`)
+#' @param emLag Embedding lag (default = `1`)
+#' @param emRad Radius on distance matrix (default = `1`)
+#' @param DLmin Minimum length of diagonal structure to be considered a line (default = `2`)
+#' @param VLmin Minimum length of vertical structure to be considered a line (default = `2`)
+#' @param theiler Theiler window (default = `0`)
+#' @param win Window to calculate the (C)RQA (default = minimum of length of `y1` or `y2`)
+#' @param step Stepsize for sliding windows (default = size of `win`, so no sliding window)
+#' @param JRP Wether to calculate a Joint Recurrence Plot (default = `FALSE`)
+#' @param distNorm One of "EUCLIDEAN" (default), `"MAX", "MIN"`, or `"OP"` for an Order Pattern recurrence matrix
+#' @param standardise Standardise data: `"none"` (default), `"mean.sd"`, or `"median.mad"`
+#' @param returnMeasures Return the (C)RQA measures? (default = `TRUE`)
+#' @param returnRPvector Return the recurrent points in a dataframe? (default = `FALSE`)
+#' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = `FALSE`)
+#' @param doPlot Produce a plot of the recurrence matrix by calling [rp_plot()], values can be `"rp"` (the thresholded recurrence matrix),`"distmat"` (the unthresholded recurrence matrix) or `"noplot"` (default = `"noplot"`)
+#' @param path_to_rp Path to the command line executable (default = path set during installation, use `getOption("casnet.path_to_rp")` to see)
+#' @param saveOut Save the output to files? If `TRUE` and `path_out = NA`, the current working directory will be used (default = `FALSE`)
+#' @param path_out Path to save output if `saveOut = TRUE` (default = `NULL`)
+#' @param file_ID A file ID which will be a prefix to to the filename if `saveOut = TRUE` (default = `NULL`, an integer will be added tot the file name to ensure unique files)
+#' @param silent Do not display any messages (default = `TRUE`)
+#' @param surrogateTest Perform surrogate tests. If `TRUE`, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments `ns = 39, fft = TRUE, amplitude = TRUE`)
+#' @param targetValue A value passed to `crqa_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`. This is useful for windowed analysis, it will estimate a new radius for each window.
+#' @param useParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using [purrr::map2()] to assign data and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
 #' @param ... Additional parameters (currently not used)
 #'
-#' @details The \code{rp} executable is installed when the function is called for the first time and is renamed to \code{rp}, from a platform specific filename downloaded from \url{http://tocsy.pik-potsdam.de/commandline-rp.php} or extracted from an archive located in the directory: \code{...\\casnet\\commandline_rp\\}.
-#' The file is copied to the directory: \code{...\\casnet\\exec\\}
-#' The latter location is stored as an option and can be read by calling \code{getOption("casnet.path_to_rp")}.
+#' @details The `rp` executable is installed when the function is called for the first time and is renamed to `rp`, from a platform specific filename downloaded from <http://tocsy.pik-potsdam.de/commandline-rp.php> or extracted from an archive located in the directory: `...\\casnet\\commandline_rp\\`.
+#' The file is copied to the directory: `...\\casnet\\exec\\`
+#' The latter location is stored as an option and can be read by calling `getOption("casnet.path_to_rp")`.
 #'
 #' @section Troubleshooting:
-#' Some notes on resolving errors with \code{rp}.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in \code{...\\casnet\\commandline_rp\\crp_cl.zip}. If that fails, the copy will have failed. It should be relatively easy to get \code{crqa_cl()} working using custom settings:
+#' Some notes on resolving errors with `rp`.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in `...\\casnet\\commandline_rp\\crp_cl.zip`. If that fails, the copy will have failed. It should be relatively easy to get `crqa_cl()` working using custom settings:
 #'
 #' \itemize{
-#' \item \emph{Copy failed} - Every time the function \code{crqa_cl()} is called it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you delete the log file, and call the function, another copy of the executable will be attempted.
-#' \item \emph{Copy still fails and/or no permission to copy} - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as the argument \code{path_to_rp} in the \code{crqa_cl} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}. If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page and copy to a directory you have access to. Then follow the instruction to set \code{path_to_rp}.
-#' \item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[callr]{rcmd}} and makes use of the \code{\link{normalizePath}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return an empty character vector, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")} and fill in the prefix that is correct for your OS
+#' \item *Copy failed* - Every time the function `crqa_cl()` is called it will check whether a log file `rp_instal_log.txt` is present in the `...\\casnet\\exec\\` directory. If you delete the log file, and call the function, another copy of the executable will be attempted.
+#' \item *Copy still fails and/or no permission to copy* - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to `rp` (`rp.exe` on Windows OS). Then, either pass the path to `rp` as the argument `path_to_rp` in the `crqa_cl` function call, or, as a more permanent solution, set the `path_to_rp` option by calling `options(casnet.path_to_rp="YOUR_PATH")`. If you cannot acces the directory `...\\casnet\\commandline_rp\\`, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page and copy to a directory you have access to. Then follow the instruction to set `path_to_rp`.
+#' \item *Error in execution of `rp`* - This can have a variety of causes, the `rp` executable is called using [callr::rcmd()] and makes use of the [normalizePath()] function with argument `mustWork = FALSE`. Problems caused by specific OS, machine, or, locale problems (e.g. the `winslash` can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing `getOption("casnet.rp_prefix")`. On Windows OS this should return an empty character vector, on Linux or macOS it should return `"./"`. You can manually set the correct prefix by calling `options(casnet.rp_prefix="CORRECT OS PREFIX")` and fill in the prefix that is correct for your OS
 #' }
 #'
 #' @return A list object containing 1-3 elements, depending on arguments requesting output.
 #'
 #' \enumerate{
-#' \item \code{rqa_measures} - A list of the (C)RQA measures returned if \code{returnMeasures = TRUE}:
+#' \item `rqa_measures` - A list of the (C)RQA measures returned if `returnMeasures = TRUE`:
 #' \itemize{
 #'  \item RR = 'Recurrence rate'
 #'  \item DET = 'Determinism'
@@ -298,11 +267,11 @@ file_ID=1
 #'  \item W_prob = 'Probability of interval'
 #'  \item F_min = 'F min'
 #' }
-#' \item \code{rqa_rpvector} - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling \code{\link{rp_plot}}. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting \code{saveOut = TRUE}.
-#' \item \code{rqa_diagdist} - The distribution of diagonal line lengths
+#' \item `rqa_rpvector` - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling [rp_plot()]. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting `saveOut = TRUE`.
+#' \item `rqa_diagdist` - The distribution of diagonal line lengths
 #' }
 #'
-#' @note The platform specific \code{rp} command line executables were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at \url{http://tocsy.pik-potsdam.de/}.
+#' @note The platform specific `rp` command line executables were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at <http://tocsy.pik-potsdam.de/>.
 #'
 #' The full copyright statement on the website is as follows:
 #'
@@ -592,14 +561,26 @@ crqa_cl <- function(y1,
     rqa_horidist <-plyr::ldply(wList, function(l) l$hori_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
   }
 
-  doPlot <- which(doPlot%in%c("noplot","rp","distmat"))
+  wPlot <- which(doPlot%in%c("noplot","rp","distmat"))
 
-  if(doPlot>1){
-    if(doPlot==2){
-      plotList <- plyr::llply(wIndices, function(ind) rp_plot(di2bi(rp(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag),emRad = emRad)))
+  if(wPlot>1){
+    if(wPlot==2){
+      if(windowedAnalysis){
+      plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1], y2 = df[ind,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE))
+      multi_PLOT(plotList)
+      } else {
+        rp(y1 = df[,1], y2 = df[,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE)
+      }
     }
-    if(doPlot==3){plotList <- plyr::llply(wIndices, function(ind) rp_plot(rp(df[ind,1],df[ind,2], emDim = emDim, emLag = emLag)))}
-    multi_PLOT(plotList)
+    if(wPlot==3){
+      if(windowedAnalysis){
+       plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1],y2 = df[ind,2], emDim = emDim, emLag = emLag, doPlot = TRUE))
+       multi_PLOT(plotList)
+      } else {
+        rp(y1 = df[,1],y2 = df[,2], emDim = emDim, emLag = emLag, doPlot = TRUE)
+      }
+    }
+
   }
 
   justData <- FALSE
@@ -633,32 +614,32 @@ crqa_cl <- function(y1,
 #' A wrapper for various algorithms used to find optimal value pair for the embedding delay and the number of embedding dimensions
 #'
 #' @param y A numeric vector or time series
-#' @param emLag Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If \code{NULL} the lags based on the mutual information in \code{lagMethods} will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = \code{NULL})
-#' @param lagMethods A character vector with one or more of the following strings: \code{"first.minimum","global.minimum","max.lag"}. If \code{emLag} represents a valid lag this value will  be reported as "user.lag" (default = \code{c("first.minimum","global.minimum","max.lag")})
-#' @param maxLag Maximum embedding lag to consider. Default value is: \code{floor(length(y)/(maxDim+1))}
-#' @param estimateDimensions Decide on an optimal embedding dimension relative to the values in \code{maxDim} and \code{lagMethods}, according to a number of preferences passed as a character vector. The order in which the preferences appear in the vector affects the selection procedure, with index \code{1} being most important preference. The following options are available: \itemize{
-#' \item{\code{preferNone} - No optimal number will be picked all other preferences will be ignored}
-#' \item{\code{preferSmallestDim} - Pick smallest number of dimensions associated with a percentage NN below \code{nnThres}}
-#' \item{\code{preferSmallestNN} - Pick the number of dimensions that is associated with the smallest percentage NN below \code{nnThres}}
-#' \item{\code{preferSmallestLag} - If the value of \code{nnThres} does not lead to a unique preference for a pair of dimension and lag values, use the pair with the smallest lag}
-#' \item{\code{preferSmallestInLargestHood} - The default option: If no unique pair can be found, prefer pairs with smallest values for lag, dimensions, percentage NN for the largest NN size}
+#' @param emLag Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If `NULL` the lags based on the mutual information in `lagMethods` will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = `NULL`)
+#' @param lagMethods A character vector with one or more of the following strings: `"first.minimum","global.minimum","max.lag"`. If `emLag` represents a valid lag this value will  be reported as "user.lag" (default = `c("first.minimum","global.minimum","max.lag")`)
+#' @param maxLag Maximum embedding lag to consider. Default value is: `floor(length(y)/(maxDim+1))`
+#' @param estimateDimensions Decide on an optimal embedding dimension relative to the values in `maxDim` and `lagMethods`, according to a number of preferences passed as a character vector. The order in which the preferences appear in the vector affects the selection procedure, with index `1` being most important preference. The following options are available: \itemize{
+#' \item{`preferNone` - No optimal number will be picked all other preferences will be ignored}
+#' \item{`preferSmallestDim` - Pick smallest number of dimensions associated with a percentage NN below `nnThres`}
+#' \item{`preferSmallestNN` - Pick the number of dimensions that is associated with the smallest percentage NN below `nnThres`}
+#' \item{`preferSmallestLag` - If the value of `nnThres` does not lead to a unique preference for a pair of dimension and lag values, use the pair with the smallest lag}
+#' \item{`preferSmallestInLargestHood` - The default option: If no unique pair can be found, prefer pairs with smallest values for lag, dimensions, percentage NN for the largest NN size}
 #' }
-#' @param maxDim Maximum number of embedding dimensions to consider (default = \code{10})
-#' @param nnSizes Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5,10,15)})
-#' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{5})
-#' @param nnThres Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = \code{10})
-#' @param theiler Theiler window on distance matrix (default = \code{0})
-#' @param diagPlot Produce a diagnostic plot the results (default = \code{TRUE})
+#' @param maxDim Maximum number of embedding dimensions to consider (default = `10`)
+#' @param nnSizes Points whose distance is `nnSize` times further apart than the estimated size of the attractor will be declared false neighbours. See the argument `atol` in [fractal::FNN()] (default = `c(2,5,10,15)`)
+#' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than `nnRadius`, the points are declared false neighbours. See the argument `rtol` in [fractal::FNN()] (default = `5`)
+#' @param nnThres Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = `10`)
+#' @param theiler Theiler window on distance matrix (default = `0`)
+#' @param diagPlot Produce a diagnostic plot the results (default = `TRUE`)
 #' @param silent Silent-ish mode
-#' @param ... Other parameters passed to \code{\link[nonlinearTseries]{timeLag}}
+#' @param ... Other parameters passed to [nonlinearTseries::timeLag()]
 #'
 #' @return A list object containing the optimal values (as indicated by the user) and iteration history.
 #'
 #' @details A number of functions are called to determie optimal parameters for delay embedding a time series:
 #'
 #' \itemize{
-#' \item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet]{est_emLag}}, which is a wrapper around \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"} to get lags based on the mutual information function.}
-#' \item{Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[fractal]{FNN}}}
+#' \item{Embedding lag (\eqn{\tau}, `emLag`): The default is to call [casnet::est_emLag()], which is a wrapper around [nonlinearTseries::timeLag()] with `technique="ami"` to get lags based on the mutual information function.}
+#' \item{Embedding dimension (`m`, `emDim`): The default is to call [casnet::est_emDim()], which is a wrapper around [fractal::FNN()]}
 #' }
 #'
 #' @family Recurrence Quantification Analysis
@@ -926,20 +907,20 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
 #' @param y2  A numeric vector or time series
 #' @param emLag Delay to use for embedding
 #' @param emDim Number of embedding dimensions
-#' @param type Either \code{"fixed"} (default) or \code{"optimal"}, \code{"fixed"} will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}, \code{"optimal"} will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.
-#' @param startRadius If \code{type = "fixed"} this is the starting value for the radius (default = percentile of unique distances in RM given by \code{targetValue}). If \code{type = "optimal"} this will be a range of radius values (in normalised SD units) that will be considered (default = \code{seq(0,2,by=.01)})
-#' @param eachRadius If \code{type = "optimal"} this is the number of signal and noise series that will be generated for each level in \code{startRadius} (default = \code{1})
-#' @param targetMeasure If \code{type = "optimal"}, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option \code{targetMeasure = "all"} will report all the optimal values obtained from one realisation of \code{startRadius * eachRadius} signal and noise series.
-#' @param targetValue When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).
-#' @param tol Tolerance for achieving \code{targetValue} for \code{targetMeasure} (default = \code{0.1})
-#' @param maxIter If \code{type = "fixed"}: Maximum number of iterations to reach targetValue.
-#' @param theiler Size of theiler window (default \code{0})
-#' @param histIter Return iteration history? (default = \code{FALSE})
-#' @param noiseLevel Noise level to construct the \code{signal + noiseLevel *} \eqn{N(\mu=0,\sigma=1)} (default = \code{0.75})
+#' @param type Either `"fixed"` (default) or `"optimal"`, `"fixed"` will search for a radius that is close to the value for the `targetMeasure` in `targetValue`, `"optimal"` will optimise the radius for the `targetMeasure`, `targetValue` is ignored.
+#' @param startRadius If `type = "fixed"` this is the starting value for the radius (default = percentile of unique distances in RM given by `targetValue`). If `type = "optimal"` this will be a range of radius values (in normalised SD units) that will be considered (default = `seq(0,2,by=.01)`)
+#' @param eachRadius If `type = "optimal"` this is the number of signal and noise series that will be generated for each level in `startRadius` (default = `1`)
+#' @param targetMeasure If `type = "optimal"`, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option `targetMeasure = "all"` will report all the optimal values obtained from one realisation of `startRadius * eachRadius` signal and noise series.
+#' @param targetValue When argument `type` is set to "fixed", the value represents the target value for the measure in `targetMeasure` (default = `RR = .05`).
+#' @param tol Tolerance for achieving `targetValue` for `targetMeasure` (default = `0.1`)
+#' @param maxIter If `type = "fixed"`: Maximum number of iterations to reach targetValue.
+#' @param theiler Size of theiler window (default `0`)
+#' @param histIter Return iteration history? (default = `FALSE`)
+#' @param noiseLevel Noise level to construct the `signal + noiseLevel *` \eqn{N(\mu=0,\sigma=1)} (default = `0.75`)
 #' @param noiseType Type
-#' @param plotROC Generates an ROC plot if \code{type = "optimal"}
+#' @param plotROC Generates an ROC plot if `type = "optimal"`
 #' @param standardise Standardise
-#' @param radiusOnFail Radius to return when search fails \code{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \code{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \code{"percentile" = quantile(RM, prob = targetValue) of distances greater than 0}.
+#' @param radiusOnFail Radius to return when search fails `"tiny" = 0 + ,Machine.double.eps`, this will likely cause a matrix full of zeros. `"huge" = 1 + max. distance in RM`, which will give a matrix full of ones, `"percentile" = quantile(RM, prob = targetValue) of distances greater than 0`.
 #' @param silent Silent-ish
 #'
 #' @family Recurrence Quantification Analysis
@@ -1277,23 +1258,7 @@ roc_noise <- function(y, emRad, emDim=1, emLag=1, noiseLevel=.75, standardise = 
 #'
 #' Use `crqa_rp`
 #'
-#' @param RM A binary recurrence matrix
-#' @param emRad Threshold for distance value that counts as a recurrence
-#' @param DLmin Minimal diagonal line length
-#' @param VLmin Minimal vertical line length
-#' @param HLmin Minimal horizontal line length
-#' @param DLmax Maximal diagonal line length
-#' @param VLmax Maximal vertical line length
-#' @param HLmax Maximal horizontal line length
-#' @param AUTO Is this an AUTO RQA?
-#' @param theiler theiler
-#' @param chromatic Chromatic RQA?
-#' @param matrices Return Matrices?
-#' @param doHalf Analyse half of the matrix?
-#' @param Nboot How many bootstraps?
-#' @param CL Confidence Limit for bootstrap results
-#' @param doParallel Use parallel?
-#'
+#' @inheritParams crqa_rp
 #'
 #' @family Recurrence Quantification Analysis
 #'
@@ -1439,24 +1404,24 @@ crqa_rp_measures <- function(RM,
 #'
 #' A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures will be caluclated.
 #'
-#' @param RM A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NA})
+#' @param RM A distance matrix, or a matrix of zeroes and ones (you must set `emRad = NA`)
 #' @param emRad Threshold for distance value that counts as a recurrence
-#' @param DLmin Minimal diagonal line length (default = \code{2})
-#' @param VLmin Minimal vertical line length (default = \code{2})
-#' @param HLmin Minimal horizontal line length (default = \code{2})
+#' @param DLmin Minimal diagonal line length (default = `2`)
+#' @param VLmin Minimal vertical line length (default = `2`)
+#' @param HLmin Minimal horizontal line length (default = `2`)
 #' @param DLmax Maximal diagonal line length (default = length of diagonal -1)
 #' @param VLmax Maximal vertical line length (default = length of diagonal -1)
 #' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
-#' @param AUTO Auto-recurrence? (default = \code{FALSE})
-#' @param theiler = Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})
-#' @param chromatic Force chromatic RQA? (default = \code{FALSE})
-#' @param matrices Return matrices? (default = \code{FALSE})
-#' @param doHalf Analyse half of the matrix? (default = \code{FALSE})
-#' @param Nboot How many bootstrap replications? (default = \code{NULL})
-#' @param CL Confidence limit for bootstrap results (default = \code{.95})
-#' @param targetValue A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR", tol = .2)} if \code{is.na(emRad)==TRUE}, it will estimate a radius (default = \code{.05}).
-#' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr]{map2}} to assign data and \code{\link[parallel]{detectCores}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})
-#' @param silent Do not display any messages (default = \code{TRUE})
+#' @param AUTO Auto-recurrence? (default = `FALSE`)
+#' @param theiler = Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = `0`)
+#' @param chromatic Force chromatic RQA? (default = `FALSE`)
+#' @param matrices Return matrices? (default = `FALSE`)
+#' @param doHalf Analyse half of the matrix? (default = `FALSE`)
+#' @param Nboot How many bootstrap replications? (default = `NULL`)
+#' @param CL Confidence limit for bootstrap results (default = `.95`)
+#' @param targetValue A value passed to `crqa_radius(...,type="fixed", targetMeasure="RR", tol = .2)` if `is.na(emRad)==TRUE`, it will estimate a radius (default = `.05`).
+#' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using [purrr::map2()] to assign data and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
+#' @param silent Do not display any messages (default = `TRUE`)
 
 #' @return A list object containing (C)RQA measures (and matrices if requested)
 #'
@@ -1636,9 +1601,9 @@ crqa_rp <- function(RM,
 #' @param diagWin Window around the line of synchrony
 #' @param xname Label for x-axis
 #' @param yname Label for y-axis
-#' @param DLmin Minimal diagonal line length (default = \code{2})
-#' @param VLmin Minimal vertical line length (default = \code{2})
-#' @param HLmin Minimal horizontal line length (default = \code{2})
+#' @param DLmin Minimal diagonal line length (default = `2`)
+#' @param VLmin Minimal vertical line length (default = `2`)
+#' @param HLmin Minimal horizontal line length (default = `2`)
 #' @param DLmax Maximal diagonal line length (default = length of diagonal -1)
 #' @param VLmax Maximal vertical line length (default = length of diagonal -1)
 #' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
@@ -1646,9 +1611,9 @@ crqa_rp <- function(RM,
 #' @param y1 The original `y1` time series
 #' @param y2 The original `y2` time series
 #' @param Nshuffle How many shuffled versions to make up the baseline? The default is `19`, which is the minimum for a one-sided surrogate test.
-#' @param AUTO Auto-recurrence? (default = \code{FALSE})
-#' @param chromatic Force chromatic RQA? (default = \code{FALSE})
-#' @param matrices Return matrices? (default = \code{FALSE})
+#' @param AUTO Auto-recurrence? (default = `FALSE`)
+#' @param chromatic Force chromatic RQA? (default = `FALSE`)
+#' @param matrices Return matrices? (default = `FALSE`)
 #' @param doPlot Plot
 #'
 #' @return A plot and/or the data for the plot
@@ -1749,14 +1714,13 @@ crqa_diagProfile <- function(RM,
 
     df$group  <- 1
     df$labels <- paste(df$Diagonal)
-    df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
+   # df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
     df$labels <- factor(df$labels,levels = df$labels,ordered = TRUE)
 
     out[[r]] <- df
     rm(df,B,cID,diagID)
 
     cat(paste("\nProfile"),r)
-
   }
 
   dy      <- plyr::ldply(out)
@@ -1770,16 +1734,26 @@ crqa_diagProfile <- function(RM,
     dplyr::group_by(.data$Diagonal,.data$labels) %>%
     dplyr::summarise(meanRRrnd = mean(.data$RR), sdRRrnd = stats::sd(.data$RR))
 
+    if(Nshuffle==1){
+    dy_m$sdRRrnd <- dy_m$meanRRrnd
+  }
+
   dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
   dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
-  dy_m$y_obs <- dy$RR[dy$.id=="obs"]
 
-  df <- tidyr::gather(dy_m, key=variable, value = RR, -c(.data$Diagonal,.data$sdRRrnd, .data$labels, .data$ciLO, .data$ciHI, .data$y_obs))
+  obs <- dy$RR[dy$.id=="obs"]
+  if(length(obs)!=(2*length(y1))){
+    obs <-  ts_trimfill(obs,c(y1,y2),action = 'trim')$y
+  }
+  dy_m$y_obs <- obs
+
+  df <- tidyr::gather(dy_m, key=variable, value = RR, -c(.data$Diagonal,.data$sdRRrnd, .data$labels, .data$ciLO, .data$ciHI))
   df$Diagonal <- as.numeric(df$Diagonal)
 
   if(doPlot){
 
     Diags <- as.numeric(levels(df$labels))
+    Diags[is.na(Diags)] <- 0
     if(length(diagWin)>21){
       ext <- max(min(abs(Diags),na.rm = TRUE),abs(max(Diags,na.rm = TRUE)))
       breaks <- which(Diags%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
@@ -1797,18 +1771,16 @@ crqa_diagProfile <- function(RM,
     col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
     siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
 
-
-
     g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
       ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
-      ggplot2::geom_line(ggplot2::aes_(y=~RR), colour = "grey40", size = .5) +
+      ggplot2::geom_line(ggplot2::aes_(y=~RR, colour = ~variable), size = .5) +
       #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
       ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
       ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
       ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
       ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
       ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
-      # ggplot2::scale_colour_manual(values = col) +
+       ggplot2::scale_colour_manual(values = col) +
       # ggplot2::scale_size_manual(values = siz) +
       ggplot2::theme_bw()
 
@@ -1902,8 +1874,8 @@ est_emLag <- function(y,
 #' @param y Time series or numeric vector
 #' @param delay Embedding lag
 #' @param maxDim Maximum number of embedding dimensions
-#' @param threshold See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
-#' @param max.relative.change See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}
+#' @param threshold See [nonlinearTseries::estimateEmbeddingDim()]
+#' @param max.relative.change See [nonlinearTseries::estimateEmbeddingDim()]
 #' @param doPlot Plot
 #' @param ... Other arguments (not in use)
 #'
@@ -1925,13 +1897,13 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 
 #' rp_nzdiags
 #'
-#' @description Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument \code{d}.
+#' @description Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument `d`.
 #'
 #' @param RM A binary (0,1) matrix.
 #' @param d An optional vector of diagonals to extract.
 #' @param returnVectorList Return list
-#' @param returnNZtriplets Return a dataframe with coordinates of only nonzero elements in diagonals (default = \code{FALSE})
-#' @param removeNZ Remove nonzero diagonals if \code{TRUE}. If \code{FALSE} returns the full diagonals matrix. Use e.g. to plot diagonal recurrence profiles (default = \code{TRUE})
+#' @param returnNZtriplets Return a dataframe with coordinates of only nonzero elements in diagonals (default = `FALSE`)
+#' @param removeNZ Remove nonzero diagonals if `TRUE`. If `FALSE` returns the full diagonals matrix. Use e.g. to plot diagonal recurrence profiles (default = `TRUE`)
 #' @param silent Silent-ish mode
 #'
 #' @author Fred Hasselman
@@ -2116,19 +2088,17 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 }
 
 
-
-
 #' Line length distributions
 #'
 #' @param RM A thresholded recurrence matrix (binary: 0 - 1)
-#' @param DLmin Minimal diagonal line length (default = \code{2})
-#' @param VLmin Minimal vertical line length (default = \code{2})
-#' @param HLmin Minimal horizontal line length (default = \code{2})
+#' @param DLmin Minimal diagonal line length (default = `2`)
+#' @param VLmin Minimal vertical line length (default = `2`)
+#' @param HLmin Minimal horizontal line length (default = `2`)
 #' @param DLmax Maximal diagonal line length (default = length of diagonal -1)
 #' @param VLmax Maximal vertical line length (default = length of diagonal -1)
 #' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
-#' @param d Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \code{-50,50,100}.
-#' @param theiler Size of the theiler window, e.g. \code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}.
+#' @param d Vector of diagonals to be extracted from matrix `RP` before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., `d = 50` will extract the diagonal band `-50:50`. A two element vector will be interpreted as a band, e.g. `d = c(-50,100)` will extract diagonals `-50:100`. If `length(d) > 2`, the numbers will be interpreted to refer to individual diagonals, `d = c(-50,50,100)` will extract diagonals `-50,50,100`.
+#' @param theiler Size of the theiler window, e.g. `theiler = 1` removes diagonal bands -1,0,1 from the matrix. If `length(d)` is `NULL`, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if `length(d)>2`, or if it is larger than the matrix or band indicated by parameter `d`.
 #' @param invert Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
 #' @param AUTO Is this an AUTO RQA?
 #' @param chromatic Chromatic RQA?
@@ -2137,7 +2107,7 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 #'
 #' @description Extract lengths of diagonal, vertical and horizontal line segments from a recurrence matrix.
 #'
-#' @details Based on the Matlab function \code{linedists} by Stefan Schinkel, Copyright (C) 2009 Stefan Schinkel, University of Potsdam, http://www.agnld.uni-potsdam.de
+#' @details Based on the Matlab function `linedists` by Stefan Schinkel, Copyright (C) 2009 Stefan Schinkel, University of Potsdam, http://www.agnld.uni-potsdam.de
 #'
 #' References:
 #' S. Schinkel, N. Marwan, O. Dimigen & J. Kurths (2009):
@@ -2145,10 +2115,10 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 #' Physics Letters A,  373(26), pp. 2245-2250
 #'
 #' Copyright (C) 2009 Stefan Schinkel, University of Potsdam
-#' \url{http://www.agnld.uni-potsdam.de}
+#' <http://www.agnld.uni-potsdam.de>
 #'
 #' @author Fred Hasselman
-#' @return A list object with distributions of line lengths. If \code{matrices = TRUE} datafr are returned whose columns represent the nonzero diagonals, verticals, or, horizontals.
+#' @return A list object with distributions of line lengths. If `matrices = TRUE` datafr are returned whose columns represent the nonzero diagonals, verticals, or, horizontals.
 #'
 #' @export
 #'
@@ -2316,8 +2286,8 @@ dist_hamming <- function(X, Y=NULL, embedded=TRUE) {
 #' @param mat A Matrix
 #' @param lower Lower diagonal to be included in the band (should be \eqn{\le 0})
 #' @param upper Upper diagonal to be included in the band (should be \eqn{\ge 0})
-#' @param value A single value to replace all values in the selected band (default = \code{NA})
-#' @param silent Operate in silence, only (some) warnings will be shown (default = \code{TRUE})
+#' @param value A single value to replace all values in the selected band (default = `NA`)
+#' @param silent Operate in silence, only (some) warnings will be shown (default = `TRUE`)
 #'
 #' @return A matrix in which the values in the selected diagonals have been replaced
 #'
@@ -2359,25 +2329,25 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 #' @param y2 A numeric vector or time series for cross recurrence
 #' @param emDim The embedding dimensions
 #' @param emLag The embedding lag
-#' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})
-#' @param to.ts Should \code{y1} and \code{y2} be converted to time series objects?
-#' @param order.by If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.
+#' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If `NULL`, an unthresholded matrix will be created (default = `NULL`)
+#' @param to.ts Should `y1` and `y2` be converted to time series objects?
+#' @param order.by If `to.ts = TRUE`, pass a vector of the same length as `y1` and `y2`. It will be used as the time index, if `NA` the vector indices will be used to represent time.
 #' @param to.sparse Should sparse matrices be used?
-#' @param weighted If \code{FALSE} a binary matrix will be returned. If \code{TRUE} every value larger than \code{emRad} will be \code{0}, but values smaller than \code{emRad} will be retained (default = \code{FALSE})
-#' @param method Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})
-#' @param targetValue A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.
-#' @param doPlot Plot the matrix by calling \code{\link{rp_plot}} with defult settings
+#' @param weighted If `FALSE` a binary matrix will be returned. If `TRUE` every value larger than `emRad` will be `0`, but values smaller than `emRad` will be retained (default = `FALSE`)
+#' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
+#' @param targetValue A value passed to `crqa_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`.
+#' @param doPlot Plot the matrix by calling [rp_plot()] with defult settings
 #' @param silent Silent-ish mode
-#' @param ... Any paramters to pass to \code{\link{rp_plot}} if \code{doPlot = TRUE}
+#' @param ... Any paramters to pass to [rp_plot()] if `doPlot = TRUE`
 #'
 #' @return A (Coss-) Recurrence matrix with attributes:
 #' \enumerate{
-#' \item \code{emdims1} and \code{emdims2} - A matrix of surrogate dimensions
-#' \item \code{emdims1.name} and \code{emdims2.name} - Names of surrogate dimensions
-#' \item \code{method} and \code{call} - The distance \code{method} used by \code{\link[proxy]{dist}}
-#' \item \code{weighetd} - Whether a weighted matrix is returned
-#' \item \code{emDim}, \code{emLag} and \code{emRad} - The embedding parameters
-#' \item \code{AUTO} - Whether the matrix represents AUTO recurrence
+#' \item `emdims1` and `emdims2` - A matrix of surrogate dimensions
+#' \item `emdims1.name` and `emdims2.name` - Names of surrogate dimensions
+#' \item `method` and `call` - The distance `method` used by [proxy::dist()]
+#' \item `weighetd` - Whether a weighted matrix is returned
+#' \item `emDim`, `emLag` and `emRad` - The embedding parameters
+#' \item `AUTO` - Whether the matrix represents AUTO recurrence
 #'  }
 #'
 #'
@@ -2487,15 +2457,17 @@ rp <- function(y1, y2 = NULL,
   dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
 
   if(doPlot){
-    dotArgs <- list(...)
-
-    nameOK  <- names(dotArgs)%in%methods::formalArgs(rp_plot)
-    # Plot with defaults
-    if(!all(dotArgs)){
-      dotArgs    <- formals(rp_plot)
-      nameOk <- rep(TRUE,length(dotArgs))
+    dotArgs  <- formals(rp_plot)
+    nameOk   <- rep(TRUE,length(dotArgs))
+    if(...length()>0){
+      dotArgs <- list(...)
+      nameOK  <- names(dotArgs)%in%methods::formalArgs(rp_plot)
+      # Plot with defaults
+      if(!all(nameOK)){
+        dotArgs    <- formals(rp_plot)
+        nameOk <- rep(TRUE,length(dotArgs))
+      }
     }
-
     dotArgs$RM <- dmat
     do.call(rp_plot, dotArgs[nameOk])
   }
@@ -2506,7 +2478,7 @@ rp <- function(y1, y2 = NULL,
 
 #' Copy Matrix Attributes
 #'
-#' Simple attribute copy used in \code{casnet} to convert between \code{matrix} and \code{Matrix} classes and back.
+#' Simple attribute copy used in `casnet` to convert between `matrix` and `Matrix` classes and back.
 #'
 #' @param source Source matrix
 #' @param target Target matrix
@@ -2592,25 +2564,35 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' Plot (thresholded) distance matrix as a recurrence plot
 #'
 #' @param RM A distance matrix or recurrence matrix
-#' @param plotDimensions Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})
+#' @param plotDimensions Should the state vectors be plotted if they are available as attributes of RM (default = `TRUE`)
 #' @param plotMeasures Print common (C)RQA measures in the plot if the matrix is binary
-#' @param plotRadiusRRbar The \code{Radius-RR-bar} is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of \code{RR} values one would get if a certain distance threshold were chosen (\code{default = TRUE})
-#' @param drawGrid Draw a grid on the recurrence plot (\code{default = FALSE})
-#' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (\code{default = NULL})
-#' @param Chromatic If \code{TRUE} and there are more than two discrete values in \code{RM}, give recurrent points a distinct colour. If \code{RM} was returned by \code{crqa_rp(..., chromatic = TRUE)}, the recurrence plot will colour-code recurrent points according to the category values in \code{attributes(RM)$chromaticRP} (\code{default = FALSE})
-#' @param radiusValue If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.
+#' @param plotRadiusRRbar The `Radius-RR-bar` is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of `RR` values one would get if a certain distance threshold were chosen (`default = TRUE`)
+#' @param drawGrid Draw a grid on the recurrence plot (`default = FALSE`)
+#' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (`default = NULL`)
+#' @param Chromatic If `TRUE` and there are more than two discrete values in `RM`, give recurrent points a distinct colour. If `RM` was returned by `crqa_rp(..., chromatic = TRUE)`, the recurrence plot will colour-code recurrent points according to the category values in `attributes(RM)$chromaticRP` (`default = FALSE`)
+#' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `crqa_radius()` will be called with default settings (find a radius that yields .05 recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
 #' @param title A title for the plot
 #' @param xlab An x-axis label
 #' @param ylab An y-axis label
-#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link{rp}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.
-#' @param returnOnlyObject Return the ggplot object only, do not draw the plot (default = \code{TRUE})
+#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If `RM` has attributes `y1` and `y2` containing the time series data (i.e. it was created by a call to [rp()]), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from `y1`.
+#' @param returnOnlyObject Return the ggplot object only, do not draw the plot (default = `TRUE`)
 #'
 #' @return A nice plot of the recurrence matrix.
 #' @export
 #'
 #' @family Distance matrix operations (recurrence plot)
 #'
-rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusRRbar = TRUE, drawGrid = FALSE, markEpochsLOI = NULL, Chromatic = NULL, radiusValue = NA, title = "", xlab = "", ylab="", plotSurrogate = NA, returnOnlyObject = FALSE){
+rp_plot <- function(RM,
+                    plotDimensions = FALSE,
+                    plotMeasures   = FALSE,
+                    plotRadiusRRbar = TRUE,
+                    drawGrid = FALSE,
+                    markEpochsLOI = NULL,
+                    Chromatic = NULL,
+                    radiusValue = NA,
+                    title = "", xlab = "", ylab="",
+                    plotSurrogate = NA,
+                    returnOnlyObject = FALSE){
 
   useGtable <- TRUE
 
@@ -3158,7 +3140,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
       grid::grid.newpage()
       grid::grid.draw(g)
     } else {
-      graphics::plot.new()
+      # graphics::plot.new()
       graphics::plot(g)
     }
   }
@@ -3169,7 +3151,7 @@ rp_plot <- function(RM, plotDimensions= FALSE, plotMeasures = FALSE, plotRadiusR
 #' rp_size
 #'
 #' @param mat A Matrix object
-#' @param AUTO Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass \code{FALSE} to prevent this behaviour. If \code{NULL} (default) \code{AUTO} will take on the value of \code{isSymmetric(mat)}.
+#' @param AUTO Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass `FALSE` to prevent this behaviour. If `NULL` (default) `AUTO` will take on the value of `isSymmetric(mat)`.
 #' @param theiler Should a Theiler window be applied?
 #'
 #' @return Matrix size for computation of recurrence measures.
@@ -3761,24 +3743,24 @@ crqa_rp_prep <- function(RP,
 
 #' Create a Recurrence Network Matrix
 #'
-#' This function serves as a wrapper for function \code{rp()}, it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)
+#' This function serves as a wrapper for function `rp()`, it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)
 #'
 #' @param y1 A numeric vector or time series
 #' @param y2 A numeric vector or time series for cross recurrence
 #' @param emDim The embedding dimensions
 #' @param emLag The embedding lag
 #' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary matrix
-#' @param directed Should the matrix be considered to represent a directed network? (default = \code{FALSE})
-#' @param weighted Should the matrix be considered to represent a weighted network? (default = \code{FALSE})
-#' @param includeDiagonal Should the diagonal of the matrix be included when creating the network (default = \code{FALSE})
-#' @param to.ts Should \code{y1} and \code{y2} be converted to time series objects?
-#' @param order.by If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.
+#' @param directed Should the matrix be considered to represent a directed network? (default = `FALSE`)
+#' @param weighted Should the matrix be considered to represent a weighted network? (default = `FALSE`)
+#' @param includeDiagonal Should the diagonal of the matrix be included when creating the network (default = `FALSE`)
+#' @param to.ts Should `y1` and `y2` be converted to time series objects?
+#' @param order.by If `to.ts = TRUE`, pass a vector of the same length as `y1` and `y2`. It will be used as the time index, if `NA` the vector indices will be used to represent time.
 #' @param to.sparse Should sparse matrices be used?
-#' @param method Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})
-#' @param returnGraph Return an \code{\link[igraph]{igraph}} object (default = \code{TRUE})
-#' @param doPlot Plot the matrix and its network representation by calling \code{\link{rp_plot}} and \code{\link{rn_plot}} with default settings
-#' @param silent Silent-ish mode (default = \code{TRUE})
-#' @param ... Any paramters to pass to \code{\link{rn_plot}} if \code{doPlot = TRUE}
+#' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
+#' @param returnGraph Return an [igraph::igraph()] object (default = `TRUE`)
+#' @param doPlot Plot the matrix and its network representation by calling [rp_plot()] and [rn_plot()] with default settings
+#' @param silent Silent-ish mode (default = `TRUE`)
+#' @param ... Any paramters to pass to [rn_plot()] if `doPlot = TRUE`
 #'
 #' @return A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidence) matrix.
 #'
@@ -3842,8 +3824,8 @@ rn <- function(y1, y2 = NULL,
 #' @param title A title for the plot
 #' @param xlab An x-axis label
 #' @param ylab An y-axis label
-#' @param returnOnlyObject Return the \code{ggplot} / \code{ggraph} object only, do not draw the plot (default = \code{FALSE})
-#' @param useGtable Use package \code{\link{gtable}}. If this results in errors (e.g. viewport settings), set to FALSE (default = \code{TRUE})
+#' @param returnOnlyObject Return the `ggplot` / `ggraph` object only, do not draw the plot (default = `FALSE`)
+#' @param useGtable Use package [gtable()]. If this results in errors (e.g. viewport settings), set to FALSE (default = `TRUE`)
 #'
 #' @return A nice plot of the recurrence network
 #' @export
@@ -3859,12 +3841,12 @@ rn_plot <- function(RN, title = "", xlab = "", ylab="", returnOnlyObject = FALSE
 #'
 #' Get the recurrence time distribution from a recurrence network.
 #'
-#' @param RN A thresholded recurrence matrix generated by function \code{rn()}
-#' @param fitRange If \code{NULL} the entire range will be used for log-log slope. If a 2-element vector of integers, this will represent the range of recurrence times to use for fitting the log=log slope (e.g. \code{c(1,50)} would fit the first 50 recurrence times).
+#' @param RN A thresholded recurrence matrix generated by function `rn()`
+#' @param fitRange If `NULL` the entire range will be used for log-log slope. If a 2-element vector of integers, this will represent the range of recurrence times to use for fitting the log=log slope (e.g. `c(1,50)` would fit the first 50 recurrence times).
 #' @param doPlot Should a plot of the recurrence time spectrum be produced?
-#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
-#' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in SDA (default = \code{FALSE})
+#' @param returnPlot Return ggplot2 object (default = `FALSE`)
+#' @param returnPLAW Return the power law data (default = `FALSE`)
+#' @param returnInfo Return all the data used in SDA (default = `FALSE`)
 #' @param silent Silent-ish mode
 #' @param noTitle Do not generate a title (only the subtitle)
 #' @param tsName Name of y added as a subtitle to the plot
@@ -3873,7 +3855,7 @@ rn_plot <- function(RN, title = "", xlab = "", ylab="", returnOnlyObject = FALSE
 #'
 #' @export
 #'
-#' @family Distance matrix operations (recurrence plot)
+#' @family Distance matrix operations (recurrence network)
 #'
 rn_recSpec <- function(RN,
                        fitRange = NULL,
@@ -4002,13 +3984,13 @@ rn_recSpec <- function(RN,
 #'
 #' Display a recurrence network in a space representing Time (x-axis) x Scale (y-axis). The scale axis will be determined by the latency between the occurence of a value in the (embedded) time series vector and its recurrences in the future (i.e. only the upper triangle of the recurrence matrix will be displayed, excluding the diagonal).
 #'
-#' @param RN A thresholded recurrence matrix generated by function \code{rn()}
-#' @param returnOnlyObject Return the \code{ggplot} / \code{ggraph} object only, do not draw the plot (default = \code{FALSE})
+#' @param RN A thresholded recurrence matrix generated by function `rn()`
+#' @param returnOnlyObject Return the `ggplot` / `ggraph` object only, do not draw the plot (default = `FALSE`)
 #'
-#' @return A \code{ggraph} graph object
+#' @return A `ggraph` graph object
 #' @export
 #'
-#' @family Distance matrix operations (recurrence plot)
+#' @family Distance matrix operations (recurrence network)
 #'
 rn_scaleoGram <- function(RN, returnOnlyObject = FALSE){
 
@@ -4093,14 +4075,16 @@ rn_scaleoGram <- function(RN, returnOnlyObject = FALSE){
 #'
 #'  Calculate the lagged mutual information fucntion within (auto-mif) or between (cross-mif) time series, or, conditional on another time series (conditional-cross-mif). Alternatively, calculate the total information of a multivariate dataset for different lags.
 #'
-#' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using functions in package \code{\link[infotheo]{infotheo}} for \code{lags} lagged versions of the time series.
+#' @param y A `Nx1` matrix for auto-mif, a `Nx2` matrix or data frame for cross-mif, a `Nx3` matrix or data frame for mif between col 1 and 2 conditional on col 3; or a `NxM` matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using functions in package [infotheo::infotheo()] for `lags` lagged versions of the time series.
 #' @param lags The lags to evaluate mutual information.
-#' @param nbins The number of bins passed to \code{\link[infotheo]{discretize}} if y is a matrix or \code{\link[casnet]{ts_discrete}}
-#' @param doPlot Produce a plot of the symbolic time series (default = \code{FALSE})
-#' @param surTest Either \code{FALSE} or an alpha level for conducting a test of significance using simple surrogates, e.g. \code{surTes = .05}. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin \code{j} when the current value is in bin \code{j} .
+#' @param nbins The number of bins passed to [infotheo::discretize()] if y is a matrix or [casnet::ts_discrete()]
+#' @param doPlot Produce a plot of the symbolic time series (default = `FALSE`)
+#' @param surTest Either `FALSE` or an alpha level for conducting a test of significance using simple surrogates, e.g. `surTes = .05`. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin `j` when the current value is in bin `j` .
 #'
 #' @return The auto- or cross-mi function
 #' @export
+#'
+#' @family Redundancy measures (mutual information)
 #'
 #' @examples
 #'
@@ -4176,6 +4160,8 @@ mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), doPlot = FALSE
 #' @return mi in nats
 #' @export
 #'
+#' @family Redundancy measures (mutual information)
+#'
 mi_mat <- function(y, ID1, ID2, discreteBins = ceiling(2*NROW(ID1)^(1/3))){
   Nc <- NCOL(y)
   if(!is.null(dim(y))){
@@ -4243,12 +4229,13 @@ mi_ts <- function(y1,y2=NULL, nbins=NA){
 #'
 #' @param g0 An igraph object representing a layer in a multiplex graph
 #' @param g1 An igraph object representing a layer in a multiplex graph
-#' @param probTable Option to return the table with marginal and joint degree distribution probabilities (default = \code{TRUE})
+#' @param probTable Option to return the table with marginal and joint degree distribution probabilities (default = `TRUE`)
 #'
-#' @return The inter-layer mutual information between \code{g1} and \code{g2}. If \code{probTable=TRUE}, a list object with two fields, the inter-layer mutual information and the table with marginal and joint degree distributions
+#' @return The inter-layer mutual information between `g1` and `g2`. If `probTable=TRUE`, a list object with two fields, the inter-layer mutual information and the table with marginal and joint degree distributions
 #' @export
 #'
-#' @family Multiplex Networks
+#' @family Redundancy measures (mutual information)
+#' @family Multiplex Recurrence Networks
 #'
 mif_interlayer <- function(g0,g1, probTable=FALSE){
   d0    <- igraph::degree_distribution(g0)
@@ -4279,14 +4266,15 @@ mif_interlayer <- function(g0,g1, probTable=FALSE){
 #'
 #' @param distmat Distance matrix
 #' @param emRad The radius or threshold value
-#' @param theiler = Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})
-#' @param convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)
+#' @param theiler = Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = `0`)
+#' @param convMat Should the matrix be converted from a `distmat` obkect of class [Matrix::Matrix()] to [base::matrix()] (or vice versa)
 #'
 #' @return A (sparse) matrix with only 0s and 1s
 #'
 #' @export
 #'
 #' @family Distance matrix operations (recurrence plot)
+#' @family Distance matrix operations (recurrence network)
 #'
 di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
@@ -4331,13 +4319,14 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 #'
 #' @param distmat Distance matrix
 #' @param emRad The radius or threshold value
-#' @param convMat convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)
+#' @param convMat convMat Should the matrix be converted from a `distmat` obkect of class [Matrix::Matrix()] to [base::matrix()] (or vice versa)
 #'
 #' @return A matrix with 0s and leaves the values < threshold distance value
 #'
 #' @export
 #'
 #' @family Distance matrix operations (recurrence plot)
+#' @family Distance matrix operations (recurrence network)
 #'
 di2we <- function(distmat, emRad, convMat = FALSE){
 
@@ -4407,6 +4396,14 @@ SWtest0 <- function(g){
 #  return(list(cp=igraph::transitivity(g,type="global"),cpR=igraph::transitivity(igraph::rewire(g,mode=c("simple"),niter=N),type="global"),lp=igraph::average.path.length(g), lpR=igraph::average.path.length(igraph::rewire(g,mode=c("simple"),niter=N))))
 # }
 
+#' Small World test
+#'
+#' @param g An igraph object
+#' @param p p
+#' @param N N
+#'
+#' @export
+#'
 SWtestE <- function(g,p=1,N=20){
   values <- matrix(nrow=N,ncol=6,dimnames=list(c(1:N),c("cp","cpR","cp0","lp","lpR","lp0")))
 
@@ -4420,6 +4417,7 @@ SWtestE <- function(g,p=1,N=20){
   valuesAV <- data.frame(matrix(colMeans(values[,1:10],na.rm=T),nrow=1,ncol=10,dimnames=list(c(1),c("cp","cpR","cp0","lp","lpR","lp0","SWI","cp:cp0","lp:lp0","SWIn"))))
   return(list(valuesAV=valuesAV,valuesSD=valuesSD,valuesSE=valuesSD/sqrt(N)))
 }
+
 
 # PLFsmall <- function(g){
 #
@@ -4445,15 +4443,17 @@ SWtestE <- function(g,p=1,N=20){
 # }
 
 
-#' Import GrdWare files
+#' Import GridWare files
 #'
-#' @param gwf_name Name of the GridWare project file. A directory named \code{../gwf_name_trjs} must be present at the location of the project file.
+#' @param gwf_name Name of the GridWare project file. A directory named `../gwf_name_trjs` must be present at the location of the project file.
 #' @param delta_t Time between two samples or sampling frequency
 #' @param returnOnlyData Just return the data, do not return a list object with data, variable info and preferences.
-#' @param saveLongFormat Save the long format trajectory data as a \code{.csv} file in the same location as \code{gwf_name}
+#' @param saveLongFormat Save the long format trajectory data as a `.csv` file in the same location as `gwf_name`
 #'
 #' @return A data frame containing State Space Grid trajectories, or a list object with additional info.
 #' @export
+#'
+#' @family State Space Grid functions
 #'
 ssg_gwf2long <- function(gwf_name, delta_t = 0.01,returnOnlyData = TRUE, saveLongFormat = FALSE){
   gwf_lines <- readr::read_lines(gwf_name)
@@ -4531,16 +4531,19 @@ ssg_gwf2long <- function(gwf_name, delta_t = 0.01,returnOnlyData = TRUE, saveLon
 }
 
 
-#' ssg_winnowing
+#' Winnowing procedure for SSG
 #'
-#' @param durations durations frame
-#' @param screeCut cutoff
+#' Find attractor states in a State Space Grid using a winnowing procedure.
 #'
-#' @return attractor frame
+#' @param durations A data frame obtained by function [ts_duration()]
+#' @param screeCut Cutoff based on a scree plot.
+#'
+#' @return Attractor frame
 #' @export
 #'
+#' @family State Space Grid functions
+#'
 ssg_winnowing <- function(durations, screeCut){
-
 
   durations$duration.time[is.na(durations$duration.time)] <- 0
   winnowing <- durations %>% dplyr::filter(duration.time>0)
@@ -4578,13 +4581,17 @@ ssg_winnowing <- function(durations, screeCut){
 }
 
 
-#' Factor labels
+#' Add expected factor labels to observed values
+#'
+#'
 #'
 #' @param observed_Ncat obsN
 #' @param observed_labels obsL
 #' @param expected_Ncat expN
 #' @param expected_labels expL
 #' @param varname varname
+#'
+#' @family State Space Grid functions
 #'
 #' @return character vector
 #' @export
@@ -4647,7 +4654,7 @@ factor_obs_exp <- function(observed_Ncat, observed_labels, expected_Ncat=0, expe
 }
 
 
-# FD estimators ----------------------------------------------
+# (M)FD estimators ----------------------------------------------
 
 
 FDrel <- function(g){
@@ -4661,8 +4668,8 @@ FDrel <- function(g){
 
 #' Informed Dimension estimate from Spectral Slope (aplha)
 #'
-#' @description Conversion formula: From periodogram based self-affinity parameter estimate (\code{sa}) to an informed estimate of the (fractal) dimension (FD).
-#' @param sa Self-Affinity parameter estimate based on PSD slope (e.g., \code{\link{fd_psd}}))
+#' @description Conversion formula: From periodogram based self-affinity parameter estimate (`sa`) to an informed estimate of the (fractal) dimension (FD).
+#' @param sa Self-Affinity parameter estimate based on PSD slope (e.g., [fd_psd()]))
 #' @param ... Other arguments
 #'
 #' @return An informed estimate of the Fractal Dimension, see Hasselman(2013) for details.
@@ -4673,7 +4680,7 @@ FDrel <- function(g){
 #' \deqn{D_{PSD}\approx\frac{3}{2}+\frac{14}{33}*\tanh\left(Slope * \ln(1+\sqrt{2})\right)}
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
 #'
 #'
 sa2fd_psd <- function(sa, ...){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)))), digits = 2))}
@@ -4681,9 +4688,9 @@ sa2fd_psd <- function(sa, ...){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)
 
 #' Informed Dimension estimate from DFA slope (H)
 #'
-#' @description Conversion formula: Detrended Fluctuation Analysis (DFA) estimate of the Hurst exponent (a self-affinity parameter \code{sa}) to an informed estimate of the (fractal) dimension (FD).
+#' @description Conversion formula: Detrended Fluctuation Analysis (DFA) estimate of the Hurst exponent (a self-affinity parameter `sa`) to an informed estimate of the (fractal) dimension (FD).
 #'
-#' @param sa Self-Afinity parameter estimate based on DFA slope (e.g., \code{\link{fd_sda}})).
+#' @param sa Self-Afinity parameter estimate based on DFA slope (e.g., [fd_sda()])).
 #' @param ... Other arguments
 #'
 #' @return An informed estimate of the Fractal Dimension, see Hasselman(2013) for details.
@@ -4696,16 +4703,16 @@ sa2fd_psd <- function(sa, ...){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)
 #'
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
 #'
 sa2fd_dfa <- function(sa, ...){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 
 
 #' Informed Dimension estimate from SDA slope.
 #'
-#' @description Conversion formula: Standardised Dispersion Analysis (SDA) estimate of self-affinity parameter (\code{SA}) to an informed estimate of the fractal dimension (FD).
+#' @description Conversion formula: Standardised Dispersion Analysis (SDA) estimate of self-affinity parameter (`SA`) to an informed estimate of the fractal dimension (FD).
 #'
-#' @param sa Self-afinity parameter estimate based on SDA slope (e.g., \code{\link{fd_sda}})).
+#' @param sa Self-afinity parameter estimate based on SDA slope (e.g., [fd_sda()])).
 #' @param ... Other arguments
 #'
 #' @details
@@ -4717,7 +4724,7 @@ sa2fd_dfa <- function(sa, ...){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 #' @export
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
 #'
 #'
 sa2fd_sda <- function(sa, ...){return(1-sa)}
@@ -4739,7 +4746,7 @@ sa2fd_sda <- function(sa, ...){return(1-sa)}
 #'
 #' @references
 #' \itemize{
-#' \item{Marmelat, V., Torre, K., & Delignieres, D. (2012). Relative roughness: an index for testing the suitability of the monofractal model. \emph{Frontiers in Physiology, 3}, 208.}}
+#' \item{Marmelat, V., Torre, K., & Delignieres, D. (2012). Relative roughness: an index for testing the suitability of the monofractal model. *Frontiers in Physiology, 3*, 208.}}
 #'
 #'
 fd_RR <- function(y){
@@ -4759,27 +4766,27 @@ fd_RR <- function(y){
 #' @description Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope.
 #'
 #' @param y    A numeric vector or time series object.
-#' @param fs Sample rate (default = \code{NULL})
-#' @param standardise    standardise the series (default = \code{TRUE}).
-#' @param detrend    Subtract linear trend from the series (default = \code{TRUE}).
+#' @param fs Sample rate (default = `NULL`)
+#' @param standardise    standardise the series (default = `TRUE`).
+#' @param detrend    Subtract linear trend from the series (default = `TRUE`).
 #' @param fitMethod Method to decide on a frequency range for log-log fit. Can be one of: "lowest25","Wijnants","Hurvich-Deo" (default). See details for more info.
-#' @param doPlot    Return the log-log spectrum with linear fit (default = \code{TRUE}).
-#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
-#' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in SDA (default = \code{FALSE})
-#' @param silent Run in silent-ish mode (default = \code{TRUE)}
+#' @param doPlot    Return the log-log spectrum with linear fit (default = `TRUE`).
+#' @param returnPlot Return ggplot2 object (default = `FALSE`)
+#' @param returnPLAW Return the power law data (default = `FALSE`)
+#' @param returnInfo Return all the data used in SDA (default = `FALSE`)
+#' @param silent Run in silent-ish mode (default = `TRUE)`
 #' @param noTitle Do not generate a title (only the subtitle)
 #' @param tsName Name of y added as a subtitle to the plot
 #'
 #' @author Fred Hasselman
 #'
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
 #'
 #' @return A list object containing:
 #' \itemize{
-#' \item A data matrix \code{PLAW} with columns \code{freq.norm}, \code{size} and \code{bulk}.
-#' \item Estimate of scaling exponent \code{alpha} based on a fit over the lowest 25\% frequencies (\code{low25}), or using the HD estimate \code{HD}.
-#' \item Estimate of the the Fractal Dimension (\code{FD}) using conversion formula's reported in Hasselman(2013).
+#' \item A data matrix `PLAW` with columns `freq.norm`, `size` and `bulk`.
+#' \item Estimate of scaling exponent `alpha` based on a fit over the lowest 25\% frequencies (`low25`), or using the HD estimate `HD`.
+#' \item Estimate of the the Fractal Dimension (`FD`) using conversion formula's reported in Hasselman(2013).
 #' \item Information output by various functions.
 #' }
 #'
@@ -4787,13 +4794,13 @@ fd_RR <- function(y){
 #'
 #' @export
 #'
-#' @details Calls function \code{\link[sapa]{SDF}} to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), \code{SDF} is called using a Tukey window (\code{raised cosine \link[sapa]{taper}}).
+#' @details Calls function [sapa::SDF()] to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), `SDF` is called using a Tukey window (\code{raised cosine \link[sapa]{taper}}).
 #'
 #' A line is fitted on the periodogram in log-log coordinates. The full ramge is fitted as well as one of three fit-ranges:
 #' \itemize{
-#' \item{\code{lowest25} - The 25\% lowest frequencies}
-#' \item{\code{Wijnants} - The 50 lowest frequencies (Wijnants et al., 2012)}
-#' \item{\code{HurvichDeo} - The Hurvich-Deo estimate, see (\code{\link[fractal]{HDEst}})}
+#' \item{`lowest25` - The 25\% lowest frequencies}
+#' \item{`Wijnants` - The 50 lowest frequencies (Wijnants et al., 2012)}
+#' \item{`HurvichDeo` - The Hurvich-Deo estimate, see ([fractal::HDEst()])}
 #' }
 #'
 fd_psd <- function(y,
@@ -4924,29 +4931,29 @@ fd_psd <- function(y,
 #' @param standardise standardise the series (default = "mean.sd")
 #' @param detrend Subtract linear trend from the series (default = FALSE)
 #' @param polyOrder Order of detrending polynomial
-#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})
+#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `FALSE`)
 #' @param scaleMax   Maximum scale to use
 #' @param scaleMin   Minimium scale to use
-#' @param scaleResolution  The scales at which the standardised fluctuations are calculated as: \code{(scaleMax-scaleMin)/scaleResolution}
-#' @param scaleS If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.
-#' @param overlap Turn SDA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2} (default = \code{0})
+#' @param scaleResolution  The scales at which the standardised fluctuations are calculated as: `(scaleMax-scaleMin)/scaleResolution`
+#' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` will be ignored.
+#' @param overlap Turn SDA into a sliding window analysis. A number in `[0 ... 1]` representing the amount of 'bin overlap'. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with stepsize `floor(.5 * 4) = 2` (default = `0`)
 #' @param minData Minimum number of data points in a bin needed to calculate standardised dispersion
-#' @param doPlot   Output the log-log scale versus fluctuation plot with linear fit by calling function \code{plotFD_loglog()} (default = \code{TRUE})
-#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
-#' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in SDA (default = \code{FALSE})
+#' @param doPlot   Output the log-log scale versus fluctuation plot with linear fit by calling function `plotFD_loglog()` (default = `TRUE`)
+#' @param returnPlot Return ggplot2 object (default = `FALSE`)
+#' @param returnPLAW Return the power law data (default = `FALSE`)
+#' @param returnInfo Return all the data used in SDA (default = `FALSE`)
 #' @param silent Silent-ish mode
 #' @param noTitle Do not generate a title (only the subtitle)
 #' @param tsName Name of y added as a subtitle to the plot
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
 #'
 #' @return A list object containing:
 #' \itemize{
-#' \item A data matrix \code{PLAW} with columns \code{freq.norm}, \code{size} and \code{bulk}.
-#' \item Estimate of scaling exponent \code{sap} based on a fit over the standard range (\code{fullRange}), or on a user defined range \code{fitRange}.
-#' \item Estimate of the the Fractal Dimension (\code{FD}) using conversion formula's reported in Hasselman(2013).
+#' \item A data matrix `PLAW` with columns `freq.norm`, `size` and `bulk`.
+#' \item Estimate of scaling exponent `sap` based on a fit over the standard range (`fullRange`), or on a user defined range `fitRange`.
+#' \item Estimate of the the Fractal Dimension (`FD`) using conversion formula's reported in Hasselman(2013).
 #' \item Information output by various functions.
 #' }
 #'
@@ -5074,38 +5081,38 @@ fd_sda <- function(y,
 #'
 #' @param y    A numeric vector or time series object.
 #' @param fs   Sample rate
-#' @param removeTrend Method to use for detrending, see \code{\link[fractal]{DFA}} (default = "poly")
-#' @param polyOrder Order of polynomial trend to remove if \code{removeTrend = "poly"}
-#' @param standardise Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")
-#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})
+#' @param removeTrend Method to use for detrending, see [fractal::DFA()] (default = "poly")
+#' @param polyOrder Order of polynomial trend to remove if `removeTrend = "poly"`
+#' @param standardise Standardise by the series using [casnet::ts_standardise()] with `adjustN = FALSE` (default = "mean.sd")
+#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `FALSE`)
 #' @param scaleMax   Maximum scale (as a power of 2) to use
 #' @param scaleMin   Minimium scale (as a power of 2) to use
-#' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}. The default value yields no resolution of scales: `(scaleMax-scaleMin)`. Common values
-#' @param scaleS If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.
-#' @param overlap Turn DFA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})
+#' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculatd as: `(scaleMax-scaleMin)/scaleResolution`. The default value yields no resolution of scales: `(scaleMax-scaleMin)`. Common values
+#' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` will be ignored.
+#' @param overlap Turn DFA into a sliding window analysis. A number in `[0 ... 1]` representing the amount of 'bin overlap'. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with stepsize `floor(.5 * 4) = 2`. The detrended fluctuation in   For scale `128` this will be  (default = `0`)
 #' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
-#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
-#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
-#' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = `TRUE`).
+#' @param returnPlot Return ggplot2 object (default = `FALSE`)
+#' @param returnPLAW Return the power law data (default = `FALSE`)
+#' @param returnInfo Return all the data used in DFA (default = `FALSE`)
 #' @param silent Silent-ish mode
 #' @param noTitle Do not generate a title (only the subtitle)
 #' @param tsName Name of y added as a subtitle to the plot
 #'
 #'
-#' @return Estimate of Hurst exponent (slope of \code{log(bin)} vs. \code{log(RMSE))} and an FD estimate based on Hasselman(2013)
+#' @return Estimate of Hurst exponent (slope of `log(bin)` vs. `log(RMSE))` and an FD estimate based on Hasselman(2013)
 #' A list object containing:
 #' \itemize{
-#' \item A data matrix \code{PLAW} with columns \code{freq.norm}, \code{size} and \code{bulk}.
-#' \item Estimate of scaling exponent \code{sap} based on a fit over the standard range (\code{fullRange}), or on a user defined range \code{fitRange}.
-#' \item Estimate of the the Fractal Dimension (\code{FD}) using conversion formula's reported in Hasselman(2013).
+#' \item A data matrix `PLAW` with columns `freq.norm`, `size` and `bulk`.
+#' \item Estimate of scaling exponent `sap` based on a fit over the standard range (`fullRange`), or on a user defined range `fitRange`.
+#' \item Estimate of the the Fractal Dimension (`FD`) using conversion formula's reported in Hasselman(2013).
 #' \item Information output by various functions.
 #' }
 #'
 #' @export
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
 #'
 #' @family Fluctuation Analyses
 #'
@@ -5275,18 +5282,18 @@ fd_dfa <- function(y,
 #' @param image2D A matrix representing a 2D image, argument `y` and `unitSquare` will be ignored (default = `NA`)
 #' @param resolution The resolution used to embed the timeseries in 2D, a factor by which the dimensions the matrix will be multiplied (default = `1`)
 #' @param removeTrend If `TRUE`, will call \link[casnet]{ts_detrend} on `y` (default = `FALSE`)
-#' @param polyOrder Order of polynomial trend to remove if \code{removeTrend = `TRUE`}
-#' @param standardise Standardise `y` using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = `none`)
-#' @param adjustSumOrder Adjust the order of the time series (by summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = `FALSE``)
+#' @param polyOrder Order of polynomial trend to remove if `removeTrend = `TRUE``
+#' @param standardise Standardise `y` using [casnet::ts_standardise()] with `adjustN = FALSE` (default = `none`)
+#' @param adjustSumOrder Adjust the order of the time series (by summation or differencing), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `FALSE``)
 #' @param scaleMax Maximum scale value (as `2^scale`) to use (default = `max` of `log2(nrows)` and `log2(ncols)`)
 #' @param scaleMin Minimium scale value (as `2^scale`) to use (default = `0`)
 #' @param scaleS If not `NA`, pass a numeric vector listing the scales (as a power of `2`) on which to evaluate the boxcount. Arguments `scaleMax`, `scaleMin`, and `scaleResolution` will be ignored (default = `NA`)
 #' @param minData Minimum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMin`)
 #' @param maxData Maximum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMax`)
-#' @param doPlot Return the log-log scale versus bulk plot with linear fit (default = \code{TRUE}).
-#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
-#' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param doPlot Return the log-log scale versus bulk plot with linear fit (default = `TRUE`).
+#' @param returnPlot Return ggplot2 object (default = `FALSE`)
+#' @param returnPLAW Return the power law data (default = `FALSE`)
+#' @param returnInfo Return all the data used in DFA (default = `FALSE`)
 #' @param returnLocalScaling Return estimates of FD for each scale
 #' @param silent Silent-ish mode (default = `TRUE`)
 #' @param noTitle Do not generate a title (only the subtitle)
@@ -5547,13 +5554,13 @@ fd_boxcount2D <- function(y = NA,
 #' Calculate FD using Sevcik's method
 #'
 #' @param y A time series or numeric vector
-#' @param detrend Subtract linear trend from the series (default = \code{TRUE}).
-#' @param adjustSumOrder Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{TRUE})
+#' @param detrend Subtract linear trend from the series (default = `TRUE`).
+#' @param adjustSumOrder Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `TRUE`)
 #' @param smallNapprox Force use of small sample approximation (default for N < 128)
-#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
-#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
-#' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = `TRUE`).
+#' @param returnPlot Return ggplot2 object (default = `FALSE`)
+#' @param returnPLAW Return the power law data (default = `FALSE`)
+#' @param returnInfo Return all the data used in DFA (default = `FALSE`)
 #' @param silent Silent-ish mode
 #' @param noTitle Do not generate a title (only the subtitle)
 #' @param tsName Name of y added as a subtitle to the plot
@@ -5682,7 +5689,7 @@ fd_sev <- function(y,
     # dfFD <- data.frame(time=time(ts(y)),FD=D.FD,ci_lo=D.FD-(1.96*D.SE),ci_hi=D.FD+(1.96*D.SE))
     # ggFD <- ggplot(dfFD,aes_(x=time,y=FD)) +  geom_ribbon(aes_(ymin=ci_lo, ymax=ci_hi),colour="grey70", fill = "grey70")+ geom_line() +  scale_x_continuous(expand = c(0,0)) + scale_y_continuous("Fractal Dimension",breaks = c(0.8,1,1.1,1.2,1.5,1.8),expand = c(0,0), limits = c(.8,2)) + theme_bw() + theme(panel.grid.major.x  = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank())
 
-    # graphics::plot.new()
+    # # graphics::plot.new()
     # old <- ifultools::splitplot(2,1,1)
     # #graphics::plot(y,ylab = "Y", main = paste0('FD: ', round(dplyr::last(D.FD), digits=2)))
     # graphics::plot(elascer(y)~ seq(0,1,length.out = N), ylab = "", xlab="", main = paste0('FD: ', round(dplyr::last(D.FD), digits=2)),xlim=c(0,1),ylim=c(0,1),pty="s", type="l")
@@ -5725,10 +5732,10 @@ fd_sev <- function(y,
 #' @param y A numeric vector or time series object
 #' @param fs Sample frequency in Hz
 #' @param useSD Use the standarddeviation instead of variance?
-#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).
-#' @param returnPlot Return ggplot2 object (default = \code{FALSE})
-#' @param returnPLAW Return the power law data (default = \code{FALSE})
-#' @param returnInfo Return all the data used in DFA (default = \code{FALSE})
+#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = `TRUE`).
+#' @param returnPlot Return ggplot2 object (default = `FALSE`)
+#' @param returnPLAW Return the power law data (default = `FALSE`)
+#' @param returnInfo Return all the data used in DFA (default = `FALSE`)
 #' @param silent Silent-ish mode
 #' @param noTitle Do not generate a title (only the subtitle)
 #' @param tsName Name of y added as a subtitle to the plot
@@ -5875,14 +5882,13 @@ fd_allan <- function(y,
     # return(df)
 }
 
-# Multi-Fractal DFA -----------------------------------------------------------------------------------------------
 
 #' Multi-fractal Detrended Fluctuation Analysis
 #'
-#' @param signal    An input signal.
-#' @param qq    A vector containing a range of values for the order of fluctuation \code{q}.
-#' @param mins    Minimum scale to consider.
-#' @param maxs    Maximum scale to consider.
+#' @param signal An input signal.
+#' @param qq A vector containing a range of values for the order of fluctuation `q`.
+#' @param mins Minimum scale to consider.
+#' @param maxs Maximum scale to consider.
 #' @param ressc rescc
 #' @param m m
 #'
@@ -5891,7 +5897,7 @@ fd_allan <- function(y,
 #'
 #' @family Fluctuation Analyses
 #'
-MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
+fd_mfdfa <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
 
   #   reload <- FALSE
   #   if("signal" %in% .packages()){
@@ -5899,6 +5905,7 @@ MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
   #     reload <- TRUE
   #     detach("package:signal", unload=TRUE)
   #   }
+
   scale     <- round(2^(seq(mins,maxs,by=((maxs-mins)/ressc))))
   segv      <- numeric(length(scale))
   RMS_scale <- vector("list",length(scale))
@@ -5951,7 +5958,7 @@ MFDFA <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
 
 #' mono Hurst
 #'
-#' @param TSm TS matrix with 2 columns \code{t} (1st) and \code{y} (second)
+#' @param TSm TS matrix with 2 columns `t` (1st) and `y` (second)
 #' @param scaleS scales to evaluate
 #' @param polyOrder If numeric: order to use for polynomial detrendiing, if "adaptive" will use the best fitting polynomial.
 #'
@@ -6045,19 +6052,268 @@ monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments
 #
 # qq<-c(-10,-5,seq(-2,2,.1),5,10)
 
+# Dynamic Complexity ----
+
+
+#' @title Dynamic Complexity
+#'
+#' @description Calculates Dynamic Complexity, a complexity index for short and coarse-grained time series (Schiepek & Strunk, 2010; Schiepek, 2003; Haken & Schiepek 2006).
+#'
+#' @param df A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.
+#' @param col_first The first column of the dataframe that should be analyzed.
+#' @param col_last The last column of the dataframe that should be analyzed.
+#' @param win Size of window in which to calculate Dynamic Complexity. If `win < NROW(df)` the window will move along the time series with a stepsize of `1` (default = `NROW(df)`)
+#' @param scale_min Theoretical minimum value of thescale.
+#' @param scale_max Theoretical maximum value of the scale.
+#' @param doPlot If `TRUE` shows a Complexity Resonance Diagram and returns an invisible [ggplot2::ggplot()] object. If `FALSE`, plot will be drawn and no object will be returned (default = `FALSE`)
+#' @param useVarNames Use the column names of `df` as variable names in the Complexity Resonance Diagram (default = `TRUE`)
+#' @param colOrder If `TRUE`, the order of the columns in `df` determines the of variables on the y-axis. Use `FALSE` for alphabetic/numeric order. Use `NA` to sort by by mean value of Dynamic Complexity (default = `TRUE`)
+#' @param useTimeVector Parameter used for plotting. Either a variable name, or a vector of length `NROW(df)`, containing date/time information (default = `NA`)
+#' @param timeStamp If `useTimeVector` is not `NA`, a character string that can be passed to [lubridate::stamp()] to format the the dates/times passed in `useTimeVector` (default = `"01-01-1999"`)
+#'
+#' @return If `doPlot = TRUE`, a list object containing a data frame of Dynamic Complexity values and a `ggplot2` object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016). If `doPlot = FALSE` only the data frame with Dynamic Complexity series is returned.
+#'
+#' @export
+#'
+#' @author Merlijn Olthof
+#'
+#' @family Dynamic Complexity functions
+#'
+#' @references Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. Biological cybernetics, 102(3), 197-207.
+#' @references Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. European Journal of Psychological Assessment, 19, 175-184.
+#' @references Haken, H. & Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.
+#' @references Schiepek, G. K., St?ger-Schmidinger, B., Aichhorn, W., Sch?ller, H., & Aas, B. (2016). Systemic case formulation, individualized process monitoring, and state dynamics in a case of dissociative identity disorder. Frontiers in psychology, 7, 1545.
+#'
+dc_win <- function(df, col_first, col_last, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
+
+  if(win<=0){stop("Need a window > 0")}
+
+  tsNames <- colnames(df)[col_first:col_last]
+
+  data_f <- dc_f(df=df, win=win, scale_min=scale_min, scale_max=scale_max, col_first =col_first, col_last = col_last)
+  data_d <- dc_d(df=df, win=win, scale_min=scale_min, scale_max=scale_max, col_first =col_first, col_last = col_last)
+
+  df_win <- data_f*data_d
+  colnames(df_win) <- tsNames
+  attr(df_win,"time") <- attr(data_f,"time")
+
+  if(doPlot){
+
+    g <- plotDC_res(df = df_win, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot)
+
+   return(invisible(list(df   = df_win,
+               plot = g)))
+  } else {
+    return(df_win)
+  }
+}
+
+#' @title Cumulative Complexity Peaks (CCP)
+#'
+#' @description Computes significant peaks in the dynamic complexity time series. Example: Schiepek, Tominschek & Heinzel, 2014.
+#'
+#' @param df_win A data frame containing series of Dynamic Complexity values obtained by running function [dc_win()]
+#' @param alpha_item The significance level of the one-sided Z-test used to determine which peaks are `> 0`.
+#' @param alpha_time The significance level of the one-sided Z-test used to determine if the number of significant peaks (as determined  by `alpha_item`) at a specific time stamp are `> 0`.
+#' @inheritParams dc_win
+#'
+#' @return A list with a dataframe of binary complexity peak indices and a cumulative complexity peak index, a CCP diagram.
+#'
+#' @export
+#'
+#' @author Merlijn Olthof
+#' @author Fred Hasselman
+#'
+#'
+#' @family Dynamic Complexity functions
+#'
+#' @references Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. Biological cybernetics, 102(3), 197-207.
+#' @references Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. European Journal of Psychological Assessment, 19, 175-184.
+#' @references Haken, H. & Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.
+#' @references Schiepek, G. K., Tominschek, I., & Heinzel, S. (2014). Self-organization in psychotherapy: testing the synergetic model of change processes. Frontiers in psychology, 5, 1089.
+#'
+dc_ccp = function(df_win, col_first, col_last, win=NROW(df), scale_min, scale_max, alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
+
+  Zitem <- qnorm(1-alpha_item)
+  Ztime <- qnorm(1-alpha_time)
+
+  df_ccp <- data.frame(matrix(data=NA, nrow=nrow(df_win), ncol=ncol(df_win)))
+  colnames(df_ccp) <- colnames(df_win)
+
+  for (c in (1:NCOL(df_win))){
+    item_z <- ts_standardise(df_win[,c])
+    df_ccp[,c] <- as.numeric(item_z > Zitem)
+  }
+
+  numPeaks <- rowSums(df_ccp,na.rm = TRUE)
+
+  df_ccp$sig.peaks <- as.numeric(ts_standardise(rowSums(df_ccp,na.rm = TRUE)) > Ztime) * 10
+
+  if(doPlot){
+
+    g <- plotDC_ccp(df = df_ccp, win = win, useVarNames = useVarNames, colOrder = colOrder, useTimeVector = useTimeVector, timeStamp = timeStamp, doPlot = doPlot)
+
+    return(invisible(list(df   = df_ccp,
+                          plot = g)))
+  } else {
+    return(df_ccp)
+  }
+}
+
+
+
+#' Fluctuation Intensity
+#'
+#' Fluctuation intensity is one of two components of which the product is the Dynamic Complexity measure.
+#'
+#' @inheritParams dc_win
+#'
+#' @return dataframe
+#' @export
+#'
+#' @seealso Use [dc_win()] to get the dynamic complexity measure.
+#'
+#' @family Dynamic Complexity functions
+#'
+dc_f <- function(df, col_first, col_last, win=NROW(df), scale_min, scale_max){
+
+  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+    time_vec <- time(df)
+  } else {
+    time_vec <- NA
+  }
+
+  ew_data_F <- matrix(NA, nrow=nrow(df), ncol=(col_last-col_first+1))
+  ew_data_F <- data.frame(ew_data_F)
+  newrows = data.frame(subset(df[1,]))
+  newrows[,] <- 0
+  newrows[,1] <- 0
+  data <- rbind(df, newrows)
+  data <- rbind(data, newrows)
+
+  s <- scale_max-scale_min
+  length_ts <- nrow(data)
+
+  for (column in (col_first:col_last)){
+    distance<-1
+    fluctuation <- NA
+    tsy <- as.numeric(data[,column])
+
+    for (i in (1:(nrow(data)-win-1))){
+      y <- NA
+      fluct <- NA
+      dist_next <- 1
+      k <- NA
+
+      for (j in (0:(win-2))){
+        if((tsy[i+j+1] >= tsy[i+j]) & (tsy[i+j+1] > tsy[i+j+2])){
+          (k[j+1]<- 1)
+        }  else if((tsy[i+j+1] <= tsy[i+j]) & (tsy[i+j+1]<tsy[i+j+2])){
+          (k[j+1]<- 1)
+        }  else if ((tsy[i+j+1]>tsy[i+j]) & (tsy[i+j+1] == tsy[i+j+2])){
+          (k[j+1]<- 1)
+        }  else if ((tsy[i+j+1]<tsy[i+j]) & (tsy[i+j+1] == tsy[i+j+2])){
+          (k[j+1] <-1)
+        }  else if ((tsy[i+j+1]==tsy[i+j]) & (tsy[i+j+1] >tsy[i+j+2])){
+          (k[j+1] <-1)
+        }  else if ((tsy[i+j+1]==tsy[i+j]) & (tsy[i+j+1] <tsy[i+j+2])){
+          (k[j+1] <-1)
+        }  else {
+          (k[j+1] <- 0)}
+      }
+      k[win-1] = 1
+      k<-k[1:(win-1)]
+      for (g in (1:length(k))){
+        if(k[g]==1){
+          y[g] <- abs(tsy[i+g]-tsy[i+g-dist_next])
+          fluct[g] = (y[g]/((i+g)-(i+g-dist_next)))
+          dist_next <- distance
+        } else if(k[g]==0){
+          y[g]=0
+          fluct[g]=0
+          dist_next <- dist_next+1}
+      }
+      ew_data_F[(i+win-1),(column-col_first+1)]<-sum(fluct/(s*(win-1)), na.rm=TRUE)
+    }
+  }
+  ew_data_F <- ew_data_F[1:nrow(df),]
+  attr(ew_data_F,"time") <- time_vec
+  return(ew_data_F)
+}
+
+
+#' Distribution Uniformity
+#'
+#' Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.
+#'
+#' @inheritParams dc_win
+#'
+#' @return a dataframe
+#' @export
+#'
+#' @seealso Use [dc_win()] to get the Dynamic Complexity measure.
+#'
+#' @family Dynamic Complexity functions
+#'
+dc_d <- function (df, col_first, col_last, win=NROW(df), scale_min, scale_max){
+
+  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+   time_vec <- time(df)
+  } else {
+    time_vec <- NA
+  }
+
+  ew_data_D <- matrix(NA, nrow=(nrow(df)+2), ncol=(col_last-col_first+1))
+  ew_data_D <- data.frame(ew_data_D)
+  for (column in (col_first:col_last)){
+    tsy <- as.numeric(df[,column])
+    dens <- NA
+    x <- NA
+    y <- NA
+    s <- scale_max-scale_min
+    y <- pracma::linspace(scale_max, scale_min, win)
+    for (i in (1:(length(tsy)-(win-1)))){
+      x <- tsy[i:(i+win-1)]
+      x <- sort(x)
+      r=0
+      g=0
+      for (e in (1:(win-1))){
+        for (d in ((e+1):win)){
+          for (a in (e:(d-1))){
+            for (b in (((a+1):d))){
+              h <- Heaviside((y[b]-y[a])-(x[b]-x[a]))
+              if(h==1){
+                r <- r + (((y[b]-y[a]) - (x[b]-x[a])))
+                g <- g + (y[b]-y[a])
+              } else {
+                r <- r
+                g <- g + (y[b]-y[a])
+              }
+            }
+          }
+        }
+      }
+      ew_data_D[(i+win-1),(column-col_first+1)] <- 1-(r/g)
+    }
+  }
+  ew_data_D <- ew_data_D[(1:nrow(df)),]
+  attr(ew_data_D,"time") <- time_vec
+  return(ew_data_D)
+}
+
 
 # PLOTS -------------------------------------------------------------------
 #
 #
 #' gg_theme
 #'
-#' @param type      One of \code{"clean"}, or \code{"noax"}
+#' @param type      One of `"clean"`, or `"noax"`
 #'
-#' @details Will generate a \code{"clean"} ggplot theme, or a theme without any axes (\code{"noax"}).
+#' @details Will generate a `"clean"` ggplot theme, or a theme without any axes (`"noax"`).
 #'
-#' Some scientific journals explicitly request the Arial font should be used in figures. This can be achieved by using \code{.afm} font format (see, e.g. http://www.pure-mac.com/font.html).
+#' Some scientific journals explicitly request the Arial font should be used in figures. This can be achieved by using `.afm` font format (see, e.g. http://www.pure-mac.com/font.html).
 #'
-#' @return A theme for \code{ggplot2}.
+#' @return A theme for `ggplot2`.
 #' @export
 #'
 #' @examples
@@ -6091,7 +6347,7 @@ gg_theme <- function(type=c("clean","noax")){
 
 #' gg_plotHolder
 #'
-#' @return A blank \code{ggplot2} object that can be used in concordance with \code{grid.arrange}.
+#' @return A blank `ggplot2` object that can be used in concordance with `grid.arrange`.
 #' @export
 #'
 #' @examples
@@ -6142,18 +6398,18 @@ gg_plotHolder <- function(){
 
 #' Set Edge weights by group
 #'
-#'  Use a layout which takes a \code{weights}
+#'  Use a layout which takes a `weights`
 #'
-#' @param g  An igraph object whose edges (\code{get.edgelist(g)}) will be re-weighted according to the \code{membership} argument.
-#' @param groups A named numeric vector with \code{length(V(g))} integers representing each group, or, a named character vector describing each group. If \code{names(groups)==NULL} then the names of the vector will be set as \code{names(groups) == V(g)$name}. If \code{V(g)$name==NULL}, the names of the vector will be set by the Vertex index
-#' @param weigth.within The weight within a group (\code{default = 100})
-#' @param weight.between The weight within a group (\code{default = 1})
-#' @param preserve.weight.within If \code{E(g)$weights} is not \code{NULL}, try to preserve edge weigths within a group
-#' @param preserve.weight.between If \code{E(g)$weights} is not \code{NULL}, try to preserve edge weigths between a groups
+#' @param g  An igraph object whose edges (`get.edgelist(g)`) will be re-weighted according to the `membership` argument.
+#' @param groups A named numeric vector with `length(V(g))` integers representing each group, or, a named character vector describing each group. If `names(groups)==NULL` then the names of the vector will be set as `names(groups) == V(g)$name`. If `V(g)$name==NULL`, the names of the vector will be set by the Vertex index
+#' @param weigth.within The weight within a group (`default = 100`)
+#' @param weight.between The weight within a group (`default = 1`)
+#' @param preserve.weight.within If `E(g)$weights` is not `NULL`, try to preserve edge weigths within a group
+#' @param preserve.weight.between If `E(g)$weights` is not `NULL`, try to preserve edge weigths between a groups
 #' @param doPlot Plot the igraph object
-#' @param returnOnlyWeights Do not return the graph, just the weights. If \code{FALSE} this will return the graph object, otherwis it returns \code{E(g)$weights}
+#' @param returnOnlyWeights Do not return the graph, just the weights. If `FALSE` this will return the graph object, otherwis it returns `E(g)$weights`
 #'
-#' @return A numeric vector with \code{length(get.edgelist(g))} edge weights that will cluster groups defined in \code{membership} if a layout is used that can handle edge weights as a parameter (see examples).
+#' @return A numeric vector with `length(get.edgelist(g))` edge weights that will cluster groups defined in `membership` if a layout is used that can handle edge weights as a parameter (see examples).
 #'
 #' @export
 #'
@@ -6194,7 +6450,7 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
     }
   }
   if(doPlot){
-    graphics::plot.new()
+    # graphics::plot.new()
     graphics::plot(g)
   }
   if(returnOnlyWeights){
@@ -6209,9 +6465,9 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
 #'
 #' @param g An igraph object
 #' @param labels Vertex labels
-#' @param nodesize Set nodesizes by \code{degree(g, normalised = TRUE)} (default) or \code{hubscore(g)$vector}. If a numeric value is passed all vertex sizes will be set to that value.
-#' @param labelsize Set labelsize: "asnodesize" sets the \code{cex} for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the \code{cex} of all labels to that value. A numeric vector of length two, \code{c(min,max)} wil scale the node sizes to \code{min} and \code{max} which
-#' @param edgeweight Set size of edges to \code{"E(g)$weight"} by passing "weight". If a single numeric value is provided all edges will be set to that value.
+#' @param nodesize Set nodesizes by `degree(g, normalised = TRUE)` (default) or `hubscore(g)$vector`. If a numeric value is passed all vertex sizes will be set to that value.
+#' @param labelsize Set labelsize: "asnodesize" sets the `cex` for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the `cex` of all labels to that value. A numeric vector of length two, `c(min,max)` wil scale the node sizes to `min` and `max` which
+#' @param edgeweight Set size of edges to `"E(g)$weight"` by passing "weight". If a single numeric value is provided all edges will be set to that value.
 #' @param doPlot Plot the igraph object.
 #'
 #' @return an igraph object
@@ -6219,7 +6475,12 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
 #'
 #' @family tools for plotting networks
 #'
-plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], labelsize = "asnodesize", edgeweight = "weight", doPlot = TRUE){
+plotNET_prep <- function(g,
+                         labels     = NA,
+                         nodesize   = c("degree","hubscore")[1],
+                         labelsize  = "asnodesize",
+                         edgeweight = "weight",
+                         doPlot     = TRUE){
 
   rev <- NA
   if(is.character(nodesize)){
@@ -6258,7 +6519,9 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
 
   if(igraph::ecount(g)>0){
   if(edgeweight%in%"weight"){
-    igraph::E(g)$width <- elascer(igraph::E(g)$weight,lo = .8, hi = 5)
+    if(igraph::is_weighted(g)){
+      igraph::E(g)$width <- elascer(igraph::E(g)$weight,lo = .8, hi = 5)
+    }
   } else {
     if(is.numeric(edgeweight)){
       igraph::E(g)$width <- as.numeric(edgeweight)
@@ -6269,7 +6532,7 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
   igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
   }
   if(doPlot){
-    graphics::plot.new()
+    # graphics::plot.new()
     graphics::plot(g)
   }
   return(invisible(g))
@@ -6278,11 +6541,11 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
 
 #' Example of Strogatz-Watts small-world network
 #'
-#' A wrapper around \code{\link[igraph]{sample_smallworld}} with \code{dim=1}
+#' A wrapper around [igraph::sample_smallworld()] with `dim=1`
 #'
 #' @param n Size of the lattice (integer)
 #' @param k Neighbourhood size (integer)
-#' @param p Rewiring probability (between \code{0} and \code{1})
+#' @param p Rewiring probability (between `0` and `1`)
 #' @param doPlot PLot the igraph object
 #'
 #' @return A Strogatz-Watts small-world igraph object
@@ -6291,12 +6554,12 @@ plotNET_prep <- function(g, labels = NA, nodesize = c("degree","hubscore")[1], l
 #'
 #' @family tools for plotting networks
 #'
-#' @seealso \code{\link[igraph]{sample_smallworld}}
+#' @seealso [igraph::sample_smallworld()]
 #'
 plotNET_SW <- function(n=100,k=5,p=0.05, doPlot = TRUE){
 
   g <- igraph::sample_smallworld(1, n, k, p)
-  g <- plotNET_prep(g)
+  g <- plotNET_prep(g,doPlot = FALSE)
 
   # igraph::V(g)$degree <- igraph::degree(g)
   #
@@ -6315,7 +6578,7 @@ plotNET_SW <- function(n=100,k=5,p=0.05, doPlot = TRUE){
   # igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
   if(doPlot){
-    graphics::plot.new()
+    # graphics::plot.new()
     graphics::plot(g)
   }
   return(invisible(g))
@@ -6323,7 +6586,7 @@ plotNET_SW <- function(n=100,k=5,p=0.05, doPlot = TRUE){
 
 #' Example of Barabasi scale-free network
 #'
-#' A wrapper around \code{\link[igraph]{sample_pa}}
+#' A wrapper around [igraph::sample_pa()]
 #'
 #' @param n Number of vertices
 #' @param pwr Power of preferential attachment
@@ -6335,30 +6598,33 @@ plotNET_SW <- function(n=100,k=5,p=0.05, doPlot = TRUE){
 #'
 #' @family tools for plotting networks
 #'
-#' @seealso \code{\link[igraph]{sample_pa}}
+#' @seealso [igraph::sample_pa()]
 #'
 plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
 
   g <- igraph::sample_pa(n, power = pwr, out.dist=out.dist, directed=FALSE)
-  igraph::V(g)$degree <- igraph::degree(g)
+  g <- plotNET_prep(g,doPlot = FALSE)
 
-  # set colors and sizes for vertices
-  rev<-elascer(log1p(igraph::V(g)$degree))
-  rev[rev<=0.2] <- 0.2
-  rev[rev>=0.9] <- 0.9
-  igraph::V(g)$rev <- rev$x
 
-  igraph::V(g)$color    <- grDevices::rgb(igraph::V(g)$rev, 1-igraph::V(g)$rev,  0, 1)
-  igraph::V(g)$size     <- 25*igraph::V(g)$rev
-  # igraph::V(g)$frame.color <- grDevices::rgb(.5, .5,  0, .4)
+  # igraph::V(g)$degree <- igraph::degree(g)
 
-  # set vertex labels and their colors and sizes
-  igraph::V(g)$label <- ""
-  igraph::E(g)$width <- 1
-  igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
+  # # set colors and sizes for vertices
+  # rev<-elascer(log1p(igraph::V(g)$degree))
+  # rev[rev<=0.2] <- 0.2
+  # rev[rev>=0.9] <- 0.9
+  # igraph::V(g)$rev <- rev$x
+  #
+  # igraph::V(g)$color    <- grDevices::rgb(igraph::V(g)$rev, 1-igraph::V(g)$rev,  0, 1)
+  # igraph::V(g)$size     <- 25*igraph::V(g)$rev
+  # # igraph::V(g)$frame.color <- grDevices::rgb(.5, .5,  0, .4)
+  #
+  # # set vertex labels and their colors and sizes
+  # igraph::V(g)$label <- ""
+  # igraph::E(g)$width <- 1
+  # igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
 
   if(doPlot){
-    graphics::plot.new()
+    # graphics::plot.new()
     graphics::plot(g)
   }
   return(invisible(g))
@@ -6370,15 +6636,15 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
 #' Identify Vertex and/or Edge groups by colour.
 #'
 #' @param g An igraph object
-#' @param groups A named numeric vector with \code{length(V(g))} integers representing each group, or, a named character vector describing each group. If \code{names(groups)==NULL} then the names of the vector will be set as \code{names(groups) == V(g)$name}. If \code{V(g)$name==NULL}, the names of the vector will be set by the Vertex index
-#' @param colourV Colour Vertices based on \code{groups} (default = \code{TRUE})
-#' @param alphaV Set transparency for Vertices (default = \code{1})
-#' @param colourE Colour Edges based on \code{groups} (default = \code{FALSE})
-#' @param alphaE Set transparency for Edges (default = \code{0.8})
-#' @param groupColours A list of length \code{groups} with valid colour codes
+#' @param groups A named numeric vector with `length(V(g))` integers representing each group, or, a named character vector describing each group. If `names(groups)==NULL` then the names of the vector will be set as `names(groups) == V(g)$name`. If `V(g)$name==NULL`, the names of the vector will be set by the Vertex index
+#' @param colourV Colour Vertices based on `groups` (default = `TRUE`)
+#' @param alphaV Set transparency for Vertices (default = `1`)
+#' @param colourE Colour Edges based on `groups` (default = `FALSE`)
+#' @param alphaE Set transparency for Edges (default = `0.8`)
+#' @param groupColours A list of length `groups` with valid colour codes
 #' @param doPlot Plot the igraph object
 #'
-#' @return An igraph object with vertices and/or edges coloured by groups listed in \code{groups}
+#' @return An igraph object with vertices and/or edges coloured by groups listed in `groups`
 #'
 #' @export
 #'
@@ -6461,7 +6727,7 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
   } # group loop
 
   if(doPlot){
-    graphics::plot.new()
+    # graphics::plot.new()
     graphics::plot(g)
   }
   return(invisible(g))
@@ -6471,7 +6737,7 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=FALSE, colourE=F
 
 #' Plot output from fluctuation analyses based on log-log regression
 #'
-#' @param fd.OUT Output from one of the \code{fd_} functions that use log-log regression to get scaling exponents.
+#' @param fd.OUT Output from one of the `fd_` functions that use log-log regression to get scaling exponents.
 #' @param title Plot title
 #' @param subtitle Plot subtitle
 #' @param xlabel x label
@@ -6604,7 +6870,7 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
                    plot.margin = ggplot2::margin(t = 5,b = 5, r = 5,l = 5, unit = "pt"))
 
 
-    graphics::plot.new()
+    # graphics::plot.new()
     graphics::plot(g)
 
   return(invisible(g))
@@ -6615,16 +6881,16 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
 #'
 #' @param surrogateValues Vector of measures based on surrogate time series
 #' @param observedValue The measure obtained from the observed value
-#' @param sides Is this a 1 or 2-sided test (default = \code{1})
-#' @param binWidth The size of the histogram bins. The default is to look for the max. number of digits and set the width to \code{1/10^(Ndigits-1)}. If integers are detectec width will be set to 1.
+#' @param sides Is this a 1 or 2-sided test (default = `1`)
+#' @param binWidth The size of the histogram bins. The default is to look for the max. number of digits and set the width to `1/10^(Ndigits-1)`. If integers are detectec width will be set to 1.
 #' @param measureName Label for x-axis
 #' @param title A title for the plot
-#' @param doPlot Plot a histogram of the distribution (default = \code{TRUE})
-#' @param returnOnlyPvalue Do not return the graph, just the point p-value (default = \code{FALSE})
+#' @param doPlot Plot a histogram of the distribution (default = `TRUE`)
+#' @param returnOnlyPvalue Do not return the graph, just the point p-value (default = `FALSE`)
 #'
 #' alpha Significance threshold for the test. This value is currently calculated from the data as \eqn{\frac{1}{rank}*Nsides}, setting it will not have an effect.
 #'
-#' @return A point p-value for the observed value, and/or a histogram of the distribution (\code{ggplot2} object).
+#' @return A point p-value for the observed value, and/or a histogram of the distribution (`ggplot2` object).
 #' @export
 #'
 plotSUR_hist <- function(surrogateValues,
@@ -6802,97 +7068,6 @@ pacf_fisherZ <-function(r, n, lag, siglevel=.05,sides=2,type=""){
   return(data.frame(r=r,ciL=conf.low,ciU=conf.high,fZ=z,p=p,alpha=siglevel,sig=sig,lag=lag,n=n,type=type, stringsAsFactors = FALSE))
 }
 
-#' Estimate the transition matrix for computing the critical threshold values on
-#' mutual information.
-#'
-#' \code{mutual_info} is a helper function for estimating the transition matrix
-#' used in creating resampled vectors for the (1 - alpha)\% critical threshold
-#' value on the mutual info.
-#'
-#' @param x A \code{vector} of values.
-#' @param n_bins The number of bins for the entropy calculation.
-#'
-#' @return A \code{list} with the following components:
-#' \describe{
-#' \item{\code{xn}}{An `[n x 2]` matrix of the original and discretized vectors.}
-#' \item{\code{MM}}{Transition probability matrix from bin-i to bin-j.}
-#' }
-#'
-#' @author Mark Scheuerell (https://mdscheuerell.github.io/muti/)
-#'
-#' @importFrom stats runif
-#' @export
-#' @keywords internal
-#'
-transM <- function(x,n_bins) {
-  ## helper function for estimating transition matrix used in
-  ## creating resampled ts for the CI on mutual info
-  ## replace NA with runif()
-  x[is.na(x)] <- runif(length(x[is.na(x)]),min(x,na.rm=TRUE),max(x,na.rm=TRUE))
-  ## length of ts
-  tt <- length(x)
-  ## get bins via slightly extended range
-  bins <- seq(min(x)-0.001,max(x),length.out=n_bins+1)
-  ## discretize ts
-  hin <- vector("numeric",tt)
-  for(b in 1:n_bins) {
-    hin[x > bins[b] & x <= bins[b+1]] <- b
-  }
-  ## matrix of raw-x & discrete-x
-  xn <- cbind(x,hin)
-  ## transition matrix from bin-i to bin-j
-  MM <- matrix(0,n_bins,n_bins)
-  for(i in 1:n_bins) {
-    for(j in 1:n_bins) {
-      MM[i,j] <- sum(hin[-tt]==i & hin[-1]==j)
-    }
-    if(sum(MM[i,])>0) { MM[i,] <- MM[i,]/sum(MM[i,]) }
-    else { MM[i,] <- 1/n_bins }
-  }
-  return(list(xn=xn,MM=MM))
-} ## end function
-
-#' Create new vector based on resampling of the original data.
-#'
-#' \code{newZ} creates new vector based on a transition matrix. It is a helper
-#'   function for \code{muti}.
-#'
-#' @param tM The output from \code{transM}; a \code{list} with elements \code{xn} and \code{MM}.
-#' @param n_bins The number of bins to use; passed from \code{muti}.
-#'
-#' @return A vector of resampled values.
-#'
-#' @author Mark Scheuerell (https://mdscheuerell.github.io/muti/)
-#'
-#' @importFrom stats rmultinom
-#' @export
-#' @keywords internal
-#'
-newZ <- function(tM, n_bins) {
-  ## helper function for creating new ts based on resampling
-  ## the original data
-  ## number of bins
-  # n_bins <- dim(tM$MM)[1]
-  ## length of ts
-  tt <- dim(tM$xn)[1]
-  ## random start index
-  tin <- sample(tt,1)
-  ## init zz
-  zz <- matrix(NA,tt,2)
-  ## get first sample
-  zz[1,] <- tM$xn[tin,]
-  ## loop over remaining samples
-  for(t in 2:tt) {
-    ## random transition bin
-    zz[t,2] <- seq(n_bins)[rmultinom(1,1,tM$MM[zz[t-1,2],])==1]
-    ## possible set of real values
-    pset <- tM$xn[tM$xn[,2] %in% zz[t,2],1]
-    if(length(pset)==0) { pset <- NA }
-    ## get next sample
-    zz[t,1] <- pset[sample(length(pset),1)]
-  }
-  return(zz[,1])
-} ## end function
 
 #' Plot ACF and PACF
 #'
@@ -6908,7 +7083,7 @@ newZ <- function(tM, n_bins) {
 #'
 #' @export
 #'
-plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = TRUE, returnCorFun = TRUE){
+plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = TRUE, returnCorFun = FALSE){
 
   siglevel <- alpha
   df.acf <- stats::acf(y,plot=FALSE, lag.max = Lmax)
@@ -6943,7 +7118,7 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
     ggplot2::theme(panel.grid.minor.y = ggplot2::element_blank(), panel.grid.minor.x = ggplot2::element_blank())
 
   if(doPlot){
-    graphics::plot.new()
+    # graphics::plot.new()
     graphics::plot(g)
   }
 
@@ -6957,9 +7132,9 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
 
 #' Plot various MI functions
 #'
-#' @param y A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function.
+#' @param y A `Nx1` matrix for auto-mif, a `Nx2` matrix or data frame for cross-mif, a `Nx3` matrix or data frame for mif between col 1 and 2 conditional on col 3; or a `NxM` matrix or data frame for the multi-information function.
 #' @param lags Maximum number of lags
-#' @param nbins The number of bins passed to \code{\link[infotheo]{discretize}} if y is a matrix or \code{\link[casnet]{ts_discrete}}
+#' @param nbins The number of bins passed to [infotheo::discretize()] if y is a matrix or [casnet::ts_discrete()]
 #' @param alpha Significance level
 #' @param doPlot Plot output
 #' @param returnMIFun Return the data
@@ -7007,7 +7182,7 @@ plotRED_mif <- function(y, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*
     ggplot2::theme(panel.grid.minor.y = ggplot2::element_blank(), panel.grid.minor.x = ggplot2::element_blank())
 
   if(doPlot){
-    graphics::plot.new()
+    # graphics::plot.new()
     graphics::plot(g)
   }
 
@@ -7018,6 +7193,236 @@ plotRED_mif <- function(y, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*
     return(invisible(g))
   }
 }
+
+
+
+#' Plot Complexity Resonance Diagram
+#'
+#' @inheritParams dc_ccp
+#'
+#' @return An invisible ggplot2 object.
+#' @export
+#'
+#' @family Dynamic Complexity functions
+#'
+plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999", doPlot = TRUE, title = 'Complexity Resonance Diagram', subtitle = "", xlabel = "Time", ylabel = ""){
+
+  if(!useVarNames){
+    df_win <- data.matrix(df_win)
+    colnames(df_win) <- c(1:ncol(df_win))
+  }
+
+  if(!all(is.na(useTimeVector))){
+    if(length(useTimeVector)==1){
+      if(useTimeVector%in%colnames(df_win)){
+        labels <- lubridate::stamp(timeStamp)(df_win[,useTimeVector%ci%df_win])
+      }
+    } else {
+      if(length(useTimeVector)==NROW(df_win)){
+        labels <- lubridate::stamp(timeStamp)(useTimeVector)
+      }
+    }
+  } else {
+    labels <- paste(1:NROW(df_win))
+  }
+
+  df_win$time <- 1:NROW(df_win)
+
+  minorBreaks <- df_win$time[seq(win, NROW(df_win))]
+  if(NROW(df_win)>50){
+    labels <- labels[minorBreaks]
+    #  by = round(length(breaks)/25))]
+    #labels[!labels%in%labels[seq(2,length(minorBreaks), by = round(length(minorBreaks)/25))]] <- ""
+    labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+    majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+  }
+
+  # breaks <- seq(win, NROW(df_win))
+  # if(NROW(df_win)>50){
+  #   labels <- paste(breaks)
+  #   labels[!labels%in%labels[seq(2,length(breaks), by = round(length(breaks)/25))]]<- ""
+  #   labels[1] <- ""
+  #   labels[2] <- paste(win+1)
+  # }
+
+  if(is.na(colOrder)){
+    subtitle <- 'Variables ordered by mean Dynamic Complexity'
+  } else {
+    subtitle <- ifelse(colOrder,
+                       'Variables ordered by position in data source',
+                       'Variables ordered by variable name')
+  }
+
+  if(is.na(colOrder)){
+    df_win <- dplyr::select(df_win,names(sort(colMeans(df_win, na.rm = TRUE))))
+    colOrder <- TRUE
+  }
+
+  df_win$time <- 1:NROW(df_win)
+  dfp <- tidyr::gather(df_win, key = variable, value = value, c(-time), factor_key = colOrder)
+  dfp$time <- as.numeric(dfp$time)
+
+
+
+  # if(subtitle=="Variables ordered by ..."){
+  #   subt <- paste0("Variables ordered by ",corder)
+  # }
+
+  g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
+    ggplot2::geom_raster(interpolate = FALSE) +
+    ggplot2::scale_fill_gradient2("Dynamic Complexity",low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
+    ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, size=.1) +
+    ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="steelblue", alpha=.9, size=.1) +
+    ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
+    ggplot2::scale_x_continuous(xlabel,
+                                breaks = majorBreaks,
+                                minor_breaks = minorBreaks-.5,
+                                labels = labels,
+                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5)) +
+   # ggplot2::scale_x_continuous(xlabel, breaks = breaks, labels = labels, expand = c(0,0), limits = c((win+1)-.5, max(breaks)+.5)) +
+    ggplot2::labs(title = title, subtitle = subtitle) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(#axis.text.x = element_text(vjust = 0, hjust = 1, angle = 90),
+                   #axis.text.y = element_text(vjust = 1),
+                   legend.position = "bottom",
+                   legend.key.size = unit(.05,"npc"),
+                   axis.text.x = element_text(size=8, angle = 90, vjust =0.5),
+                   axis.text.y = element_text(size=8),
+                   axis.line.x.top = element_line(),
+                   axis.ticks.x.top = element_line(),
+                   panel.grid.major.x = element_blank(),
+                   panel.grid.minor.x = element_line(),
+                   panel.grid.minor.y = element_line(),
+                   panel.grid.major.y = element_blank(),
+                   plot.subtitle = element_text(size=10),
+                   plot.title = element_text(face = "bold"),
+                   legend.title = element_text(vjust=.75,size = 10))
+
+
+  if(doPlot){
+   graphics::plot(g)
+  }
+  return(invisible(g))
+}
+
+
+
+#' Plot Cumulative Complexity Peaks
+#'
+#' @param df_ccp A dataframe generated by `dc_ccp()`
+#' @inheritParams plotDC_res
+#'
+#' @return An invisible ggplot2 object.
+#' @export
+#'
+#' @family Dynamic Complexity functions
+#'
+plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", doPlot = TRUE, title = 'Critical Instability Plot', subtitle = "", xlabel = "Time", ylabel = ""){
+
+  if(!useVarNames){
+    df_ccp <- data.matrix(df_ccp)
+    colnames(df_ccp) <- c(1:ncol(df_ccp))
+  }
+
+  lcol  <- df_ccp$sig.peaks
+  lcol[lcol==0] <- 5
+  df_ccp <- df_ccp[,-c("sig.peaks"%ci%df_ccp)]
+  if(is.na(colOrder)){
+    df_ccp <- dplyr::select(df_ccp,names(sort(colSums(df_ccp, na.rm = TRUE))))
+    colOrder <- TRUE
+  }
+
+   if(!all(is.na(useTimeVector))){
+     if(length(useTimeVector)==1){
+       if(useTimeVector%in%colnames(df_ccp)){
+         labels <- lubridate::stamp(timeStamp)(df_ccp[,useTimeVector%ci%df_ccp])
+         }
+       } else {
+         if(length(useTimeVector)==NROW(df_ccp)){
+           labels <- lubridate::stamp(timeStamp)(useTimeVector)
+         }
+       }
+   } else {
+     labels <- paste(1:NROW(df_ccp))
+   }
+
+  df_ccp$time <- 1:NROW(df_ccp)
+
+  # typeX <- ""
+  # if(lubridate::is.Date(df_ccp$time)){
+  #   typeX <- "date"
+  #   df_ccp$time <- lubridate::as.Date(df_ccp$time)
+  # } else {
+  #   if(lubridate::is.timepoint(df_ccp$time)){
+  #     typeX <- "datetime"
+  #     df_ccp$time <- as.POSIXct(df_ccp$time)
+  #   } else {
+  #     if(is.numeric( df_ccp$time)){
+  #       typeX <- "num"
+  #       df_ccp$time <- as.numeric( df_ccp$time)
+  #     }
+  #   }
+  # }
+  # if(nchar(typeX)==0){
+  #   stop("X-axis must be numeric or a date or a date-time.")
+  # }
+
+  minorBreaks <- df_ccp$time[seq(win, NROW(df_ccp))]
+  if(NROW(df_ccp)>50){
+    labels <- labels[minorBreaks]
+    #  by = round(length(breaks)/25))]
+    #labels[!labels%in%labels[seq(2,length(minorBreaks), by = round(length(minorBreaks)/25))]] <- ""
+    labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+    majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+  }
+
+ if(!colOrder){
+   df_ccp <- df_ccp[,sort(colnames(df_ccp))]
+ }
+
+  df_ccp$sig.peaks <- lcol
+  colnames(df_ccp)[colnames(df_ccp)%in%"sig.peaks"]<-"Sig. CCP"
+  dfp <- tidyr::gather(df_ccp, key = variable, value = value, -(time), factor_key = TRUE)
+  dfp$value <- factor(dfp$value,levels = c(0,1,5,10),
+                      labels = c("0","Sig. DC level","5","Sig. CCP"))
+
+
+  g <- ggplot2::ggplot(dfp[complete.cases(dfp),], ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
+    ggplot2::geom_raster(interpolate = FALSE) +
+    ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, size=.1) +
+    ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="grey90", alpha=1, size=.1) +
+    ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
+    ggplot2::scale_x_continuous(xlabel,
+                                breaks = majorBreaks,
+                                minor_breaks = minorBreaks-.5,
+                                labels = labels,
+                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5)) +
+    ggplot2::scale_fill_manual("Critical Insability", breaks = c("Sig. DC level","Sig. CCP"), values = c("0"="white","Sig. DC level"="grey","5"="whitesmoke","Sig. CCP"="black")) +
+    ggplot2::labs(title = title, subtitle = subtitle) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      legend.position = "bottom",
+      legend.key.size = unit(.05,"npc"),
+      axis.text.x = element_text(size=8, angle = 90, vjust =0.5),
+      axis.text.y = element_text(size=8),
+      axis.line.x.top = element_line(),
+      axis.ticks.x.top = element_line(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_line(),
+      panel.grid.minor.y = element_line(),
+      panel.grid.major.y = element_blank(),
+      plot.subtitle = element_text(size=10),
+      plot.title = element_text(face = "bold"),
+      legend.title = element_text(vjust=.75,size = 10))
+
+  if(doPlot){
+    # graphics::plot.new()
+    graphics::plot(g)
+  }
+
+  return(invisible(g))
+}
+
 
 
 # Complex Networks# graph2svg <- function(TDM,pname){
@@ -7265,24 +7670,26 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 #' @param y1 Time series 1. The goal of the permutation test will be to decide whether the difference `y1-targetValue != 0` for each time point, given `alpha`.
 #' @param y2 An optional second time series. If this timeseries is provided then the goal of the permutation test will be the to decide wether the difference `y2-y1 != targetValue` for each time point, given `alpha`.
 #' @param targetValue The target value for the permutation test. If `NULL`, the function will return a data frame with the block randomised surrogates  columns (default = `0`)
-#' @param Nperms Number of permutations (default = \code{99})
-#' @param sim Value passed to the \code{sim} argument of \code{\link[boot]{tsboot}} valid options are: \code{"model","fixed","geom","scramble"} (default = \code{"geom"})
-#' @param l Block sizes to use, see \code{\link[boot]{tsboot}} for details (default = \code{3})
-#' @param alpha Alpha level for deciding significance  (default = \code{0.05})
-#' @param returnBootObject Return the \code{boot} object (default = \code{FALSE})
-#' @param ... Other arguments passed to function \code{\link[boot]{tsboot}}
+#' @param Nperms Number of permutations (default = `19`)
+#' @param sim Value passed to the `sim` argument of [boot::tsboot()] valid options are: `"model","fixed","geom","scramble"` (default = `"geom"`)
+#' @param l Block sizes to use, see [boot::tsboot()] for details (default = `3`)
+#' @param alpha Alpha level for deciding significance  (default = `0.05`)
+#' @param returnBootObject Return the `boot` object (default = `FALSE`)
+#' @param ... Other arguments passed to function [boot::tsboot()]
 #'
 #' @return A data frame with the difference time series and variables indicating N and significance.
 #'
+#' @family Time series operations
+#'
 #' @export
 #'
-ts_permtest_block <- function(y1, y2 = NULL, targetValue = 0, Nperms = 99, sim = "geom", l = 3, alpha = .05, returnBootObject = FALSE, ...){
+ts_permtest_block <- function(y1, y2 = NULL, targetValue = 0, Nperms = 19, sim = "geom", l = 3, alpha = .05, returnBootObject = FALSE){
 
   tsSame <- function(y){
     y
   }
 
-  dotArgs <- list(...)
+#  dotArgs <- list(...)
 #  Args <- methods::formalArgs(boot::tsboot)
 #   Args <- Args[!Args%in%c("tseries","statistic","R","l","sim")]
 #   nameOK  <- names(dotArgs)%in%Args
@@ -7368,17 +7775,63 @@ ts_permtest_block <- function(y1, y2 = NULL, targetValue = 0, Nperms = 99, sim =
 }
 
 
+#' Permutation Test: Transition Matrix
+#'
+#' Monte Carlo resampling of a time series using a discretised version of `y`, a sequence of `bin` numbers with unique values equal to `nbins`:
+#'    1. The discrete version of `y` will be used to generate a transition matrix of size `nbins X nbins`.
+#'    2. This transition matrix will be used to resample values
+#'
+#' @inheritParams ts_permtest_block
+#' @param keepNA keepNA
+#'
+#' @return Resampled series
+#' @export
+#'
+#' @family Time series operations
+#'
+#' @examples
+#'
+#' set.seed(4321)
+#' y <- rnorm(5000)
+#' ys <- ts_resample(y)
+#'
+ts_permtest_transmat <- function(y1, y2 = NA, targetValue, nbins = ceiling(2*length(y)^(1/3)), mc = 19, alpha = .05, keepNA = TRUE){
+
+  bins <- ts_discrete(y, nbins, keepNA = keepNA)
+
+
+  yn <- cbind(rbin = bins, yr = y)
+
+  y_mc   <- matrix(NA,NROW(yn),2, dimnames = list(NULL,c("rbin","ry")))
+  y_mc[1,] <- yn[sample(NROW(yn),1),]
+
+  y_mc[2:NROW(yn),1:2] <- plyr::laply(2:NROW(yn), function(t){
+    # set of real values
+    rbin <- seq(nbins)[rmultinom(1,1,transmat[zz[t-1,2],])==1]
+    pset <- yn[yn[,2] %in% rbin,1]
+    if(length(pset)==0){
+      out <- NA
+    } else {
+      out <- pset[sample(length(pset),1)]
+    }
+    return(cbind2(rbin,out))
+  })
+}
+
+
 
 #' Find change indices
 #'
 #' @param y An indicator variable representing different levels of a variable or factor
-#' @param returnRectdata Return a dataframe suitable for shading a \code{ggplot2} graph with \code{\link[ggplot2]{geom_rect}}
-#' @param groupVar Pass a value (length 1) or variable (length of y) that can be used as a variable to join the indices by if \code{returnRectdata = TRUE}
-#' @param labelVar If \code{y} is not a character vector, provide a vector of labels equal to \code{length(y)}
-#' @param discretize If \code{y} is a continuous variable, setting \code{discretize = TRUE} will partition the values of \code{y} into \code{nbins} number of bins, each value of \code{y} will be replaced by its bin number.
-#' @param nbins Number of bins to use to change a continuous \code{y} (if \code{discretize = TRUE}) into a variable with \code{nbins} levels
+#' @param returnRectdata Return a dataframe suitable for shading a `ggplot2` graph with [ggplot2::geom_rect()]
+#' @param groupVar Pass a value (length 1) or variable (length of y) that can be used as a variable to join the indices by if `returnRectdata = TRUE`
+#' @param labelVar If `y` is not a character vector, provide a vector of labels equal to `length(y)`
+#' @param discretize If `y` is a continuous variable, setting `discretize = TRUE` will partition the values of `y` into `nbins` number of bins, each value of `y` will be replaced by its bin number.
+#' @param nbins Number of bins to use to change a continuous `y` (if `discretize = TRUE`) into a variable with `nbins` levels
 #'
-#' @return Either a vector with the indices of change in \code{y}, or, a data frame with variables \code{xmin,xmax,ymin,ymax,label}
+#' @return Either a vector with the indices of change in `y`, or, a data frame with variables `xmin,xmax,ymin,ymax,label`
+#'
+#' @family Time series operations
 #'
 #' @export
 #'
@@ -7422,16 +7875,17 @@ ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = N
 }
 
 
-
 #' Time series to Duration series
 #'
 #' @param y A time series, numeric vector, or categorical variable.
-#' @param timeVec A vector, same length as \code{y} containing timestamps, or, sample indices.
-#' @param fs Optional sampling frequency if timeVec represents sample indices. An extra column \code{duration.fs} will be added which represents \code{1/fs * duration in samples}
-#' @param tolerance A number \code{tol} indicating a range \code{[y-tol,y+tol]} to consider the same value. Useful when \code{y} is continuous (\code{default = 0})
+#' @param timeVec A vector, same length as `y` containing timestamps, or, sample indices.
+#' @param fs Optional sampling frequency if timeVec represents sample indices. An extra column `duration.fs` will be added which represents `1/fs * duration in samples`
+#' @param tolerance A number `tol` indicating a range `[y-tol,y+tol]` to consider the same value. Useful when `y` is continuous (`default = 0`)
 #'
 #' @return A data frame
 #' @export
+#'
+#' @family Time series operations
 #'
 #' @examples
 #' library(invctr)
@@ -7488,7 +7942,7 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
 #' @param y Time series
 #' @param emDim Embedding dimension
 #' @param emLag Embedding lag
-#' @param returnOnlyIndices Return only the index of y for each surrogate dimension, not the values (default = \code{FALSE})
+#' @param returnOnlyIndices Return only the index of y for each surrogate dimension, not the values (default = `FALSE`)
 #' @param silent Silent-ish mode
 #'
 #' @return The lag embedded time series
@@ -7497,6 +7951,8 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
 #' @author Fred Hasselman
 #'
 #' @export
+#'
+#' @family Time series operations
 #'
 ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE){
 
@@ -7564,13 +8020,15 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
 
 #' Discrete representation
 #'
-#'  Return a discrete representation of \code{y} by binning the observed values and returning the transfer probabilities.
+#'  Return a discrete representation of `y` by binning the observed values and returning the transfer probabilities.
 #'
 #' @param y Numeric vector or time series to be discretised.
-#' @param nbins Number of bins to use for calculating transfer probabilities (default = \code{ceiling(2*length(y)^(1/3))})
-#' @param keepNA If \code{TRUE}, any \code{NA} values will first be removed and later re-inserted into the discretised time series.
+#' @param nbins Number of bins to use for calculating transfer probabilities (default = `ceiling(2*length(y)^(1/3))`)
+#' @param keepNA If `TRUE`, any `NA` values will first be removed and later re-inserted into the discretised time series.
 #'
-#' @return A discretised version of \code{y}
+#' @return A discretised version of `y`
+#'
+#' @family Time series operations
 #'
 #' @export
 #'
@@ -7599,14 +8057,16 @@ ts_discrete <- function(y, nbins=ceiling(2*NROW(y)^(1/3)), keepNA = TRUE){
 
 #' Symbolic representation
 #'
-#'  Return a discrete representation of \code{y} by binning the observed values and returning the transfer probabilities.
+#'  Return a discrete representation of `y` by binning the observed values and returning the transfer probabilities.
 #'
 #' @param y Numeric vector or time series to be discretised.
-#' @param keepNA If \code{TRUE}, any \code{NA} values will first be removed and later re-inserted into the discretised time series.
+#' @param keepNA If `TRUE`, any `NA` values will first be removed and later re-inserted into the discretised time series.
 #' @param usePlateaus Treat consequative "same" values after "peak" or "trough" as a "peak"/"trough".
 #' @param doPlot Create a plot of the symbolized series.
 #'
-#' @return A discretised version of \code{y}
+#' @return A discretised version of `y`
+#'
+#' @family Time series operations
 #'
 #' @export
 #'
@@ -7619,18 +8079,20 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
   }
 
   idNA <- plyr::colwise(.fun = is.na)(as.data.frame(y))
-  y <- as.data.frame(y)[stats::complete.cases(!idNA),]
+  #y <- as.data.frame(y)[stats::complete.cases(!idNA),]
+  y <- as.data.frame(y)[complete.cases(y),]
 
   sym <- symbolize(xy = y)
-
 
   if(is.null(dim(y))) {
     ymat <-  as.matrix(y)
   } else {
     ymat <- y
-    }
+  }
+
   for(i in 1:NCOL(sym)) {
      t = NROW(sym)
+    # if(!is.na(ymat[t-1,i])){
     if(ymat[t-1,i]>ymat[t,i]){
       sym[t,i] <- 2
     }
@@ -7640,6 +8102,7 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
      if(ymat[t-1,i]==ymat[t,i]){
        sym[t,i] <- 3
      }
+    #}
   }
 
   if(keepNA){
@@ -7750,11 +8213,18 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
     return(out)
   }
 
-
-
 }
 
 
+#' Correct for plateaus in symbolic series
+#'
+#' @param sym_num
+#'
+#' @return data frame
+#' @export
+#'
+#' @keywords internal
+#'
 symHelper <- function(sym_num){
   out <- sym_num
   i <- 1
@@ -7795,13 +8265,13 @@ symHelper <- function(sym_num){
 
 #' Convert numeric vectors to symbolic vectors.
 #'
-#' \code{symbolize} converts numeric vectors to symbolic vectors. It is a helper
-#'   function for \code{muti}.
+#' `symbolize` converts numeric vectors to symbolic vectors. It is a helper
+#'   function for `muti`.
 #'
-#' @param xy An n x 2 \code{matrix} or \code{data.frame} containing the two
+#' @param xy An n x 2 `matrix` or `data.frame` containing the two
 #'   vectors of interest.
 #'
-#' @return An (n-2) x 2 \code{matrix} of integer symbols that indicate whether
+#' @return An (n-2) x 2 `matrix` of integer symbols that indicate whether
 #'   the i-th value, based on the i-1 and i+1 values, is a "trough" (=1),
 #'   "decrease" (=2), "same" (=3), "increase" (=4), or "peak" (=5).
 #'
@@ -7852,36 +8322,25 @@ symbolize <- function(xy) {
   return(su)
 }
 
-ts_resample <- function(y, nbins = ceiling(2*length(y)^(1/3)), keepNA = TRUE){
-
-  bins <- ts_discrete(y, nbins)
-  transmat <- matrix(0,nbins,nbins)
-  for(i in 1:nbins) {
-    for(j in 1:nbins) {
-      transmat[i,j] <- sum(bins[-NROW(y)]==i & bins[-1]==j)
-    }
-    if(sum(transmat[i,])>0) { transmat[i,] <- transmat[i,]/sum(transmat[i,]) }
-    else { transmat[i,] <- 1/nbins }
-  }
-
-}
 
 #' Derivative of time series
 #'
-#' Iteratively differenced series up to \code{order}. The same length as the original series is recovered by calculating the mean of two vectors for each iteration: One with a duplicated first value and one with a duplicated last value.
+#' Iteratively differenced series up to `order`. The same length as the original series is recovered by calculating the mean of two vectors for each iteration: One with a duplicated first value and one with a duplicated last value.
 #'
 #' @param y A timeseries object or numeric vector or a matrix in which columns are variables and rows are numeric values observed over time.
-#' @param order How many times should the difference iteration be applied? (default = \code{1})
-#' @param addColumns Should the derivative(s) be added to the input vector/matrix as columns? (default = \code{TRUE})
-#' @param keepDerivatives If \code{TRUE} and \code{order > 1}, all derivatives from \code{1:order} will be returned as a matrix )default = \code{FALSE})
-#' @param maskEdges Mask the values at the edges of the derivatives by any numeric type that is not \code{NULL} (default = \code{NULL})
+#' @param order How many times should the difference iteration be applied? (default = `1`)
+#' @param addColumns Should the derivative(s) be added to the input vector/matrix as columns? (default = `TRUE`)
+#' @param keepDerivatives If `TRUE` and `order > 1`, all derivatives from `1:order` will be returned as a matrix )default = `FALSE`)
+#' @param maskEdges Mask the values at the edges of the derivatives by any numeric type that is not `NULL` (default = `NULL`)
 #' @param silent Silent-ish mode
 #'
-#' @return Depending on the setting of \code{addColumns} and the object type passed as \code{y}, a vector of equal length as \code{y} iteratively differenced by \code{order} times; a matrix with derivatives, or a matrix with original(s) and derivative(s).
+#' @return Depending on the setting of `addColumns` and the object type passed as `y`, a vector of equal length as `y` iteratively differenced by `order` times; a matrix with derivatives, or a matrix with original(s) and derivative(s).
 #'
-#' @note The values at the edges of the derivatives represent endpoint averages and should be excluded from any subsequent analyses. Set argument \code{maskEdges} to a value of your choice.
+#' @note The values at the edges of the derivatives represent endpoint averages and should be excluded from any subsequent analyses. Set argument `maskEdges` to a value of your choice.
 #'
 #' @export
+#'
+#' @family Time series operations
 #'
 #' @examples
 #'
@@ -7892,20 +8351,26 @@ ts_resample <- function(y, nbins = ceiling(2*length(y)^(1/3)), keepNA = TRUE){
 #' ts_diff(y=y,addColumns=FALSE)
 #'
 #' # Return original and derivative as a matrix
-#' plot(ts_diff(y=y, addColumns=TRUE))
+#' plot(stats::ts(ts_diff(y=y, addColumns=TRUE)))
 #'
 #' # Works on multivariate data objects with mixed variable types
-#' df <- data.frame(x=letters, y=1:26, z=y)
+#' df <- data.frame(x=letters, y=1:26, z=sin(y))
 #'
 #' # Returns only derivatives of the numeric colunmns
 #' ts_diff(y=df,addColumns=FALSE)
 #'
 #' # Returns original data with derivatives of the numeric columns
-#' ts_diff(y = df, order=4, addColumns=TRUE)
+#' ts_diff(y=df, order=4, addColumns=TRUE)
 #'
 #' # Plot logistic S-curve and derivatives 1 to 3
-#' plot(ts(ts_diff(stats::plogis(seq(-5,5,.1)),
-#' order=3, keepDerivatives = TRUE)),  main="ts_derivative")
+#' S <- stats::plogis(seq(-5,5,.1))
+#' plot(stats::ts(ts_diff(S, order=3, keepDerivatives = TRUE)))
+#' abline(v=which(seq(-5,5,.1)==0), col= "red3", lwd=3)
+#'
+#' # Plot again, but with masked edges
+#' (maskEdge <- ts_diff(S, order=3, keepDerivatives = TRUE, maskEdges = NA))
+#' plot(stats::ts(maskEdge))
+#' abline(v=which(seq(-5,5,.1)==0), col= "red3", lwd=3)
 #'
 ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, maskEdges = NULL, silent = TRUE){
 
@@ -7931,26 +8396,35 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
 
   if(N==1){
     Nnum <- TRUE
-    dy <- as.matrix(y)
+    yy <- matrix(y)
   } else {
-    if(is.null(dimnames(y))){
-      dimnames(y) <- list(dimnames(y)[[1]], gsub("[[:punct:]]","", paste0(deparse(substitute(y)),1:NCOL(y))))
-    }
-    dy <- as.matrix(y[,(1:N)[Nnum]])
+    yy <- as.matrix(y[,(1:N)[Nnum]])
   }
-  if(is.null(dimnames(dy)[[2]])){
-     dynames <- paste0("y",1:NCOL(dy))
-    } else {
-     dynames <- paste(dimnames(dy)[[2]])
-    }
-  dimnames(dy) <- list(dimnames(dy)[[1]],paste0(dynames,"_d",order))
 
-  if((N-NCOL(dy))>=0){
-    if(!silent){cat(paste0("\nCalulating derivative for ",NCOL(dy)," time series.\n"))}
+  if(is.null(dimnames(yy)[[2]])){
+    dimnames(yy) <- list(dimnames(yy)[[1]], gsub("[[:punct:]]","", paste0(deparse(substitute(y)),1:NCOL(yy))))
+  }
+
+  dynames <- dimnames(yy)[[2]]
+
+  # dy <- matrix(y[,(1:N)[Nnum]], dimnames = dimnames(y))
+  #
+  # if(is.null(dimnames(dy)[[2]])){
+  #    dynames <- paste0("y",1:NCOL(dy))
+  #   } else {
+  #    dynames <- paste(dimnames(dy)[[2]])
+  #   }
+  #
+  # dimnames(dy) <- list(dimnames(dy)[[1]],paste0(dynames,"_d",order))
+
+  if((N-NCOL(yy))>=0){
+    if(!silent){cat(paste0("\nCalulating derivative for ",NCOL(yy)," time series.\n"))}
   }
 
   keepDiffs <- list() # matrix(NA, nrow = NROW(dy),ncol = length(1:order)*NCOL(dy))
   maskWhich <- list()
+
+  dy <- yy
   # Repeat the difference operation
   for(o in 1:order){
     dif <- diff(dy)
@@ -7964,8 +8438,11 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
   }
 
   if(keepDerivatives){
-  dy <- as.data.frame(keepDiffs)
-  colnames(dy) <- paste0(dynames,"_d",1:order)
+    dy <- as.data.frame(keepDiffs)
+    colnames(dy) <- unlist(plyr::llply(1:order, function(n) paste0(dynames,"_d",n)))
+  } else {
+    dy <- as.data.frame(dy)
+    colnames(dy) <- paste0(dynames,"_d",order)
   }
 
   if(!is.null(maskEdges)){
@@ -7975,13 +8452,10 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
   }
 
   if(addColumns){
-    if(N==1){y<-as.matrix(y)}
-    out <- cbind(y,dy)
-    #class(out) <- class(y)
-    return(out)
+    return(cbind(yy,dy))
   } else {
     if(N==1){
-      return(as.vector(dy))
+      return(dy[,1])
     } else {
       return(dy)
     }
@@ -7992,24 +8466,26 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
 
 #' Adjust time series by summation order
 #'
-#' Many fluctuation analyses assume a time series' Hurst exponent is within the range of \code{0.2 - 1.2}. If this is not the case it is sensible to make adjustments to the time series, as well as the resutling Hurst exponent.
+#' Many fluctuation analyses assume a time series' Hurst exponent is within the range of `0.2 - 1.2`. If this is not the case it is sensible to make adjustments to the time series, as well as the resutling Hurst exponent.
 #'
 #' @param y A time series of numeric vector
-#' @param scaleS The scales to consider for \code{DFA1}
-#' @param polyOrder Order of polynomial for detrending in DFA (default = \code{1})
+#' @param scaleS The scales to consider for `DFA1`
+#' @param polyOrder Order of polynomial for detrending in DFA (default = `1`)
 #' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
 #'
-#' @return The input vector, possibly adjusted based on \code{H} with an attribute \code{"Hadj"} containing an integer by which a Hurst exponent calculated from the series should be adjusted.
+#' @return The input vector, possibly adjusted based on `H` with an attribute `"Hadj"` containing an integer by which a Hurst exponent calculated from the series should be adjusted.
 #'
-#' @details Following recommendations by \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)}, a global Hurst exponent is estimated using DFA and \code{y} is adjusted accordingly:
+#' @details Following recommendations by <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)}, a global Hurst exponent is estimated using DFA and `y` is adjusted accordingly:
 #' \itemize{
-#' \item{\code{1.2 < H < 1.8} first derivative of y, atribute \code{Hadj = 1}}
-#' \item{\code{H > 1.8} second derivative of y, atribute \code{Hadj = 2}}
-#' \item{\code{H < 0.2} y is centered and integrated, atribute \code{Hadj = -1}}
-#' \item{\code{0.2 <= H <= 1.2 } y is unaltered, atribute \code{Hadj = 0}}
+#' \item{`1.2 < H < 1.8` first derivative of y, atribute `Hadj = 1`}
+#' \item{`H > 1.8` second derivative of y, atribute `Hadj = 2`}
+#' \item{`H < 0.2` y is centered and integrated, atribute `Hadj = -1`}
+#' \item{`0.2 <= H <= 1.2 ` y is unaltered, atribute `Hadj = 0`}
 #' }
 #'
 #' @references Ihlen, E. A. F. E. (2012). Introduction to multifractal detrended fluctuation analysis in Matlab. Frontiers in physiology, 3, 141.
+#'
+#' @family Time series operations
 #'
 #' @export
 #'
@@ -8079,6 +8555,9 @@ ts_sumorder <- function(y, scaleS = NULL, polyOrder = 1, minData = 4){
 #' @param fixNonHomogeneity fixNonHomogeneity
 #'
 #' @return A 'check' report and/or a 'fixed' vector y.
+#'
+#' @family Time series operations
+#'
 #' @export
 #'
 ts_checkfix <- function(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE, checkTimeVector = FALSE, checkPow2 = FALSE, checkScale = FALSE, checkSummationOrder = FALSE, checkNonStationarity = FALSE, checkNonHomogeneity = FALSE, fixNumericVector = FALSE, fixWholeNumbers = FALSE, fixTimeVector = FALSE, fixPow2 = FALSE, fixNA = TRUE, fixScale = FALSE, fixSummationOrder = FALSE, fixNonStationarity = FALSE, fixNonHomogeneity = FALSE){
@@ -8207,9 +8686,9 @@ ts_checkfix <- function(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE,
 #'
 #' @param x A numeric vector
 #' @param y A numeric vector
-#' @param action Use \code{"fill"} to fill the shortest vector with \code{padding} (default); \code{"trim.cut"} to trim the longest vector to the length of the shortest; \code{"trim.NA"} to fill the longest vector with \code{NA}. This is a shortcut for running \code{action = "trim.cut"} with \code{padding=NA}, which can be useful if one wants to match the shortest series, but preserve the original length of largest vector.
-#' @param type Should trimming or filling take place at the \code{"end"} (default), or \code{"front"} of the vector? The option \code{"center"} will try to distribute trimming by \code{NA} or filling by \code{padding} evenly across the front and end of the vector.
-#' @param padding A value to use for padding (default = \code{0})
+#' @param action Use `"fill"` to fill the shortest vector with `padding` (default); `"trim.cut"` to trim the longest vector to the length of the shortest; `"trim.NA"` to fill the longest vector with `NA`. This is a shortcut for running `action = "trim.cut"` with `padding=NA`, which can be useful if one wants to match the shortest series, but preserve the original length of largest vector.
+#' @param type Should trimming or filling take place at the `"end"` (default), or `"front"` of the vector? The option `"center"` will try to distribute trimming by `NA` or filling by `padding` evenly across the front and end of the vector.
+#' @param padding A value to use for padding (default = `0`)
 #' @param silent Run silent-ish
 #'
 #' @return A list with two vectors of equal length.
@@ -8221,6 +8700,8 @@ ts_checkfix <- function(y, checkNumericVector = TRUE, checkWholeNumbers = FALSE,
 #' @author Fred Hasselman
 #'
 #' @export
+#'
+#' @family Time series operations
 #'
 #'
 ts_trimfill <- function(x,y,action=c("fill","trim.cut","trim.NA")[1],type=c("end","center","front")[1],padding=0,silent=TRUE){
@@ -8285,13 +8766,15 @@ ts_trimfill <- function(x,y,action=c("fill","trim.cut","trim.NA")[1],type=c("end
 #' Get sliding window indices
 #'
 #' @param y A time series or numeric vector
-#' @param win Size of the window to slide across \code{y}
-#' @param step Size of steps between windows. Can be larger than \code{win}, but is ignored if \code{overlap} is not {NA}.
-#' @param overlap A value between \code{[0 .. 1]}. If overlap is not \code{NA} (default), the value of \code{step} is ignored and set to \code{floor(overlap*win)}. This produces indices in which the size of \code{step} is always smaller than \code{win}, e.g. for fluctuation analyses that use binning procedures to represent time scales.
-#' @param adjustY If not \code{NA}, or, \code{FALSE} a list object with fields that match one or more arguments of \link[casnet]{ts_trimfill} (except for \code{x,y}), e.g. \code{list(action="trim.NA",type="end",padding=NA,silent=TRUE)}. See \code{Return value} below for details.
+#' @param win Size of the window to slide across `y`
+#' @param step Size of steps between windows. Can be larger than `win`, but is ignored if `overlap` is not {NA}.
+#' @param overlap A value between `[0 .. 1]`. If overlap is not `NA` (default), the value of `step` is ignored and set to `floor(overlap*win)`. This produces indices in which the size of `step` is always smaller than `win`, e.g. for fluctuation analyses that use binning procedures to represent time scales.
+#' @param adjustY If not `NA`, or, `FALSE` a list object with fields that match one or more arguments of \link[casnet]{ts_trimfill} (except for `x,y`), e.g. `list(action="trim.NA",type="end",padding=NA,silent=TRUE)`. See `Return value` below for details.
 #'
-#' @return If \code{adjustY = FALSE}, or, a list object with fields that represent arguments of \link[casnet]{ts_trimfill}, then the (adjusted) vector \code{y} is returned with an attribute \code{"windower"}. This is a list object with fields that contain the indices for each window that fits on \code{y}, given \code{win}, \code{step} or \code{overlap} and the settings of \code{adjustY}. If \code{adjustY = NA}, only the list object is returned.
+#' @return If `adjustY = FALSE`, or, a list object with fields that represent arguments of \link[casnet]{ts_trimfill}, then the (adjusted) vector `y` is returned with an attribute `"windower"`. This is a list object with fields that contain the indices for each window that fits on `y`, given `win`, `step` or `overlap` and the settings of `adjustY`. If `adjustY = NA`, only the list object is returned.
 #' @export
+#'
+#' @family Time series operations
 #'
 ts_windower <- function(y, win=length(y), step=round(win/2), overlap=NA, adjustY=NA){
 
@@ -8334,7 +8817,7 @@ ts_windower <- function(y, win=length(y), step=round(win/2), overlap=NA, adjustY
 #' @param y A time series ot numeric vector
 #' @param polyOrder order Order of polynomial trend to remove
 #'
-#' @return Residuals after detrending polynomial of order \code{order}
+#' @return Residuals after detrending polynomial of order `order`
 #'
 #' @export
 #'
@@ -8351,31 +8834,46 @@ ts_detrend <- function(y, polyOrder=1){
 
 #' Detect levels in time series
 #'
-#'  Use recursive partitioning function (\link[rpart]{rpart} from \code{rpart} to perform a 'classification' of relatively stable levels in a timeseries.
+#'  Use recursive partitioning function (\link[rpart]{rpart} to perform a 'classification' of relatively stable levels in a timeseries.
 #'
 #' @param y A time series of numeric vector
-#' @param minDataSplit A factor indicating how many datapoints should be in a segment before it we analyze whether it contains a level change (default = \code{12})
-#' @param minLevelDuration Minimum durtion (length) of a level (default = \code{round(minLevelChange/3)})
-#' @param changeSensitivity A factor indicating a criterion of change that must occur before declaring a new level.
-#' @param maxLevels Maximum number of levels in one series (default = \code{30})
-#' @param method The partitioning method to use, see the manual pages of \link[rpart]{rpart} for details.
+#' @param minDataSplit An integer indicating how many datapoints should be in a segment before it will be analysed for presence of a level change (default = `12`)
+#' @param minLevelDuration Minimum duration (number of datapoint) of a level (default = `round(minDataSplit/3)`)
+#' @param changeSensitivity A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if `method = "anova"`, the overall `R^2` after a level is introduced must increase by the value of `changeSensitivity`, see the `cp` parameter in [rpart::rpart.control].     (default = `0.01`)
+#' @param maxLevels Maximum number of levels in one series (default = `30`)
+#' @param method The partitioning method to use, see the manual pages of [rpart] for details.
 #'
-#' @return A list object with fields \code{tree} and \code{pred}
+#' @return A list object with fields `tree` and `pred`. The latter is a data frame with columns `x` (time), `y` (the variable of interest) and `p` the predicted levels in `y`.
+#'
 #' @export
 #'
 #' @family Time series operations
 #'
 #' @author Fred Hasselman
 #'
+#' @examples
+#'
+#' # Levels in white noise?
+#'
+#' set.seed(4321)
+#' wn <- ts_levels(rnorm(100))
+#' plot(wn$pred$x,wn$pred$y, type = "l")
+#' lines(wn$pred$p, col = "red3", lwd = 2)
+#'
+#' # This is due to the default changeSensitivity of 0.01
+#'
+#' lines(ts_levels(rnorm(100),changeSensitivity = .1)$pred$p, col = "steelblue", lwd = 2)
+#'
+#'
 ts_levels <- function(y, minDataSplit=12, minLevelDuration=round(minDataSplit/3), changeSensitivity = 0.01, maxLevels=30, method=c("anova","poisson","class","exp")[1]){
   x <- seq_along(y)
   dfs  <- data.frame(x=x, y=y)
   tree <- rpart::rpart(y ~ x,
-                       method=method,
+                       method = method,
                        control = list(
-                         minsplit=minDataSplit,
+                         minsplit  = minDataSplit,
                          minbucket = minLevelDuration,
-                         maxdepth = maxLevels,
+                         maxdepth  = maxLevels,
                          cp = changeSensitivity),
                        data=dfs)
 
@@ -8446,8 +8944,8 @@ ts_peaks <- function (y,
 #' Center a vector
 #'
 #' @param numvec A numeric vector
-#' @param na.rm Set the \code{na.rm} field
-#' @param type Center on the \code{"mean"} (default) or the \code{"median"} of the vector.
+#' @param na.rm Set the `na.rm` field
+#' @param type Center on the `"mean"` (default) or the `"median"` of the vector.
 #'
 #' @return A mean or median centered vector
 #' @export
@@ -8472,9 +8970,10 @@ ts_center <- function(numvec, na.rm=TRUE, type = c("mean","median")[1]){
 #'
 #'
 #' @param y A time series or numeric vector
-#' @param na.rm Set the \code{na.rm} field
-#' @param type Center on the \code{"mean"} and divide by \code{sd} (default), or center on \code{"median"} and divide by \code{mad}
-#' @param adjustN Use the population SD estimator (\code{N-1}), or \code{N} (default = \code{TRUE})
+#' @param na.rm Set the `na.rm` field
+#' @param keepNAvalues If `na.rm = TRUE` and `keepNAvalues = TRUE`, any `NA` values in `y` will be re-inserted after transformation.
+#' @param type Center on the `"mean"` and divide by `sd` (default), or center on `"median"` and divide by `mad`
+#' @param adjustN If `TRUE`, apply Bessel's correction (divide by `N-1`) or return the unadjusted `SD` (divide by `N`) (default = `TRUE`)
 #'
 #' @return A standardised vector
 #'
@@ -8484,7 +8983,7 @@ ts_center <- function(numvec, na.rm=TRUE, type = c("mean","median")[1]){
 #'
 #' @author Fred Hasselman
 #'
-ts_standardise <- function(y, na.rm=TRUE, type = c("mean.sd","median.mad")[1], adjustN = TRUE){
+ts_standardise <- function(y, na.rm = TRUE, keepNAvalues = TRUE, type = c("mean.sd","median.mad")[1], adjustN = TRUE){
   if(!is.numeric(y)){
     stop("Vector must be numeric!")
   } else {
@@ -8494,9 +8993,14 @@ ts_standardise <- function(y, na.rm=TRUE, type = c("mean.sd","median.mad")[1], a
     } else {
       SDtype <- "unadjusted"
     }
+    if(keepNAvalues){
+      idNA <- !logical(length = N)
+    } else {
+      idNA <- !is.na(y)
+    }
     switch(type,
-           mean.sd    = return((y - mean(y, na.rm = na.rm)) / ts_sd(y,na.rm = na.rm, type = SDtype)),
-           median.mad = return((y - stats::median(y, na.rm=na.rm)) / stats::mad(y, na.rm = na.rm))
+           mean.sd    = return(((y - mean(y, na.rm = na.rm)) / ts_sd(y,na.rm = na.rm, type = SDtype))[idNA]),
+           median.mad = return(((y - stats::median(y, na.rm=na.rm)) / stats::mad(y, na.rm = na.rm))[idNA])
     )
   }
 }
@@ -8506,24 +9010,26 @@ ts_standardise <- function(y, na.rm=TRUE, type = c("mean.sd","median.mad")[1], a
 #' Calculates the population estimate of the standard deviation, or the unadjusted standard deviation.
 #'
 #' @param y Time series or numeric vector
-#' @param na.rm Remove missing values
+#' @param na.rm Remove missing values before calculations
 #' @param type Apply Bessel's correction (divide by N-1) or return unadjusted SD (divide by N)
-#' @param silent Silent-ish mode (default = \code{TRUE})
+#' @param silent Silent-ish mode (default = `TRUE`)
 #'
-#' @return Standard deviation of \code{y}
+#' @return Standard deviation of `y`
 #' @export
 #'
-ts_sd <- function(y, na.rm=TRUE, type = c("Bessel","unadjusted")[1], silent=TRUE){
+#' @family Time series operations
+#'
+ts_sd <- function(y, na.rm = TRUE, keepNAvalues = TRUE, type = c("Bessel","unadjusted")[1], silent=TRUE){
 
   if(!is.numeric(y)){
     stop("Vector must be numeric!")
-    }
+  }
 
   if(na.rm){
     y<-y[stats::complete.cases(y)]
   }
 
-  N <- NROW(y)
+  N          <- NROW(y)
   Y_mean     <- mean(y)
   Y_sd       <- stats::sd(y)
   Bessel     <- sqrt((sum((y - Y_mean)^2)/(N-1)))
@@ -8552,6 +9058,7 @@ ts_sd <- function(y, na.rm=TRUE, type = c("Bessel","unadjusted")[1], silent=TRUE
     }
     out <- unadjusted
   }
+
   return(out)
 }
 
@@ -8590,7 +9097,7 @@ ts_slice<-function(y,epochSz=4){
 #' @return The profile
 #' @export
 #'
-#'
+#' @family Time series operations
 #'
 #' @examples
 #' y <- runif(1000,-3,3)
@@ -8627,6 +9134,8 @@ ts_integrate <-function(y){
 #'
 #' @return A (sparse) matrix representing the time series as a curve in 2D space
 #' @export
+#'
+#' @family Time series operations
 #'
 #' @examples
 #'
@@ -8684,6 +9193,55 @@ ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 # }
 
 
+#' Transition matrix
+#'
+#' Create a transition matrix from a discrete time series, e.g. to generate Monte Carlo simulations.
+#'
+#' @param yd A discrete numeric vector or time series, e.g. transformed using [ts_discrete()], or, [ts_symbolic()].
+#' @param nbins The number of bins used to transform a continuous time series, or, the number of expected (given `nbins`, or, theoretically possible) values for a discrete series (default = `unique(yd)`)
+#'
+#' @return A transition probability matrix
+#' @export
+#'
+#' @examples
+#'
+#' set.seed(4321)
+#'
+#' # Random uniform numbers
+#' y  <- runif(10,0,20)
+#'
+#' # Discrete version
+#' yd <- ts_discrete(y, nbins = 10)
+#'
+#' # Transition probabilities
+#' ts_transmat(yd = yd, nbins = 10)
+#'
+#' # Note: The number of 'observed' bins differs from 'expected' bins
+#' table(yd)
+#'
+#' # Not specifying the expected bins will geberate a different matrix!
+#' ts_transmat(yd = yd, nbins = length(unique(yd)))
+#'
+ts_transmat <- function(yd, nbins = unique(yd)){
+
+  if(!all(is.wholenumber(yd))){
+    stop("yd is not a vector of discrete numbers!")
+  }
+
+  transmat <- matrix(0,nbins,nbins)
+  for(i in 1:nbins){
+    for(j in 1:nbins){
+      transmat[i,j] <- sum(yd[-NROW(y)]==i & yd[-1]==j, na.rm = TRUE)
+    }
+    if(sum(transmat[i,])>0) {
+      transmat[i,] <- transmat[i,]/sum(transmat[i,], na.rm = TRUE)
+    } else {
+      transmat[i,] <- 1/nbins
+    }
+  }
+  return(transmat)
+}
+
 # HELPERS ----
 
 
@@ -8694,6 +9252,7 @@ ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 #' @param N Length of the time series
 #' @param standardise Forces scaling of the output to the range `[-1, 1]`, consequently the power law will not necessarily extend right down to `0Hz`.
 #' @param randomPower If `TRUE` phases will be deterministic, uniformly distributed in `[-pi,pi]`. If `FALSE`, the spectrum will be stochastic with a Chi-square distribution. If `y` is not `NULL` this argument will be ignored.
+#' @param seed Provide an integer number to set the seed for the random number generator in order to get reproducible results. If `NA` (default) no user defined seed will be set,
 #'
 #' @return Time series with a power law of alpha.
 #' @export
@@ -8720,13 +9279,19 @@ ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 #  If you use this work, consider saying hi on comp.dsp
 #  Dale B. Dalrymple
 #'
-noise_powerlaw <- function(y = NULL, alpha=-1, N=100, standardise = FALSE, randomPower = FALSE){
+noise_powerlaw <- function(y = NULL, alpha=-1, N=100, standardise = FALSE, randomPower = FALSE, seed = NA){
 
   if(!is.null(y)){
     N <- length(y)
   }
 
-  alpha <- -alpha
+  if(!is.na(seed)){
+    if(is.wholenumber(seed)){
+      set.seed(seed)
+    }
+  }
+
+  alpha <- -1 * alpha
 
   # Nyquist
   N2 = floor(N/2)-1
@@ -8854,31 +9419,62 @@ noise_fBm <- function(H=1.5, N = 100, mu = NULL, sigma = NULL){
 }
 
 
-#' Convert numeric factor to numeric vector
+#' Numeric factor to numeric vector
+#'
+#' Converts a factor with numeric levels to a numeric vector, using the values of the levels.
 #'
 #' @param x A factor based on numeric values.
+#' @param keepNA Keep NA values (`TRUE`), or remove them (default = `FALSE`)
 #'
 #' @return A numeric vector with factor levels as names.
 #' @export
 #'
-as.numeric_factor <- function(x){
- out <-  as.numeric(levels(x))[x]
- names(out) <- as.character(x)
+#' @examples
+#'
+#' f <- factor(round(runif(10,0,9)))
+#' as.numeric_factor(f)
+#'
+#' # Add NAs
+#' f <- factor(c(round(runif(9,0,9)),NA))
+#' as.numeric_factor(f)
+#' as.numeric_factor(f, keepNA = TRUE)
+#'
+#'
+#'
+as.numeric_factor <- function(x, keepNA = FALSE){
+  idNA <- is.na(x)
+  if(!is.factor(x)){stop("Not a factor, use: `as.numeric_character()`")}
+  out <- try(as.numeric(levels(x))[x])
+  if(sum(is.na(out))>sum(idNA)){
+    stop("Factor levels are not numeric!")
+  }
+  if(!keepNA){
+    out <- out[!is.na(out)]
+  }
+  names(out) <- as.character(out)
+  return(out)
 }
 
-
-#' Convert character vector to a named numeric vector
+#' Character vector to named numeric vector
+#'
+#' Converts a character vector to a named numeric vector, with the character elements as names.
 #'
 #' @param x A character vector
-#' @param sort.unique Should the unique character values be sorted? (\code{default = FALSE})
+#' @param sortUnique Should the unique character values be sorted? (default = `FALSE`)
+#' @param keepNA Keep NA values (`TRUE`), or remove them (default = `FALSE`)
 #'
 #' @return A named numeric vector
 #' @export
 #'
-as.numeric_character <- function(x, sort.unique = FALSE){
+#' @examples
+#'
+#' f <- letters
+#' as.numeric_character(f)
+#'
+as.numeric_character <- function(x, sortUnique = FALSE, keepNA = FALSE){
   IDna <- is.na(x)
-  x <- as.character(x[!IDna])
-  labels.char     <- unique(as.character(x))
+  xx <- as.character(x[!IDna])
+  labels.char <- unique(as.character(xx))
   if(sort.unique){labels.char <- sort(labels.char)}
   labels.num <- seq_along(labels.char)
   names(x) <- x
@@ -8891,6 +9487,50 @@ as.numeric_character <- function(x, sort.unique = FALSE){
   return(xx)
 }
 
+
+#' Discrete (factor or character) to numeric vector
+#'
+#' Converts a factor with numeric levels, or, a character vector with numeric values to a numeric vector using [as.numeric_factor], or, [as.numeric_character] respectively. If an unnamed numeric vector is passed, it will be returned as a named numeric vector.
+#'
+#' @param x A factor with levels that are numeric, or, a character vector representing numbers.
+#' @param keepNA Keep NA values (`TRUE`), or remove them (default = `FALSE`)
+#'
+#' @return A numeric vector with factor levels / numeric character values as names.
+#' @export
+#'
+#' @examples
+#'
+#' f <- factor(round(runif(10,0,9)))
+#' as.numeric_factor(f)
+#'
+#' # Add NAs
+#' f <- factor(c(round(runif(9,0,9)),NA))
+#' as.numeric_factor(f)
+#' as.numeric_factor(f, keepNA = TRUE)
+#'
+#'
+#'
+as.numeric_discrete <- function(x, keepNA = FALSE){
+
+  if(is.discrete(x)){
+    if(is.factor(x)){
+      y <- as.numeric_factor(x, keepNA = keepNA)
+    }
+    if(is.character(x)){
+      y <- as.numeric_character(x, keepNA = keepNA)
+    }
+  } else {
+    if(is.numeric(x)){
+      if(is.null(names(x))){
+        names(x) <- paste(x)
+        y <- x
+      } else {
+        stop("Variable is not a factor, character vector, or, unnamed numeric vector.")
+      }
+    }
+  }
+  return(y)
+}
 
 
 
@@ -8933,11 +9573,11 @@ fltrIT <- function(TS,f){
 #' @description The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.
 #'
 #' @param x   Input vector or data frame.
-#' @param mn  Minimum value of original, defaults to \code{min(x, na.rm = TRUE)} if set to \code{NA}.
-#' @param mx  Maximum value of original, defaults to \code{max(x, na.rm = TRUE)} if set to \code{NA}.
-#' @param hi  Minimum value to rescale to, defaults to \code{0}.
-#' @param lo  Maximum value to rescale to, defaults to \code{1}.
-#' @param groupwise If \code{x} is a data frame with \code{2+} columns, \code{mn = NA} and/or \code{mx = NA} and \code{groupwise = TRUE}, scaling will occur
+#' @param mn  Minimum value of original, defaults to `min(x, na.rm = TRUE)` if set to `NA`.
+#' @param mx  Maximum value of original, defaults to `max(x, na.rm = TRUE)` if set to `NA`.
+#' @param hi  Minimum value to rescale to, defaults to `0`.
+#' @param lo  Maximum value to rescale to, defaults to `1`.
+#' @param groupwise If `x` is a data frame with `2+` columns, `mn = NA` and/or `mx = NA` and `groupwise = TRUE`, scaling will occur
 #'
 #' @details Three uses:
 #' \enumerate{
@@ -8964,7 +9604,8 @@ fltrIT <- function(TS,f){
 #'
 #' elascer(somenumbers,mn=-10,mx=100,lo=-1,hi=4)
 #' elascer(somenumbers,mn= NA,mx=100,lo=-1,hi=4, groupwise = TRUE)
-elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE){
+elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE, keepNA = TRUE){
+
   doGroupwise <- FALSE
   mnNA <- FALSE
   mxNA <- FALSE
@@ -8982,6 +9623,7 @@ elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE){
       }
   }
   x <- as.data.frame(x)
+  isNA <- colwise(is.na)(x)
   u <- x
   for(i in 1:NCOL(x)){
     if(doGroupwise){
@@ -8994,8 +9636,10 @@ elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE){
       u[,i]<-rep(mx,length(x[,i]))
       } else {
       u[,i]<-(((x[,i]-mn)*(hi-lo))/((mx-mn))+lo)
+      if(!keepNA){
       id<-stats::complete.cases(u[,i])
-      u[!id,i]<-0
+      u[!id,i]<-mn
+      }
     }
   }
   if(UNLIST){
@@ -9044,7 +9688,9 @@ multi_PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 
   if (numPlots==1) {
-    print(plots[[1]])
+    grid::grid.newpage()
+    grid::grid.draw(plots[[1]])
+    #print(plots[[1]])
 
   } else {
     # Set up the page
@@ -9056,11 +9702,29 @@ multi_PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
       # Get the i,j matrix positions of the regions that contain this subplot
       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
 
-      print(plots[[i]], vp = grid::viewport(layout.pos.row = matchidx$row,
+      grid::grid.draw(plots[[i]], vp = grid::viewport(layout.pos.row = matchidx$row,
                                             layout.pos.col = matchidx$col))
     }
   }
 }
+
+#' Heaviside step function
+#'
+#' @param value value
+#'
+#' @return heaviside change
+#' @export
+#' @keywords internal
+#'
+Heaviside <- function(value){
+
+  if (value>0){
+    h=1
+  }
+  else {h=0}
+  return(h)
+}
+
 
 #' TRY ... CATCH
 #'
@@ -9093,6 +9757,16 @@ try_CATCH <- function(expr){
 }
 
 
+#' Test for wholenumber
+#'
+#' @param x x
+#' @param tol tol
+#'
+#' @return logical vector
+#' @export
+#'
+#' @keywords internal
+#'
 is.wholenumber <- function(x, tol = .Machine$double.eps^0.5){
   return(abs(x - round(x)) < tol)
 }

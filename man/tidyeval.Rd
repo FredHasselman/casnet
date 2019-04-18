@@ -19,20 +19,20 @@
 \title{Tidy eval helpers}
 \description{
 \itemize{
-\item \code{\link[rlang]{sym}()} creates a symbol from a string and
-\code{\link[rlang]{syms}()} creates a list of symbols from a
+\item \code{\link[rlang:sym]{rlang::sym()}} creates a symbol from a string and
+\code{\link[rlang:syms]{rlang::syms()}} creates a list of symbols from a
 character vector.
-\item \code{\link[rlang]{expr}()} and \code{\link[rlang]{quo}()} quote
+\item \code{\link[rlang:expr]{rlang::expr()}} and \code{\link[rlang:quo]{rlang::quo()}} quote
 one expression. \code{quo()} wraps the quoted expression in a quosure.
 
 The plural variants \code{\link[rlang:exprs]{rlang::exprs()}} and
-\code{\link[rlang]{quos}()} return a list of quoted expressions or
+\code{\link[rlang:quos]{rlang::quos()}} return a list of quoted expressions or
 quosures.
-\item \code{\link[rlang]{enexpr}()} and \code{\link[rlang]{enquo}()}
+\item \code{\link[rlang:enexpr]{rlang::enexpr()}} and \code{\link[rlang:enquo]{rlang::enquo()}}
 capture the expression supplied as argument by the user of the
 current function (\code{enquo()} wraps this expression in a quosure).
 
-\code{\link[rlang]{enexprs}()} and \code{\link[rlang]{enquos}()}
+\code{\link[rlang:enexprs]{rlang::enexprs()}} and \code{\link[rlang:enquos]{rlang::enquos()}}
 capture multiple expressions supplied as arguments, including
 \code{...}.
 }

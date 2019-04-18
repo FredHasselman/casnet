@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{factor_obs_exp}
 \alias{factor_obs_exp}
-\title{Factor labels}
+\title{Add expected factor labels to observed values}
 \usage{
 factor_obs_exp(observed_Ncat, observed_labels, expected_Ncat = 0,
   expected_labels = "", varname = "")
@@ -22,5 +22,10 @@ factor_obs_exp(observed_Ncat, observed_labels, expected_Ncat = 0,
 character vector
 }
 \description{
-Factor labels
+Add expected factor labels to observed values
 }
+\seealso{
+Other State Space Grid functions: \code{\link{ssg_gwf2long}},
+  \code{\link{ssg_winnowing}}
+}
+\concept{State Space Grid functions}

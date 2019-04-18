@@ -10,7 +10,7 @@ ts_changeindex(y, returnRectdata = TRUE, groupVar = NULL,
 \arguments{
 \item{y}{An indicator variable representing different levels of a variable or factor}
 
-\item{returnRectdata}{Return a dataframe suitable for shading a \code{ggplot2} graph with \code{\link[ggplot2]{geom_rect}}}
+\item{returnRectdata}{Return a dataframe suitable for shading a \code{ggplot2} graph with \code{\link[ggplot2:geom_rect]{ggplot2::geom_rect()}}}
 
 \item{groupVar}{Pass a value (length 1) or variable (length of y) that can be used as a variable to join the indices by if \code{returnRectdata = TRUE}}
 
@@ -26,3 +26,17 @@ Either a vector with the indices of change in \code{y}, or, a data frame with va
 \description{
 Find change indices
 }
+\seealso{
+Other Time series operations: \code{\link{ts_center}},
+  \code{\link{ts_checkfix}}, \code{\link{ts_detrend}},
+  \code{\link{ts_diff}}, \code{\link{ts_discrete}},
+  \code{\link{ts_duration}}, \code{\link{ts_embed}},
+  \code{\link{ts_integrate}}, \code{\link{ts_levels}},
+  \code{\link{ts_peaks}}, \code{\link{ts_permtest_block}},
+  \code{\link{ts_permtest_transmat}},
+  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
+  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
+  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
+  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
+}
+\concept{Time series operations}

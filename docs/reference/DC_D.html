@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Distribution Uniformity — DC_D • casnet</title>
+<title>Distribution Uniformity — dc_d • casnet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Distribution Uniformity — DC_D" />
+<meta property="og:title" content="Distribution Uniformity — dc_d" />
 
-<meta property="og:description" content="Distribution Uniformity" />
+<meta property="og:description" content="Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -117,50 +123,57 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Distribution Uniformity</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/CasNET_Merlijn.R'><code>R/CasNET_Merlijn.R</code></a></small>
-    <div class="hidden name"><code>DC_D.Rd</code></div>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <div class="hidden name"><code>dc_d.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Distribution Uniformity</p>
+    <p>Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>DC_D</span>(<span class='no'>df</span>, <span class='no'>win</span>, <span class='no'>xmin</span>, <span class='no'>xmax</span>, <span class='no'>col_first</span>, <span class='no'>col_last</span>)</pre>
+    <pre class="usage"><span class='fu'>dc_d</span>(<span class='no'>df</span>, <span class='no'>col_first</span>, <span class='no'>col_last</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>df</span>), <span class='no'>scale_min</span>, <span class='no'>scale_max</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>win</th>
-      <td><p>win</p></td>
-    </tr>
-    <tr>
-      <th>xmin</th>
-      <td><p>xmin</p></td>
-    </tr>
-    <tr>
-      <th>xmax</th>
-      <td><p>xmax</p></td>
+      <th>df</th>
+      <td><p>A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.</p></td>
     </tr>
     <tr>
       <th>col_first</th>
-      <td><p>col_first</p></td>
+      <td><p>The first column of the dataframe that should be analyzed.</p></td>
     </tr>
     <tr>
       <th>col_last</th>
-      <td><p>col_last</p></td>
+      <td><p>The last column of the dataframe that should be analyzed.</p></td>
     </tr>
     <tr>
-      <th>data</th>
-      <td><p>data</p></td>
+      <th>win</th>
+      <td><p>Size of window in which to calculate Dynamic Complexity. If <code>win &lt; NROW(df)</code> the window will move along the time series with a stepsize of <code>1</code> (default = <code><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW(df)</a></code>)</p></td>
+    </tr>
+    <tr>
+      <th>scale_min</th>
+      <td><p>Theoretical minimum value of thescale.</p></td>
+    </tr>
+    <tr>
+      <th>scale_max</th>
+      <td><p>Theoretical maximum value of the scale.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>a dataframe</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Use <code><a href='dc_win.html'>dc_win()</a></code> to get the Dynamic Complexity measure.</p>
+<p>Other Dynamic Complexity functions: <code><a href='dc_ccp.html'>dc_ccp</a></code>,
+  <code><a href='dc_f.html'>dc_f</a></code>, <code><a href='dc_win.html'>dc_win</a></code>,
+  <code><a href='plotDC_ccp.html'>plotDC_ccp</a></code>, <code><a href='plotDC_res.html'>plotDC_res</a></code></p></div>
     
 
   </div>
@@ -170,6 +183,8 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#see-also">See also</a></li>
           </ul>
 
   </div>

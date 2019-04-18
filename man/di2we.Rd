@@ -11,7 +11,7 @@ di2we(distmat, emRad, convMat = FALSE)
 
 \item{emRad}{The radius or threshold value}
 
-\item{convMat}{convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix]{Matrix}} to \code{\link[base]{matrix}} (or vice versa)}
+\item{convMat}{convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix:Matrix]{Matrix::Matrix()}} to \code{\link[base:matrix]{base::matrix()}} (or vice versa)}
 }
 \value{
 A matrix with 0s and leaves the values < threshold distance value
@@ -22,9 +22,13 @@ Distance matrix to weighted matrix based on threshold value
 \seealso{
 Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{dist_hamming}},
-  \code{\link{rn_recSpec}}, \code{\link{rn_scaleoGram}},
   \code{\link{rp_lineDist}}, \code{\link{rp_nzdiags}},
   \code{\link{rp_plot}}, \code{\link{rp_size}},
   \code{\link{rp}}
+
+Other Distance matrix operations (recurrence network): \code{\link{di2bi}},
+  \code{\link{rn_plot}}, \code{\link{rn_recSpec}},
+  \code{\link{rn_scaleoGram}}, \code{\link{rn}}
 }
+\concept{Distance matrix operations (recurrence network)}
 \concept{Distance matrix operations (recurrence plot)}

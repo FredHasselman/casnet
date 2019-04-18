@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{ssg_gwf2long}
 \alias{ssg_gwf2long}
-\title{Import GrdWare files}
+\title{Import GridWare files}
 \usage{
 ssg_gwf2long(gwf_name, delta_t = 0.01, returnOnlyData = TRUE,
   saveLongFormat = FALSE)
@@ -20,5 +20,10 @@ ssg_gwf2long(gwf_name, delta_t = 0.01, returnOnlyData = TRUE,
 A data frame containing State Space Grid trajectories, or a list object with additional info.
 }
 \description{
-Import GrdWare files
+Import GridWare files
 }
+\seealso{
+Other State Space Grid functions: \code{\link{factor_obs_exp}},
+  \code{\link{ssg_winnowing}}
+}
+\concept{State Space Grid functions}

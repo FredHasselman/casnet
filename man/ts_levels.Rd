@@ -11,27 +11,49 @@ ts_levels(y, minDataSplit = 12,
 \arguments{
 \item{y}{A time series of numeric vector}
 
-\item{minDataSplit}{A factor indicating how many datapoints should be in a segment before it we analyze whether it contains a level change (default = \code{12})}
+\item{minDataSplit}{An integer indicating how many datapoints should be in a segment before it will be analysed for presence of a level change (default = \code{12})}
 
-\item{minLevelDuration}{Minimum durtion (length) of a level (default = \code{round(minLevelChange/3)})}
+\item{minLevelDuration}{Minimum duration (number of datapoint) of a level (default = \code{round(minDataSplit/3)})}
 
-\item{changeSensitivity}{A factor indicating a criterion of change that must occur before declaring a new level.}
+\item{changeSensitivity}{A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if \code{method = "anova"}, the overall \code{R^2} after a level is introduced must increase by the value of \code{changeSensitivity}, see the \code{cp} parameter in \link[rpart:rpart.control]{rpart::rpart.control}.     (default = \code{0.01})}
 
 \item{maxLevels}{Maximum number of levels in one series (default = \code{30})}
 
-\item{method}{The partitioning method to use, see the manual pages of \link[rpart]{rpart} for details.}
+\item{method}{The partitioning method to use, see the manual pages of \link{rpart} for details.}
 }
 \value{
-A list object with fields \code{tree} and \code{pred}
+A list object with fields \code{tree} and \code{pred}. The latter is a data frame with columns \code{x} (time), \code{y} (the variable of interest) and \code{p} the predicted levels in \code{y}.
 }
 \description{
-Use recursive partitioning function (\link[rpart]{rpart} from \code{rpart} to perform a 'classification' of relatively stable levels in a timeseries.
+Use recursive partitioning function (\link[rpart]{rpart} to perform a 'classification' of relatively stable levels in a timeseries.
+}
+\examples{
+
+# Levels in white noise?
+
+set.seed(4321)
+wn <- ts_levels(rnorm(100))
+plot(wn$pred$x,wn$pred$y, type = "l")
+lines(wn$pred$p, col = "red3", lwd = 2)
+
+# This is due to the default changeSensitivity of 0.01
+
+lines(ts_levels(rnorm(100),changeSensitivity = .1)$pred$p, col = "steelblue", lwd = 2)
+
+
 }
 \seealso{
 Other Time series operations: \code{\link{ts_center}},
-  \code{\link{ts_detrend}}, \code{\link{ts_embed}},
-  \code{\link{ts_peaks}}, \code{\link{ts_slice}},
-  \code{\link{ts_standardise}}, \code{\link{ts_trimfill}}
+  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
+  \code{\link{ts_detrend}}, \code{\link{ts_diff}},
+  \code{\link{ts_discrete}}, \code{\link{ts_duration}},
+  \code{\link{ts_embed}}, \code{\link{ts_integrate}},
+  \code{\link{ts_peaks}}, \code{\link{ts_permtest_block}},
+  \code{\link{ts_permtest_transmat}},
+  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
+  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
+  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
+  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
 }
 \author{
 Fred Hasselman

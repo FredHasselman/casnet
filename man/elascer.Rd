@@ -4,7 +4,8 @@
 \alias{elascer}
 \title{Elastic Scaler - A Flexible Rescale Function}
 \usage{
-elascer(x, mn = NA, mx = NA, lo = 0, hi = 1, groupwise = FALSE)
+elascer(x, mn = NA, mx = NA, lo = 0, hi = 1, groupwise = FALSE,
+  keepNA = TRUE)
 }
 \arguments{
 \item{x}{Input vector or data frame.}

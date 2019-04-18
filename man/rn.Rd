@@ -33,15 +33,15 @@ rn(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 
 \item{to.sparse}{Should sparse matrices be used?}
 
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
-\item{returnGraph}{Return an \code{\link[igraph]{igraph}} object (default = \code{TRUE})}
+\item{returnGraph}{Return an \code{\link[igraph:igraph]{igraph::igraph()}} object (default = \code{TRUE})}
 
-\item{doPlot}{Plot the matrix and its network representation by calling \code{\link{rp_plot}} and \code{\link{rn_plot}} with default settings}
+\item{doPlot}{Plot the matrix and its network representation by calling \code{\link[=rp_plot]{rp_plot()}} and \code{\link[=rn_plot]{rn_plot()}} with default settings}
 
 \item{silent}{Silent-ish mode (default = \code{TRUE})}
 
-\item{...}{Any paramters to pass to \code{\link{rn_plot}} if \code{doPlot = TRUE}}
+\item{...}{Any paramters to pass to \code{\link[=rn_plot]{rn_plot()}} if \code{doPlot = TRUE}}
 }
 \value{
 A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidence) matrix.
@@ -50,6 +50,8 @@ A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidenc
 This function serves as a wrapper for function \code{rp()}, it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)
 }
 \seealso{
-Other Distance matrix operations (recurrence network): \code{\link{rn_plot}}
+Other Distance matrix operations (recurrence network): \code{\link{di2bi}},
+  \code{\link{di2we}}, \code{\link{rn_plot}},
+  \code{\link{rn_recSpec}}, \code{\link{rn_scaleoGram}}
 }
 \concept{Distance matrix operations (recurrence network)}

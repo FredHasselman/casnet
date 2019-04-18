@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -198,11 +204,11 @@
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Calls function <code><a href='https://www.rdocumentation.org/packages/sapa/topics/SDF'>SDF</a></code> to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), <code>SDF</code> is called using a Tukey window (<code>raised cosine <a href='https://www.rdocumentation.org/packages/sapa/topics/taper'>taper</a></code>).</p>
+    <p>Calls function <code><a href='https://www.rdocumentation.org/packages/sapa/topics/SDF'>sapa::SDF()</a></code> to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), <code>SDF</code> is called using a Tukey window (<code>raised cosine <a href='https://www.rdocumentation.org/packages/sapa/topics/taper'>taper</a></code>).</p>
 <p>A line is fitted on the periodogram in log-log coordinates. The full ramge is fitted as well as one of three fit-ranges:</p><ul>
 <li><p><code>lowest25</code> - The 25% lowest frequencies</p></li>
 <li><p><code>Wijnants</code> - The 50 lowest frequencies (Wijnants et al., 2012)</p></li>
-<li><p><code>HurvichDeo</code> - The Hurvich-Deo estimate, see (<code><a href='https://www.rdocumentation.org/packages/fractal/topics/HDEst'>HDEst</a></code>)</p></li>
+<li><p><code>HurvichDeo</code> - The Hurvich-Deo estimate, see (<code><a href='https://www.rdocumentation.org/packages/fractal/topics/HDEst'>fractal::HDEst()</a></code>)</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
@@ -211,9 +217,9 @@
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Fluctuation Analyses: <code><a href='MFDFA.html'>MFDFA</a></code>,
-  <code><a href='fd_RR.html'>fd_RR</a></code>, <code><a href='fd_allan.html'>fd_allan</a></code>,
-  <code><a href='fd_dfa.html'>fd_dfa</a></code>, <code><a href='fd_sda.html'>fd_sda</a></code>,
+    <div class='dont-index'><p>Other Fluctuation Analyses: <code><a href='fd_RR.html'>fd_RR</a></code>,
+  <code><a href='fd_allan.html'>fd_allan</a></code>, <code><a href='fd_dfa.html'>fd_dfa</a></code>,
+  <code><a href='fd_mfdfa.html'>fd_mfdfa</a></code>, <code><a href='fd_sda.html'>fd_sda</a></code>,
   <code><a href='fd_sev.html'>fd_sev</a></code></p></div>
     
 

@@ -5,7 +5,7 @@
 \title{Generate noise series with power law scaling exponent}
 \usage{
 noise_powerlaw(y = NULL, alpha = -1, N = 100, standardise = FALSE,
-  randomPower = FALSE)
+  randomPower = FALSE, seed = NA)
 }
 \arguments{
 \item{y}{Time series to use as a 'model'. If specified, \code{N} will be \code{N = length(y)}, and the series will be constructed based on \code{stats::fft(y)}.}
@@ -17,6 +17,8 @@ noise_powerlaw(y = NULL, alpha = -1, N = 100, standardise = FALSE,
 \item{standardise}{Forces scaling of the output to the range \code{[-1, 1]}, consequently the power law will not necessarily extend right down to \code{0Hz}.}
 
 \item{randomPower}{If \code{TRUE} phases will be deterministic, uniformly distributed in \code{[-pi,pi]}. If \code{FALSE}, the spectrum will be stochastic with a Chi-square distribution. If \code{y} is not \code{NULL} this argument will be ignored.}
+
+\item{seed}{Provide an integer number to set the seed for the random number generator in order to get reproducible results. If \code{NA} (default) no user defined seed will be set,}
 }
 \value{
 Time series with a power law of alpha.

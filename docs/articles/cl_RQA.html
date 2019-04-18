@@ -57,6 +57,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -84,7 +90,7 @@
       <h1>Using the CRQA command line interface (crqa_cl)</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2019-03-14</h4>
+            <h4 class="date">2019-04-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/cl_RQA.Rmd"><code>vignettes/cl_RQA.Rmd</code></a></small>
       <div class="hidden name"><code>cl_RQA.Rmd</code></div>
@@ -131,12 +137,12 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 IDs &lt;-<span class="st"> </span>RNG<span class="op">$</span>ID<span class="op">%in%</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">163</span>,<span class="dv">291</span>)
 
 <span class="co"># Look at the sequence</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(RNG[IDs,],<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>time,<span class="dt">y=</span>number,<span class="dt">group=</span>ID)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">colour=</span>ID))<span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span>(<span class="op">~</span>ID) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">breaks =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">9</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"Which of these number sequences is more 'random'?"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>()</code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(RNG[IDs,],<span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x=</span>time,<span class="dt">y=</span>number,<span class="dt">group=</span>ID)) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/geom_path">geom_line</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">colour=</span>ID))<span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/facet_grid">facet_grid</a></span>(<span class="op">~</span>ID) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_y_continuous</a></span>(<span class="dt">breaks =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">9</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">ggtitle</a></span>(<span class="st">"Which of these number sequences is more 'random'?"</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_bw</a></span>()</code></pre></div>
 <p><img src="cl_RQA_files/figure-html/RNG1-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>In order to answer the question in the Figure title, we’ll run a Recurrence Quantification Analysis.</p>
 <p>The data are unordered categorical, that is, the differences between the integers are meaningless in the context of generating random number sequences. This means the RQA parameters can be set to quantify recurrences of the same value:</p>
@@ -164,7 +170,7 @@ crqa_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.015   0.004   0.031 
+&gt;   0.018   0.008   0.041 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crqa_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> y_<span class="dv">2</span>, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</code></pre></div>
@@ -182,7 +188,7 @@ crqa_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.011   0.003   0.018 
+&gt;   0.009   0.004   0.019 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Plot the recurrence matrix
@@ -257,7 +263,7 @@ crqa_1rnd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/c
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.015 
+&gt;   0.011   0.003   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crqa_2rnd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> y_2rnd, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</code></pre></div>
@@ -275,7 +281,7 @@ crqa_1rnd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/c
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.015 
+&gt;   0.010   0.003   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create the recurrence matrix</span>
@@ -388,10 +394,15 @@ cowplot<span class="op">::</span><span class="kw"><a href="https://www.rdocument
 <h2 class="hasAnchor">
 <a href="#cross-rqa" class="anchor"></a><strong>Cross RQA</strong>
 </h2>
-<div id="sliding-window-analyses" class="section level3">
+<div id="diagonal-recurrence-profile" class="section level3">
 <h3 class="hasAnchor">
-<a href="#sliding-window-analyses" class="anchor"></a>Sliding window analyses</h3>
+<a href="#diagonal-recurrence-profile" class="anchor"></a>Diagonal Recurrence Profile</h3>
 </div>
+</div>
+<div id="lagged-rqa-sliding-window-analyses" class="section level2">
+<h2 class="hasAnchor">
+<a href="#lagged-rqa-sliding-window-analyses" class="anchor"></a><strong>Lagged RQA: Sliding window analyses</strong>
+</h2>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
@@ -414,6 +425,7 @@ cowplot<span class="op">::</span><span class="kw"><a href="https://www.rdocument
       <li><a href="#auto-rqa"><strong>Auto RQA</strong></a></li>
       <li><a href="#hypothesis-testing-using-constrained-data-realisations"><strong>Hypothesis testing using constrained data realisations</strong></a></li>
       <li><a href="#cross-rqa"><strong>Cross RQA</strong></a></li>
+      <li><a href="#lagged-rqa-sliding-window-analyses"><strong>Lagged RQA: Sliding window analyses</strong></a></li>
       <li><a href="#references"><strong>References</strong></a></li>
       </ul>
 </div>

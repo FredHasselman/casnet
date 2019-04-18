@@ -12,7 +12,7 @@ plotRED_mif(y, lags = 0:max(round(NROW(y)/4), 10), nbins = ceiling(2 *
 
 \item{lags}{Maximum number of lags}
 
-\item{nbins}{The number of bins passed to \code{\link[infotheo]{discretize}} if y is a matrix or \code{\link[casnet]{ts_discrete}}}
+\item{nbins}{The number of bins passed to \code{\link[infotheo:discretize]{infotheo::discretize()}} if y is a matrix or \code{\link[casnet:ts_discrete]{casnet::ts_discrete()}}}
 
 \item{alpha}{Significance level}
 

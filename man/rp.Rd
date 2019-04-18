@@ -28,22 +28,22 @@ rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 
 \item{weighted}{If \code{FALSE} a binary matrix will be returned. If \code{TRUE} every value larger than \code{emRad} will be \code{0}, but values smaller than \code{emRad} will be retained (default = \code{FALSE})}
 
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy]{dist}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
 \item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
-\item{doPlot}{Plot the matrix by calling \code{\link{rp_plot}} with defult settings}
+\item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with defult settings}
 
 \item{silent}{Silent-ish mode}
 
-\item{...}{Any paramters to pass to \code{\link{rp_plot}} if \code{doPlot = TRUE}}
+\item{...}{Any paramters to pass to \code{\link[=rp_plot]{rp_plot()}} if \code{doPlot = TRUE}}
 }
 \value{
 A (Coss-) Recurrence matrix with attributes:
 \enumerate{
 \item \code{emdims1} and \code{emdims2} - A matrix of surrogate dimensions
 \item \code{emdims1.name} and \code{emdims2.name} - Names of surrogate dimensions
-\item \code{method} and \code{call} - The distance \code{method} used by \code{\link[proxy]{dist}}
+\item \code{method} and \code{call} - The distance \code{method} used by \code{\link[proxy:dist]{proxy::dist()}}
 \item \code{weighetd} - Whether a weighted matrix is returned
 \item \code{emDim}, \code{emLag} and \code{emRad} - The embedding parameters
 \item \code{AUTO} - Whether the matrix represents AUTO recurrence
@@ -55,8 +55,7 @@ Create a Distance Matrix
 \seealso{
 Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
   \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rn_recSpec}},
-  \code{\link{rn_scaleoGram}}, \code{\link{rp_lineDist}},
+  \code{\link{dist_hamming}}, \code{\link{rp_lineDist}},
   \code{\link{rp_nzdiags}}, \code{\link{rp_plot}},
   \code{\link{rp_size}}
 }

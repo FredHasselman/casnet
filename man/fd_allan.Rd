@@ -37,8 +37,8 @@ A dataframe with the Allan Factor (variance), Alan standard deviation and error 
 Allan Variance Analysis
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{MFDFA}},
-  \code{\link{fd_RR}}, \code{\link{fd_dfa}},
+Other Fluctuation Analyses: \code{\link{fd_RR}},
+  \code{\link{fd_dfa}}, \code{\link{fd_mfdfa}},
   \code{\link{fd_psd}}, \code{\link{fd_sda}},
   \code{\link{fd_sev}}
 }

@@ -19,10 +19,10 @@ plotNET_BA(n = 100, pwr = 1, out.dist = NULL, doPlot = TRUE)
 A Barabasi scale-free igraph object
 }
 \description{
-A wrapper around \code{\link[igraph]{sample_pa}}
+A wrapper around \code{\link[igraph:sample_pa]{igraph::sample_pa()}}
 }
 \seealso{
-\code{\link[igraph]{sample_pa}}
+\code{\link[igraph:sample_pa]{igraph::sample_pa()}}
 
 Other tools for plotting networks: \code{\link{plotNET_SW}},
   \code{\link{plotNET_groupColour}},

@@ -48,22 +48,22 @@ A list object containing:
 Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope.
 }
 \details{
-Calls function \code{\link[sapa]{SDF}} to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), \code{SDF} is called using a Tukey window (\code{raised cosine \link[sapa]{taper}}).
+Calls function \code{\link[sapa:SDF]{sapa::SDF()}} to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), \code{SDF} is called using a Tukey window (\code{raised cosine \link[sapa]{taper}}).
 
 A line is fitted on the periodogram in log-log coordinates. The full ramge is fitted as well as one of three fit-ranges:
 \itemize{
 \item{\code{lowest25} - The 25\% lowest frequencies}
 \item{\code{Wijnants} - The 50 lowest frequencies (Wijnants et al., 2012)}
-\item{\code{HurvichDeo} - The Hurvich-Deo estimate, see (\code{\link[fractal]{HDEst}})}
+\item{\code{HurvichDeo} - The Hurvich-Deo estimate, see (\code{\link[fractal:HDEst]{fractal::HDEst()}})}
 }
 }
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{MFDFA}},
-  \code{\link{fd_RR}}, \code{\link{fd_allan}},
-  \code{\link{fd_dfa}}, \code{\link{fd_sda}},
+Other Fluctuation Analyses: \code{\link{fd_RR}},
+  \code{\link{fd_allan}}, \code{\link{fd_dfa}},
+  \code{\link{fd_mfdfa}}, \code{\link{fd_sda}},
   \code{\link{fd_sev}}
 }
 \author{

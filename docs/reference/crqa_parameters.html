@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -168,11 +174,11 @@
     </tr>
     <tr>
       <th>nnSizes</th>
-      <td><p>Points whose distance is <code>nnSize</code> times further apart than the estimated size of the attractor will be declared false neighbours. See the argument <code>atol</code> in <code><a href='https://www.rdocumentation.org/packages/fractal/topics/FNN'>FNN</a></code> (default = <code><a href='https://www.rdocumentation.org/packages/base/topics/c'>c(2,5,10,15)</a></code>)</p></td>
+      <td><p>Points whose distance is <code>nnSize</code> times further apart than the estimated size of the attractor will be declared false neighbours. See the argument <code>atol</code> in <code><a href='https://www.rdocumentation.org/packages/fractal/topics/FNN'>fractal::FNN()</a></code> (default = <code><a href='https://www.rdocumentation.org/packages/base/topics/c'>c(2,5,10,15)</a></code>)</p></td>
     </tr>
     <tr>
       <th>nnRadius</th>
-      <td><p>If the ratio of the distance between two points in successive dimensions is larger than <code>nnRadius</code>, the points are declared false neighbours. See the argument <code>rtol</code> in <code><a href='https://www.rdocumentation.org/packages/fractal/topics/FNN'>FNN</a></code> (default = <code>5</code>)</p></td>
+      <td><p>If the ratio of the distance between two points in successive dimensions is larger than <code>nnRadius</code>, the points are declared false neighbours. See the argument <code>rtol</code> in <code><a href='https://www.rdocumentation.org/packages/fractal/topics/FNN'>fractal::FNN()</a></code> (default = <code>5</code>)</p></td>
     </tr>
     <tr>
       <th>nnThres</th>
@@ -192,7 +198,7 @@
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other parameters passed to <code><a href='https://www.rdocumentation.org/packages/nonlinearTseries/topics/timeLag'>timeLag</a></code></p></td>
+      <td><p>Other parameters passed to <code><a href='https://www.rdocumentation.org/packages/nonlinearTseries/topics/timeLag'>nonlinearTseries::timeLag()</a></code></p></td>
     </tr>
     </table>
     
@@ -204,8 +210,8 @@
 
     <p>A number of functions are called to determie optimal parameters for delay embedding a time series:</p>
 <ul>
-<li><p>Embedding lag (\(\tau\), <code>emLag</code>): The default is to call <code><a href='est_emLag.html'>est_emLag</a></code>, which is a wrapper around <code><a href='https://www.rdocumentation.org/packages/nonlinearTseries/topics/timeLag'>timeLag</a></code> with <code>technique="ami"</code> to get lags based on the mutual information function.</p></li>
-<li><p>Embedding dimension (<code>m</code>, <code>emDim</code>): The default is to call <code><a href='est_emDim.html'>est_emDim</a></code>, which is a wrapper around <code><a href='https://www.rdocumentation.org/packages/fractal/topics/FNN'>FNN</a></code></p></li>
+<li><p>Embedding lag (\(\tau\), <code>emLag</code>): The default is to call <code><a href='est_emLag.html'>casnet::est_emLag()</a></code>, which is a wrapper around <code><a href='https://www.rdocumentation.org/packages/nonlinearTseries/topics/timeLag'>nonlinearTseries::timeLag()</a></code> with <code>technique="ami"</code> to get lags based on the mutual information function.</p></li>
+<li><p>Embedding dimension (<code>m</code>, <code>emDim</code>): The default is to call <code><a href='est_emDim.html'>casnet::est_emDim()</a></code>, which is a wrapper around <code><a href='https://www.rdocumentation.org/packages/fractal/topics/FNN'>fractal::FNN()</a></code></p></li>
 </ul>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

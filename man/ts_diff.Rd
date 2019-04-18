@@ -38,19 +38,39 @@ y <- DescTools::Fibonacci(1:26)
 ts_diff(y=y,addColumns=FALSE)
 
 # Return original and derivative as a matrix
-plot(ts_diff(y=y, addColumns=TRUE))
+plot(stats::ts(ts_diff(y=y, addColumns=TRUE)))
 
 # Works on multivariate data objects with mixed variable types
-df <- data.frame(x=letters, y=1:26, z=y)
+df <- data.frame(x=letters, y=1:26, z=sin(y))
 
 # Returns only derivatives of the numeric colunmns
 ts_diff(y=df,addColumns=FALSE)
 
 # Returns original data with derivatives of the numeric columns
-ts_diff(y = df, order=4, addColumns=TRUE)
+ts_diff(y=df, order=4, addColumns=TRUE)
 
 # Plot logistic S-curve and derivatives 1 to 3
-plot(ts(ts_diff(stats::plogis(seq(-5,5,.1)),
-order=3, keepDerivatives = TRUE)),  main="ts_derivative")
+S <- stats::plogis(seq(-5,5,.1))
+plot(stats::ts(ts_diff(S, order=3, keepDerivatives = TRUE)))
+abline(v=which(seq(-5,5,.1)==0), col= "red3", lwd=3)
+
+# Plot again, but with masked edges
+(maskEdge <- ts_diff(S, order=3, keepDerivatives = TRUE, maskEdges = NA))
+plot(stats::ts(maskEdge))
+abline(v=which(seq(-5,5,.1)==0), col= "red3", lwd=3)
 
 }
+\seealso{
+Other Time series operations: \code{\link{ts_center}},
+  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
+  \code{\link{ts_detrend}}, \code{\link{ts_discrete}},
+  \code{\link{ts_duration}}, \code{\link{ts_embed}},
+  \code{\link{ts_integrate}}, \code{\link{ts_levels}},
+  \code{\link{ts_peaks}}, \code{\link{ts_permtest_block}},
+  \code{\link{ts_permtest_transmat}},
+  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
+  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
+  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
+  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
+}
+\concept{Time series operations}

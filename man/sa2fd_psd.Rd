@@ -7,7 +7,7 @@
 sa2fd_psd(sa, ...)
 }
 \arguments{
-\item{sa}{Self-Affinity parameter estimate based on PSD slope (e.g., \code{\link{fd_psd}}))}
+\item{sa}{Self-Affinity parameter estimate based on PSD slope (e.g., \code{\link[=fd_psd]{fd_psd()}}))}
 
 \item{...}{Other arguments}
 }

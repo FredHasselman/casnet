@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -144,20 +150,20 @@
                  <span class='kw'>group</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/factor'>factor</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sample'>sample</a></span>(<span class='kw'>x</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>,<span class='fl'>1</span>),
                  <span class='kw'>size</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>replace</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)))
 
-<span class='no'>scatterP</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span>(<span class='no'>df</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span><span class='no'>y</span>, <span class='kw'>colour</span> <span class='kw'>=</span> <span class='no'>group</span>)) +
-                   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span>() +
+<span class='no'>scatterP</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/ggplot'>ggplot</a></span>(<span class='no'>df</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/aes'>aes</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span><span class='no'>y</span>, <span class='kw'>colour</span> <span class='kw'>=</span> <span class='no'>group</span>)) +
+                   <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/geom_point'>geom_point</a></span>() +
                    <span class='fu'><a href='gg_theme.html'>gg_theme</a></span>()
 
-<span class='no'>xDense</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span>(<span class='no'>df</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>fill</span> <span class='kw'>=</span> <span class='no'>group</span>)) +
-                 <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_density.html'>geom_density</a></span>(<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(<span class='kw'>y</span><span class='kw'>=</span> <span class='no'>..count..</span>),<span class='kw'>trim</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>alpha</span><span class='kw'>=</span><span class='fl'>.5</span>) +
+<span class='no'>xDense</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/ggplot'>ggplot</a></span>(<span class='no'>df</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/aes'>aes</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>fill</span> <span class='kw'>=</span> <span class='no'>group</span>)) +
+                 <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/geom_density'>geom_density</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/aes'>aes</a></span>(<span class='kw'>y</span><span class='kw'>=</span> <span class='no'>..count..</span>),<span class='kw'>trim</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>alpha</span><span class='kw'>=</span><span class='fl'>.5</span>) +
                  <span class='fu'><a href='gg_theme.html'>gg_theme</a></span>(<span class='st'>"noax"</span>) +
-                 <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span>(<span class='kw'>legend.position</span> <span class='kw'>=</span> <span class='st'>"none"</span>)
+                 <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/theme'>theme</a></span>(<span class='kw'>legend.position</span> <span class='kw'>=</span> <span class='st'>"none"</span>)
 
-<span class='no'>yDense</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span>(<span class='no'>df</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>y</span>, <span class='kw'>fill</span> <span class='kw'>=</span> <span class='no'>group</span>)) +
-                 <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_density.html'>geom_density</a></span>(<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(<span class='kw'>y</span><span class='kw'>=</span> <span class='no'>..count..</span>),<span class='kw'>trim</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>alpha</span><span class='kw'>=</span><span class='fl'>.5</span>) +
-                 <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/coord_flip.html'>coord_flip</a></span>() +
+<span class='no'>yDense</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/ggplot'>ggplot</a></span>(<span class='no'>df</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/aes'>aes</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>y</span>, <span class='kw'>fill</span> <span class='kw'>=</span> <span class='no'>group</span>)) +
+                 <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/geom_density'>geom_density</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/aes'>aes</a></span>(<span class='kw'>y</span><span class='kw'>=</span> <span class='no'>..count..</span>),<span class='kw'>trim</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>alpha</span><span class='kw'>=</span><span class='fl'>.5</span>) +
+                 <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/coord_flip'>coord_flip</a></span>() +
                  <span class='fu'><a href='gg_theme.html'>gg_theme</a></span>(<span class='st'>"noax"</span>) +
-                 <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span>(<span class='kw'>legend.position</span> <span class='kw'>=</span> <span class='st'>"none"</span>)
+                 <span class='fu'><a href='https://www.rdocumentation.org/packages/ggplot2/topics/theme'>theme</a></span>(<span class='kw'>legend.position</span> <span class='kw'>=</span> <span class='st'>"none"</span>)
 
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>gridExtra</span>)
 <span class='fu'><a href='https://www.rdocumentation.org/packages/gridExtra/topics/arrangeGrob'>grid.arrange</a></span>(<span class='no'>xDense</span>,

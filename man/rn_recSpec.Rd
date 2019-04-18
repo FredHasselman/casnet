@@ -34,11 +34,8 @@ A vector of frequencies of recurrence times and a plot (if requested)
 Get the recurrence time distribution from a recurrence network.
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
-  \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rn_scaleoGram}},
-  \code{\link{rp_lineDist}}, \code{\link{rp_nzdiags}},
-  \code{\link{rp_plot}}, \code{\link{rp_size}},
-  \code{\link{rp}}
+Other Distance matrix operations (recurrence network): \code{\link{di2bi}},
+  \code{\link{di2we}}, \code{\link{rn_plot}},
+  \code{\link{rn_scaleoGram}}, \code{\link{rn}}
 }
-\concept{Distance matrix operations (recurrence plot)}
+\concept{Distance matrix operations (recurrence network)}

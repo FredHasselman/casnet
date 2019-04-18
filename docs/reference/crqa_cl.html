@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -208,7 +214,7 @@
     </tr>
     <tr>
       <th>doPlot</th>
-      <td><p>Produce a plot of the recurrence matrix by calling <code><a href='rp_plot.html'>rp_plot</a></code>, values can be <code>"rp"</code> (the thresholded recurrence matrix),<code>"distmat"</code> (the unthresholded recurrence matrix) or <code>"noplot"</code> (default = <code>"noplot"</code>)</p></td>
+      <td><p>Produce a plot of the recurrence matrix by calling <code><a href='rp_plot.html'>rp_plot()</a></code>, values can be <code>"rp"</code> (the thresholded recurrence matrix),<code>"distmat"</code> (the unthresholded recurrence matrix) or <code>"noplot"</code> (default = <code>"noplot"</code>)</p></td>
     </tr>
     <tr>
       <th>path_to_rp</th>
@@ -240,7 +246,7 @@
     </tr>
     <tr>
       <th>useParallel</th>
-      <td><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://purrr.tidyverse.org/reference/map2.html'>map2</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></td>
+      <td><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://purrr.tidyverse.org/reference/map2.html'>purrr::map2()</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>parallel::detectCores()</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -273,7 +279,7 @@
 <li><p>W_prob = 'Probability of interval'</p></li>
 <li><p>F_min = 'F min'</p></li>
 </ul></li>
-<li><p><code>rqa_rpvector</code> - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling <code><a href='rp_plot.html'>rp_plot</a></code>. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting <code>saveOut = TRUE</code>.</p></li>
+<li><p><code>rqa_rpvector</code> - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling <code><a href='rp_plot.html'>rp_plot()</a></code>. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting <code>saveOut = TRUE</code>.</p></li>
 <li><p><code>rqa_diagdist</code> - The distribution of diagonal line lengths</p></li>
 </ol>
 
@@ -301,7 +307,7 @@ The latter location is stored as an option and can be read by calling <code><a h
 <ul>
 <li><p><em>Copy failed</em> - Every time the function <code>crqa_cl()</code> is called it will check whether a log file <code>rp_instal_log.txt</code> is present in the <code>...\casnet\exec\</code> directory. If you delete the log file, and call the function, another copy of the executable will be attempted.</p></li>
 <li><p><em>Copy still fails and/or no permission to copy</em> - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to <code>rp</code> (<code>rp.exe</code> on Windows OS). Then, either pass the path to <code>rp</code> as the argument <code>path_to_rp</code> in the <code>crqa_cl</code> function call, or, as a more permanent solution, set the <code>path_to_rp</code> option by calling <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>options(casnet.path_to_rp="YOUR_PATH")</a></code>. If you cannot acces the directory <code>...\casnet\commandline_rp\</code>, download the appropriate executable from the <a href='http://tocsy.pik-potsdam.de/commandline-rp.php'>commandline Recurrence Plots</a> page and copy to a directory you have access to. Then follow the instruction to set <code>path_to_rp</code>.</p></li>
-<li><p><em>Error in execution of <code>rp</code></em> - This can have a variety of causes, the <code>rp</code> executable is called using <code><a href='https://www.rdocumentation.org/packages/callr/topics/rcmd'>rcmd</a></code> and makes use of the <code><a href='https://www.rdocumentation.org/packages/base/topics/normalizePath'>normalizePath</a></code> function with argument <code>mustWork = FALSE</code>. Problems caused by specific OS, machine, or, locale problems (e.g. the <code>winslash</code> can be reported as an <a href='https://github.com/FredHasselman/casnet/issues'>issue on Github</a>). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption("casnet.rp_prefix")</a></code>. On Windows OS this should return an empty character vector, on Linux or macOS it should return <code>"./"</code>. You can manually set the correct prefix by calling <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>options(casnet.rp_prefix="CORRECT OS PREFIX")</a></code> and fill in the prefix that is correct for your OS</p></li>
+<li><p><em>Error in execution of <code>rp</code></em> - This can have a variety of causes, the <code>rp</code> executable is called using <code><a href='https://www.rdocumentation.org/packages/callr/topics/rcmd'>callr::rcmd()</a></code> and makes use of the <code><a href='https://www.rdocumentation.org/packages/base/topics/normalizePath'>normalizePath()</a></code> function with argument <code>mustWork = FALSE</code>. Problems caused by specific OS, machine, or, locale problems (e.g. the <code>winslash</code> can be reported as an <a href='https://github.com/FredHasselman/casnet/issues'>issue on Github</a>). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption("casnet.rp_prefix")</a></code>. On Windows OS this should return an empty character vector, on Linux or macOS it should return <code>"./"</code>. You can manually set the correct prefix by calling <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>options(casnet.rp_prefix="CORRECT OS PREFIX")</a></code> and fill in the prefix that is correct for your OS</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

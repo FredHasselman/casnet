@@ -7,7 +7,7 @@
 sa2fd_dfa(sa, ...)
 }
 \arguments{
-\item{sa}{Self-Afinity parameter estimate based on DFA slope (e.g., \code{\link{fd_sda}})).}
+\item{sa}{Self-Afinity parameter estimate based on DFA slope (e.g., \code{\link[=fd_sda]{fd_sda()}})).}
 
 \item{...}{Other arguments}
 }

@@ -14,9 +14,9 @@ est_emDim(y, delay = est_emLag(y), maxDim = 15, threshold = 0.95,
 
 \item{maxDim}{Maximum number of embedding dimensions}
 
-\item{threshold}{See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
+\item{threshold}{See \code{\link[nonlinearTseries:estimateEmbeddingDim]{nonlinearTseries::estimateEmbeddingDim()}}}
 
-\item{max.relative.change}{See \code{\link[nonlinearTseries]{estimateEmbeddingDim}}}
+\item{max.relative.change}{See \code{\link[nonlinearTseries:estimateEmbeddingDim]{nonlinearTseries::estimateEmbeddingDim()}}}
 
 \item{doPlot}{Plot}
 

@@ -2,18 +2,26 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{as.numeric_character}
 \alias{as.numeric_character}
-\title{Convert character vector to a named numeric vector}
+\title{Character vector to named numeric vector}
 \usage{
-as.numeric_character(x, sort.unique = FALSE)
+as.numeric_character(x, sortUnique = FALSE, keepNA = FALSE)
 }
 \arguments{
 \item{x}{A character vector}
 
-\item{sort.unique}{Should the unique character values be sorted? (\code{default = FALSE})}
+\item{sortUnique}{Should the unique character values be sorted? (default = \code{FALSE})}
+
+\item{keepNA}{Keep NA values (\code{TRUE}), or remove them (default = \code{FALSE})}
 }
 \value{
 A named numeric vector
 }
 \description{
-Convert character vector to a named numeric vector
+Converts a character vector to a named numeric vector, with the character elements as names.
+}
+\examples{
+
+f <- letters
+as.numeric_character(f)
+
 }

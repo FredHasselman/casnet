@@ -29,9 +29,9 @@ crqa_parameters(y, emLag = NULL, maxLag = floor(length(y)/(maxDim +
 
 \item{maxDim}{Maximum number of embedding dimensions to consider (default = \code{10})}
 
-\item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal]{FNN}} (default = \code{c(2,5,10,15)})}
+\item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{c(2,5,10,15)})}
 
-\item{nnRadius}{If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal]{FNN}} (default = \code{5})}
+\item{nnRadius}{If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{5})}
 
 \item{nnThres}{Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = \code{10})}
 
@@ -41,7 +41,7 @@ crqa_parameters(y, emLag = NULL, maxLag = floor(length(y)/(maxDim +
 
 \item{silent}{Silent-ish mode}
 
-\item{...}{Other parameters passed to \code{\link[nonlinearTseries]{timeLag}}}
+\item{...}{Other parameters passed to \code{\link[nonlinearTseries:timeLag]{nonlinearTseries::timeLag()}}}
 }
 \value{
 A list object containing the optimal values (as indicated by the user) and iteration history.
@@ -53,8 +53,8 @@ A wrapper for various algorithms used to find optimal value pair for the embeddi
 A number of functions are called to determie optimal parameters for delay embedding a time series:
 
 \itemize{
-\item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet]{est_emLag}}, which is a wrapper around \code{\link[nonlinearTseries]{timeLag}} with \code{technique="ami"} to get lags based on the mutual information function.}
-\item{Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[casnet]{est_emDim}}, which is a wrapper around \code{\link[fractal]{FNN}}}
+\item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet:est_emLag]{casnet::est_emLag()}}, which is a wrapper around \code{\link[nonlinearTseries:timeLag]{nonlinearTseries::timeLag()}} with \code{technique="ami"} to get lags based on the mutual information function.}
+\item{Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[casnet:est_emDim]{casnet::est_emDim()}}, which is a wrapper around \code{\link[fractal:FNN]{fractal::FNN()}}}
 }
 }
 \seealso{

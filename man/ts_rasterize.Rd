@@ -31,3 +31,17 @@ image(y_img,col=c("white","black"))
 
 
 }
+\seealso{
+Other Time series operations: \code{\link{ts_center}},
+  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
+  \code{\link{ts_detrend}}, \code{\link{ts_diff}},
+  \code{\link{ts_discrete}}, \code{\link{ts_duration}},
+  \code{\link{ts_embed}}, \code{\link{ts_integrate}},
+  \code{\link{ts_levels}}, \code{\link{ts_peaks}},
+  \code{\link{ts_permtest_block}},
+  \code{\link{ts_permtest_transmat}}, \code{\link{ts_sd}},
+  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
+  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
+  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
+}
+\concept{Time series operations}

@@ -11,37 +11,37 @@ crqa_rp_measures(RM, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
   Nboot = NULL, CL = 0.95, doParallel = FALSE)
 }
 \arguments{
-\item{RM}{A binary recurrence matrix}
+\item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NA})}
 
 \item{emRad}{Threshold for distance value that counts as a recurrence}
 
-\item{DLmin}{Minimal diagonal line length}
+\item{DLmin}{Minimal diagonal line length (default = \code{2})}
 
-\item{VLmin}{Minimal vertical line length}
+\item{VLmin}{Minimal vertical line length (default = \code{2})}
 
-\item{HLmin}{Minimal horizontal line length}
+\item{HLmin}{Minimal horizontal line length (default = \code{2})}
 
-\item{DLmax}{Maximal diagonal line length}
+\item{DLmax}{Maximal diagonal line length (default = length of diagonal -1)}
 
-\item{VLmax}{Maximal vertical line length}
+\item{VLmax}{Maximal vertical line length (default = length of diagonal -1)}
 
-\item{HLmax}{Maximal horizontal line length}
+\item{HLmax}{Maximal horizontal line length (default = length of diagonal -1)}
 
-\item{AUTO}{Is this an AUTO RQA?}
+\item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
-\item{theiler}{theiler}
+\item{theiler}{= Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
 
-\item{chromatic}{Chromatic RQA?}
+\item{chromatic}{Force chromatic RQA? (default = \code{FALSE})}
 
-\item{matrices}{Return Matrices?}
+\item{matrices}{Return matrices? (default = \code{FALSE})}
 
-\item{doHalf}{Analyse half of the matrix?}
+\item{doHalf}{Analyse half of the matrix? (default = \code{FALSE})}
 
-\item{Nboot}{How many bootstraps?}
+\item{Nboot}{How many bootstrap replications? (default = \code{NULL})}
 
-\item{CL}{Confidence Limit for bootstrap results}
+\item{CL}{Confidence limit for bootstrap results (default = \code{.95})}
 
-\item{doParallel}{Use parallel?}
+\item{doParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr:map2]{purrr::map2()}} to assign data and \code{\link[parallel:detectCores]{parallel::detectCores()}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
 }
 \description{
 Use \code{crqa_rp}

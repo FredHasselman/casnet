@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -167,6 +173,20 @@
 
     <p>The values at the edges of the derivatives represent endpoint averages and should be excluded from any subsequent analyses. Set argument <code>maskEdges</code> to a value of your choice.</p>
     
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other Time series operations: <code><a href='ts_center.html'>ts_center</a></code>,
+  <code><a href='ts_changeindex.html'>ts_changeindex</a></code>, <code><a href='ts_checkfix.html'>ts_checkfix</a></code>,
+  <code><a href='ts_detrend.html'>ts_detrend</a></code>, <code><a href='ts_discrete.html'>ts_discrete</a></code>,
+  <code><a href='ts_duration.html'>ts_duration</a></code>, <code><a href='ts_embed.html'>ts_embed</a></code>,
+  <code><a href='ts_integrate.html'>ts_integrate</a></code>, <code><a href='ts_levels.html'>ts_levels</a></code>,
+  <code><a href='ts_peaks.html'>ts_peaks</a></code>, <code><a href='ts_permtest_block.html'>ts_permtest_block</a></code>,
+  <code><a href='ts_permtest_transmat.html'>ts_permtest_transmat</a></code>,
+  <code><a href='ts_rasterize.html'>ts_rasterize</a></code>, <code><a href='ts_sd.html'>ts_sd</a></code>,
+  <code><a href='ts_slice.html'>ts_slice</a></code>, <code><a href='ts_standardise.html'>ts_standardise</a></code>,
+  <code><a href='ts_sumorder.html'>ts_sumorder</a></code>, <code><a href='ts_symbolic.html'>ts_symbolic</a></code>,
+  <code><a href='ts_trimfill.html'>ts_trimfill</a></code>, <code><a href='ts_windower.html'>ts_windower</a></code></p></div>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -178,69 +198,172 @@
 #&gt; [10]    27.5    44.5    72.0   116.5   188.5   305.0   493.5   798.5  1292.0
 #&gt; [19]  2090.5  3382.5  5473.0  8855.5 14328.5 23184.0 37512.5 46368.0</div><div class='input'>
 <span class='co'># Return original and derivative as a matrix</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='fu'>ts_diff</span>(<span class='kw'>y</span><span class='kw'>=</span><span class='no'>y</span>, <span class='kw'>addColumns</span><span class='kw'>=</span><span class='fl'>TRUE</span>))</div><div class='img'><img src='ts_diff-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/ts'>ts</a></span>(<span class='fu'>ts_diff</span>(<span class='kw'>y</span><span class='kw'>=</span><span class='no'>y</span>, <span class='kw'>addColumns</span><span class='kw'>=</span><span class='fl'>TRUE</span>)))</div><div class='img'><img src='ts_diff-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Works on multivariate data objects with mixed variable types</span>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>x</span><span class='kw'>=</span><span class='no'>letters</span>, <span class='kw'>y</span><span class='kw'>=</span><span class='fl'>1</span>:<span class='fl'>26</span>, <span class='kw'>z</span><span class='kw'>=</span><span class='no'>y</span>)
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>x</span><span class='kw'>=</span><span class='no'>letters</span>, <span class='kw'>y</span><span class='kw'>=</span><span class='fl'>1</span>:<span class='fl'>26</span>, <span class='kw'>z</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Trig'>sin</a></span>(<span class='no'>y</span>))
 
 <span class='co'># Returns only derivatives of the numeric colunmns</span>
-<span class='fu'>ts_diff</span>(<span class='kw'>y</span><span class='kw'>=</span><span class='no'>df</span>,<span class='kw'>addColumns</span><span class='kw'>=</span><span class='fl'>FALSE</span>)</div><div class='output co'>#&gt;       y_d1    z_d1
-#&gt;  [1,]    1     0.0
-#&gt;  [2,]    1     0.5
-#&gt;  [3,]    1     1.0
-#&gt;  [4,]    1     1.5
-#&gt;  [5,]    1     2.5
-#&gt;  [6,]    1     4.0
-#&gt;  [7,]    1     6.5
-#&gt;  [8,]    1    10.5
-#&gt;  [9,]    1    17.0
-#&gt; [10,]    1    27.5
-#&gt; [11,]    1    44.5
-#&gt; [12,]    1    72.0
-#&gt; [13,]    1   116.5
-#&gt; [14,]    1   188.5
-#&gt; [15,]    1   305.0
-#&gt; [16,]    1   493.5
-#&gt; [17,]    1   798.5
-#&gt; [18,]    1  1292.0
-#&gt; [19,]    1  2090.5
-#&gt; [20,]    1  3382.5
-#&gt; [21,]    1  5473.0
-#&gt; [22,]    1  8855.5
-#&gt; [23,]    1 14328.5
-#&gt; [24,]    1 23184.0
-#&gt; [25,]    1 37512.5
-#&gt; [26,]    1 46368.0</div><div class='input'>
+<span class='fu'>ts_diff</span>(<span class='kw'>y</span><span class='kw'>=</span><span class='no'>df</span>,<span class='kw'>addColumns</span><span class='kw'>=</span><span class='fl'>FALSE</span>)</div><div class='output co'>#&gt;    y_d1         z_d1
+#&gt; 1     1  0.000000000
+#&gt; 2     1  0.033913221
+#&gt; 3     1 -0.350175488
+#&gt; 4     1 -0.934110851
+#&gt; 5     1  0.424119119
+#&gt; 6     1  0.689545656
+#&gt; 7     1 -0.076351304
+#&gt; 8     1  0.054457825
+#&gt; 9     1 -0.918205406
+#&gt; 10    1  0.165493360
+#&gt; 11    1  0.254366790
+#&gt; 12    1 -0.180665062
+#&gt; 13    1  0.249951523
+#&gt; 14    1  0.003839173
+#&gt; 15    1  0.252587288
+#&gt; 16    1  0.185614980
+#&gt; 17    1  0.242571191
+#&gt; 18    1 -0.216929525
+#&gt; 19    1 -0.956188618
+#&gt; 20    1  0.096834873
+#&gt; 21    1 -0.025106788
+#&gt; 22    1 -0.604418999
+#&gt; 23    1  0.009782856
+#&gt; 24    1 -0.007199127
+#&gt; 25    1  0.951168192
+#&gt; 26    1  1.544287661</div><div class='input'>
 <span class='co'># Returns original data with derivatives of the numeric columns</span>
-<span class='fu'>ts_diff</span>(<span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>df</span>, <span class='kw'>order</span><span class='kw'>=</span><span class='fl'>4</span>, <span class='kw'>addColumns</span><span class='kw'>=</span><span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;    x  y      z y_d4       z_d4
-#&gt; 1  a  1      1    0     0.0000
-#&gt; 2  b  2      1    0     0.0625
-#&gt; 3  c  3      2    0     0.1875
-#&gt; 4  d  4      3    0     0.2500
-#&gt; 5  e  5      5    0     0.3125
-#&gt; 6  f  6      8    0     0.5000
-#&gt; 7  g  7     13    0     0.8125
-#&gt; 8  h  8     21    0     1.3125
-#&gt; 9  i  9     34    0     2.1250
-#&gt; 10 j 10     55    0     3.4375
-#&gt; 11 k 11     89    0     5.5625
-#&gt; 12 l 12    144    0     9.0000
-#&gt; 13 m 13    233    0    14.5625
-#&gt; 14 n 14    377    0    23.5625
-#&gt; 15 o 15    610    0    38.1250
-#&gt; 16 p 16    987    0    61.6875
-#&gt; 17 q 17   1597    0    99.8125
-#&gt; 18 r 18   2584    0   161.5000
-#&gt; 19 s 19   4181    0   261.3125
-#&gt; 20 t 20   6765    0   422.8125
-#&gt; 21 u 21  10946    0   684.1250
-#&gt; 22 v 22  17711    0  1106.9375
-#&gt; 23 w 23  28657    0     0.0000
-#&gt; 24 x 24  46368    0 -2475.1875
-#&gt; 25 y 25  75025    0 -2475.1875
-#&gt; 26 z 26 121393    0 -1368.2500</div><div class='input'>
+<span class='fu'>ts_diff</span>(<span class='kw'>y</span><span class='kw'>=</span><span class='no'>df</span>, <span class='kw'>order</span><span class='kw'>=</span><span class='fl'>4</span>, <span class='kw'>addColumns</span><span class='kw'>=</span><span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;     y            z y_d4         z_d4
+#&gt; 1   1  0.841470985    0 -0.049961663
+#&gt; 2   2  0.841470985    0  0.245059245
+#&gt; 3   3  0.909297427    0  0.453441387
+#&gt; 4   4  0.141120008    0 -0.299904391
+#&gt; 5   5 -0.958924275    0 -0.606303114
+#&gt; 6   6  0.989358247    0  0.116672669
+#&gt; 7   7  0.420167037    0  0.375608463
+#&gt; 8   8  0.836655639    0  0.294476247
+#&gt; 9   9  0.529082686    0 -0.150414665
+#&gt; 10 10 -0.999755173    0 -0.398926720
+#&gt; 11 11  0.860069406    0  0.123482077
+#&gt; 12 12 -0.491021594    0  0.148004812
+#&gt; 13 13  0.498739282    0 -0.066673886
+#&gt; 14 14  0.008881452    0 -0.002462862
+#&gt; 15 15  0.506417628    0 -0.072698985
+#&gt; 16 16  0.514056028    0 -0.147011481
+#&gt; 17 17  0.877647588    0  0.162578652
+#&gt; 18 18  0.999198409    0  0.414823169
+#&gt; 19 19  0.443788538    0 -0.216415897
+#&gt; 20 20 -0.913178827    0 -0.378254228
+#&gt; 21 21  0.637458284    0  0.289186502
+#&gt; 22 22 -0.963392403    0  0.225335985
+#&gt; 23 23 -0.571379715    0 -0.043025854
+#&gt; 24 24 -0.943826692    0 -0.082705261
+#&gt; 25 25 -0.585777969    0 -0.210595327
+#&gt; 26 26  0.958509692    0 -0.243837325</div><div class='input'>
 <span class='co'># Plot logistic S-curve and derivatives 1 to 3</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/ts'>ts</a></span>(<span class='fu'>ts_diff</span>(<span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Logistic'>plogis</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(-<span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span>)),
-<span class='kw'>order</span><span class='kw'>=</span><span class='fl'>3</span>, <span class='kw'>keepDerivatives</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)),  <span class='kw'>main</span><span class='kw'>=</span><span class='st'>"ts_derivative"</span>)</div><div class='img'><img src='ts_diff-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='no'>S</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Logistic'>plogis</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(-<span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span>))
+<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/ts'>ts</a></span>(<span class='fu'>ts_diff</span>(<span class='no'>S</span>, <span class='kw'>order</span><span class='kw'>=</span><span class='fl'>3</span>, <span class='kw'>keepDerivatives</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)))</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/abline'>abline</a></span>(<span class='kw'>v</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/which'>which</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(-<span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span>)<span class='kw'>==</span><span class='fl'>0</span>), <span class='kw'>col</span><span class='kw'>=</span> <span class='st'>"red3"</span>, <span class='kw'>lwd</span><span class='kw'>=</span><span class='fl'>3</span>)</div><div class='img'><img src='ts_diff-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># Plot again, but with masked edges</span>
+(<span class='no'>maskEdge</span> <span class='kw'>&lt;-</span> <span class='fu'>ts_diff</span>(<span class='no'>S</span>, <span class='kw'>order</span><span class='kw'>=</span><span class='fl'>3</span>, <span class='kw'>keepDerivatives</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>maskEdges</span> <span class='kw'>=</span> <span class='fl'>NA</span>))</div><div class='output co'>#&gt;              S1        S1_d1         S1_d2         S1_d3
+#&gt; 1   0.006692851           NA            NA            NA
+#&gt; 2   0.007391541 0.0007348601            NA            NA
+#&gt; 3   0.008162571 0.0008108787  7.987762e-05            NA
+#&gt; 4   0.009013299 0.0008946154  8.797167e-05  8.486490e-06
+#&gt; 5   0.009951802 0.0009868220  9.685060e-05  9.305569e-06
+#&gt; 6   0.010986943 0.0010883166  1.065828e-04  1.019515e-05
+#&gt; 7   0.012128435 0.0011999876  1.172409e-04  1.115939e-05
+#&gt; 8   0.013386918 0.0013227984  1.289016e-04  1.220225e-05
+#&gt; 9   0.014774032 0.0014577908  1.416454e-04  1.332731e-05
+#&gt; 10  0.016302499 0.0016060891  1.555562e-04  1.453764e-05
+#&gt; 11  0.017986210 0.0017689032  1.707207e-04  1.583556e-05
+#&gt; 12  0.019840306 0.0019475305  1.872273e-04  1.722237e-05
+#&gt; 13  0.021881271 0.0021433578  2.051654e-04  1.869804e-05
+#&gt; 14  0.024127021 0.0023578613  2.246234e-04  2.026085e-05
+#&gt; 15  0.026596994 0.0025926047  2.456871e-04  2.190694e-05
+#&gt; 16  0.029312231 0.0028492356  2.684373e-04  2.362981e-05
+#&gt; 17  0.032295465 0.0031294793  2.929467e-04  2.541974e-05
+#&gt; 18  0.035571189 0.0034351290  3.192768e-04  2.726316e-05
+#&gt; 19  0.039165723 0.0037680328  3.474731e-04  2.914192e-05
+#&gt; 20  0.043107255 0.0041300752  3.775606e-04  3.103251e-05
+#&gt; 21  0.047425873 0.0045231541  4.095381e-04  3.290530e-05
+#&gt; 22  0.052153563 0.0049491514  4.433712e-04  3.472367e-05
+#&gt; 23  0.057324176 0.0054098965  4.789854e-04  3.644327e-05
+#&gt; 24  0.062973356 0.0059071222  5.162577e-04  3.801125e-05
+#&gt; 25  0.069138420 0.0064424120  5.550079e-04  3.936576e-05
+#&gt; 26  0.075858180 0.0070171381  5.949893e-04  4.043560e-05
+#&gt; 27  0.083172696 0.0076323905  6.358791e-04  4.114027e-05
+#&gt; 28  0.091122961 0.0082888963  6.772698e-04  4.139048e-05
+#&gt; 29  0.099750489 0.0089869301  7.186601e-04  4.108922e-05
+#&gt; 30  0.109096821 0.0097262165  7.594482e-04  4.013371e-05
+#&gt; 31  0.119202922 0.0105058266  7.989275e-04  3.841807e-05
+#&gt; 32  0.130108474 0.0113240714  8.362844e-04  3.583714e-05
+#&gt; 33  0.141851065 0.0121783954  8.706018e-04  3.229131e-05
+#&gt; 34  0.154465265 0.0130652750  9.008670e-04  2.769244e-05
+#&gt; 35  0.167981615 0.0139801294  9.259867e-04  2.197080e-05
+#&gt; 36  0.182425524 0.0149172483  9.448086e-04  1.508273e-05
+#&gt; 37  0.197816111 0.0158697466  9.561521e-04  7.018734e-06
+#&gt; 38  0.214165017 0.0168295525  9.588461e-04 -2.188584e-06
+#&gt; 39  0.231475217 0.0177874387  9.517750e-04 -1.245735e-05
+#&gt; 40  0.249739894 0.0187331024  9.339314e-04 -2.365090e-05
+#&gt; 41  0.268941421 0.0196553015  9.044732e-04 -3.557475e-05
+#&gt; 42  0.289050497 0.0205420488  8.627819e-04 -4.797690e-05
+#&gt; 43  0.310025519 0.0213808652  8.085193e-04 -6.055212e-05
+#&gt; 44  0.331812228 0.0221590875  7.416776e-04 -7.295077e-05
+#&gt; 45  0.354343694 0.0228642205  6.626178e-04 -8.479214e-05
+#&gt; 46  0.377540669 0.0234843231  5.720934e-04 -9.568182e-05
+#&gt; 47  0.401312340 0.0240084072  4.712542e-04 -1.052323e-04
+#&gt; 48  0.425557483 0.0244268314  3.616287e-04 -1.130853e-04
+#&gt; 49  0.450166003 0.0247316647  2.450836e-04 -1.189337e-04
+#&gt; 50  0.475020813 0.0249169987  1.237614e-04 -1.225418e-04
+#&gt; 51  0.500000000 0.0249791875  6.938894e-17 -1.237614e-04
+#&gt; 52  0.524979187 0.0249169987 -1.237614e-04 -1.225418e-04
+#&gt; 53  0.549833997 0.0247316647 -2.450836e-04 -1.189337e-04
+#&gt; 54  0.574442517 0.0244268314 -3.616287e-04 -1.130853e-04
+#&gt; 55  0.598687660 0.0240084072 -4.712542e-04 -1.052323e-04
+#&gt; 56  0.622459331 0.0234843231 -5.720934e-04 -9.568182e-05
+#&gt; 57  0.645656306 0.0228642205 -6.626178e-04 -8.479214e-05
+#&gt; 58  0.668187772 0.0221590875 -7.416776e-04 -7.295077e-05
+#&gt; 59  0.689974481 0.0213808652 -8.085193e-04 -6.055212e-05
+#&gt; 60  0.710949503 0.0205420488 -8.627819e-04 -4.797690e-05
+#&gt; 61  0.731058579 0.0196553015 -9.044732e-04 -3.557475e-05
+#&gt; 62  0.750260106 0.0187331024 -9.339314e-04 -2.365090e-05
+#&gt; 63  0.768524783 0.0177874387 -9.517750e-04 -1.245735e-05
+#&gt; 64  0.785834983 0.0168295525 -9.588461e-04 -2.188584e-06
+#&gt; 65  0.802183889 0.0158697466 -9.561521e-04  7.018734e-06
+#&gt; 66  0.817574476 0.0149172483 -9.448086e-04  1.508273e-05
+#&gt; 67  0.832018385 0.0139801294 -9.259867e-04  2.197080e-05
+#&gt; 68  0.845534735 0.0130652750 -9.008670e-04  2.769244e-05
+#&gt; 69  0.858148935 0.0121783954 -8.706018e-04  3.229131e-05
+#&gt; 70  0.869891526 0.0113240714 -8.362844e-04  3.583714e-05
+#&gt; 71  0.880797078 0.0105058266 -7.989275e-04  3.841807e-05
+#&gt; 72  0.890903179 0.0097262165 -7.594482e-04  4.013371e-05
+#&gt; 73  0.900249511 0.0089869301 -7.186601e-04  4.108922e-05
+#&gt; 74  0.908877039 0.0082888963 -6.772698e-04  4.139048e-05
+#&gt; 75  0.916827304 0.0076323905 -6.358791e-04  4.114027e-05
+#&gt; 76  0.924141820 0.0070171381 -5.949893e-04  4.043560e-05
+#&gt; 77  0.930861580 0.0064424120 -5.550079e-04  3.936576e-05
+#&gt; 78  0.937026644 0.0059071222 -5.162577e-04  3.801125e-05
+#&gt; 79  0.942675824 0.0054098965 -4.789854e-04  3.644327e-05
+#&gt; 80  0.947846437 0.0049491514 -4.433712e-04  3.472367e-05
+#&gt; 81  0.952574127 0.0045231541 -4.095381e-04  3.290530e-05
+#&gt; 82  0.956892745 0.0041300752 -3.775606e-04  3.103251e-05
+#&gt; 83  0.960834277 0.0037680328 -3.474731e-04  2.914192e-05
+#&gt; 84  0.964428811 0.0034351290 -3.192768e-04  2.726316e-05
+#&gt; 85  0.967704535 0.0031294793 -2.929467e-04  2.541974e-05
+#&gt; 86  0.970687769 0.0028492356 -2.684373e-04  2.362981e-05
+#&gt; 87  0.973403006 0.0025926047 -2.456871e-04  2.190694e-05
+#&gt; 88  0.975872979 0.0023578613 -2.246234e-04  2.026085e-05
+#&gt; 89  0.978118729 0.0021433578 -2.051654e-04  1.869804e-05
+#&gt; 90  0.980159694 0.0019475305 -1.872273e-04  1.722237e-05
+#&gt; 91  0.982013790 0.0017689032 -1.707207e-04  1.583556e-05
+#&gt; 92  0.983697501 0.0016060891 -1.555562e-04  1.453764e-05
+#&gt; 93  0.985225968 0.0014577908 -1.416454e-04  1.332731e-05
+#&gt; 94  0.986613082 0.0013227984 -1.289016e-04  1.220225e-05
+#&gt; 95  0.987871565 0.0011999876 -1.172409e-04  1.115939e-05
+#&gt; 96  0.989013057 0.0010883166 -1.065828e-04  1.019515e-05
+#&gt; 97  0.990048198 0.0009868220 -9.685060e-05  9.305569e-06
+#&gt; 98  0.990986701 0.0008946154 -8.797167e-05            NA
+#&gt; 99  0.991837429 0.0008108787            NA            NA
+#&gt; 100 0.992608459           NA            NA            NA
+#&gt; 101 0.993307149           NA            NA            NA</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/ts'>ts</a></span>(<span class='no'>maskEdge</span>))</div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/abline'>abline</a></span>(<span class='kw'>v</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/which'>which</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(-<span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span>)<span class='kw'>==</span><span class='fl'>0</span>), <span class='kw'>col</span><span class='kw'>=</span> <span class='st'>"red3"</span>, <span class='kw'>lwd</span><span class='kw'>=</span><span class='fl'>3</span>)</div><div class='img'><img src='ts_diff-3.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -251,6 +374,8 @@
       <li><a href="#value">Value</a></li>
 
       <li><a href="#note">Note</a></li>
+
+      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

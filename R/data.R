@@ -10,7 +10,7 @@
 #' }
 #' @references
 #' Oomens, W., Maes, J. H., Hasselman, F., & Egger, J. I. (2015). A time series approach to random number generation: using recurrence quantification analysis to capture executive behavior. Frontiers in human neuroscience, 9
-#' @source \url{https://www.frontiersin.org/articles/10.3389/fnhum.2015.00319/full}
+#' @source <https://www.frontiersin.org/articles/10.3389/fnhum.2015.00319/full>
 "RNG"
 
 

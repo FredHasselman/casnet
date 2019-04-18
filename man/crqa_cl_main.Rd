@@ -15,51 +15,34 @@ crqa_cl_main(data, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
   targetValue = 0.05, useParallel = FALSE, ...)
 }
 \arguments{
-\item{emDim}{y1}
-
-\item{emLag}{y1}
-
-\item{emRad}{y1}
-
-\item{DLmin}{y1}
-
-\item{VLmin}{y1}
-
-\item{theiler}{y1}
-
-\item{win}{y1}
-
-\item{step}{y1}
-
-\item{JRP}{y1}
-
-\item{distNorm}{y1}
-
-\item{returnMeasures}{y1}
-
-\item{returnRPvector}{y1}
-
-\item{returnLineDist}{y1}
-
-\item{path_to_rp}{y1}
-
-\item{saveOut}{y1}
-
-\item{path_out}{y1}
-
-\item{file_ID}{y1}
-
-\item{silent}{y1}
-
-\item{targetValue}{y1}
-
-\item{...}{}
-
-\item{y1}{y1}
-
-\item{y2}{y1}
-
-\item{returnDistance}{y1}
+\item{...}{Arguments passed on to \code{crqa_cl}
+\describe{
+  \item{y1}{Time series 1}
+  \item{y2}{Time series 2 for Cross Recurrence Analysis (default = \code{NULL})}
+  \item{emDim}{Embedding dimensions (default = \code{1})}
+  \item{emLag}{Embedding lag (default = \code{1})}
+  \item{emRad}{Radius on distance matrix (default = \code{1})}
+  \item{DLmin}{Minimum length of diagonal structure to be considered a line (default = \code{2})}
+  \item{VLmin}{Minimum length of vertical structure to be considered a line (default = \code{2})}
+  \item{theiler}{Theiler window (default = \code{0})}
+  \item{win}{Window to calculate the (C)RQA (default = minimum of length of \code{y1} or \code{y2})}
+  \item{step}{Stepsize for sliding windows (default = size of \code{win}, so no sliding window)}
+  \item{JRP}{Wether to calculate a Joint Recurrence Plot (default = \code{FALSE})}
+  \item{distNorm}{One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
+  \item{standardise}{Standardise data: \code{"none"} (default), \code{"mean.sd"}, or \code{"median.mad"}}
+  \item{returnMeasures}{Return the (C)RQA measures? (default = \code{TRUE})}
+  \item{returnRPvector}{Return the recurrent points in a dataframe? (default = \code{FALSE})}
+  \item{returnLineDist}{Return the distribution of diagonal and horizontal line length distances (default = \code{FALSE})}
+  \item{doPlot}{Produce a plot of the recurrence matrix by calling \code{\link[=rp_plot]{rp_plot()}}, values can be \code{"rp"} (the thresholded recurrence matrix),\code{"distmat"} (the unthresholded recurrence matrix) or \code{"noplot"} (default = \code{"noplot"})}
+  \item{path_to_rp}{Path to the command line executable (default = path set during installation, use \code{getOption("casnet.path_to_rp")} to see)}
+  \item{saveOut}{Save the output to files? If \code{TRUE} and \code{path_out = NA}, the current working directory will be used (default = \code{FALSE})}
+  \item{path_out}{Path to save output if \code{saveOut = TRUE} (default = \code{NULL})}
+  \item{file_ID}{A file ID which will be a prefix to to the filename if \code{saveOut = TRUE} (default = \code{NULL}, an integer will be added tot the file name to ensure unique files)}
+  \item{silent}{Do not display any messages (default = \code{TRUE})}
+  \item{surrogateTest}{Perform surrogate tests. If \code{TRUE}, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments \code{ns = 39, fft = TRUE, amplitude = TRUE})}
+  \item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}. This is useful for windowed analysis, it will estimate a new radius for each window.}
+  \item{useParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr:map2]{purrr::map2()}} to assign data and \code{\link[parallel:detectCores]{parallel::detectCores()}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
+}}
 }
 \description{
 crqa_cl_main

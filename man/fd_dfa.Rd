@@ -17,11 +17,11 @@ fd_dfa(y, fs = NULL, removeTrend = c("no", "poly", "adaptive",
 
 \item{fs}{Sample rate}
 
-\item{removeTrend}{Method to use for detrending, see \code{\link[fractal]{DFA}} (default = "poly")}
+\item{removeTrend}{Method to use for detrending, see \code{\link[fractal:DFA]{fractal::DFA()}} (default = "poly")}
 
 \item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
 
-\item{standardise}{Standardise by the series using \code{\link[casnet]{ts_standardise}} with \code{adjustN = FALSE} (default = "mean.sd")}
+\item{standardise}{Standardise by the series using \code{\link[casnet:ts_standardise]{casnet::ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
 \item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
 
@@ -68,8 +68,8 @@ fd_dfa
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{MFDFA}},
-  \code{\link{fd_RR}}, \code{\link{fd_allan}},
+Other Fluctuation Analyses: \code{\link{fd_RR}},
+  \code{\link{fd_allan}}, \code{\link{fd_mfdfa}},
   \code{\link{fd_psd}}, \code{\link{fd_sda}},
   \code{\link{fd_sev}}
 }

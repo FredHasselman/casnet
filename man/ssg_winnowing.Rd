@@ -2,18 +2,23 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{ssg_winnowing}
 \alias{ssg_winnowing}
-\title{ssg_winnowing}
+\title{Winnowing procedure for SSG}
 \usage{
 ssg_winnowing(durations, screeCut)
 }
 \arguments{
-\item{durations}{durations frame}
+\item{durations}{A data frame obtained by function \code{\link[=ts_duration]{ts_duration()}}}
 
-\item{screeCut}{cutoff}
+\item{screeCut}{Cutoff based on a scree plot.}
 }
 \value{
-attractor frame
+Attractor frame
 }
 \description{
-ssg_winnowing
+Find attractor states in a State Space Grid using a winnowing procedure.
 }
+\seealso{
+Other State Space Grid functions: \code{\link{factor_obs_exp}},
+  \code{\link{ssg_gwf2long}}
+}
+\concept{State Space Grid functions}

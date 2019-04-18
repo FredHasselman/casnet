@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +144,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>RM</th>
-      <td><p>A binary recurrence matrix</p></td>
+      <td><p>A distance matrix, or a matrix of zeroes and ones (you must set <code>emRad = NA</code>)</p></td>
     </tr>
     <tr>
       <th>emRad</th>
@@ -146,59 +152,59 @@
     </tr>
     <tr>
       <th>DLmin</th>
-      <td><p>Minimal diagonal line length</p></td>
+      <td><p>Minimal diagonal line length (default = <code>2</code>)</p></td>
     </tr>
     <tr>
       <th>VLmin</th>
-      <td><p>Minimal vertical line length</p></td>
+      <td><p>Minimal vertical line length (default = <code>2</code>)</p></td>
     </tr>
     <tr>
       <th>HLmin</th>
-      <td><p>Minimal horizontal line length</p></td>
+      <td><p>Minimal horizontal line length (default = <code>2</code>)</p></td>
     </tr>
     <tr>
       <th>DLmax</th>
-      <td><p>Maximal diagonal line length</p></td>
+      <td><p>Maximal diagonal line length (default = length of diagonal -1)</p></td>
     </tr>
     <tr>
       <th>VLmax</th>
-      <td><p>Maximal vertical line length</p></td>
+      <td><p>Maximal vertical line length (default = length of diagonal -1)</p></td>
     </tr>
     <tr>
       <th>HLmax</th>
-      <td><p>Maximal horizontal line length</p></td>
+      <td><p>Maximal horizontal line length (default = length of diagonal -1)</p></td>
     </tr>
     <tr>
       <th>AUTO</th>
-      <td><p>Is this an AUTO RQA?</p></td>
+      <td><p>Auto-recurrence? (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>theiler</th>
-      <td><p>theiler</p></td>
+      <td><p>= Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = <code>0</code>)</p></td>
     </tr>
     <tr>
       <th>chromatic</th>
-      <td><p>Chromatic RQA?</p></td>
+      <td><p>Force chromatic RQA? (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>matrices</th>
-      <td><p>Return Matrices?</p></td>
+      <td><p>Return matrices? (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>doHalf</th>
-      <td><p>Analyse half of the matrix?</p></td>
+      <td><p>Analyse half of the matrix? (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>Nboot</th>
-      <td><p>How many bootstraps?</p></td>
+      <td><p>How many bootstrap replications? (default = <code>NULL</code>)</p></td>
     </tr>
     <tr>
       <th>CL</th>
-      <td><p>Confidence Limit for bootstrap results</p></td>
+      <td><p>Confidence limit for bootstrap results (default = <code>.95</code>)</p></td>
     </tr>
     <tr>
       <th>doParallel</th>
-      <td><p>Use parallel?</p></td>
+      <td><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://purrr.tidyverse.org/reference/map2.html'>purrr::map2()</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>parallel::detectCores()</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></td>
     </tr>
     </table>
     

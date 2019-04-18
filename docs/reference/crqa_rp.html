@@ -91,6 +91,12 @@
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
+      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+    </li>
+    <li>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+    </li>
+    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -204,7 +210,7 @@
     </tr>
     <tr>
       <th>doParallel</th>
-      <td><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://purrr.tidyverse.org/reference/map2.html'>map2</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></td>
+      <td><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://purrr.tidyverse.org/reference/map2.html'>purrr::map2()</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>parallel::detectCores()</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>silent</th>
