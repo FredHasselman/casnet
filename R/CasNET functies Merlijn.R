@@ -48,9 +48,7 @@ dyn_comp = function(df, col_first, col_last, win=NROW(df),  fromScaleMin=NULL, f
 
 if(win>0){ok=TRUE}
 
-
   if(rescale){
-
     df[,col_first:col_last] <- elascer(x = df[,col_first:col_last], mn = fromScaleMin, mx = fromScaleMax, lo = toScaleMin, hi = toScaleMax)
 
   }
@@ -171,7 +169,7 @@ DC_F = function(df, win, xmin, xmax, col_first, col_last){
 
 #' Distribution Uniformity
 #'
-#' @param data data
+#' @param df data
 #' @param win win
 #' @param xmin xmin
 #' @param xmax xmax
@@ -189,9 +187,9 @@ NULL
 #' For \code{DC_D}, use \code{\link{dc_d}}.
 #'
 #' @export
-DC_D = function (data, win, xmin, xmax, col_first, col_last){
+DC_D = function (df, win, xmin, xmax, col_first, col_last){
 
-  ew_data_D <- matrix(NA, nrow=(nrow(data)+2), ncol=(col_last-col_first+1))
+  ew_data_D <- matrix(NA, nrow=(nrow(df)+2), ncol=(col_last-col_first+1))
   ew_data_D <- data.frame(ew_data_D)
   for (column in (col_first:col_last)){
     ts <- data[,column]
@@ -224,7 +222,7 @@ DC_D = function (data, win, xmin, xmax, col_first, col_last){
       ew_data_D[(i+win-1),(column-col_first+1)] <- 1-(r/g)
     }
   }
-  ew_data_D <- ew_data_D[(1:nrow(data)),]
+  ew_data_D <- ew_data_D[(1:nrow(df)),]
   return(ew_data_D)
 }
 

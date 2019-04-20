@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
       </span>
     </div>
 
@@ -88,9 +88,9 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Applied Synergetics: Dynamic Complexity in a Clinical Case Study</h1>
-                        <h4 class="author">Merlijn Olthof &amp; Fred Hasselman</h4>
+                        <h4 class="author">Fred Hasselman &amp; Merlijn Olthof</h4>
             
-            <h4 class="date">2019-04-18</h4>
+            <h4 class="date">2019-04-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/dynamiccomplexity.Rmd"><code>vignettes/dynamiccomplexity.Rmd</code></a></small>
       <div class="hidden name"><code>dynamiccomplexity.Rmd</code></div>
@@ -315,7 +315,7 @@ dateTimesNA[ccp.caseNA<span class="op">$</span>sig.peaks<span class="op">&gt;</s
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#  CART</span>
 dateTimesIMP[ccp.caseIMP<span class="op">$</span>sig.peaks<span class="op">&gt;</span><span class="dv">0</span>]</code></pre></div>
 <pre><code>&gt; [1] "2014-11-10 21:05:00 CET" "2014-11-12 21:37:00 CET"
-&gt; [3] "2014-11-13 09:28:00 CET" "2014-11-25 21:22:00 CET"
+&gt; [3] "2014-11-16 21:57:00 CET" "2014-11-25 21:22:00 CET"
 &gt; [5] "2014-11-26 09:37:00 CET" "2014-11-26 13:12:00 CET"
 &gt; [7] "2014-11-26 17:30:00 CET"</code></pre>
 </div>
@@ -325,68 +325,40 @@ dateTimesIMP[ccp.caseIMP<span class="op">$</span>sig.peaks<span class="op">&gt;<
 <a href="#plot-state-versus-complexity" class="anchor"></a>Plot ‘state’ versus complexity</h2>
 <p>One could look for a single variable that best predicts level changes, e.g. by looking at crosscorrelation functions, or by extracting peak-complexity times and gain/loss events can average the time course of dynamic complexity in a number of ways. Here we use the</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Dates for state variables</span>
-dates       &lt;-<span class="st"> </span>df<span class="op">$</span>start[<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(df<span class="op">$</span>unsatisfy)]
-dateTimesS  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strptime">strptime</a></span>(dates, <span class="st">"%m/%d/%Y %H:%M"</span>)
+dates       &lt;-<span class="st"> </span>df<span class="op">$</span>start
+dateTimesS  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strptime">strptime</a></span>(dates, <span class="st">"%m/%d/%Y %H:%M"</span>))
+idNA &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/complete.cases">complete.cases</a></span>(df_vars)
 
-caseNA &lt;-<span class="st"> </span><span class="kw">laply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(dc.caseNA<span class="op">$</span>df), <span class="cf">function</span>(r){
- <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/warning">suppressWarnings</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(dc.caseNA<span class="op">$</span>df[r,<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(dc.caseNA<span class="op">$</span>df)]<span class="op">*</span>ccp.caseNA[r,<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(dc.caseNA<span class="op">$</span>df)]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)<span class="op">%00%</span><span class="ot">NA</span>)
-  })
+df_lvl_hrs   &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ts_levels.html">ts_levels</a></span>(df<span class="op">$</span>hours)
+df_lvl_diff  &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ts_levels.html">ts_levels</a></span>(df<span class="op">$</span>difficult)
+df_lvl_unsat &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ts_levels.html">ts_levels</a></span>(df<span class="op">$</span>unsatisfy)
 
-<span class="co"># Add all data in a data frame</span>
-dc.mean &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">time =</span> dateTimesIMP,
-                      <span class="st">`</span><span class="dt">remove.NA</span><span class="st">`</span> =<span class="st"> </span><span class="ot">NA</span>, 
-                      <span class="st">`</span><span class="dt">impute.cart</span><span class="st">`</span> =<span class="st"> </span><span class="kw"><a href="../reference/elascer.html">elascer</a></span>(<span class="kw">laply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(dc.caseIMP), <span class="cf">function</span>(r){
-                        <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/warning">suppressWarnings</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(dc.caseIMP[r,<span class="dv">1</span><span class="op">:</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(dc.caseIMP)<span class="op">-</span><span class="dv">1</span>)]<span class="op">*</span>ccp.caseIMP[r,<span class="dv">1</span><span class="op">:</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(dc.caseIMP)<span class="op">-</span><span class="dv">1</span>)]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)<span class="op">%00%</span><span class="ot">NA</span>)}))
-                      )
-dc.mean<span class="op">$</span><span class="st">`</span><span class="dt">remove.NA</span><span class="st">`</span>[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(dc.mean<span class="op">$</span>time)<span class="op">%in%</span>dateTimesNA] &lt;-<span class="st"> </span><span class="kw"><a href="../reference/elascer.html">elascer</a></span>(caseNA)
+df_lvl_hrsNA   &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ts_levels.html">ts_levels</a></span>(df<span class="op">$</span>hours[idNA])
+df_lvl_diffNA  &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ts_levels.html">ts_levels</a></span>(df<span class="op">$</span>difficult[idNA])
+df_lvl_unsatNA &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ts_levels.html">ts_levels</a></span>(df<span class="op">$</span>unsatisfy[idNA])
 
-dc.lvl &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">time =</span> dateTimesIMP,
-                        <span class="dt">lvl1 =</span> <span class="ot">NA</span>, 
-                        <span class="dt">lvl2 =</span> <span class="ot">NA</span>, 
-                        <span class="dt">lvl3 =</span> <span class="ot">NA</span>)
-
-dc.lvl<span class="op">$</span>lvl1[dc.lvl<span class="op">$</span>time<span class="op">%in%</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(dateTimesS)] &lt;-<span class="st"> </span><span class="kw"><a href="../reference/elascer.html">elascer</a></span>(lvl1<span class="op">$</span>pred<span class="op">$</span>p)
-dc.lvl<span class="op">$</span>lvl2[dc.lvl<span class="op">$</span>time<span class="op">%in%</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(dateTimesS)] &lt;-<span class="st"> </span><span class="kw"><a href="../reference/elascer.html">elascer</a></span>(lvl2<span class="op">$</span>pred<span class="op">$</span>p)
-dc.lvl<span class="op">$</span>lvl3[dc.lvl<span class="op">$</span>time<span class="op">%in%</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(dateTimesS)] &lt;-<span class="st"> </span><span class="kw"><a href="../reference/elascer.html">elascer</a></span>(lvl3<span class="op">$</span>pred<span class="op">$</span>p)
-
-dc.lvl1 &lt;-<span class="st"> </span><span class="kw"><a href="http://stefvanbuuren.github.io/mice/reference/cbind.html">cbind</a></span>(dc.mean, <span class="dt">lvl1 =</span> dc.lvl<span class="op">$</span>lvl1) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather</span>(<span class="dt">key =</span> method, <span class="dt">value =</span> DC, <span class="op">-</span>time, <span class="op">-</span>lvl1)
-dc.lvl2 &lt;-<span class="st"> </span><span class="kw"><a href="http://stefvanbuuren.github.io/mice/reference/cbind.html">cbind</a></span>(dc.mean, <span class="dt">lvl2 =</span> dc.lvl<span class="op">$</span>lvl2) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather</span>(<span class="dt">key =</span> method, <span class="dt">value =</span> DC, <span class="op">-</span>time, <span class="op">-</span>lvl2)
-dc.lvl3 &lt;-<span class="st"> </span><span class="kw"><a href="http://stefvanbuuren.github.io/mice/reference/cbind.html">cbind</a></span>(dc.mean, <span class="dt">lvl3 =</span> dc.lvl<span class="op">$</span>lvl3) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather</span>(<span class="dt">key =</span> method, <span class="dt">value =</span> DC, <span class="op">-</span>time, <span class="op">-</span>lvl3)
-
-dc.lvl1<span class="op">$</span>DC[dc.lvl1<span class="op">$</span>DC<span class="op">==</span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
-dc.lvl2<span class="op">$</span>DC[dc.lvl2<span class="op">$</span>DC<span class="op">==</span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
-dc.lvl3<span class="op">$</span>DC[dc.lvl3<span class="op">$</span>DC<span class="op">==</span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
-
-lvl1 &lt;-<span class="st"> </span>dc.lvl[<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/complete.cases">complete.cases</a></span>(dc.lvl<span class="op">$</span>lvl1),<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>)] 
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(lvl1)[<span class="dv">2</span>] &lt;-<span class="st"> "lvl"</span>
-lvl2 &lt;-<span class="st"> </span>dc.lvl[<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/complete.cases">complete.cases</a></span>(dc.lvl<span class="op">$</span>lvl2),<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">3</span>)]
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(lvl2)[<span class="dv">2</span>] &lt;-<span class="st"> "lvl"</span>
-lvl3 &lt;-<span class="st"> </span>dc.lvl[<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/complete.cases">complete.cases</a></span>(dc.lvl<span class="op">$</span>lvl3),<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">4</span>)]
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(lvl3)[<span class="dv">2</span>] &lt;-<span class="st"> "lvl"</span></code></pre></div>
+<span class="kw"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(<span class="dt">df_ccp =</span> ccp.caseIMP, <span class="dt">df_win =</span> dc.caseIMP, <span class="dt">df_lvl =</span> df_lvl_hrs, <span class="dt">useTimeVector =</span> dateTimesS, <span class="dt">win =</span> win, <span class="dt">subtitle =</span> <span class="st">"CART"</span>, <span class="dt">levelName =</span> <span class="st">"Hours sleep"</span>)</code></pre></div>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(<span class="dt">df_ccp =</span> ccp.caseNA, <span class="dt">df_win =</span> dc.caseNA<span class="op">$</span>df, <span class="dt">df_lvl =</span> df_lvl_hrsNA, <span class="dt">useTimeVector =</span> dateTimesS[idNA], <span class="dt">win =</span> win, <span class="dt">subtitle =</span> <span class="st">"Remove NA"</span>, <span class="dt">levelName =</span> <span class="st">"Hours sleep"</span>)</code></pre></div>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(<span class="dt">df_ccp =</span> ccp.caseIMP, <span class="dt">df_win =</span> dc.caseIMP, <span class="dt">df_lvl =</span> df_lvl_diff, <span class="dt">useTimeVector =</span> dateTimesS, <span class="dt">win =</span> win, <span class="dt">subtitle =</span> <span class="st">"CART"</span>, <span class="dt">levelName =</span> <span class="st">"Difficulty sleeping"</span>)</code></pre></div>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-3.png" width="672" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(<span class="dt">df_ccp =</span> ccp.caseNA, <span class="dt">df_win =</span> dc.caseNA<span class="op">$</span>df, <span class="dt">df_lvl =</span> df_lvl_diffNA, <span class="dt">useTimeVector =</span> dateTimesS[idNA], <span class="dt">win =</span> win, <span class="dt">subtitle =</span> <span class="st">"Remove NA"</span>, <span class="dt">levelName =</span> <span class="st">"Difficulty sleeping"</span>)</code></pre></div>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-4.png" width="672" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(<span class="dt">df_ccp =</span> ccp.caseIMP, <span class="dt">df_win =</span> dc.caseIMP, <span class="dt">df_lvl =</span> df_lvl_unsat, <span class="dt">useTimeVector =</span> dateTimesS, <span class="dt">win =</span> win, <span class="dt">subtitle =</span> <span class="st">"CART"</span>, <span class="dt">levelName =</span> <span class="st">"Unsatisfactory sleep"</span>)</code></pre></div>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-5.png" width="672" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(<span class="dt">df_ccp =</span> ccp.caseNA, <span class="dt">df_win =</span> dc.caseNA<span class="op">$</span>df, <span class="dt">df_lvl =</span> df_lvl_unsatNA, <span class="dt">useTimeVector =</span> dateTimesS[idNA], <span class="dt">win =</span> win, <span class="dt">subtitle =</span> <span class="st">"Remove NA"</span>, <span class="dt">levelName =</span> <span class="st">"Unsatisfactory sleep"</span>)</code></pre></div>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-6.png" width="672" style="display: block; margin: auto;"></p>
 <p>Look for max complexity peaks around level changes.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dclv &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(dc.lvl1,dc.lvl2,dc.lvl3)
-lv   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(lvl1,lvl2,lvl3)
-
-<span class="cf">for</span>(d <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(dclv)){
-  
-  g &lt;-<span class="st"> </span><span class="kw">ggplot</span>(dclv[[d]], <span class="kw">aes</span>(<span class="dt">x =</span> time, <span class="dt">y =</span> DC), <span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span>
-<span class="st">    </span><span class="kw">geom_path</span>(<span class="dt">data =</span> lv[[d]], <span class="kw">aes</span>(<span class="dt">x=</span> time, <span class="dt">y =</span> lvl), <span class="dt">colour =</span> <span class="st">"red3"</span>, <span class="dt">size =</span> <span class="dv">1</span>)  <span class="op">+</span>
-<span class="st">    </span><span class="kw">geom_path</span>(<span class="dt">size=</span><span class="dv">1</span>) <span class="op">+</span>
-<span class="st">    </span><span class="kw">facet_grid</span>(method<span class="op">~</span>.) <span class="op">+</span>
-<span class="st">    </span><span class="kw">scale_y_continuous</span>(<span class="st">"Dynamic Complexity vs. Level (arbitrary units)"</span>) <span class="op">+</span>
-<span class="st">    </span><span class="kw">ggtitle</span>(<span class="dt">label =</span> <span class="st">"Hours sleep"</span>) <span class="op">+</span>
-<span class="st">    </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st">  </span><span class="kw">theme</span>(<span class="co">#panel.grid.minor =  = element_blank(),</span>
-      <span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">vjust =</span><span class="fl">0.5</span>))
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(g)
-}</code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;"><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;"><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-13-3.png" width="672" style="display: block; margin: auto;"></p>
 </div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
-<a href="#references" class="anchor"></a><strong>References</strong>
-</h2>
+<a href="#references" class="anchor"></a>References</h2>
 <p>Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F., Boker, S. M., Ceulemans, E., Chen, M., … Bringmann, L. F. (2019, March 21). Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology. <a href="https://doi.org/10.31234/osf.io/c8vp7" class="uri">https://doi.org/10.31234/osf.io/c8vp7</a></p>
-<p>Fisher, A. J., &amp; Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. Assessment, 23(4), 496–506. <a href="https://doi.org/10.1177/1073191116638735-Fisher" class="uri">https://doi.org/10.1177/1073191116638735-Fisher</a></p>
+<p>Fisher, A. J., &amp; Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. <em>Assessment, 23(4)</em>, 496–506. <a href="https://doi.org/10.1177/1073191116638735-Fisher" class="uri">https://doi.org/10.1177/1073191116638735-Fisher</a></p>
+<p>Haken H, Schiepek G (2006) <em>Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten</em>. Hogrefe, Göttingen.</p>
+<p>Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. <em>European Journal of Psychological Assessment, 19</em>, 175-184. httpd://doi.org/10.1027//1015-5759.19.3.175</p>
+<p>Schiepek, G., &amp; Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. <em>Biological cybernetics, 102(3)</em>, 197-207. <a href="https://doi.org/10.1007/s00422-009-0362-1" class="uri">https://doi.org/10.1007/s00422-009-0362-1</a></p>
 </div>
 </div>
   </div>
@@ -402,7 +374,7 @@ lv   &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocume
       <li><a href="#phase-transitions-as-sudden-gains-and-losses">Phase transitions as sudden gains and losses</a></li>
       <li><a href="#detecting-early-warning-signals-ews-using-dynamic-complexity">Detecting Early Warning Signals (EWS) using Dynamic Complexity</a></li>
       <li><a href="#plot-state-versus-complexity">Plot ‘state’ versus complexity</a></li>
-      <li><a href="#references"><strong>References</strong></a></li>
+      <li><a href="#references">References</a></li>
       </ul>
 </li>
       </ul>

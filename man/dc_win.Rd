@@ -49,7 +49,8 @@ Schiepek, G. K., St?ger-Schmidinger, B., Aichhorn, W., Sch?ller, H., & Aas, B. (
 \seealso{
 Other Dynamic Complexity functions: \code{\link{dc_ccp}},
   \code{\link{dc_d}}, \code{\link{dc_f}},
-  \code{\link{plotDC_ccp}}, \code{\link{plotDC_res}}
+  \code{\link{plotDC_ccp}}, \code{\link{plotDC_lvl}},
+  \code{\link{plotDC_res}}
 }
 \author{
 Merlijn Olthof

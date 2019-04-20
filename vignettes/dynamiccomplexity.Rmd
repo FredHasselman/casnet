@@ -1,6 +1,6 @@
 ---
 title: "Applied Synergetics: Dynamic Complexity in a Clinical Case Study"
-author: "Merlijn Olthof & Fred Hasselman"
+author: "Fred Hasselman & Merlijn Olthof"
 date: "`r Sys.Date()`"
 bibliography: bibliography.bib
 csl: apa.csl
@@ -286,72 +286,44 @@ One could look for a single variable that best predicts level changes, e.g. by l
 
 ```{r}
 # Dates for state variables
-dates       <- df$start[!is.na(df$unsatisfy)]
-dateTimesS  <- strptime(dates, "%m/%d/%Y %H:%M")
+dates       <- df$start
+dateTimesS  <- as.POSIXct(strptime(dates, "%m/%d/%Y %H:%M"))
+idNA <- complete.cases(df_vars)
 
-caseNA <- laply(1:NROW(dc.caseNA$df), function(r){
- suppressWarnings(mean(as.numeric(dc.caseNA$df[r,1:NCOL(dc.caseNA$df)]*ccp.caseNA[r,1:NCOL(dc.caseNA$df)]), na.rm = TRUE)%00%NA)
-  })
+df_lvl_hrs   <- ts_levels(df$hours)
+df_lvl_diff  <- ts_levels(df$difficult)
+df_lvl_unsat <- ts_levels(df$unsatisfy)
 
-# Add all data in a data frame
-dc.mean <- data.frame(time = dateTimesIMP,
-                      `remove.NA` = NA, 
-                      `impute.cart` = elascer(laply(1:NROW(dc.caseIMP), function(r){
-                        suppressWarnings(mean(as.numeric(dc.caseIMP[r,1:(NCOL(dc.caseIMP)-1)]*ccp.caseIMP[r,1:(NCOL(dc.caseIMP)-1)]), na.rm = TRUE)%00%NA)}))
-                      )
-dc.mean$`remove.NA`[paste(dc.mean$time)%in%dateTimesNA] <- elascer(caseNA)
+df_lvl_hrsNA   <- ts_levels(df$hours[idNA])
+df_lvl_diffNA  <- ts_levels(df$difficult[idNA])
+df_lvl_unsatNA <- ts_levels(df$unsatisfy[idNA])
 
-dc.lvl <- data.frame(time = dateTimesIMP,
-                        lvl1 = NA, 
-                        lvl2 = NA, 
-                        lvl3 = NA)
+plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_hrs, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Hours sleep")
+plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA$df, df_lvl = df_lvl_hrsNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Hours sleep")
 
-dc.lvl$lvl1[dc.lvl$time%in%as.POSIXct(dateTimesS)] <- elascer(lvl1$pred$p)
-dc.lvl$lvl2[dc.lvl$time%in%as.POSIXct(dateTimesS)] <- elascer(lvl2$pred$p)
-dc.lvl$lvl3[dc.lvl$time%in%as.POSIXct(dateTimesS)] <- elascer(lvl3$pred$p)
+plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_diff, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Difficulty sleeping")
+plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA$df, df_lvl = df_lvl_diffNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Difficulty sleeping")
 
-dc.lvl1 <- cbind(dc.mean, lvl1 = dc.lvl$lvl1) %>% gather(key = method, value = DC, -time, -lvl1)
-dc.lvl2 <- cbind(dc.mean, lvl2 = dc.lvl$lvl2) %>% gather(key = method, value = DC, -time, -lvl2)
-dc.lvl3 <- cbind(dc.mean, lvl3 = dc.lvl$lvl3) %>% gather(key = method, value = DC, -time, -lvl3)
+plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_unsat, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Unsatisfactory sleep")
+plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA$df, df_lvl = df_lvl_unsatNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Unsatisfactory sleep")
 
-dc.lvl1$DC[dc.lvl1$DC==0] <- NA
-dc.lvl2$DC[dc.lvl2$DC==0] <- NA
-dc.lvl3$DC[dc.lvl3$DC==0] <- NA
-
-lvl1 <- dc.lvl[complete.cases(dc.lvl$lvl1),c(1,2)] 
-colnames(lvl1)[2] <- "lvl"
-lvl2 <- dc.lvl[complete.cases(dc.lvl$lvl2),c(1,3)]
-colnames(lvl2)[2] <- "lvl"
-lvl3 <- dc.lvl[complete.cases(dc.lvl$lvl3),c(1,4)]
-colnames(lvl3)[2] <- "lvl"
 ```
 
 
 Look for max complexity peaks around level changes.
 
-```{r}
-dclv <- list(dc.lvl1,dc.lvl2,dc.lvl3)
-lv   <- list(lvl1,lvl2,lvl3)
-
-for(d in seq_along(dclv)){
-  
-  g <- ggplot(dclv[[d]], aes(x = time, y = DC), size=1) +
-    geom_path(data = lv[[d]], aes(x= time, y = lvl), colour = "red3", size = 1)  +
-    geom_path(size=1) +
-    facet_grid(method~.) +
-    scale_y_continuous("Dynamic Complexity vs. Level (arbitrary units)") +
-    ggtitle(label = "Hours sleep") +
-    theme_bw() +  theme(#panel.grid.minor =  = element_blank(),
-      axis.text.x = element_text(angle = 90, vjust =0.5))
-  plot(g)
-}
-
-```   
 
 
-
-## **References**
+## References
 
 Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F., Boker, S. M., Ceulemans, E., Chen, M., … Bringmann, L. F. (2019, March 21). Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology. https://doi.org/10.31234/osf.io/c8vp7
 
-Fisher, A. J., & Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. Assessment, 23(4), 496–506. https://doi.org/10.1177/1073191116638735-Fisher
+Fisher, A. J., & Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. *Assessment, 23(4)*, 496–506. https://doi.org/10.1177/1073191116638735-Fisher
+
+Haken H, Schiepek G (2006) *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
+
+Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. *European Journal of Psychological Assessment, 19*, 175-184. httpd://doi.org/10.1027//1015-5759.19.3.175
+
+Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. *Biological cybernetics, 102(3)*, 197-207. https://doi.org/10.1007/s00422-009-0362-1
+
+

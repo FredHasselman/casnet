@@ -15,7 +15,7 @@ dyn_comp(df, col_first, col_last, win = NROW(df), fromScaleMin = NULL,
 
 DC_F(df, win, xmin, xmax, col_first, col_last)
 
-DC_D(data, win, xmin, xmax, col_first, col_last)
+DC_D(df, win, xmin, xmax, col_first, col_last)
 
 crit_in(df, win)
 }

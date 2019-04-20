@@ -4,7 +4,7 @@
 \alias{DC_D-deprecated}
 \title{Distribution Uniformity}
 \arguments{
-\item{data}{data}
+\item{df}{data}
 
 \item{win}{win}
 

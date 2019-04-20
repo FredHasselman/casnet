@@ -54,7 +54,8 @@ Schiepek, G. K., Tominschek, I., & Heinzel, S. (2014). Self-organization in psyc
 \seealso{
 Other Dynamic Complexity functions: \code{\link{dc_d}},
   \code{\link{dc_f}}, \code{\link{dc_win}},
-  \code{\link{plotDC_ccp}}, \code{\link{plotDC_res}}
+  \code{\link{plotDC_ccp}}, \code{\link{plotDC_lvl}},
+  \code{\link{plotDC_res}}
 }
 \author{
 Merlijn Olthof

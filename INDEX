@@ -1,92 +1,93 @@
-add_alpha                                   Add transparency to a colour
-as.numeric_character                        Character vector to named numeric vector
-as.numeric_discrete                         Discrete (factor or character) to numeric vector
-as.numeric_factor                           Numeric factor to numeric vector
-bandReplace                                 Replace matrix diagonals
-crqa_cl                                     Fast (C)RQA (command line crp)
-crqa_diagProfile                            Diagonal Recurrence Profile
-crqa_parameters                             Find optimal (C)RQA parameters
-crqa_radius                                 Find fixed or optimal radius
-crqa_rp                                     Get bootsrapped (C)RQA measures based on a recurrence matrix
-dc_ccp                                      Cumulative Complexity Peaks (CCP)
-dc_d                                        Distribution Uniformity
-dc_f                                        Fluctuation Intensity
-dc_win                                      Dynamic Complexity
-di2bi                                       Distance to binary matrix
-di2we                                       Distance 2 weighted matrix
-dist_hamming                                Calculate Hamming distance
-elascer                                     Elastic Scaler - A Flexible Rescale Function
-est_emDim                                   Estimate number of embedding dimensions
-est_emLag                                   Estimate embedding lag (tau)
-factor_obs_exp                              Add expected factor labels to observed values
-fd_allan                                    Allan Variance Analysis
-fd_boxcount2D                               2D Boxcount for 1D signal
-fd_dfa                                      Detrended Fluctuation Analysis (DFA)
-fd_mfdfa                                    Multi-fractal Detrended Fluctuation Analysis
-fd_psd                                      Power Spectral Density Slope (PSD).
-fd_RR                                       Relative Roughness
-fd_sda                                      Standardised Dispersion Analysis (SDA).
-fd_sev                                      Calculate FD using Sevcik's method
-get_os                                      Which OS is running?
-gg_plotHolder                               gg_plotHolder
-gg_theme                                    gg_theme
-growth_ac                                   Examples of dynamical growth models (maps)
-growth_ac_cond                              Examples of conditional dynamical growth models (maps)
-mi_mat                                      Mutual Information variations
-mif                                         Mutual Information Function
-mif_interlayer                              Inter-layer mutual information
-noise_fBm                                   Generate fractional Brownian motion
-noise_fGn                                   Generate fractional Gaussian noise
-noise_powerlaw                              Generate noise series with power law scaling exponent
-plotDC_ccp                                  Plot Cumulative Complexity Peaks
-plotDC_res                                  Plot Complexity Resonance Diagram
-plotFD_loglog                               Plot output from fluctuation analyses based on log-log regression
-plotNET_BA                                  Example of Barabasi scale-free network
-plotNET_groupColour                         Vertex Group Colours
-plotNET_groupWeight                         Set Edge weights by group
-plotNET_prep                                Plot Network Based on RQA
-plotNET_SW                                  Example of Strogatz-Watts small-world network
-plotRED_acf                                 Plot ACF and PACF
-plotRED_mif                                 Plot various MI functions
-plotSUR_hist                                Surrogate Test
-repmat                                      Repeat Copies of a Matrix
-rn                                          Create a Recurrence Network Matrix
-rn_plot                                     Plot (thresholded) distance matrix as a network
-rn_recSpec                                  Recurrence Time Spectrum
-rn_scaleoGram                               Recurrence Time Scaleogram
-RNG                                         Random Number Sequences
-rp                                          Create a Distance Matrix
-rp_copy_attributes                          Copy Matrix Attributes
-rp_lineDist                                 Line length distributions
-rp_nzdiags                                  rp_nzdiags
-rp_plot                                     Plot (thresholded) distance matrix as a recurrence plot
-rp_size                                     rp_size
-sa2fd_dfa                                   Informed Dimension estimate from DFA slope (H)
-sa2fd_psd                                   Informed Dimension estimate from Spectral Slope (aplha)
-sa2fd_sda                                   Informed Dimension estimate from SDA slope.
-set_command_line_rp                         Set command line RQA executable
-ssg_gwf2long                                Import GridWare files
-ssg_winnowing                               Winnowing procedure for SSG
-SWtestE                                     Small World test
-ts_center                                   Center a vector
-ts_changeindex                              Find change indices
-ts_checkfix                                 Check and/or Fix a vector
-ts_detrend                                  Detrend a time series
-ts_diff                                     Derivative of time series
-ts_discrete                                 Discrete representation
-ts_duration                                 Time series to Duration series
-ts_embed                                    Delay embedding of a time series
-ts_integrate                                Create a timeseries profile
-ts_levels                                   Detect levels in time series
-ts_peaks                                    Find Peaks or Wells
-ts_permtest_block                           Permutation Test: Block Randomisation
-ts_permtest_transmat                        Permutation Test: Transition Matrix
-ts_rasterize                                Turn a 1D time series vector into a 2D curve
-ts_sd                                       Standard Deviation estimates
-ts_slice                                    Slice columns of a matrix in epochs
-ts_standardise                              Standardise a vector
-ts_sumorder                                 Adjust time series by summation order
-ts_symbolic                                 Symbolic representation
-ts_transmat                                 Transition matrix
-ts_trimfill                                 Trim or Fill Vectors
-ts_windower                                 Get sliding window indices
+add_alpha                              Add transparency to a colour
+as.numeric_character                   Character vector to named numeric vector
+as.numeric_discrete                    Discrete (factor or character) to numeric vector
+as.numeric_factor                      Numeric factor to numeric vector
+bandReplace                            Replace matrix diagonals
+crqa_cl                                Fast (C)RQA (command line crp)
+crqa_diagProfile                       Diagonal Recurrence Profile
+crqa_parameters                        Find optimal (C)RQA parameters
+crqa_radius                            Find fixed or optimal radius
+crqa_rp                                Get bootsrapped (C)RQA measures based on a recurrence matrix
+dc_ccp                                 Cumulative Complexity Peaks (CCP)
+dc_d                                   Distribution Uniformity
+dc_f                                   Fluctuation Intensity
+dc_win                                 Dynamic Complexity
+di2bi                                  Distance to binary matrix
+di2we                                  Distance 2 weighted matrix
+dist_hamming                           Calculate Hamming distance
+elascer                                Elastic Scaler - A Flexible Rescale Function
+est_emDim                              Estimate number of embedding dimensions
+est_emLag                              Estimate embedding lag (tau)
+factor_obs_exp                         Add expected factor labels to observed values
+fd_allan                               Allan Variance Analysis
+fd_boxcount2D                          2D Boxcount for 1D signal
+fd_dfa                                 Detrended Fluctuation Analysis (DFA)
+fd_mfdfa                               Multi-fractal Detrended Fluctuation Analysis
+fd_psd                                 Power Spectral Density Slope (PSD).
+fd_RR                                  Relative Roughness
+fd_sda                                 Standardised Dispersion Analysis (SDA).
+fd_sev                                 Calculate FD using Sevcik's method
+get_os                                 Which OS is running?
+gg_plotHolder                          gg_plotHolder
+gg_theme                               gg_theme
+growth_ac                              Examples of dynamical growth models (maps)
+growth_ac_cond                         Examples of conditional dynamical growth models (maps)
+mi_mat                                 Mutual Information variations
+mif                                    Mutual Information Function
+mif_interlayer                         Inter-layer mutual information
+noise_fBm                              Generate fractional Brownian motion
+noise_fGn                              Generate fractional Gaussian noise
+noise_powerlaw                         Generate noise series with power law scaling exponent
+plotDC_ccp                             Plot Cumulative Complexity Peaks
+plotDC_lvl                             Plot Peaks versus Levels
+plotDC_res                             Plot Complexity Resonance Diagram
+plotFD_loglog                          Plot output from fluctuation analyses based on log-log regression
+plotNET_BA                             Example of Barabasi scale-free network
+plotNET_groupColour                    Vertex Group Colours
+plotNET_groupWeight                    Set Edge weights by group
+plotNET_prep                           Plot Network Based on RQA
+plotNET_SW                             Example of Strogatz-Watts small-world network
+plotRED_acf                            Plot ACF and PACF
+plotRED_mif                            Plot various MI functions
+plotSUR_hist                           Surrogate Test
+repmat                                 Repeat Copies of a Matrix
+rn                                     Create a Recurrence Network Matrix
+rn_plot                                Plot (thresholded) distance matrix as a network
+rn_recSpec                             Recurrence Time Spectrum
+rn_scaleoGram                          Recurrence Time Scaleogram
+RNG                                    Random Number Sequences
+rp                                     Create a Distance Matrix
+rp_copy_attributes                     Copy Matrix Attributes
+rp_lineDist                            Line length distributions
+rp_nzdiags                             rp_nzdiags
+rp_plot                                Plot (thresholded) distance matrix as a recurrence plot
+rp_size                                rp_size
+sa2fd_dfa                              Informed Dimension estimate from DFA slope (H)
+sa2fd_psd                              Informed Dimension estimate from Spectral Slope (aplha)
+sa2fd_sda                              Informed Dimension estimate from SDA slope.
+set_command_line_rp                    Set command line RQA executable
+ssg_gwf2long                           Import GridWare files
+ssg_winnowing                          Winnowing procedure for SSG
+SWtestE                                Small World test
+ts_center                              Center a vector
+ts_changeindex                         Find change indices
+ts_checkfix                            Check and/or Fix a vector
+ts_detrend                             Detrend a time series
+ts_diff                                Derivative of time series
+ts_discrete                            Discrete representation
+ts_duration                            Time series to Duration series
+ts_embed                               Delay embedding of a time series
+ts_integrate                           Create a timeseries profile
+ts_levels                              Detect levels in time series
+ts_peaks                               Find Peaks or Wells
+ts_permtest_block                      Permutation Test: Block Randomisation
+ts_permtest_transmat                   Permutation Test: Transition Matrix
+ts_rasterize                           Turn a 1D time series vector into a 2D curve
+ts_sd                                  Standard Deviation estimates
+ts_slice                               Slice columns of a matrix in epochs
+ts_standardise                         Standardise a vector
+ts_sumorder                            Adjust time series by summation order
+ts_symbolic                            Symbolic representation
+ts_transmat                            Transition matrix
+ts_trimfill                            Trim or Fill Vectors
+ts_windower                            Get sliding window indices

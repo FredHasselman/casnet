@@ -30,6 +30,7 @@ Use \code{\link[=dc_win]{dc_win()}} to get the dynamic complexity measure.
 
 Other Dynamic Complexity functions: \code{\link{dc_ccp}},
   \code{\link{dc_d}}, \code{\link{dc_win}},
-  \code{\link{plotDC_ccp}}, \code{\link{plotDC_res}}
+  \code{\link{plotDC_ccp}}, \code{\link{plotDC_lvl}},
+  \code{\link{plotDC_res}}
 }
 \concept{Dynamic Complexity functions}
