@@ -4,23 +4,12 @@
 \alias{dc_ccp}
 \title{Cumulative Complexity Peaks (CCP)}
 \usage{
-dc_ccp(df_win, col_first, col_last, win = NROW(df), scale_min, scale_max,
-  alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE,
+dc_ccp(df_win, alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE,
   useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA,
   timeStamp = "01-01-1999")
 }
 \arguments{
 \item{df_win}{A data frame containing series of Dynamic Complexity values obtained by running function \code{\link[=dc_win]{dc_win()}}}
-
-\item{col_first}{The first column of the dataframe that should be analyzed.}
-
-\item{col_last}{The last column of the dataframe that should be analyzed.}
-
-\item{win}{Size of window in which to calculate Dynamic Complexity. If \code{win < NROW(df)} the window will move along the time series with a stepsize of \code{1} (default = \code{NROW(df)})}
-
-\item{scale_min}{Theoretical minimum value of thescale.}
-
-\item{scale_max}{Theoretical maximum value of the scale.}
 
 \item{alpha_item}{The significance level of the one-sided Z-test used to determine which peaks are \code{> 0}.}
 

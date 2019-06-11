@@ -133,7 +133,9 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>dc_d</span>(<span class='no'>df</span>, <span class='no'>col_first</span>, <span class='no'>col_last</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>df</span>), <span class='no'>scale_min</span>, <span class='no'>scale_max</span>)</pre>
+    <pre class="usage"><span class='fu'>dc_d</span>(<span class='no'>df</span>, <span class='kw'>col_first</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>col_last</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>df</span>),
+  <span class='kw'>from_scale_min</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>from_scale_max</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>to_scale_min</span>, <span class='no'>to_scale_max</span>,
+  <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,23 +146,35 @@
     </tr>
     <tr>
       <th>col_first</th>
-      <td><p>The first column of the dataframe that should be analyzed.</p></td>
+      <td><p>The first column of the dataframe that should be analyzed. If <code>NA</code>, <code>col_first = 1</code> (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>col_last</th>
-      <td><p>The last column of the dataframe that should be analyzed.</p></td>
+      <td><p>The last column of the dataframe that should be analyzed. If <code>NA</code>, <code>col_first = NCOL(df)</code> (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>win</th>
       <td><p>Size of window in which to calculate Dynamic Complexity. If <code>win &lt; NROW(df)</code> the window will move along the time series with a stepsize of <code>1</code> (default = <code><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW(df)</a></code>)</p></td>
     </tr>
     <tr>
-      <th>scale_min</th>
-      <td><p>Theoretical minimum value of thescale.</p></td>
+      <th>from_scale_min</th>
+      <td><p>The minimum value of the data. If <code>NA</code> will be set to minimum of each column <code>c</code> as <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>min(df,c, na.rm = TRUE)</a></code> (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
-      <th>scale_max</th>
-      <td><p>Theoretical maximum value of the scale.</p></td>
+      <th>from_scale_max</th>
+      <td><p>The minimum value of the data. If <code>NA</code> will be set to maximum of each column <code>c</code> as <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>max(df,c, na.rm = TRUE)</a></code> (default = <code>NA</code>)</p></td>
+    </tr>
+    <tr>
+      <th>to_scale_min</th>
+      <td><p>The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if <code>rescale = TRUE</code>, this value will be used to rescale each column <code>c</code> using <code><a href='elascer.html'>elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>to_scale_max</th>
+      <td><p>The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if <code>rescale = TRUE</code>, this value will be used to rescale each column <code>c</code> using <code><a href='elascer.html'>elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>rescale</th>
+      <td><p>Should all columns in <code>df</code> be rescaled to <code>scle_min</code> and <code>scale_max</code>? Each column will be rescaled individually, which means the <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>min()</a></code> and <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>max()</a></code> values of each column will be used, not of the entire dataset. (default = <code>FALSE</code>)</p></td>
     </tr>
     </table>
     

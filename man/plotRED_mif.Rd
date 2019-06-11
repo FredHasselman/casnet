@@ -4,19 +4,22 @@
 \alias{plotRED_mif}
 \title{Plot various MI functions}
 \usage{
-plotRED_mif(y, lags = 0:max(round(NROW(y)/4), 10), nbins = ceiling(2 *
-  NROW(y)^(1/3)), alpha = 0.05, doPlot = TRUE, returnMIFun = TRUE)
+plotRED_mif(mif.OUT = NULL, lags = 0:max(round(NROW(y)/4), 10),
+  nbins = ceiling(2 * NROW(y)^(1/3)), surTest = FALSE, alpha = 0.05,
+  doPlot = TRUE, returnMIFun = TRUE)
 }
 \arguments{
-\item{y}{A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function.}
+\item{mif.OUT}{Output from function \code{\link[=mif]{mif()}}}
 
-\item{lags}{Maximum number of lags}
+\item{lags}{The lags to evaluate mutual information.}
 
 \item{nbins}{The number of bins passed to \code{\link[infotheo:discretize]{infotheo::discretize()}} if y is a matrix or \code{\link[casnet:ts_discrete]{casnet::ts_discrete()}}}
 
-\item{alpha}{Significance level}
+\item{surTest}{If \code{TRUE}, a surrogate will be conducted using simple surrogates. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin \code{j} when the current value is in bin \code{j}. The number of surrogates needed will be computed based on the value of the \code{alpha} parameter, conceived as a one-sided test: \code{mi > 0}.}
 
-\item{doPlot}{Plot output}
+\item{alpha}{The alpha level for the surrogate test (default = \code{0.05})}
+
+\item{doPlot}{Produce a plot of the symbolic time series by calling \code{\link[=plotRED_mif]{plotRED_mif()}} (default = \code{FALSE})}
 
 \item{returnMIFun}{Return the data}
 }

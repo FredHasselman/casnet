@@ -4,11 +4,25 @@
 \alias{rn_plot}
 \title{Plot (thresholded) distance matrix as a network}
 \usage{
-rn_plot(RN, title = "", xlab = "", ylab = "",
-  returnOnlyObject = FALSE, useGtable = TRUE)
+rn_plot(RN, plotDimensions = FALSE, plotMeasures = FALSE,
+  drawGrid = FALSE, markEpochsLOI = NULL, Chromatic = NULL,
+  radiusValue = NA, title = "", xlab = "", ylab = "",
+  plotSurrogate = NA, returnOnlyObject = FALSE)
 }
 \arguments{
 \item{RN}{A distance matrix or recurrence matrix}
+
+\item{plotDimensions}{Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})}
+
+\item{plotMeasures}{Print common (C)RQA measures in the plot if the matrix is binary}
+
+\item{drawGrid}{Draw a grid on the recurrence plot (\code{default = FALSE})}
+
+\item{markEpochsLOI}{Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (\code{default = NULL})}
+
+\item{Chromatic}{If \code{TRUE} and there are more than two discrete values in \code{RM}, give recurrent points a distinct colour. If \code{RM} was returned by \code{crqa_rp(..., chromatic = TRUE)}, the recurrence plot will colour-code recurrent points according to the category values in \code{attributes(RM)$chromaticRP} (\code{default = FALSE})}
+
+\item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
 
 \item{title}{A title for the plot}
 
@@ -16,9 +30,9 @@ rn_plot(RN, title = "", xlab = "", ylab = "",
 
 \item{ylab}{An y-axis label}
 
-\item{returnOnlyObject}{Return the \code{ggplot} / \code{ggraph} object only, do not draw the plot (default = \code{FALSE})}
+\item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link[=rp]{rp()}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.}
 
-\item{useGtable}{Use package \code{\link[=gtable]{gtable()}}. If this results in errors (e.g. viewport settings), set to FALSE (default = \code{TRUE})}
+\item{returnOnlyObject}{Return the ggplot object only, do not draw the plot (default = \code{TRUE})}
 }
 \value{
 A nice plot of the recurrence network

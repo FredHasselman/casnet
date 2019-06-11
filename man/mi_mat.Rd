@@ -7,7 +7,7 @@
 mi_mat(y, ID1, ID2, discreteBins = ceiling(2 * NROW(ID1)^(1/3)))
 }
 \arguments{
-\item{y}{Matrix}
+\item{y}{A matrix with time series in columns}
 
 \item{ID1}{ids}
 

@@ -4,10 +4,12 @@
 \alias{symHelper}
 \title{Correct for plateaus in symbolic series}
 \usage{
-symHelper(sym_num)
+symHelper(sym_label, sym_num)
 }
 \arguments{
-\item{sym_num}{}
+\item{sym_label}{Labels}
+
+\item{sym_num}{Numeric labels}
 }
 \value{
 data frame

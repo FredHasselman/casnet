@@ -177,13 +177,16 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>invctr</span>)</div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘invctr’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:casnet’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    is.wholenumber</span></div><div class='input'><span class='co'># Create data with events and their timecodes</span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>invctr</span>)
+<span class='co'># Create data with events and their timecodes</span>
 <span class='no'>coder</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>beh</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"stare"</span>,<span class='st'>"stare"</span>,<span class='st'>"coffee"</span>,<span class='st'>"type"</span>,<span class='st'>"type"</span>,<span class='st'>"stare"</span>),<span class='kw'>t</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>,<span class='fl'>5</span>,<span class='fl'>10</span>,<span class='fl'>15</span>,<span class='fl'>20</span>,<span class='fl'>25</span>))
 
-<span class='fu'>ts_duration</span>(<span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>coder</span>$<span class='no'>beh</span>, <span class='kw'>timeVec</span> <span class='kw'>=</span> <span class='no'>coder</span>$<span class='no'>t</span>)</div><div class='output co'>#&gt; <span class='error'>Error in as.numeric_character(y): object 'sort.unique' not found</span></div></pre>
+<span class='fu'>ts_duration</span>(<span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>coder</span>$<span class='no'>beh</span>, <span class='kw'>timeVec</span> <span class='kw'>=</span> <span class='no'>coder</span>$<span class='no'>t</span>)</div><div class='output co'>#&gt;   y y.name t.start t.end duration.time duration.samples duration.fs
+#&gt; 1 1  stare       0    10            10                2           2
+#&gt; 2 2 coffee      10    15             5                1           1
+#&gt; 3 3   type      15    25            10                2           2
+#&gt; 4 1  stare      25    25             0                1           1</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

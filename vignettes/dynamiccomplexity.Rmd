@@ -43,7 +43,7 @@ Dynamic assessment, for example, ecological momentary assesment (EMA), is used m
 
 In this vignette, we'll use complex systems theory and methodology developed to analyse fluctuations in rating scale time series to perform a quantitative case study for real patient data. We'll analyze publicly available EMA data from 1 patient that was drawn from a personalized psychotherapy study (cf. Fisher & Boswell, 2016) and was analysed by several different teams in a 'Many Analysists' study: [*Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology*](https://doi.org/10.31234/osf.io/c8vp7) by Bastiaansen et al. (2019).
 
-The main purpose of the vignette is to showcase the *Dynamic Complexity functions* family in `casnet`. The choice for the imputation method is explained in the vignette *Dealing with missing values in time series*.
+We use the theoretical and analytic framework developed by Haken and Schiepek (2006), based on the mathematical theory of *Synergetics*, specifically the *Dynamic Complexity Measure* (Schiepek & Strunk, 2010). The main purpose of the vignette is to showcase the *Dynamic Complexity functions* family in `casnet`. The choice for the imputation method is explained in the vignette *Dealing with missing values in time series*.
 
 
 ### Load clincal case data from OSF
@@ -51,13 +51,12 @@ The main purpose of the vignette is to showcase the *Dynamic Complexity function
 Load the data used by Bastiaansen et al. (2019) from the Open Science Framework.
 
 ```{r}
-# Load data from OSF https://osf.io/tcnpd/
-if(!require("osfr")) {
-  install.packages("osfr", dependencies = TRUE)
-  library("osfr")
-}
+# # Load data from OSF https://osf.io/tcnpd/
+# require(osfr)
+# manyAnalystsESM <- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)
 
-df <- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)
+# Or use the internal data
+data(manyAnalystsESM)
 ```
 
 ### Dealing with missing values
@@ -65,16 +64,14 @@ df <- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrit
 Most variables were measured three times in one day. We'll check the time series for missing values using package `imputeTS`.
  
 ```{r,fig.height=10}
-if(!require("imputeTS")){
-  install.packages("imputeTS", dependencies = TRUE)
-  library("imputeTS")
-}
+require(imputeTS)
+require(mice)
 
 # We want to use these variables
 # Note: the infix function '%ci%' is from package 'invctr'
-vars <- c(seq("energetic"%ci%df,"procrast"%ci%df),"avoid_people"%ci%df)
+vars <- c(seq("energetic"%ci%manyAnalystsESM,"procrast"%ci%manyAnalystsESM),"avoid_people"%ci%manyAnalystsESM)
 
-df_vars <- df[,vars]
+df_vars <- manyAnalystsESM[,vars]
 
 # Plot the timeseries with NAs in red
 op <- par(mfrow = c(ceiling(length(vars)/4),4),mar =c(2,2,2,2))
@@ -99,15 +96,13 @@ From the description of the package:
 The function `mice()` will try to select an imputation method based on the variable type if we leave the `method` argument empty. Here we'll use `method = "cart"` to impute all missing data using *Classification And Regression Trees*. The same results can be obtained using the *Random Forest* method.
 
 ```{r fig.height=4}
-library(mice)
-
 # 1. Remove NA 
-out.NA <- df_vars[complete.cases(df_vars),]
+out.NA <- df_vars[stats::complete.cases(df_vars),]
 
 # 2. Classification And Regression Trees / Random Forests
 # RF and CART return (identical) discrete numbers
-imp.cart  <- mice(df_vars, method = 'cart', printFlag = FALSE)
-out.cart  <- complete(imp.cart)
+imp.cart  <- mice::mice(df_vars, method = 'cart', printFlag = FALSE)
+out.cart  <- mice::complete(imp.cart)
 
 
 # Plot the timeseries with NAs in red
@@ -144,11 +139,11 @@ We'll assume these variables indicate a "global sate" of the system.
 
 ```{r}
 # Use the date information in the dataset to create time series objects
-dates      <- df$start[!is.na(df$unsatisfy)]
+dates      <- manyAnalystsESM$start[!is.na(manyAnalystsESM$unsatisfy)]
 days       <- as.Date(dates, "%m/%d/%Y")
-hours      <- df$hours[!is.na(df$hours)]
-difficult  <- df$difficult[!is.na(df$difficult)]
-unsatisfy  <- df$unsatisfy[!is.na(df$unsatisfy)]
+hours      <- manyAnalystsESM$hours[!is.na(manyAnalystsESM$hours)]
+difficult  <- manyAnalystsESM$difficult[!is.na(manyAnalystsESM$difficult)]
+unsatisfy  <- manyAnalystsESM$unsatisfy[!is.na(manyAnalystsESM$unsatisfy)]
 
 df_sleep <- data.frame(days = days,
                        hours_sleep = hours,
@@ -207,36 +202,39 @@ There appear to be more or less synchronous `jumps` and `stages`, or, `levels` i
 
 Now it is time to analyze the dynamic complexity of the ESM time series and see if we can find early-warning signals. 
 
-We need to make sure all variables are on the same scale, for this dataset there's no need to transform, all data are on a scale of `0-100`.
+Use `dc_win()` to calculate Dynamic Complexity. The function can also call `plotDC_res()` to produce a *Complexity Resonance Diagram*.
 
-Use `dc_win()` to calculate Dynamic Complexity. The function can also call `plotDC_res()` to produce a *Complexity Resonance Diagram*. 
+We need to make sure all variables are on the same scale, for this dataset there's no need to transform, all data are on a scale of `0-100`. If no value is passed to arguments `from_scale_min` and `from_scale_max` and argument `rescale = TRUE` then the minimum and maximum value in each column will be used. This should be used if scale limits are unknown (or `-Inf` and `+Inf`). If the theoretical limits are known, they should be passed. If the data contain a mix of known scale ranges, transformation should be done manually.
 
 ```{r}
 win = 6
 
 # NA removed 
-dc.caseNA <- dc_win(out.NA, win = win, col_first=1, col_last=NCOL(out.NA), scale_min=0, scale_max=100, doPlot = TRUE, colOrder = TRUE)
+dc.caseNA <- dc_win(out.NA, win = win, col_first=1, col_last=NCOL(out.NA), from_scale_min = 0, from_scale_max = 100, to_scale_min=0, to_scale_max=100, doPlot = TRUE, colOrder = TRUE)
 ```
+
+Dynamic complexity is calculated as a product of *fluctuation intensity* calculated by function `dc_f()` and *distribution uniformity* calculated by `dc_d()`. These functions can be called seperately, or, you can set the argument `returnFandD = TRUE` in function `dc_win()`.
+
 
 There are several options for sorting the variables on the y-axis by setting the `colOrder` argument. If set to `TRUE` like the figure above the order variables appear as columns in the dataframe will be used. Setting it to `FALSE` will sort by vasriable name.
 
 We can use the `df` field of the `dc_win()` output as input for `plotDC_res()`. 
 
 ```{r}
-plotDC_res(df_win = dc.caseNA$df, win = win, doPlot = TRUE, colOrder = FALSE)
+plotDC_res(df_win = dc.caseNA, win = win, doPlot = TRUE, colOrder = FALSE)
 ```
 
 An interesting option is to sort by the mean value of Dynamic Complexity, to do so set the `colOrder` argument to `NA`.
 
 ```{r}
-plotDC_res(df_win = dc.caseNA$df, win = win, doPlot = TRUE, colOrder = NA)
+plotDC_res(df_win = dc.caseNA, win = win, doPlot = TRUE, colOrder = NA)
 ```
 
 Let's compare to the `cart` imputation by MICE.
 
 ```{r}
 # CART with observed scale
-dc.caseIMP <- dc_win(out.cart, win=win, col_first=1, col_last=NCOL(out.cart), scale_min=0, scale_max=100, colOrder = TRUE)
+dc.caseIMP <- dc_win(out.cart, win=win, col_first=1, col_last=NCOL(out.cart),  from_scale_min = 0, from_scale_max = 100, to_scale_min=0, to_scale_max=100, colOrder = TRUE)
 
 plotDC_res(df_win = dc.caseIMP, win = win, doPlot = TRUE, colOrder = NA, title = "Complexity Resonance Diagram (CART)")
 ```
@@ -252,16 +250,16 @@ If we plot 2 versions of the analysis, the differences between the methods are a
 
 ```{r}
 # Use the date information in the dataset to create time series objects
-datesNA <- df$start[complete.cases(df_vars)]
+datesNA <- manyAnalystsESM$start[complete.cases(df_vars)]
 daysNA  <- as.Date(datesNA, "%m/%d/%Y")
 
-ccp.caseNA <- dc_ccp(df_win = dc.caseNA$df, win = win)
+ccp.caseNA <- dc_ccp(df_win = dc.caseNA)
 plotDC_ccp(df_ccp = ccp.caseNA, win = win, colOrder = NA, title = "Cumulative Complexity Peak Plot (Remove missing values)", useTimeVector = daysNA)
 
 
-datesIMP         <- df$start
+datesIMP      <- manyAnalystsESM$start
 dateTimesIMP  <- strptime(datesIMP, "%m/%d/%Y %H:%M")
-ccp.caseIMP <- dc_ccp(df_win = dc.caseIMP, win = win)
+ccp.caseIMP <- dc_ccp(df_win = dc.caseIMP)
 # Change the time stamp fromat
 plotDC_ccp(df_ccp = ccp.caseIMP, win = win, colOrder = NA, 
            useTimeVector = dateTimesIMP, timeStamp = "31-01-99",
@@ -286,32 +284,33 @@ One could look for a single variable that best predicts level changes, e.g. by l
 
 ```{r}
 # Dates for state variables
-dates       <- df$start
+dates       <- manyAnalystsESM$start
 dateTimesS  <- as.POSIXct(strptime(dates, "%m/%d/%Y %H:%M"))
-idNA <- complete.cases(df_vars)
+idNA        <- complete.cases(df_vars)
 
-df_lvl_hrs   <- ts_levels(df$hours)
-df_lvl_diff  <- ts_levels(df$difficult)
-df_lvl_unsat <- ts_levels(df$unsatisfy)
+df_lvl_hrs   <- ts_levels(manyAnalystsESM$hours,minDataSplit = minSplit)
+df_lvl_diff  <- ts_levels(manyAnalystsESM$difficult,minDataSplit = minSplit)
+df_lvl_unsat <- ts_levels(manyAnalystsESM$unsatisfy,minDataSplit = minSplit)
 
-df_lvl_hrsNA   <- ts_levels(df$hours[idNA])
-df_lvl_diffNA  <- ts_levels(df$difficult[idNA])
-df_lvl_unsatNA <- ts_levels(df$unsatisfy[idNA])
+df_lvl_hrsNA   <- ts_levels(manyAnalystsESM$hours[idNA],minDataSplit = minSplit)
+df_lvl_diffNA  <- ts_levels(manyAnalystsESM$difficult[idNA],minDataSplit = minSplit)
+df_lvl_unsatNA <- ts_levels(manyAnalystsESM$unsatisfy[idNA],minDataSplit = minSplit)
 
 plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_hrs, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Hours sleep")
-plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA$df, df_lvl = df_lvl_hrsNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Hours sleep")
+
+plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA, df_lvl = df_lvl_hrsNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Hours sleep")
 
 plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_diff, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Difficulty sleeping")
-plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA$df, df_lvl = df_lvl_diffNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Difficulty sleeping")
+
+plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA, df_lvl = df_lvl_diffNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Difficulty sleeping")
 
 plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_unsat, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Unsatisfactory sleep")
-plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA$df, df_lvl = df_lvl_unsatNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Unsatisfactory sleep")
+
+plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA, df_lvl = df_lvl_unsatNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Unsatisfactory sleep")
 
 ```
 
-
 Look for max complexity peaks around level changes.
-
 
 
 ## References
@@ -320,9 +319,9 @@ Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F., Boker, S. M., Ceulemans, E., Che
 
 Fisher, A. J., & Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. *Assessment, 23(4)*, 496–506. https://doi.org/10.1177/1073191116638735-Fisher
 
-Haken H, Schiepek G (2006) *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
+Haken H, & Schiepek G. (2006). *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
 
-Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. *European Journal of Psychological Assessment, 19*, 175-184. httpd://doi.org/10.1027//1015-5759.19.3.175
+Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. *European Journal of Psychological Assessment, 19*, 175-184. https://doi.org/10.1027//1015-5759.19.3.175
 
 Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. *Biological cybernetics, 102(3)*, 197-207. https://doi.org/10.1007/s00422-009-0362-1
 

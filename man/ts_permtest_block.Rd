@@ -32,6 +32,15 @@ A data frame with the difference time series and variables indicating N and sign
 \description{
 Use block randomistion to get a permutation test evaluation of the deviation of an observed value at each time point from a target value. To do block permutation without any tests, pass \code{NULL} for argument \code{targetValue}.
 }
+\examples{
+
+set.seed(4321)
+y1 <- rnorm(5000)
+y2 <- y1-(mean(y1)+rnorm(1))
+
+ts_permtest_block(y1 = y1, y2 = y2)
+
+}
 \seealso{
 Other Time series operations: \code{\link{ts_center}},
   \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},

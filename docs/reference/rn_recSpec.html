@@ -133,9 +133,9 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>rn_recSpec</span>(<span class='no'>RN</span>, <span class='kw'>fitRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</pre>
+    <pre class="usage"><span class='fu'>rn_recSpec</span>(<span class='no'>RN</span>, <span class='kw'>fitRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fs</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,6 +147,10 @@
     <tr>
       <th>fitRange</th>
       <td><p>If <code>NULL</code> the entire range will be used for log-log slope. If a 2-element vector of integers, this will represent the range of recurrence times to use for fitting the log=log slope (e.g. <code><a href='https://www.rdocumentation.org/packages/base/topics/c'>c(1,50)</a></code> would fit the first 50 recurrence times).</p></td>
+    </tr>
+    <tr>
+      <th>fs</th>
+      <td><p>Sample rate (default = <code>1</code>)</p></td>
     </tr>
     <tr>
       <th>doPlot</th>

@@ -4,20 +4,28 @@
 \alias{dc_d}
 \title{Distribution Uniformity}
 \usage{
-dc_d(df, col_first, col_last, win = NROW(df), scale_min, scale_max)
+dc_d(df, col_first = NA, col_last = NA, win = NROW(df),
+  from_scale_min = NA, from_scale_max = NA, to_scale_min, to_scale_max,
+  rescale = FALSE)
 }
 \arguments{
 \item{df}{A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.}
 
-\item{col_first}{The first column of the dataframe that should be analyzed.}
+\item{col_first}{The first column of the dataframe that should be analyzed. If \code{NA}, \code{col_first = 1} (default = \code{NA})}
 
-\item{col_last}{The last column of the dataframe that should be analyzed.}
+\item{col_last}{The last column of the dataframe that should be analyzed. If \code{NA}, \code{col_first = NCOL(df)} (default = \code{NA})}
 
 \item{win}{Size of window in which to calculate Dynamic Complexity. If \code{win < NROW(df)} the window will move along the time series with a stepsize of \code{1} (default = \code{NROW(df)})}
 
-\item{scale_min}{Theoretical minimum value of thescale.}
+\item{from_scale_min}{The minimum value of the data. If \code{NA} will be set to minimum of each column \code{c} as \code{min(df,c, na.rm = TRUE)} (default = \code{NA})}
 
-\item{scale_max}{Theoretical maximum value of the scale.}
+\item{from_scale_max}{The minimum value of the data. If \code{NA} will be set to maximum of each column \code{c} as \code{max(df,c, na.rm = TRUE)} (default = \code{NA})}
+
+\item{to_scale_min}{The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if \code{rescale = TRUE}, this value will be used to rescale each column \code{c} using \code{elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)}.}
+
+\item{to_scale_max}{The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if \code{rescale = TRUE}, this value will be used to rescale each column \code{c} using \code{elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)}.}
+
+\item{rescale}{Should all columns in \code{df} be rescaled to \code{scle_min} and \code{scale_max}? Each column will be rescaled individually, which means the \code{min()} and \code{max()} values of each column will be used, not of the entire dataset. (default = \code{FALSE})}
 }
 \value{
 a dataframe

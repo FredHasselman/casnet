@@ -133,31 +133,36 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>plotRED_mif</span>(<span class='no'>y</span>, <span class='kw'>lags</span> <span class='kw'>=</span> <span class='fl'>0</span>:<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>max</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>round</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)/<span class='fl'>4</span>), <span class='fl'>10</span>), <span class='kw'>nbins</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>ceiling</a></span>(<span class='fl'>2</span> *
-  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>)), <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>returnMIFun</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>plotRED_mif</span>(<span class='kw'>mif.OUT</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>lags</span> <span class='kw'>=</span> <span class='fl'>0</span>:<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>max</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>round</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)/<span class='fl'>4</span>), <span class='fl'>10</span>),
+  <span class='kw'>nbins</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>ceiling</a></span>(<span class='fl'>2</span> * <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>)), <span class='kw'>surTest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>returnMIFun</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>y</th>
-      <td><p>A <code>Nx1</code> matrix for auto-mif, a <code>Nx2</code> matrix or data frame for cross-mif, a <code>Nx3</code> matrix or data frame for mif between col 1 and 2 conditional on col 3; or a <code>NxM</code> matrix or data frame for the multi-information function.</p></td>
+      <th>mif.OUT</th>
+      <td><p>Output from function <code><a href='mif.html'>mif()</a></code></p></td>
     </tr>
     <tr>
       <th>lags</th>
-      <td><p>Maximum number of lags</p></td>
+      <td><p>The lags to evaluate mutual information.</p></td>
     </tr>
     <tr>
       <th>nbins</th>
       <td><p>The number of bins passed to <code><a href='https://www.rdocumentation.org/packages/infotheo/topics/discretize'>infotheo::discretize()</a></code> if y is a matrix or <code><a href='ts_discrete.html'>casnet::ts_discrete()</a></code></p></td>
     </tr>
     <tr>
+      <th>surTest</th>
+      <td><p>If <code>TRUE</code>, a surrogate will be conducted using simple surrogates. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin <code>j</code> when the current value is in bin <code>j</code>. The number of surrogates needed will be computed based on the value of the <code>alpha</code> parameter, conceived as a one-sided test: <code>mi &gt; 0</code>.</p></td>
+    </tr>
+    <tr>
       <th>alpha</th>
-      <td><p>Significance level</p></td>
+      <td><p>The alpha level for the surrogate test (default = <code>0.05</code>)</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
-      <td><p>Plot output</p></td>
+      <td><p>Produce a plot of the symbolic time series by calling <code>plotRED_mif()</code> (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>returnMIFun</th>

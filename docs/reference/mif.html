@@ -134,7 +134,7 @@
     </div>
 
     <pre class="usage"><span class='fu'>mif</span>(<span class='no'>y</span>, <span class='kw'>lags</span> <span class='kw'>=</span> -<span class='fl'>10</span>:<span class='fl'>10</span>, <span class='kw'>nbins</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>ceiling</a></span>(<span class='fl'>2</span> * <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>)),
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>surTest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>surTest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,11 +153,15 @@
     </tr>
     <tr>
       <th>doPlot</th>
-      <td><p>Produce a plot of the symbolic time series (default = <code>FALSE</code>)</p></td>
+      <td><p>Produce a plot of the symbolic time series by calling <code><a href='plotRED_mif.html'>plotRED_mif()</a></code> (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>surTest</th>
-      <td><p>Either <code>FALSE</code> or an alpha level for conducting a test of significance using simple surrogates, e.g. <code>surTes = .05</code>. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin <code>j</code> when the current value is in bin <code>j</code> .</p></td>
+      <td><p>If <code>TRUE</code>, a surrogate will be conducted using simple surrogates. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin <code>j</code> when the current value is in bin <code>j</code>. The number of surrogates needed will be computed based on the value of the <code>alpha</code> parameter, conceived as a one-sided test: <code>mi &gt; 0</code>.</p></td>
+    </tr>
+    <tr>
+      <th>alpha</th>
+      <td><p>The alpha level for the surrogate test (default = <code>0.05</code>)</p></td>
     </tr>
     </table>
     
@@ -214,33 +218,33 @@
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
 <span class='no'>y</span>$<span class='no'>s</span> <span class='kw'>&lt;-</span> <span class='no'>y2</span>+<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y2</span>))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.824487 1.744000 1.983888 1.878350 2.000039 1.997520 2.003551 2.057971 
+#&gt; 1.862221 1.769316 1.996348 1.851036 1.995601 2.010456 1.962493 2.063345 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.883325 1.902833 1.902833 1.902833 2.040702 1.983402 1.984676 2.005857 
+#&gt; 1.884125 1.909442 1.909442 1.909442 2.041484 2.002678 1.979676 2.011610 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 2.022351 1.786048 1.787322 1.762830 2.511825 1.857320 1.916479 1.900262 
+#&gt; 2.025035 1.806844 1.774623 1.733806 2.516726 1.831044 1.879487 1.883610 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.934479 1.925594 1.890592 1.891668 2.027751 1.999994 1.979257 2.161102 
+#&gt; 1.932340 1.921755 1.880654 1.870835 2.012621 1.959015 1.997225 2.133363 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 2.004768 1.966695 1.916750 1.919306 1.983114 1.870310 1.956632 1.897670 
+#&gt; 1.988501 1.952195 1.882010 1.933072 1.973111 1.817211 1.944932 1.871809 
 #&gt;       30 
-#&gt; 1.925018 
+#&gt; 1.896970 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
 <span class='no'>y</span>$<span class='no'>y3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cumsum'>cumsum</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 5.011812 4.997671 4.996383 4.996535 5.149310 5.151574 5.143682 5.140343 
+#&gt; 4.991668 4.986394 4.987553 4.989480 5.137644 5.137500 5.136654 5.135741 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.137672 5.137097 5.137097 5.137097 5.134198 5.133324 5.138442 5.144145 
+#&gt; 5.133076 5.126595 5.126595 5.126595 5.131354 5.135741 5.138442 5.141291 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.147721 4.987161 4.992326 4.993420 5.006067 5.010936 5.012313 5.018315 
+#&gt; 5.139578 4.991354 4.989461 4.988782 4.993674 4.996754 4.996337 4.995210 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 5.016186 5.144422 5.140042 5.146757 5.147810 5.152227 5.158326 5.163626 
+#&gt; 5.001949 5.142203 5.135363 5.138499 5.139541 5.138575 5.145333 5.149938 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.160740 5.161417 5.159608 5.164054 5.012035 5.013560 5.025781 5.025573 
+#&gt; 5.152429 5.151294 5.160289 5.159320 5.009102 5.008813 5.013780 5.020129 
 #&gt;       30 
-#&gt; 5.032717 
+#&gt; 5.019313 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y;Z;...;N)"</div><div class='input'>
 

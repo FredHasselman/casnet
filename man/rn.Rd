@@ -7,8 +7,8 @@
 rn(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
   directed = FALSE, weighted = FALSE, includeDiagonal = FALSE,
   to.ts = NULL, order.by = NULL, to.sparse = FALSE,
-  method = "Euclidean", returnGraph = TRUE, doPlot = FALSE,
-  silent = TRUE, ...)
+  method = "Euclidean", targetValue = 0.05, returnGraph = TRUE,
+  doPlot = FALSE, silent = TRUE, ...)
 }
 \arguments{
 \item{y1}{A numeric vector or time series}
@@ -19,7 +19,7 @@ rn(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 
 \item{emLag}{The embedding lag}
 
-\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary matrix}
+\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
 
 \item{directed}{Should the matrix be considered to represent a directed network? (default = \code{FALSE})}
 
@@ -35,11 +35,13 @@ rn(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 
 \item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
+\item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
+
 \item{returnGraph}{Return an \code{\link[igraph:igraph]{igraph::igraph()}} object (default = \code{TRUE})}
 
-\item{doPlot}{Plot the matrix and its network representation by calling \code{\link[=rp_plot]{rp_plot()}} and \code{\link[=rn_plot]{rn_plot()}} with default settings}
+\item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with defult settings}
 
-\item{silent}{Silent-ish mode (default = \code{TRUE})}
+\item{silent}{Silent-ish mode}
 
 \item{...}{Any paramters to pass to \code{\link[=rn_plot]{rn_plot()}} if \code{doPlot = TRUE}}
 }

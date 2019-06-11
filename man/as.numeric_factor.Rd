@@ -28,5 +28,4 @@ as.numeric_factor(f)
 as.numeric_factor(f, keepNA = TRUE)
 
 
-
 }

@@ -139,8 +139,9 @@ This transition matrix will be used to resample values
     
     </div>
 
-    <pre class="usage"><span class='fu'>ts_permtest_transmat</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>targetValue</span>, <span class='kw'>nbins</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>ceiling</a></span>(<span class='fl'>2</span> *
-  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>y</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>)), <span class='kw'>mc</span> <span class='kw'>=</span> <span class='fl'>19</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>keepNA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>ts_permtest_transmat</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>nbins</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>ceiling</a></span>(<span class='fl'>2</span> * <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>y1</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>)), <span class='kw'>Nperms</span> <span class='kw'>=</span> <span class='fl'>19</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>keepNA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -156,6 +157,14 @@ This transition matrix will be used to resample values
     <tr>
       <th>targetValue</th>
       <td><p>The target value for the permutation test. If <code>NULL</code>, the function will return a data frame with the block randomised surrogates  columns (default = <code>0</code>)</p></td>
+    </tr>
+    <tr>
+      <th>nbins</th>
+      <td><p>Number of bins to use (default = <code><a href='https://www.rdocumentation.org/packages/base/topics/Round'>ceiling(2*length(y1)^(1/3))</a></code>)</p></td>
+    </tr>
+    <tr>
+      <th>Nperms</th>
+      <td><p>Number of permutations (default = <code>19</code>)</p></td>
     </tr>
     <tr>
       <th>alpha</th>
@@ -190,7 +199,42 @@ This transition matrix will be used to resample values
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>4321</span>)
 <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fl'>5000</span>)
-<span class='no'>ys</span> <span class='kw'>&lt;-</span> <span class='fu'>ts_resample</span>(<span class='no'>y</span>)</div><div class='output co'>#&gt; <span class='error'>Error in ts_resample(y): could not find function "ts_resample"</span></div><div class='input'>
+<span class='fu'>ts_permtest_transmat</span>(<span class='no'>y</span>)</div><div class='output co'>#&gt;       rbin          ry
+#&gt;  [1,]   26  2.08818023
+#&gt;  [2,]   24  1.58725821
+#&gt;  [3,]   16  0.09653892
+#&gt;  [4,]    9 -1.39035299
+#&gt;  [5,]   14 -0.39098588
+#&gt;  [6,]   17  0.10892428
+#&gt;  [7,]   22  1.29930579
+#&gt;  [8,]   21  0.98398040
+#&gt;  [9,]   19  0.52177283
+#&gt; [10,]   21  1.02843119
+#&gt; [11,]   15 -0.14276880
+#&gt; [12,]   12 -0.77445871
+#&gt; [13,]   13 -0.63536159
+#&gt; [14,]   18  0.48263657
+#&gt; [15,]   24  1.62755386
+#&gt; [16,]   16  0.07547420
+#&gt; [17,]    9 -1.46591660
+#&gt; [18,]   18  0.33554199
+#&gt; [19,]   21  1.10316966
+#&gt; [20,]   22  1.18329004
+#&gt; [21,]   13 -0.58592084
+#&gt; [22,]   10 -1.14519531
+#&gt; [23,]   16  0.04919834
+#&gt; [24,]   21  0.96874435
+#&gt; [25,]   11 -0.96468212
+#&gt; [26,]   18  0.31490903
+#&gt; [27,]   12 -0.74418643
+#&gt; [28,]   10 -1.21643446
+#&gt; [29,]   19  0.55663395
+#&gt; [30,]   26  2.10894272
+#&gt; [31,]   13 -0.60242124
+#&gt; [32,]   24  1.55858186
+#&gt; [33,]   20  0.78980920
+#&gt; [34,]   27  2.29774635
+#&gt; [35,]   19  0.69767483</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

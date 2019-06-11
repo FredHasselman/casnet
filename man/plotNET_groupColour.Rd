@@ -4,9 +4,9 @@
 \alias{plotNET_groupColour}
 \title{Vertex Group Colours}
 \usage{
-plotNET_groupColour(g, groups, colourV = TRUE, alphaV = FALSE,
-  colourE = FALSE, alphaE = FALSE, groupColours = NULL,
-  doPlot = TRUE)
+plotNET_groupColour(g, groups, colourV = TRUE, alphaV = 1,
+  colourE = FALSE, alphaE = 0.8, groupColours = NULL,
+  defaultEdgeColour = "grey70", doPlot = TRUE)
 }
 \arguments{
 \item{g}{An igraph object}
@@ -17,11 +17,13 @@ plotNET_groupColour(g, groups, colourV = TRUE, alphaV = FALSE,
 
 \item{alphaV}{Set transparency for Vertices (default = \code{1})}
 
-\item{colourE}{Colour Edges based on \code{groups} (default = \code{FALSE})}
+\item{colourE}{Colour Edges based on \code{groups}. Edges connecting to vertices of the same group will be coloured as the group (default = \code{FALSE})}
 
-\item{alphaE}{Set transparency for Edges (default = \code{0.8})}
+\item{alphaE}{Set transparency for Edges. A single numeric, or a vector of length \code{ecount(g)} (default = \code{0.8})}
 
 \item{groupColours}{A list of length \code{groups} with valid colour codes}
+
+\item{defaultEdgeColour}{Default edge colour}
 
 \item{doPlot}{Plot the igraph object}
 }

@@ -153,15 +153,19 @@
     </tr>
     <tr>
       <th>lo</th>
-      <td><p>Maximum value to rescale to, defaults to <code>1</code>.</p></td>
+      <td><p>Minimum value to rescale to, defaults to <code>0</code>.</p></td>
     </tr>
     <tr>
       <th>hi</th>
-      <td><p>Minimum value to rescale to, defaults to <code>0</code>.</p></td>
+      <td><p>Maximum value to rescale to, defaults to <code>1</code>.</p></td>
     </tr>
     <tr>
       <th>groupwise</th>
       <td><p>If <code>x</code> is a data frame with <code>2+</code> columns, <code>mn = NA</code> and/or <code>mx = NA</code> and <code>groupwise = TRUE</code>, scaling will occur</p></td>
+    </tr>
+    <tr>
+      <th>keepNA</th>
+      <td><p>Keep <code>NA</code> values?</p></td>
     </tr>
     </table>
     
@@ -182,11 +186,33 @@
     <pre class="examples"><div class='input'><span class='co'># Works on numeric objects</span>
 <span class='no'>somenumbers</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cbind'>cbind</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>5</span>,<span class='fl'>100</span>,<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/MathFun'>sqrt</a></span>(<span class='fl'>2</span>)),<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Log'>exp</a></span>(<span class='fl'>1</span>),<span class='fl'>0</span>,-<span class='no'>pi</span>))
 
-<span class='fu'>elascer</span>(<span class='no'>somenumbers</span>)</div><div class='output co'>#&gt; <span class='error'>Error in colwise(is.na): could not find function "colwise"</span></div><div class='input'><span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>mn</span><span class='kw'>=</span>-<span class='fl'>100</span>)</div><div class='output co'>#&gt; <span class='error'>Error in colwise(is.na): could not find function "colwise"</span></div><div class='input'><span class='co'># Values &lt; mn will return &lt; lo (default=0)</span>
+<span class='fu'>elascer</span>(<span class='no'>somenumbers</span>)</div><div class='output co'>#&gt;           V1         V2
+#&gt; 1 0.00000000 0.07350745
+#&gt; 2 1.00000000 0.04761905
+#&gt; 3 0.06108775 0.01769912</div><div class='input'><span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>mn</span><span class='kw'>=</span>-<span class='fl'>100</span>)</div><div class='output co'>#&gt;          V1        V2
+#&gt; 1 0.4750000 0.5135914
+#&gt; 2 1.0000000 0.5000000
+#&gt; 3 0.5070711 0.4842920</div><div class='input'><span class='co'># Values &lt; mn will return &lt; lo (default=0)</span>
 <span class='co'># Values &gt; mx will return &gt; hi (default=1)</span>
-<span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>mn</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>mx</span><span class='kw'>=</span><span class='fl'>99</span>)</div><div class='output co'>#&gt; <span class='error'>Error in colwise(is.na): could not find function "colwise"</span></div><div class='input'>
-<span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>lo</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>hi</span><span class='kw'>=</span><span class='fl'>1</span>)</div><div class='output co'>#&gt; <span class='error'>Error in colwise(is.na): could not find function "colwise"</span></div><div class='input'><span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>lo</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>hi</span><span class='kw'>=</span><span class='fl'>1</span>, <span class='kw'>groupwise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='error'>Error in colwise(is.na): could not find function "colwise"</span></div><div class='input'>
-<span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>mn</span><span class='kw'>=</span>-<span class='fl'>10</span>,<span class='kw'>mx</span><span class='kw'>=</span><span class='fl'>100</span>,<span class='kw'>lo</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>hi</span><span class='kw'>=</span><span class='fl'>4</span>)</div><div class='output co'>#&gt; <span class='error'>Error in colwise(is.na): could not find function "colwise"</span></div><div class='input'><span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>mn</span><span class='kw'>=</span> <span class='fl'>NA</span>,<span class='kw'>mx</span><span class='kw'>=</span><span class='fl'>100</span>,<span class='kw'>lo</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>hi</span><span class='kw'>=</span><span class='fl'>4</span>, <span class='kw'>groupwise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='error'>Error in colwise(is.na): could not find function "colwise"</span></div></pre>
+<span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>mn</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>mx</span><span class='kw'>=</span><span class='fl'>99</span>)</div><div class='output co'>#&gt;            V1          V2
+#&gt; 1 -0.04000000  0.03718282
+#&gt; 2  1.01000000  0.01000000
+#&gt; 3  0.02414214 -0.02141593</div><div class='input'>
+<span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>lo</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>hi</span><span class='kw'>=</span><span class='fl'>1</span>)</div><div class='output co'>#&gt;           V1         V2
+#&gt; 1 -1.0000000 -0.8529851
+#&gt; 2  1.0000000 -0.9047619
+#&gt; 3 -0.8778245 -0.9646018</div><div class='input'><span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>lo</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>hi</span><span class='kw'>=</span><span class='fl'>1</span>, <span class='kw'>groupwise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;           V1          V2
+#&gt; 1 -1.0000000  1.00000000
+#&gt; 2  1.0000000  0.07223889
+#&gt; 3 -0.8778245 -1.00000000</div><div class='input'>
+<span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>mn</span><span class='kw'>=</span>-<span class='fl'>10</span>,<span class='kw'>mx</span><span class='kw'>=</span><span class='fl'>100</span>,<span class='kw'>lo</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>hi</span><span class='kw'>=</span><span class='fl'>4</span>)</div><div class='output co'>#&gt;           V1         V2
+#&gt; 1 -0.7727273 -0.4218963
+#&gt; 2  4.0000000 -0.5454545
+#&gt; 3 -0.4811721 -0.6882542</div><div class='input'><span class='fu'>elascer</span>(<span class='no'>somenumbers</span>,<span class='kw'>mn</span><span class='kw'>=</span> <span class='fl'>NA</span>,<span class='kw'>mx</span><span class='kw'>=</span><span class='fl'>100</span>,<span class='kw'>lo</span><span class='kw'>=</span>-<span class='fl'>1</span>,<span class='kw'>hi</span><span class='kw'>=</span><span class='fl'>4</span>, <span class='kw'>groupwise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;           V1         V2
+#&gt; 1 -1.0000000 -0.7159306
+#&gt; 2  4.0000000 -0.8477049
+#&gt; 3 -0.6945613 -1.0000000</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

@@ -90,7 +90,7 @@
       <h1>Dealing with missing values in time series</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2019-04-20</h4>
+            <h4 class="date">2019-06-11</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/imputemissingsata.Rmd"><code>vignettes/imputemissingsata.Rmd</code></a></small>
       <div class="hidden name"><code>imputemissingsata.Rmd</code></div>
@@ -109,22 +109,17 @@
 <div id="data" class="section level3">
 <h3 class="hasAnchor">
 <a href="#data" class="anchor"></a>Data</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load data from OSF https://osf.io/tcnpd/</span>
-<span class="cf">if</span>(<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(<span class="st">"osfr"</span>)) {
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"osfr"</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"osfr"</span>)
-}
-<span class="cf">if</span>(<span class="op">!</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(<span class="st">"imputeTS"</span>)){
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"imputeTS"</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(<span class="st">"imputeTS"</span>)
-}
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># # Load data from OSF https://osf.io/tcnpd/</span>
+<span class="co"># require(osfr)</span>
+<span class="co"># manyAnalystsESM &lt;- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)</span>
 
-df &lt;-<span class="st"> </span>rio<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/rio/topics/import">import</a></span>(osfr<span class="op">::</span><span class="kw"><a href="https://centerforopenscience.github.io/osfr//reference/osf_download.html">osf_download</a></span>(osfr<span class="op">::</span><span class="kw"><a href="https://centerforopenscience.github.io/osfr//reference/osf_retrieve.html">osf_retrieve_file</a></span>(<span class="st">"tcnpd"</span>) , <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)<span class="op">$</span>local_path)
+<span class="co"># Or use the internal data</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(manyAnalystsESM)
 
 <span class="co"># We want to use these variables</span>
 <span class="co"># Note: the infix function '%ci%' is from package 'invctr'</span>
-vars &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"angry"</span><span class="op">%ci%</span>df,<span class="st">"ruminate"</span><span class="op">%ci%</span>df,<span class="st">"hours"</span><span class="op">%ci%</span>df)
-df_vars    &lt;-<span class="st">  </span>df[,vars]
+vars &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"angry"</span><span class="op">%ci%</span>manyAnalystsESM,<span class="st">"ruminate"</span><span class="op">%ci%</span>manyAnalystsESM,<span class="st">"hours"</span><span class="op">%ci%</span>manyAnalystsESM)
+df_vars    &lt;-<span class="st">  </span>manyAnalystsESM[,vars]
 
 <span class="co"># Create different variable types, we can use these to check imputation "accuracy"</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">54321</span>)
@@ -137,7 +132,8 @@ df_vars<span class="op">$</span>cat_unordered[<span class="kw"><a href="https://
 df_vars<span class="op">$</span>cat_ordered &lt;-<span class="st"> </span>cat_ordered &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">ordered</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(df_vars),<span class="dt">min =</span> <span class="dv">1</span>,<span class="dt">max =</span> <span class="dv">20</span>)))
 df_vars<span class="op">$</span>cat_ordered[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(df_vars<span class="op">$</span>angry)] &lt;-<span class="st"> </span><span class="ot">NA</span></code></pre></div>
 <p>Function <code><a href="https://www.rdocumentation.org/packages/imputeTS/topics/statsNA">statsNA()</a></code> can produce some hellful stats on <code>NA</code>s</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(imputeTS)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(imputeTS)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(mice)
 
 imputeTS<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/imputeTS/topics/statsNA">statsNA</a></span>(df_vars<span class="op">$</span>angry)</code></pre></div>
 <pre><code>&gt; [1] "Length of time series:"
@@ -202,7 +198,7 @@ imputeTS<span class="op">::</span><span class="kw"><a href="https://www.rdocumen
 <a href="#kalman-filter" class="anchor"></a>Kalman filter</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out.kalman &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(<span class="kw">laply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(df_vars), <span class="cf">function</span>(c){
   y &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(<span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="dt">x =</span> df_vars[,c], <span class="dt">keepNA =</span> <span class="ot">TRUE</span>))
-  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(imputeTS<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/imputeTS/topics/na.kalman">na.kalman</a></span>(y, <span class="dt">model =</span>  <span class="st">"auto.arima"</span>))
+  <span class="kw"><a href="http://stefvanbuuren.github.io/mice/reference/cbind.html">cbind</a></span>(imputeTS<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/imputeTS/topics/na.kalman">na.kalman</a></span>(y, <span class="dt">model =</span>  <span class="st">"auto.arima"</span>))
   }))
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(out.kalman) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)</code></pre></div>
 </div>

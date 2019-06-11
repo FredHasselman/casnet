@@ -4,22 +4,30 @@
 \alias{dc_win}
 \title{Dynamic Complexity}
 \usage{
-dc_win(df, col_first, col_last, win = NROW(df), scale_min, scale_max,
-  doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE,
-  useTimeVector = NA, timeStamp = "01-01-1999")
+dc_win(df, col_first = NA, col_last = NA, win = NROW(df),
+  from_scale_min = NA, from_scale_max = NA, to_scale_min, to_scale_max,
+  rescale = FALSE, doPlot = FALSE, useVarNames = TRUE,
+  colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999",
+  returnFandD = FALSE)
 }
 \arguments{
 \item{df}{A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.}
 
-\item{col_first}{The first column of the dataframe that should be analyzed.}
+\item{col_first}{The first column of the dataframe that should be analyzed. If \code{NA}, \code{col_first = 1} (default = \code{NA})}
 
-\item{col_last}{The last column of the dataframe that should be analyzed.}
+\item{col_last}{The last column of the dataframe that should be analyzed. If \code{NA}, \code{col_first = NCOL(df)} (default = \code{NA})}
 
 \item{win}{Size of window in which to calculate Dynamic Complexity. If \code{win < NROW(df)} the window will move along the time series with a stepsize of \code{1} (default = \code{NROW(df)})}
 
-\item{scale_min}{Theoretical minimum value of thescale.}
+\item{from_scale_min}{The minimum value of the data. If \code{NA} will be set to minimum of each column \code{c} as \code{min(df,c, na.rm = TRUE)} (default = \code{NA})}
 
-\item{scale_max}{Theoretical maximum value of the scale.}
+\item{from_scale_max}{The minimum value of the data. If \code{NA} will be set to maximum of each column \code{c} as \code{max(df,c, na.rm = TRUE)} (default = \code{NA})}
+
+\item{to_scale_min}{The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if \code{rescale = TRUE}, this value will be used to rescale each column \code{c} using \code{elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)}.}
+
+\item{to_scale_max}{The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if \code{rescale = TRUE}, this value will be used to rescale each column \code{c} using \code{elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)}.}
+
+\item{rescale}{Should all columns in \code{df} be rescaled to \code{scle_min} and \code{scale_max}? Each column will be rescaled individually, which means the \code{min()} and \code{max()} values of each column will be used, not of the entire dataset. (default = \code{FALSE})}
 
 \item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. If \code{FALSE}, plot will be drawn and no object will be returned (default = \code{FALSE})}
 
@@ -30,9 +38,11 @@ dc_win(df, col_first, col_last, win = NROW(df), scale_min, scale_max,
 \item{useTimeVector}{Parameter used for plotting. Either a variable name, or a vector of length \code{NROW(df)}, containing date/time information (default = \code{NA})}
 
 \item{timeStamp}{If \code{useTimeVector} is not \code{NA}, a character string that can be passed to \code{\link[lubridate:stamp]{lubridate::stamp()}} to format the the dates/times passed in \code{useTimeVector} (default = \code{"01-01-1999"})}
+
+\item{returnFandD}{Returns a list object also containing the dynamic complexity serties as well as the \code{F} and \code{D} series.}
 }
 \value{
-If \code{doPlot = TRUE}, a list object containing a data frame of Dynamic Complexity values and a \code{ggplot2} object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016). If \code{doPlot = FALSE} only the data frame with Dynamic Complexity series is returned.
+If \code{doPlot = TRUE}, a list object containing a data frame of Dynamic Complexity values and a \code{ggplot2} object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016). If \code{doPlot = FALSE} the data frame with Dynamic Complexity series is returned.
 }
 \description{
 Calculates Dynamic Complexity, a complexity index for short and coarse-grained time series (Schiepek & Strunk, 2010; Schiepek, 2003; Haken & Schiepek 2006).
@@ -54,5 +64,7 @@ Other Dynamic Complexity functions: \code{\link{dc_ccp}},
 }
 \author{
 Merlijn Olthof
+
+Fred Hasselman
 }
 \concept{Dynamic Complexity functions}

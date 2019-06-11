@@ -133,8 +133,10 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>plotNET_prep</span>(<span class='no'>g</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>nodesize</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"degree"</span>, <span class='st'>"hubscore"</span>)[<span class='fl'>1</span>],
-  <span class='kw'>labelsize</span> <span class='kw'>=</span> <span class='st'>"asnodesize"</span>, <span class='kw'>edgeweight</span> <span class='kw'>=</span> <span class='st'>"weight"</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>plotNET_prep</span>(<span class='no'>g</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>nodesize</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"degree"</span>, <span class='st'>"hubscore"</span>,
+  <span class='st'>"strength"</span>, <span class='st'>"eccentricity"</span>, <span class='st'>"coreness"</span>)[<span class='fl'>1</span>], <span class='kw'>labelsize</span> <span class='kw'>=</span> <span class='st'>"asnodesize"</span>,
+  <span class='kw'>edgeweight</span> <span class='kw'>=</span> <span class='st'>"weight"</span>, <span class='kw'>removeZeroDegree</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>removeSelfLoops</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,7 +151,7 @@
     </tr>
     <tr>
       <th>nodesize</th>
-      <td><p>Set nodesizes by <code>degree(g, normalised = TRUE)</code> (default) or <code>hubscore(g)$vector</code>. If a numeric value is passed all vertex sizes will be set to that value.</p></td>
+      <td><p>Set nodesizes by <code>degree(g, normalised = TRUE)</code> (default), <code>hubscore(g)$vector</code>, or, <code>strength(g)</code>, <code>eccentricity(g)</code>, <code>coreness(g)</code>. If a numeric value is passed all vertex sizes will be set to that value.</p></td>
     </tr>
     <tr>
       <th>labelsize</th>
@@ -158,6 +160,14 @@
     <tr>
       <th>edgeweight</th>
       <td><p>Set size of edges to <code>"E(g)$weight"</code> by passing "weight". If a single numeric value is provided all edges will be set to that value.</p></td>
+    </tr>
+    <tr>
+      <th>removeZeroDegree</th>
+      <td><p>Remove vertices with <code>degree(g) == 0</code> (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>removeSelfLoops</th>
+      <td><p>Calls <code>simplify(g)</code> (default = <code>TRUE</code>)</p></td>
     </tr>
     <tr>
       <th>doPlot</th>

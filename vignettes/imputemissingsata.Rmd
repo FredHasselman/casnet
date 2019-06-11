@@ -43,22 +43,17 @@ https://cran.r-project.org/web/packages/HotDeckImputation/HotDeckImputation.pdf
 ### Data
 
 ```{r}
-# Load data from OSF https://osf.io/tcnpd/
-if(!require("osfr")) {
-  install.packages("osfr", dependencies = TRUE)
-  library("osfr")
-}
-if(!require("imputeTS")){
-  install.packages("imputeTS", dependencies = TRUE)
-  library("imputeTS")
-}
+# # Load data from OSF https://osf.io/tcnpd/
+# require(osfr)
+# manyAnalystsESM <- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)
 
-df <- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)
+# Or use the internal data
+data(manyAnalystsESM)
 
 # We want to use these variables
 # Note: the infix function '%ci%' is from package 'invctr'
-vars <- c("angry"%ci%df,"ruminate"%ci%df,"hours"%ci%df)
-df_vars    <-  df[,vars]
+vars <- c("angry"%ci%manyAnalystsESM,"ruminate"%ci%manyAnalystsESM,"hours"%ci%manyAnalystsESM)
+df_vars    <-  manyAnalystsESM[,vars]
 
 # Create different variable types, we can use these to check imputation "accuracy"
 set.seed(54321)
@@ -75,7 +70,8 @@ df_vars$cat_ordered[is.na(df_vars$angry)] <- NA
 Function `statsNA()` can produce some hellful stats on `NA`s
 
 ```{r}
-library(imputeTS)
+require(imputeTS)
+require(mice)
 
 imputeTS::statsNA(df_vars$angry)
 

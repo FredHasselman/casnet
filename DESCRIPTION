@@ -60,7 +60,9 @@ Imports:
     boot,
     invctr,
     cowplot,
-    raster
+    raster,
+    mice,
+    imputeTS
 Suggests: 
     knitr,
     rmarkdown,

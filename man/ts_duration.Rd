@@ -28,6 +28,7 @@ library(invctr)
 coder <- data.frame(beh=c("stare","stare","coffee","type","type","stare"),t=c(0,5,10,15,20,25))
 
 ts_duration(y = coder$beh, timeVec = coder$t)
+
 }
 \seealso{
 Other Time series operations: \code{\link{ts_center}},

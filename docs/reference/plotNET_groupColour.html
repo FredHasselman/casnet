@@ -133,9 +133,9 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>plotNET_groupColour</span>(<span class='no'>g</span>, <span class='no'>groups</span>, <span class='kw'>colourV</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>alphaV</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>colourE</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>alphaE</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>groupColours</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>plotNET_groupColour</span>(<span class='no'>g</span>, <span class='no'>groups</span>, <span class='kw'>colourV</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>alphaV</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>colourE</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>alphaE</span> <span class='kw'>=</span> <span class='fl'>0.8</span>, <span class='kw'>groupColours</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>defaultEdgeColour</span> <span class='kw'>=</span> <span class='st'>"grey70"</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -158,15 +158,19 @@
     </tr>
     <tr>
       <th>colourE</th>
-      <td><p>Colour Edges based on <code>groups</code> (default = <code>FALSE</code>)</p></td>
+      <td><p>Colour Edges based on <code>groups</code>. Edges connecting to vertices of the same group will be coloured as the group (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>alphaE</th>
-      <td><p>Set transparency for Edges (default = <code>0.8</code>)</p></td>
+      <td><p>Set transparency for Edges. A single numeric, or a vector of length <code>ecount(g)</code> (default = <code>0.8</code>)</p></td>
     </tr>
     <tr>
       <th>groupColours</th>
       <td><p>A list of length <code>groups</code> with valid colour codes</p></td>
+    </tr>
+    <tr>
+      <th>defaultEdgeColour</th>
+      <td><p>Default edge colour</p></td>
     </tr>
     <tr>
       <th>doPlot</th>

@@ -4,8 +4,9 @@
 \alias{ts_permtest_transmat}
 \title{Permutation Test: Transition Matrix}
 \usage{
-ts_permtest_transmat(y1, y2 = NA, targetValue, nbins = ceiling(2 *
-  length(y)^(1/3)), mc = 19, alpha = 0.05, keepNA = TRUE)
+ts_permtest_transmat(y1, y2 = NULL, targetValue = 0,
+  nbins = ceiling(2 * length(y1)^(1/3)), Nperms = 19, alpha = 0.05,
+  keepNA = TRUE)
 }
 \arguments{
 \item{y1}{Time series 1. The goal of the permutation test will be to decide whether the difference \code{y1-targetValue != 0} for each time point, given \code{alpha}.}
@@ -13,6 +14,10 @@ ts_permtest_transmat(y1, y2 = NA, targetValue, nbins = ceiling(2 *
 \item{y2}{An optional second time series. If this timeseries is provided then the goal of the permutation test will be the to decide wether the difference \code{y2-y1 != targetValue} for each time point, given \code{alpha}.}
 
 \item{targetValue}{The target value for the permutation test. If \code{NULL}, the function will return a data frame with the block randomised surrogates  columns (default = \code{0})}
+
+\item{nbins}{Number of bins to use (default = \code{ceiling(2*length(y1)^(1/3))})}
+
+\item{Nperms}{Number of permutations (default = \code{19})}
 
 \item{alpha}{Alpha level for deciding significance  (default = \code{0.05})}
 
@@ -32,7 +37,7 @@ Monte Carlo resampling of a time series using a discretised version of \code{y},
 
 set.seed(4321)
 y <- rnorm(5000)
-ys <- ts_resample(y)
+ts_permtest_transmat(y)
 
 }
 \seealso{

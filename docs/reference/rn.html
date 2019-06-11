@@ -136,8 +136,8 @@
     <pre class="usage"><span class='fu'>rn</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>emDim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emRad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>directed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>includeDiagonal</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>to.ts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>to.sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>, <span class='kw'>returnGraph</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>returnGraph</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,7 +160,7 @@
     </tr>
     <tr>
       <th>emRad</th>
-      <td><p>The threshold (emRad) to apply to the distance matrix to create a binary matrix</p></td>
+      <td><p>The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If <code>NULL</code>, an unthresholded matrix will be created (default = <code>NULL</code>)</p></td>
     </tr>
     <tr>
       <th>directed</th>
@@ -191,16 +191,20 @@
       <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://www.rdocumentation.org/packages/proxy/topics/dist'>proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
     </tr>
     <tr>
+      <th>targetValue</th>
+      <td><p>A value passed to <code><a href='crqa_radius.html'>crqa_radius(...,type="fixed", targetMeasure="RR")</a></code> if <code>is.na(emRad)==TRUE</code>.</p></td>
+    </tr>
+    <tr>
       <th>returnGraph</th>
       <td><p>Return an <code><a href='https://www.rdocumentation.org/packages/igraph/topics/aaa-igraph-package'>igraph::igraph()</a></code> object (default = <code>TRUE</code>)</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
-      <td><p>Plot the matrix and its network representation by calling <code><a href='rp_plot.html'>rp_plot()</a></code> and <code><a href='rn_plot.html'>rn_plot()</a></code> with default settings</p></td>
+      <td><p>Plot the matrix by calling <code><a href='rp_plot.html'>rp_plot()</a></code> with defult settings</p></td>
     </tr>
     <tr>
       <th>silent</th>
-      <td><p>Silent-ish mode (default = <code>TRUE</code>)</p></td>
+      <td><p>Silent-ish mode</p></td>
     </tr>
     <tr>
       <th>...</th>
