@@ -6780,7 +6780,7 @@ dc_d <- function (df, col_first = NA, col_last = NA, win=NROW(df), from_scale_mi
     x <- NA
     y <- NA
     s <- to_scale_max-to_scale_min
-    y <- pracma::linspace(to_scale_max, to_scale_min, win)
+    y <- pracma::linspace(to_scale_min, to_scale_max, win)
     for (i in (1:(length(tsy)-(win-1)))){
       x <- tsy[i:(i+win-1)]
       x <- sort(x)
