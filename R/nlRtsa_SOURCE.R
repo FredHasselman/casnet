@@ -6910,14 +6910,14 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, doPlot = TRUE, returnPl
 
   yOrder <- groupVec
   names(yOrder) <- paste(groupVec)
-  offsets     <- names(yOrder) %>% {setNames(0:(length(.) - 1), .)}
+  offsets     <- names(yOrder) %>% {stats::setNames(0:(length(.) - 1), .)}
   tmp$offsets <- unlist(llply(seq_along(yOrder), function(n) rep(offsets[n],sum(tmp$timeSeries%in%names(offsets)[n]))))
 
   # Calculate and scale group densities
   pdat <- tmp %>%
-    group_by(timeSeries) %>%
-    mutate(y = elascer(y,lo = -.45,hi = .45)) %>%
-    ungroup()
+    dplyr::group_by(timeSeries) %>%
+    dplyr::mutate(y = elascer(y,lo = -.45,hi = .45)) %>%
+    dplyr::ungroup()
   pdat$y_offset <- pdat$y + pdat$offsets
 
   if(doPlot){
