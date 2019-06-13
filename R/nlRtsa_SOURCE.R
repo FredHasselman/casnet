@@ -2,7 +2,7 @@
 
 #' crqa_cl_main
 #'
-#' @inheritDotParams crqa_cl
+#' @inheritParams crqa_cl
 #'
 #' @keywords internal
 #'
@@ -6403,21 +6403,18 @@ monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments
 #'
 #' @description Calculates Dynamic Complexity, a complexity index for short and coarse-grained time series (Schiepek & Strunk, 2010; Schiepek, 2003; Haken & Schiepek 2006).
 #'
-#' @param df A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.
-#' @param col_first The first column of the dataframe that should be analyzed. If `NA`, `col_first = 1` (default = `NA`)
-#' @param col_last The last column of the dataframe that should be analyzed. If `NA`, `col_first = NCOL(df)` (default = `NA`)
+#' @param df A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in `df` should be on the same scale, an error will be thrown if the range of the time series in`df` is not `[scale_min,scale_max]`.
 #' @param win Size of window in which to calculate Dynamic Complexity. If `win < NROW(df)` the window will move along the time series with a stepsize of `1` (default = `NROW(df)`)
-#' @param from_scale_min The minimum value of the data. If `NA` will be set to minimum of each column `c` as `min(df,c, na.rm = TRUE)` (default = `NA`)
-#' @param from_scale_max The minimum value of the data. If `NA` will be set to maximum of each column `c` as `max(df,c, na.rm = TRUE)` (default = `NA`)
-#' @param to_scale_min The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if `rescale = TRUE`, this value will be used to rescale each column `c` using `elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)`.
-#' @param to_scale_max The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if `rescale = TRUE`, this value will be used to rescale each column `c` using `elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)`.
-#' @param rescale Should all columns in `df` be rescaled to `scle_min` and `scale_max`? Each column will be rescaled individually, which means the `min()` and `max()` values of each column will be used, not of the entire dataset. (default = `FALSE`)
-#' @param doPlot If `TRUE` shows a Complexity Resonance Diagram and returns an invisible [ggplot2::ggplot()] object. If `FALSE`, plot will be drawn and no object will be returned (default = `FALSE`)
+#' @param scale_min The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to the correct value.
+#' @param scale_max The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value.
+#' @param doPlot If `TRUE` shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible [ggplot2::ggplot()] object. (default = `FALSE`)
+#' @param doPlotF If `TRUE` shows a Complexity Resonance Diagram of the Fluctuation Intensity and returns an invisible [ggplot2::ggplot()] object. (default = `FALSE`)
+#' #' @param doPlotD If `TRUE` shows a Complexity Resonance Diagram of the Distribution Uniformity and returns an invisible [ggplot2::ggplot()] object. (default = `FALSE`)
+#' @param returnFandD Returns a list object containing the dynamic complexity series as well as the `F` and `D` series. (default = `FALSE`)
 #' @param useVarNames Use the column names of `df` as variable names in the Complexity Resonance Diagram (default = `TRUE`)
 #' @param colOrder If `TRUE`, the order of the columns in `df` determines the of variables on the y-axis. Use `FALSE` for alphabetic/numeric order. Use `NA` to sort by by mean value of Dynamic Complexity (default = `TRUE`)
-#' @param useTimeVector Parameter used for plotting. Either a variable name, or a vector of length `NROW(df)`, containing date/time information (default = `NA`)
+#' @param useTimeVector Parameter used for plotting. A vector of length `NROW(df)`, containing date/time information (default = `NA`)
 #' @param timeStamp If `useTimeVector` is not `NA`, a character string that can be passed to [lubridate::stamp()] to format the the dates/times passed in `useTimeVector` (default = `"01-01-1999"`)
-#' @param returnFandD Returns a list object also containing the dynamic complexity serties as well as the `F` and `D` series.
 #'
 #' @return If `doPlot = TRUE`, a list object containing a data frame of Dynamic Complexity values and a `ggplot2` object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016). If `doPlot = FALSE` the data frame with Dynamic Complexity series is returned.
 #'
@@ -6433,20 +6430,12 @@ monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments
 #' @references Haken, H. & Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.
 #' @references Schiepek, G. K., St?ger-Schmidinger, B., Aichhorn, W., Sch?ller, H., & Aas, B. (2016). Systemic case formulation, individualized process monitoring, and state dynamics in a case of dissociative identity disorder. Frontiers in psychology, 7, 1545.
 #'
-dc_win <- function(df, col_first = NA, col_last = NA, win=NROW(df), from_scale_min = NA, from_scale_max = NA, to_scale_min, to_scale_max, rescale = FALSE, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999", returnFandD = FALSE){
-
+dc_win <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, doPlotF = FALSE, doPlotD = FALSE, returnFandD = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
   if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
     time_vec <- stats::time(df)
   } else {
     time_vec <- NA
-  }
-
-
-  if(rescale){
-    if(any(is.null(to_scale_min),is.null(to_scale_max))){
-      stop("Need values for to_scale_min and to_scale_max.")
-    }
   }
 
   if(is.null(dim(df))){
@@ -6457,57 +6446,50 @@ dc_win <- function(df, col_first = NA, col_last = NA, win=NROW(df), from_scale_m
     }
   }
 
-  if(is.na(col_first)){
-    col_first = 1
-  }
-  if(is.na(col_last)){
-    col_last = NCOL(df)
+
+  if(any(df<scale_min,df>scale_max)){
+    stop("Range of values in df is outside [scale_min,scale_max]!")
   }
 
   if(win<=0){stop("Need a window > 0")}
 
-  if(rescale){
-    for(c in col_first:col_last){
-      if(is.na(from_scale_min)){
-        fromScaleMin <- min(df[,c], na.rm = TRUE)
-        fromScaleMax <- max(df[,c], na.rm = TRUE)
-      }
-      df[,c] <- elascer(x  = df[,c],
-                        mn = fromScaleMin,
-                        mx = fromScaleMax,
-                        lo = to_scale_min,
-                        hi = to_scale_max)
-    }
-    }
+  tsNames <- colnames(df)
 
-#   if(rescale){
-#     for(c in 1:NCOL(df)){
-#       df[,c] <- elascer(x = df[,c], lo = scale_min, hi = scale_max)
-#     }
-#   }
+  data_f <- dc_f(df = df, win = win, scale_min = scale_min, scale_max = scale_max, doPlot = doPlotF, useVarNames = useVarNames, colOrder = colOrder, useTimeVector = useTimeVector, timeStamp = timeStamp)
+  data_d <- dc_d(df = df, win = win, scale_min = scale_min, scale_max = scale_max, doPlot = doPlotD, useVarNames = useVarNames, colOrder = colOrder, useTimeVector = useTimeVector, timeStamp = timeStamp)
 
-  tsNames <- colnames(df)[col_first:col_last]
+  if(doPlotF){
+  graph_f <- data_f$data
+  data_f  <- data_f$data
+  #graphics::plot(graph_f)
+  }
 
-  data_f <- dc_f(df=df, win=win,
-                 from_scale_min = from_scale_min, from_scale_max = from_scale_max,
-                 to_scale_min = to_scale_min, to_scale_max = to_scale_max,
-                 col_first =col_first, col_last = col_last)
-  data_d <- dc_d(df=df, win=win,
-                 from_scale_min = from_scale_min, from_scale_max = from_scale_max,
-                 to_scale_min = to_scale_min, to_scale_max = to_scale_max,
-                 col_first = col_first, col_last = col_last)
+  if(doPlotD){
+    graph_d <- data_d$data
+    data_d  <- data_d$data
+   # graphics::plot(graph_d)
+  }
 
   df_win <- data_f*data_d
+
+  # if(logDC){
+  #   for(c in 1:NCOL(df_win)){
+  #     idNA <- is.na(df_win[,c])
+  #     id0  <- df_win[,c]<=0
+  #     if(sum(!idNA&id0,na.rm = TRUE)>0){
+  #    df_win[!idNA&id0,c] <- df_win[!idNA&id0,c] + .Machine$double.eps
+  #    }
+  #   }
+  #   df_win <- log(df_win)
+  # }
+
+
   colnames(df_win) <- tsNames
-  attr(df_win, "time")           <- attr(data_f,"time")
-  attr(df_win, "from_scale_min") <- from_scale_min
-  attr(df_win, "from_scale_max") <- from_scale_max
-  attr(df_win, "to_scale_min") <- to_scale_min
-  attr(df_win, "to_scale_max") <- to_scale_max
-  attr(df_win, "col_first")    <- col_first
-  attr(df_win, "col_last")     <- col_last
-  attr(df_win, "win")          <- win
-  attr(df_win, "dataType")     <- "dc_win"
+  attr(df_win, "time")      <- attr(data_f,"time")
+  attr(df_win, "scale_min") <- scale_min
+  attr(df_win, "scale_max") <- scale_max
+  attr(df_win, "win")       <- win
+  attr(df_win, "dataType")  <- "dc_win"
 
   g <- NULL
   if(doPlot){
@@ -6603,19 +6585,12 @@ dc_ccp = function(df_win, alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE, 
 #'
 #' @family Dynamic Complexity functions
 #'
-dc_f <- function(df, col_first = NA, col_last = NA, win=NROW(df), from_scale_min = NA, from_scale_max = NA,
-                 to_scale_min, to_scale_max, rescale = FALSE){
+dc_f <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
   if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
     time_vec <- stats::time(df)
   } else {
     time_vec <- NA
-  }
-
-  if(rescale){
-    if(any(is.null(to_scale_min),is.null(to_scale_max))){
-      stop("Need values for to_scale_min and to_scale_max.")
-    }
   }
 
   if(is.null(dim(df))){
@@ -6626,41 +6601,23 @@ dc_f <- function(df, col_first = NA, col_last = NA, win=NROW(df), from_scale_min
     }
   }
 
-  if(is.na(col_first)){
-    col_first = 1
+  if(any(df<scale_min,df>scale_max)){
+    stop("Range of values in df is outside [scale_min,scale_max]!")
   }
-  if(is.na(col_last)){
-    col_last = NCOL(df)
-  }
+
 
   if(win<=0){stop("Need a window > 0")}
 
-  if(rescale){
-    for(c in col_first:col_last){
-      if(is.na(from_scale_min)){
-        fromScaleMin <- min(df[,c], na.rm = TRUE)
-      }
-      if(is.na(from_scale_max)){
-        fromScaleMax <- max(df[,c], na.rm = TRUE)
-      }
-      df[,c] <- elascer(x  = df[,c],
-                        mn = fromScaleMin,
-                        mx = fromScaleMax,
-                        lo = to_scale_min,
-                        hi = to_scale_max)
-    }
-    }
+  tsNames <- colnames(df)
 
-  tsNames <- colnames(df)[col_first:col_last]
-
-  ew_data_F <- matrix(NA, nrow=NROW(df), ncol=length(col_first:col_last))
+  ew_data_F <- matrix(NA, nrow=NROW(df), ncol=NCOL(df))
   ew_data_F <- data.frame(ew_data_F)
   data <- rbind(df, matrix(0,nrow=2,ncol=NCOL(df), dimnames = list(NULL,colnames(df))))
 
-  s <- to_scale_max-to_scale_min
+  s <- scale_max-scale_min
   length_ts <- nrow(data)
 
-  for (column in (col_first:col_last)){
+  for (column in 1:NCOL(data)){
     distance<-1
     fluctuation <- NA
     tsy <- as.numeric(data[,column])
@@ -6680,9 +6637,9 @@ dc_f <- function(df, col_first = NA, col_last = NA, win=NROW(df), from_scale_min
           (k[j+1]<- 1)
         }  else if ((tsy[i+j+1]<tsy[i+j]) & (tsy[i+j+1] == tsy[i+j+2])){
           (k[j+1] <-1)
-        }  else if ((tsy[i+j+1]==tsy[i+j]) & (tsy[i+j+1] >tsy[i+j+2])){
+        }  else if ((tsy[i+j+1]==tsy[i+j]) & (tsy[i+j+1] > tsy[i+j+2])){
           (k[j+1] <-1)
-        }  else if ((tsy[i+j+1]==tsy[i+j]) & (tsy[i+j+1] <tsy[i+j+2])){
+        }  else if ((tsy[i+j+1]==tsy[i+j]) & (tsy[i+j+1] < tsy[i+j+2])){
           (k[j+1] <-1)
         }  else {
           (k[j+1] <- 0)}
@@ -6699,7 +6656,7 @@ dc_f <- function(df, col_first = NA, col_last = NA, win=NROW(df), from_scale_min
           fluct[g]=0
           dist_next <- dist_next+1}
       }
-      ew_data_F[(i+win-1),(column-col_first+1)]<-sum(fluct/(s*(win-1)), na.rm=TRUE)
+      ew_data_F[(i+win-1),(column)]<-sum(fluct/(s*(win-1)), na.rm=TRUE)
     }
   }
   ew_data_F <- ew_data_F[1:nrow(df),]
@@ -6707,7 +6664,15 @@ dc_f <- function(df, col_first = NA, col_last = NA, win=NROW(df), from_scale_min
   if(is.null(dim(ew_data_F))){
     ew_data_F <- data.frame(ew_data_F)
   }
+
+  colnames(ew_data_F) <- tsNames
+  g <- NULL
+  if(doPlot){
+    g <- plotDC_res(df_win = ew_data_F, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot, title = "Fluctuation Intensity Diagram")
+    return(list(data = ew_data_F, graph = g))
+  } else {
   return(ew_data_F)
+    }
 }
 
 
@@ -6724,18 +6689,12 @@ dc_f <- function(df, col_first = NA, col_last = NA, win=NROW(df), from_scale_min
 #'
 #' @family Dynamic Complexity functions
 #'
-dc_d <- function (df, col_first = NA, col_last = NA, win=NROW(df), from_scale_min = NA, from_scale_max = NA, to_scale_min, to_scale_max, rescale = FALSE){
+dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
   if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
    time_vec <- stats::time(df)
   } else {
     time_vec <- NA
-  }
-
-  if(rescale){
-    if(any(is.null(to_scale_min),is.null(to_scale_max))){
-      stop("Need values for to_scale_min and to_scale_max.")
-    }
   }
 
   if(is.null(dim(df))){
@@ -6746,41 +6705,23 @@ dc_d <- function (df, col_first = NA, col_last = NA, win=NROW(df), from_scale_mi
     }
   }
 
-  if(is.na(col_first)){
-    col_first = 1
-  }
-  if(is.na(col_last)){
-    col_last = NCOL(df)
+  if(any(df<scale_min,df>scale_max)){
+    stop("Range of values in df is outside [scale_min,scale_max]!")
   }
 
   if(win<=0){stop("Need a window > 0")}
 
-  if(rescale){
-    for(c in col_first:col_last){
-      if(is.na(from_scale_min)){
-        fromScaleMin <- min(df[,c], na.rm = TRUE)
-        fromScaleMax <- max(df[,c], na.rm = TRUE)
-      }
-      df[,c] <- elascer(x  = df[,c],
-                        mn = fromScaleMin,
-                        mx = fromScaleMax,
-                        lo = to_scale_min,
-                        hi = to_scale_max)
-    }
-    }
+ tsNames <- colnames(df)
 
-    tsNames <- colnames(df)[col_first:col_last]
-
-
-  ew_data_D <- matrix(NA, nrow=(nrow(df)+2), ncol=(length(col_first:col_last)))
+  ew_data_D <- matrix(NA, nrow=(nrow(df)+2), ncol=NCOL(df))
   ew_data_D <- data.frame(ew_data_D)
-  for (column in (col_first:col_last)){
+  for (column in 1:NCOL(df)){
     tsy <- as.numeric(df[,column])
     dens <- NA
     x <- NA
     y <- NA
-    s <- to_scale_max-to_scale_min
-    y <- pracma::linspace(to_scale_min, to_scale_max, win)
+    s <- scale_max-scale_min
+    y <- pracma::linspace(scale_min, scale_max, win)
     for (i in (1:(length(tsy)-(win-1)))){
       x <- tsy[i:(i+win-1)]
       x <- sort(x)
@@ -6802,7 +6743,7 @@ dc_d <- function (df, col_first = NA, col_last = NA, win=NROW(df), from_scale_mi
           }
         }
       }
-      ew_data_D[(i+win-1),(column-col_first+1)] <- 1-(r/g)
+      ew_data_D[(i+win-1),(column)] <- 1-(r/g)
     }
   }
   ew_data_D <- ew_data_D[(1:nrow(df)),]
@@ -6810,7 +6751,18 @@ dc_d <- function (df, col_first = NA, col_last = NA, win=NROW(df), from_scale_mi
   if(is.null(dim(ew_data_D))){
     ew_data_D <- data.frame(ew_data_D)
   }
-  return(ew_data_D)
+
+  colnames(ew_data_D) <- tsNames
+  g <- NULL
+  if(doPlot){
+    g <- plotDC_res(df_win = ew_data_D, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot, title = "Distribution Uniformity Diagram")
+    return(list(data = ew_data_D, graph = g))
+  } else {
+    return(ew_data_D)
+  }
+
+
+
 }
 
 
@@ -7945,7 +7897,7 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   # if(subtitle=="Variables ordered by ..."){
   #   subt <- paste0("Variables ordered by ",corder)
   # }
-
+  #max(dfp$value, na.rm=TRUE)/2
   g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
     ggplot2::geom_raster(interpolate = FALSE) +
     ggplot2::scale_fill_gradient2("Dynamic Complexity",low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +

@@ -133,48 +133,48 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>dc_f</span>(<span class='no'>df</span>, <span class='kw'>col_first</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>col_last</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>df</span>),
-  <span class='kw'>from_scale_min</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>from_scale_max</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='no'>to_scale_min</span>, <span class='no'>to_scale_max</span>,
-  <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>dc_f</span>(<span class='no'>df</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>df</span>), <span class='no'>scale_min</span>, <span class='no'>scale_max</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>useTimeVector</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>timeStamp</span> <span class='kw'>=</span> <span class='st'>"01-01-1999"</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>df</th>
-      <td><p>A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.</p></td>
-    </tr>
-    <tr>
-      <th>col_first</th>
-      <td><p>The first column of the dataframe that should be analyzed. If <code>NA</code>, <code>col_first = 1</code> (default = <code>NA</code>)</p></td>
-    </tr>
-    <tr>
-      <th>col_last</th>
-      <td><p>The last column of the dataframe that should be analyzed. If <code>NA</code>, <code>col_first = NCOL(df)</code> (default = <code>NA</code>)</p></td>
+      <td><p>A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in <code>df</code> should be on the same scale, an error will be thrown if the range of the time series in<code>df</code> is not <code>[scale_min,scale_max]</code>.</p></td>
     </tr>
     <tr>
       <th>win</th>
       <td><p>Size of window in which to calculate Dynamic Complexity. If <code>win &lt; NROW(df)</code> the window will move along the time series with a stepsize of <code>1</code> (default = <code><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW(df)</a></code>)</p></td>
     </tr>
     <tr>
-      <th>from_scale_min</th>
-      <td><p>The minimum value of the data. If <code>NA</code> will be set to minimum of each column <code>c</code> as <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>min(df,c, na.rm = TRUE)</a></code> (default = <code>NA</code>)</p></td>
+      <th>scale_min</th>
+      <td><p>The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to the correct value.</p></td>
     </tr>
     <tr>
-      <th>from_scale_max</th>
-      <td><p>The minimum value of the data. If <code>NA</code> will be set to maximum of each column <code>c</code> as <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>max(df,c, na.rm = TRUE)</a></code> (default = <code>NA</code>)</p></td>
+      <th>scale_max</th>
+      <td><p>The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value.</p></td>
     </tr>
     <tr>
-      <th>to_scale_min</th>
-      <td><p>The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if <code>rescale = TRUE</code>, this value will be used to rescale each column <code>c</code> using <code><a href='elascer.html'>elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)</a></code>.</p></td>
+      <th>doPlot</th>
+      <td><p>If <code>TRUE</code> shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible <code><a href='https://www.rdocumentation.org/packages/ggplot2/topics/ggplot'>ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
-      <th>to_scale_max</th>
-      <td><p>The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if <code>rescale = TRUE</code>, this value will be used to rescale each column <code>c</code> using <code><a href='elascer.html'>elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)</a></code>.</p></td>
+      <th>useVarNames</th>
+      <td><p>Use the column names of <code>df</code> as variable names in the Complexity Resonance Diagram (default = <code>TRUE</code>)</p></td>
     </tr>
     <tr>
-      <th>rescale</th>
-      <td><p>Should all columns in <code>df</code> be rescaled to <code>scle_min</code> and <code>scale_max</code>? Each column will be rescaled individually, which means the <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>min()</a></code> and <code><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>max()</a></code> values of each column will be used, not of the entire dataset. (default = <code>FALSE</code>)</p></td>
+      <th>colOrder</th>
+      <td><p>If <code>TRUE</code>, the order of the columns in <code>df</code> determines the of variables on the y-axis. Use <code>FALSE</code> for alphabetic/numeric order. Use <code>NA</code> to sort by by mean value of Dynamic Complexity (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>useTimeVector</th>
+      <td><p>Parameter used for plotting. A vector of length <code><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW(df)</a></code>, containing date/time information (default = <code>NA</code>)</p></td>
+    </tr>
+    <tr>
+      <th>timeStamp</th>
+      <td><p>If <code>useTimeVector</code> is not <code>NA</code>, a character string that can be passed to <code><a href='http://lubridate.tidyverse.org/reference/stamp.html'>lubridate::stamp()</a></code> to format the the dates/times passed in <code>useTimeVector</code> (default = <code>"01-01-1999"</code>)</p></td>
     </tr>
     </table>
     

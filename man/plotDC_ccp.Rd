@@ -16,11 +16,11 @@ plotDC_ccp(df_ccp, win, useVarNames = TRUE, colOrder = TRUE,
 
 \item{colOrder}{If \code{TRUE}, the order of the columns in \code{df} determines the of variables on the y-axis. Use \code{FALSE} for alphabetic/numeric order. Use \code{NA} to sort by by mean value of Dynamic Complexity (default = \code{TRUE})}
 
-\item{useTimeVector}{Parameter used for plotting. Either a variable name, or a vector of length \code{NROW(df)}, containing date/time information (default = \code{NA})}
+\item{useTimeVector}{Parameter used for plotting. A vector of length \code{NROW(df)}, containing date/time information (default = \code{NA})}
 
 \item{timeStamp}{If \code{useTimeVector} is not \code{NA}, a character string that can be passed to \code{\link[lubridate:stamp]{lubridate::stamp()}} to format the the dates/times passed in \code{useTimeVector} (default = \code{"01-01-1999"})}
 
-\item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. If \code{FALSE}, plot will be drawn and no object will be returned (default = \code{FALSE})}
+\item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
 
 \item{title}{A title for the plot.}
 

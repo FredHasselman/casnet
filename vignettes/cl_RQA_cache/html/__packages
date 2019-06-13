@@ -5,3 +5,10 @@ ggplot2
 cowplot
 plyr
 dplyr
+tidyverse
+tibble
+tidyr
+readr
+purrr
+stringr
+forcats

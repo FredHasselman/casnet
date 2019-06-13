@@ -210,7 +210,7 @@ We need to make sure all variables are on the same scale, for this dataset there
 win = 6
 
 # NA removed 
-dc.caseNA <- dc_win(out.NA, win = win, col_first=1, col_last=NCOL(out.NA), from_scale_min = 0, from_scale_max = 100, to_scale_min=0, to_scale_max=100, doPlot = TRUE, colOrder = TRUE)
+dc.caseNA <- dc_win(out.NA, win = win, scale_min=0, scale_max=100, doPlot = TRUE, colOrder = TRUE)
 ```
 
 Dynamic complexity is calculated as a product of *fluctuation intensity* calculated by function `dc_f()` and *distribution uniformity* calculated by `dc_d()`. These functions can be called seperately, or, you can set the argument `returnFandD = TRUE` in function `dc_win()`.
@@ -234,7 +234,7 @@ Let's compare to the `cart` imputation by MICE.
 
 ```{r}
 # CART with observed scale
-dc.caseIMP <- dc_win(out.cart, win=win, col_first=1, col_last=NCOL(out.cart),  from_scale_min = 0, from_scale_max = 100, to_scale_min=0, to_scale_max=100, colOrder = TRUE)
+dc.caseIMP <- dc_win(out.cart, win=win, scale_min=0, scale_max=100, colOrder = TRUE)
 
 plotDC_res(df_win = dc.caseIMP, win = win, doPlot = TRUE, colOrder = NA, title = "Complexity Resonance Diagram (CART)")
 ```

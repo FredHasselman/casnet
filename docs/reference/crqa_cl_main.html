@@ -147,34 +147,92 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>emDim</th>
+      <td><p>Embedding dimensions (default = <code>1</code>)</p></td>
+    </tr>
+    <tr>
+      <th>emLag</th>
+      <td><p>Embedding lag (default = <code>1</code>)</p></td>
+    </tr>
+    <tr>
+      <th>emRad</th>
+      <td><p>Radius on distance matrix (default = <code>1</code>)</p></td>
+    </tr>
+    <tr>
+      <th>DLmin</th>
+      <td><p>Minimum length of diagonal structure to be considered a line (default = <code>2</code>)</p></td>
+    </tr>
+    <tr>
+      <th>VLmin</th>
+      <td><p>Minimum length of vertical structure to be considered a line (default = <code>2</code>)</p></td>
+    </tr>
+    <tr>
+      <th>theiler</th>
+      <td><p>Theiler window (default = <code>0</code>)</p></td>
+    </tr>
+    <tr>
+      <th>win</th>
+      <td><p>Window to calculate the (C)RQA (default = minimum of length of <code>y1</code> or <code>y2</code>)</p></td>
+    </tr>
+    <tr>
+      <th>step</th>
+      <td><p>Stepsize for sliding windows (default = size of <code>win</code>, so no sliding window)</p></td>
+    </tr>
+    <tr>
+      <th>JRP</th>
+      <td><p>Wether to calculate a Joint Recurrence Plot (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>distNorm</th>
+      <td><p>One of "EUCLIDEAN" (default), <code>"MAX", "MIN"</code>, or <code>"OP"</code> for an Order Pattern recurrence matrix</p></td>
+    </tr>
+    <tr>
+      <th>returnMeasures</th>
+      <td><p>Return the (C)RQA measures? (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>returnRPvector</th>
+      <td><p>Return the recurrent points in a dataframe? (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>returnLineDist</th>
+      <td><p>Return the distribution of diagonal and horizontal line length distances (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>doPlot</th>
+      <td><p>Produce a plot of the recurrence matrix by calling <code><a href='rp_plot.html'>rp_plot()</a></code>, values can be <code>"rp"</code> (the thresholded recurrence matrix),<code>"distmat"</code> (the unthresholded recurrence matrix) or <code>"noplot"</code> (default = <code>"noplot"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>path_to_rp</th>
+      <td><p>Path to the command line executable (default = path set during installation, use <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption("casnet.path_to_rp")</a></code> to see)</p></td>
+    </tr>
+    <tr>
+      <th>saveOut</th>
+      <td><p>Save the output to files? If <code>TRUE</code> and <code>path_out = NA</code>, the current working directory will be used (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>path_out</th>
+      <td><p>Path to save output if <code>saveOut = TRUE</code> (default = <code>NULL</code>)</p></td>
+    </tr>
+    <tr>
+      <th>file_ID</th>
+      <td><p>A file ID which will be a prefix to to the filename if <code>saveOut = TRUE</code> (default = <code>NULL</code>, an integer will be added tot the file name to ensure unique files)</p></td>
+    </tr>
+    <tr>
+      <th>silent</th>
+      <td><p>Do not display any messages (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>targetValue</th>
+      <td><p>A value passed to <code><a href='crqa_radius.html'>crqa_radius(...,type="fixed", targetMeasure="RR")</a></code> if <code>is.na(emRad)==TRUE</code>. This is useful for windowed analysis, it will estimate a new radius for each window.</p></td>
+    </tr>
+    <tr>
+      <th>useParallel</th>
+      <td><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://purrr.tidyverse.org/reference/map2.html'>purrr::map2()</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>parallel::detectCores()</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
       <th>...</th>
-      <td><p>Arguments passed on to <code>crqa_cl</code></p><dl class='dl-horizontal'>
-  <dt>y1</dt><dd><p>Time series 1</p></dd>
-  <dt>y2</dt><dd><p>Time series 2 for Cross Recurrence Analysis (default = <code>NULL</code>)</p></dd>
-  <dt>emDim</dt><dd><p>Embedding dimensions (default = <code>1</code>)</p></dd>
-  <dt>emLag</dt><dd><p>Embedding lag (default = <code>1</code>)</p></dd>
-  <dt>emRad</dt><dd><p>Radius on distance matrix (default = <code>1</code>)</p></dd>
-  <dt>DLmin</dt><dd><p>Minimum length of diagonal structure to be considered a line (default = <code>2</code>)</p></dd>
-  <dt>VLmin</dt><dd><p>Minimum length of vertical structure to be considered a line (default = <code>2</code>)</p></dd>
-  <dt>theiler</dt><dd><p>Theiler window (default = <code>0</code>)</p></dd>
-  <dt>win</dt><dd><p>Window to calculate the (C)RQA (default = minimum of length of <code>y1</code> or <code>y2</code>)</p></dd>
-  <dt>step</dt><dd><p>Stepsize for sliding windows (default = size of <code>win</code>, so no sliding window)</p></dd>
-  <dt>JRP</dt><dd><p>Wether to calculate a Joint Recurrence Plot (default = <code>FALSE</code>)</p></dd>
-  <dt>distNorm</dt><dd><p>One of "EUCLIDEAN" (default), <code>"MAX", "MIN"</code>, or <code>"OP"</code> for an Order Pattern recurrence matrix</p></dd>
-  <dt>standardise</dt><dd><p>Standardise data: <code>"none"</code> (default), <code>"mean.sd"</code>, or <code>"median.mad"</code></p></dd>
-  <dt>returnMeasures</dt><dd><p>Return the (C)RQA measures? (default = <code>TRUE</code>)</p></dd>
-  <dt>returnRPvector</dt><dd><p>Return the recurrent points in a dataframe? (default = <code>FALSE</code>)</p></dd>
-  <dt>returnLineDist</dt><dd><p>Return the distribution of diagonal and horizontal line length distances (default = <code>FALSE</code>)</p></dd>
-  <dt>doPlot</dt><dd><p>Produce a plot of the recurrence matrix by calling <code><a href='rp_plot.html'>rp_plot()</a></code>, values can be <code>"rp"</code> (the thresholded recurrence matrix),<code>"distmat"</code> (the unthresholded recurrence matrix) or <code>"noplot"</code> (default = <code>"noplot"</code>)</p></dd>
-  <dt>path_to_rp</dt><dd><p>Path to the command line executable (default = path set during installation, use <code><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption("casnet.path_to_rp")</a></code> to see)</p></dd>
-  <dt>saveOut</dt><dd><p>Save the output to files? If <code>TRUE</code> and <code>path_out = NA</code>, the current working directory will be used (default = <code>FALSE</code>)</p></dd>
-  <dt>path_out</dt><dd><p>Path to save output if <code>saveOut = TRUE</code> (default = <code>NULL</code>)</p></dd>
-  <dt>file_ID</dt><dd><p>A file ID which will be a prefix to to the filename if <code>saveOut = TRUE</code> (default = <code>NULL</code>, an integer will be added tot the file name to ensure unique files)</p></dd>
-  <dt>silent</dt><dd><p>Do not display any messages (default = <code>TRUE</code>)</p></dd>
-  <dt>surrogateTest</dt><dd><p>Perform surrogate tests. If <code>TRUE</code>, will run surrogate tests using default settings for a two-sided test of \(H_0: The data generating process is a rescaled linear Gaussian process\) at \(\alpha = .05\) (arguments <code>ns = 39, fft = TRUE, amplitude = TRUE</code>)</p></dd>
-  <dt>targetValue</dt><dd><p>A value passed to <code><a href='crqa_radius.html'>crqa_radius(...,type="fixed", targetMeasure="RR")</a></code> if <code>is.na(emRad)==TRUE</code>. This is useful for windowed analysis, it will estimate a new radius for each window.</p></dd>
-  <dt>useParallel</dt><dd><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis using <code><a href='https://purrr.tidyverse.org/reference/map2.html'>purrr::map2()</a></code> to assign data and <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>parallel::detectCores()</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></dd>
-</dl></td>
+      <td><p>Additional parameters (currently not used)</p></td>
     </tr>
     </table>
     

@@ -4,28 +4,28 @@
 \alias{dc_d}
 \title{Distribution Uniformity}
 \usage{
-dc_d(df, col_first = NA, col_last = NA, win = NROW(df),
-  from_scale_min = NA, from_scale_max = NA, to_scale_min, to_scale_max,
-  rescale = FALSE)
+dc_d(df, win = NROW(df), scale_min, scale_max, doPlot = FALSE,
+  useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA,
+  timeStamp = "01-01-1999")
 }
 \arguments{
-\item{df}{A dataframe containing multivariate time series data from 1 person. Rows should indicate time,  columns should indicate variables. The multivariate time series should be on the same scale. If nescessary, rescale variables.}
-
-\item{col_first}{The first column of the dataframe that should be analyzed. If \code{NA}, \code{col_first = 1} (default = \code{NA})}
-
-\item{col_last}{The last column of the dataframe that should be analyzed. If \code{NA}, \code{col_first = NCOL(df)} (default = \code{NA})}
+\item{df}{A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in \code{df} should be on the same scale, an error will be thrown if the range of the time series in\code{df} is not \code{[scale_min,scale_max]}.}
 
 \item{win}{Size of window in which to calculate Dynamic Complexity. If \code{win < NROW(df)} the window will move along the time series with a stepsize of \code{1} (default = \code{NROW(df)})}
 
-\item{from_scale_min}{The minimum value of the data. If \code{NA} will be set to minimum of each column \code{c} as \code{min(df,c, na.rm = TRUE)} (default = \code{NA})}
+\item{scale_min}{The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to the correct value.}
 
-\item{from_scale_max}{The minimum value of the data. If \code{NA} will be set to maximum of each column \code{c} as \code{max(df,c, na.rm = TRUE)} (default = \code{NA})}
+\item{scale_max}{The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value.}
 
-\item{to_scale_min}{The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if \code{rescale = TRUE}, this value will be used to rescale each column \code{c} using \code{elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)}.}
+\item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
 
-\item{to_scale_max}{The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value. Therefore, there is no default, but if \code{rescale = TRUE}, this value will be used to rescale each column \code{c} using \code{elascer(x = df[,c], mn = min(df[,c]), mx = max(df[,c]), lo = scale_min, hi = scale_max)}.}
+\item{useVarNames}{Use the column names of \code{df} as variable names in the Complexity Resonance Diagram (default = \code{TRUE})}
 
-\item{rescale}{Should all columns in \code{df} be rescaled to \code{scle_min} and \code{scale_max}? Each column will be rescaled individually, which means the \code{min()} and \code{max()} values of each column will be used, not of the entire dataset. (default = \code{FALSE})}
+\item{colOrder}{If \code{TRUE}, the order of the columns in \code{df} determines the of variables on the y-axis. Use \code{FALSE} for alphabetic/numeric order. Use \code{NA} to sort by by mean value of Dynamic Complexity (default = \code{TRUE})}
+
+\item{useTimeVector}{Parameter used for plotting. A vector of length \code{NROW(df)}, containing date/time information (default = \code{NA})}
+
+\item{timeStamp}{If \code{useTimeVector} is not \code{NA}, a character string that can be passed to \code{\link[lubridate:stamp]{lubridate::stamp()}} to format the the dates/times passed in \code{useTimeVector} (default = \code{"01-01-1999"})}
 }
 \value{
 a dataframe
