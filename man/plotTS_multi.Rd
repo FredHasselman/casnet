@@ -4,8 +4,10 @@
 \alias{plotTS_multi}
 \title{Plot Multivariate Time Series Data}
 \usage{
-plotTS_multi(df, timeVec = NA, groupVec = NA, doPlot = TRUE,
-  returnPlotData = FALSE)
+plotTS_multi(df, timeVec = NA, groupVec = NA, useVarNames = TRUE,
+  colOrder = TRUE, doPlot = TRUE, title = "", subtitle = "",
+  xlabel = "Time", ylabel = "", returnPlotData = FALSE,
+  useRibbon = FALSE, overlap = 1)
 }
 \arguments{
 \item{df}{A data frame with time series in columns.}
@@ -14,9 +16,25 @@ plotTS_multi(df, timeVec = NA, groupVec = NA, doPlot = TRUE,
 
 \item{groupVec}{A vector indicating the names of the time series in the columns of \code{df}. If \code{NA}, the column names of \code{df} will be used, excluding the \code{timeVec}, if present. (default = \code{NA})}
 
-\item{doPlot}{Plot the \link{ggplot} object (default = \code{TRUE})}
+\item{useVarNames}{Use the column names of \code{df} as variable names in the Complexity Resonance Diagram (default = \code{TRUE})}
+
+\item{colOrder}{If \code{TRUE}, the order of the columns in \code{df} determines the of variables on the y-axis. Use \code{FALSE} for alphabetic/numeric order. Use \code{NA} to sort by by mean value of Dynamic Complexity (default = \code{TRUE})}
+
+\item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
+
+\item{title}{A title for the plot.}
+
+\item{subtitle}{A subtitle for the plot.}
+
+\item{xlabel}{A label for the x-axis.}
+
+\item{ylabel}{A label for the y-axis.}
 
 \item{returnPlotData}{Return the restructered data frame used to create the plot (default = \code{FALSE})}
+
+\item{useRibbon}{Neat for distributions}
+
+\item{overlap}{Multiplier for scaling the series around the y-offset. Default is \code{offset + elascer(y, lo = -.45*overlap, hi = .45*overlap)} and if \code{useRibbon = TRUE} it is \code{offset + elascer(y, lo = 0*overlap, hi = .95*overlap)}. (default = \code{1})}
 }
 \value{
 A \link{ggplot} object.

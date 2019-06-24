@@ -6571,7 +6571,6 @@ dc_ccp = function(df_win, alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE, 
 }
 
 
-
 #' Fluctuation Intensity
 #'
 #' Fluctuation intensity is one of two components of which the product is the Dynamic Complexity measure.
@@ -6618,17 +6617,28 @@ dc_f <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarN
   length_ts <- nrow(data)
 
   for (column in 1:NCOL(data)){
-    distance<-1
-    fluctuation <- NA
-    tsy <- as.numeric(data[,column])
 
-    for (i in (1:(nrow(data)-win-1))){
+    distance    <- 1
+    fluctuation <- NA
+    tsy         <- as.numeric(data[,column])
+
+    # start sliding window
+    for(i in (1:(nrow(data)-win-1))){
+
       y <- NA
       fluct <- NA
       dist_next <- 1
       k <- NA
 
+      # yd2 <- diff(diff(tsy))
+      # k <- rep(0,length(yd2))
+      # k[yd2!=0] <- 1
+
       for (j in (0:(win-2))){
+
+        # Start 2nd sliding window
+       # k[j+1] <- eval_f(ts[i+j],ts[i+j+1],ts[i+j+2])
+
         if((tsy[i+j+1] >= tsy[i+j]) & (tsy[i+j+1] > tsy[i+j+2])){
           (k[j+1]<- 1)
         }  else if((tsy[i+j+1] <= tsy[i+j]) & (tsy[i+j+1]<tsy[i+j+2])){
@@ -6644,8 +6654,10 @@ dc_f <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarN
         }  else {
           (k[j+1] <- 0)}
       }
-      k[win-1] = 1
-      k<-k[1:(win-1)]
+
+      k[win-1] <- 1
+      k <- k[1:(win-1)]
+
       for (g in (1:length(k))){
         if(k[g]==1){
           y[g] <- abs(tsy[i+g]-tsy[i+g-dist_next])
@@ -6675,6 +6687,84 @@ dc_f <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarN
     }
 }
 
+
+#' Get fluctuations (internal)
+#'
+#' @param y_win a time series
+#' @param s scale range
+#'
+#' @return fluctuation intensity
+#' @export
+#'
+#' @keywords internal
+#'
+get_fluct <- function(y_win,s){
+  # Get k-points
+  signs <- sign(diff(y_win))
+  signs <- c(signs,signs[length(signs)])
+  dur   <- ts_duration(signs)
+  return(sum(abs(y_win[dur$t.end]-y_win[dur$t.start])/dur$duration.time, na.rm = TRUE)/(s*(win-1)))
+}
+
+
+
+
+#' Title
+#'
+#' @inheritParams df_f
+#'
+#' @return
+#' @export
+#'
+#' @examples
+dc_f2 <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE,
+                    colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
+
+  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+    time_vec <- stats::time(df)
+  } else {
+    time_vec <- NA
+  }
+
+  if(is.null(dim(df))){
+    if(is.numeric(df)){
+      df <- data.frame(df)
+    } else {
+      df <- data.frame(as.numeric_discrete(df))
+    }
+  }
+
+  if(any(df<scale_min,df>scale_max)){
+    stop("Range of values in df is outside [scale_min,scale_max]!")
+  }
+
+  if(win<=0){stop("Need a window > 0")}
+
+  s         <- scale_max-scale_min
+
+  ew_data_F <- matrix(NA, nrow=NROW(df), ncol=NCOL(df))
+  ew_data_F <- data.frame(ew_data_F)
+  data <- rbind(df, matrix(0,nrow=2,ncol=NCOL(df), dimnames = list(NULL,colnames(df))))
+
+  s <- scale_max-scale_min
+  length_ts <- nrow(data)
+
+  for (c in 1:NCOL(data)){
+  ew_data_F[,c] <- zoo::rollapplyr(data = zoo::as.zoo(data[,c]), width = win, FUN = function(z){get_fluct(y_win=z,s=s)}, by = 1, by.column = TRUE, fill = NA)
+}
+  attr(ew_data_F,"time") <- time_vec
+  if(is.null(dim(ew_data_F))){
+    ew_data_F <- data.frame(ew_data_F)
+  }
+
+  g <- NULL
+  if(doPlot){
+    g <- plotDC_res(df_win = ew_data_F, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot, title = "Fluctuation Intensity Diagram")
+    return(list(data = ew_data_F, graph = g))
+  } else {
+    return(ew_data_F)
+  }
+}
 
 #' Distribution Uniformity
 #'
@@ -6864,10 +6954,12 @@ gg_plotHolder <- function(){
 #' Plot Multivariate Time Series Data
 #'
 #' @param df A data frame with time series in columns.
+#' @inheritParams plotDC_res
 #' @param timeVec If numeric, the number of the column in `df` which contains a time=keeping variable. If `NA`, the time vector will be `1:NROW(df)` (default = `NA`)
 #' @param groupVec A vector indicating the names of the time series in the columns of `df`. If `NA`, the column names of `df` will be used, excluding the `timeVec`, if present. (default = `NA`)
-#' @param doPlot Plot the [ggplot] object (default = `TRUE`)
 #' @param returnPlotData Return the restructered data frame used to create the plot (default = `FALSE`)
+#' @param useRibbon Neat for distributions
+#' @param overlap Multiplier for scaling the series around the y-offset. Default is `offset + elascer(y, lo = -.45*overlap, hi = .45*overlap)` and if `useRibbon = TRUE` it is `offset + elascer(y, lo = 0*overlap, hi = .95*overlap)`. (default = `1`)
 #'
 #' @return A [ggplot] object.
 #' @export
@@ -6886,7 +6978,7 @@ gg_plotHolder <- function(){
 #'
 #'  plotTS_multi(y)
 #'
-plotTS_multi <- function(df,timeVec = NA, groupVec = NA, doPlot = TRUE, returnPlotData = FALSE){
+plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, colOrder = TRUE, doPlot = TRUE, title = '', subtitle = "", xlabel = "Time", ylabel = "", returnPlotData = FALSE, useRibbon = FALSE, overlap = 1){
 
   if(is.na(timeVec)){
     df$time <- 1:NROW(df)
@@ -6898,38 +6990,72 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, doPlot = TRUE, returnPl
     }
   }
   if(is.na(groupVec)){
-    groupVec <- colnames(df)[-c("time"%ci%df)]
+    if(colOrder){
+      groupVec <- colnames(df)[-c("time"%ci%df)]
+    } else {
+      groupVec <- sort(colnames(df)[-c("time"%ci%df)])
+    }
   } else {
     if(length(groupVec)!=(NCOL(df)-1)){
       stop("Length of groupVec does not match number of time series in df.")
     }
   }
 
-  tmp <- tidyr::gather(df, key = timeSeries, value = y, -time, factor_key = TRUE)
-  tmp$timeSeries <- ordered(tmp$timeSeries)
+  tmp <- tidyr::gather(df, key = timeSeries, value = y, -time, factor_key = colOrder)
+  #tmp$timeSeries <- ordered(tmp$timeSeries)
 
   yOrder <- groupVec
   names(yOrder) <- paste(groupVec)
   offsets     <- names(yOrder) %>% {stats::setNames(0:(length(.) - 1), .)}
   tmp$offsets <- unlist(llply(seq_along(yOrder), function(n) rep(offsets[n],sum(tmp$timeSeries%in%names(offsets)[n]))))
 
+  ymin <- -.45 * overlap
+  ymax <-  .45 * overlap
+
+  if(useRibbon){
+    ymin <- 0
+    ymax <- .95 * overlap
+  }
+
   # Calculate and scale group densities
   pdat <- tmp %>%
     dplyr::group_by(timeSeries) %>%
-    dplyr::mutate(y = elascer(y,lo = -.45,hi = .45)) %>%
+    dplyr::mutate(y = elascer(y,lo = ymin, hi = ymax)) %>%
     dplyr::ungroup()
   pdat$y_offset <- pdat$y + pdat$offsets
+  pdat$ymin <- pdat$offsets
+  pdat$ycol <- factor(pdat$offsets%%2)
+
 
   if(doPlot){
-    g <- ggplot(pdat, aes(x=time, y = y_offset, group = timeSeries)) +
-      geom_path() +
-      scale_y_continuous("Spectral Slope", breaks = offsets, labels = names(offsets), expand = c(0,0)) +
-      scale_x_continuous("Time",expand = c(0,0)) +
-      theme_minimal() +
-      theme(axis.text.y = element_text(size = 8, face = "plain"),
+
+    g <- ggplot(pdat, aes(x=time, y = y_offset, group = rev(timeSeries)))
+
+    if(useRibbon){
+      g <- g + geom_ribbon(aes(ymin = ymin, ymax = y_offset, fill = ycol, colour = ycol)) +
+        scale_fill_manual(values = c("0"="grey30","1"="grey70"), guide = "none") +
+        scale_color_manual(values = c("0"="grey90","1"="grey90"), guide = "none")
+    } else {
+      g <- g +  geom_path()
+    }
+
+    g <- g +
+      scale_y_continuous(ylabel, breaks = offsets, labels = names(offsets), expand = c(0,0)) +
+      scale_x_continuous(xlabel, expand = c(0,0)) +
+      ggtitle(label = title, subtitle = subtitle) +
+      theme_minimal()
+
+    if(useRibbon){
+    g <- g +  theme(axis.text.y = element_text(size = 8, face = "plain"),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            plot.margin = margin(1,1,1,1,"line"))
+    } else{
+    g <- g +   theme(axis.text.y = element_text(size = 8, face = "plain"),
             panel.grid.minor.y = element_blank(),
             panel.grid.minor.x = element_blank(),
             plot.margin = margin(1,1,1,1,"line"))
+      }
     print(g)
   }
 
@@ -7859,13 +7985,15 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
 
   df_win$time <- 1:NROW(df_win)
 
-  minorBreaks <- df_win$time[seq(win, NROW(df_win))]
   if(NROW(df_win)>50){
     labels <- labels[minorBreaks]
     #  by = round(length(breaks)/25))]
     #labels[!labels%in%labels[seq(2,length(minorBreaks), by = round(length(minorBreaks)/25))]] <- ""
     labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
     majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+  } else {
+    minorBreaks <- NULL
+    majorBreaks <- NULL
   }
 
   # breaks <- seq(win, NROW(df_win))
@@ -7900,7 +8028,15 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   #max(dfp$value, na.rm=TRUE)/2
   g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
     ggplot2::geom_raster(interpolate = FALSE) +
-    ggplot2::scale_fill_gradient2("Dynamic Complexity",low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
+    ggplot2::scale_fill_gradient2("Dynamic Complexity",low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white')
+
+    if(is.null(majorBreaks)){
+    g <- g +
+        ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
+        ggplot2::scale_x_continuous(xlabel, expand = c(0,0), limits = c((win+1)-.5, NROW(dfp)+.5))
+
+    } else {
+  g <- g +
     ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, size=.1) +
     ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="steelblue", alpha=.9, size=.1) +
     ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
@@ -7908,8 +8044,10 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
                                 breaks = majorBreaks,
                                 minor_breaks = minorBreaks-.5,
                                 labels = labels,
-                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5)) +
+                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5))
    # ggplot2::scale_x_continuous(xlabel, breaks = breaks, labels = labels, expand = c(0,0), limits = c((win+1)-.5, max(breaks)+.5)) +
+  }
+
     ggplot2::labs(title = title, subtitle = subtitle) +
     ggplot2::theme_bw() +
     ggplot2::theme(#axis.text.x = element_text(vjust = 0, hjust = 1, angle = 90),
@@ -8690,6 +8828,7 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
     y.n <- as.numeric_discrete(y)
   } else {
     y.n <- as.numeric(y)
+    names(y.n) <- paste(y.n)
     if(all(is.na(y.n))){
       stop("Conversion to numeric failed for all elements of y.")
     }
@@ -8702,7 +8841,7 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
 
   same <- list()
   same[[1]] <- data.frame(y = y[1],
-                          y.name  = names(y[1]),
+                          y.name  = names(y)[1],
                           t.start = timeVec[1],
                           t.end   = timeVec[1],
                           duration.time    = 0,
@@ -10546,6 +10685,8 @@ fltrIT <- function(TS,f){
 #' @param hi  Maximum value to rescale to, defaults to `1`.
 #' @param groupwise If `x` is a data frame with `2+` columns, `mn = NA` and/or `mx = NA` and `groupwise = TRUE`, scaling will occur
 #' @param keepNA Keep `NA` values?
+#' @param boundaryPrecision If set to `NA` the precision of the input will be the same as the precision of the output. This can cause problems when detecting values that lie just outside of, or, exactly on boundaries given by `lo` and `hi`, e.g. after saving the data using a default precision. Setting `boundaryPrecision` to an integer value will ensure that the boundaries of the new scale are given by `round(..., digits = boundaryPrecision)`. Alternatively one could just round all the output after rescaling to a desired precision (default = `NA`)
+#' @param tol The tolerance for deciding wether a value is on the boundary `lo` or `hi` (default = `.Machine$double.eps^0.5)`)
 #'
 #' @details Three uses:
 #' \enumerate{
@@ -10561,19 +10702,35 @@ fltrIT <- function(TS,f){
 #' # Works on numeric objects
 #' somenumbers <- cbind(c(-5,100,sqrt(2)),c(exp(1),0,-pi))
 #'
+#' # Using the defaults:
+#' # 1. mn and mx are derived globally (groupWise = FALSE)
+#' # 2. values rescaled to hi and lo are integers, 0 and 1 respectively
 #' elascer(somenumbers)
-#' elascer(somenumbers,mn=-100)
-#' # Values < mn will return < lo (default=0)
-#' # Values > mx will return > hi (default=1)
-#' elascer(somenumbers,mn=-1,mx=99)
 #'
+#' # If the data contain values < mn they will return as < lo
+#' elascer(somenumbers,mn=-100)
+#' # If the data contain values > mx they will return > hi
+#' elascer(somenumbers,mx=99)
+#'
+#' # Effect of setting groupWise
 #' elascer(somenumbers,lo=-1,hi=1)
 #' elascer(somenumbers,lo=-1,hi=1, groupwise = TRUE)
 #'
 #' elascer(somenumbers,mn=-10,mx=100,lo=-1,hi=4)
 #' elascer(somenumbers,mn= NA,mx=100,lo=-1,hi=4, groupwise = TRUE)
 #'
-elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE, keepNA = TRUE){
+#' # Effect of setting boundaryPrecision
+#' x <- rbind(1/3, 1/7)
+#'
+#' re1 <- elascer(x, lo = 0, hi = 1/13, boundaryPrecision = NA)
+#' max(re1)==0.07692308 # FALSE
+#' max(re1)==1/13       # TRUE
+#'
+#' re2 <- elascer(x, lo = 0, hi = 1/13, boundaryPrecision = 8)
+#' max(re2)==0.07692308 # TRUE
+#' max(re2)==1/13       # FALSE
+#'
+elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE, keepNA = TRUE, boundaryPrecision = NA, tol= .Machine$double.eps^0.5){
 
   doGroupwise <- FALSE
   mnNA <- FALSE
@@ -10609,6 +10766,13 @@ elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE, keepNA = TRUE){
       id<-stats::complete.cases(u[,i])
       u[!id,i]<-mn
       }
+      }
+    if(!is.na(boundaryPrecision)){
+    # Make sure the end points of the scale are the same as passed in the argument
+      idLo <- u[,i]%[]%c(lo-tol,lo+tol)
+      u[idLo,i] <- round(u[idLo,i], digits = boundaryPrecision)
+      idHi <- u[,i]%[]%c(hi-tol,hi+tol)
+      u[idHi,i] <- round(u[idHi,i], digits = boundaryPrecision)
     }
   }
   if(UNLIST){
