@@ -94,7 +94,7 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in time series</a>
+      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -133,8 +133,10 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>plotTS_multi</span>(<span class='no'>df</span>, <span class='kw'>timeVec</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>groupVec</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>returnPlotData</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>plotTS_multi</span>(<span class='no'>df</span>, <span class='kw'>timeVec</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>groupVec</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>xlabel</span> <span class='kw'>=</span> <span class='st'>"Time"</span>, <span class='kw'>ylabel</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>returnPlotData</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>useRibbon</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -152,12 +154,44 @@
       <td><p>A vector indicating the names of the time series in the columns of <code>df</code>. If <code>NA</code>, the column names of <code>df</code> will be used, excluding the <code>timeVec</code>, if present. (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
+      <th>useVarNames</th>
+      <td><p>Use the column names of <code>df</code> as variable names in the Complexity Resonance Diagram (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>colOrder</th>
+      <td><p>If <code>TRUE</code>, the order of the columns in <code>df</code> determines the of variables on the y-axis. Use <code>FALSE</code> for alphabetic/numeric order. Use <code>NA</code> to sort by by mean value of Dynamic Complexity (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
       <th>doPlot</th>
-      <td><p>Plot the ggplot object (default = <code>TRUE</code>)</p></td>
+      <td><p>If <code>TRUE</code> shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>title</th>
+      <td><p>A title for the plot.</p></td>
+    </tr>
+    <tr>
+      <th>subtitle</th>
+      <td><p>A subtitle for the plot.</p></td>
+    </tr>
+    <tr>
+      <th>xlabel</th>
+      <td><p>A label for the x-axis.</p></td>
+    </tr>
+    <tr>
+      <th>ylabel</th>
+      <td><p>A label for the y-axis.</p></td>
     </tr>
     <tr>
       <th>returnPlotData</th>
       <td><p>Return the restructered data frame used to create the plot (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>useRibbon</th>
+      <td><p>Neat for distributions</p></td>
+    </tr>
+    <tr>
+      <th>overlap</th>
+      <td><p>Multiplier for scaling the series around the y-offset. Default is <code>offset + elascer(y, lo = -.45*overlap, hi = .45*overlap)</code> and if <code>useRibbon = TRUE</code> it is <code>offset + elascer(y, lo = 0*overlap, hi = .95*overlap)</code>. (default = <code>1</code>)</p></td>
     </tr>
     </table>
     
