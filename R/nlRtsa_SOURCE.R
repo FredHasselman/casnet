@@ -7984,17 +7984,24 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   }
 
   df_win$time <- 1:NROW(df_win)
-
+  minorBreaks <- df_win$time[seq(win, NROW(df_win))]
   if(NROW(df_win)>50){
     labels <- labels[minorBreaks]
-    #  by = round(length(breaks)/25))]
-    #labels[!labels%in%labels[seq(2,length(minorBreaks), by = round(length(minorBreaks)/25))]] <- ""
     labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
     majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
-  } else {
-    minorBreaks <- NULL
-    majorBreaks <- NULL
   }
+
+#
+#   if(NROW(df_win)>50){
+#     labels <- labels[minorBreaks]
+#     #  by = round(length(breaks)/25))]
+#     #labels[!labels%in%labels[seq(2,length(minorBreaks), by = round(length(minorBreaks)/25))]] <- ""
+#     labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+#     majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+#   } else {
+#     minorBreaks <- NULL
+#     majorBreaks <- NULL
+#   }
 
   # breaks <- seq(win, NROW(df_win))
   # if(NROW(df_win)>50){
@@ -8028,15 +8035,15 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   #max(dfp$value, na.rm=TRUE)/2
   g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
     ggplot2::geom_raster(interpolate = FALSE) +
-    ggplot2::scale_fill_gradient2("Dynamic Complexity",low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white')
+    ggplot2::scale_fill_gradient2("Dynamic Complexity",low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
 
-    if(is.null(majorBreaks)){
-    g <- g +
-        ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
-        ggplot2::scale_x_continuous(xlabel, expand = c(0,0), limits = c((win+1)-.5, NROW(dfp)+.5))
-
-    } else {
-  g <- g +
+  #   if(is.null(majorBreaks)){
+  #   g <- g +
+  #       ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
+  #       ggplot2::scale_x_continuous(xlabel, expand = c(0,0), limits = c((win+1)-.5, NROW(dfp)+.5))
+  #
+  #   } else {
+  # g <- g +
     ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, size=.1) +
     ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="steelblue", alpha=.9, size=.1) +
     ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
@@ -8044,9 +8051,8 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
                                 breaks = majorBreaks,
                                 minor_breaks = minorBreaks-.5,
                                 labels = labels,
-                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5))
+                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5)) +
    # ggplot2::scale_x_continuous(xlabel, breaks = breaks, labels = labels, expand = c(0,0), limits = c((win+1)-.5, max(breaks)+.5)) +
-  }
 
     ggplot2::labs(title = title, subtitle = subtitle) +
     ggplot2::theme_bw() +
