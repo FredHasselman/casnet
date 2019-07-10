@@ -54,6 +54,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
+    </li>
+    <li>
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
@@ -90,7 +93,7 @@
       <h1>Using the CRQA command line interface (crqa_cl)</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2019-06-26</h4>
+            <h4 class="date">2019-07-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/cl_RQA.Rmd"><code>vignettes/cl_RQA.Rmd</code></a></small>
       <div class="hidden name"><code>cl_RQA.Rmd</code></div>
@@ -170,7 +173,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.015   0.010   0.052 
+&gt;   0.019   0.040   0.124 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">crqa_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> y_<span class="dv">2</span>, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
@@ -188,7 +191,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.018 
+&gt;   0.011   0.006   0.024 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co">## Plot the recurrence matrix</span></a>
@@ -263,7 +266,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
+&gt;   0.008   0.003   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">crqa_2rnd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> y_2rnd, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
@@ -281,7 +284,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
+&gt;   0.009   0.002   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># Create the recurrence matrix</span></a>
@@ -388,143 +391,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.002   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.013 
+&gt;   0.010   0.003   0.015 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -542,74 +409,6 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; Completed in:
 &gt;    user  system elapsed 
 &gt;   0.010   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -660,7 +459,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.002   0.012 
+&gt;   0.016   0.003   0.020 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -677,7 +476,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.003   0.011 
+&gt;   0.010   0.003   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -694,7 +493,92 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.003   0.012 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.002   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.005   0.016 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -712,6 +596,74 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; Completed in:
 &gt;    user  system elapsed 
 &gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -745,108 +697,6 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.001   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.004   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
 &gt;   0.008   0.001   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
@@ -864,74 +714,6 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.004   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.004   0.019 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
 &gt;   0.009   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
@@ -949,58 +731,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.011 
+&gt;   0.011   0.005   0.015 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -1051,1198 +782,6 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.002   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.001   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.003   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.015 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.004   0.016 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.016 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.001   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.014   0.003   0.018 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.003   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.001   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.015 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.003   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">crqa_1rnd_sur[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(crqa_1rnd_sur)<span class="op">+</span><span class="dv">1</span>,] &lt;-<span class="st"> </span>crqa_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb21-2" data-line-number="2">crqa_2rnd_sur &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ldply">ldply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(y_2rnd_sur<span class="op">$</span>V1), <span class="cf">function</span>(r) <span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(y_2rnd_sur[r,]), <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>))</a></code></pre></div>
-<pre><code>&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.002   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.001   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
 &gt;   0.011   0.003   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
@@ -2277,41 +816,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.011   0.003   0.015 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.006   0.038 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.011   0.003   0.015 
+&gt;   0.009   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2345,24 +850,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
+&gt;   0.010   0.002   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2396,6 +884,23 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
+&gt;   0.015   0.003   0.019 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
 &gt;   0.009   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
@@ -2413,7 +918,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.002   0.012 
+&gt;   0.011   0.003   0.015 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2430,109 +935,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.001   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.002   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.015   0.004   0.018 
+&gt;   0.011   0.003   0.015 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2566,7 +969,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.013   0.003   0.017 
+&gt;   0.009   0.003   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2583,7 +986,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
+&gt;   0.011   0.003   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2600,7 +1003,75 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2634,7 +1105,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.002   0.010 
+&gt;   0.008   0.001   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2651,7 +1122,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.007   0.002   0.010 
+&gt;   0.008   0.003   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2668,41 +1139,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.003   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.010 
+&gt;   0.008   0.003   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2736,7 +1173,313 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.012   0.005   0.016 
+&gt;   0.008   0.001   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.015 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.015   0.002   0.017 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.019 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2787,7 +1530,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.001   0.011 
+&gt;   0.010   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -2804,432 +1547,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.016 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.005   0.016 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.004   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.013   0.002   0.016 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.012   0.003   0.016 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.012   0.003   0.015 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.001   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.012 
+&gt;   0.009   0.002   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3280,7 +1598,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
+&gt;   0.010   0.003   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3297,126 +1615,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.011   0.003   0.015 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.003   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.002   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.012 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.010   0.002   0.013 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.009   0.003   0.013 
+&gt;   0.009   0.002   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3450,6 +1649,278 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
+&gt;   0.009   0.005   0.022 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.002   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.004   0.016 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
 &gt;   0.009   0.002   0.012 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
@@ -3467,7 +1938,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.002   0.012 
+&gt;   0.008   0.002   0.010 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3485,91 +1956,6 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; Completed in:
 &gt;    user  system elapsed 
 &gt;   0.008   0.003   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.007   0.001   0.010 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.003   0.011 
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Performing auto-RQA
-&gt; 
-&gt; ...using sequential processing...
-&gt; 
-  |                                                                     
-  |                                                               |   0%
-  |                                                                     
-  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
-&gt; 
-&gt; Completed in:
-&gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3603,7 +1989,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.001   0.010 
+&gt;   0.010   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3620,7 +2006,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.003   0.010 
+&gt;   0.011   0.002   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3637,7 +2023,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.008   0.002   0.011 
+&gt;   0.014   0.003   0.018 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3654,7 +2040,128 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.012 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">crqa_1rnd_sur[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(crqa_1rnd_sur)<span class="op">+</span><span class="dv">1</span>,] &lt;-<span class="st"> </span>crqa_<span class="dv">1</span></a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">crqa_2rnd_sur &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ldply">ldply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(y_2rnd_sur<span class="op">$</span>V1), <span class="cf">function</span>(r) <span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(y_2rnd_sur[r,]), <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>))</a></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.001   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3705,7 +2212,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.002   0.012 
+&gt;   0.009   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -3723,6 +2230,1502 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; Completed in:
 &gt;    user  system elapsed 
 &gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.016   0.003   0.020 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.007   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.007   0.003   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.010 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.010 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.012   0.002   0.015 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.004   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.010 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.001   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.007   0.003   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.010 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.013   0.002   0.017 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.007   0.001   0.010 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.004   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.002   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.014 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.004   0.015 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.011   0.002   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.004   0.021 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.010   0.003   0.013 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.001   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.009   0.003   0.012 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.007   0.003   0.011 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt; Performing auto-RQA
+&gt; 
+&gt; ...using sequential processing...
+&gt; 
+  |                                                                     
+  |                                                               |   0%
+  |                                                                     
+  |o~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~oo~o| 100%
+&gt; 
+&gt; Completed in:
+&gt;    user  system elapsed 
+&gt;   0.008   0.002   0.011 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 

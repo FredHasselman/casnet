@@ -88,6 +88,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
+    </li>
+    <li>
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
@@ -133,11 +136,11 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>crqa_parameters</span>(<span class='no'>y</span>, <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxLag</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>floor</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>y</span>)/(<span class='no'>maxDim</span> +
-  <span class='fl'>1</span>)), <span class='kw'>lagMethods</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"first.minimum"</span>, <span class='st'>"global.minimum"</span>, <span class='st'>"max.lag"</span>),
-  <span class='kw'>estimateDimensions</span> <span class='kw'>=</span> <span class='st'>"preferSmallestInLargestHood"</span>, <span class='kw'>maxDim</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>nnSizes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>10</span>, <span class='fl'>15</span>), <span class='kw'>nnRadius</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>nnThres</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>theiler</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>diagPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>crqa_parameters</span>(<span class='no'>y</span>, <span class='kw'>lagMethods</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"first.minimum"</span>, <span class='st'>"global.minimum"</span>,
+  <span class='st'>"max.lag"</span>), <span class='kw'>estimateDimensions</span> <span class='kw'>=</span> <span class='st'>"preferSmallestInLargestHood"</span>,
+  <span class='kw'>maxDim</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxLag</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>floor</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>y</span>)/(<span class='no'>maxDim</span> + <span class='fl'>1</span>)),
+  <span class='kw'>nnSizes</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>nnRadius</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>nnThres</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>theiler</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,14 +148,6 @@
     <tr>
       <th>y</th>
       <td><p>A numeric vector or time series</p></td>
-    </tr>
-    <tr>
-      <th>emLag</th>
-      <td><p>Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If <code>NULL</code> the lags based on the mutual information in <code>lagMethods</code> will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = <code>NULL</code>)</p></td>
-    </tr>
-    <tr>
-      <th>maxLag</th>
-      <td><p>Maximum embedding lag to consider. Default value is: <code><a href='https://www.rdocumentation.org/packages/base/topics/Round'>floor(length(y)/(maxDim+1))</a></code></p></td>
     </tr>
     <tr>
       <th>lagMethods</th>
@@ -173,8 +168,16 @@
       <td><p>Maximum number of embedding dimensions to consider (default = <code>10</code>)</p></td>
     </tr>
     <tr>
+      <th>emLag</th>
+      <td><p>Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If <code>NULL</code> the lags based on the mutual information in <code>lagMethods</code> will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = <code>NULL</code>)</p></td>
+    </tr>
+    <tr>
+      <th>maxLag</th>
+      <td><p>Maximum embedding lag to consider. Default value is: <code><a href='https://www.rdocumentation.org/packages/base/topics/Round'>floor(length(y)/(maxDim+1))</a></code></p></td>
+    </tr>
+    <tr>
       <th>nnSizes</th>
-      <td><p>Points whose distance is <code>nnSize</code> times further apart than the estimated size of the attractor will be declared false neighbours. See the argument <code>atol</code> in <code><a href='https://www.rdocumentation.org/packages/fractal/topics/FNN'>fractal::FNN()</a></code> (default = <code><a href='https://www.rdocumentation.org/packages/base/topics/c'>c(2,5,10,15)</a></code>)</p></td>
+      <td><p>Points whose distance is <code>nnSize</code> times further apart than the estimated size of the attractor will be declared false neighbours. See the argument <code>atol</code> in <code><a href='https://www.rdocumentation.org/packages/fractal/topics/FNN'>fractal::FNN()</a></code> (default = <code>2</code>)</p></td>
     </tr>
     <tr>
       <th>nnRadius</th>
@@ -189,7 +192,7 @@
       <td><p>Theiler window on distance matrix (default = <code>0</code>)</p></td>
     </tr>
     <tr>
-      <th>diagPlot</th>
+      <th>doPlot</th>
       <td><p>Produce a diagnostic plot the results (default = <code>TRUE</code>)</p></td>
     </tr>
     <tr>

@@ -88,6 +88,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
+    </li>
+    <li>
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
@@ -218,33 +221,33 @@
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
 <span class='no'>y</span>$<span class='no'>s</span> <span class='kw'>&lt;-</span> <span class='no'>y2</span>+<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y2</span>))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.862221 1.769316 1.996348 1.851036 1.995601 2.010456 1.962493 2.063345 
+#&gt; 1.806580 1.704955 1.944587 1.835034 1.992138 1.992580 1.947652 2.036912 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.884125 1.909442 1.909442 1.909442 2.041484 2.002678 1.979676 2.011610 
+#&gt; 1.841540 1.872002 1.872002 1.872002 2.002114 1.969284 1.971542 2.003628 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 2.025035 1.806844 1.774623 1.733806 2.516726 1.831044 1.879487 1.883610 
+#&gt; 1.987575 1.789631 1.729699 1.726824 2.479943 1.839458 1.866192 1.857668 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.932340 1.921755 1.880654 1.870835 2.012621 1.959015 1.997225 2.133363 
+#&gt; 1.903964 1.878283 1.837191 1.815339 1.981295 1.916875 1.944174 2.121953 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 1.988501 1.952195 1.882010 1.933072 1.973111 1.817211 1.944932 1.871809 
+#&gt; 1.946313 1.915560 1.870796 1.878248 1.922366 1.808156 1.917618 1.881391 
 #&gt;       30 
-#&gt; 1.896970 
+#&gt; 1.842507 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
 <span class='no'>y</span>$<span class='no'>y3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cumsum'>cumsum</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>NROW</a></span>(<span class='no'>y</span>)))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 4.991668 4.986394 4.987553 4.989480 5.137644 5.137500 5.136654 5.135741 
+#&gt; 4.988127 4.982858 4.979822 4.978232 5.126411 5.126280 5.123692 5.121040 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.133076 5.126595 5.126595 5.126595 5.131354 5.135741 5.138442 5.141291 
+#&gt; 5.121899 5.121344 5.121344 5.121344 5.120177 5.122795 5.127237 5.130071 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.139578 4.991354 4.989461 4.988782 4.993674 4.996754 4.996337 4.995210 
+#&gt; 5.128344 4.978342 4.983496 4.984579 4.988362 4.991436 4.991012 4.993432 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 5.001949 5.142203 5.135363 5.138499 5.139541 5.138575 5.145333 5.149938 
+#&gt; 4.997282 5.133730 5.131121 5.136038 5.142443 5.145739 5.142186 5.152852 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.152429 5.151294 5.160289 5.159320 5.009102 5.008813 5.013780 5.020129 
+#&gt; 5.149952 5.148815 5.146989 5.151418 5.004805 5.006321 5.009472 5.011056 
 #&gt;       30 
-#&gt; 5.019313 
+#&gt; 5.010914 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y;Z;...;N)"</div><div class='input'>
 

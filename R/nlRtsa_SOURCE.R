@@ -4471,7 +4471,9 @@ SWtestE <- function(g,p=1,N=20){
 #'
 #' @examples
 #'
-#' g  <- sample_gnp(100, 1/100)
+#'library(igraph)
+#'
+#' g  <- igraph::sample_gnp(100, 1/100)
 #'
 #' # Equiangular spiral: Any line from the origin cuts at the same angle.
 #' plot(g, layout = layout_as_spiral(g, type = "Bernoulli", arcs = 5))
@@ -4585,7 +4587,8 @@ layout_as_spiral <- function(g,
 #' @examples
 #'
 #' library(igraph)
-#' g  <- sample_gnp(200, 1/20)
+#'
+#' g  <- igraph::sample_gnp(200, 1/20)
 #' V(g)$size <- degree(g)
 #' make_spiral_graph(g, markTimeBy = TRUE, showSizeLegend = TRUE, sizeLabel = "Node degree")
 #'

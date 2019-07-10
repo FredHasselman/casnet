@@ -28,7 +28,9 @@ Layout a graph on a spiral
 }
 \examples{
 
-g  <- sample_gnp(100, 1/100)
+library(igraph)
+
+g  <- igraph::sample_gnp(100, 1/100)
 
 # Equiangular spiral: Any line from the origin cuts at the same angle.
 plot(g, layout = layout_as_spiral(g, type = "Bernoulli", arcs = 5))

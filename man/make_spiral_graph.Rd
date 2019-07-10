@@ -70,7 +70,8 @@ To keep the igraph object, use the layout function \link{layout_as_spiral(g)} wh
 \examples{
 
 library(igraph)
-g  <- sample_gnp(200, 1/20)
+
+g  <- igraph::sample_gnp(200, 1/20)
 V(g)$size <- degree(g)
 make_spiral_graph(g, markTimeBy = TRUE, showSizeLegend = TRUE, sizeLabel = "Node degree")
 

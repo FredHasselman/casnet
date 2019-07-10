@@ -54,6 +54,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
+    </li>
+    <li>
       <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
     </li>
     <li>
@@ -90,7 +93,7 @@
       <h1>Applied Synergetics: Dynamic Complexity in a Clinical Case Study</h1>
                         <h4 class="author">Fred Hasselman &amp; Merlijn Olthof</h4>
             
-            <h4 class="date">2019-06-26</h4>
+            <h4 class="date">2019-07-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/dynamiccomplexity.Rmd"><code>vignettes/dynamiccomplexity.Rmd</code></a></small>
       <div class="hidden name"><code>dynamiccomplexity.Rmd</code></div>
@@ -136,7 +139,7 @@
 <a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co"># Plot the timeseries with NAs in red</span></a>
 <a class="sourceLine" id="cb2-11" data-line-number="11">op &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mfrow =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">ceiling</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(vars)<span class="op">/</span><span class="dv">4</span>),<span class="dv">4</span>),<span class="dt">mar =</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb2-12" data-line-number="12"><span class="kw">l_ply</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq_along</a></span>(vars), <span class="cf">function</span>(c){</a>
-<a class="sourceLine" id="cb2-13" data-line-number="13">  imputeTS<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/imputeTS/topics/plotNA.distribution">plotNA.distribution</a></span>(<span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(df_vars[,c]), </a>
+<a class="sourceLine" id="cb2-13" data-line-number="13">  imputeTS<span class="op">::</span><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/plotNA.distribution.html">plotNA.distribution</a></span>(<span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(df_vars[,c]), </a>
 <a class="sourceLine" id="cb2-14" data-line-number="14">                                <span class="dt">main=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)[c], </a>
 <a class="sourceLine" id="cb2-15" data-line-number="15">                                <span class="dt">xlab =</span> <span class="st">""</span>,<span class="dt">ylab =</span> <span class="st">""</span>)</a>
 <a class="sourceLine" id="cb2-16" data-line-number="16">  })</a>
@@ -162,12 +165,12 @@
 <a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co"># Plot the timeseries with NAs in red</span></a>
 <a class="sourceLine" id="cb3-11" data-line-number="11"><span class="cf">for</span>(c <span class="cf">in</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"angry"</span><span class="op">%ci%</span>df_vars,<span class="st">"ruminate"</span><span class="op">%ci%</span>df_vars)){</a>
 <a class="sourceLine" id="cb3-12" data-line-number="12">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cat">cat</a></span>(<span class="st">"Remove NA</span><span class="ch">\n</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb3-13" data-line-number="13">  imputeTS<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/imputeTS/topics/plotNA.imputations">plotNA.imputations</a></span>(<span class="dt">x.withNA =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(df_vars[,c]),</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">  imputeTS<span class="op">::</span><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/plotNA.imputations.html">plotNA.imputations</a></span>(<span class="dt">x.withNA =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(df_vars[,c]),</a>
 <a class="sourceLine" id="cb3-14" data-line-number="14">                               <span class="dt">x.withImputations =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(df_vars[,c]<span class="op">%00%</span><span class="dv">0</span>),</a>
 <a class="sourceLine" id="cb3-15" data-line-number="15">                               <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)[c],<span class="st">"NA removed"</span>), <span class="dt">xlab =</span> <span class="st">""</span>, <span class="dt">ylab =</span> <span class="st">""</span>)</a>
 <a class="sourceLine" id="cb3-16" data-line-number="16"></a>
 <a class="sourceLine" id="cb3-17" data-line-number="17">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cat">cat</a></span>(<span class="st">"Classification And Regression Trees</span><span class="ch">\n</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb3-18" data-line-number="18">  imputeTS<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/imputeTS/topics/plotNA.imputations">plotNA.imputations</a></span>(<span class="dt">x.withNA =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(df_vars[,c]),</a>
+<a class="sourceLine" id="cb3-18" data-line-number="18">  imputeTS<span class="op">::</span><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/plotNA.imputations.html">plotNA.imputations</a></span>(<span class="dt">x.withNA =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(df_vars[,c]),</a>
 <a class="sourceLine" id="cb3-19" data-line-number="19">                               <span class="dt">x.withImputations =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(out.cart[,c]),</a>
 <a class="sourceLine" id="cb3-20" data-line-number="20">                               <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)[c],<span class="st">"CART"</span>), <span class="dt">xlab =</span> <span class="st">""</span>, <span class="dt">ylab =</span> <span class="st">""</span>)</a>
 <a class="sourceLine" id="cb3-21" data-line-number="21">}</a></code></pre></div>
@@ -309,11 +312,10 @@
 &gt; [7] "2014-11-27 09:29:00 CET"</code></pre>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="co">#  CART</span></a>
 <a class="sourceLine" id="cb18-2" data-line-number="2">dateTimesIMP[ccp.caseIMP<span class="op">$</span>sig.peaks<span class="op">&gt;</span><span class="dv">0</span>]</a></code></pre></div>
-<pre><code>&gt;  [1] "2014-11-02 21:27:00 CET" "2014-11-03 09:54:00 CET"
-&gt;  [3] "2014-11-10 21:05:00 CET" "2014-11-12 21:37:00 CET"
-&gt;  [5] "2014-11-13 09:28:00 CET" "2014-11-18 13:54:00 CET"
-&gt;  [7] "2014-11-25 21:22:00 CET" "2014-11-26 09:37:00 CET"
-&gt;  [9] "2014-11-26 13:12:00 CET" "2014-11-26 17:30:00 CET"</code></pre>
+<pre><code>&gt; [1] "2014-11-03 09:54:00 CET" "2014-11-10 21:05:00 CET"
+&gt; [3] "2014-11-12 21:37:00 CET" "2014-11-14 21:15:00 CET"
+&gt; [5] "2014-11-15 09:18:00 CET" "2014-11-18 13:54:00 CET"
+&gt; [7] "2014-11-26 17:30:00 CET"</code></pre>
 </div>
 </div>
 <div id="plot-state-versus-complexity" class="section level2">
