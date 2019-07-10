@@ -625,11 +625,11 @@ crqa_cl <- function(y1,
 #' \item{`preferSmallestInLargestHood` - The default option: If no unique pair can be found, prefer pairs with smallest values for lag, dimensions, percentage NN for the largest NN size}
 #' }
 #' @param maxDim Maximum number of embedding dimensions to consider (default = `10`)
-#' @param nnSizes Points whose distance is `nnSize` times further apart than the estimated size of the attractor will be declared false neighbours. See the argument `atol` in [fractal::FNN()] (default = `c(2,5,10,15)`)
+#' @param nnSizes Points whose distance is `nnSize` times further apart than the estimated size of the attractor will be declared false neighbours. See the argument `atol` in [fractal::FNN()] (default = `2`)
 #' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than `nnRadius`, the points are declared false neighbours. See the argument `rtol` in [fractal::FNN()] (default = `5`)
 #' @param nnThres Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = `10`)
 #' @param theiler Theiler window on distance matrix (default = `0`)
-#' @param diagPlot Produce a diagnostic plot the results (default = `TRUE`)
+#' @param doPlot Produce a diagnostic plot the results (default = `TRUE`)
 #' @param silent Silent-ish mode
 #' @param ... Other parameters passed to [nonlinearTseries::timeLag()]
 #'
@@ -647,23 +647,23 @@ crqa_cl <- function(y1,
 #' @export
 #'
 crqa_parameters <- function(y,
-                            emLag     = NULL,
-                            maxLag   = floor(length(y)/(maxDim+1)),
                             lagMethods = c("first.minimum","global.minimum","max.lag"),
                             estimateDimensions = "preferSmallestInLargestHood",
                             maxDim   = 10,
-                            nnSizes  = c(2,5,10,15),
+                            emLag     = NULL,
+                            maxLag   = floor(length(y)/(maxDim+1)),
+                            nnSizes  = 2,
                             nnRadius = 5,
                             nnThres  = 10,
                             theiler  = 0,
-                            diagPlot = TRUE,
+                            doPlot   = TRUE,
                             silent   = TRUE,
                             ...){
 
   if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
 
   if(length(nnRadius)!=1){stop("nnRadius must have 1 numeric value")}
-  if(length(nnSizes)!=4){stop("nnSizes must have 4 numeric values")}
+  #if(length(nnSizes)!=4){stop("nnSizes must have 4 numeric values")}
   y <- y[!is.na(y)]
   #y <- ts_standardise(y, adjustN = FALSE)
 
@@ -685,7 +685,7 @@ crqa_parameters <- function(y,
       emLags <- cbind.data.frame(selection.methods = lagMethods, lag = NA)
       for(m in seq_along(emLags$selection.methods)){
         if(emLags$selection.methods[m]=="first.minimum"){
-          emLags$lag[m] <- which(ts_symbolic(data.frame(mi))[,2]%in%"trough")[1]%00%NA
+          emLags$lag[m] <- which(ts_symbolic(data.frame(mi))%in%"trough")[1]%00%NA
         }
         if(emLags$selection.methods[m]=="global.minimum"){
           emLags$lag[m] <- as.numeric(which.min(mi))
@@ -809,7 +809,7 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
   df$Nns   <- interaction(df$Nsize,df$Nradius)
   df$Nns.f  <-  factor(df$Nns, levels=levels(df$Nns), labels = paste0("size=",nnSizes," | radius=",nnRadius))
 
-  if(diagPlot){
+  if(doPlot){
 
     dfs <- data.frame(startAt= c(.5, graphics::hist(emDims,plot=FALSE)$mids),
                       stopAt = c(graphics::hist(emDims,plot=FALSE)$mids,max(emDims)+.5),
@@ -853,7 +853,8 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
       ggplot2::theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
             strip.text.x = element_text(colour = "black", face = "bold"),
             panel.spacing = ggplot2::unit(1, "lines"),
-            legend.background = element_rect(colour = "grey90",fill = "grey90"),
+            legend.position = c(.9, .8),
+            legend.background = element_rect(colour = "grey10",fill = "grey90"),
             legend.title = element_text(face = "bold"),
             legend.key = element_rect(colour = "grey90", fill = "grey90"),
             panel.grid.minor.x = element_blank(),
@@ -874,7 +875,7 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
             legend.justification = c("right", "top"),
             legend.box.just = "right",
             legend.margin = margin(6, 6, 6, 6),
-            legend.background = element_rect(colour = "grey90",fill = "grey90"),
+            legend.background = element_rect(colour = "grey10",fill = "grey90"),
             legend.title = element_text(face = "bold"),
             legend.key = element_rect(colour = "grey90", fill = "grey90"),
             #panel.grid.major.x = element_blank(),
@@ -885,7 +886,7 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
       )
 
     g <- gridExtra::grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
-    grid::grid.newpage()
+    #grid::grid.newpage()
     grid::grid.draw(g)
 
   } else {
@@ -2572,8 +2573,8 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param Chromatic If `TRUE` and there are more than two discrete values in `RM`, give recurrent points a distinct colour. If `RM` was returned by `crqa_rp(..., chromatic = TRUE)`, the recurrence plot will colour-code recurrent points according to the category values in `attributes(RM)$chromaticRP` (`default = FALSE`)
 #' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `crqa_radius()` will be called with default settings (find a radius that yields .05 recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
 #' @param title A title for the plot
-#' @param xlab An x-axis label
-#' @param ylab An y-axis label
+#' @param xlabel An x-axis label
+#' @param ylabel An y-axis label
 #' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If `RM` has attributes `y1` and `y2` containing the time series data (i.e. it was created by a call to [rp()]), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from `y1`.
 #' @param returnOnlyObject Return the ggplot object only, do not draw the plot (default = `TRUE`)
 #'
@@ -2590,7 +2591,7 @@ rp_plot <- function(RM,
                     markEpochsLOI = NULL,
                     Chromatic = NULL,
                     radiusValue = NA,
-                    title = "", xlab = "", ylab="",
+                    title = "", xlabel = "", ylabel="",
                     plotSurrogate = NA,
                     returnOnlyObject = FALSE){
 
@@ -2875,22 +2876,15 @@ rp_plot <- function(RM,
   xdims <- ""
   ydims <- ""
 
-  if(!is.null(attr(RM,"emDims1.name"))){
-    xdims <- ifelse(nchar(xlab)>0,xlab,attr(RM,"emDims1.name"))
+  if(!is.null(attr(RM,"emDims1.name"))|nchar(xlabel)>0){
+    xdims <- ifelse(nchar(xlabel)>0, xlabel, attr(RM,"emDims1.name"))
+  }
+  if(!is.null(attr(RM,"emDims2.name"))|nchar(ylabel)>0){
+    ydims <- ifelse(nchar(ylabel)>0, ylabel, attr(RM,"emDims2.name"))
     if(AUTO){
       ydims <- xdims
-    } else {
-      ydims <- ifelse(nchar(ylab)>0,ylab,attr(RM,"emDims2.name"))
     }
   }
-
-  if(nchar(xlab)>0){
-    xdims <- xlab
-  }
-  if(nchar(ylab)>0){
-    ydims <- ylab
-  }
-
 
   if(plotDimensions){
 
@@ -4468,7 +4462,7 @@ SWtestE <- function(g,p=1,N=20){
 #' @param type Spiral type, one of `"Archimedean"`,`"Bernoulli"`,`"Fermat"`, or, `"Euler"` (default = `"Archimedean"`)
 #' @param arcs The number of arcs (half circles/ovals) that make up the spiral (default = `10`)
 #' @param a Parameter controlling the distance between spiral arms, however, the effect will vary for different spiral types (default = `0.5`)
-#' @param b Parameter controlling where the spiral originates. A value of 1 will generally place the origin in the center. The default value places the origin right of the center, however, the effect will vary for different spiral types (default = `0.1`)
+#' @param b Parameter controlling where the spiral originates. A value of 1 will generally place the origin in the center. The default `NULL` will choose a value based on the different spiral types (default = `NULL`)
 #' @param rev If `TRUE` the vertex with the highest index will be placed in the centre of the spiral (default = `FALSE`)
 #'
 #' @return An igraph layout
@@ -4494,6 +4488,9 @@ layout_as_spiral <- function(g,
                              a = 1,
                              b = NULL,
                              rev= FALSE){
+  if(length(which(type%in%c("Archimedean","Bernoulli","Fermat","Euler")))==0){
+    stop("Type must be one of: Archimedean, Bernoulli, Fermat, Euler")
+  }
 
   N <- igraph::vcount(g)
   if(length(unique(V(g)$size))>1){
@@ -4526,6 +4523,9 @@ layout_as_spiral <- function(g,
     df <- matrix(cbind(r*cos(theta),r*sin(theta)),ncol = 2)
   }
   if(type=="Euler"){
+    if(is.null(b)){
+      b = .5
+    }
     res1  <- ceiling(res/2)
     res2  <- floor(res/2)
     theta <- seq(0,pi/2,length.out = res1)
@@ -4533,19 +4533,19 @@ layout_as_spiral <- function(g,
     df1$x[1] <-0
     df1$y[1] <-0
 
-    dt <-arcs/res1
+    dt <- arcs/res1
 
     for(i in 2:res1){
-      df1$x[i] <- df1$x[i-1] + cos(df1$t[i-1]*df1$t[i-1]) * dt
-      df1$y[i] <- df1$y[i-1] + sin(df1$t[i-1]*df1$t[i-1]) * dt
+      df1$x[i] <- df1$x[i-1] + cos(df1$t[i-1]^(b+1)/(b+1)) * dt #*df1$t[i-1]) * dt
+      df1$y[i] <- df1$y[i-1] + sin(df1$t[i-1]^(b+1)/(b+1)) * dt #*df1$t[i-1]) * dt
       df1$t[i] <- df1$t[i-1]+dt
     }
     df <- matrix(cbind(c(-rev(df1$x[1:res2]),df1$x),c(-rev(df1$y[1:res2]),df1$y)),ncol = 2)
   }
 
   df     <- df[seq(1, res, length.out = N),]
-  df[,1] <- elascer(df[,1],lo = 0.1, hi = 0.9)
-  df[,2] <- elascer(df[,2],lo = 0.1, hi = 0.9)
+  df[,1] <- elascer(df[,1],lo = 0.1, hi = 0.9,boundaryPrecision = NA)
+  df[,2] <- elascer(df[,2],lo = 0.1, hi = 0.9,boundaryPrecision = NA)
 
   if(rev){
     df[,1] <- rev(df[,1])
@@ -4584,6 +4584,7 @@ layout_as_spiral <- function(g,
 #'
 #' @examples
 #'
+#' library(igraph)
 #' g  <- sample_gnp(200, 1/20)
 #' V(g)$size <- degree(g)
 #' make_spiral_graph(g, markTimeBy = TRUE, showSizeLegend = TRUE, sizeLabel = "Node degree")
@@ -4591,8 +4592,8 @@ layout_as_spiral <- function(g,
 make_spiral_graph <- function(g,
                               type = "Archimedean",
                               arcs = 6,
-                              a = .5,
-                              b = .1,
+                              a = 1,
+                              b = NULL,
                               rev= FALSE,
                               curvature = -0.6,
                               angle = 90,
@@ -4620,6 +4621,7 @@ make_spiral_graph <- function(g,
       grIDs <- ts_changeindex(markEpochsBy)
       tbreaks <- unique(sort(c(grIDs$xmax,grIDs$xmax)))
       tlabels <- ceiling(tbreaks)
+      markTimeBy <- TRUE
     } else {
       x <- 1:vcount(g)
       v <- seq(1,vcount(g),by=vcount(g)/arcs)
@@ -4711,10 +4713,19 @@ make_spiral_graph <- function(g,
     if(length(vertexBorderColour)==1|length(vertexBorderColour)==NROW(gNodes)){
     vBc <- vertexBorderColour
     } else {
-      warning("Invalif value(s) for vertexBorderColour, using default.")
+      warning("Invalid value(s) for vertexBorderColour, using default.")
       vertexBorderColour <- "black"
     }
   }
+
+  # Fix same coords
+  sameID <- which(gEdges$from.x==gEdges$to.x)
+    if(length(sameID)>0){
+   gNodes$V2[gEdges$from[sameID]] <- gNodes$V2[gEdges$from[sameID]]+mean(diff(gNodes$V2))/2
+   gEdges$to.x[sameID] <- gEdges$to.x[sameID]+mean(diff(gEdges$to.x))/2
+   gEdges$to.y[sameID] <- gEdges$to.y[sameID]+mean(diff(gEdges$to.y))/2
+    }
+
 
   gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
     geom_curve(data=gEdges, aes(x = from.x, xend = to.x, y = from.y, yend = to.y),
@@ -4761,6 +4772,232 @@ make_spiral_graph <- function(g,
 
   return(invisible(gg))
 }
+
+
+#' Spiral Graph with Epoch Focus
+#'
+#' Turn an [igraph] object into a spiral graph returning a [ggplot2] object.
+#'
+#' @note To keep the igraph object, use the layout function [layout_as_spiral(g)] when plotting the graph.
+#'
+#' @inheritParams make_spiral_graph
+#'
+#' @return A ggplot object.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' library(igraph)
+#' g  <- sample_gnp(200, 1/20)
+#' V(g)$size <- degree(g)
+#' make_spiral_graph(g, markTimeBy = TRUE, showSizeLegend = TRUE, sizeLabel = "Node degree")
+#'
+make_spiral_focus <- function(g,
+                              arcs = 6,
+                              a = 1,
+                              b = NULL,
+                              rev= FALSE,
+                              curvature = -0.6,
+                              angle = 90,
+                              markTimeBy = NULL,
+                              alphaV = 1,
+                              alphaE = .6,
+                              title = "",
+                              subtitle = "",
+                              showEpochLegend = TRUE,
+                              markEpochsBy = NULL,
+                              epochColours = NULL,
+                              epochLabel = "Epoch",
+                              showSizeLegend = FALSE,
+                              sizeLabel = "Size",
+                              scaleVertexSize = c(1,6),
+                              vertexBorderColour = "black",
+                              scaleEdgeSize = 1/5,
+                              defaultEdgeColour = "grey70",
+                              doPlot = TRUE){
+
+  type   <- "Archimedean"
+  g_left <- g_right <- g
+
+  theta <- seq(0,arcs*pi,length.out = res)
+
+  if(type=="Archimedean"){
+    if(is.null(b)){
+      b <- 1
+    }
+    r  <- a + b*theta
+    g_right$layout <- matrix(cbind(r*cos(theta),r*sin(theta)),ncol = 2)
+    g_left$layout  <- matrix(cbind(r*cos(theta),r*sin(theta)),ncol = 2)
+    g_left
+
+  }
+
+  # g_right$layout <- layout_as_spiral(g, type = type, arcs = arcs, a = a, b = b, rev = rev)
+  # g_left$layout  <- -1*g_right$layout
+
+  g <- g_left + g_right
+
+  plot(g_left)
+ # g$layout <- layout_as_spiral(g, type = type, arcs = arcs, a = a, b = b, rev = rev)
+
+  if(is.null(markTimeBy)){
+    if(!is.null(markEpochsBy)){
+      grIDs <- ts_changeindex(markEpochsBy)
+      tbreaks <- unique(sort(c(grIDs$xmax,grIDs$xmax)))
+      tlabels <- ceiling(tbreaks)
+    } else {
+      x <- 1:vcount(g)
+      v <- seq(1,vcount(g),by=vcount(g)/arcs)
+      tbreaks <- c(1,which(diff(findInterval(x, v))!=0),vcount(g))
+      #tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
+      if(max(tbreaks)!=vcount(g)){
+        tbreaks[which.max(tbreaks)]<-vcount(g)
+        tlabels <- paste(tbreaks)
+      }
+      if(min(tbreaks)>1){
+        tbreaks<- c(1,tbreaks)
+        tlabels <- paste(tbreaks)
+      }
+    }
+  } else {
+    if(is.numeric(markTimeBy)){
+      if(all(markTimeBy%in%1:vcount(g))){
+        tbreaks <- unique(markTimeBy)
+        if(!is.null(names(markTimeBy))){
+          tlabels <- names(unique(markTimeBy))
+        } else {
+          tlabels <- paste(tbreaks)
+        }
+      }
+    }
+    if(markTimeBy){
+      tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
+      if(max(tbreaks)>vcount(g)){tbreaks[which.max(tbreaks)]<-vcount(g)}
+      if(min(tbreaks)>1){tbreaks<- c(1,tbreaks)}
+      tlabels <- paste(tbreaks)
+    }
+  }
+
+  if(max(tbreaks)!=vcount(g)){
+    tbreaks[which.max(tbreaks)]<-vcount(g)
+    tlabels <- paste(tbreaks)
+  }
+  if(min(tbreaks)>1){
+    tbreaks<- c(1,tbreaks)
+    tlabels <- paste(tbreaks)
+  }
+
+  if(is.null(markEpochsBy)){
+    markEpochsBy <- character(vcount(g))
+    for(i in 1:(length(tbreaks)-1)){
+      markEpochsBy[tbreaks[i]:tbreaks[i+1]] <- rep(paste0(tbreaks[i],"-",tbreaks[i+1]),length(tbreaks[i]:tbreaks[i+1]))
+    }
+    if(!is.null(epochColours)){
+      if(length(unique(markEpochsBy))>length(unique(epochColours))){
+        warning("Number of unique epochs is unequal to number of unique colours!\nUsing default colour scheme.")
+        epochColours <- NULL
+      }
+    }
+  }
+
+  g <- plotNET_groupColour(g,
+                           groups = markEpochsBy,
+                           colourV = TRUE,
+                           colourE = TRUE,
+                           groupColours = epochColours,
+                           defaultEdgeColour = defaultEdgeColour,
+                           doPlot = FALSE)
+
+  size <- 1
+  if(!is.null(V(g)$size)){
+    size <- V(g)$size
+  }
+  gNodes        <- as.data.frame(g$layout)
+  gNodes$ID     <- as.numeric(V(g))
+  gNodes$colour <- V(g)$colour
+  gNodes$labels <- factor(V(g)$groupnum, levels = unique(V(g)$groupnum), labels = unique(V(g)$group))
+  gNodes$size   <- size
+  gNodes$alpha  <- V(g)$alpha
+
+  width <- 1
+  if(!is.null(E(g)$width)){
+    width <- E(g)$width
+  }
+  gEdges        <- igraph::get.data.frame(g)
+  gEdges$from.x <- gNodes$V1[match(gEdges$from, gNodes$ID)]
+  gEdges$from.y <- gNodes$V2[match(gEdges$from, gNodes$ID)]
+  gEdges$to.x   <- gNodes$V1[match(gEdges$to, gNodes$ID)]
+  gEdges$to.y   <- gNodes$V2[match(gEdges$to, gNodes$ID)]
+  gEdges$width  <- width
+
+  if(is.null(vertexBorderColour))(
+    vBc <- gNodes$colour
+  ) else {
+    if(length(vertexBorderColour)==1|length(vertexBorderColour)==NROW(gNodes)){
+      vBc <- vertexBorderColour
+    } else {
+      warning("Invalid value(s) for vertexBorderColour, using default.")
+      vertexBorderColour <- "black"
+    }
+  }
+
+  # Fix same coords
+  sameID <- which(gEdges$from.x==gEdges$to.x)
+  if(length(sameID)>0){
+    gNodes$V2[gEdges$from[sameID]] <- gNodes$V2[gEdges$from[sameID]]+mean(diff(gNodes$V2))/2
+    gEdges$to.x[sameID] <- gEdges$to.x[sameID]+mean(diff(gEdges$to.x))/2
+    gEdges$to.y[sameID] <- gEdges$to.y[sameID]+mean(diff(gEdges$to.y))/2
+  }
+
+
+  gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
+    geom_curve(data=gEdges, aes(x = from.x, xend = to.x, y = from.y, yend = to.y),
+               curvature = curvature,
+               angle = angle,
+               size = gEdges$width * scaleEdgeSize,
+               colour= gEdges$color,
+               alpha = alphaE) +
+    geom_point(aes(fill = labels, size = size), pch=21, colour = vBc, alpha = alphaV) +
+    ggtitle(label = title, subtitle = subtitle) +
+    scale_fill_manual(epochLabel, values = unique(gNodes$colour)) +
+    scale_size(sizeLabel, range = scaleVertexSize)
+
+  if(showEpochLegend){
+    gg <- gg + guides(fill = guide_legend(title.position = "top",
+                                          byrow = TRUE,
+                                          override.aes = list(size=5, order = 0)))
+  } else {
+    gg <- gg + guides(fill = "none")
+  }
+
+  if(showSizeLegend){
+    gg <- gg + guides(size = guide_legend(title.position = "top",
+                                          byrow = TRUE,
+                                          override.aes = list(legend.key.size = unit(1.2,"lines"), order = 1)))
+  } else {
+    gg <- gg + guides(size = "none")
+  }
+
+  if(!is.null(markTimeBy)){
+    gg <- gg + annotate("label", x=gNodes$V1[tbreaks], y=gNodes$V2[tbreaks], label = tlabels)
+  }
+
+  gg <- gg +
+    coord_fixed() +
+    theme_void() +
+    theme(legend.title = element_text(face="bold"),
+          legend.position =  "top",
+          legend.margin = margin(t = 0,r = 1,l = 1,0))
+
+  if(doPlot){
+    print(gg)
+  }
+
+  return(invisible(gg))
+}
+
+
 
 
 # PLFsmall <- function(g){
@@ -5201,7 +5438,7 @@ fd_psd <- function(y,
   # General guideline: fit over 25% frequencies
   # If signal is continuous (sampled) consider Wijnants et al. (2013) log-log fitting procedure
   nr <- switch(fitMethod,
-    "lowest25" = which.min(powspec$size>=0.25),
+    "lowest25" = which(powspec$size>=0.25)[1],
     "Hurvich-Deo" = fractal::HDEst(NFT = length(powspec$bulk), sdf = as.vector(powspec$bulk)),
     "Wijnants" = 50
   )
@@ -7895,28 +8132,28 @@ plotRED_mif <- function(mif.OUT = NULL, lags = 0:max(round(NROW(y)/4),10), nbins
   }
 
 
-  # mifunMIF  <- mif(y = y, lags = lags, nbins = nbins)
+   #mifunMIF  <- mif(y = y, lags = lags, nbins = nbins)
   # #ldply(seq_along(df.acf$acf), function(cc){pacf_fisherZ(r=df.acf$acf[cc],n=dfN[cc],lag=df.acf$lag[cc],type="acf")})
-  # mifunPMIF <- mif(y = cbind(y,y[,1],y[,1]), lags = lags, nbins = nbins)
+   #mifunPMIF <- mif(y = cbind(y,y[,1],y[,1]), lags = lags, nbins = nbins)
   # #ldply(seq_along(df.pacf$acf), function(cc){pacf_fisherZ(r=df.pacf$acf[cc],n=dfN[cc],lag=df.pacf$lag[cc],type="pacf")})
   # mif.OUT   <- rbind(mifunMIF,mifunPMIF)
 
   groupColours <-  scales::brewer_pal(palette="RdBu")(11)
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
 
-  mifun_long <- data.frame(lag =  c(as.numeric(names(mif.OUT)),as.numeric(names(mifunPMIF))),
-                           mi = c(mifunMIF,mifunPMIF),
-                           type = c(rep(attributes(mifunMIF)$miType,NROW(mifunMIF)),rep(attributes(mifunPMIF)$miType,NROW(mifunPMIF))))
+  mifun_long <- data.frame(lag =  c(as.numeric(names(mif.OUT))), #,as.numeric(names(mifunPMIF))),
+                           mi = c(mif.OUT),
+                           type = c(rep(attributes(mif.OUT)$miType,NROW(mif.OUT)))) #,rep(attributes(mifunPMIF)$miType,NROW(mifunPMIF))))
 
   g <- ggplot2::ggplot(mifun_long,ggplot2::aes_(x=~lag,y=~mi)) +
     ggplot2::geom_hline(yintercept = 0, colour="grey",size=1) +
-    ggplot2::geom_line(data = data.frame(x=c(0,mifun_long$lag[1]),y=c(1,mifun_long$mi[1])),ggplot2::aes_(x=~x,y=~y),colour="grey50")
+  #  ggplot2::geom_line(data = data.frame(x=c(0,mifun_long$lag[1]),y=c(1,mifun_long$mi[1])),ggplot2::aes_(x=~x,y=~y),colour="grey50")
 
-  if(length(lags)<=50){
-   g <- g + ggplot2::geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21)
-  }
+  # if(length(lags)<=50){
+  #  g <- g + ggplot2::geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21)
+  # }
     #geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
-   g <- g +  ggplot2::geom_path(colour="grey50") +
+    ggplot2::geom_path(colour="grey50") +
     ggplot2::geom_point(pch=21, cex=(1 + .01*(NROW(y)/nbins))) +
     ggplot2::facet_grid(type ~.) +
     # scale_fill_manual(bquote(p < .(siglevel)),values = cols,
@@ -7925,8 +8162,8 @@ plotRED_mif <- function(mif.OUT = NULL, lags = 0:max(round(NROW(y)/4),10), nbins
     # scale_colour_manual(bquote(p < .(siglevel)),values = cols,
     #                     labels =  list("yes"= expression(rho != 0),
     #                                    "no" = expression(rho == 0))) +
-    ggplot2::scale_x_continuous(limits = c(0,length(lags)),expand = c(0.01,0), breaks = seq(0,length(lags),by = round(length(lags)/10))) +
-    ggplot2::scale_y_continuous(limits = c(-1,1)) +
+    ggplot2::scale_x_continuous(limits = c(min(lags),max(lags)),expand = c(0.01,0), breaks = seq(min(lags),max(lags), by = round(length(lags)/10))) +
+    ggplot2::scale_y_continuous(limits = c(min(mifun_long$mi,na.rm = TRUE),max(mifun_long$mi,na.rm = TRUE))) +
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.minor.y = ggplot2::element_blank(), panel.grid.minor.x = ggplot2::element_blank())
 
@@ -7936,7 +8173,7 @@ plotRED_mif <- function(mif.OUT = NULL, lags = 0:max(round(NROW(y)/4),10), nbins
   }
 
   if(returnMIFun){
-    return(list(mifun=mifun,
+    return(list(mifun=mif.OUT,
                 plot=invisible(g)))
   } else {
     return(invisible(g))

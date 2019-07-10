@@ -4,18 +4,14 @@
 \alias{crqa_parameters}
 \title{Find optimal (C)RQA parameters}
 \usage{
-crqa_parameters(y, emLag = NULL, maxLag = floor(length(y)/(maxDim +
-  1)), lagMethods = c("first.minimum", "global.minimum", "max.lag"),
-  estimateDimensions = "preferSmallestInLargestHood", maxDim = 10,
-  nnSizes = c(2, 5, 10, 15), nnRadius = 5, nnThres = 10,
-  theiler = 0, diagPlot = TRUE, silent = TRUE, ...)
+crqa_parameters(y, lagMethods = c("first.minimum", "global.minimum",
+  "max.lag"), estimateDimensions = "preferSmallestInLargestHood",
+  maxDim = 10, emLag = NULL, maxLag = floor(length(y)/(maxDim + 1)),
+  nnSizes = 2, nnRadius = 5, nnThres = 10, theiler = 0,
+  doPlot = TRUE, silent = TRUE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series}
-
-\item{emLag}{Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If \code{NULL} the lags based on the mutual information in \code{lagMethods} will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = \code{NULL})}
-
-\item{maxLag}{Maximum embedding lag to consider. Default value is: \code{floor(length(y)/(maxDim+1))}}
 
 \item{lagMethods}{A character vector with one or more of the following strings: \code{"first.minimum","global.minimum","max.lag"}. If \code{emLag} represents a valid lag this value will  be reported as "user.lag" (default = \code{c("first.minimum","global.minimum","max.lag")})}
 
@@ -29,7 +25,11 @@ crqa_parameters(y, emLag = NULL, maxLag = floor(length(y)/(maxDim +
 
 \item{maxDim}{Maximum number of embedding dimensions to consider (default = \code{10})}
 
-\item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{c(2,5,10,15)})}
+\item{emLag}{Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If \code{NULL} the lags based on the mutual information in \code{lagMethods} will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = \code{NULL})}
+
+\item{maxLag}{Maximum embedding lag to consider. Default value is: \code{floor(length(y)/(maxDim+1))}}
+
+\item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{2})}
 
 \item{nnRadius}{If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{5})}
 
@@ -37,7 +37,7 @@ crqa_parameters(y, emLag = NULL, maxLag = floor(length(y)/(maxDim +
 
 \item{theiler}{Theiler window on distance matrix (default = \code{0})}
 
-\item{diagPlot}{Produce a diagnostic plot the results (default = \code{TRUE})}
+\item{doPlot}{Produce a diagnostic plot the results (default = \code{TRUE})}
 
 \item{silent}{Silent-ish mode}
 

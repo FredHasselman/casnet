@@ -16,7 +16,7 @@ layout_as_spiral(g, type = c("Archimedean", "Bernoulli", "Fermat",
 
 \item{a}{Parameter controlling the distance between spiral arms, however, the effect will vary for different spiral types (default = \code{0.5})}
 
-\item{b}{Parameter controlling where the spiral originates. A value of 1 will generally place the origin in the center. The default value places the origin right of the center, however, the effect will vary for different spiral types (default = \code{0.1})}
+\item{b}{Parameter controlling where the spiral originates. A value of 1 will generally place the origin in the center. The default \code{NULL} will choose a value based on the different spiral types (default = \code{NULL})}
 
 \item{rev}{If \code{TRUE} the vertex with the highest index will be placed in the centre of the spiral (default = \code{FALSE})}
 }

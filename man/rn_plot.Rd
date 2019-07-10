@@ -26,10 +26,6 @@ rn_plot(RN, plotDimensions = FALSE, plotMeasures = FALSE,
 
 \item{title}{A title for the plot}
 
-\item{xlab}{An x-axis label}
-
-\item{ylab}{An y-axis label}
-
 \item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link[=rp]{rp()}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.}
 
 \item{returnOnlyObject}{Return the ggplot object only, do not draw the plot (default = \code{TRUE})}
