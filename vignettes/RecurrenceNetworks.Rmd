@@ -12,8 +12,181 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(casnet)
+library(igraph)
 ```
 
-```{r setup}
-library(casnet)
+# *Recurrence Networks*
+
+A recurrence network is a representation of a recurrence matrix as a graph (a network). The nodes in the network represent time points, and if a value at any point in time will recur at some later point in time, an edge is drawn between the time points.
+
+
+## Recurrence Networks {.tabset .tabset-fade .tabset-pills}
+
+Recurrence networks are graphs created from a recurrence matrix. This means the nodes of the graph represent time points and the connections between nodes represent a recurrence relation betwen the values observed at those time points. That is, often the matrix represents recurrences in a reconstructed state space, the values are coordinates and therefore we would say the edges of a recurrence network represent a temporal relation between recurring states. The ultimate reference for learning everything about recurrence networks is:
+
+> [Zou, Y., Donner, R. V., Marwan, N., Donges, J. F., & Kurths, J. (2018). Complex network approaches to nonlinear time series analysis. Physics Reports](https://www.sciencedirect.com/science/article/abs/pii/S037015731830276X?via%3Dihub)
+
+
+Package `casnet` has some functions to create recurrence networks, they are similar to the functions used for CRQA:
+* `rn()` is very similar to `rp()`, it will create a matrix based on embedding parameters. One difference is the option to create a weighted matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value is retained and acts as an edge-weight
+* `rn_plot()` will produce the same as `rp_plot()`
+
+We can turn the recurrence matrix into an adjecency matrix, an `igraph` object. This means we can use all the `igraph` functions to calculate network measures.
+
+```{r}
+library(igraph)
+library(qgraph)
+# Reload the data we used earlier
+series <- rio::import("https://github.com/complexity-methods/CSA-assignments/raw/master/assignment_data/BasicTSA_arma/series.xlsx")
+
+# Lets use a shorter dataset to speed things up
+series <- series[1:500,]
 ```
+
+We'll analyse the three time series as a recurrence network:
+* Compare the results, look at the SMall World Index and other measures
+   - Remember: TS_1 was white noise, TS_2 was a sine with added noise, TS_3 was the logistic map in the chaotic regime.
+* Note that some of the RQA measures can be exactly calculated from the measures of the network representation.
+   - Try to understand why the Recurrence is reprented as the *degree centrality() of the network (`igraph::centr_degree()`)
+
+
+### TS 1 {-}
+
+```{r message=FALSE, warning=FALSE}
+#----------------------
+# Adjacency matrix TS_1
+#----------------------
+plot(ts(series$TS_1))
+
+arcs=6
+
+crqa_parameters(series$TS_1)
+
+# By passing emRad = NA, a radius will be calculated
+RN1 <- casnet::rn(y1 = series$TS_1, emDim = 7, emLag = 2, emRad = NA, targetValue = .01)
+casnet::rn_plot(RN1)
+
+# Get RQA measures
+rqa1 <- crqa_rp(RN1)
+knitr::kable(rqa1,digits = 2)
+
+g1  <- igraph::graph_from_adjacency_matrix(RN1, mode="undirected", diag = FALSE)
+igraph::V(g1)$size <- igraph::degree(g1)
+g1r <- casnet::make_spiral_graph(g1,arcs = arcs,type = "Euler" ,epochColours = getColours(arcs))
+
+
+# Network measures
+igraph::average.path.length(g1)
+igraph::transitivity(g1)
+qgraph::smallworldness(g1)
+
+recs1 <- igraph::centr_degree(g1)
+
+(RP_N <- sum(recs1$res))
+rqa1$RP_N
+
+RP_N / recs1$theoretical_max
+rqa1$RR
+```
+
+### TS 2 {-}
+
+```{r message=FALSE, warning=FALSE}
+#----------------------
+# Adjacency matrix TS_2
+#----------------------
+plot(ts(series$TS_2))
+
+crqa_parameters(series$TS_2)
+
+RN2 <- rn(y1 = series$TS_2, emDim = 7, emLag = 2, emRad = NA,  targetValue = 0.01)
+rn_plot(RN2)
+
+# Get RQA measures
+rqa2 <- crqa_rp(RN2)
+knitr::kable(rqa2,digits = 2)
+
+g2 <- graph_from_adjacency_matrix(RN2, mode="undirected", diag = FALSE)
+V(g2)$size <- degree(g2)
+g2r <- casnet::make_spiral_graph(g2,arcs = arcs,type = "Euler" ,epochColours = getColours(arcs))
+
+# Network measures
+average.path.length(g2)
+transitivity(g2)
+smallworldness(g2)
+
+recs2 <- centr_degree(g2)
+
+(RP_N <- sum(recs2$res))
+rqa2$RP_N
+
+RP_N / recs2$theoretical_max
+rqa2$RR
+```
+
+### TS 3 {-}
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+#----------------------
+# Adjacency matrix TS_3
+#----------------------
+plot(ts(series$TS_3))
+
+crqa_parameters(series$TS_3)
+
+RN3 <- rn(y1 = series$TS_3, emDim = 7, emLag = 8, emRad = NA, targetValue = 0.01)
+rn_plot(RN3)
+
+# Get RQA measures
+rqa3 <- crqa_rp(RN3)
+knitr::kable(rqa3,digits = 2)
+
+g3 <- graph_from_adjacency_matrix(RN3, mode="undirected", diag = FALSE)
+V(g3)$size <- degree(g3)
+g3r <- casnet::make_spiral_graph(g3,arcs = arcs,type = "Euler" ,epochColours = getColours(arcs))
+
+
+average.path.length(g3)
+transitivity(g3)
+smallworldness(g3)
+
+recs3 <- centr_degree(g3)
+
+(RP_N <- sum(recs3$res))
+rqa3$RP_N
+
+RP_N / recs3$theoretical_max
+rqa3$RR
+```
+
+
+## Multiplex Recurrence Networks {.tabset .tabset-fade .tabset-pills}
+
+
+Consider the three time series to be part of a multi-layer recurrence network.
+Common properties of the multiplex network are multi-layer mutual information and edge overlap.
+
+```{r}
+# Inter-layer Mutual Information
+(interlayer_mi12 <- mi_interlayer(g1,g2))
+(interlayer_mi13 <- mi_interlayer(g1,g3))
+(interlayer_mi23 <- mi_interlayer(g2,g3))
+
+# mean I-L MI  
+mean(c(interlayer_mi12,interlayer_mi13,interlayer_mi23))
+
+# Edge Overlap
+(edge_overlap12 <- length(E(g1 %s% g2)) / (length(E(g1))+length(E(g2))))
+(edge_overlap13 <- length(E(g1 %s% g3)) / (length(E(g1))+length(E(g3))))
+(edge_overlap23 <- length(E(g2 %s% g3)) / (length(E(g2))+length(E(g3))))
+
+# mean EO 
+mean(c(edge_overlap12,interlayer_mi13,interlayer_mi23))
+
+# Overall Edge Overlap
+(eo_all  <- length(E(intersection(g1,g2,g3))))
+#(eo_mean <- eo_all / (edge_overlap12+edge_overlap13+edge_overlap23))
+```
+  
+  

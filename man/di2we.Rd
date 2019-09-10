@@ -14,7 +14,7 @@ di2we(distmat, emRad, convMat = FALSE)
 \item{convMat}{convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix:Matrix]{Matrix::Matrix()}} to \code{\link[base:matrix]{base::matrix()}} (or vice versa)}
 }
 \value{
-A matrix with 0s and leaves the values < threshold distance value
+A matrix with 0s and values < threshold distance value
 }
 \description{
 Distance matrix to weighted matrix based on threshold value

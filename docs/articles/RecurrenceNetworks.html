@@ -6,9 +6,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recurrence Networks • casnet</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Recurrence Networks">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
@@ -39,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -74,7 +81,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/FredHasselman/casnet">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -87,6 +94,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -100,13 +108,481 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(casnet)</a></code></pre></div>
+<div id="recurrence-networks" class="section level1">
+<h1 class="hasAnchor">
+<a href="#recurrence-networks" class="anchor"></a><em>Recurrence Networks</em>
+</h1>
+<p>A recurrence network is a representation of a recurrence matrix as a graph (a network). The nodes in the network represent time points, and if a value at any point in time will recur at some later point in time, an edge is drawn between the time points.</p>
+<div id="recurrence-networks-1" class="section level2 tabset tabset-fade tabset-pills">
+<h2 class="hasAnchor">
+<a href="#recurrence-networks-1" class="anchor"></a>Recurrence Networks</h2>
+<p>Recurrence networks are graphs created from a recurrence matrix. This means the nodes of the graph represent time points and the connections between nodes represent a recurrence relation betwen the values observed at those time points. That is, often the matrix represents recurrences in a reconstructed state space, the values are coordinates and therefore we would say the edges of a recurrence network represent a temporal relation between recurring states. The ultimate reference for learning everything about recurrence networks is:</p>
+<blockquote>
+<p><a href="https://www.sciencedirect.com/science/article/abs/pii/S037015731830276X?via%3Dihub">Zou, Y., Donner, R. V., Marwan, N., Donges, J. F., &amp; Kurths, J. (2018). Complex network approaches to nonlinear time series analysis. Physics Reports</a></p>
+</blockquote>
+<p>Package <code>casnet</code> has some functions to create recurrence networks, they are similar to the functions used for CRQA: * <code><a href="../reference/rn.html">rn()</a></code> is very similar to <code><a href="../reference/rp.html">rp()</a></code>, it will create a matrix based on embedding parameters. One difference is the option to create a weighted matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value is retained and acts as an edge-weight * <code><a href="../reference/rn_plot.html">rn_plot()</a></code> will produce the same as <code><a href="../reference/rp_plot.html">rp_plot()</a></code></p>
+<p>We can turn the recurrence matrix into an adjecency matrix, an <code>igraph</code> object. This means we can use all the <code>igraph</code> functions to calculate network measures.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(igraph)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(qgraph)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; Registered S3 methods overwritten by 'huge':</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt;   method    from   </span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt;   plot.sim  BDgraph</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt;   print.sim BDgraph</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co"># Reload the data we used earlier</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">series &lt;-<span class="st"> </span>rio<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="st">"https://github.com/complexity-methods/CSA-assignments/raw/master/assignment_data/BasicTSA_arma/series.xlsx"</span>)</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co"># Lets use a shorter dataset to speed things up</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11">series &lt;-<span class="st"> </span>series[<span class="dv">1</span><span class="op">:</span><span class="dv">500</span>,]</a></code></pre></div>
+<p>We’ll analyse the three time series as a recurrence network: * Compare the results, look at the SMall World Index and other measures - Remember: TS_1 was white noise, TS_2 was a sine with added noise, TS_3 was the logistic map in the chaotic regime. * Note that some of the RQA measures can be exactly calculated from the measures of the network representation. - Try to understand why the Recurrence is reprented as the *degree centrality() of the network (<code><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">igraph::centr_degree()</a></code>)</p>
+<div id="ts-1" class="section level3 unnumbered">
+<h3 class="hasAnchor">
+<a href="#ts-1" class="anchor"></a>TS 1</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co">#----------------------</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co"># Adjacency matrix TS_1</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#----------------------</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(series<span class="op">$</span>TS_<span class="dv">1</span>))</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">arcs=<span class="dv">6</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="kw"><a href="../reference/crqa_parameters.html">crqa_parameters</a></span>(series<span class="op">$</span>TS_<span class="dv">1</span>)</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-2.png" width="700"></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co"># By passing emRad = NA, a radius will be calculated</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">RN1 &lt;-<span class="st"> </span>casnet<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/casnet/man/rn.html">rn</a></span>(<span class="dt">y1 =</span> series<span class="op">$</span>TS_<span class="dv">1</span>, <span class="dt">emDim =</span> <span class="dv">7</span>, <span class="dt">emLag =</span> <span class="dv">2</span>, <span class="dt">emRad =</span> <span class="ot">NA</span>, <span class="dt">targetValue =</span> <span class="fl">.01</span>)</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Searching for a radius that will yield 0.01 for RR</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8">casnet<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/casnet/man/rn_plot.html">rn_plot</a></span>(RN1)</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-3.png" width="700"></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co"># Get RQA measures</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">rqa1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_rp.html">crqa_rp</a></span>(RN1)</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">knitr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(rqa1,<span class="dt">digits =</span> <span class="dv">2</span>)</a></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">emRad</th>
+<th align="right">RP_N</th>
+<th align="right">RR</th>
+<th align="right">SING_N</th>
+<th align="right">SING_rate</th>
+<th align="right">DIV_dl</th>
+<th align="right">REP_av</th>
+<th align="right">ANI</th>
+<th align="right">N_dl</th>
+<th align="right">N_dlp</th>
+<th align="right">DET</th>
+<th align="right">MEAN_dl</th>
+<th align="right">MAX_dl</th>
+<th align="right">ENT_dl</th>
+<th align="right">ENTrel_dl</th>
+<th align="right">CoV_dl</th>
+<th align="right">N_vl</th>
+<th align="right">N_vlp</th>
+<th align="right">LAM_vl</th>
+<th align="right">TT_vl</th>
+<th align="right">MAX_vl</th>
+<th align="right">ENT_vl</th>
+<th align="right">ENTrel_vl</th>
+<th align="right">CoV_vl</th>
+<th align="right">REP_vl</th>
+<th align="right">N_hlp</th>
+<th align="right">N_hl</th>
+<th align="right">LAM_hl</th>
+<th align="right">TT_hl</th>
+<th align="right">MAX_hl</th>
+<th align="right">ENT_hl</th>
+<th align="right">ENTrel_hl</th>
+<th align="right">CoV_hl</th>
+<th align="right">REP_hl</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="right">0.55</td>
+<td align="right">2368</td>
+<td align="right">0.01</td>
+<td align="right">2348</td>
+<td align="right">0.99</td>
+<td align="right">0.33</td>
+<td align="right">4.65</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">20</td>
+<td align="right">0.01</td>
+<td align="right">2.5</td>
+<td align="right">3</td>
+<td align="right">0.69</td>
+<td align="right">0.11</td>
+<td align="right">0.21</td>
+<td align="right">45</td>
+<td align="right">93</td>
+<td align="right">0.04</td>
+<td align="right">2.07</td>
+<td align="right">3</td>
+<td align="right">0.24</td>
+<td align="right">0.04</td>
+<td align="right">0.12</td>
+<td align="right">4.65</td>
+<td align="right">93</td>
+<td align="right">45</td>
+<td align="right">0.04</td>
+<td align="right">2.07</td>
+<td align="right">3</td>
+<td align="right">0.24</td>
+<td align="right">0.04</td>
+<td align="right">0.12</td>
+<td align="right">4.65</td>
+</tr></tbody>
+</table>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">g1  &lt;-<span class="st"> </span>igraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(RN1, <span class="dt">mode=</span><span class="st">"undirected"</span>, <span class="dt">diag =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">igraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(g1)<span class="op">$</span>size &lt;-<span class="st"> </span>igraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(g1)</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">g1r &lt;-<span class="st"> </span>casnet<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/casnet/man/make_spiral_graph.html">make_spiral_graph</a></span>(g1,<span class="dt">arcs =</span> arcs,<span class="dt">type =</span> <span class="st">"Euler"</span> ,<span class="dt">epochColours =</span> <span class="kw"><a href="../reference/getColours.html">getColours</a></span>(arcs))</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-4.png" width="700"></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co"># Network measures</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">igraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(g1)</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; [1] 4.242546</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">igraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(g1)</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; [1] 0.3158716</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">qgraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(g1)</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;       smallworldness         trans_target averagelength_target </span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;           6.59815446           0.31587164         215.96216865 </span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt;           0.04089653           0.03252385           0.04943625 </span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt;         184.49134321         181.75135126         194.25320033</span></a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16">recs1 &lt;-<span class="st"> </span>igraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(g1)</a>
+<a class="sourceLine" id="cb7-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb7-18" data-line-number="18">(RP_N &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(recs1<span class="op">$</span>res))</a>
+<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; [1] 2368</span></a>
+<a class="sourceLine" id="cb7-20" data-line-number="20">rqa1<span class="op">$</span>RP_N</a>
+<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#&gt; [1] 2368</span></a>
+<a class="sourceLine" id="cb7-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb7-23" data-line-number="23">RP_N <span class="op">/</span><span class="st"> </span>recs1<span class="op">$</span>theoretical_max</a>
+<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#&gt; [1] 0.01000499</span></a>
+<a class="sourceLine" id="cb7-25" data-line-number="25">rqa1<span class="op">$</span>RR</a>
+<a class="sourceLine" id="cb7-26" data-line-number="26"><span class="co">#&gt; [1] 0.01000499</span></a></code></pre></div>
+</div>
+<div id="ts-2" class="section level3 unnumbered">
+<h3 class="hasAnchor">
+<a href="#ts-2" class="anchor"></a>TS 2</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co">#----------------------</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># Adjacency matrix TS_2</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#----------------------</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(series<span class="op">$</span>TS_<span class="dv">2</span>))</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw"><a href="../reference/crqa_parameters.html">crqa_parameters</a></span>(series<span class="op">$</span>TS_<span class="dv">2</span>)</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-2.png" width="700"></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">RN2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rn.html">rn</a></span>(<span class="dt">y1 =</span> series<span class="op">$</span>TS_<span class="dv">2</span>, <span class="dt">emDim =</span> <span class="dv">7</span>, <span class="dt">emLag =</span> <span class="dv">2</span>, <span class="dt">emRad =</span> <span class="ot">NA</span>,  <span class="dt">targetValue =</span> <span class="fl">0.01</span>)</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses</span></a>
+<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; Searching for a radius that will yield 0.01 for RR</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="kw"><a href="../reference/rn_plot.html">rn_plot</a></span>(RN2)</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-3.png" width="700"></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co"># Get RQA measures</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">rqa2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_rp.html">crqa_rp</a></span>(RN2)</a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">knitr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(rqa2,<span class="dt">digits =</span> <span class="dv">2</span>)</a></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">emRad</th>
+<th align="right">RP_N</th>
+<th align="right">RR</th>
+<th align="right">SING_N</th>
+<th align="right">SING_rate</th>
+<th align="right">DIV_dl</th>
+<th align="right">REP_av</th>
+<th align="right">ANI</th>
+<th align="right">N_dl</th>
+<th align="right">N_dlp</th>
+<th align="right">DET</th>
+<th align="right">MEAN_dl</th>
+<th align="right">MAX_dl</th>
+<th align="right">ENT_dl</th>
+<th align="right">ENTrel_dl</th>
+<th align="right">CoV_dl</th>
+<th align="right">N_vl</th>
+<th align="right">N_vlp</th>
+<th align="right">LAM_vl</th>
+<th align="right">TT_vl</th>
+<th align="right">MAX_vl</th>
+<th align="right">ENT_vl</th>
+<th align="right">ENTrel_vl</th>
+<th align="right">CoV_vl</th>
+<th align="right">REP_vl</th>
+<th align="right">N_hlp</th>
+<th align="right">N_hl</th>
+<th align="right">LAM_hl</th>
+<th align="right">TT_hl</th>
+<th align="right">MAX_hl</th>
+<th align="right">ENT_hl</th>
+<th align="right">ENTrel_hl</th>
+<th align="right">CoV_hl</th>
+<th align="right">REP_hl</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="right">0.32</td>
+<td align="right">2368</td>
+<td align="right">0.01</td>
+<td align="right">2270</td>
+<td align="right">0.96</td>
+<td align="right">0.14</td>
+<td align="right">1.99</td>
+<td align="right">1</td>
+<td align="right">28</td>
+<td align="right">98</td>
+<td align="right">0.04</td>
+<td align="right">3.5</td>
+<td align="right">7</td>
+<td align="right">1.23</td>
+<td align="right">0.2</td>
+<td align="right">0.57</td>
+<td align="right">93</td>
+<td align="right">195</td>
+<td align="right">0.08</td>
+<td align="right">2.1</td>
+<td align="right">4</td>
+<td align="right">0.33</td>
+<td align="right">0.05</td>
+<td align="right">0.16</td>
+<td align="right">1.99</td>
+<td align="right">195</td>
+<td align="right">93</td>
+<td align="right">0.08</td>
+<td align="right">2.1</td>
+<td align="right">4</td>
+<td align="right">0.33</td>
+<td align="right">0.05</td>
+<td align="right">0.16</td>
+<td align="right">1.99</td>
+</tr></tbody>
+</table>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">g2 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(RN2, <span class="dt">mode=</span><span class="st">"undirected"</span>, <span class="dt">diag =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(g2)<span class="op">$</span>size &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(g2)</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">g2r &lt;-<span class="st"> </span>casnet<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/casnet/man/make_spiral_graph.html">make_spiral_graph</a></span>(g2,<span class="dt">arcs =</span> arcs,<span class="dt">type =</span> <span class="st">"Euler"</span> ,<span class="dt">epochColours =</span> <span class="kw"><a href="../reference/getColours.html">getColours</a></span>(arcs))</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-4.png" width="700"></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="co"># Network measures</span></a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(g2)</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; [1] 9.696495</span></a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(g2)</a>
+<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt; [1] 0.3422773</span></a>
+<a class="sourceLine" id="cb13-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(g2)</a>
+<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt;       smallworldness         trans_target averagelength_target </span></a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt;          11.06548841           0.34227726          77.69775479 </span></a>
+<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span></a>
+<a class="sourceLine" id="cb13-11" data-line-number="11"><span class="co">#&gt;           0.02315549           0.01651187           0.03130375 </span></a>
+<a class="sourceLine" id="cb13-12" data-line-number="12"><span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span></a>
+<a class="sourceLine" id="cb13-13" data-line-number="13"><span class="co">#&gt;          58.16408797          55.86622257          67.07671678</span></a>
+<a class="sourceLine" id="cb13-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb13-15" data-line-number="15">recs2 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(g2)</a>
+<a class="sourceLine" id="cb13-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb13-17" data-line-number="17">(RP_N &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(recs2<span class="op">$</span>res))</a>
+<a class="sourceLine" id="cb13-18" data-line-number="18"><span class="co">#&gt; [1] 2368</span></a>
+<a class="sourceLine" id="cb13-19" data-line-number="19">rqa2<span class="op">$</span>RP_N</a>
+<a class="sourceLine" id="cb13-20" data-line-number="20"><span class="co">#&gt; [1] 2368</span></a>
+<a class="sourceLine" id="cb13-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb13-22" data-line-number="22">RP_N <span class="op">/</span><span class="st"> </span>recs2<span class="op">$</span>theoretical_max</a>
+<a class="sourceLine" id="cb13-23" data-line-number="23"><span class="co">#&gt; [1] 0.01000499</span></a>
+<a class="sourceLine" id="cb13-24" data-line-number="24">rqa2<span class="op">$</span>RR</a>
+<a class="sourceLine" id="cb13-25" data-line-number="25"><span class="co">#&gt; [1] 0.01000499</span></a></code></pre></div>
+</div>
+<div id="ts-3" class="section level3 unnumbered">
+<h3 class="hasAnchor">
+<a href="#ts-3" class="anchor"></a>TS 3</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co">#----------------------</span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="co"># Adjacency matrix TS_3</span></a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="co">#----------------------</span></a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(series<span class="op">$</span>TS_<span class="dv">3</span>))</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="kw"><a href="../reference/crqa_parameters.html">crqa_parameters</a></span>(series<span class="op">$</span>TS_<span class="dv">3</span>)</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">RN3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rn.html">rn</a></span>(<span class="dt">y1 =</span> series<span class="op">$</span>TS_<span class="dv">3</span>, <span class="dt">emDim =</span> <span class="dv">7</span>, <span class="dt">emLag =</span> <span class="dv">8</span>, <span class="dt">emRad =</span> <span class="ot">NA</span>, <span class="dt">targetValue =</span> <span class="fl">0.01</span>)</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co">#&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses</span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="co">#&gt; Searching for a radius that will yield 0.01 for RR</span></a>
+<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="kw"><a href="../reference/rn_plot.html">rn_plot</a></span>(RN3)</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-3.png" width="700"></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="co"># Get RQA measures</span></a>
+<a class="sourceLine" id="cb17-3" data-line-number="3">rqa3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_rp.html">crqa_rp</a></span>(RN3)</a>
+<a class="sourceLine" id="cb17-4" data-line-number="4">knitr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(rqa3,<span class="dt">digits =</span> <span class="dv">2</span>)</a></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">emRad</th>
+<th align="right">RP_N</th>
+<th align="right">RR</th>
+<th align="right">SING_N</th>
+<th align="right">SING_rate</th>
+<th align="right">DIV_dl</th>
+<th align="right">REP_av</th>
+<th align="right">ANI</th>
+<th align="right">N_dl</th>
+<th align="right">N_dlp</th>
+<th align="right">DET</th>
+<th align="right">MEAN_dl</th>
+<th align="right">MAX_dl</th>
+<th align="right">ENT_dl</th>
+<th align="right">ENTrel_dl</th>
+<th align="right">CoV_dl</th>
+<th align="right">N_vl</th>
+<th align="right">N_vlp</th>
+<th align="right">LAM_vl</th>
+<th align="right">TT_vl</th>
+<th align="right">MAX_vl</th>
+<th align="right">ENT_vl</th>
+<th align="right">ENTrel_vl</th>
+<th align="right">CoV_vl</th>
+<th align="right">REP_vl</th>
+<th align="right">N_hlp</th>
+<th align="right">N_hl</th>
+<th align="right">LAM_hl</th>
+<th align="right">TT_hl</th>
+<th align="right">MAX_hl</th>
+<th align="right">ENT_hl</th>
+<th align="right">ENTrel_hl</th>
+<th align="right">CoV_hl</th>
+<th align="right">REP_hl</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="right">0.57</td>
+<td align="right">2030</td>
+<td align="right">0.01</td>
+<td align="right">1852</td>
+<td align="right">0.91</td>
+<td align="right">0.25</td>
+<td align="right">0.09</td>
+<td align="right">1</td>
+<td align="right">84</td>
+<td align="right">178</td>
+<td align="right">0.09</td>
+<td align="right">2.12</td>
+<td align="right">4</td>
+<td align="right">0.37</td>
+<td align="right">0.06</td>
+<td align="right">0.19</td>
+<td align="right">8</td>
+<td align="right">16</td>
+<td align="right">0.01</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.09</td>
+<td align="right">16</td>
+<td align="right">8</td>
+<td align="right">0.01</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.09</td>
+</tr></tbody>
+</table>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">g3 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(RN3, <span class="dt">mode=</span><span class="st">"undirected"</span>, <span class="dt">diag =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(g3)<span class="op">$</span>size &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(g3)</a>
+<a class="sourceLine" id="cb18-4" data-line-number="4">g3r &lt;-<span class="st"> </span>casnet<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/casnet/man/make_spiral_graph.html">make_spiral_graph</a></span>(g3,<span class="dt">arcs =</span> arcs,<span class="dt">type =</span> <span class="st">"Euler"</span> ,<span class="dt">epochColours =</span> <span class="kw"><a href="../reference/getColours.html">getColours</a></span>(arcs))</a></code></pre></div>
+<p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-4.png" width="700"></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(g3)</a>
+<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co">#&gt; [1] 6.094221</span></a>
+<a class="sourceLine" id="cb19-5" data-line-number="5"><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(g3)</a>
+<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; [1] 0.3300908</span></a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(g3)</a>
+<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt;       smallworldness         trans_target averagelength_target </span></a>
+<a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt;         29.108832776          0.330090791         13.959812762 </span></a>
+<a class="sourceLine" id="cb19-10" data-line-number="10"><span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span></a>
+<a class="sourceLine" id="cb19-11" data-line-number="11"><span class="co">#&gt;          0.010292477          0.003891051          0.016861219 </span></a>
+<a class="sourceLine" id="cb19-12" data-line-number="12"><span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span></a>
+<a class="sourceLine" id="cb19-13" data-line-number="13"><span class="co">#&gt;         12.670416576         12.060622666         19.881875634</span></a>
+<a class="sourceLine" id="cb19-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb19-15" data-line-number="15">recs3 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(g3)</a>
+<a class="sourceLine" id="cb19-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb19-17" data-line-number="17">(RP_N &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(recs3<span class="op">$</span>res))</a>
+<a class="sourceLine" id="cb19-18" data-line-number="18"><span class="co">#&gt; [1] 2030</span></a>
+<a class="sourceLine" id="cb19-19" data-line-number="19">rqa3<span class="op">$</span>RP_N</a>
+<a class="sourceLine" id="cb19-20" data-line-number="20"><span class="co">#&gt; [1] 2030</span></a>
+<a class="sourceLine" id="cb19-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb19-22" data-line-number="22">RP_N <span class="op">/</span><span class="st"> </span>recs3<span class="op">$</span>theoretical_max</a>
+<a class="sourceLine" id="cb19-23" data-line-number="23"><span class="co">#&gt; [1] 0.01000246</span></a>
+<a class="sourceLine" id="cb19-24" data-line-number="24">rqa3<span class="op">$</span>RR</a>
+<a class="sourceLine" id="cb19-25" data-line-number="25"><span class="co">#&gt; [1] 0.01000246</span></a></code></pre></div>
+</div>
+</div>
+<div id="multiplex-recurrence-networks" class="section level2 tabset tabset-fade tabset-pills">
+<h2 class="hasAnchor">
+<a href="#multiplex-recurrence-networks" class="anchor"></a>Multiplex Recurrence Networks</h2>
+<p>Consider the three time series to be part of a multi-layer recurrence network. Common properties of the multiplex network are multi-layer mutual information and edge overlap.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># Inter-layer Mutual Information</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">(interlayer_mi12 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(g1,g2))</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="co">#&gt; [1] 2.20549</span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co">#&gt; attr(,"miType")</span></a>
+<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co">#&gt; [1] "inter-layer mutual information"</span></a>
+<a class="sourceLine" id="cb20-6" data-line-number="6">(interlayer_mi13 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(g1,g3))</a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co">#&gt; [1] 1.666615</span></a>
+<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="co">#&gt; attr(,"miType")</span></a>
+<a class="sourceLine" id="cb20-9" data-line-number="9"><span class="co">#&gt; [1] "inter-layer mutual information"</span></a>
+<a class="sourceLine" id="cb20-10" data-line-number="10">(interlayer_mi23 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(g2,g3))</a>
+<a class="sourceLine" id="cb20-11" data-line-number="11"><span class="co">#&gt; [1] 2.155163</span></a>
+<a class="sourceLine" id="cb20-12" data-line-number="12"><span class="co">#&gt; attr(,"miType")</span></a>
+<a class="sourceLine" id="cb20-13" data-line-number="13"><span class="co">#&gt; [1] "inter-layer mutual information"</span></a>
+<a class="sourceLine" id="cb20-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb20-15" data-line-number="15"><span class="co"># mean I-L MI  </span></a>
+<a class="sourceLine" id="cb20-16" data-line-number="16"><span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(interlayer_mi12,interlayer_mi13,interlayer_mi23))</a>
+<a class="sourceLine" id="cb20-17" data-line-number="17"><span class="co">#&gt; [1] 2.009089</span></a>
+<a class="sourceLine" id="cb20-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb20-19" data-line-number="19"><span class="co"># Edge Overlap</span></a>
+<a class="sourceLine" id="cb20-20" data-line-number="20">(edge_overlap12 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g1 <span class="op">%s%</span><span class="st"> </span>g2)) <span class="op">/</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g1))<span class="op">+</span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g2))))</a>
+<a class="sourceLine" id="cb20-21" data-line-number="21"><span class="co">#&gt; [1] 0.003800676</span></a>
+<a class="sourceLine" id="cb20-22" data-line-number="22">(edge_overlap13 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g1 <span class="op">%s%</span><span class="st"> </span>g3)) <span class="op">/</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g1))<span class="op">+</span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g3))))</a>
+<a class="sourceLine" id="cb20-23" data-line-number="23"><span class="co">#&gt; [1] 0.005457026</span></a>
+<a class="sourceLine" id="cb20-24" data-line-number="24">(edge_overlap23 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g2 <span class="op">%s%</span><span class="st"> </span>g3)) <span class="op">/</span><span class="st"> </span>(<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g2))<span class="op">+</span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(g3))))</a>
+<a class="sourceLine" id="cb20-25" data-line-number="25"><span class="co">#&gt; [1] 0.004092769</span></a>
+<a class="sourceLine" id="cb20-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb20-27" data-line-number="27"><span class="co"># mean EO </span></a>
+<a class="sourceLine" id="cb20-28" data-line-number="28"><span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(edge_overlap12,interlayer_mi13,interlayer_mi23))</a>
+<a class="sourceLine" id="cb20-29" data-line-number="29"><span class="co">#&gt; [1] 1.275193</span></a>
+<a class="sourceLine" id="cb20-30" data-line-number="30"></a>
+<a class="sourceLine" id="cb20-31" data-line-number="31"><span class="co"># Overall Edge Overlap</span></a>
+<a class="sourceLine" id="cb20-32" data-line-number="32">(eo_all  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/igraph/man/intersection.html">intersection</a></span>(g1,g2,g3))))</a>
+<a class="sourceLine" id="cb20-33" data-line-number="33"><span class="co">#&gt; [1] 0</span></a>
+<a class="sourceLine" id="cb20-34" data-line-number="34"><span class="co">#(eo_mean &lt;- eo_all / (edge_overlap12+edge_overlap13+edge_overlap23))</span></a></code></pre></div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
+        <div id="tocnav">
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+<li>
+<a href="#recurrence-networks"><em>Recurrence Networks</em></a><ul class="nav nav-pills nav-stacked">
+<li><a href="#recurrence-networks-1">Recurrence Networks</a></li>
+      <li><a href="#multiplex-recurrence-networks">Multiplex Recurrence Networks</a></li>
+      </ul>
+</li>
+      </ul>
+</div>
       </div>
 
 </div>
+
 
 
       <footer><div class="copyright">
@@ -114,12 +590,14 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

@@ -2,7 +2,9 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{dc_d}
 \alias{dc_d}
-\title{Distribution Uniformity}
+\title{Distribution Uniformity
+
+Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.}
 \usage{
 dc_d(df, win = NROW(df), scale_min, scale_max, doPlot = FALSE,
   useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA,
@@ -31,6 +33,8 @@ dc_d(df, win = NROW(df), scale_min, scale_max, doPlot = FALSE,
 a dataframe
 }
 \description{
+Distribution Uniformity
+
 Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.
 }
 \seealso{

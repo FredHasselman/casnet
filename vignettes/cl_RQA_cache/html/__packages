@@ -12,3 +12,7 @@ readr
 purrr
 stringr
 forcats
+usethis
+devtools
+igraph
+qgraph

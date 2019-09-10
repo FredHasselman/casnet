@@ -53,7 +53,7 @@ y$y3 <- cumsum(rnorm(NROW(y)))
 
 }
 \seealso{
-Other Redundancy measures (mutual information): \code{\link{mi_mat}},
-  \code{\link{mif_interlayer}}
+Other Redundancy measures (mutual information): \code{\link{mi_interlayer}},
+  \code{\link{mi_mat}}
 }
 \concept{Redundancy measures (mutual information)}

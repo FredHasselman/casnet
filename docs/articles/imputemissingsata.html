@@ -6,9 +6,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dealing with missing values in (discrete) time series • casnet</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Dealing with missing values in (discrete) time series">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
@@ -39,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -74,7 +81,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/FredHasselman/casnet">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -87,13 +94,14 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Dealing with missing values in (discrete) time series</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2019-07-10</h4>
+            <h4 class="date">2019-09-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/imputemissingsata.Rmd"><code>vignettes/imputemissingsata.Rmd</code></a></small>
       <div class="hidden name"><code>imputemissingsata.Rmd</code></div>
@@ -112,37 +120,37 @@
 <h3 class="hasAnchor">
 <a href="#data-with-missing-values" class="anchor"></a>Data with missing values</h3>
 <p>We’ll create some variables from which we artifically remove datapoints. This allows us to evaluate how well the imputation methods perform in recovering the true values.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">54321</span>)</a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="dv">54321</span>)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co"># Random normally distributed numbers</span></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">zscore &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> <span class="dv">122</span>)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">df_vars &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">zscore =</span> zscore)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">zscore &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="dt">n =</span> <span class="dv">122</span>)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">df_vars &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">zscore =</span> zscore)</a>
 <a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co"># Random discrete uniform numbers</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">df_vars<span class="op">$</span>unif_discrete &lt;-<span class="st"> </span>unif_discrete  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(df_vars),<span class="dt">min =</span> <span class="dv">0</span>,<span class="dt">max =</span> <span class="dv">6</span>))</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">df_vars<span class="op">$</span>unif_discrete[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">5</span>,<span class="dv">10</span><span class="op">:</span><span class="dv">15</span>,<span class="dv">74</span><span class="op">:</span><span class="dv">78</span>,<span class="dv">102</span>,<span class="dv">111</span>,<span class="dv">120</span>)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">df_vars<span class="op">$</span>unif_discrete &lt;-<span class="st"> </span>unif_discrete  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(df_vars),<span class="dt">min =</span> <span class="dv">0</span>,<span class="dt">max =</span> <span class="dv">6</span>))</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">df_vars<span class="op">$</span>unif_discrete[<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">5</span>,<span class="dv">10</span><span class="op">:</span><span class="dv">15</span>,<span class="dv">74</span><span class="op">:</span><span class="dv">78</span>,<span class="dv">102</span>,<span class="dv">111</span>,<span class="dv">120</span>)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
 <a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co"># Unordered catagorical </span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">df_vars<span class="op">$</span>cat_unordered &lt;-<span class="st"> </span>cat_unordered  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">factor</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(df_vars),<span class="dt">min =</span> <span class="dv">1</span>,<span class="dt">max =</span> <span class="dv">7</span>)))</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10">df_vars<span class="op">$</span>cat_unordered[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">5</span>,<span class="dv">10</span><span class="op">:</span><span class="dv">15</span>,<span class="dv">74</span><span class="op">:</span><span class="dv">78</span>,<span class="dv">102</span>,<span class="dv">111</span>,<span class="dv">120</span>)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9">df_vars<span class="op">$</span>cat_unordered &lt;-<span class="st"> </span>cat_unordered  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(df_vars),<span class="dt">min =</span> <span class="dv">1</span>,<span class="dt">max =</span> <span class="dv">7</span>)))</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10">df_vars<span class="op">$</span>cat_unordered[<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">5</span>,<span class="dv">10</span><span class="op">:</span><span class="dv">15</span>,<span class="dv">74</span><span class="op">:</span><span class="dv">78</span>,<span class="dv">102</span>,<span class="dv">111</span>,<span class="dv">120</span>)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
 <a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co"># Ordered categroical</span></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12">df_vars<span class="op">$</span>cat_ordered &lt;-<span class="st"> </span>cat_ordered &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">ordered</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Uniform">runif</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NROW</a></span>(df_vars),<span class="dt">min =</span> <span class="dv">1</span>,<span class="dt">max =</span> <span class="dv">20</span>)))</a></code></pre></div>
+<a class="sourceLine" id="cb1-12" data-line-number="12">df_vars<span class="op">$</span>cat_ordered &lt;-<span class="st"> </span>cat_ordered &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/factor.html">ordered</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(df_vars),<span class="dt">min =</span> <span class="dv">1</span>,<span class="dt">max =</span> <span class="dv">20</span>)))</a></code></pre></div>
 <p>We’ll also load the data analysed by Bastiaansen et al. (2019) and select some variables which have missing values.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># # Load data from OSF https://osf.io/tcnpd/</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co"># require(osfr)</span></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co"># manyAnalystsESM &lt;- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)</span></a>
 <a class="sourceLine" id="cb2-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co"># Or use the internal data</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(manyAnalystsESM)</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(manyAnalystsESM)</a>
 <a class="sourceLine" id="cb2-7" data-line-number="7"></a>
 <a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co"># We want to use these variables</span></a>
 <a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co"># Note: the infix function '%ci%' is from package 'invctr'</span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10">vars    &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"angry"</span><span class="op">%ci%</span>manyAnalystsESM,<span class="st">"ruminate"</span><span class="op">%ci%</span>manyAnalystsESM,<span class="st">"hours"</span><span class="op">%ci%</span>manyAnalystsESM)</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10">vars    &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"angry"</span><span class="op">%ci%</span>manyAnalystsESM,<span class="st">"ruminate"</span><span class="op">%ci%</span>manyAnalystsESM,<span class="st">"hours"</span><span class="op">%ci%</span>manyAnalystsESM)</a>
 <a class="sourceLine" id="cb2-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12">df_vars &lt;-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(df_vars,manyAnalystsESM[,vars])</a>
+<a class="sourceLine" id="cb2-12" data-line-number="12">df_vars &lt;-<span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(df_vars,manyAnalystsESM[,vars])</a>
 <a class="sourceLine" id="cb2-13" data-line-number="13"></a>
 <a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co"># Give zscore and ordered categorical gthe same NAs as variable 'angry'</span></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15">df_vars<span class="op">$</span>zscore[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(df_vars<span class="op">$</span>angry)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16">df_vars<span class="op">$</span>cat_ordered[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(df_vars<span class="op">$</span>angry)] &lt;-<span class="st"> </span><span class="ot">NA</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-15" data-line-number="15">df_vars<span class="op">$</span>zscore[<span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(df_vars<span class="op">$</span>angry)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">df_vars<span class="op">$</span>cat_ordered[<span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(df_vars<span class="op">$</span>angry)] &lt;-<span class="st"> </span><span class="ot">NA</span></a></code></pre></div>
 <p>Function <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/statsNA.html">imputeTS::statsNA()</a></code> can produce some helpful statistics on the <code>NA</code>s that might be present in your data.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(imputeTS)</a>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(imputeTS)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co"># The variable 'angry'</span></a>
 <a class="sourceLine" id="cb3-4" data-line-number="4">imputeTS<span class="op">::</span><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/statsNA.html">statsNA</a></span>(df_vars<span class="op">$</span>angry)</a></code></pre></div>
@@ -214,17 +222,17 @@
 <a href="#linear-interpolation" class="anchor"></a>Linear interpolation</h3>
 <p>One of the most straightforward inputation methods is linear interpolation. This is a relatively sensible method if there is just one time point missing. However, when several values are missing in a row, the linear interpolation might be unrealistic. Other methods that will give less plausible results for imputation of multiple missing values in a row are <em>last observation carried forward</em> and <em>next observation carried backward</em>, also available in <code>imputeTS</code> as <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.locf.html">na.locf(type = "locf")</a></code>, and <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.locf.html">na.locf(type = "nocb")</a></code> respectively.</p>
 <p>We’ll generate a data set with linear interpolation (also available are <code>spline</code> and <code>stine</code> interpolation), to compare to the more advanced multiple imputation methods discussed below.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">out.linear &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(<span class="kw">laply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(df_vars), <span class="cf">function</span>(c){</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">  y  &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(<span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="dt">x =</span> df_vars[,c], <span class="dt">keepNA =</span> <span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">  idNA &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(y)</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">  yy &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(imputeTS<span class="op">::</span><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.interpolation.html">na.interpolation</a></span>(y,<span class="dt">option =</span> <span class="st">"linear"</span>))</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">  <span class="cf">if</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/all">all</a></span>(<span class="kw">is.wholenumber</span>(y[<span class="op">!</span>idNA]))){</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">round</a></span>(yy))</a>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">out.linear &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">laply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">NCOL</a></span>(df_vars), <span class="cf">function</span>(c){</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">  y  &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="dt">x =</span> df_vars[,c], <span class="dt">keepNA =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">  idNA &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(y)</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">  yy &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(imputeTS<span class="op">::</span><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.interpolation.html">na.interpolation</a></span>(y,<span class="dt">option =</span> <span class="st">"linear"</span>))</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">  <span class="cf">if</span>(<span class="kw"><a href="https://rdrr.io/r/base/all.html">all</a></span>(<span class="kw">is.wholenumber</span>(y[<span class="op">!</span>idNA]))){</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">    <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(yy))</a>
 <a class="sourceLine" id="cb7-7" data-line-number="7">  } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">      <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/function">return</a></span>(yy)</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">      <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(yy)</a>
 <a class="sourceLine" id="cb7-9" data-line-number="9">    }</a>
 <a class="sourceLine" id="cb7-10" data-line-number="10">  }))</a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(out.linear) &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)</a></code></pre></div>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(out.linear) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(df_vars)</a></code></pre></div>
 <p>Note that we need to round the imputed values to get discrete values if the original variable was discrete.</p>
 </div>
 <div id="kalman-filter" class="section level3">
@@ -242,11 +250,11 @@
 <a class="sourceLine" id="cb9-2" data-line-number="2">lo &lt;-<span class="st"> </span><span class="dv">1</span></a>
 <a class="sourceLine" id="cb9-3" data-line-number="3">hi &lt;-<span class="st"> </span><span class="dv">20</span></a>
 <a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co"># Transform data, take care of dividsion by 0</span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">ca_t &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(((ca<span class="op">-</span>lo)<span class="op">+</span>.Machine<span class="op">$</span>double.eps)<span class="op">/</span>((hi<span class="op">-</span>ca)<span class="op">+</span>.Machine<span class="op">$</span>double.eps))</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5">ca_t &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(((ca<span class="op">-</span>lo)<span class="op">+</span>.Machine<span class="op">$</span>double.eps)<span class="op">/</span>((hi<span class="op">-</span>ca)<span class="op">+</span>.Machine<span class="op">$</span>double.eps))</a>
 <a class="sourceLine" id="cb9-6" data-line-number="6">imputations &lt;-<span class="st"> </span>imputeTS<span class="op">::</span><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.kalman.html">na.kalman</a></span>(ca_t, <span class="dt">model =</span> <span class="st">"auto.arima"</span>)</a>
 <a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co"># Plot the result</span></a>
 <a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co"># Back-transform the imputed forecasts </span></a>
-<a class="sourceLine" id="cb9-9" data-line-number="9">imputationsBack &lt;-<span class="st"> </span>(hi<span class="op">-</span>lo)<span class="op">*</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(imputations)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(imputations)) <span class="op">+</span><span class="st"> </span>lo</a>
+<a class="sourceLine" id="cb9-9" data-line-number="9">imputationsBack &lt;-<span class="st"> </span>(hi<span class="op">-</span>lo)<span class="op">*</span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(imputations)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(imputations)) <span class="op">+</span><span class="st"> </span>lo</a>
 <a class="sourceLine" id="cb9-10" data-line-number="10"></a>
 <a class="sourceLine" id="cb9-11" data-line-number="11">imputeTS<span class="op">::</span><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/plotNA.imputations.html">plotNA.imputations</a></span>(<span class="dt">x.withNA =</span> ca, <span class="dt">x.withTruth =</span> <span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(cat_ordered), <span class="dt">x.withImputations =</span> imputationsBack)</a></code></pre></div>
 <p><img src="imputemissingsata_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></p>
@@ -262,7 +270,7 @@
 <h3 class="hasAnchor">
 <a href="#auto-select-method" class="anchor"></a>Auto-select method</h3>
 <p>We can just provide the <code><a href="http://stefvanbuuren.github.io/mice/reference/mice.html">mice()</a></code> function our data set and it will take care of analysing the variables and selecting an appropriate imputation method.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">require</a></span>(mice)</a>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(mice)</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co"># auto choice by mice algorithm</span></a>
 <a class="sourceLine" id="cb10-3" data-line-number="3">imp.mice &lt;-<span class="st"> </span>mice<span class="op">::</span><span class="kw"><a href="http://stefvanbuuren.github.io/mice/reference/mice.html">mice</a></span>(df_vars, <span class="dt">printFlag =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p>The algorithm chooses methods <code>pmm</code>, <code>polyreg</code> and <code>polr</code>:</p>
@@ -272,7 +280,7 @@
 &gt;      ruminate         hours 
 &gt;         "pmm"         "pmm"</code></pre>
 <p>By default <code><a href="http://stefvanbuuren.github.io/mice/reference/mice.html">mice()</a></code> will generate <code>5</code> iterations of each time series, that is, argument <code>maxit = 5</code>. If you inspect the <code>imp.mice</code> object you can see it is a list with several fields, the field <code>imp</code> is another list with fields named after the columns in our data set. Each field contains <code>5</code> iterations for the variable.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lengths">lengths</a></span>(imp.mice<span class="op">$</span>imp)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span>(imp.mice<span class="op">$</span>imp)</a></code></pre></div>
 <pre><code>&gt;        zscore unif_discrete cat_unordered   cat_ordered         angry 
 &gt;             5             5             5             5             5 
 &gt;      ruminate         hours 
@@ -301,11 +309,11 @@
 <h3 class="hasAnchor">
 <a href="#visual-inspection" class="anchor"></a>Visual inspection</h3>
 <p>Function <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/plotNA.imputations.html">imputeTS::plotNA.imputations()</a></code> is an excellent way to visualise the imputation result.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">truth &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(zscore, unif_discrete, cat_unordered, cat_ordered, df_vars<span class="op">$</span>angry, df_vars<span class="op">$</span>ruminate, df_vars<span class="op">$</span>hours)</a>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">truth &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(zscore, unif_discrete, cat_unordered, cat_ordered, df_vars<span class="op">$</span>angry, df_vars<span class="op">$</span>ruminate, df_vars<span class="op">$</span>hours)</a>
 <a class="sourceLine" id="cb17-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="cf">for</span>(c <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(df_vars)){</a>
+<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="cf">for</span>(c <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">NCOL</a></span>(df_vars)){</a>
 <a class="sourceLine" id="cb17-4" data-line-number="4">  </a>
-<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)[c])</a>
+<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(df_vars)[c])</a>
 <a class="sourceLine" id="cb17-6" data-line-number="6">  </a>
 <a class="sourceLine" id="cb17-7" data-line-number="7">withNA  &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(df_vars[,c], <span class="dt">keepNA =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb17-8" data-line-number="8">Truth   &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(truth[[c]], <span class="dt">keepNA =</span> <span class="ot">TRUE</span>)</a>
@@ -314,19 +322,19 @@
 <a class="sourceLine" id="cb17-11" data-line-number="11">                   <span class="dt">x.withImputations =</span> out.linear[,c], </a>
 <a class="sourceLine" id="cb17-12" data-line-number="12">                   <span class="dt">x.withTruth =</span> Truth,</a>
 <a class="sourceLine" id="cb17-13" data-line-number="13">                   <span class="dt">main =</span> <span class="st">"linear interpolation"</span>,</a>
-<a class="sourceLine" id="cb17-14" data-line-number="14">                   <span class="dt">ylab =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)[c])</a>
+<a class="sourceLine" id="cb17-14" data-line-number="14">                   <span class="dt">ylab =</span> <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(df_vars)[c])</a>
 <a class="sourceLine" id="cb17-15" data-line-number="15">  </a>
 <a class="sourceLine" id="cb17-16" data-line-number="16"><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/plotNA.imputations.html">plotNA.imputations</a></span>(<span class="dt">x.withNA =</span> withNA, </a>
 <a class="sourceLine" id="cb17-17" data-line-number="17">                   <span class="dt">x.withImputations =</span> <span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(out.auto[,c]), </a>
 <a class="sourceLine" id="cb17-18" data-line-number="18">                   <span class="dt">x.withTruth =</span> Truth,</a>
-<a class="sourceLine" id="cb17-19" data-line-number="19">                   <span class="dt">main =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"auto:"</span>,imp.mice<span class="op">$</span>method)[c],</a>
-<a class="sourceLine" id="cb17-20" data-line-number="20">                   <span class="dt">ylab =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)[c])</a>
+<a class="sourceLine" id="cb17-19" data-line-number="19">                   <span class="dt">main =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"auto:"</span>,imp.mice<span class="op">$</span>method)[c],</a>
+<a class="sourceLine" id="cb17-20" data-line-number="20">                   <span class="dt">ylab =</span> <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(df_vars)[c])</a>
 <a class="sourceLine" id="cb17-21" data-line-number="21">  </a>
 <a class="sourceLine" id="cb17-22" data-line-number="22"><span class="kw"><a href="https://SteffenMoritz.github.io/imputeTS/reference/plotNA.imputations.html">plotNA.imputations</a></span>(<span class="dt">x.withNA =</span> withNA, </a>
 <a class="sourceLine" id="cb17-23" data-line-number="23">                     <span class="dt">x.withImputations =</span> <span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(out.cart[,c]), </a>
 <a class="sourceLine" id="cb17-24" data-line-number="24">                     <span class="dt">x.withTruth =</span>Truth,</a>
 <a class="sourceLine" id="cb17-25" data-line-number="25">                     <span class="dt">main=</span><span class="st">"regression trees"</span>,</a>
-<a class="sourceLine" id="cb17-26" data-line-number="26">                     <span class="dt">ylab =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)[c])</a>
+<a class="sourceLine" id="cb17-26" data-line-number="26">                     <span class="dt">ylab =</span> <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(df_vars)[c])</a>
 <a class="sourceLine" id="cb17-27" data-line-number="27"></a>
 <a class="sourceLine" id="cb17-28" data-line-number="28">}</a></code></pre></div>
 <pre><code>&gt; [1] "zscore"</code></pre>
@@ -348,21 +356,21 @@
 <h3 class="hasAnchor">
 <a href="#effect-on-analysis-results" class="anchor"></a>Effect on analysis results</h3>
 <p>Finally, we compare the effect of different methods on the results of analyses.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="cf">for</span>(c <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">NCOL</a></span>(df_vars)){</a>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="cf">for</span>(c <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">NCOL</a></span>(df_vars)){</a>
 <a class="sourceLine" id="cb25-2" data-line-number="2">  </a>
-<a class="sourceLine" id="cb25-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/colnames">colnames</a></span>(df_vars)[c])</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(df_vars)[c])</a>
 <a class="sourceLine" id="cb25-4" data-line-number="4">  </a>
 <a class="sourceLine" id="cb25-5" data-line-number="5">withNA  &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(df_vars[,c], <span class="dt">keepNA =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb25-6" data-line-number="6">Truth   &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(truth[[c]], <span class="dt">keepNA =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb25-7" data-line-number="7">LINEAR  &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unname">unname</a></span>(out.linear[,c]))</a>
+<a class="sourceLine" id="cb25-7" data-line-number="7">LINEAR  &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unname.html">unname</a></span>(out.linear[,c]))</a>
 <a class="sourceLine" id="cb25-8" data-line-number="8">AUTO    &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(out.auto[,c])</a>
 <a class="sourceLine" id="cb25-9" data-line-number="9">CART    &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(out.cart[,c])</a>
 <a class="sourceLine" id="cb25-10" data-line-number="10"></a>
 <a class="sourceLine" id="cb25-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb25-12" data-line-number="12">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">NAremoved =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(withNA, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/sd">sd</a></span>(withNA)),</a>
+<a class="sourceLine" id="cb25-12" data-line-number="12">df &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">NAremoved =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(withNA, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="kw"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span>(withNA)),</a>
 <a class="sourceLine" id="cb25-13" data-line-number="13">                 N</a>
 <a class="sourceLine" id="cb25-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb25-15" data-line-number="15">knitr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>(<span class="dt">x =</span> ))</a>
+<a class="sourceLine" id="cb25-15" data-line-number="15">knitr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(<span class="dt">x =</span> ))</a>
 <a class="sourceLine" id="cb25-16" data-line-number="16"></a>
 <a class="sourceLine" id="cb25-17" data-line-number="17"></a>
 <a class="sourceLine" id="cb25-18" data-line-number="18"></a>
@@ -377,6 +385,7 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -393,17 +402,20 @@
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Fred Hasselman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

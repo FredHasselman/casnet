@@ -8,21 +8,32 @@
 
 <title>Create a Recurrence Network Matrix — rn • casnet</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,12 +41,12 @@
 
 
 
+
 <meta property="og:title" content="Create a Recurrence Network Matrix — rn" />
-
 <meta property="og:description" content="This function serves as a wrapper for function rp(), it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)" />
-
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -47,6 +58,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 
 
   </head>
@@ -73,7 +85,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -105,11 +117,10 @@
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/FredHasselman/casnet">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -120,6 +131,7 @@
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -131,17 +143,16 @@
     </div>
 
     <div class="ref-description">
-    
     <p>This function serves as a wrapper for function <code><a href='rp.html'>rp()</a></code>, it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>rn</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>emDim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emRad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>directed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>includeDiagonal</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>directed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>weightedBy</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"si"</span>, <span class='st'>"rt"</span>,
+  <span class='st'>"rf"</span>)[<span class='fl'>1</span>], <span class='kw'>rescaleWeights</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fs</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>includeDiagonal</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>to.ts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>to.sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>returnGraph</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>returnGraph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -174,6 +185,18 @@
       <td><p>Should the matrix be considered to represent a weighted network? (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
+      <th>weightedBy</th>
+      <td><p>After setting values smaller than <code>emRad</code> to <code>0</code>, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (<code>"si"</code>). Other option are <code>"rt"</code> for <em>recurrence time</em> and <code>"rf"</code> for <em>recurrence time frequency</em>, Because vertices represent time points in \(\epsilon\)-thresholded recurrence networks, a difference of two vertex-indices represents duration. If an edge <code>e1</code> connects <code>v1</code> and <code>v10</code> then the <em>recurrence time</em> will be the difference of the vertex indices, <code>9</code>, and the <em>recurrence time frequency</em> will be <code>1/9</code>.</p></td>
+    </tr>
+    <tr>
+      <th>rescaleWeights</th>
+      <td><p>If set to <code>TRUE</code> and <code>weighted = TRUE</code>, all weight values will be rescaled to <code>[0,1]</code>, where <code>0</code> means no recurrence relation and <code>1</code> the maximum weight value.</p></td>
+    </tr>
+    <tr>
+      <th>fs</th>
+      <td><p>Sample frequency: A numeric value interpreted as the <code>number of observed samples per unit of time</code>. If the weights represent recurrence times (<code>"rt"</code>), they will be divided by the value in <code>fs</code>. If the weights represent recurrence time frequencies (<code>"rf"</code>), they will be multiplied by the value of <code>fs</code> (default = <code>NA</code>)</p></td>
+    </tr>
+    <tr>
       <th>includeDiagonal</th>
       <td><p>Should the diagonal of the matrix be included when creating the network (default = <code>FALSE</code>)</p></td>
     </tr>
@@ -191,7 +214,7 @@
     </tr>
     <tr>
       <th>method</th>
-      <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://www.rdocumentation.org/packages/proxy/topics/dist'>proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
+      <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://rdrr.io/pkg/proxy/man/dist.html'>proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
     </tr>
     <tr>
       <th>targetValue</th>
@@ -199,7 +222,7 @@
     </tr>
     <tr>
       <th>returnGraph</th>
-      <td><p>Return an <code><a href='https://www.rdocumentation.org/packages/igraph/topics/aaa-igraph-package'>igraph::igraph()</a></code> object (default = <code>TRUE</code>)</p></td>
+      <td><p>Return an <code><a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph::igraph()</a></code> object (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
@@ -214,31 +237,28 @@
       <td><p>Any paramters to pass to <code><a href='rn_plot.html'>rn_plot()</a></code> if <code>doPlot = TRUE</code></p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidence) matrix.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Distance matrix operations (recurrence network): <code><a href='di2bi.html'>di2bi</a></code>,
   <code><a href='di2we.html'>di2we</a></code>, <code><a href='rn_plot.html'>rn_plot</a></code>,
   <code><a href='rn_recSpec.html'>rn_recSpec</a></code>, <code><a href='rn_scaleoGram.html'>rn_scaleoGram</a></code></p></div>
-    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#see-also">See also</a></li>
-          </ul>
+    </ul>
 
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -246,13 +266,16 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

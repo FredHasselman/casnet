@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{crqa_rp}
 \alias{crqa_rp}
-\title{Get bootsrapped (C)RQA measures based on a recurrence matrix}
+\title{Get (C)RQA measures based on a binary matrix}
 \usage{
 crqa_rp(RM, emRad = NA, DLmin = 2, VLmin = 2, HLmin = 2,
   DLmax = length(Matrix::diag(RM)) - 1,
@@ -53,7 +53,7 @@ crqa_rp(RM, emRad = NA, DLmin = 2, VLmin = 2, HLmin = 2,
 A list object containing (C)RQA measures (and matrices if requested)
 }
 \description{
-A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures will be caluclated.
+A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures (anisotropic) will be caluclated.
 }
 \seealso{
 Other Recurrence Quantification Analysis: \code{\link{crqa_cl}},

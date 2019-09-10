@@ -2,8 +2,6 @@
 title: "Applied Synergetics: Dynamic Complexity in a Clinical Case Study"
 author: "Fred Hasselman & Merlijn Olthof"
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
-csl: apa.csl
 output: 
   html_vignette:
     toc: true
@@ -125,92 +123,91 @@ for(c in c("angry"%ci%df_vars,"ruminate"%ci%df_vars)){
 
 A (sudden) qualitative change in the behavioural regime of a system is often considered to be a shift from one relatively stable attractor-state to another. This shift is referred to as a phase, or, order transition. Phase transitions are preceded by a period of destabilization in which the stability of the existing attractor-state decreases (as a consequence of changing control parameters). During destabilization, the system loses its resilience to external influences (i.e. resistance to perturbation). Thas is often reflected by an increase in fluctuations and disorder in the behaviour of the system (critical fluctuations) and an increase in the time it takes to return to attractor-states from which the sytem it perturbed (critical slowing down). Destabilization ends abruptly when the system makes a phase transition towards a new stable state. Critical fluctuations and critical slowing down can therefore serve as early-warning signals (EWS) for imminent phase transitions. 
 
-Onset of pathology (e.g. psychosis), relapse in addiction, suicide attempts, sudden gains and losses, etc. Destabilization is most of the time a good thing in treatment: The goal of treatment is to change (destabilize) the existing stable, delibitating state into another stable state that is less problematic. During destabilization, the patient is expexted to be increasingly sensitive to external influences, or, perturbations (e.g. treatment). Destabilization could turn out to be a period in which an intervention has optimal results. 
 
 ### State variables
 
-Often, the purpose of detecting early warning signals is to predict changes in a state variable, for example a test for depressive symptoms, or, a broad assesment by a therapist, measured once a week. Here we do not have clear apriori state variables, we'll use the less densely measured variables on sleep quality as potential states. These variables were measured once per day:
-
-* `hours` (how many hours did you sleep last night?)
-* `difficult` (experienced difficulty falling or staying asleep)
-* `unsatisfy` (experienced restless or unsatisfying sleep)
-
-We'll assume these variables indicate a "global sate" of the system.
-
-```{r}
-# Use the date information in the dataset to create time series objects
-dates      <- manyAnalystsESM$start[!is.na(manyAnalystsESM$unsatisfy)]
-days       <- as.Date(dates, "%m/%d/%Y")
-hours      <- manyAnalystsESM$hours[!is.na(manyAnalystsESM$hours)]
-difficult  <- manyAnalystsESM$difficult[!is.na(manyAnalystsESM$difficult)]
-unsatisfy  <- manyAnalystsESM$unsatisfy[!is.na(manyAnalystsESM$unsatisfy)]
-
-df_sleep <- data.frame(days = days,
-                       hours_sleep = hours,
-                       difficult_sleep = difficult,
-                       unsatisfy_sleep = unsatisfy) %>% 
-  tidyr::gather(key = variable, value = quality_sleep, -days, factor_key = TRUE)
-
-ggplot(df_sleep, aes(x = days, y = quality_sleep)) +
-  geom_line(linetype = 2) +
-  geom_point(pch=16, size=2, colour = "steelblue") +
-  facet_grid(variable~., scales = "free_y") +
-  scale_x_date(breaks = unique(days)) +
-  theme_bw() + theme(panel.grid.minor = element_blank(),
-                     axis.text.x = element_text(angle = 90, vjust =0.5))
-
-```
+Often, the purpose of detecting early warning signals is to predict changes in a state variable, for example a test for depressive symptoms, or, a broad assesment by a therapist, measured once a week. Here we do not have clear apriori state variables, we'll use the measure 'Feeling Positive' as it can be considered indicative for both major depressive disorder and generalized anxiety disorder. We'll assume in this example that 'Feeling Positive' indicate a "global sate" of the system.
 
 
-### Detecting periods of relative stability using recursive partitioning
+### Detecting periods of relative stability in state variables recursive partitioning
 
 We can use function `ts_levels()` to evaluate whether there are sudden jumps (gains or losses) in the data. The method uses function `rpart::rpart()` and has several arguments that control when a level should be considered, that is, how many datapoints should a level last minimally; how much must the signal change before a new level is considered, etc. Check the manual pages for more details. ` 
 
-The value of `minDataSplit` tells the algorithm how many data points need to be in a segment before a change of level is considered. Here we choose `minDataSplit = 6`, which is 2 days.
+The value of `minDataSplit` tells the algorithm how many data points need to be in a segment before a change of level is considered. Here we choose `minDataSplit = 12`, which is 3 days. The value of `minLevelDuration` tells the algorithm how long a segment should be at least. We choose 28 time points, which corresponds to 1 week.
+
+One can see that there appears to be a sudden shift in feeling positive around half way of the measurement period.
 
 ```{r echo=TRUE}
-minSplit = 6
-lvl1 <- ts_levels(hours, minDataSplit = minSplit)
-lvl2 <- ts_levels(difficult, minDataSplit = minSplit) 
-lvl3 <- ts_levels(unsatisfy, minDataSplit = minSplit) 
+dates      <- manyAnalystsESM$start
+dateTimesS  <- as.POSIXct(strptime(dates, "%m/%d/%Y %H:%M"))
+idNA        <- complete.cases(df_vars)
+dateTimess.NA <- dateTimesS[idNA]
+lvl <- ts_levels(out.cart$positive, minDataSplit = 12, minLevelDuration = 28, changeSensitivity = 0.05)
 
 # ggplot likes the long data format
-df_sleep$level <-  
-  data.frame(days = days,
-             hours_sleep_lvl = lvl1$pred$p,
-             difficult_sleep_lvl = lvl2$pred$p,
-             unsatisfy_sleep_lvl = lvl3$pred$p) %>% 
+df_state <- data.frame(days = dateTimesS,
+                       positive = out.cart$positive) %>% 
+  tidyr::gather(key = variable, value = value, -days, factor_key = TRUE)
+
+df_state$level <-  
+  data.frame(days=dateTimesS,
+             positive_lvl = lvl$pred$p) %>% 
   tidyr::gather(key = variable_lvl, value = level, -days, factor_key = TRUE) %>%
   dplyr::select("level") %>%
   unlist(.)
   
-ggplot(df_sleep, aes(x = days)) +
-  geom_line(aes(y = quality_sleep), linetype = 2) +
-  geom_point(aes(y = quality_sleep), pch=16, size=2, colour = "steelblue") +
+ggplot(df_state, aes(x = days)) +
+  geom_line(aes(y = value), linetype = 2) +
+  geom_point(aes(y = value), pch=16, size=2, colour = "steelblue") +
   geom_line(aes(y = level), colour = "red3") +
   facet_grid(variable~., scales = "free_y") +
-  scale_x_date(breaks = unique(days)) +
   theme_bw() +  theme(panel.grid.minor = element_blank(),
                      axis.text.x = element_text(angle = 90, vjust =0.5))
 
 ```
 
-There appear to be more or less synchronous `jumps` and `stages`, or, `levels` in the raw data of variables `difficult` and `unsatisfy`. The levels in variable `hours`, representing hours of sleep seem to show the inverted pattern.
+And this is what it looks like without imputation.
+```{r}
+####
+lvl.NA <- ts_levels(out.NA$positive, minDataSplit = 12, minLevelDuration = 28, changeSensitivity = 0.05)
+
+# ggplot likes the long data format
+df_state.NA <- data.frame(days = dateTimess.NA ,
+                       positive = out.NA$positive) %>% 
+  tidyr::gather(key = variable, value = value, -days, factor_key = TRUE)
+
+df_state.NA$level <-  
+  data.frame(days = dateTimess.NA ,
+             positive_lvl = lvl.NA$pred$p) %>% 
+  tidyr::gather(key = variable_lvl, value = level, -days, factor_key = TRUE) %>%
+  dplyr::select("level") %>%
+  unlist(.)
+  
+ggplot(df_state.NA, aes(x = days)) +
+  geom_line(aes(y = value), linetype = 2) +
+  geom_point(aes(y = value), pch=16, size=2, colour = "steelblue") +
+  geom_line(aes(y = level), colour = "red3") +
+  facet_grid(variable~., scales = "free_y") +
+  theme_bw() +  theme(panel.grid.minor = element_blank(),
+                     axis.text.x = element_text(angle = 90, vjust =0.5))
+
+
+```
 
 
 ## Detecting Early Warning Signals (EWS) using Dynamic Complexity
 
 Now it is time to analyze the dynamic complexity of the ESM time series and see if we can find early-warning signals. 
 
-Use `dc_win()` to calculate Dynamic Complexity. The function can also call `plotDC_res()` to produce a *Complexity Resonance Diagram*.
+Use `dc_win()` to calculate Dynamic Complexity. The function can also call `plotDC_res()` to produce a *Complexity Resonance Diagram*. Also, the resonance diagrams for only measure D or F can simply be obtained by adding `doPlotF = TRUE` and `doPlotD = TRUE`.
 
-We need to make sure all variables are on the same scale, for this dataset there's no need to transform, all data are on a scale of `0-100`. If no value is passed to arguments `from_scale_min` and `from_scale_max` and argument `rescale = TRUE` then the minimum and maximum value in each column will be used. This should be used if scale limits are unknown (or `-Inf` and `+Inf`). If the theoretical limits are known, they should be passed. If the data contain a mix of known scale ranges, transformation should be done manually.
+We need to make sure all variables are on the same scale, for this dataset there's no need to transform, all data are on a scale of `0-100`. The arguments `scale_min` and `scale_max` have to be given manually as they refer to the theoretical limits of the scale. If the data contain a mix of known scale ranges, transformation should be done manually.
 
 ```{r}
-win = 6
+win = 12
 
 # NA removed 
-dc.caseNA <- dc_win(out.NA, win = win, scale_min=0, scale_max=100, doPlot = TRUE, colOrder = TRUE)
+dc.caseNA <- dc_win(out.NA, win = win, scale_min=0, scale_max=100, doPlot = TRUE, colOrder = TRUE, doPlotF = TRUE, doPlotD = TRUE)
 ```
 
 Dynamic complexity is calculated as a product of *fluctuation intensity* calculated by function `dc_f()` and *distribution uniformity* calculated by `dc_d()`. These functions can be called seperately, or, you can set the argument `returnFandD = TRUE` in function `dc_win()`.
@@ -224,7 +221,7 @@ We can use the `df` field of the `dc_win()` output as input for `plotDC_res()`.
 plotDC_res(df_win = dc.caseNA, win = win, doPlot = TRUE, colOrder = FALSE)
 ```
 
-An interesting option is to sort by the mean value of Dynamic Complexity, to do so set the `colOrder` argument to `NA`.
+An interesting option is to sort by the mean value of Dynamic Complexity, to do so set the `colOrder` argument to `NA`. 
 
 ```{r}
 plotDC_res(df_win = dc.caseNA, win = win, doPlot = TRUE, colOrder = NA)
@@ -239,8 +236,13 @@ dc.caseIMP <- dc_win(out.cart, win=win, scale_min=0, scale_max=100, colOrder = T
 plotDC_res(df_win = dc.caseIMP, win = win, doPlot = TRUE, colOrder = NA, title = "Complexity Resonance Diagram (CART)")
 ```
 
-There are some differences, and this is expected of course when imputing or removing `NA`s. To see how these differences may affect the inference of periods of destabilisation we run the *Cumulative Complexity Peak* analysis on both datasets.
+One can obtain a dynamic complexity profile by averaging the dynamic complexity scores over all items.
+```{r}
+mean_DC <- rowMeans(as.matrix(dc.caseIMP))
+plot(mean_DC, type='line')
+```
 
+There are some differences, and this is expected of course when imputing or removing `NA`s. To see how these differences may affect the inference of periods of destabilisation we run the *Cumulative Complexity Peak* analysis on both datasets.
 
 #### Cumulative Complexity Peaks
 
@@ -279,38 +281,36 @@ dateTimesIMP[ccp.caseIMP$sig.peaks>0]
 
 ## Plot 'state' versus complexity 
 
-One could look for a single variable that best predicts level changes, e.g. by looking at crosscorrelation functions, or by extracting peak-complexity times and gain/loss events can average the time course of dynamic complexity in a number of ways. Here we use the 
+One could look for a single variable that best predicts level changes, e.g. by looking at crosscorrelation functions, or by extracting peak-complexity times and gain/loss events can average the time course of dynamic complexity in a number of ways.
 
+Here we make a plot of the state variable, the levels and the dynamic complexity. 
+```{r ews2}
 
+out.cart$measure <- (1:nrow(out.cart))
+out.cart$lvl <- lvl$pred$p
+out.cart %>% 
+  mutate(Level=ts_standardise(lvl), StateVariable=ts_standardise(positive), DynamicComplexity=ts_standardise(mean_DC)) %>% 
+  select(measure,StateVariable,DynamicComplexity, Level) %>% 
+  gather(key=variable,value=value,-measure) %>%
+  ggplot(aes(x=measure, y=value, colour=variable)) + geom_line() + theme_bw()
+```
+
+Here we use the function `plotDC_lvl` to look for high dynamic complexity in relation to shifts in the state variable.
 ```{r}
 # Dates for state variables
 dates       <- manyAnalystsESM$start
 dateTimesS  <- as.POSIXct(strptime(dates, "%m/%d/%Y %H:%M"))
 idNA        <- complete.cases(df_vars)
 
-df_lvl_hrs   <- ts_levels(manyAnalystsESM$hours,minDataSplit = minSplit)
-df_lvl_diff  <- ts_levels(manyAnalystsESM$difficult,minDataSplit = minSplit)
-df_lvl_unsat <- ts_levels(manyAnalystsESM$unsatisfy,minDataSplit = minSplit)
+df_lvl   <-  ts_levels(out.cart$positive, minDataSplit = 12, minLevelDuration = 28, changeSensitivity = 0.05)
+df_lvl_NA <- ts_levels(out.NA$positive, minDataSplit = 12, minLevelDuration = 28, changeSensitivity = 0.05)
 
-df_lvl_hrsNA   <- ts_levels(manyAnalystsESM$hours[idNA],minDataSplit = minSplit)
-df_lvl_diffNA  <- ts_levels(manyAnalystsESM$difficult[idNA],minDataSplit = minSplit)
-df_lvl_unsatNA <- ts_levels(manyAnalystsESM$unsatisfy[idNA],minDataSplit = minSplit)
+plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Feeling Positive")
 
-plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_hrs, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Hours sleep")
-
-plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA, df_lvl = df_lvl_hrsNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Hours sleep")
-
-plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_diff, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Difficulty sleeping")
-
-plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA, df_lvl = df_lvl_diffNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Difficulty sleeping")
-
-plotDC_lvl(df_ccp = ccp.caseIMP, df_win = dc.caseIMP, df_lvl = df_lvl_unsat, useTimeVector = dateTimesS, win = win, subtitle = "CART", levelName = "Unsatisfactory sleep")
-
-plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA, df_lvl = df_lvl_unsatNA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Unsatisfactory sleep")
-
+plotDC_lvl(df_ccp = ccp.caseNA, df_win = dc.caseNA, df_lvl = df_lvl_NA, useTimeVector = dateTimesS[idNA], win = win, subtitle = "Remove NA", levelName = "Feeling Positive")
 ```
 
-Look for max complexity peaks around level changes.
+
 
 
 ## References

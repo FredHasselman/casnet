@@ -22,7 +22,7 @@ mi in nats
 Mutual Information variations
 }
 \seealso{
-Other Redundancy measures (mutual information): \code{\link{mif_interlayer}},
+Other Redundancy measures (mutual information): \code{\link{mi_interlayer}},
   \code{\link{mif}}
 }
 \concept{Redundancy measures (mutual information)}

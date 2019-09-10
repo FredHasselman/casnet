@@ -1,4 +1,413 @@
-# (C)RQA ------------------------
+#' Fast (C)RQA (command line crp)
+#'
+#' This function will run the [commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php) executable provided by Norbert Marwan.
+#'
+#' @param y1 Time series 1
+#' @param y2 Time series 2 for Cross Recurrence Analysis (default = `NULL`)
+#' @param emDim Embedding dimensions (default = `1`)
+#' @param emLag Embedding lag (default = `1`)
+#' @param emRad Radius on distance matrix (default = `1`)
+#' @param DLmin Minimum length of diagonal structure to be considered a line (default = `2`)
+#' @param VLmin Minimum length of vertical structure to be considered a line (default = `2`)
+#' @param theiler Theiler window (default = `0`)
+#' @param win Window to calculate the (C)RQA (default = minimum of length of `y1` or `y2`)
+#' @param step Stepsize for sliding windows (default = size of `win`, so no sliding window)
+#' @param JRP Wether to calculate a Joint Recurrence Plot (default = `FALSE`)
+#' @param distNorm One of "EUCLIDEAN" (default), `"MAX", "MIN"`, or `"OP"` for an Order Pattern recurrence matrix
+#' @param standardise Standardise data: `"none"` (default), `"mean.sd"`, or `"median.mad"`
+#' @param returnMeasures Return the (C)RQA measures? (default = `TRUE`)
+#' @param returnRPvector Return the recurrent points in a dataframe? (default = `FALSE`)
+#' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = `FALSE`)
+#' @param doPlot Produce a plot of the recurrence matrix by calling [rp_plot()], values can be `"rp"` (the thresholded recurrence matrix),`"distmat"` (the unthresholded recurrence matrix) or `"noplot"` (default = `"noplot"`)
+#' @param path_to_rp Path to the command line executable (default = path set during installation, use `getOption("casnet.path_to_rp")` to see)
+#' @param saveOut Save the output to files? If `TRUE` and `path_out = NA`, the current working directory will be used (default = `FALSE`)
+#' @param path_out Path to save output if `saveOut = TRUE` (default = `NULL`)
+#' @param file_ID A file ID which will be a prefix to to the filename if `saveOut = TRUE` (default = `NULL`, an integer will be added tot the file name to ensure unique files)
+#' @param silent Do not display any messages (default = `TRUE`)
+#' @param surrogateTest Perform surrogate tests. If `TRUE`, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments `ns = 39, fft = TRUE, amplitude = TRUE`)
+#' @param targetValue A value passed to `crqa_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`. This is useful for windowed analysis, it will estimate a new radius for each window.
+#' @param useParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using [purrr::map2()] to assign data and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
+#' @param ... Additional parameters (currently not used)
+#'
+#' @details The `rp` executable is installed when the function is called for the first time and is renamed to `rp`, from a platform specific filename downloaded from http://tocsy.pik-potsdam.de/commandline-rp.php or extracted from an archive located in the directory: `...\\casnet\\commandline_rp\\`.
+#' The file is copied to the directory: `...\\casnet\\exec\\`
+#' The latter location is stored as an option and can be read by calling `getOption("casnet.path_to_rp")`.
+#'
+#' @section Troubleshooting:
+#' Some notes on resolving errors with `rp`.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in `...\\casnet\\commandline_rp\\crp_cl.zip`. If that fails, the copy will have failed. It should be relatively easy to get `crqa_cl()` working using custom settings:
+#'
+#' \itemize{
+#' \item *Copy failed* - Every time the function `crqa_cl()` is called it will check whether a log file `rp_instal_log.txt` is present in the `...\\casnet\\exec\\` directory. If you delete the `rp_instal_log.txt` file, and call the function, another attempt will be madxe to download a copy of the executable.
+#' \item *Copy still fails and/or no permission to copy* - If you cannot acces the directory `...\\casnet\\commandline_rp\\`, download the appropriate executable from the [Commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php) page and copy to a directory you do have the rights to: *execute* commands, *write* and *read* files. Make sure you rename the file to `rp` (`rp.exe` on Windows OS). Then, either pass the path to `rp` as the argument `path_to_rp` in the `crqa_cl(..,, path_to_rp = "YOUR_PATH")` function call, or, as a more permanent solution, set the `path_to_rp` option by calling `options(casnet.path_to_rp="YOUR_PATH")`.
+#' \item *Error in execution of `rp`* - This can have a variety of causes, the `rp` executable is called using [system2()] and makes use of the [normalizePath()] function with argument `mustWork = FALSE`. Problems caused by specific OS, machine, or, locale problems (e.g. the `winslash` can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing `getOption("casnet.rp_prefix")`. On Windows OS this should return an empty character vector, on Linux or macOS it should return `"./"`. You can manually set the correct prefix by calling `options(casnet.rp_prefix="CORRECT OS PREFIX")` and fill in the prefix that is correct for your OS
+#' }
+#'
+#' @return A list object containing 1-3 elements, depending on arguments requesting output.
+#'
+#' \enumerate{
+#' \item `rqa_measures` - A list of the (C)RQA measures returned if `returnMeasures = TRUE`:
+#' \itemize{
+#'  \item RR = 'Recurrence rate'
+#'  \item DET = 'Determinism'
+#'  \item DET_RR = 'Ratio DET/RR'
+#'  \item LAM = 'Laminarity'
+#'  \item LAM_DET = 'Ratio LAM/DET'
+#'  \item L_max = 'maximal diagonal line length'
+#'  \item L_mean = 'mean diagonal line length'
+#'  \item L_entr = 'Entropy of diagonal line length distribution'
+#'  \item DIV =  'Divergence (1/L_max)'
+#'  \item V_max = 'maximal vertical line length'
+#'  \item TT = 'Trapping time'
+#'  \item V_entr = 'Entropy of vertical line length distribution'
+#'  \item T1 = 'Recurrence times 1st type'
+#'  \item T2 = 'Recurrence times 2nd type'
+#'  \item W_max = 'Max interval length'
+#'  \item W_mean = 'Mean of interval lengths'
+#'  \item W_entr = 'Entropy of interval length distribution'
+#'  \item W_prob = 'Probability of interval'
+#'  \item F_min = 'F min'
+#' }
+#' \item `rqa_rpvector` - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling [rp_plot()]. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting `saveOut = TRUE`.
+#' \item `rqa_diagdist` - The distribution of diagonal line lengths
+#' }
+#'
+#' @note The platform specific `rp` command line executables were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at [http://tocsy.pik-potsdam.de/](http://tocsy.pik-potsdam.de/).
+#'
+#' The full copyright statement on the website is as follows:
+#'
+#' (C) 2004-2017 SOME RIGHTS RESERVED
+#'
+#' University of Potsdam, Interdisciplinary Center for Dynamics of Complex Systems, Germany
+#'
+#' Potsdam Institute for Climate Impact Research, Transdisciplinary Concepts and Methods, Germany
+#'
+#' This work is licensed under a [Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Germany License](https://creativecommons.org/licenses/by-nc-nd/2.0/de/).
+#'
+#' More information about recurrence analysis can be found on the [Recurrence Plot](http://www.recurrence-plot.tk) website.
+#'
+#' @family Recurrence Quantification Analysis
+
+#' @export
+#'
+crqa_cl <- function(y1,
+                    y2      = NULL,
+                    emDim   = 1,
+                    emLag   = 1,
+                    emRad   = NA,
+                    DLmin   = 2,
+                    VLmin   = 2,
+                    theiler = 0,
+                    win            = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
+                    step           = win,
+                    JRP            = FALSE,
+                    distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+                    standardise    = c("none","mean.sd","median.mad")[1],
+                    returnMeasures = TRUE,
+                    returnRPvector = FALSE,
+                    returnLineDist = FALSE,
+                    doPlot         = c("noplot","rp","distmat")[[1]],
+                    path_to_rp     = getOption("casnet.path_to_rp"),
+                    saveOut        = FALSE,
+                    path_out       = NULL,
+                    file_ID        = NULL,
+                    silent         = TRUE,
+                    surrogateTest  = FALSE,
+                    targetValue    = .05,
+                    useParallel    = FALSE,
+                    ...){
+
+  if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"rp_install_log.txt"), mustWork = FALSE))){
+    set_command_line_rp()
+  }
+
+  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+
+  dotArgs <- list(...)
+  if(is.na(dotArgs%00%NA)){dotArgs<-list(nothing=NA)}
+
+  if(!is.null(y2)){
+    y2 <- zoo::as.zoo(y2)
+    N1 <- NROW(y1)
+    N2 <- NROW(y2)
+    if(N1>N2){
+      y2[N2:(N1+(N1-N2))] <- 0
+    }
+    if(N1<N2){
+      y1[N1:(N2+(N2-N1))] <- 0
+    }
+    df <- cbind.data.frame(y1=unclass(y1),y2=unclass(y2))
+    df <- df[stats::complete.cases(df),]
+  } else {
+    if(any(is.na(y1))){
+      y1 <- y1[!is.na(y1)]
+      if(!silent){message("Removed NAs from timeseries y1 before (C)RQA")}
+    }
+    df <- cbind.data.frame(y1=unclass(y1),y2=NA)
+  }
+
+  # Begin input checks
+  if(is.null(path_out)){
+    if(saveOut){
+      path_out <- getwd()
+    } else {
+      path_out <- tempdir(check = TRUE)
+    }
+  } else {
+    path_out <- normalizePath(path_out, mustWork = TRUE)
+  }
+
+  if(is.null(y2)){
+    cat("\nPerforming auto-RQA\n")
+    if(theiler<1){theiler=1}
+  } else {
+    cat("\nPerforming cross-RQA\n")
+  }
+
+  if(surrogateTest){
+    surrogateSeries <- tseries::surrogate(y1,ns=39, fft = TRUE, amplitude = TRUE)
+  }
+
+  windowedAnalysis <- FALSE
+  if(win==NROW(df)|step==(NROW(df))){
+    win <- step <- NROW(df)
+    wIndex <- seq(1,NROW(df))
+    if(is.na(emRad)){cat(paste("Radius will be calulated to yield targetValue =",targetValue,"RR...\n"))}
+  } else {
+    windowedAnalysis = TRUE
+    wIndex <- seq(1,NROW(df)-win, by = step)
+    cat(paste("\nCalculating recurrence measures in a window of size",win,"taking steps of",step,"data points. \n"))
+    if(is.na(emRad)){cat(paste("Radius will be re-calculated to yield targetValue =",targetValue,"RR for each window...\n\n"))}
+  }
+
+
+  if(windowedAnalysis){
+
+    # Check window length vs. embedding
+    if(win < (emLag*emDim)){
+
+      stop(paste0("The size of win = ", win, " must be larger than the product of emLag = ",emLag, " and emDim = ", emDim))
+
+    } else {
+
+      # Adjust time series lengths
+      if((dplyr::last(wIndex)+win-NROW(df))>0){
+
+        yy1 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,1])
+        yy2 <- rep(NA,length(yy1))
+        if(!all(is.na(df[,2]))){
+          yy2 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,2])
+        }
+        df <- cbind.data.frame(y1=yy1,y2=yy2)
+        if(!silent){message("\nAdded 0s to vector to make window and stepsize combination fit to time series length\n\n ")}
+      } else {
+        if(!silent){message("\nWindow and stepsize combination do not fit to the full length of the time series!\n\n ")}
+      }
+
+      if(silent){cat("\nsst! [it's a silent-ish mode]\n\n")}
+
+      wIndices <- plyr::llply(wIndex, function(w){seq(w,w+(win))})
+      names(wIndices) <- paste0("window: ",seq_along(wIndices)," | start: ",wIndex," | stop: ",wIndex+win)
+
+    }
+  } else {
+
+    wIndices <- list(wIndex)
+    names(wIndices) <- paste0("window: 1 | start: ",wIndex[1]," | stop: ",wIndex[NROW(df)])
+
+  } # If windowed
+
+  #cl <- parallel::makeCluster(mc.cores)
+  #parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp","saveOut","path_out","file_ID","silent","..."))
+
+  # Create the data, for all windows,need this for parallel, but also speeds up processing in general.
+  dfList <- plyr::llply(wIndices, function(ind){cbind(y1 = df[ind,1],y2 = df[ind,2])})
+
+  if(useParallel){
+
+    if(names(dotArgs)%in%"logical"){logical <- logical} else {logical <- TRUE}
+
+    cat("\n...using parallel processing...\n")
+
+    # Only return measures
+    returnRPvector <- FALSE
+    returnLineDist <- FALSE
+
+    # How many cores is optimal?
+    cores_available <- parallel::detectCores(logical = logical)-1
+    if(cores_available>1){
+      if(length(wIndices)%%2==0){odd_windows <- FALSE} else {odd_windows <- TRUE}
+      if(cores_available%%2==0){odd_cores <- FALSE} else {odd_cores <- TRUE}
+      if(odd_windows&!odd_cores){cores_available<-cores_available-1}
+      if(!odd_windows&odd_cores){cores_available<-cores_available-1}
+    } else {
+      cores_available <- 1
+    }
+
+    cl       <- parallel::makeCluster(cores_available)
+
+    parallel::clusterEvalQ(cl, library(callr))
+    parallel::clusterEvalQ(cl,library(utils))
+    parallel::clusterEvalQ(cl,library(plyr))
+    parallel::clusterEvalQ(cl,library(tidyverse))
+    parallel::clusterEvalQ(cl,library(pROC))
+    parallel::clusterEvalQ(cl,library(Matrix))
+    parallel::clusterEvalQ(cl,library(casnet))
+
+    # parallel::clusterExport(cl, varlist = c("data","emDim","emLag","emRad","DLmin","VLmin","theiler","win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp", "saveOut","path_out","file_ID","silent","targetValue", "useParallel"))
+
+    # cluster_library(c("devtools","utils","plyr","dplyr","tidyr","Matrix","pROC")) %>%
+    # cluster_assign_value("crqa_cl_main", crqa_cl_main) %>%
+    # cluster_assign_value("crqa_radius", crqa_radius) %>%
+    # cluster_assign_value("emDim", emDim)  %>%
+    # cluster_assign_value("emLag", emLag)  %>%
+    # cluster_assign_value("emRad", emRad)  %>%
+    # cluster_assign_value("DLmin", DLmin)  %>%
+    # cluster_assign_value("VLmin", VLmin)  %>%
+    # cluster_assign_value("theiler", theiler)  %>%
+    # cluster_assign_value("JRP", JRP)  %>%
+    # cluster_assign_value("distNorm", distNorm)  %>%
+    # cluster_assign_value("returnMeasures", returnMeasures)  %>%
+    # cluster_assign_value("returnRPvector", returnRPvector)  %>%
+    # cluster_assign_value("returnLineDist", returnLineDist)  %>%
+    # cluster_assign_value("doPlot", doPlot)  %>%
+    # cluster_assign_value("path_to_rp", path_to_rp)  %>%
+    # cluster_assign_value("saveOut", saveOut)  %>%
+    # cluster_assign_value("path_out", path_out)  %>%
+    # cluster_assign_value("file_ID", file_ID)  %>%
+    # cluster_assign_value("silent", silent)  %>%
+    # cluster_assign_value("targetValue", targetValue) %>%
+    # cluster_assign_value("useParallel", useParallel)
+
+    #  parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp","saveOut","path_out","file_ID","silent","..."))
+
+
+    start <- proc.time()
+    wList <- parallel::parLapply(cl,dfList,function(df){crqa_cl_main(data = df,
+                                                                     emDim          = emDim,
+                                                                     emLag          = emLag,
+                                                                     emRad          = emRad,
+                                                                     DLmin          = DLmin,
+                                                                     VLmin          = VLmin,
+                                                                     theiler        = theiler,
+                                                                     JRP            = JRP,
+                                                                     distNorm       = distNorm,
+                                                                     returnMeasures = returnMeasures,
+                                                                     returnRPvector = returnRPvector,
+                                                                     returnLineDist = returnLineDist,
+                                                                     doPlot    = doPlot,
+                                                                     path_to_rp     = path_to_rp,
+                                                                     saveOut        = saveOut,
+                                                                     path_out       = path_out,
+                                                                     file_ID        = file_ID,
+                                                                     silent         = silent,
+                                                                     targetValue    = targetValue,
+                                                                     useParallel    = useParallel)})
+
+    parallel::stopCluster(cl)
+    time_elapsed_parallel <- proc.time() - start # End clock
+
+    cat("\nCompleted in:\n")
+    print(time_elapsed_parallel)
+
+  } else {
+
+    cat("\n...using sequential processing...\n")
+
+    start <- proc.time()
+
+    wList <- plyr::llply(dfList, function(data){
+      crqa_cl_main(
+        data           = data,
+        emDim          = emDim,
+        emLag          = emLag,
+        emRad          = emRad,
+        DLmin          = DLmin,
+        VLmin          = VLmin,
+        theiler        = theiler,
+        JRP            = JRP,
+        distNorm       = distNorm,
+        returnMeasures = returnMeasures,
+        returnRPvector = returnRPvector,
+        returnLineDist = returnLineDist,
+        doPlot    = doPlot,
+        path_to_rp     = path_to_rp,
+        saveOut        = saveOut,
+        path_out       = path_out,
+        file_ID        = file_ID,
+        silent         = silent,
+        targetValue    = targetValue)},
+      .progress = plyr::progress_text(char = "o~o"))
+
+    time_elapsed_parallel <- proc.time() - start # End clock
+
+    cat(paste("\nCompleted in:\n"))
+    print(time_elapsed_parallel)
+
+
+  } # useParallel
+  rm(dfList)
+
+  rqa_measures <- rqa_rpvector <- rqa_diagdist <- rqa_horidist <- NA
+  if(useParallel){
+    if(is.list(wList)){
+      rqa_measures <-  plyr::ldply(wList)
+    } else {
+      rqa_measures <-  tidyr::unnest(wList)
+    }
+  } else {
+    rqa_measures <-plyr::ldply(wList, function(l) l$measures) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+    rqa_rpvector <-plyr::ldply(wList, function(l) l$rpMAT) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+    rqa_diagdist <-plyr::ldply(wList, function(l) l$diag_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+    rqa_horidist <-plyr::ldply(wList, function(l) l$hori_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
+  }
+
+  wPlot <- which(doPlot%in%c("noplot","rp","distmat"))
+
+  if(wPlot>1){
+    if(wPlot==2){
+      if(windowedAnalysis){
+        plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1], y2 = df[ind,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE))
+        multi_PLOT(plotList)
+      } else {
+        rp(y1 = df[,1], y2 = df[,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE)
+      }
+    }
+    if(wPlot==3){
+      if(windowedAnalysis){
+        plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1],y2 = df[ind,2], emDim = emDim, emLag = emLag, doPlot = TRUE))
+        multi_PLOT(plotList)
+      } else {
+        rp(y1 = df[,1],y2 = df[,2], emDim = emDim, emLag = emLag, doPlot = TRUE)
+      }
+    }
+
+  }
+
+  justData <- FALSE
+  if(win!=NROW(df)){
+    if(!silent){message("Windowed (c)rqa: Returning only (c)rqa measures, use saveOut = TRUE, to get the distribution files")}
+    justData <- TRUE
+  }
+
+  if(returnMeasures&!returnRPvector&!returnLineDist){
+    justData<- TRUE
+  }
+
+  out <- list(rqa_measures = rqa_measures,
+              rqa_rpvector = rqa_rpvector,
+              rqa_diagdist = rqa_diagdist,
+              rqa_horidist = rqa_horidist)
+  if(saveOut){saveRDS(out,paste0(path_out,"CRQA_out",file_ID,".rds"))}
+
+  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+
+  if(justData){
+    return(rqa_measures)
+  } else {
+    return(out[c(returnMeasures,returnRPvector,returnLineDist,returnLineDist)])
+  }
+}
+
 
 #' crqa_cl_main
 #'
@@ -197,416 +606,6 @@ file_ID=1
   }
 }
 
-
-#' Fast (C)RQA (command line crp)
-#'
-#' This function will run the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} executable provided by Norbert Marwan.
-#'
-#' @param y1 Time series 1
-#' @param y2 Time series 2 for Cross Recurrence Analysis (default = `NULL`)
-#' @param emDim Embedding dimensions (default = `1`)
-#' @param emLag Embedding lag (default = `1`)
-#' @param emRad Radius on distance matrix (default = `1`)
-#' @param DLmin Minimum length of diagonal structure to be considered a line (default = `2`)
-#' @param VLmin Minimum length of vertical structure to be considered a line (default = `2`)
-#' @param theiler Theiler window (default = `0`)
-#' @param win Window to calculate the (C)RQA (default = minimum of length of `y1` or `y2`)
-#' @param step Stepsize for sliding windows (default = size of `win`, so no sliding window)
-#' @param JRP Wether to calculate a Joint Recurrence Plot (default = `FALSE`)
-#' @param distNorm One of "EUCLIDEAN" (default), `"MAX", "MIN"`, or `"OP"` for an Order Pattern recurrence matrix
-#' @param standardise Standardise data: `"none"` (default), `"mean.sd"`, or `"median.mad"`
-#' @param returnMeasures Return the (C)RQA measures? (default = `TRUE`)
-#' @param returnRPvector Return the recurrent points in a dataframe? (default = `FALSE`)
-#' @param returnLineDist Return the distribution of diagonal and horizontal line length distances (default = `FALSE`)
-#' @param doPlot Produce a plot of the recurrence matrix by calling [rp_plot()], values can be `"rp"` (the thresholded recurrence matrix),`"distmat"` (the unthresholded recurrence matrix) or `"noplot"` (default = `"noplot"`)
-#' @param path_to_rp Path to the command line executable (default = path set during installation, use `getOption("casnet.path_to_rp")` to see)
-#' @param saveOut Save the output to files? If `TRUE` and `path_out = NA`, the current working directory will be used (default = `FALSE`)
-#' @param path_out Path to save output if `saveOut = TRUE` (default = `NULL`)
-#' @param file_ID A file ID which will be a prefix to to the filename if `saveOut = TRUE` (default = `NULL`, an integer will be added tot the file name to ensure unique files)
-#' @param silent Do not display any messages (default = `TRUE`)
-#' @param surrogateTest Perform surrogate tests. If `TRUE`, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments `ns = 39, fft = TRUE, amplitude = TRUE`)
-#' @param targetValue A value passed to `crqa_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`. This is useful for windowed analysis, it will estimate a new radius for each window.
-#' @param useParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using [purrr::map2()] to assign data and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
-#' @param ... Additional parameters (currently not used)
-#'
-#' @details The `rp` executable is installed when the function is called for the first time and is renamed to `rp`, from a platform specific filename downloaded from <http://tocsy.pik-potsdam.de/commandline-rp.php> or extracted from an archive located in the directory: `...\\casnet\\commandline_rp\\`.
-#' The file is copied to the directory: `...\\casnet\\exec\\`
-#' The latter location is stored as an option and can be read by calling `getOption("casnet.path_to_rp")`.
-#'
-#' @section Troubleshooting:
-#' Some notes on resolving errors with `rp`.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in `...\\casnet\\commandline_rp\\crp_cl.zip`. If that fails, the copy will have failed. It should be relatively easy to get `crqa_cl()` working using custom settings:
-#'
-#' \itemize{
-#' \item *Copy failed* - Every time the function `crqa_cl()` is called it will check whether a log file `rp_instal_log.txt` is present in the `...\\casnet\\exec\\` directory. If you delete the log file, and call the function, another copy of the executable will be attempted.
-#' \item *Copy still fails and/or no permission to copy* - You can copy the approrpiate executable to any directory you have access to, be sure to rename it to `rp` (`rp.exe` on Windows OS). Then, either pass the path to `rp` as the argument `path_to_rp` in the `crqa_cl` function call, or, as a more permanent solution, set the `path_to_rp` option by calling `options(casnet.path_to_rp="YOUR_PATH")`. If you cannot acces the directory `...\\casnet\\commandline_rp\\`, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} page and copy to a directory you have access to. Then follow the instruction to set `path_to_rp`.
-#' \item *Error in execution of `rp`* - This can have a variety of causes, the `rp` executable is called using [callr::rcmd()] and makes use of the [normalizePath()] function with argument `mustWork = FALSE`. Problems caused by specific OS, machine, or, locale problems (e.g. the `winslash` can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing `getOption("casnet.rp_prefix")`. On Windows OS this should return an empty character vector, on Linux or macOS it should return `"./"`. You can manually set the correct prefix by calling `options(casnet.rp_prefix="CORRECT OS PREFIX")` and fill in the prefix that is correct for your OS
-#' }
-#'
-#' @return A list object containing 1-3 elements, depending on arguments requesting output.
-#'
-#' \enumerate{
-#' \item `rqa_measures` - A list of the (C)RQA measures returned if `returnMeasures = TRUE`:
-#' \itemize{
-#'  \item RR = 'Recurrence rate'
-#'  \item DET = 'Determinism'
-#'  \item DET_RR = 'Ratio DET/RR'
-#'  \item LAM = 'Laminarity'
-#'  \item LAM_DET = 'Ratio LAM/DET'
-#'  \item L_max = 'maximal diagonal line length'
-#'  \item L_mean = 'mean diagonal line length'
-#'  \item L_entr = 'Entropy of diagonal line length distribution'
-#'  \item DIV =  'Divergence (1/L_max)'
-#'  \item V_max = 'maximal vertical line length'
-#'  \item TT = 'Trapping time'
-#'  \item V_entr = 'Entropy of vertical line length distribution'
-#'  \item T1 = 'Recurrence times 1st type'
-#'  \item T2 = 'Recurrence times 2nd type'
-#'  \item W_max = 'Max interval length'
-#'  \item W_mean = 'Mean of interval lengths'
-#'  \item W_entr = 'Entropy of interval length distribution'
-#'  \item W_prob = 'Probability of interval'
-#'  \item F_min = 'F min'
-#' }
-#' \item `rqa_rpvector` - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling [rp_plot()]. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting `saveOut = TRUE`.
-#' \item `rqa_diagdist` - The distribution of diagonal line lengths
-#' }
-#'
-#' @note The platform specific `rp` command line executables were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at <http://tocsy.pik-potsdam.de/>.
-#'
-#' The full copyright statement on the website is as follows:
-#'
-#' (C) 2004-2017 SOME RIGHTS RESERVED
-#'
-#' University of Potsdam, Interdisciplinary Center for Dynamics of Complex Systems, Germany
-#'
-#' Potsdam Institute for Climate Impact Research, Transdisciplinary Concepts and Methods, Germany
-#'
-#' This work is licensed under a \href{https://creativecommons.org/licenses/by-nc-nd/2.0/de/}{Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Germany License}.
-#'
-#' More information about recurrence analysis can be found on the \href{http://www.recurrence-plot.tk}{Recurrence Plot} website.
-#'
-#' @family Recurrence Quantification Analysis
-
-#' @export
-#'
-crqa_cl <- function(y1,
-                    y2      = NULL,
-                    emDim   = 1,
-                    emLag   = 1,
-                    emRad   = NA,
-                    DLmin   = 2,
-                    VLmin   = 2,
-                    theiler = 0,
-                    win            = min(length(y1),ifelse(is.null(y2),(length(y1)+1), length(y2)), na.rm = TRUE),
-                    step           = win,
-                    JRP            = FALSE,
-                    distNorm       = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-                    standardise    = c("none","mean.sd","median.mad")[1],
-                    returnMeasures = TRUE,
-                    returnRPvector = FALSE,
-                    returnLineDist = FALSE,
-                    doPlot         = c("noplot","rp","distmat")[[1]],
-                    path_to_rp     = getOption("casnet.path_to_rp"),
-                    saveOut        = FALSE,
-                    path_out       = NULL,
-                    file_ID        = NULL,
-                    silent         = TRUE,
-                    surrogateTest  = FALSE,
-                    targetValue    = .05,
-                    useParallel    = FALSE,
-                    ...){
-
-  if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"/rp_install_log.txt"), mustWork = FALSE))){
-    set_command_line_rp()
-  }
-
-  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
-
-  dotArgs <- list(...)
-  if(is.na(dotArgs%00%NA)){dotArgs<-list(nothing=NA)}
-
-  if(!is.null(y2)){
-    y2 <- zoo::as.zoo(y2)
-    N1 <- NROW(y1)
-    N2 <- NROW(y2)
-    if(N1>N2){
-      y2[N2:(N1+(N1-N2))] <- 0
-    }
-    if(N1<N2){
-      y1[N1:(N2+(N2-N1))] <- 0
-    }
-    df <- cbind.data.frame(y1=unclass(y1),y2=unclass(y2))
-    df <- df[stats::complete.cases(df),]
-  } else {
-    if(any(is.na(y1))){
-      y1 <- y1[!is.na(y1)]
-      if(!silent){message("Removed NAs from timeseries y1 before (C)RQA")}
-    }
-    df <- cbind.data.frame(y1=unclass(y1),y2=NA)
-  }
-
-  # Begin input checks
-  if(is.null(path_out)){
-    if(saveOut){
-      path_out <- getwd()
-    } else {
-      path_out <- tempdir()
-    }
-  } else {
-    path_out <- normalizePath(path_out, mustWork = TRUE)
-  }
-
-  if(is.null(y2)){
-    cat("\nPerforming auto-RQA\n")
-    if(theiler<1){theiler=1}
-  } else {
-    cat("\nPerforming cross-RQA\n")
-  }
-
-  if(surrogateTest){
-    surrogateSeries <- tseries::surrogate(y1,ns=39, fft = TRUE, amplitude = TRUE)
-  }
-
-  windowedAnalysis <- FALSE
-  if(win==NROW(df)|step==(NROW(df))){
-    win <- step <- NROW(df)
-    wIndex <- seq(1,NROW(df))
-    if(is.na(emRad)){cat(paste("Radius will be calulated to yield targetValue =",targetValue,"RR...\n"))}
-  } else {
-    windowedAnalysis = TRUE
-    wIndex <- seq(1,NROW(df)-win, by = step)
-    cat(paste("\nCalculating recurrence measures in a window of size",win,"taking steps of",step,"data points. \n"))
-    if(is.na(emRad)){cat(paste("Radius will be re-calculated to yield targetValue =",targetValue,"RR for each window...\n\n"))}
-  }
-
-
-  if(windowedAnalysis){
-
-    # Check window length vs. embedding
-    if(win < (emLag*emDim)){
-
-      stop(paste0("The size of win = ", win, " must be larger than the product of emLag = ",emLag, " and emDim = ", emDim))
-
-    } else {
-
-  # Adjust time series lengths
-  if((dplyr::last(wIndex)+win-NROW(df))>0){
-
-    yy1 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,1])
-    yy2 <- rep(NA,length(yy1))
-    if(!all(is.na(df[,2]))){
-    yy2 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,2])
-    }
-    df <- cbind.data.frame(y1=yy1,y2=yy2)
-    if(!silent){message("\nAdded 0s to vector to make window and stepsize combination fit to time series length\n\n ")}
-  } else {
-    if(!silent){message("\nWindow and stepsize combination do not fit to the full length of the time series!\n\n ")}
-  }
-
-  if(silent){cat("\nsst! [it's a silent-ish mode]\n\n")}
-
-  wIndices <- plyr::llply(wIndex, function(w){seq(w,w+(win))})
-  names(wIndices) <- paste0("window: ",seq_along(wIndices)," | start: ",wIndex," | stop: ",wIndex+win)
-
-  }
-  } else {
-
-    wIndices <- list(wIndex)
-    names(wIndices) <- paste0("window: 1 | start: ",wIndex[1]," | stop: ",wIndex[NROW(df)])
-
-  } # If windowed
-
-  #cl <- parallel::makeCluster(mc.cores)
-  #parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp","saveOut","path_out","file_ID","silent","..."))
-
-  # Create the data, for all windows,need this for parallel, but also speeds up processing in general.
-  dfList <- plyr::llply(wIndices, function(ind){cbind(y1 = df[ind,1],y2 = df[ind,2])})
-
-  if(useParallel){
-
-    if(names(dotArgs)%in%"logical"){logical <- logical} else {logical <- TRUE}
-
-   cat("\n...using parallel processing...\n")
-
-   # Only return measures
-   returnRPvector <- FALSE
-   returnLineDist <- FALSE
-
-   # How many cores is optimal?
-   cores_available <- parallel::detectCores(logical = logical)-1
-   if(cores_available>1){
-    if(length(wIndices)%%2==0){odd_windows <- FALSE} else {odd_windows <- TRUE}
-    if(cores_available%%2==0){odd_cores <- FALSE} else {odd_cores <- TRUE}
-    if(odd_windows&!odd_cores){cores_available<-cores_available-1}
-    if(!odd_windows&odd_cores){cores_available<-cores_available-1}
-   } else {
-     cores_available <- 1
-   }
-
-    cl       <- parallel::makeCluster(cores_available)
-
-    parallel::clusterEvalQ(cl, library(callr))
-    parallel::clusterEvalQ(cl,library(utils))
-    parallel::clusterEvalQ(cl,library(plyr))
-    parallel::clusterEvalQ(cl,library(tidyverse))
-    parallel::clusterEvalQ(cl,library(pROC))
-    parallel::clusterEvalQ(cl,library(Matrix))
-    parallel::clusterEvalQ(cl,library(casnet))
-
-   # parallel::clusterExport(cl, varlist = c("data","emDim","emLag","emRad","DLmin","VLmin","theiler","win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp", "saveOut","path_out","file_ID","silent","targetValue", "useParallel"))
-
-      # cluster_library(c("devtools","utils","plyr","dplyr","tidyr","Matrix","pROC")) %>%
-      # cluster_assign_value("crqa_cl_main", crqa_cl_main) %>%
-      # cluster_assign_value("crqa_radius", crqa_radius) %>%
-      # cluster_assign_value("emDim", emDim)  %>%
-      # cluster_assign_value("emLag", emLag)  %>%
-      # cluster_assign_value("emRad", emRad)  %>%
-      # cluster_assign_value("DLmin", DLmin)  %>%
-      # cluster_assign_value("VLmin", VLmin)  %>%
-      # cluster_assign_value("theiler", theiler)  %>%
-      # cluster_assign_value("JRP", JRP)  %>%
-      # cluster_assign_value("distNorm", distNorm)  %>%
-      # cluster_assign_value("returnMeasures", returnMeasures)  %>%
-      # cluster_assign_value("returnRPvector", returnRPvector)  %>%
-      # cluster_assign_value("returnLineDist", returnLineDist)  %>%
-      # cluster_assign_value("doPlot", doPlot)  %>%
-      # cluster_assign_value("path_to_rp", path_to_rp)  %>%
-      # cluster_assign_value("saveOut", saveOut)  %>%
-      # cluster_assign_value("path_out", path_out)  %>%
-      # cluster_assign_value("file_ID", file_ID)  %>%
-      # cluster_assign_value("silent", silent)  %>%
-      # cluster_assign_value("targetValue", targetValue) %>%
-      # cluster_assign_value("useParallel", useParallel)
-
- #  parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp","saveOut","path_out","file_ID","silent","..."))
-
-
-  start <- proc.time()
-  wList <- parallel::parLapply(cl,dfList,function(df){crqa_cl_main(data = df,
-                                                                       emDim          = emDim,
-                                                                       emLag          = emLag,
-                                                                       emRad          = emRad,
-                                                                       DLmin          = DLmin,
-                                                                       VLmin          = VLmin,
-                                                                       theiler        = theiler,
-                                                                       JRP            = JRP,
-                                                                       distNorm       = distNorm,
-                                                                       returnMeasures = returnMeasures,
-                                                                       returnRPvector = returnRPvector,
-                                                                       returnLineDist = returnLineDist,
-                                                                       doPlot    = doPlot,
-                                                                       path_to_rp     = path_to_rp,
-                                                                       saveOut        = saveOut,
-                                                                       path_out       = path_out,
-                                                                       file_ID        = file_ID,
-                                                                       silent         = silent,
-                                                                       targetValue    = targetValue,
-                                                                       useParallel    = useParallel)})
-
-  parallel::stopCluster(cl)
-  time_elapsed_parallel <- proc.time() - start # End clock
-
-  cat("\nCompleted in:\n")
-  print(time_elapsed_parallel)
-
-  } else {
-
-    cat("\n...using sequential processing...\n")
-
-    start <- proc.time()
-
-    wList <- plyr::llply(dfList, function(data){
-      crqa_cl_main(
-        data           = data,
-        emDim          = emDim,
-        emLag          = emLag,
-        emRad          = emRad,
-        DLmin          = DLmin,
-        VLmin          = VLmin,
-        theiler        = theiler,
-        JRP            = JRP,
-        distNorm       = distNorm,
-        returnMeasures = returnMeasures,
-        returnRPvector = returnRPvector,
-        returnLineDist = returnLineDist,
-        doPlot    = doPlot,
-        path_to_rp     = path_to_rp,
-        saveOut        = saveOut,
-        path_out       = path_out,
-        file_ID        = file_ID,
-        silent         = silent,
-        targetValue    = targetValue)},
-      .progress = plyr::progress_text(char = "o~o"))
-
-    time_elapsed_parallel <- proc.time() - start # End clock
-
-    cat(paste("\nCompleted in:\n"))
-    print(time_elapsed_parallel)
-
-
-    } # useParallel
-  rm(dfList)
-
-     rqa_measures <- rqa_rpvector <- rqa_diagdist <- rqa_horidist <- NA
-  if(useParallel){
-    if(is.list(wList)){
-      rqa_measures <-  plyr::ldply(wList)
-    } else {
-      rqa_measures <-  tidyr::unnest(wList)
-    }
-  } else {
-    rqa_measures <-plyr::ldply(wList, function(l) l$measures) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
-    rqa_rpvector <-plyr::ldply(wList, function(l) l$rpMAT) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
-    rqa_diagdist <-plyr::ldply(wList, function(l) l$diag_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
-    rqa_horidist <-plyr::ldply(wList, function(l) l$hori_disthist) # %>% dplyr::mutate(win = win, step = step, index = attr(wlist, "index"))
-  }
-
-  wPlot <- which(doPlot%in%c("noplot","rp","distmat"))
-
-  if(wPlot>1){
-    if(wPlot==2){
-      if(windowedAnalysis){
-      plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1], y2 = df[ind,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE))
-      multi_PLOT(plotList)
-      } else {
-        rp(y1 = df[,1], y2 = df[,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE)
-      }
-    }
-    if(wPlot==3){
-      if(windowedAnalysis){
-       plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1],y2 = df[ind,2], emDim = emDim, emLag = emLag, doPlot = TRUE))
-       multi_PLOT(plotList)
-      } else {
-        rp(y1 = df[,1],y2 = df[,2], emDim = emDim, emLag = emLag, doPlot = TRUE)
-      }
-    }
-
-  }
-
-  justData <- FALSE
-  if(win!=NROW(df)){
-    if(!silent){message("Windowed (c)rqa: Returning only (c)rqa measures, use saveOut = TRUE, to get the distribution files")}
-    justData <- TRUE
-  }
-
-  if(returnMeasures&!returnRPvector&!returnLineDist){
-    justData<- TRUE
-  }
-
-  out <- list(rqa_measures = rqa_measures,
-              rqa_rpvector = rqa_rpvector,
-              rqa_diagdist = rqa_diagdist,
-              rqa_horidist = rqa_horidist)
-  if(saveOut){saveRDS(out,paste0(path_out,"CRQA_out",file_ID,".rds"))}
-
-  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
-
-  if(justData){
-    return(rqa_measures)
-  } else {
-    return(out[c(returnMeasures,returnRPvector,returnLineDist,returnLineDist)])
-  }
-}
 
 
 #' Find optimal (C)RQA parameters
@@ -893,11 +892,11 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
     g <- NA
   }
 
-  return(list(optimLag  = opLag,
+  return(invisible(list(optimLag  = opLag,
               optimDim  = opDim,
               optimRow  = opt,
               optimData = df,
-              diagPlot = invisible(g)))
+              diagPlot = g)))
 }
 
 
@@ -1401,9 +1400,9 @@ crqa_rp_measures <- function(RM,
 }
 
 
-#' Get bootsrapped (C)RQA measures based on a recurrence matrix
+#' Get (C)RQA measures based on a binary matrix
 #'
-#' A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures will be caluclated.
+#' A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures (anisotropic) will be caluclated.
 #'
 #' @param RM A distance matrix, or a matrix of zeroes and ones (you must set `emRad = NA`)
 #' @param emRad Threshold for distance value that counts as a recurrence
@@ -1743,9 +1742,10 @@ crqa_diagProfile <- function(RM,
   dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
 
   obs <- dy$RR[dy$.id=="obs"]
+  if(doShuffle){
   if(length(obs)!=(2*length(y1))){
     obs <-  ts_trimfill(obs,c(y1,y2),action = 'trim')$y
-  }
+  }}
   dy_m$y_obs <- obs
 
   df <- tidyr::gather(dy_m, key = "variable", value = "RR", -c(.data$Diagonal,.data$sdRRrnd, .data$labels, .data$ciLO, .data$ciHI))
@@ -1761,10 +1761,18 @@ crqa_diagProfile <- function(RM,
       labels <- sort(unique(c(Diags[breaks],0)))
       breaks <- sort(unique(c(breaks,stats::median(breaks))))
     } else {
-      breaks <- seq_along(labels)
+      breaks <- seq_along(Diags)
       labels <- sort(unique(c(Diags[breaks],0)))
-
     }
+
+    # if(which.min(c(length(breaks),length(labels)))==1){
+    #   labels <- labels[1:length(breaks)]
+    # } else {
+    #   breaks <- breaks[1:length(labels)]
+    # }
+
+    df$Diags <- Diags
+
 
     x1<-(which.min(as.numeric(paste(df$Diagonal))))+(length(diagWin)*.1)
     x2<-(which.max(as.numeric(paste(df$Diagonal))))-(length(diagWin)*.1)
@@ -1772,13 +1780,13 @@ crqa_diagProfile <- function(RM,
     col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
     siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
 
-    g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
+    g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diags)) +
       ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
-      ggplot2::geom_line(ggplot2::aes_(y=~RR, colour = ~variable), size = .5) +
+      ggplot2::geom_line(ggplot2::aes_(y=~RR), size = .5) +
       #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
       ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
       ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
-      ggplot2::scale_x_discrete("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
+      ggplot2::scale_x_continuous("Diagonals in recurrence Matrix") + #, breaks = breaks, labels = labels) +
       ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
       ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
        ggplot2::scale_colour_manual(values = col) +
@@ -2424,16 +2432,17 @@ rp <- function(y1, y2 = NULL,
     rownames(dmat) <- paste(order.by)
   }
 
-    if(!is.null(emRad)){
-      if(is.na(emRad)){
-        emRad <- crqa_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue)$Radius
-      }
-      if(weighted){
-        dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse)
-      } else {
-        dmat <- di2bi(dmat, emRad = emRad, convMat = to.sparse)
-      }
+  if(!is.null(emRad)){
+    if(is.na(emRad)){
+      emRad <- crqa_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue)$Radius
     }
+    if(weighted){
+      dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse)
+    } else {
+      dmat <- di2bi(dmat, emRad = emRad, convMat = to.sparse)
+    }
+  }
+
 
   if(to.sparse){
     attributes(dmat)$emDims1  <- et1
@@ -2458,19 +2467,26 @@ rp <- function(y1, y2 = NULL,
   dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
 
   if(doPlot){
-    dotArgs  <- formals(rp_plot)
-    nameOk   <- rep(TRUE,length(dotArgs))
-    if(...length()>0){
-      dotArgs <- list(...)
-      nameOK  <- names(dotArgs)%in%methods::formalArgs(rp_plot)
-      # Plot with defaults
-      if(!all(nameOK)){
-        dotArgs    <- formals(rp_plot)
-        nameOk <- rep(TRUE,length(dotArgs))
-      }
-    }
-    dotArgs$RM <- dmat
-    do.call(rp_plot, dotArgs[nameOk])
+
+    rp_plot(RM = dmat)
+
+    # if(...length()>0){
+    #   dotArgs <- list(...)
+    #   nameOK  <- names(dotArgs)%in%methods::formalArgs(rp_plot)
+    #   dotArgs <- dotArgs[nameOk]
+    # } else {
+    #   # Plot with defaults
+    #   dotArgs  <- formals(rp_plot)
+    #   #nameOk   <- rep(TRUE,length(dotArgs))
+    # }
+    #
+    # if(!"RM"%in%names(dotArgs)|length(dotArgs$RM)==1){
+    #   dotArgs$RM <- dmat
+    # }
+    # if(!is.na(emRad%00%NA)&(!"radiusValue"%in%names(dotArgs))){
+    #   dotArgs$radiusValue <- emRad
+    # }
+    # do.call(rp_plot, as.list(dotArgs))
   }
 
   return(dmat)
@@ -2603,7 +2619,6 @@ rp_plot <- function(RM,
   #   useGtable=TRUE
   # }
 
-
   colvec <- c("#FFFFFF","#000000")
   names(colvec) <- c("0","1")
 
@@ -2638,37 +2653,27 @@ rp_plot <- function(RM,
 
     unthresholded <- FALSE
 
-    if(!is.null(attr(RM,"emRad"))){
-      radiusValue <- attr(RM,"emRad")
-    }
-
-    # Check epochs
+    # Check epochs ----
     if(!is.null(markEpochsLOI)){
       if(is.factor(markEpochsLOI)&length(markEpochsLOI)==max(c(NROW(RM),NCOL(RM)))){
-
         start <- max(meltRP$value, na.rm = TRUE) + 1
-
-        cpal <- paletteer::paletteer_d(package = "rcartocolor",palette = "Safe", n = nlevels(markEpochsLOI))
+        #cpal <- paletteer::paletteer_d(package = "rcartocolor",palette = "Safe", n = nlevels(markEpochsLOI))
+        cpal <- getColours(Ncols = nlevels(markEpochsLOI))
         #cpal <- paletteer::paletteer_d(package = "ggthemes",palette = "tableau_colorblind10",n = nlevels(markEpochsLOI),direction = 1)
-
         if(hasNA){
-        colvec <- c("#FFFFFF","#000000","#FF0000", cpal)
-        names(colvec) <- c("0","1","NA",levels(markEpochsLOI))
-
+          colvec <- c("#FFFFFF","#000000","#FF0000", cpal)
+          names(colvec) <- c("0","1","NA",levels(markEpochsLOI))
         } else {
           colvec <- c("#FFFFFF","#000000", cpal) #viridis::viridis_pal()(nlevels(markEpochsLOI)))
           names(colvec) <- c("0","1",levels(markEpochsLOI))
         }
-
         N <- max(c(NROW(RM),NCOL(RM)))
         for(i in 1:N){
           j <- i
           meltRP$value[meltRP$Var1==i&meltRP$Var2==j] <- start + as.numeric_character(markEpochsLOI)[i]
         }
-
         meltRP$value <- factor(meltRP$value, levels = sort(unique(meltRP$value)), labels = names(colvec))
         showL <- TRUE
-
       } else {
         warning("Variable passed to 'markEpochsLOI' is not a factor or doesn't have correct length.")
       }
@@ -2679,15 +2684,26 @@ rp_plot <- function(RM,
     }
   }
 
-  # Get CRQA measures
-  if(plotMeasures){
-    if(is.na(radiusValue)){
-      if(!is.null(attributes(RM)$emRad)){
-        radiusValue <- attr(RM,"emRad")
-      } else {
+  if(is.na(radiusValue)){
+    if(!is.null(attr(RM,"emRad"))|!is.na(attr(RM,"emRad"))){
+      radiusValue <- attr(RM,"emRad")
+    } else {
+      if(unthresholded|plotMeasures){
         radiusValue <- crqa_radius(RM,silent = TRUE)$Radius
+        attr(RM,"emRad") <- radiusValue
       }
     }
+  }
+
+  # Get CRQA measures
+  if(plotMeasures){
+    # if(is.na(radiusValue)){
+    #   if(!is.null(attributes(RM)$emRad)){
+    #     radiusValue <- attr(RM,"emRad")
+    #   } else {
+    #     radiusValue <- crqa_radius(RM,silent = TRUE)$Radius
+    #   }
+    # }
     if(unthresholded){
       rpOUT   <- crqa_rp(RM, emRad = radiusValue, AUTO = AUTO)
     } else {
@@ -2695,21 +2711,60 @@ rp_plot <- function(RM,
     }
   }
 
+  #meltRP$value <- log(meltRP$value+.Machine$double.eps)
   # main plot ----
   gRP <-  ggplot2::ggplot(ggplot2::aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
     ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL) +
     ggplot2::geom_abline(slope = 1,colour = "grey50", size = 1)
 
+  ## unthresholded ----
   if(unthresholded){
-    gRP <- gRP + ggplot2::scale_fill_gradient2(low = "red3",
-                                      high     = "steelblue",
-                                      mid      = "white",
-                                      na.value = scales::muted("slategray4"),
-                                      midpoint = mean(meltRP$value, na.rm = TRUE),
-                                      limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
-                                      space    = "Lab",
-                                      name     = "")
 
+    # #barValue <- 0.05
+    # if(is.na(radiusValue)){
+    #   barValue <- mean(meltRP$value, na.rm = TRUE)
+    #   } else {
+    #   barValue <- crqa_radius(RM, targetValue = radiusValue, silent = TRUE, maxIter = 100, radiusOnFail = "percentile")$Radius
+    # }
+
+    if(!is.na(radiusValue)){
+      barValue <- radiusValue
+    } else {
+      barValue <- mean(meltRP$value, na.rm = TRUE)
+     }
+
+    if(attr(RM,"weighted")){
+
+      if(!is.na(radiusValue)){
+        barValue <- sort(unique(meltRP$value[meltRP$value>0]))[1]
+      }
+
+      gRP <- gRP + ggplot2::scale_fill_gradient2(low      = "white",
+                                                 high     = "red3",
+                                                 mid      = "orangered3",
+                                                 na.value = "white", #scales::muted("slategray4"),
+                                                 midpoint = barValue*1.1, #mean(meltRP$value, na.rm = TRUE),
+                                                 limit    = c(0,max(meltRP$value, na.rm = TRUE)),
+                                                 space    = "Lab",
+                                                 name     = "")
+
+      cat(barValue)
+
+    } else {
+
+      gRP <- gRP + ggplot2::scale_fill_gradient2(low      = "red3",
+                                                 high     = "steelblue",
+                                                 mid      = "white",
+                                                 na.value = scales::muted("slategray4"),
+                                                 midpoint = barValue*1.1, #mean(meltRP$value, na.rm = TRUE),
+                                                 limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
+                                                 space    = "Lab",
+                                                 name     = "")
+
+      cat(barValue)
+    }
+
+    ## RadiusRRbar ----
     if(plotRadiusRRbar){
       # Create a custom legend ---
       distrange  <- round(seq(0,max(RM,na.rm = TRUE),length.out=7),2)
@@ -2720,7 +2775,7 @@ rp_plot <- function(RM,
       if(length(resol)>100){
         resol <- round(seq(0,max(RM,na.rm = TRUE),length.out=100),2)
       }
-      resol <- resol %>% tibble::as.tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
+      resol <- resol %>% tibble::as_tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
       #resol <- resol[-1,]
 
       distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){
@@ -2728,23 +2783,33 @@ rp_plot <- function(RM,
       })
       #ldply(distrange[2:6],function(d) cbind(epsilon=d,RR=crqa_rp(RM = RM, emRad = d)$RR))
 
+
       RecScale <- data.frame(RR=distrange$Measure,epsilon=distrange$Radius)
       RecScale <- RecScale %>%
         dplyr::add_row(epsilon=mean(c(0,distrange$Radius[1])),RR=mean(c(0,distrange$Measure[1])),.before = 1) %>%
         dplyr::add_row(epsilon=max(RM),RR=1)
 
+
       resol$y <- elascer(x = resol$y,lo = min(log(RecScale$RR),na.rm = TRUE), hi = max(log(RecScale$RR),na.rm = TRUE))
       #resol$value <- log(resol$value)
       resol <- resol[-1,]
 
+
+      if(!is.na(radiusValue)){
+        barValue <- round(RecScale$RR[which(round(RecScale$epsilon,4)>=radiusValue)[1]],4)
+        barValue <- resol$value[which(resol$y>=log(barValue))[1]]
+      } else {
+        barValue <- mean(meltRP$value, na.rm = TRUE)
+      }
+
       gDist <-  ggplot2::ggplot(resol,ggplot2::aes_(x=~x,y=~y,fill=~value)) +
         ggplot2::geom_tile(show.legend = FALSE) +
-        ggplot2::scale_y_continuous(name = "Recurrence Rate", breaks = log(RecScale$RR), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence hreshold",~ epsilon)), labels = paste(round(RecScale$epsilon,2)))) +
+        ggplot2::scale_y_continuous(name = "Recurrence Rate", breaks = log(RecScale$RR), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence threshold",~ epsilon)), labels = paste(round(RecScale$epsilon,2)))) +
         ggplot2::scale_fill_gradient2(low      = "red3",
                              high     = "steelblue",
                              mid      = "white",
                              na.value = scales::muted("slategray4"),
-                             midpoint = mean(resol$value, na.rm = TRUE),
+                             midpoint =  barValue * 1.1,#mean(meltRP$value, na.rm = TRUE),
                              #limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                              space    = "Lab",
                              name     = "") +
@@ -2769,6 +2834,9 @@ rp_plot <- function(RM,
     }
 
   } else { # unthresholded
+
+
+
   }
 
   rptheme <- ggplot2::theme_bw() + ggplot2::theme(panel.background = element_blank(),
@@ -2799,7 +2867,7 @@ rp_plot <- function(RM,
                                axis.title.x =element_blank())
   }
 
-  # Expand main plot ----
+
   if(!is.null(markEpochsLOI)){
     if(!unthresholded){
         gRP <- gRP +  ggplot2::scale_fill_manual(name  = "Key:",
@@ -3742,8 +3810,11 @@ crqa_rp_prep <- function(RP,
 #' @inheritParams rp
 #' @param directed Should the matrix be considered to represent a directed network? (default = `FALSE`)
 #' @param weighted Should the matrix be considered to represent a weighted network? (default = `FALSE`)
+#' @param weightedBy After setting values smaller than `emRad` to `0`, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (`"si"`). Other option are `"rt"` for *recurrence time* and `"rf"` for *recurrence time frequency*, Because vertices represent time points in \eqn{\epsilon}-thresholded recurrence networks, a difference of two vertex-indices represents duration. If an edge `e1` connects `v1` and `v10` then the *recurrence time* will be the difference of the vertex indices, `9`, and the *recurrence time frequency* will be `1/9`.
+#' @param rescaleWeights If set to `TRUE` and `weighted = TRUE`, all weight values will be rescaled to `[0,1]`, where `0` means no recurrence relation and `1` the maximum weight value.
+#' @param fs Sample frequency: A numeric value interpreted as the `number of observed samples per unit of time`. If the weights represent recurrence times (`"rt"`), they will be divided by the value in `fs`. If the weights represent recurrence time frequencies (`"rf"`), they will be multiplied by the value of `fs` (default = `NA`)
 #' @param includeDiagonal Should the diagonal of the matrix be included when creating the network (default = `FALSE`)
-#' @param returnGraph Return an [igraph::igraph()] object (default = `TRUE`)
+#' @param returnGraph Return an [igraph::igraph()] object (default = `FALSE`)
 #' @param ... Any paramters to pass to [rn_plot()] if `doPlot = TRUE`
 #'
 #' @return A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidence) matrix.
@@ -3759,13 +3830,16 @@ rn <- function(y1, y2 = NULL,
                emRad = NULL,
                directed = FALSE,
                weighted = FALSE,
+               weightedBy = c("si","rt","rf")[1],
+               rescaleWeights = FALSE,
+               fs = NA,
                includeDiagonal = FALSE,
                to.ts = NULL,
                order.by = NULL,
                to.sparse = FALSE,
                method = "Euclidean",
                targetValue = .05,
-               returnGraph = TRUE,
+               returnGraph = FALSE,
                doPlot = FALSE,
                silent = TRUE,
                ...){
@@ -3776,35 +3850,97 @@ rn <- function(y1, y2 = NULL,
            weighted = weighted,targetValue = targetValue,
            method = method, doPlot = FALSE, silent = silent)
 
+
   if(to.sparse){
     attributes(dmat)$directed <- directed
     attributes(dmat)$includeDiagonal <- includeDiagonal
+    #attributes(dmat)$weighted <- weighted
   } else {
     attr(dmat,"directed") <- directed
     attr(dmat,"includeDiagonal") <- includeDiagonal
+    #attr(dmat,"weighted") <- weighted
   }
 
+  if(attr(dmat,"AUTO")){
+    mode <- "upper"
+  } else {
+    mode <- "directed"
+  }
 
-  if(doPlot){
-    dotArgs <- list(...)
-
-    if(is.null(dotArgs)){
-      dotArgs<- formals(rn_plot)
+  if(weighted){
+    if(!weightedBy%in%c("si","rt","rf")){stop("Invalid string in argument weightedBy!")}
+    if(weightedBy%in%c("rt","rf")){
+      grW <- igraph::graph_from_adjacency_matrix(dmat, weighted = TRUE, mode = mode, diag = TRUE) #includeDiagonal)
+      edgeFrame         <- igraph::as_data_frame(grW,"edges")
+      edgeFrame$rectime <- edgeFrame$to-edgeFrame$from
+      if(weightedBy=="rf"){
+        edgeFrame$rectime <- 1/(edgeFrame$rectime+1) #.Machine$double.eps)
+        }
+      if(is.numeric(fs)){
+        if(weightedBy=="rf"){edgeFrame$rectime <- edgeFrame$rectime * fs}
+        if(weightedBy=="rt"){edgeFrame$rectime <- edgeFrame$rectime / fs}
       }
-
-    nameOk  <- names(dotArgs)%in%methods::formalArgs(rn_plot)
-    # Plot with defaults
-    if(!all(nameOk)){
-      dotArgs <- formals(rn_plot)
-      nameOk  <- rep(TRUE,length(dotArgs))
+      E(grW)$weight <- edgeFrame$rectime
+      # for(r in 1:NROW(edgeFrame)){
+      #   dmat[edgeFrame$from[r],edgeFrame$to[r]] <- 1/edgeFrame$rectime[r]
+      #   if(attr(dmat,"AUTO")){
+      #     dmat[edgeFrame$to[r],edgeFrame$from[r]] <- 1/edgeFrame$rectime[r]
+      #     }
+      #   }
+      tmp <- as_adjacency_matrix(grW, type = "both", sparse = to.sparse, attr = "weight")
+      #tmp <- bandReplace(tmp,0,0,0)
+      dmat <- rp_copy_attributes(source = dmat, target = tmp)
+      rm(tmp)
     }
 
-    dotArgs$RN <- dmat
-
-    do.call(rn_plot, dotArgs[nameOk])
+    if(rescaleWeights==TRUE){
+        dmat <- dmat/max(dmat, na.rm = TRUE)
+    }
   }
 
-  return(dmat)
+  if(doPlot){
+
+    if(doPlot){
+      dotArgs  <- formals(rn_plot)
+      nameOk   <- rep(TRUE,length(dotArgs))
+      if(...length()>0){
+        dotArgs <- list(...)
+        nameOK  <- names(dotArgs)%in%methods::formalArgs(rn_plot)
+        # Plot with defaults
+        if(!all(nameOK)){
+          dotArgs    <- formals(rn_plot)
+          nameOk <- rep(TRUE,length(dotArgs))
+        }
+      }
+      dotArgs$RM <- dmat
+      do.call(rn_plot, dotArgs[nameOk])
+    }
+
+    # dotArgs <- list(...)
+    #
+    # if(is.null(dotArgs)){
+    #   dotArgs<- formals(rn_plot)
+    #   }
+    #
+    # nameOk  <- names(dotArgs)%in%methods::formalArgs(rn_plot)
+    # # Plot with defaults
+    # if(!all(nameOk)){
+    #   dotArgs <- formals(rn_plot)
+    #   nameOk  <- rep(TRUE,length(dotArgs))
+    # }
+    #
+    # dotArgs$RN <- dmat
+    #
+    # do.call(rn_plot, dotArgs[nameOk])
+  }
+
+  if(returnGraph){
+    return(list(RN = dmat,
+                g  = igraph::graph_from_adjacency_matrix(dmat, weighted = weighted, mode = mode, diag = includeDiagonal))
+           )
+  } else {
+   return(dmat)
+  }
 }
 
 
@@ -4273,7 +4409,7 @@ mi_ts <- function(y1,y2=NULL, nbins=NA){
 #' @family Redundancy measures (mutual information)
 #' @family Multiplex Recurrence Networks
 #'
-mif_interlayer <- function(g0,g1, probTable=FALSE){
+mi_interlayer <- function(g0,g1, probTable=FALSE){
   d0    <- igraph::degree_distribution(g0)
   d1    <- igraph::degree_distribution(g1)
 
@@ -4357,7 +4493,7 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 #' @param emRad The radius or threshold value
 #' @param convMat convMat Should the matrix be converted from a `distmat` obkect of class [Matrix::Matrix()] to [base::matrix()] (or vice versa)
 #'
-#' @return A matrix with 0s and leaves the values < threshold distance value
+#' @return A matrix with 0s and values < threshold distance value
 #'
 #' @export
 #'
@@ -6768,7 +6904,7 @@ dc_win <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, doPlo
 #' @references Haken, H. & Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.
 #' @references Schiepek, G. K., Tominschek, I., & Heinzel, S. (2014). Self-organization in psychotherapy: testing the synergetic model of change processes. Frontiers in psychology, 5, 1089.
 #'
-dc_ccp = function(df_win, alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
+dc_ccp = function(df_win , alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
   if(attr(df_win,"dataType")!="dc_win"){
     stop("Argument df_win must be generated by function dc_win()!")
@@ -6948,65 +7084,65 @@ get_fluct <- function(y_win,s){
 
 
 
-
-#' Title
 #'
-#' @inheritParams df_f
+#' #' Title
+#' #'
+#' #' @inheritParams dc_f
+#' #'
+#' #' @return
+#' #' @export
+#' #'
+#' #' @examples
+#' dc_f2 <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE,
+#'                     colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 #'
-#' @return
-#' @export
+#'   if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+#'     time_vec <- stats::time(df)
+#'   } else {
+#'     time_vec <- NA
+#'   }
 #'
-#' @examples
-dc_f2 <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE,
-                    colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
+#'   if(is.null(dim(df))){
+#'     if(is.numeric(df)){
+#'       df <- data.frame(df)
+#'     } else {
+#'       df <- data.frame(as.numeric_discrete(df))
+#'     }
+#'   }
+#'
+#'   if(any(df<scale_min,df>scale_max)){
+#'     stop("Range of values in df is outside [scale_min,scale_max]!")
+#'   }
+#'
+#'   if(win<=0){stop("Need a window > 0")}
+#'
+#'   s         <- scale_max-scale_min
+#'
+#'   ew_data_F <- matrix(NA, nrow=NROW(df), ncol=NCOL(df))
+#'   ew_data_F <- data.frame(ew_data_F)
+#'   data <- rbind(df, matrix(0,nrow=2,ncol=NCOL(df), dimnames = list(NULL,colnames(df))))
+#'
+#'   s <- scale_max-scale_min
+#'   length_ts <- nrow(data)
+#'
+#'   for (c in 1:NCOL(data)){
+#'   ew_data_F[,c] <- zoo::rollapplyr(data = zoo::as.zoo(data[,c]), width = win, FUN = function(z){get_fluct(y_win=z,s=s)}, by = 1, by.column = TRUE, fill = NA)
+#' }
+#'   attr(ew_data_F,"time") <- time_vec
+#'   if(is.null(dim(ew_data_F))){
+#'     ew_data_F <- data.frame(ew_data_F)
+#'   }
+#'
+#'   g <- NULL
+#'   if(doPlot){
+#'     g <- plotDC_res(df_win = ew_data_F, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot, title = "Fluctuation Intensity Diagram")
+#'     return(list(data = ew_data_F, graph = g))
+#'   } else {
+#'     return(ew_data_F)
+#'   }
+#' }
 
-  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
-    time_vec <- stats::time(df)
-  } else {
-    time_vec <- NA
-  }
-
-  if(is.null(dim(df))){
-    if(is.numeric(df)){
-      df <- data.frame(df)
-    } else {
-      df <- data.frame(as.numeric_discrete(df))
-    }
-  }
-
-  if(any(df<scale_min,df>scale_max)){
-    stop("Range of values in df is outside [scale_min,scale_max]!")
-  }
-
-  if(win<=0){stop("Need a window > 0")}
-
-  s         <- scale_max-scale_min
-
-  ew_data_F <- matrix(NA, nrow=NROW(df), ncol=NCOL(df))
-  ew_data_F <- data.frame(ew_data_F)
-  data <- rbind(df, matrix(0,nrow=2,ncol=NCOL(df), dimnames = list(NULL,colnames(df))))
-
-  s <- scale_max-scale_min
-  length_ts <- nrow(data)
-
-  for (c in 1:NCOL(data)){
-  ew_data_F[,c] <- zoo::rollapplyr(data = zoo::as.zoo(data[,c]), width = win, FUN = function(z){get_fluct(y_win=z,s=s)}, by = 1, by.column = TRUE, fill = NA)
-}
-  attr(ew_data_F,"time") <- time_vec
-  if(is.null(dim(ew_data_F))){
-    ew_data_F <- data.frame(ew_data_F)
-  }
-
-  g <- NULL
-  if(doPlot){
-    g <- plotDC_res(df_win = ew_data_F, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot, title = "Fluctuation Intensity Diagram")
-    return(list(data = ew_data_F, graph = g))
-  } else {
-    return(ew_data_F)
-  }
-}
-
-#' Distribution Uniformity
+#' @title Distribution Uniformity
 #'
 #' Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.
 #'
@@ -8423,6 +8559,7 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
 #' Produce a plot in which the output of `dc_win()` and `dc_ccp()` on the same multivariate timeseries data is combined with the output of `ts_level()` on a state variable of the same length as the multivariate data.
 #'
 #' @param df_lvl A dataframe generated by `ts_level()` of a variable that is considered a state variable.
+#' @param df_ccp If an object generated by [dc_ccp()], the levels shown in the plot will only be displayed if there is an cumulative complexity peak at that time point (default = `NA` )
 #' @inheritParams plotDC_ccp
 #' @inheritParams plotDC_res
 #' @param levelName A name for the state variable.
@@ -8432,7 +8569,10 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
 #'
 #' @family Dynamic Complexity functions
 #'
-plotDC_lvl <-  function(df_win, df_ccp, df_lvl, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", doPlot = TRUE, title = 'Peaks versus Levels Plot', subtitle = "", xlabel = "Time", ylabel = "", levelName = "State variable"){
+plotDC_lvl <-  function(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", doPlot = TRUE, title = 'Peaks versus Levels Plot', subtitle = "", xlabel = "Time", ylabel = "", levelName = "State variable"){
+
+
+  if(!is.na(dc_ccp)){
 
   if(!(all(NROW(df_win)==NROW(df_ccp) & NROW(df_win)==NROW(df_lvl$pred) & NROW(df_ccp)==NROW(df_lvl$pred)))){
     stop("The time series must all have equal lengths:\n all(NROW(df_win)==NROW(df_ccp) & NROW(df_win)==NROW(df_lvl$pred) & NROW(df_ccp)==NROW(df_lvl$pred))")
@@ -8442,22 +8582,29 @@ plotDC_lvl <-  function(df_win, df_ccp, df_lvl, win, useVarNames = TRUE, colOrde
     stop("There must be an equal number of time series variables in 'df_win' and 'df_ccp'")
   }
 
+  }
+
+
   ylabel <- paste0(ylabel," (arbitrary units)")
 
   if(!useVarNames){
-    df_ccp <- data.matrix(df_ccp)
+    if(!is.na(dc_ccp)){
+      df_ccp <- data.matrix(df_ccp)
     colnames(df_ccp) <- c(1:ncol(df_ccp))
+    }
 
     df_win <- data.matrix(df_win)
     colnames(df_win) <- c(1:ncol(df_win))
   }
 
+  if(!is.na(dc_ccp)){
   lcol  <- df_ccp$sig.peaks
   lcol[lcol==0] <- 5
   df_ccp <- df_ccp[,-c("sig.peaks"%ci%df_ccp)]
   if(is.na(colOrder)){
     df_ccp <- dplyr::select(df_ccp,names(sort(colSums(df_ccp, na.rm = TRUE))))
     colOrder <- TRUE
+  }
   }
 
   if(!all(is.na(useTimeVector))){
@@ -10701,6 +10848,89 @@ as.numeric_factor <- function(x, keepNA = FALSE){
 
 
 
+#' Character vector to named numeric vector
+#'
+#' Converts a character vector to a named numeric vector, with the character elements as names.
+#'
+#' @param x A character vector
+#' @param sortUnique Should the unique character values be sorted? (default = `FALSE`)
+#' @param keepNA Keep NA values (`TRUE`), or remove them (default = `FALSE`)
+#'
+#' @return A named numeric vector
+#' @export
+#'
+#' @examples
+#'
+#' f <- letters
+#' as.numeric_character(f)
+#'
+as.numeric_character <- function(x, sortUnique = FALSE, keepNA = FALSE){
+  IDna <- is.na(x)
+  xx <- as.character(x[!IDna])
+  labels.char <- unique(as.character(xx))
+  if(sortUnique){labels.char <- sort(labels.char)}
+  labels.num <- seq_along(labels.char)
+  names(x) <- x
+  xx <- x
+  plyr::laply(labels.num, function(num){
+    xx[xx%in%labels.char[num]]<<-num}
+  )
+  xx<-as.numeric(xx)
+  names(xx) <- x
+  return(xx)
+}
+
+
+#' Discrete (factor or character) to numeric vector
+#'
+#' Converts a factor with numeric levels, or, a character vector with numeric values to a numeric vector using [as.numeric_factor], or, [as.numeric_character] respectively. If an unnamed numeric vector is passed, it will be returned as a named numeric vector.
+#'
+#' @param x A factor with levels that are numeric, or, a character vector representing numbers.
+#' @param keepNA Keep NA values (`TRUE`), or remove them (default = `FALSE`)
+#'
+#' @return A numeric vector with factor levels / numeric character values as names.
+#' @export
+#'
+#' @examples
+#'
+#' f <- factor(round(runif(10,0,9)))
+#' as.numeric_factor(f)
+#'
+#' # Add NAs
+#' f <- factor(c(round(runif(9,0,9)),NA))
+#' as.numeric_factor(f)
+#' as.numeric_factor(f, keepNA = TRUE)
+#'
+#'
+#'
+as.numeric_discrete <- function(x, keepNA = FALSE){
+
+  if(plyr::is.discrete(x)){
+    if(is.factor(x)){
+      if(suppressWarnings(all(is.na(as.numeric(levels(x)))))){
+        x <- as.character(x)
+      } else {
+        y <- as.numeric_factor(x, keepNA = keepNA)
+      }
+    }
+    if(is.character(x)){
+      y <- as.numeric_character(x, keepNA = keepNA)
+    }
+  } else {
+    if(is.numeric(x)){
+      if(is.null(names(x))){
+        names(x) <- paste(x)
+        y <- x
+      } else {
+        stop("Variable is not a factor, character vector, or, unnamed numeric vector.")
+      }
+    }
+  }
+  return(y)
+}
+
+
+
 #' Create Cauchy Flight
 #'
 #' Creates a Cauchy flight by taking increments from the Cauchy distributions
@@ -10799,91 +11029,6 @@ flight_LevyPareto <- function(N=1000, ndims = 2, alpha = 1.5, beta = 0, scale = 
   for(c in 1:NCOL(df)){df[,c] <- cumsum(stabledist::rstable(n=N, alpha = alpha, beta = beta, gamma = scale, delta = location, pm = 2))}
   return(df)
 }
-
-
-
-
-#' Character vector to named numeric vector
-#'
-#' Converts a character vector to a named numeric vector, with the character elements as names.
-#'
-#' @param x A character vector
-#' @param sortUnique Should the unique character values be sorted? (default = `FALSE`)
-#' @param keepNA Keep NA values (`TRUE`), or remove them (default = `FALSE`)
-#'
-#' @return A named numeric vector
-#' @export
-#'
-#' @examples
-#'
-#' f <- letters
-#' as.numeric_character(f)
-#'
-as.numeric_character <- function(x, sortUnique = FALSE, keepNA = FALSE){
-  IDna <- is.na(x)
-  xx <- as.character(x[!IDna])
-  labels.char <- unique(as.character(xx))
-  if(sortUnique){labels.char <- sort(labels.char)}
-  labels.num <- seq_along(labels.char)
-  names(x) <- x
-  xx <- x
-  plyr::laply(labels.num, function(num){
-    xx[xx%in%labels.char[num]]<<-num}
-  )
-  xx<-as.numeric(xx)
-  names(xx) <- x
-  return(xx)
-}
-
-
-#' Discrete (factor or character) to numeric vector
-#'
-#' Converts a factor with numeric levels, or, a character vector with numeric values to a numeric vector using [as.numeric_factor], or, [as.numeric_character] respectively. If an unnamed numeric vector is passed, it will be returned as a named numeric vector.
-#'
-#' @param x A factor with levels that are numeric, or, a character vector representing numbers.
-#' @param keepNA Keep NA values (`TRUE`), or remove them (default = `FALSE`)
-#'
-#' @return A numeric vector with factor levels / numeric character values as names.
-#' @export
-#'
-#' @examples
-#'
-#' f <- factor(round(runif(10,0,9)))
-#' as.numeric_factor(f)
-#'
-#' # Add NAs
-#' f <- factor(c(round(runif(9,0,9)),NA))
-#' as.numeric_factor(f)
-#' as.numeric_factor(f, keepNA = TRUE)
-#'
-#'
-#'
-as.numeric_discrete <- function(x, keepNA = FALSE){
-
-  if(plyr::is.discrete(x)){
-    if(is.factor(x)){
-      if(suppressWarnings(all(is.na(as.numeric(levels(x)))))){
-        x <- as.character(x)
-      } else {
-        y <- as.numeric_factor(x, keepNA = keepNA)
-      }
-    }
-    if(is.character(x)){
-      y <- as.numeric_character(x, keepNA = keepNA)
-    }
-  } else {
-    if(is.numeric(x)){
-      if(is.null(names(x))){
-        names(x) <- paste(x)
-        y <- x
-      } else {
-        stop("Variable is not a factor, character vector, or, unnamed numeric vector.")
-      }
-    }
-  }
-  return(y)
-}
-
 
 
 # Convert decimal point
