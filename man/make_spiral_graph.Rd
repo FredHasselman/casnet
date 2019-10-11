@@ -11,7 +11,9 @@ make_spiral_graph(g, type = "Archimedean", arcs = 6, a = 1,
   epochColours = NULL, epochLabel = "Epoch", showSizeLegend = FALSE,
   sizeLabel = "Size", scaleVertexSize = c(1, 6),
   vertexBorderColour = "black", scaleEdgeSize = 1/5,
-  defaultEdgeColour = "grey70", doPlot = TRUE)
+  edgeColourLabel = "Weight", showEdgeColourLegend = FALSE,
+  edgeColourByEpoch = TRUE, defaultEdgeColour = "grey70",
+  doPlot = TRUE)
 }
 \arguments{
 \item{g}{An igraph object. If (\code{rev = FALSE}) the vertex with the lowest index will be placed in the centre of the spiral, the highest index will be most outer vertex,}
@@ -53,6 +55,12 @@ make_spiral_graph(g, type = "Archimedean", arcs = 6, a = 1,
 \item{vertexBorderColour}{Draw a border around the vertices. Pass \code{NULL} to use the same colour as the fill colour (default = \code{"black"})}
 
 \item{scaleEdgeSize}{Scale the size of the edges by a constant: \code{E(g)$width * scaleEdgeSize} (default = \code{1/5})}
+
+\item{edgeColourLabel}{Use to indicate if \code{E(g)$color} represents color coding based on some property. (default = \code{"Weight"})}
+
+\item{showEdgeColourLegend}{Should a legend be shown for the colour of the edges? (default = \code{FALSE})}
+
+\item{edgeColourByEpoch}{Should edges that connect to the same epoch be assigned the epoch colour? This will ignore edge colour info in \code{E(g)$color}. (default = \code{TRUE})}
 
 \item{defaultEdgeColour}{Colour of edges that do not connect to the same epoch (default = \code{"grey70"})}
 

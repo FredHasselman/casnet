@@ -30,7 +30,7 @@ rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 
 \item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
-\item{targetValue}{A value passed to \code{crqa_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
+\item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
 \item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with defult settings}
 

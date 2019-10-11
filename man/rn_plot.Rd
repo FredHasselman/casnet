@@ -22,7 +22,7 @@ rn_plot(RN, plotDimensions = FALSE, plotMeasures = FALSE,
 
 \item{Chromatic}{If \code{TRUE} and there are more than two discrete values in \code{RM}, give recurrent points a distinct colour. If \code{RM} was returned by \code{crqa_rp(..., chromatic = TRUE)}, the recurrence plot will colour-code recurrent points according to the category values in \code{attributes(RM)$chromaticRP} (\code{default = FALSE})}
 
-\item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{crqa_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
+\item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{est_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
 
 \item{title}{A title for the plot}
 

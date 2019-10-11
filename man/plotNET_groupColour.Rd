@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{plotNET_groupColour}
 \alias{plotNET_groupColour}
-\title{Vertex Group Colours}
+\title{Vertex and Edge Group Colours}
 \usage{
 plotNET_groupColour(g, groups, colourV = TRUE, alphaV = 1,
   colourE = FALSE, alphaE = 0.8, groupColours = NULL,

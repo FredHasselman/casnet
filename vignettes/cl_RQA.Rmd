@@ -1,5 +1,5 @@
 ---
-title: "Using the CRQA command line interface (crqa_cl)"
+title: "Using the CRQA command line interface (rp_cl)"
 author: "Fred Hasselman"
 date: "`r Sys.Date()`"
 bibliography: bibliography.bib
@@ -8,7 +8,7 @@ output:
   html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Using the CRQA command line interface (crqa_cl)}
+  %\VignetteIndexEntry{Using the CRQA command line interface (rp_cl)}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
@@ -30,7 +30,7 @@ library(invctr)
 
 ## **An R interface to Marwan's commandline recurrence plots**
 
-The `crqa_cl()` function is a wrapper for the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} executables provided by Norbert Marwan. 
+The `rp_cl()` function is a wrapper for the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} executables provided by Norbert Marwan. 
 
 The `rp` executable is installed when the function is called for the first time:
 
@@ -84,14 +84,14 @@ The data are unordered categorical, that is, the differences between the integer
 * Embedding dimension = 1
 * Radius = 0 (any number $\leq$ 1 will do)
 
-In the code block below the functions `crqa_cl()`, `rp()`, and `rp_plot()` are used to perform RQA on 2 participants in the dataset.
+In the code block below the functions `rp_cl()`, `rp()`, and `rp_plot()` are used to perform RQA on 2 participants in the dataset.
 
 ```{r RNG2, message=FALSE, warning=FALSE, cache=TRUE, collapse=FALSE, include=TRUE, echo=TRUE, paged.print=FALSE}
 # Run the RQA analysis
 y_1  <- RNG$number[RNG$ID==163]
 y_2 <-  RNG$number[RNG$ID==291]
-crqa_1 <- crqa_cl(y1 = y_1, emDim  = 1, emLag = 1, emRad= 1)
-crqa_2 <- crqa_cl(y1 = y_2, emDim  = 1, emLag = 1, emRad= 1)
+crqa_1 <- rp_cl(y1 = y_1, emDim  = 1, emLag = 1, emRad= 1)
+crqa_2 <- rp_cl(y1 = y_2, emDim  = 1, emLag = 1, emRad= 1)
 
 ## Plot the recurrence matrix
 # Get the recurrence matrix
@@ -130,8 +130,8 @@ y_1rnd <- y_1[sample(1:NROW(y_1),size = NROW(y_1))]
 y_2rnd <- y_2[sample(1:NROW(y_2),size = NROW(y_2))]
 
 # Calculate RQA measures
-crqa_1rnd <- crqa_cl(y1 = y_1rnd, emDim  = 1, emLag = 1, emRad= 1)
-crqa_2rnd <- crqa_cl(y1 = y_2rnd, emDim  = 1, emLag = 1, emRad= 1)
+crqa_1rnd <- rp_cl(y1 = y_1rnd, emDim  = 1, emLag = 1, emRad= 1)
+crqa_2rnd <- rp_cl(y1 = y_2rnd, emDim  = 1, emLag = 1, emRad= 1)
 
 # Create the recurrence matrix
 rp_1 <- rp(y1=y_1rnd, y2=y_1rnd, emDim = 1, emLag = 1,emRad = 1)
@@ -172,9 +172,9 @@ set.seed(123456789)
 y_1rnd_sur <- ldply(1:99, function(s) y_1[sample(1:NROW(y_1),size = NROW(y_1))])
 y_2rnd_sur <- ldply(1:99, function(s) y_2[sample(1:NROW(y_2),size = NROW(y_2))])
 
-crqa_1rnd_sur <- ldply(seq_along(y_1rnd_sur$V1), function(r) crqa_cl(y1 = as.numeric(y_1rnd_sur[r,]), emDim  = 1, emLag = 1, emRad= 1))
+crqa_1rnd_sur <- ldply(seq_along(y_1rnd_sur$V1), function(r) rp_cl(y1 = as.numeric(y_1rnd_sur[r,]), emDim  = 1, emLag = 1, emRad= 1))
 crqa_1rnd_sur[NROW(crqa_1rnd_sur)+1,] <- crqa_1
-crqa_2rnd_sur <- ldply(seq_along(y_2rnd_sur$V1), function(r) crqa_cl(y1 = as.numeric(y_2rnd_sur[r,]), emDim  = 1, emLag = 1, emRad= 1))
+crqa_2rnd_sur <- ldply(seq_along(y_2rnd_sur$V1), function(r) rp_cl(y1 = as.numeric(y_2rnd_sur[r,]), emDim  = 1, emLag = 1, emRad= 1))
 crqa_2rnd_sur[NROW(crqa_2rnd_sur)+1,] <- crqa_2
 ```
 

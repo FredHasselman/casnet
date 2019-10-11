@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Using the CRQA command line interface (crqa_cl) • casnet</title>
+<title>Using the CRQA command line interface (rp_cl) • casnet</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -16,7 +16,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Using the CRQA command line interface (crqa_cl)">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Using the CRQA command line interface (rp_cl)">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
@@ -64,7 +64,7 @@
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
-      <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
+      <a href="../articles/cl_RQA.html">Using the CRQA command line interface (rp_cl)</a>
     </li>
     <li>
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
@@ -98,10 +98,10 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Using the CRQA command line interface (crqa_cl)</h1>
+      <h1>Using the CRQA command line interface (rp_cl)</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2019-09-10</h4>
+            <h4 class="date">2019-10-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/cl_RQA.Rmd"><code>vignettes/cl_RQA.Rmd</code></a></small>
       <div class="hidden name"><code>cl_RQA.Rmd</code></div>
@@ -114,7 +114,7 @@
 <h2 class="hasAnchor">
 <a href="#an-r-interface-to-marwans-commandline-recurrence-plots" class="anchor"></a><strong>An R interface to Marwan’s commandline recurrence plots</strong>
 </h2>
-<p>The <code><a href="../reference/crqa_cl.html">crqa_cl()</a></code> function is a wrapper for the  executables provided by Norbert Marwan.</p>
+<p>The <code><a href="../reference/rp_cl.html">rp_cl()</a></code> function is a wrapper for the  executables provided by Norbert Marwan.</p>
 <p>The <code>rp</code> executable is installed when the function is called for the first time:</p>
 <ul>
 <li>It is renamed to <code>rp</code> from a platform specific filename located in the directory: [path to casnet]/commandline_rp/</li>
@@ -162,11 +162,11 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 <li>Embedding dimension = 1</li>
 <li>Radius = 0 (any number <span class="math inline">\(\leq\)</span> 1 will do)</li>
 </ul>
-<p>In the code block below the functions <code><a href="../reference/crqa_cl.html">crqa_cl()</a></code>, <code><a href="../reference/rp.html">rp()</a></code>, and <code><a href="../reference/rp_plot.html">rp_plot()</a></code> are used to perform RQA on 2 participants in the dataset.</p>
+<p>In the code block below the functions <code><a href="../reference/rp_cl.html">rp_cl()</a></code>, <code><a href="../reference/rp.html">rp()</a></code>, and <code><a href="../reference/rp_plot.html">rp_plot()</a></code> are used to perform RQA on 2 participants in the dataset.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># Run the RQA analysis</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">y_<span class="dv">1</span>  &lt;-<span class="st"> </span>RNG<span class="op">$</span>number[RNG<span class="op">$</span>ID<span class="op">==</span><span class="dv">163</span>]</a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">y_<span class="dv">2</span> &lt;-<span class="st">  </span>RNG<span class="op">$</span>number[RNG<span class="op">$</span>ID<span class="op">==</span><span class="dv">291</span>]</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">crqa_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> y_<span class="dv">1</span>, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb2-4" data-line-number="4">crqa_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rp_cl.html">rp_cl</a></span>(<span class="dt">y1 =</span> y_<span class="dv">1</span>, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code>&gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -181,10 +181,10 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.017   0.014   0.074 
+&gt;   0.015   0.019   0.097 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">crqa_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> y_<span class="dv">2</span>, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">crqa_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rp_cl.html">rp_cl</a></span>(<span class="dt">y1 =</span> y_<span class="dv">2</span>, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code>&gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -199,7 +199,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.018 
+&gt;   0.008   0.003   0.014 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co">## Plot the recurrence matrix</span></a>
@@ -259,7 +259,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 <a class="sourceLine" id="cb10-6" data-line-number="6">y_2rnd &lt;-<span class="st"> </span>y_<span class="dv">2</span>[<span class="kw"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(y_<span class="dv">2</span>),<span class="dt">size =</span> <span class="kw"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(y_<span class="dv">2</span>))]</a>
 <a class="sourceLine" id="cb10-7" data-line-number="7"></a>
 <a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co"># Calculate RQA measures</span></a>
-<a class="sourceLine" id="cb10-9" data-line-number="9">crqa_1rnd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> y_1rnd, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb10-9" data-line-number="9">crqa_1rnd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rp_cl.html">rp_cl</a></span>(<span class="dt">y1 =</span> y_1rnd, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code>&gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -274,10 +274,10 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.009   0.004   0.014 
+&gt;   0.009   0.002   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">crqa_2rnd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/crqa_cl.html">crqa_cl</a></span>(<span class="dt">y1 =</span> y_2rnd, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">crqa_2rnd &lt;-<span class="st"> </span><span class="kw"><a href="../reference/rp_cl.html">rp_cl</a></span>(<span class="dt">y1 =</span> y_2rnd, <span class="dt">emDim  =</span> <span class="dv">1</span>, <span class="dt">emLag =</span> <span class="dv">1</span>, <span class="dt">emRad=</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code>&gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
@@ -292,7 +292,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 &gt; 
 &gt; Completed in:
 &gt;    user  system elapsed 
-&gt;   0.010   0.003   0.014 
+&gt;   0.010   0.003   0.013 
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># Create the recurrence matrix</span></a>
@@ -436,7 +436,7 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

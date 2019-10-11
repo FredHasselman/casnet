@@ -4,29 +4,43 @@
 \alias{as.numeric_discrete}
 \title{Discrete (factor or character) to numeric vector}
 \usage{
-as.numeric_discrete(x, keepNA = FALSE)
+as.numeric_discrete(x, keepNA = FALSE, sortUnique = FALSE)
 }
 \arguments{
 \item{x}{A factor with levels that are numeric, or, a character vector representing numbers.}
 
 \item{keepNA}{Keep NA values (\code{TRUE}), or remove them (default = \code{FALSE})}
+
+\item{sortUnique}{Should the unique character/factor level values be sorted? (default = \code{FALSE})}
 }
 \value{
-A numeric vector with factor levels / numeric character values as names.
+A named numeric vector with original factor levels / character values / numeric values as names.
 }
 \description{
-Converts a factor with numeric levels, or, a character vector with numeric values to a numeric vector using \link{as.numeric_factor}, or, \link{as.numeric_character} respectively. If an unnamed numeric vector is passed, it will be returned as a named numeric vector.
+Converts a factor with numeric levels, or, a character vector with numeric values to a numeric vector using \link{as.numeric_factor}, or, \link{as.numeric_character} respectively. If an unnamed numeric vector is passed, it will be returned as a named numeric vector, if this vector is continuous, it will be returned discretised (by calling \link{ts_discrete}), the labels will be rounded to `signif(x, digits = 4).
 }
 \examples{
 
-f <- factor(round(runif(10,0,9)))
-as.numeric_factor(f)
+# Continuous
+i <- runif(10,0,9)
+as.numeric_discrete(i)
 
-# Add NAs
+# Integer
+as.numeric_discrete(round(i))
+
+# Factor with NAs
 f <- factor(c(round(runif(9,0,9)),NA))
-as.numeric_factor(f)
-as.numeric_factor(f, keepNA = TRUE)
+as.numeric_discrete(f)
+as.numeric_discrete(f, keepNA = FALSE)
 
+# Character vector
+c <- c("Thank","you", "for", "the flowers")
+as.numeric_discrete(c)
+as.numeric_discrete(c, sortUnique = TRUE)
+
+c <- c("Thank","you", "for", "the", "flowers")
+as.numeric_discrete(c)
+as.numeric_discrete(c, sortUnique = TRUE)
 
 
 }

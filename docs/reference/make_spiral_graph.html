@@ -103,7 +103,7 @@
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
-      <a href="../articles/cl_RQA.html">Using the CRQA command line interface (crqa_cl)</a>
+      <a href="../articles/cl_RQA.html">Using the CRQA command line interface (rp_cl)</a>
     </li>
     <li>
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
@@ -153,7 +153,9 @@
   <span class='kw'>epochColours</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>epochLabel</span> <span class='kw'>=</span> <span class='st'>"Epoch"</span>, <span class='kw'>showSizeLegend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>sizeLabel</span> <span class='kw'>=</span> <span class='st'>"Size"</span>, <span class='kw'>scaleVertexSize</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>6</span>),
   <span class='kw'>vertexBorderColour</span> <span class='kw'>=</span> <span class='st'>"black"</span>, <span class='kw'>scaleEdgeSize</span> <span class='kw'>=</span> <span class='fl'>1</span>/<span class='fl'>5</span>,
-  <span class='kw'>defaultEdgeColour</span> <span class='kw'>=</span> <span class='st'>"grey70"</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>edgeColourLabel</span> <span class='kw'>=</span> <span class='st'>"Weight"</span>, <span class='kw'>showEdgeColourLegend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>edgeColourByEpoch</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>defaultEdgeColour</span> <span class='kw'>=</span> <span class='st'>"grey70"</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -239,6 +241,18 @@
       <td><p>Scale the size of the edges by a constant: <code>E(g)$width * scaleEdgeSize</code> (default = <code>1/5</code>)</p></td>
     </tr>
     <tr>
+      <th>edgeColourLabel</th>
+      <td><p>Use to indicate if <code>E(g)$color</code> represents color coding based on some property. (default = <code>"Weight"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>showEdgeColourLegend</th>
+      <td><p>Should a legend be shown for the colour of the edges? (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>edgeColourByEpoch</th>
+      <td><p>Should edges that connect to the same epoch be assigned the epoch colour? This will ignore edge colour info in <code>E(g)$color</code>. (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
       <th>defaultEdgeColour</th>
       <td><p>Colour of edges that do not connect to the same epoch (default = <code>"grey70"</code>)</p></td>
     </tr>
@@ -283,7 +297,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
 
       </footer>

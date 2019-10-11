@@ -4,12 +4,14 @@
 \alias{as.numeric_factor}
 \title{Numeric factor to numeric vector}
 \usage{
-as.numeric_factor(x, keepNA = FALSE)
+as.numeric_factor(x, keepNA = FALSE, sortUnique = FALSE)
 }
 \arguments{
 \item{x}{A factor based on numeric values.}
 
 \item{keepNA}{Keep NA values (\code{TRUE}), or remove them (default = \code{FALSE})}
+
+\item{sortUnique}{Should the unique character values be sorted? (default = \code{FALSE})}
 }
 \value{
 A numeric vector with factor levels as names.

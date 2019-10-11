@@ -19,6 +19,9 @@ The inter-layer mutual information between \code{g1} and \code{g2}. If \code{pro
 \description{
 Inter-layer mutual information
 }
+\note{
+If the networks are weighted the strength distribution will be used instead of the the degree distribution.
+}
 \seealso{
 Other Redundancy measures (mutual information): \code{\link{mi_mat}},
   \code{\link{mif}}
