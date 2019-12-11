@@ -32,7 +32,7 @@
   toset <- !(names(op.casnet) %in% names(op))
   if(any(toset)) options(op.casnet[toset])
 
-  for(p in c("grDevices","graphics","stats","utils","Matrix","plyr","dplyr","ggplot2","broom","invctr")){
+  for(p in c("grDevices","graphics","stats","utils","Matrix","plyr","dplyr","ggplot2","gganimate","ggimage","broom","invctr","igraph")){
     requireNamespace(p, quietly = TRUE)
     }
   invisible()
@@ -61,6 +61,9 @@ get_os <- function(){
     (grepl("linux-gnu", R.version$os))
     os <- "linux-gnu"
   }
+  # if(os%in%"osx"&as.numeric(strsplit(sysinf[which(names(sysinf)%in%"release")],"[.]")[[1]][1])>=19){
+  #   warning("From macOS Catalina, 32-bit applications are no longer allowed, please use rp_measures() to conduct Recurrence Quantification Analysis.")
+  # }
   tolower(os)
 }
 

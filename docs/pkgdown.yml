@@ -3,7 +3,6 @@ pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
   RecurrenceNetworks: RecurrenceNetworks.html
-  cl_RQA: cl_RQA.html
   dynamiccomplexity: dynamiccomplexity.html
   imputemissingsata: imputemissingsata.html
   scalingphenomena: scalingphenomena.html

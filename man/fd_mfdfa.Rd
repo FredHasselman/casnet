@@ -4,27 +4,54 @@
 \alias{fd_mfdfa}
 \title{Multi-fractal Detrended Fluctuation Analysis}
 \usage{
-fd_mfdfa(signal, qq = c(-10, -5:5, 10), mins = 6, maxs = 12,
-  ressc = 30, m = 1)
+fd_mfdfa(y, qq = c(-10, -5:5, 10), fs = NULL, removeTrend = c("no",
+  "poly", "adaptive", "bridge")[2], polyOrder = 1,
+  standardise = c("none", "mean.sd", "median.mad")[2],
+  adjustSumOrder = FALSE, scaleMin = 2,
+  scaleMax = floor(log2(NROW(y)/2)), scaleResolution = (scaleMax -
+  scaleMin), m = 1)
 }
 \arguments{
-\item{signal}{An input signal.}
+\item{y}{An input signal.}
 
 \item{qq}{A vector containing a range of values for the order of fluctuation \code{q}.}
 
-\item{mins}{Minimum scale to consider.}
+\item{fs}{Sample rate}
 
-\item{maxs}{Maximum scale to consider.}
+\item{removeTrend}{Method to use for detrending, see \code{\link[fractal:DFA]{fractal::DFA()}} (default = "poly")}
 
-\item{ressc}{rescc}
+\item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
+
+\item{standardise}{Standardise by the series using \code{\link[casnet:ts_standardise]{casnet::ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
+
+\item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
+
+\item{scaleMin}{Minimium scale (as a power of 2) to use}
+
+\item{scaleMax}{Maximum scale (as a power of 2) to use}
+
+\item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}. The default value yields no resolution of scales: \code{(scaleMax-scaleMin)}. Common values}
 
 \item{m}{m}
 }
 \value{
-output
+A dataframe with values of \code{q},\code{H(q)}, \code{t(q)}, \code{h(q)}, `D(q)``
 }
 \description{
 Multi-fractal Detrended Fluctuation Analysis
+}
+\examples{
+
+set.seed(33)
+df <- fd_mfdfa(rnorm(4096))
+
+op <- par(mfrow=c(2,2))
+plot(df$q, df$Hq, type="l")
+plot(df$q, df$tq, type="l")
+plot(df$q, df$Dq, type="l")
+plot(df$hq,df$Dq, type="l")
+par(op)
+
 }
 \seealso{
 Other Fluctuation Analyses: \code{\link{fd_RR}},

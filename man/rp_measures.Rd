@@ -2,6 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{rp_measures}
 \alias{rp_measures}
+\alias{crqa_rp}
 \title{Get (C)RQA measures based on a binary matrix}
 \usage{
 rp_measures(RM, emRad = NA, DLmin = 2, VLmin = 2, HLmin = 2,

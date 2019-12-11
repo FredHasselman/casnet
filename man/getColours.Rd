@@ -4,11 +4,9 @@
 \alias{getColours}
 \title{Get some nice colours}
 \usage{
-getColours(pal = c("pe", "mm", "le", "an")[1], Ncols = 20)
+getColours(Ncols = 20)
 }
 \arguments{
-\item{pal}{The colour pallette, one of \code{"pe"},\code{"mm"},\code{"le"``"an"} (default = \code{"pe"})}
-
 \item{Ncols}{Number of colours}
 }
 \value{
@@ -19,6 +17,9 @@ Get some nice colours
 }
 \examples{
 
-getColours(Ncol=5)
+# Plot all available colours
+df <- expand.grid(x=1:8,y=1:8)[1:58,]
+plot(df$x,df$y,pch=15,col=getColours(Ncols=58),cex=5, axes = FALSE, ann = FALSE)
+text(df$x,df$y,paste(1:58),col="white")
 
 }

@@ -4,8 +4,8 @@
 \alias{ts_windower}
 \title{Get sliding window indices}
 \usage{
-ts_windower(y, win = length(y), step = round(win/2), overlap = NA,
-  adjustY = NA)
+ts_windower(y, win = length(y), step = NA, overlap = NA,
+  adjustY = NA, alignment = c("r", "c", "l")[1])
 }
 \arguments{
 \item{y}{A time series or numeric vector}
@@ -17,6 +17,8 @@ ts_windower(y, win = length(y), step = round(win/2), overlap = NA,
 \item{overlap}{A value between \code{[0 .. 1]}. If overlap is not \code{NA} (default), the value of \code{step} is ignored and set to \code{floor(overlap*win)}. This produces indices in which the size of \code{step} is always smaller than \code{win}, e.g. for fluctuation analyses that use binning procedures to represent time scales.}
 
 \item{adjustY}{If not \code{NA}, or, \code{FALSE} a list object with fields that match one or more arguments of \link[casnet]{ts_trimfill} (except for \code{x,y}), e.g. \code{list(action="trim.NA",type="end",padding=NA,silent=TRUE)}. See \code{Return value} below for details.}
+
+\item{alignment}{Whether to right (\code{"r"}), center (\code{"c"}), or left (\code{"l"}) align the window.}
 }
 \value{
 If \code{adjustY = FALSE}, or, a list object with fields that represent arguments of \link[casnet]{ts_trimfill}, then the (adjusted) vector \code{y} is returned with an attribute \code{"windower"}. This is a list object with fields that contain the indices for each window that fits on \code{y}, given \code{win}, \code{step} or \code{overlap} and the settings of \code{adjustY}. If \code{adjustY = NA}, only the list object is returned.
@@ -37,5 +39,8 @@ Other Time series operations: \code{\link{ts_center}},
   \code{\link{ts_slice}}, \code{\link{ts_standardise}},
   \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
   \code{\link{ts_trimfill}}
+
+Other Tools for windowed analyses: \code{\link{plotMRN_win}}
 }
 \concept{Time series operations}
+\concept{Tools for windowed analyses}

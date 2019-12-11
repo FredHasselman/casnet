@@ -29,4 +29,10 @@ data frame for ROC
 \description{
 Estimate
 }
+\seealso{
+Other Estimate Recurrence Parameters: \code{\link{est_emDim}},
+  \code{\link{est_emLag}}, \code{\link{est_parameters}},
+  \code{\link{est_radius}}
+}
+\concept{Estimate Recurrence Parameters}
 \keyword{internal}

@@ -64,9 +64,6 @@
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
-      <a href="../articles/cl_RQA.html">Using the CRQA command line interface (rp_cl)</a>
-    </li>
-    <li>
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
@@ -389,11 +386,11 @@ REP_hl
 <a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; [1] 0.3158716</span></a>
 <a class="sourceLine" id="cb7-8" data-line-number="8">qgraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(g1)</a>
 <a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;       smallworldness         trans_target averagelength_target </span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;           6.61387811           0.31587164         215.96216865 </span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;           6.57273611           0.31587164         215.96216865 </span></a>
 <a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt;           0.04082680           0.03278274           0.04943755 </span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt;           0.04108205           0.03304423           0.05021683 </span></a>
 <a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt;         184.61567398         181.75130834         194.25413559</span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt;         184.61429020         181.75197032         194.26128307</span></a>
 <a class="sourceLine" id="cb7-15" data-line-number="15"></a>
 <a class="sourceLine" id="cb7-16" data-line-number="16">recs1 &lt;-<span class="st"> </span>igraph<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(g1)</a>
 <a class="sourceLine" id="cb7-17" data-line-number="17"></a>
@@ -657,11 +654,11 @@ REP_hl
 <a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt; [1] 0.3422773</span></a>
 <a class="sourceLine" id="cb13-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(g2)</a>
 <a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt;       smallworldness         trans_target averagelength_target </span></a>
-<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt;          11.01178435           0.34227726          77.69775479 </span></a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt;          10.96316085           0.34227726          77.69775479 </span></a>
 <a class="sourceLine" id="cb13-10" data-line-number="10"><span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span></a>
-<a class="sourceLine" id="cb13-11" data-line-number="11"><span class="co">#&gt;           0.02332405           0.01651187           0.03096147 </span></a>
+<a class="sourceLine" id="cb13-11" data-line-number="11"><span class="co">#&gt;           0.02337461           0.01719814           0.03164947 </span></a>
 <a class="sourceLine" id="cb13-12" data-line-number="12"><span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span></a>
-<a class="sourceLine" id="cb13-13" data-line-number="13"><span class="co">#&gt;          58.30314691          55.86242934          70.70676938</span></a>
+<a class="sourceLine" id="cb13-13" data-line-number="13"><span class="co">#&gt;          58.17154998          55.87011125          68.89460322</span></a>
 <a class="sourceLine" id="cb13-14" data-line-number="14"></a>
 <a class="sourceLine" id="cb13-15" data-line-number="15">recs2 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(g2)</a>
 <a class="sourceLine" id="cb13-16" data-line-number="16"></a>
@@ -925,11 +922,11 @@ REP_hl
 <a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; [1] 0.3300908</span></a>
 <a class="sourceLine" id="cb19-7" data-line-number="7"><span class="kw"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(g3)</a>
 <a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt;       smallworldness         trans_target averagelength_target </span></a>
-<a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt;         28.668283725          0.330090791         13.959812762 </span></a>
+<a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt;         28.782465788          0.330090791         13.959812762 </span></a>
 <a class="sourceLine" id="cb19-10" data-line-number="10"><span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span></a>
-<a class="sourceLine" id="cb19-11" data-line-number="11"><span class="co">#&gt;          0.010459792          0.004539559          0.018158236 </span></a>
+<a class="sourceLine" id="cb19-11" data-line-number="11"><span class="co">#&gt;          0.010439689          0.004539559          0.017509728 </span></a>
 <a class="sourceLine" id="cb19-12" data-line-number="12"><span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span></a>
-<a class="sourceLine" id="cb19-13" data-line-number="13"><span class="co">#&gt;         12.681509367         12.065235230         19.900523971</span></a>
+<a class="sourceLine" id="cb19-13" data-line-number="13"><span class="co">#&gt;         12.707547189         12.061512195         19.870690121</span></a>
 <a class="sourceLine" id="cb19-14" data-line-number="14"></a>
 <a class="sourceLine" id="cb19-15" data-line-number="15">recs3 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(g3)</a>
 <a class="sourceLine" id="cb19-16" data-line-number="16"></a>

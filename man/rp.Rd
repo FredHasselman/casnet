@@ -7,7 +7,7 @@
 rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
   to.ts = NULL, order.by = NULL, to.sparse = FALSE,
   weighted = FALSE, method = "Euclidean", targetValue = 0.05,
-  doPlot = FALSE, silent = TRUE, ...)
+  doPlot = FALSE, doEmbed = TRUE, silent = TRUE, ...)
 }
 \arguments{
 \item{y1}{A numeric vector or time series}
@@ -33,6 +33,8 @@ rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
 \item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with defult settings}
+
+\item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag}. If \code{y1} and/or \code{y2} are data frames, the columns will be used as dimensions (default = \code{TRUE})}
 
 \item{silent}{Silent-ish mode}
 

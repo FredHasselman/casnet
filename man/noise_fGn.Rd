@@ -4,7 +4,7 @@
 \alias{noise_fGn}
 \title{Generate fractional Gaussian noise}
 \usage{
-noise_fGn(H = 0.5, N = 100, mu = NULL, sigma = NULL)
+noise_fGn(H = 0.5, N = 512, mu = NULL, sigma = NULL)
 }
 \arguments{
 \item{H}{Hurst exponent}

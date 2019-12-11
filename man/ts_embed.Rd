@@ -23,6 +23,9 @@ The lag embedded time series
 \description{
 Create a state vector based on an embedding lag and a number of embedding dimanesions.
 }
+\note{
+If \code{emLag = 0}, the assumption is the columns in \code{y} represent the dimensions and \code{y} will be returned with attributes \code{emLag = 0} and \code{emDim = NCOL(y)}. If \code{emLag > 0} and \code{NCOL(y)>1} the first column of \code{y} will used for embedding and a warning will be triggered.
+}
 \seealso{
 Other Time series operations: \code{\link{ts_center}},
   \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},

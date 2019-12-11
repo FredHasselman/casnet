@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlRtsa_SOURCE.R
 \name{ts_slice}
 \alias{ts_slice}
-\title{Slice columns of a matrix in epochs}
+\title{Slice a Matrix}
 \usage{
 ts_slice(y, epochSz = 4)
 }
@@ -15,7 +15,7 @@ ts_slice(y, epochSz = 4)
 A list with epochs
 }
 \description{
-Slice columns of a matrix in epochs
+Slices rows of a matrix into a list of matrices representing epochs of length \code{epochSz}.
 }
 \seealso{
 Other Time series operations: \code{\link{ts_center}},

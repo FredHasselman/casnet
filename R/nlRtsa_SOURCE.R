@@ -1,10 +1,11 @@
 # Estimate parameters ----
 
-#' Find optimal parameters for constructing a Recurrence Matrix
+#' @title Estimate (C)RQA parameters
 #'
-#' A wrapper for various algorithms used to find optimal value pair for the embedding delay and the number of embedding dimensions
+#' @description Find optimal parameters for constructing a Recurrence Matrix. A wrapper for various algorithms used to find optimal values for the embedding delay and the number of embedding dimensions
 #'
 #' @aliases crqa_parameters
+#'
 #' @param y A numeric vector or time series
 #' @param emLag Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If `NULL` the lags based on the mutual information in `lagMethods` will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = `NULL`)
 #' @param lagMethods A character vector with one or more of the following strings: `"first.minimum","global.minimum","max.lag"`. If `emLag` represents a valid lag this value will  be reported as "user.lag" (default = `c("first.minimum","global.minimum","max.lag")`)
@@ -17,6 +18,7 @@
 #' \item{`preferSmallestInLargestHood` - The default option: If no unique pair can be found, prefer pairs with smallest values for lag, dimensions, percentage NN for the largest NN size}
 #' }
 #' @param maxDim Maximum number of embedding dimensions to consider (default = `10`)
+#' @param minVecLength The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of `maxDim` that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = `20``)
 #' @param nnSizes Points whose distance is `nnSize` times further apart than the estimated size of the attractor will be declared false neighbours. See the argument `atol` in [fractal::FNN()] (default = `2`)
 #' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than `nnRadius`, the points are declared false neighbours. See the argument `rtol` in [fractal::FNN()] (default = `5`)
 #' @param nnThres Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = `10`)
@@ -38,19 +40,25 @@
 #'
 #' @export
 #'
+#' @examples
+#'
+#' set.seed(4321)
+#' est_parameters(rnorm(100))
+#'
 est_parameters <- function(y,
-                            lagMethods = c("first.minimum","global.minimum","max.lag"),
-                            estimateDimensions = "preferSmallestInLargestHood",
-                            maxDim   = 10,
-                            emLag     = NULL,
-                            maxLag   = floor(length(y)/(maxDim+1)),
-                            nnSizes  = 2,
-                            nnRadius = 5,
-                            nnThres  = 10,
-                            theiler  = 0,
-                            doPlot   = TRUE,
-                            silent   = TRUE,
-                            ...){
+                           lagMethods = c("first.minimum","global.minimum","max.lag"),
+                           estimateDimensions = "preferSmallestInLargestHood",
+                           maxDim   = 10,
+                           emLag     = NULL,
+                           maxLag   = floor(NROW(y)/(maxDim+1)),
+                           minVecLength = 20,
+                           nnSizes  = 2,
+                           nnRadius = 5,
+                           nnThres  = 10,
+                           theiler  = 0,
+                           doPlot   = TRUE,
+                           silent   = TRUE,
+                           ...){
 
   if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
 
@@ -59,11 +67,22 @@ est_parameters <- function(y,
   y <- y[!is.na(y)]
   #y <- ts_standardise(y, adjustN = FALSE)
 
-  emDims  <-  1:maxDim
+  if(minVecLength<20){
+    stop("Please collect more data!")
+  }
+
+  if(!is.na(maxDim%00%NA)&!is.na(maxLag%00%NA)){
+    if((NROW(y)-(maxDim*maxLag))<minVecLength){
+     maxDim <- (1:maxDim)[max(which(NROW(y)-(1:maxDim*maxLag)>=minVecLength), na.rm = TRUE)]
+     message(paste("Changed value of maxDim to",maxDim))
+    }
+  }
+
+  emDims <-  1:maxDim
 
   doLags <- c(1:maxLag)
   if(!is.null(emLag)){
-    if(NROW(emLag==1)){
+    if(NROW(emLag)==1){
       lagMethods <- c(lagMethods, "user.lag") #  lag = emLag, ami = 0)
       doLags <- unique(sort(c(1:maxLag,emLag)))
     } else {
@@ -71,117 +90,126 @@ est_parameters <- function(y,
     }
   }
 
-    if(nchar(estimateDimensions)>1){
-      mi <- mif(data.frame(y),lags = doLags)
-      #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
-      emLags <- cbind.data.frame(selection.methods = lagMethods, lag = NA)
-      for(m in seq_along(emLags$selection.methods)){
-        if(emLags$selection.methods[m]=="first.minimum"){
+
+  if(nchar(estimateDimensions)>1){
+    mi <- mif(data.frame(y),lags = doLags)
+    #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+    emLags <- cbind.data.frame(selection.methods = lagMethods, lag = NA)
+    for(m in seq_along(emLags$selection.methods)){
+      if(emLags$selection.methods[m]%in%"first.minimum"){
+        if(length(doLags)>2){
           emLags$lag[m] <- which(ts_symbolic(data.frame(mi))%in%"trough")[1]%00%NA
+        } else {
+          warning("Only 2 lags to evaluate, setting 'first.minimum' to 1.")
+          emLags$lag[m] <- 1
         }
-        if(emLags$selection.methods[m]=="global.minimum"){
-          emLags$lag[m] <- as.numeric(which.min(mi))
-        }
-        if(emLags$selection.methods[m]=="max.lag"){
-          emLags$lag[m] <- maxLag
-        }
-        if(emLags$selection.methods[m]=="user.lag"){
-          emLags$lag[m] <- emLag
-        }
+      }
+      if(emLags$selection.methods[m]=="global.minimum"){
+        emLags$lag[m] <- as.numeric(which.min(mi))
+      }
+      if(emLags$selection.methods[m]=="max.lag"){
+        emLags$lag[m] <- maxLag
+      }
+      if(emLags$selection.methods[m]=="user.lag"){
+        emLags$lag[m] <- emLag
+      }
+      if(is.na(emLags$lag[m])){
+        emLags$ami[m] <- NA
+      } else {
         emLags$ami[m] <- mi[emLags$lag[m]]
       }
-    } else {
-      emLags <- cbind.data.frame(selection.methods = "Not estimated", lag = NA, ami = NA)
     }
-
+  } else {
+    emLags <- cbind.data.frame(selection.methods = "Not estimated", lag = NA, ami = NA)
+  }
 
   # (fn.out <- tseriesChaos::false.nearest(lx, m=10, d=17, t=0, eps=sd(lx)/10, rt=20))
   # plot(fn.out[1,],type="b")
 
-if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallestNN", "preferSmallestLag", "preferSmallestInLargestHood"))){
+  if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallestNN", "preferSmallestLag", "preferSmallestInLargestHood"))){
 
-  lagList <- list()
-  cnt = 0
+    lagList <- list()
+    cnt = 0
 
-  for(N in seq_along(nnSizes)){
-    for(R in seq_along(nnRadius)){
-      for(L in seq_along(emLags$selection.method)){
+    for(N in seq_along(nnSizes)){
+      for(R in seq_along(nnRadius)){
+        for(L in seq_along(emLags$selection.method)){
 
-     if(!is.na(emLags$lag[L])){
-        cnt = cnt+1
+          if(!is.na(emLags$lag[L])){
+            cnt = cnt+1
 
-        Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
-      for(D in seq_along(emDims)){
-        RM <- rp(y,y, emDim = emDims[[D]], emLag = emLags$lag[L])
-        RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
-        Nn.min[D] <- min(RM, na.rm = TRUE)
-        Nn.max[D] <- max(RM, na.rm = TRUE)
-        Nn.sd[D]   <- stats::sd(RM, na.rm = TRUE)
-        Nn.mean[D] <- mean(RM, na.rm = TRUE)
-        rm(RM)
-      }
+            Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
+            for(D in seq_along(emDims)){
+              RM <- rp(y,y, emDim = emDims[D], emLag = emLags$lag[L])
+              RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
+              Nn.min[D]  <- min(RM, na.rm = TRUE)
+              Nn.max[D]  <- max(RM, na.rm = TRUE)
+              Nn.sd[D]   <- stats::sd(RM, na.rm = TRUE)
+              Nn.mean[D] <- mean(RM, na.rm = TRUE)
+              rm(RM)
+            }
 
-        #surrDims <- nonlinearTseries::buildTakens(time.series =  as.numeric(y), embedding.dim =  emDims[[D]], time.lag = emLags$optimal.lag[L])
+            #surrDims <- nonlinearTseries::buildTakens(time.series =  as.numeric(y), embedding.dim =  emDims[[D]], time.lag = emLags$optimal.lag[L])
 
-        # (fn.out <- false.nearest(rnorm(1024), m=6, d=1, t=1, rt=3))
-        # plot(fn.out)
+            # (fn.out <- false.nearest(rnorm(1024), m=6, d=1, t=1, rt=3))
+            # plot(fn.out)
 
-        fnnSeries <- fractal::FNN(x = as.numeric(y),
-                                  dimension = maxDim,
-                                  tlag = emLags$lag[L],
-                                  rtol = nnRadius[R],
-                                  atol = nnSizes[N],
-                                  olag = 1
-        )
-        }
+            fnnSeries <- fractal::FNN(x = as.numeric(y),
+                                      dimension = maxDim,
+                                      tlag = emLags$lag[L],
+                                      rtol = nnRadius[R],
+                                      atol = nnSizes[N],
+                                      olag = 1
+            )
+          }
 
-        #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*sd(y))
-        #Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
-      #   if(D==1){Nn.max <- Nn}
-        lagList[[cnt]] <- data.frame(Nn.pct = as.numeric(fnnSeries[1,]),
-                                     Nsize = nnSizes[N],
-                                     Nradius = nnRadius[R],
-                                     emLag.method = emLags$selection.method[[L]],
-                                     emLag = emLags$lag[L],
-                                     emDim = emDims,
-                                     Nn.mean = Nn.mean,
-                                     Nn.sd  = Nn.sd,
-                                     Nn.min = Nn.min,
-                                     Nn.max = Nn.max)
-       } # L
+          #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*sd(y))
+          #Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
+          #   if(D==1){Nn.max <- Nn}
+          lagList[[cnt]] <- data.frame(Nn.pct = as.numeric(fnnSeries[1,]),
+                                       Nsize = nnSizes[N],
+                                       Nradius = nnRadius[R],
+                                       emLag.method = emLags$selection.method[[L]],
+                                       emLag = emLags$lag[L],
+                                       emDim = emDims,
+                                       Nn.mean = Nn.mean,
+                                       Nn.sd  = Nn.sd,
+                                       Nn.min = Nn.min,
+                                       Nn.max = Nn.max)
+        } # L
       } # R
     } # N
 
 
-  df        <- plyr::ldply(lagList)
- # df$Nn.pct <- df$Nn/df$Nn.max
+    df        <- plyr::ldply(lagList)
+    # df$Nn.pct <- df$Nn/df$Nn.max
 
-  opt <-plyr::ldply(unique(df$emLag), function(n){
-    id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
-    if(length(id)>0){
-      #idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
-      # if(length(idmin)>0){
-      #   return(df[idmin,])
-      #}
-      df <- df[id,]
-      return(df[!duplicated(df),])
-    } else {
-      return(df[which.min(df$Nn.pct[(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag"))]),])
+    opt <-plyr::ldply(unique(df$emLag), function(n){
+      id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
+      if(length(id)>0){
+        #idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
+        # if(length(idmin)>0){
+        #   return(df[idmin,])
+        #}
+        df <- df[id,]
+        return(df[!duplicated(df),])
+      } else {
+        return(df[which.min(df$Nn.pct[(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag"))]),])
+      }
     }
-  }
-  )
+    )
 
- opt <- switch(estimateDimensions,
-         preferNone = opt[!duplicated(opt),],
-         preferSmallestDim = opt[min(opt$emDim, na.rm=TRUE),],
-         preferSmallestNN = opt[min(opt$NN.pct, na.rm=TRUE),],
-         preferSmallestLag = opt[min(opt$emLag, na.rm=TRUE),],
-         preferSmallestInLargestHood = opt[(min(opt$emLag, na.rm=TRUE)&min(opt$emDim, na.rm=TRUE)&max(opt$Nsize, na.rm = TRUE)),]
-         )
+    opt <- switch(estimateDimensions,
+                  preferNone = opt[!duplicated(opt),],
+                  preferSmallestDim = opt[min(opt$emDim, na.rm=TRUE),],
+                  preferSmallestNN = opt[min(opt$NN.pct, na.rm=TRUE),],
+                  preferSmallestLag = opt[min(opt$emLag, na.rm=TRUE),],
+                  preferSmallestInLargestHood = opt[(min(opt$emLag, na.rm=TRUE)&min(opt$emDim, na.rm=TRUE)&max(opt$Nsize, na.rm = TRUE)),]
+    )
 
-  #opt <- opt[opt$emDim==min(opt$emDim),][1,]
-  opDim <- min(unique(opt$emDim), na.rm = TRUE)
-  #opt <- opt[!duplicated(opt),]
+    #opt <- opt[opt$emDim==min(opt$emDim),][1,]
+    opDim <- min(unique(opt$emDim), na.rm = TRUE)
+    #opt <- opt[!duplicated(opt),]
 
   } else { # if estimateDim
     opDim <- NA
@@ -219,12 +247,12 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
 
     # use: alpha()
 
-   Ncol <- length(emLags$selection.method[!is.na(emLags$lag)])
-   myPal <- RColorBrewer::brewer.pal(Ncol,"Set2")
-  myPalLag <- myPal
-  names(myPalLag) <- emLags$selection.method[!is.na(emLags$lag)]
-  myPalNn <- myPal
-  names(myPalNn) <- emLags$lag[!is.na(emLags$lag)]
+    Ncol <- length(emLags$selection.method[!is.na(emLags$lag)])
+    myPal <- RColorBrewer::brewer.pal(Ncol,"Set2")
+    myPalLag <- myPal
+    names(myPalLag) <- emLags$selection.method[!is.na(emLags$lag)]
+    myPalNn <- myPal
+    names(myPalNn) <- emLags$lag[!is.na(emLags$lag)]
 
     gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
       ggplot2::geom_rect(ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
@@ -243,37 +271,37 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
       ggplot2::scale_color_manual("Lag", values = myPalNn ) +
       ggplot2::theme_minimal() +
       ggplot2::theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
-            strip.text.x = element_text(colour = "black", face = "bold"),
-            panel.spacing = ggplot2::unit(1, "lines"),
-            legend.position = c(.9, .8),
-            legend.background = element_rect(colour = "grey10",fill = "grey90"),
-            legend.title = element_text(face = "bold"),
-            legend.key = element_rect(colour = "grey90", fill = "grey90"),
-            panel.grid.minor.x = element_blank(),
-            panel.grid.major.y = element_blank(),
-            panel.grid.minor.y = element_blank()
+                     strip.text.x = element_text(colour = "black", face = "bold"),
+                     panel.spacing = ggplot2::unit(1, "lines"),
+                     legend.position = c(.9, .8),
+                     legend.background = element_rect(colour = "grey10",fill = "grey90"),
+                     legend.title = element_text(face = "bold"),
+                     legend.key = element_rect(colour = "grey90", fill = "grey90"),
+                     panel.grid.minor.x = element_blank(),
+                     panel.grid.major.y = element_blank(),
+                     panel.grid.minor.y = element_blank()
       )
 
     gDelay <- ggplot2::ggplot(dfMI, ggplot2::aes_(y = ~ami, x = ~emDelay)) +
       ggplot2::geom_line() +
       ggplot2::geom_vline(data = emLags,  ggplot2::aes_(colour=factor(emLags$selection.method),
-                                    xintercept = ~lag), alpha = .3) +
+                                                        xintercept = ~lag), alpha = .3) +
       ggplot2::geom_point(data = emLags,  ggplot2::aes_(x = ~lag, y = ~ami, colour = factor(emLags$selection.method)), size = 2) +
       ggplot2::xlab("Embedding Lag") +
       ggplot2::ylab("Average Mututal Information") +
       ggplot2::scale_color_manual("Lag", values = myPalLag) +
       ggplot2::theme_bw() +
       ggplot2::theme(legend.position = c(.95, .95),
-            legend.justification = c("right", "top"),
-            legend.box.just = "right",
-            legend.margin = margin(6, 6, 6, 6),
-            legend.background = element_rect(colour = "grey10",fill = "grey90"),
-            legend.title = element_text(face = "bold"),
-            legend.key = element_rect(colour = "grey90", fill = "grey90"),
-            #panel.grid.major.x = element_blank(),
-            panel.grid.minor.x = element_blank(),
-            panel.grid.major.y = element_blank(),
-            panel.grid.minor.y = element_blank()
+                     legend.justification = c("right", "top"),
+                     legend.box.just = "right",
+                     legend.margin = margin(6, 6, 6, 6),
+                     legend.background = element_rect(colour = "grey10",fill = "grey90"),
+                     legend.title = element_text(face = "bold"),
+                     legend.key = element_rect(colour = "grey90", fill = "grey90"),
+                     #panel.grid.major.x = element_blank(),
+                     panel.grid.minor.x = element_blank(),
+                     panel.grid.major.y = element_blank(),
+                     panel.grid.minor.y = element_blank()
 
       )
 
@@ -286,10 +314,10 @@ if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallest
   }
 
   return(invisible(list(optimLag  = opLag,
-              optimDim  = opDim,
-              optimRow  = opt,
-              optimData = df,
-              diagPlot = g)))
+                        optimDim  = opDim,
+                        optimRow  = opt,
+                        optimData = df,
+                        diagPlot = g)))
 }
 
 
@@ -651,7 +679,7 @@ est_parameters_roc <- function(y, emRad, emDim=1, emLag=1, noiseLevel=.75, stand
 
 #' Estimate embedding lag (tau)
 #'
-#' A wrapper for nonlinearTseries::timemLag
+#' A wrapper for [nonlinearTseries::timemLag]
 #'
 #' @param y Time series or numeric vector
 #' @param selection.methods Selecting an optimal embedding lag (default: Return "first.e.decay", "first.zero", "first.minimum", "first.value", where value is 1/exp(1))
@@ -717,6 +745,8 @@ est_emLag <- function(y,
 
 #' Estimate number of embedding dimensions
 #'
+#' A wrapper for [nonlinearTseries::estimateEmbeddingDim]
+#'
 #' @param y Time series or numeric vector
 #' @param delay Embedding lag
 #' @param maxDim Maximum number of embedding dimensions
@@ -758,6 +788,7 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 #' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`.
 #' @param doPlot Plot the matrix by calling [rp_plot()] with defult settings
+#' @param doEmbed If `FALSE`, a distance matrix will be returned that is not embedded by `emDim` and `emLag`. If `y1` and/or `y2` are data frames, the columns will be used as dimensions (default = `TRUE`)
 #' @param silent Silent-ish mode
 #' @param ... Any paramters to pass to [rp_plot()] if `doPlot = TRUE`
 #'
@@ -788,6 +819,7 @@ rp <- function(y1, y2 = NULL,
                method = "Euclidean",
                targetValue  = .05,
                doPlot = FALSE,
+               doEmbed = TRUE,
                silent = TRUE,
                ...){
 
@@ -811,6 +843,12 @@ rp <- function(y1, y2 = NULL,
       colnames(y2) <- id
     }
   }
+
+  if(!doEmbed){
+    emDim <- 1
+    emLag <- 0
+  }
+
 
   et1 <- ts_embed(y1, emDim, emLag, silent = silent)
   et2 <- ts_embed(y2, emDim, emLag, silent = silent)
@@ -1251,16 +1289,11 @@ rp_measures_main <- function(RM,
 #' Diagonal Recurrence Profile
 #'
 #' @aliases crqa_diagprofile
+#' @inheritParams rp_measures
 #' @param RM A binary recurrence matrix
 #' @param diagWin Window around the line of synchrony
 #' @param xname Label for x-axis
 #' @param yname Label for y-axis
-#' @param DLmin Minimal diagonal line length (default = `2`)
-#' @param VLmin Minimal vertical line length (default = `2`)
-#' @param HLmin Minimal horizontal line length (default = `2`)
-#' @param DLmax Maximal diagonal line length (default = length of diagonal -1)
-#' @param VLmax Maximal vertical line length (default = length of diagonal -1)
-#' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
 #' @param doShuffle Should a shuffled baseline be calculated (default = `FALSE`)
 #' @param y1 The original `y1` time series
 #' @param y2 The original `y2` time series
@@ -1585,6 +1618,12 @@ rp_cl            <- function(y1,
 
   if(!file.exists(normalizePath(file.path(getOption("casnet.path_to_rp"),"rp_install_log.txt"), mustWork = FALSE))){
     set_command_line_rp()
+  }
+
+  os <- get_os()
+  sysinf <- Sys.info()
+  if(os%in%"osx"&as.numeric(strsplit(sysinf[which(names(sysinf)%in%"release")],"[.]")[[1]][1])>=19){
+    stop("As of macOS Catalina, 32-bit applications are no longer supported, please use rp_measures() to conduct Recurrence Quantification Analysis.")
   }
 
   cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
@@ -1961,7 +2000,11 @@ rp_cl_main <- function(data,
 
     if(is.na(emRad)){
       if(!is.na(targetValue)){
-        emRad <- est_radius(y1 = y1, emDim = emDim, emLag = emLag, targetValue = targetValue, radiusOnFail = "percentile", tol = .2, silent = silent)
+        emRad <- est_radius(y1 = y1,
+                            emDim = emDim,
+                            emLag = emLag,
+                            targetValue = targetValue,
+                            radiusOnFail = "percentile", tol = .2, silent = silent)
         if(emRad$Converged){
           emRad <- emRad$Radius
         } else {
@@ -2282,7 +2325,7 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 #' @param invert Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
 #' @param AUTO Is this an AUTO RQA?
 #' @param chromatic Chromatic RQA?
-#' @param matrices Return the matrices ?
+#' @param matrices Return the matrices?
 #'
 #'
 #' @description Extract lengths of diagonal, vertical and horizontal line segments from a recurrence matrix.
@@ -3723,7 +3766,7 @@ rp_prep <- function(RP,
 # }
 
 
-# Networks ----
+# Recurrence Networks ----
 
 #' Create a Recurrence Network Matrix
 #'
@@ -3790,30 +3833,41 @@ rn <- function(y1, y2 = NULL,
   }
 
   if(weighted){
-    if(!weightedBy%in%c("si","rt","rf")){stop("Invalid string in argument weightedBy!")}
-    if(weightedBy%in%c("rt","rf")){
-      grW <- igraph::graph_from_adjacency_matrix(dmat, weighted = TRUE, mode = mode, diag = TRUE) #includeDiagonal)
-      edgeFrame         <- igraph::as_data_frame(grW,"edges")
-      edgeFrame$rectime <- edgeFrame$to-edgeFrame$from
-      if(weightedBy=="rf"){
-        edgeFrame$rectime <- 1/(edgeFrame$rectime+1) #.Machine$double.eps)
-        }
-      if(is.numeric(fs)){
-        if(weightedBy=="rf"){edgeFrame$rectime <- edgeFrame$rectime * fs}
-        if(weightedBy=="rt"){edgeFrame$rectime <- edgeFrame$rectime / fs}
+    if(!weightedBy%in%c("si","rt","rf")){
+      stop("Invalid string in argument weightedBy!")
       }
-      E(grW)$weight <- edgeFrame$rectime
+
+    grW <- igraph::graph_from_adjacency_matrix(dmat, weighted = TRUE, mode = mode, diag = TRUE) #includeDiagonal)
+    edgeFrame             <- igraph::as_data_frame(grW,"edges")
+    E(grW)$rec_distance   <- E(grW)$weight
+    E(grW)$rec_time       <- edgeFrame$to-edgeFrame$from
+    E(grW)$rec_timefreq   <- 1/(edgeFrame$rec_time+1) #.Machine$double.eps)
+
+    if(is.numeric(fs)){
+      if(weightedBy=="rf"){edgeFrame$rectime <- edgeFrame$rectime * fs}
+      if(weightedBy=="rt"){edgeFrame$rectime <- edgeFrame$rectime / fs}
+    }
+
+    switch(weightedBy,
+           si = E(grW)$weight <- E(grW)$rec_distance,
+           rt = E(grW)$weight <- E(grW)$rec_time,
+           rf = E(grW)$weight <- E(grW)$rec_timefreq
+           )
+
       # for(r in 1:NROW(edgeFrame)){
       #   dmat[edgeFrame$from[r],edgeFrame$to[r]] <- 1/edgeFrame$rectime[r]
       #   if(attr(dmat,"AUTO")){
       #     dmat[edgeFrame$to[r],edgeFrame$from[r]] <- 1/edgeFrame$rectime[r]
       #     }
       #   }
+
       tmp <- as_adjacency_matrix(grW, type = "both", sparse = to.sparse, attr = "weight")
       #tmp <- bandReplace(tmp,0,0,0)
       dmat <- rp_copy_attributes(source = dmat, target = tmp)
       rm(tmp)
-    }
+
+
+
 
     if(rescaleWeights==TRUE){
         dmat <- dmat/max(dmat, na.rm = TRUE)
@@ -3857,8 +3911,12 @@ rn <- function(y1, y2 = NULL,
   }
 
   if(returnGraph){
+    g  <- igraph::graph_from_adjacency_matrix(dmat, weighted = weighted, mode = mode, diag = includeDiagonal)
+    V(g)$y1 <- y1[1:igraph::vcount(g)]
+    V(g)$y2 <- y2[1:igraph::vcount(g)]
+
     return(list(RN = dmat,
-                g  = igraph::graph_from_adjacency_matrix(dmat, weighted = weighted, mode = mode, diag = includeDiagonal))
+                g  = g)
            )
   } else {
    return(dmat)
@@ -4159,6 +4217,899 @@ rn_scaleoGram <- function(RN, returnOnlyObject = FALSE){
 }
 
 
+
+#' Mutliplex Recurrence Network
+#'
+#' @description This function will create a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: *Layer similarity* (`MRNweightedBy` is set to `"InterLayerMI"` or `"EdgeOvelap"`) and *Layer importance* (`MRNweightedBy` is `"RankorderDC"`). The former generates weighted MRN based on Interlayer Mutual Information or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument `MRNrankedBy`.
+#'
+#' @param layers A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.
+#' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers), `"RankorderDC"` (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in `MRNrankedBy`). Choosing `"InterLayerMI"` or `"EdgeOverlap"` will decide which measure is displayed in the plot of the Multiplex RN, both measures will always be returned in the numerical output.
+#' @param windowedWeights If a windowed analysis is conducted and the edges of the graphs in `layers` have a weight property, there are a number of different ways to handle the weights depending on the value of `windowedWeights`: `"none"`, `"local"`, and `"cumulative"`. Value `"none"` will ignore the weights, `"local"` will limit the range of edges to those edges connecting the vertices contained within the window, `"cumulative"` will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = `none`)
+#' @param MRNrankedBy If `MRNweightedBy = "RankorderDC"`, then `MRNrankedBy` must be a valid [igraph] command that returns vertex properties, for example: `"degree"`, `"strength"`,`"hub_score"`,`"centr_degree"`, `"transitivity"`, `"betweenness"`. The appropriate measure type, e.g. for `"directed"`, or `"weighted"` graphs, will be inferred from the graph properties of the 1st graph object in the `layers` list. For best results with weighted measures, assign a value to `E(g)$weight` for each `g` in `layers`. (default = `"degree"`)
+#' @param win The window size passed to [casnet::ts_window()] in which to evaluate `"InterLayerMI"` or `"EdgeOvelap"`. If `MRNweightedBy = "RankorderDC"`, it will be the size of the right aligned window in which Dynamic Complexity will be computed using [casnet::dc_win()] (default = `NA`)
+#' @param step The stepsize for the sliding window (default = `NA`)
+#' @param overlap The window overlap passed to [casnet::ts_window()] if `MRNweightedBy` is `"InterLayerMI"` or `"EdgeOvelap"`. The value of `step` will be ignored if `overlap` is not `NA`. (default = `NA`).
+#' @param doPlot Plot the multiplex recurrence network (default = `TRUE`).
+#' @param createAnimation If `createAnimation = TRUE` *and* `doPlot = TRUE` *and* a windowed analysis is conducted, an animation will be produced using either package [gganimate] (if `useImageMagick = FALSE`) or [animation] (if `useImageMagick = FALSE`). The main difference is that [gganimate] has nice animation transition features, but plots the MRN using [ggplot2], which does not have great options for displaying the nodes as images. With package [animation] a sequence of [igraph] plots will be converted to an animation. If `doSave = TRUE` the animation will be saved in `imageDir` as an animated gif by calling either [gganimate::anim_save()], or [animation::saveGIF()] (default = `FALSE`)
+#' @param useImageMagick Should [ImageMagick](https://imagemagick.org/index.php) be used to create the animation. **NOTE:** ImageMagick has to be installed on your system, see [animation::saveGIF()] (default = `FALSE`)
+#' @param loopAnimation Should the animation loop? (default = `TRUE`)`
+#' @param transitionLength Length of each transition in the animation, ignored if `useImageMagick = TRUE` (default = `3`)
+#' @param stateLength Value of `state_length` if [gganimate] is used, or the  `interval` in seconds for [animation::ani.pause()] (default = `1`)
+#' @param gifWidth Width of the animated `gif` in pixels. The default width will be `600/150 = 4 in` or `10.16 cm` (default = `600`)
+#' @param gifRes Resolution of the animated `gif` in `ppi` (default =`150`)
+#' @param noParts Do not plot the individual graphs that make up the animation to the current `dev` (default = `TRUE`)
+#' @param imageDir Directory to save the layer images and windowed MRN plots. If `NA`, the value returned by `getwd()` will be used, if `NULL` no windowed images will be saved (default = `NA`)
+#' @param silent Silent-ish mode
+#'
+#' @return A matrix with edge weights between layers that represent the measure `MRNweightedBy`.
+#'
+#' @export
+#'
+#' @examples
+#'
+#'
+rn_multiplex <- function(layers,
+                         MRNweightedBy = c("InterlayerMI", "Edgeoverlap","RankDC")[1],
+                         MRNrankedBy = "degree",
+                         win = NA,
+                         step = NA,
+                         overlap = NA,
+                         doPlot = FALSE,
+                         doSave = FALSE,
+                         createAnimation = FALSE,
+                         useImageMagick = FALSE,
+                         loopAnimation = TRUE,
+                         transitionLength = 3,
+                         stateLength = 1,
+                         gifWidth = 600,
+                         gifRes = 150,
+                         noParts = TRUE,
+                         imageDir = NA,
+                         silent = TRUE){
+
+  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+
+  if(!all(plyr::laply(layers,function(g) igraph::is.igraph(g)))){
+    stop("All elements of the layers list have to be an igraph object!")
+  }
+
+  if(!all(plyr::laply(layers, function(g) igraph::vcount(g))==igraph::vcount(layers[[1]]))){
+    stop("In a Multiplex Recurrence Network, the layer networks must all have the same number of vertices!")
+  }
+  Nsize <- igraph::vcount(layers[[1]])
+
+  if(is.null(names(layers))){
+    names(layers) <- paste0("layer",1:length(layers))
+  }
+
+  doSave <- TRUE
+  if(is.null(imageDir)){
+    doSave <- FALSE
+  }
+
+  if(is.na(imageDir)){
+    imageDir <- getwd()
+  } else {
+    if(!dir.exists(normalizePath(imageDir))){
+      stop(paste0("The directory '",imageDir,"' does not exist."))
+    }
+  }
+
+  if(is.na(win)){
+    win <- Nsize
+  }
+  if(is.na(step)){
+    step <- win
+  }
+
+  # if(win==Nsize|step==Nsize){
+  #   wIndexList <- list(win)
+  #   names(wIndexList) <- paste0("window: 1 | start: ",1," | stop: ",Nsize)
+  # } else {
+  wIndexList <- ts_windower(y = 1:Nsize, win = win, step = step, overlap = overlap, adjustY = NA)
+  #}
+
+  func <- "mi_interlayer"
+  weighted <- igraph::is.weighted(layers[[1]])
+  directed <- igraph::is.directed(layers[[1]])
+  if(MRNweightedBy%in%"RankDC"){
+    if(MRNrankedBy%in%ls(getNamespace("igraph"))){
+      args <- formals(MRNrankedBy)
+      addArgs <- ""
+      if("directed" %in% names(args)){
+        addArgs <- c(addArgs,",directed = directed")
+      }
+      if("weighted" %in% names(args)){
+        addArgs <- c(addArgs,",weighted = weighted")
+      }
+      func <- paste0("igraph::",MRNrankedBy,"(layers[[l]]",addArgs,")")
+    } else {
+      stop("Value of MRNrankedBy is not a function of package igraph.")
+    }
+  }
+
+  if(directed){
+    combis <- DescTools::CombPairs(seq_along(layers),seq_along(layers))
+    mode <- "directed"
+  } else {
+    combis <- DescTools::CombPairs(seq_along(layers))
+    mode <- "upper"
+  }
+
+  if(func%in%"mi_interlayer"){
+
+    cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
+
+    out_mi <- out_eo <- out_means <- list()
+
+    for(w in seq_along(wIndexList)){
+
+      mp <- eo <- matrix(nrow=length(layers), ncol=length(layers), dimnames = list(names(layers),names(layers)))
+
+      for(i in seq_along(combis$X1)){
+
+        edgeFrame1 <- igraph::as_data_frame(layers[[combis$X1[i]]],"edges")
+        edgeFrame1 <- edgeFrame1 %>% filter(edgeFrame1$from%[]%range(wIndexList[[w]])&edgeFrame1$to%[]%range(wIndexList[[w]]))
+        ga  <- graph_from_data_frame(edgeFrame1, directed = directed)
+
+        edgeFrame2 <- igraph::as_data_frame(layers[[combis$X2[i]]],"edges")
+        edgeFrame2 <- edgeFrame2 %>% filter(edgeFrame2$from%[]%range(wIndexList[[w]])&edgeFrame2$to%[]%range(wIndexList[[w]]))
+        gb  <- graph_from_data_frame(edgeFrame2, directed = directed)
+
+        mp[combis$X1[i],combis$X2[i]] <- mi_interlayer(ga,gb)
+        eo[combis$X1[i],combis$X2[i]] <- igraph::ecount(ga %s% gb) / (igraph::ecount(ga) + igraph::ecount(gb))
+        #igraph::ecount(layers[[combis$X1[i]]] %s% layers[[combis$X2[i]]]) / (igraph::ecount(layers[[combis$X1[i]]]) + igraph::ecount(layers[[combis$X2[i]]]))
+      }
+
+      mi_ave   <- mean(mp[upper.tri(mp)&mp>0], na.rm = TRUE)
+      mi_sd    <- stats::sd(mp[upper.tri(mp)&mp>0], na.rm = TRUE)
+      eo_ave   <- mean(eo[upper.tri(eo)&eo>0], na.rm = TRUE)
+      eo_sd    <- stats::sd(eo[upper.tri(eo)&eo>0], na.rm = TRUE)
+      eo_sum   <- sum(plyr::laply(layers, function(g) length(igraph::E(g))),na.rm = TRUE)
+      eo_all   <- eval(parse(text = paste0("igraph::ecount(intersection(",paste0("layers[[",1:NROW(layers),"]]",collapse=","),"))")))
+      eo_joint <- eo_all / eo_sum
+
+      out_mi[[w]] <- mp
+      out_eo[[w]] <- eo
+      out_means[[w]] <- data.frame(mi_mean = mi_ave, mi_sd = mi_sd,
+                                   eo_mean = eo_ave, eo_sd = eo_sd,
+                                   eo_sum  = eo_sum, eo_all = eo_all, eo_joint = eo_joint)
+
+    } # wIndex
+
+    names(out_mi)    <- names(wIndexList)
+    names(out_eo)    <- names(wIndexList)
+    names(out_means) <- names(wIndexList)
+
+    if(doPlot){
+
+      if(MRNweightedBy%in%"InterLayerMI"){
+        RN <- out_mi
+      } else {
+        RN <- out_eo
+      }
+
+      gSpiro  <- plyr::llply(layers, function(g) {
+        gg <- make_spiral_graph(g                  = g,
+                                arcs               = 4,
+                                curvature          = -.3,
+                                a                  = .1,
+                                b                  = 1,
+                                alphaE             = .2,
+                                alphaV             = .7,
+                                scaleVertexSize    = c(.1,5),
+                                showEpochLegend    = FALSE,
+                                epochColours       = getColours(Ncols = 20),
+                                showSizeLegend     = FALSE,
+                                defaultEdgeColour  = "grey80",
+                                vertexBorderColour = "gray99",
+                                edgeColourByEpoch  = TRUE,
+                                doPlot             = FALSE)
+        gg <- gg + theme(
+          panel.background      = element_rect(fill = "transparent"),
+          plot.background       = element_rect(fill = "transparent", color = NA),
+          panel.grid.major      = element_blank(),
+          panel.grid.minor      = element_blank(),
+          legend.background     = element_rect(fill = "transparent"),
+          legend.box.background = element_rect(fill = "transparent")
+        )
+      })
+
+      g_rast <- gList <- MRN <- list()
+      if(useImageMagick){
+        bg <- "transparent"
+      } else {
+        bg <- "white"
+      }
+      for(f in seq_along(gSpiro)){
+        ggplot2::ggsave(gSpiro[[f]],
+                        filename = file.path(imageDir,paste0(names(gSpiro)[f],".png")),
+                        device = "png", width = 100, height = 100, units = "mm", bg = bg, dpi = gifRes)
+        g_rast[[f]] <- png::readPNG(file.path(imageDir,paste0(names(gSpiro)[f],".png")), native=TRUE) #magick::image_read(file.path(imageDir,paste0(names(gSpiro)[f],".png")))
+
+
+      }
+
+      for(w in seq_along(RN)){
+
+        mp_net <- graph_from_adjacency_matrix(adjmatrix = RN[[w]],
+                                              mode      = mode,
+                                              diag      = FALSE,
+                                              weighted  = weighted)
+        coord <- layout_in_circle(mp_net)
+
+        V(mp_net)$raster  <- g_rast
+        V(mp_net)$name    <- names(gSpiro)
+        E(mp_net)$width   <- elascer(E(mp_net)$weight,lo = 1,hi = 10)
+        E(mp_net)$color   <- scales::gradient_n_pal(colours = c("steelblue","grey99","red3"), values = c(0,.5,1))(elascer(E(mp_net)$weight))
+        V(mp_net)$shape   <- "raster"
+        V(mp_net)$label   <- V(mp_net)$name
+        V(mp_net)$size    <- 50
+        V(mp_net)$size2   <- 50
+        V(mp_net)$label.family <- "sans"
+        V(mp_net)$label.font <- 2
+        mp_net$layout <- coord
+
+
+        if(useImageMagick){
+
+          if(!noParts){
+            plot(mp_net)
+           }
+
+          MRN[[w]] <- mp_net
+
+        } else {
+
+          gNodes        <- as.data.frame(mp_net$layout,what = "nodes")
+          gNodes$ID     <- as.numeric(igraph::V(mp_net))
+          gNodes$name   <- V(mp_net)$name
+          gNodes$colour <- V(mp_net)$colour
+          gNodes$alpha  <- V(mp_net)$alpha
+          gNodes$image  <- paste0(file.path(imageDir,paste0(gNodes$name,".png")))
+
+          gEdges        <- igraph::get.data.frame(mp_net)
+          if(any(is.character(gEdges$from))){
+            cName <- "name"
+          } else {
+            cName <- "ID"
+          }
+          gEdges$from.x <- gNodes$V1[match(gEdges$from, gNodes[[cName]])]
+          gEdges$from.y <- gNodes$V2[match(gEdges$from, gNodes[[cName]])]
+          gEdges$to.x   <- gNodes$V1[match(gEdges$to, gNodes[[cName]])]
+          gEdges$to.y   <- gNodes$V2[match(gEdges$to, gNodes[[cName]])]
+
+
+          gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
+            geom_curve(data=gEdges, aes(x = from.x,
+                                       xend = to.x,
+                                       y = from.y,
+                                       yend = to.y,
+                                       size = weight,
+                                       colour = weight), curvature = 0) +
+            ggimage::geom_image(aes(image=image), size = .2) +
+            scale_size(range = c(.01,5)) +
+            scale_colour_gradient2(low      = "steelblue",
+                                   high     = "red3",
+                                   mid      = "white",
+                                   na.value = scales::muted("slategray4"),
+                                   midpoint = median(gEdges$weight)) +
+            labs(title = names(RN)[w]) +
+            coord_cartesian(clip="off") +
+            theme_void() + theme(plot.margin = margin(50,50,50,50, unit = "pt"),
+                                 legend.margin = margin(l = 20, unit = "pt"),
+                                 plot.title = element_text(margin = margin(b=20)))
+
+          if(!noParts){
+            plot(gg)
+            }
+
+          MRN[[w]] <- gg
+          gList[[w]] <- list(gNodes = gNodes,
+                             gEdges = gEdges)
+
+        } # useImageMagick
+
+      } # w
+
+      names(MRN)   <- names(wIndexList)
+
+
+      if(!createAnimation){
+        return(list(MRN           = MRN,
+                    interlayerMI  = out_mi,
+                    edgeOverlap   = out_eo,
+                    meanValues    = out_means))
+      } else {
+
+        if(useImageMagick){
+
+          animation::ani.options(interval = stateLength, imgdir = imageDir, loop = loopAnimation, nmax = length(MRN),
+                                 ani.width = gifWidth, ani.res = gifRes)
+
+          if(doSave){
+
+            animation::saveGIF(
+              for(i in seq_along(MRN)){
+                plot(MRN[[i]], xlab = names(MRN)[i])
+                animation::ani.pause()
+              }, img.name = paste0(names(MRN)[i]), movie.name = paste0("MRN_animation_win",win,"_step",step,".gif")
+            )
+
+          } else {
+            for(i in seq_along(MRN)){
+              plot(MRN[[i]], xlab = names(MRN)[i])
+              animation::ani.pause()
+            }
+          }
+
+          return(list(MRN           = MRN,
+                      interlayerMI  = out_mi,
+                      edgeOverlap   = out_eo,
+                      meanValues    = out_means))
+
+        } else {
+
+          names(gList) <- names(wIndexList)
+
+          gNodes <- plyr::ldply(gList , function(g) g$gNodes)
+          gEdges <- plyr::ldply(gList , function(g) g$gEdges)
+
+          gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
+            geom_curve(data=gEdges, aes(x = from.x,
+                                       xend = to.x,
+                                       y = from.y,
+                                       yend = to.y,
+                                       size = weight,
+                                       colour = weight), curvature = 0) +
+            ggimage::geom_image(aes(image=image), size = .2) +
+            scale_size(range = c(.01,5)) +
+            scale_colour_gradient2(low      = "steelblue",
+                                   high     = "red3",
+                                   mid      = "grey99",
+                                   na.value = scales::muted("slategray4"),
+                                   midpoint = mean(gEdges$weight)) +
+            labs(caption = "{closest_state}") +
+            gganimate::transition_states(factor(.id),
+                                         transition_length = transitionLength,
+                                         state_length = stateLength, wrap = loopAnimation) +
+            gganimate::enter_fade() +
+            gganimate::exit_fade() +
+            coord_cartesian(clip="off") +
+            theme_void() + theme(plot.margin = margin(50,50,50,50, unit = "pt"),
+                                 legend.margin = margin(l = 20, unit = "pt"),
+                                 plot.title = element_text(margin = margin(b=20)))
+
+          plot(gg)
+
+          if(doSave){
+            #if(file.exists())
+            gganimate::anim_save(filename =  paste0("MRN_animation_win",win,"_step",step,".gif"),
+                                 animation = gg, path = file.path(imageDir))
+          }
+
+          return(list(MRN              = MRN,
+                      MRNanimationData = gList,
+                      MRNanimationGG   = invisible(gg),
+                      interlayerMI  = out_mi,
+                      edgeOverlap   = out_eo,
+                      meanValues    = out_means))
+        }
+      }
+    } else { #doPlot
+      return(list(interlayerMI  = out_mi,
+                  edgeOverlap   = out_eo,
+                  meanValues    = out_means))
+    }
+
+  } else {    # NOT mi_interlayer
+
+    cat(paste("\nWelcome to the multiplex... in layer importance mode!\n\n"))
+
+    mr <- mr_rank <- matrix(ncol = length(layers),
+                            nrow = Nsize,
+                            dimnames = list(NULL, names(layers)))
+
+    for(l in seq_along(layers)){
+      mr[,l] <- eval(parse(text = func))
+    }
+    mr <- data.frame(mr)
+
+    for(i in 1:NROW(mr_rank)){
+      mr_rank[i,] <- as.numeric(rank(mr[i,]))
+    }
+
+    mr_rank           <- data.frame(mr_rank)
+    colnames(mr_rank) <- paste0(colnames(mr),"_rank")
+
+    mr_rankDC         <- dc_win(df = mr_rank,
+                                win = win,
+                                scale_min = min(mr_rank, na.rm = TRUE),
+                                scale_max = max(mr_rank, na.rm = TRUE))
+    mr_rankDC$meanDC    <- rowMeans(mr_rankDC)
+    mr_rankDC$sdDC      <- as.numeric(colwise(sd, na.rm = TRUE)(data.frame(t(mr_rankDC))))
+    colnames(mr_rankDC) <- c(paste0(colnames(mr),"_DC"),"mean_DC","sd_DC")
+
+    mr$sum       <- rowSums(mr[,1:length(layers)],na.rm = TRUE)
+    mr$mean      <- rowMeans(mr[,1:length(layers)], na.rm = TRUE)
+    mr$sd        <- as.numeric(colwise(sd, na.rm = TRUE)(data.frame(t(mr[,1:length(layers)]))))
+    colnames(mr) <- paste0(c(paste0(names(layers),"_"),"sum_","mean_","sd_"),MRNrankedBy)
+
+    out_rank <- cbind(time = 1:NROW(mr), mr, mr_rank, mr_rankDC)
+    attr(out_rank,"MRNrankedBy") <- MRNrankedBy
+
+    if(doPlot){
+
+      mr_rank$Time <- 1:NROW(mr_rank)
+      df_ranks <- tidyr::gather(mr_rank, key = "Layer", value = "Rank", -c("Time"))
+      df_ranks$Layer <- gsub("_rank","",df_ranks$Layer)
+
+      g1 <- ggplot2::ggplot(df_ranks, aes(x = Time, y = Rank)) +
+        geom_step(aes(colour = Layer)) +
+        facet_grid(Layer~.) +
+        scale_y_continuous(name = paste0(MRNrankedBy," (rank)"), expand = c(0,0)) +
+        scale_x_continuous(name = "Time", expand = c(0,0)) +
+        scale_colour_manual("Layer", values = getColours()) +
+        guides(colour = "none") +
+        theme_bw()
+
+      g2 <- plotDC_res(mr_rankDC[1:length(layers)],
+                       win=win,
+                       subtitle = paste0("Dynamic Complexity of rank order of ",MRNrankedBy),
+                       doPlot = FALSE)
+
+      tmp <- data.frame(Time = 1:NROW(mr_rankDC))
+      tmp$mean_DC  <- mr_rankDC$mean_DC
+      tmp$upper_CI <- mr_rankDC$mean_DC+(mr_rankDC$sd_DC/sqrt(length(layers)))*1.96
+      tmp$lower_CI <- mr_rankDC$mean_DC-(mr_rankDC$sd_DC/sqrt(length(layers)))*1.96
+      df_DC <- tidyr::gather(tmp, key = "Mean", value = "DC", -c("Time"))
+      df_DC$Mean <- gsub("_"," ",df_DC$Mean)
+      cols <- getColours()[c(3,6,4)]
+      names(cols) <- c("upper CI","mean DC","lower CI")
+
+      g3 <- ggplot2::ggplot(df_DC, aes(x=Time,y=DC)) +
+        geom_line(aes(colour = Mean)) +
+        scale_y_continuous(name = paste0("Mean DC of ",MRNrankedBy," (rank)"), expand = c(0,0)) +
+        scale_x_continuous(name = "Time", expand = c(0,0), limits = c(win,Nsize)) +
+        scale_colour_manual(name = "", values = cols) +
+        theme_bw()
+
+      top_row <- cowplot::plot_grid(g1,g2,greedy = FALSE,nrow = 1)
+      gs      <- cowplot::plot_grid(top_row,g3, ncol = 1)
+
+      return(list(plot = invisible(gs), rankData = out_rank))
+
+    } else {
+
+      return(out_rank)
+
+    } # doPlot
+
+  } # rankDC
+  cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+}
+
+# Multiplex Recurrence Networks ----
+
+
+#' Multiplex Recurrence Network
+#'
+#' @description This function will create a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: *Layer similarity* (`MRNweightedBy` is set to `"InterLayerMI"`, `"InterLayerCor"`, or `"EdgeOvelap"`) and *Layer importance* (`MRNweightedBy` is `"RankorderDC"`). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument `MRNrankedBy`.
+#'
+#' @inheritParams ts_windower
+#' @param layers A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.
+#' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers), `"RankorderDC"` (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in `MRNrankedBy`). Choosing `"InterLayerMI"`, `"InterlayerCor"`, or `"EdgeOverlap"` will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.
+#' @param windowedWeights If a windowed analysis is conducted and the edges of the graphs in `layers` have a weight property, there are a number of different ways to handle the weights depending on the value of `windowedWeights`: `"none"`, `"local"`, and `"cumulative"`. Value `"none"` will ignore the weights, `"local"` will limit the range of edges to those edges connecting the vertices contained within the window, `"cumulative"` will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = `none`)
+#' @param MRNrankedBy If `MRNweightedBy = "RankorderDC"`, then `MRNrankedBy` must be a valid [igraph] command that returns vertex properties, for example: `"degree"`, `"strength"`,`"hub_score"`,`"centr_degree"`, `"transitivity"`, `"betweenness"`. The appropriate measure type, e.g. for `"directed"`, or `"weighted"` graphs, will be inferred from the graph properties of the 1st graph object in the `layers` list. For best results with weighted measures, assign a value to `E(g)$weight` for each `g` in `layers`. (default = `"degree"`)
+#' @param win The window size passed to [casnet::ts_window()] in which to evaluate `"InterLayerMI"` or `"EdgeOvelap"`. If `MRNweightedBy = "RankorderDC"`, it will be the size of the right aligned window in which Dynamic Complexity will be computed using [casnet::dc_win()] (default = `NA`)
+#' @param step The stepsize for the sliding window (default = `NA`)
+#' @param overlap The window overlap passed to [casnet::ts_window()] if `MRNweightedBy` is `"InterLayerMI"` or `"EdgeOvelap"`. The value of `step` will be ignored if `overlap` is not `NA`. (default = `NA`).
+#' @param doPlot Plot the multiplex recurrence network (default = `TRUE`).
+#' @param createAnimation If `createAnimation = TRUE` *and* `doPlot = TRUE` *and* a windowed analysis is conducted, an animation will be produced using either package [gganimate] (if `useImageMagick = FALSE`) or [animation] (if `useImageMagick = FALSE`). The main difference is that [gganimate] has nice animation transition features, but plots the MRN using [ggplot2], which does not have great options for displaying the nodes as images. With package [animation] a sequence of [igraph] plots will be converted to an animation. If `doSave = TRUE` the animation will be saved in `imageDir` as an animated gif by calling either [gganimate::anim_save()], or [animation::saveGIF()] (default = `FALSE`)
+#' @param useImageMagick Should [ImageMagick](https://imagemagick.org/index.php) be used to create the animation. **NOTE:** ImageMagick has to be installed on your system, see [animation::saveGIF()] (default = `FALSE`)
+#' @param loopAnimation Should the animation loop? (default = `TRUE`)`
+#' @param transitionLength Length of each transition in the animation, ignored if `useImageMagick = TRUE` (default = `3`)
+#' @param stateLength Value of `state_length` if [gganimate] is used, or the  `interval` in seconds for [animation::ani.pause()] (default = `1`)
+#' @param gifWidth Width of the animated `gif` in pixels. The default width will be `600/150 = 4 in` or `10.16 cm` (default = `600`)
+#' @param gifRes Resolution of the animated `gif` in `ppi` (default =`150`)
+#' @param noParts Do not plot the individual graphs that make up the animation to the current `dev` (default = `TRUE`)
+#' @param imageDir Directory to save the layer images and windowed MRN plots. If `NA`, the value returned by `getwd()` will be used, if `NULL` no windowed images will be saved (default = `NA`)
+#' @param silent Silent-ish mode
+#'
+#' @return A list object with fields:
+#' * _interlayerMI_ - One or more matrices with edge weights between layers that represent the interlayer Mutual Information.
+#' * _interlayerCor_ - One or more matrices with edge weights between layers that represent the Pearson correlation between vertex degrees of layers.
+#' * _edgeOverlap_ - One or more matrices with edge weights between layers that represent the overlapping edges between layers.
+#' * _meanValues_ - One or more matrices that represent the means and SDs of the interlayer Mutual Information, absolute interlayer correlation and edge overlap. Ther measure `eo_joint` refers to the number of edges shared among _all_ layers of the MRN.
+#'
+#' @export
+#'
+mrn <- function(layers,
+                weightedBy = c("InterlayerMI", "InterlayerCor", "Edgeoverlap","AnisotropicCRQA")[1],
+                CRQA_vertexSequence = "degree",
+                CRQA_measure = c("RR", "DET", "LAM")[1],
+                win = NA,
+                step = NA,
+                overlap = NA,
+                alignment = "r",
+                doPlot = FALSE,
+                doSave = FALSE,
+                createAnimation = FALSE,
+                useImageMagick = FALSE,
+                loopAnimation = TRUE,
+                transitionLength = 3,
+                stateLength = 1,
+                gifWidth = 600,
+                gifRes = 150,
+                noParts = TRUE,
+                imageDir = NA,
+                silent = TRUE
+){
+
+  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+
+  if(!all(plyr::laply(layers,function(g) igraph::is.igraph(g)))){
+    stop("All elements of the layers list have to be an igraph object!")
+  }
+
+  if(!all(diff(plyr::laply(layers, function(g) igraph::vcount(g)))==0)){
+    stop("In a Multiplex Recurrence Network, the layer networks must all have the same number of vertices!")
+  }
+  Nsize <- igraph::vcount(layers[[1]])
+
+  if(is.null(names(layers))){
+    names(layers) <- paste0("layer",1:length(layers))
+  }
+
+  doSave <- TRUE
+  if(is.null(imageDir)){
+    doSave <- FALSE
+  }
+
+  if(is.na(imageDir)){
+    imageDir <- getwd()
+  } else {
+    if(!dir.exists(normalizePath(imageDir))){
+      stop(paste0("The directory '",imageDir,"' does not exist."))
+    }
+  }
+
+  if(is.na(win)){
+    win <- Nsize
+  }
+  if(is.na(step)){
+    step <- win
+  }
+
+  # if(win==Nsize|step==Nsize){
+  #   wIndexList <- list(win)
+  #   names(wIndexList) <- paste0("window: 1 | start: ",1," | stop: ",Nsize)
+  # } else {
+  wIndexList <- ts_windower(y = 1:Nsize, win = win, step = step, overlap = overlap, adjustY = NA, alignment = alignment)
+  #}
+
+  func <- "mi_interlayer"
+  weighted <- igraph::is.weighted(layers[[1]])
+  directed <- igraph::is.directed(layers[[1]])
+  if(weightedBy%in%"CRQA_vertexSequence"){
+    if(weightedByFunction%in%ls(getNamespace("igraph"))){
+      args <- formals(weightedByFunction)
+      addArgs <- ""
+      if("directed" %in% names(args)){
+        addArgs <- c(addArgs,",directed = directed")
+      }
+      if("weighted" %in% names(args)){
+        addArgs <- c(addArgs,",weighted = weighted")
+      }
+      func <- paste0("igraph::",weightedByFunction,"(layers[[l]]",addArgs,")")
+    } else {
+      stop("Value of weightedByFunction is not a function of package igraph.")
+    }
+  }
+
+  if(directed){
+    combis <- DescTools::CombPairs(seq_along(layers),seq_along(layers))
+    mode <- "directed"
+  } else {
+    combis <- DescTools::CombPairs(seq_along(layers))
+    mode <- "upper"
+  }
+
+  if(func%in%"mi_interlayer"){
+
+    cat(paste("\nWelcome to the multiplex... examining layer similarity!\n\n"))
+
+    out_mr <- out_mi <- out_eo <- out_means <- list()
+
+    pb <- progress::progress_bar$new(total = length(wIndexList))
+
+    for(w in seq_along(wIndexList)){
+
+      mr <- mp <- eo <- matrix(nrow=length(layers), ncol=length(layers), dimnames = list(names(layers),names(layers)))
+
+      for(i in seq_along(combis$X1)){
+
+        edgeFrame1 <- igraph::as_data_frame(layers[[combis$X1[i]]],"edges")
+        edgeFrame1 <- edgeFrame1 %>% filter(edgeFrame1$from%[]%range(wIndexList[[w]])&edgeFrame1$to%[]%range(wIndexList[[w]]))
+        ga  <- graph_from_data_frame(edgeFrame1, directed = directed)
+
+        edgeFrame2 <- igraph::as_data_frame(layers[[combis$X2[i]]],"edges")
+        edgeFrame2 <- edgeFrame2 %>% filter(edgeFrame2$from%[]%range(wIndexList[[w]])&edgeFrame2$to%[]%range(wIndexList[[w]]))
+        gb  <- graph_from_data_frame(edgeFrame2, directed = directed)
+
+        mp[combis$X1[i],combis$X2[i]] <- mi_interlayer(ga,gb)
+        eo[combis$X1[i],combis$X2[i]] <- igraph::ecount(ga %s% gb) / min(c(igraph::ecount(ga), igraph::ecount(gb)), na.rm = TRUE)
+        mr[combis$X1[i],combis$X2[i]] <- stats::cor(x=degree(ga),y=degree(gb))
+
+        #igraph::ecount(layers[[combis$X1[i]]] %s% layers[[combis$X2[i]]]) / (igraph::ecount(layers[[combis$X1[i]]]) + igraph::ecount(layers[[combis$X2[i]]]))
+      }
+
+      mi_ave   <- mean(mp[upper.tri(mp)&mp>0], na.rm = TRUE)
+      mi_sd    <- stats::sd(mp[upper.tri(mp)&mp>0], na.rm = TRUE)
+      mr_ave   <- mean(abs(mr[upper.tri(mr)&mr!=0]), na.rm = TRUE)
+      mr_sd    <- stats::sd(abs(mr[upper.tri(mr)&mr!=0]), na.rm = TRUE)
+      eo_ave   <- mean(eo[upper.tri(eo)&eo>0], na.rm = TRUE)
+      eo_sd    <- stats::sd(eo[upper.tri(eo)&eo>0], na.rm = TRUE)
+      eo_sum   <- sum(plyr::laply(layers, function(g) length(igraph::E(g))),na.rm = TRUE)
+      eo_all   <- eval(parse(text = paste0("igraph::ecount(intersection(",paste0("layers[[",1:NROW(layers),"]]",collapse=","),"))")))
+      eo_joint <- eo_all / eo_sum
+
+      out_mi[[w]] <- mp
+      out_mr[[w]] <- mr
+      out_eo[[w]] <- eo
+      out_means[[w]] <- data.frame(mi_mean = mi_ave, mi_sd = mi_sd,
+                                   mr_mean = mr_ave, mr_sd = mr_sd,
+                                   eo_mean = eo_ave, eo_sd = eo_sd,
+                                   eo_sum  = eo_sum, eo_all = eo_all, eo_joint = eo_joint)
+
+      pb$tick()
+
+    } # wIndex
+
+    names(out_mi)    <- names(wIndexList)
+    names(out_mr)    <- names(wIndexList)
+    names(out_eo)    <- names(wIndexList)
+    names(out_means) <- names(wIndexList)
+
+    out <- list(interlayerMI  = out_mi,
+                interlayerCor = out_mr,
+                edgeOverlap   = out_eo,
+                meanValues    = out_means)
+    attr(out,"time") <- attr(wIndexList,"time")
+
+    df_mv <- ldply(layers, function(l) data.frame(y1 = V(l)$y1, y2 = V(l)$y2))
+    attr(out,"y_layers") <- df_mv
+
+  }
+  return(out)
+}
+
+
+# mrn_plot <- function(layers){
+#
+#
+#
+#   if(MRNweightedBy%in%"InterLayerMI"){
+#     RN <- out_mi
+#   } else {
+#     RN <- out_eo
+#   }
+#
+#   gSpiro  <- plyr::llply(layers, function(g) {
+#     gg <- make_spiral_graph(g                  = g,
+#                             arcs               = 4,
+#                             curvature          = -.3,
+#                             a                  = .1,
+#                             b                  = 1,
+#                             alphaE             = .2,
+#                             alphaV             = .7,
+#                             scaleVertexSize    = c(.1,5),
+#                             showEpochLegend    = FALSE,
+#                             epochColours       = getColours(Ncols = 20),
+#                             showSizeLegend     = FALSE,
+#                             defaultEdgeColour  = "grey80",
+#                             vertexBorderColour = "gray99",
+#                             edgeColourByEpoch  = TRUE,
+#                             doPlot             = FALSE)
+#     gg <- gg + theme(
+#       panel.background      = element_rect(fill = "transparent"),
+#       plot.background       = element_rect(fill = "transparent", color = NA),
+#       panel.grid.major      = element_blank(),
+#       panel.grid.minor      = element_blank(),
+#       legend.background     = element_rect(fill = "transparent"),
+#       legend.box.background = element_rect(fill = "transparent")
+#     )
+#   })
+#
+#   g_rast <- gList <- MRN <- list()
+#   if(useImageMagick){
+#     bg <- "transparent"
+#   } else {
+#     bg <- "white"
+#   }
+#   for(f in seq_along(gSpiro)){
+#     ggplot2::ggsave(gSpiro[[f]],
+#                     filename = file.path(imageDir,paste0(names(gSpiro)[f],".png")),
+#                     device = "png", width = 100, height = 100, units = "mm", bg = bg, dpi = gifRes)
+#     g_rast[[f]] <- png::readPNG(file.path(imageDir,paste0(names(gSpiro)[f],".png")), native=TRUE) #magick::image_read(file.path(imageDir,paste0(names(gSpiro)[f],".png")))
+#
+#
+#   }
+#
+#   for(w in seq_along(RN)){
+#
+#     mp_net <- graph_from_adjacency_matrix(adjmatrix = RN[[w]],
+#                                           mode      = mode,
+#                                           diag      = FALSE,
+#                                           weighted  = weighted)
+#     coord <- layout_in_circle(mp_net)
+#
+#     V(mp_net)$raster  <- g_rast
+#     V(mp_net)$name    <- names(gSpiro)
+#     E(mp_net)$width   <- elascer(E(mp_net)$weight,lo = 1,hi = 10)
+#     E(mp_net)$color   <- scales::gradient_n_pal(colours = c("steelblue","grey99","red3"), values = c(0,.5,1))(elascer(E(mp_net)$weight))
+#     V(mp_net)$shape   <- "raster"
+#     V(mp_net)$label   <- V(mp_net)$name
+#     V(mp_net)$size    <- 50
+#     V(mp_net)$size2   <- 50
+#     V(mp_net)$label.family <- "sans"
+#     V(mp_net)$label.font <- 2
+#     mp_net$layout <- coord
+#
+#
+#     if(useImageMagick){
+#
+#       if(!noParts){
+#         plot(mp_net)
+#       }
+#
+#       MRN[[w]] <- mp_net
+#
+#     } else {
+#
+#       gNodes        <- as.data.frame(mp_net$layout,what = "nodes")
+#       gNodes$ID     <- as.numeric(igraph::V(mp_net))
+#       gNodes$name   <- V(mp_net)$name
+#       gNodes$colour <- V(mp_net)$colour
+#       gNodes$alpha  <- V(mp_net)$alpha
+#       gNodes$image  <- paste0(file.path(imageDir,paste0(gNodes$name,".png")))
+#
+#       gEdges        <- igraph::get.data.frame(mp_net)
+#       if(any(is.character(gEdges$from))){
+#         cName <- "name"
+#       } else {
+#         cName <- "ID"
+#       }
+#       gEdges$from.x <- gNodes$V1[match(gEdges$from, gNodes[[cName]])]
+#       gEdges$from.y <- gNodes$V2[match(gEdges$from, gNodes[[cName]])]
+#       gEdges$to.x   <- gNodes$V1[match(gEdges$to, gNodes[[cName]])]
+#       gEdges$to.y   <- gNodes$V2[match(gEdges$to, gNodes[[cName]])]
+#
+#
+#       gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
+#         geom_curve(data=gEdges, aes(x = from.x,
+#                                     xend = to.x,
+#                                     y = from.y,
+#                                     yend = to.y,
+#                                     size = weight,
+#                                     colour = weight), curvature = 0) +
+#         ggimage::geom_image(aes(image=image), size = .2) +
+#         scale_size(range = c(.01,5)) +
+#         scale_colour_gradient2(low      = "steelblue",
+#                                high     = "red3",
+#                                mid      = "white",
+#                                na.value = scales::muted("slategray4"),
+#                                midpoint = median(gEdges$weight)) +
+#         labs(title = names(RN)[w]) +
+#         coord_cartesian(clip="off") +
+#         theme_void() + theme(plot.margin = margin(50,50,50,50, unit = "pt"),
+#                              legend.margin = margin(l = 20, unit = "pt"),
+#                              plot.title = element_text(margin = margin(b=20)))
+#
+#       if(!noParts){
+#         plot(gg)
+#       }
+#
+#       MRN[[w]] <- gg
+#       gList[[w]] <- list(gNodes = gNodes,
+#                          gEdges = gEdges)
+#
+#     } # useImageMagick
+#
+#   } # w
+#
+#   names(MRN)   <- names(wIndexList)
+#
+#
+#   if(!createAnimation){
+#     return(list(MRN           = MRN,
+#                 interlayerMI  = out_mi,
+#                 edgeOverlap   = out_eo,
+#                 meanValues    = out_means))
+#   } else {
+#
+#     if(useImageMagick){
+#
+#       animation::ani.options(interval = stateLength, imgdir = imageDir, loop = loopAnimation, nmax = length(MRN),
+#                              ani.width = gifWidth, ani.res = gifRes)
+#
+#       if(doSave){
+#
+#         animation::saveGIF(
+#           for(i in seq_along(MRN)){
+#             plot(MRN[[i]], xlab = names(MRN)[i])
+#             animation::ani.pause()
+#           }, img.name = paste0(names(MRN)[i]), movie.name = paste0("MRN_animation_win",win,"_step",step,".gif")
+#         )
+#
+#       } else {
+#         for(i in seq_along(MRN)){
+#           plot(MRN[[i]], xlab = names(MRN)[i])
+#           animation::ani.pause()
+#         }
+#       }
+#
+#       return(list(MRN           = MRN,
+#                   interlayerMI  = out_mi,
+#                   edgeOverlap   = out_eo,
+#                   meanValues    = out_means))
+#
+#     } else {
+#
+#       names(gList) <- names(wIndexList)
+#
+#       gNodes <- plyr::ldply(gList , function(g) g$gNodes)
+#       gEdges <- plyr::ldply(gList , function(g) g$gEdges)
+#
+#       gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
+#         geom_curve(data=gEdges, aes(x = from.x,
+#                                     xend = to.x,
+#                                     y = from.y,
+#                                     yend = to.y,
+#                                     size = weight,
+#                                     colour = weight), curvature = 0) +
+#         ggimage::geom_image(aes(image=image), size = .2) +
+#         scale_size(range = c(.01,5)) +
+#         scale_colour_gradient2(low      = "steelblue",
+#                                high     = "red3",
+#                                mid      = "grey99",
+#                                na.value = scales::muted("slategray4"),
+#                                midpoint = mean(gEdges$weight)) +
+#         labs(caption = "{closest_state}") +
+#         gganimate::transition_states(factor(.id),
+#                                      transition_length = transitionLength,
+#                                      state_length = stateLength, wrap = loopAnimation) +
+#         gganimate::enter_fade() +
+#         gganimate::exit_fade() +
+#         coord_cartesian(clip="off") +
+#         theme_void() + theme(plot.margin = margin(50,50,50,50, unit = "pt"),
+#                              legend.margin = margin(l = 20, unit = "pt"),
+#                              plot.title = element_text(margin = margin(b=20)))
+#
+#       plot(gg)
+#
+#       if(doSave){
+#         #if(file.exists())
+#         gganimate::anim_save(filename =  paste0("MRN_animation_win",win,"_step",step,".gif"),
+#                              animation = gg, path = file.path(imageDir))
+#       }
+#
+#       return(list(MRN              = MRN,
+#                   MRNanimationData = gList,
+#                   MRNanimationGG   = invisible(gg),
+#                   interlayerMI  = out_mi,
+#                   edgeOverlap   = out_eo,
+#                   meanValues    = out_means))
+#       } else { #doPlot
+#   return(list(interlayerMI  = out_mi,
+#               edgeOverlap   = out_eo,
+#               meanValues    = out_means))
+# }
+#
+#
+#
+# }
+
 #' Mutual Information Function
 #'
 #'  Calculate the lagged mutual information fucntion within (auto-mif) or between (cross-mif) time series, or, conditional on another time series (conditional-cross-mif). Alternatively, calculate the total information of a multivariate dataset for different lags.
@@ -4335,22 +5286,24 @@ mi_ts <- function(y1,y2=NULL, nbins=NA){
 #'
 mi_interlayer <- function(g0,g1, probTable=FALSE){
 
+  if(any(E(g0)$weight<0)){E(g0)$weight <- abs(E(g0)$weight)}
+  if(any(E(g1)$weight<0)){E(g1)$weight <- abs(E(g1)$weight)}
   if(igraph::is.weighted(g0)&igraph::is.weighted(g1)){
     s0  <- strength(g0)
     s0m <- max(s0, na.rm = TRUE)
-    d0  <- hist(s0,seq(0,(ceiling(s0m)+1)), include.lowest = TRUE, plot = FALSE)$density
+    d0  <- graphics::hist(s0,seq(0,(ceiling(s0m)+1)), include.lowest = TRUE, plot = FALSE, warn.unused = FALSE)$density
     s1  <- strength(g1)
     s1m <- max(s1, na.rm = TRUE)
-    d1  <- hist(s1,seq(0,(ceiling(s1m)+1)), include.lowest = TRUE, plot = FALSE)$density
+    d1  <- graphics::hist(s1,seq(0,(ceiling(s1m)+1)), include.lowest = TRUE, plot = FALSE, warn.unused = FALSE)$density
     equal <- data.frame(ts_trimfill(d0,d1))
-    p01 <- graphics::hist(x = igraph::strength(g0),breaks = seq(-.5,((NROW(equal))-.5)),plot=FALSE)$counts
-    p10 <- graphics::hist(x = igraph::strength(g1),breaks = seq(-.5,((NROW(equal))-.5)),plot=FALSE)$counts
+    p01 <- graphics::hist(x = igraph::strength(g0),breaks = seq(-.5,((NROW(equal))-.5)),plot=FALSE, warn.unused = FALSE)$counts
+    p10 <- graphics::hist(x = igraph::strength(g1),breaks = seq(-.5,((NROW(equal))-.5)),plot=FALSE, warn.unused = FALSE)$counts
   } else {
     d0    <- igraph::degree_distribution(g0)
     d1    <- igraph::degree_distribution(g1)
     equal <- data.frame(ts_trimfill(d0,d1))
-    p01 <- graphics::hist(x = igraph::degree(g0),breaks = seq(-.5,((NROW(equal))-.5)),plot=FALSE)$counts
-    p10 <- graphics::hist(x = igraph::degree(g1),breaks = seq(-.5,((NROW(equal))-.5)),plot=FALSE)$counts
+    p01 <- graphics::hist(x = igraph::degree(g0),breaks = seq(-.5,((NROW(equal))-.5)),plot=FALSE, warn.unused = FALSE)$counts
+    p10 <- graphics::hist(x = igraph::degree(g1),breaks = seq(-.5,((NROW(equal))-.5)),plot=FALSE, warn.unused = FALSE)$counts
   }
 
   equal$joint <-  (p01+p10) / sum(p01,p10,na.rm = TRUE)
@@ -6575,19 +7528,39 @@ fd_allan <- function(y,
 
 #' Multi-fractal Detrended Fluctuation Analysis
 #'
-#' @param signal An input signal.
+#' @inheritParams fd_dfa
+#' @param y An input signal.
 #' @param qq A vector containing a range of values for the order of fluctuation `q`.
-#' @param mins Minimum scale to consider.
-#' @param maxs Maximum scale to consider.
-#' @param ressc rescc
 #' @param m m
 #'
-#' @return output
+#' @return A dataframe with values of `q`,`H(q)`, `t(q)`, `h(q)`, `D(q)``
 #' @export
 #'
 #' @family Fluctuation Analyses
 #'
-fd_mfdfa <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
+#' @examples
+#'
+#' set.seed(33)
+#' df <- fd_mfdfa(rnorm(4096))
+#'
+#' op <- par(mfrow=c(2,2))
+#' plot(df$q, df$Hq, type="l")
+#' plot(df$q, df$tq, type="l")
+#' plot(df$q, df$Dq, type="l")
+#' plot(df$hq,df$Dq, type="l")
+#' par(op)
+#'
+fd_mfdfa <- function(y,
+                     qq = c(-10,-5:5,10),
+                     fs = NULL,
+                     removeTrend = c("no","poly","adaptive","bridge")[2],
+                     polyOrder=1,
+                     standardise = c("none","mean.sd","median.mad")[2],
+                     adjustSumOrder = FALSE,
+                     scaleMin = 2,
+                     scaleMax = floor(log2(NROW(y)/2)),
+                     scaleResolution = (scaleMax-scaleMin),
+                     m = 1){
 
   #   reload <- FALSE
   #   if("signal" %in% .packages()){
@@ -6596,7 +7569,11 @@ fd_mfdfa <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
   #     detach("package:signal", unload=TRUE)
   #   }
 
-  scale     <- round(2^(seq(mins,maxs,by=((maxs-mins)/ressc))))
+  if(scaleMin<2){scaleMin<-2}
+  if((NROW(y)-scaleMax)<0){
+    y <- y%+]%abs(NROW(y)-scaleMax)
+  }
+  scale     <- round(2^(seq(scaleMin,scaleMax,by=((scaleMax-scaleMin)/scaleResolution))))
   segv      <- numeric(length(scale))
   RMS_scale <- vector("list",length(scale))
   qRMS      <- vector("list",length(qq))
@@ -6604,45 +7581,49 @@ fd_mfdfa <- function(signal,qq=c(-10,-5:5,10),mins=6,maxs=12,ressc=30,m=1){
   qRegLine  <- vector("list",length(qq))
   Hq        <- numeric(length(qq))
 
-  y        <- cumsum(signal-mean(signal))
+  if(adjustSumOrder){
+    Y        <- ts_sumorder(y)
+    Hglobal.full <- attr(Y,"Hglobal.full")
+    Hglobal.excl <- attr(Y,"Hglobal.excl")
+    Hadj <- attr(Y,"Hadj")
+  } else {
+    Y <- y
+    Hglobal.full <- attr(Y,"Hglobal.full") <- NA
+    Hglobal.excl <- attr(Y,"Hglobal.excl") <- NA
+    Hadj <- attr(Y,"Hadj") <- 0
+  }
   TSm      <- as.matrix(cbind(t=1:length(Y),y=Y))
-  Hglobal  <- monoH(TSm,scale)
-
-  Hadj <- 0
-  if((Hglobal>1.2)&(Hglobal<1.8)){
-    Y <- diff(signal)
-    Hadj=1}
-  if(Hglobal>1.8){
-    Y <- diff(diff(signal))
-    Hadj <- 2}
-  if(Hglobal<0.2){
-    Y <- cumsum(signal-mean(signal))
-    Hadj <- -1}
-  if(Hadj!=0){TSm  <- as.matrix(cbind(t=1:length(Y),y=cumsum(Y-mean(Y))))}
 
   for(ns in seq_along(scale)){
-    RMS_scale[[ns]] <-plyr::ldply(ts_slice(TSm,scale[ns]),function(sv){return(sqrt(mean(ts_detrend(sv[,2]))^2))})
+    RMS_scale[[ns]] <- plyr::ldply(ts_slice(y = TSm, epochSz = scale[ns]),function(sv){return(sqrt(mean(ts_detrend(sv[,2]))^2))})
     for(nq in seq_along(qq)){
       qRMS[[nq]][1:length(RMS_scale[[ns]]$V1)] <- RMS_scale[[ns]]$V1^qq[nq]
       Fq[[nq]][ns] <- mean(qRMS[[nq]][1:length(RMS_scale[[ns]]$V1)])^(1/qq[nq])
       if(is.infinite(log2(Fq[[nq]][ns]))){Fq[[nq]][ns]<-NA}
     }
-    Fq[[which(qq==0)]][ns] <- exp(0.5*mean(log(RMS_scale[[ns]]^2)))
+    Fq[[which(qq==0)]][ns] <- exp(0.5*mean(log(RMS_scale[[ns]][,2]^2)))
     if(is.infinite(log2(Fq[[which(qq==0)]][ns]))){Fq[[which(qq==0)]][ns]<-NA}
   }
 
   fmin<-1
   fmax<-which(scale==max(scale))
   #for(nq in seq_along(qq)){Hq[nq] <- stats::lm(log2(Fq[[nq]])~log2(scale))$coefficients[2]}
-  Hq <-plyr::ldply(Fq,function(Fqs){stats::lm(log2(Fqs[fmin:fmax])~log2(scale[fmin:fmax]),na.action=stats::na.omit)$coefficients[2]})
+  Hq <- plyr::ldply(Fq,function(Fqs){stats::lm(log2(Fqs[fmin:fmax])~log2(scale[fmin:fmax]),na.action=stats::na.omit)$coefficients[2]})
 
   tq <- (Hq[,1]*qq)-1
-  hq <- diff(tq)/diff(qq)
-  Dq <- (qq[1:(length(qq)-1)]*hq) - (tq[1:(length(qq)-1)])
+  hq <- ts_diff(tq, addColumns = FALSE, maskEdges = 0)/ts_diff(qq, addColumns = FALSE, maskEdges = 0) #[-c(1,length(tq))]
+  Dq <- (ts_diff(qq, addColumns = FALSE, maskEdges = NA)*hq)-tq #(qq[1:(length(qq)-1)]*hq) - (tq[1:(length(qq)-1)])
 
-  #if(reload==TRUE){library(signal,verbose=FALSE,quietly=TRUE)}
+  #if(reload==TRUE){library(y,verbose=FALSE,quietly=TRUE)}
 
-  return(list(q=qq,Hq=Hq,tq=tq,hq=hq,Dq=Dq,Hglobal=Hglobal,Hadj=Hadj))
+  out <- data.frame(q=qq,Hq=Hq[,1],tq=tq,hq=hq,Dq=Dq)
+
+  attr(out,"y") <- y
+  attr(out,"Hglobal.full") <- Hglobal.full
+  attr(out,"Hglobal.excl") <- Hglobal.excl
+  attr(out,"Hadj") <- Hadj
+
+  return(out)
 }
 
 
@@ -7579,6 +8560,7 @@ plotNET_prep <- function(g,
 }
 
 
+
 #' Example of Strogatz-Watts small-world network
 #'
 #' A wrapper around [igraph::sample_smallworld()] with `dim=1`
@@ -8365,7 +9347,7 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   #   labels[2] <- paste(win+1)
   # }
 
-  if(is.na(colOrder)){
+  if(is.na(colOrder)&subtitle==""){
     subtitle <- 'Variables ordered by mean Dynamic Complexity'
   } else {
     subtitle <- ifelse(colOrder,
@@ -8697,6 +9679,118 @@ plotDC_lvl <-  function(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE, co
 }
 
 
+#' Plot windowed Multiplex Recurrence Network measures
+#'
+#' @param df_mrn Output from function [mrn()] with arguments set for a windowed analysis.
+#' @param measures Character vector indicating which measures should be plotted. Valid elements in the vector are: `"mi"` for inter-layer mutual information,`"eo"` for edge overlap, or any function name from package [igraph] that can be applied to extract vertex-based measures from a weighted network. This is the multiplex recurrence network with a number of nodes equal to the number of layers and edge weights set by argument `mrnWeights`. (default = `"mi"`)
+#' @param mrnWeights Which measure should be used for the MRN edge-weights? Valid options are `"mi"` for inter-layer mutual information,`"eo"` for edge overlap. (default = `"mi"`)
+#' @param showSeries Should the time series that constitute the layers be plotted below the windowed MRN measures? This will only work if the [mrn()] was called using graphs that were generated by function [rn()] with `returnGraph = TRUE`, in which case they will have a property `V(g)$y1` (and if applicable `V(g)$y2`), which will be plotted. If more than 1 measure is requested in `measures` and `showSeries = TRUE` a seperate plot for each measure will be produced. (default = `FALSE`)
+#' @param doPlot Plot the igraph object.
+#'
+#' @return a ggplot object
+#' @export
+#'
+#' @family Tools for plotting multiplex recurrence networks
+#' @family Tools for windowed analyses
+#'
+plotMRN_win <- function(df_mrn,
+                        measures = "mi",
+                        mrnWeights = "mi",
+                        showSeries = FALSE,
+                        doPlot     = TRUE){
+
+
+  if(is.list(df_mrn)&(length(df_mrn)==3)&("meanValues"%in%names(df_mrn))){
+
+    df   <- plyr::ldply(df_mrn$meanValues)
+    df$t <- attr(df_mrn,"time")
+    df_long <- df %>% select(one_of(c("t","mi_mean","eo_mean"))) %>% tidyr::pivot_longer(-t,names_to = "measure",values_to = "y")
+
+
+
+   g <-  ggplot(df_long, aes(x=t, y = y, colour = measure)) +
+      geom_line() +
+      facet_grid(measure~., scales="free_y") +
+      scale_x_continuous(limits = c(0,max(df$t)),expand = c(0.1,0.1)) +
+      theme_bw()
+
+   if(doPlot){
+     # graphics::plot.new()
+     graphics::plot(g)
+   }
+
+   return(invisible(g))
+
+  }
+
+
+  #
+  # rev <- NA
+  # if(is.character(nodesize)){
+  #   switch(nodesize,
+  #          # degree   = rev <- elascer(log1p(igraph::degree(g,normalized = TRUE))),
+  #          # hubscore = rev <- elascer(log1p(igraph::hub_score(g)$vector))
+  #          # strength = rev <- elascer(log1p(igraph::strength(g)$vector)))
+  #          degree   = rev <- igraph::degree(g),
+  #          hubscore = rev <- igraph::hub_score(g)$vector,
+  #          strength = rev <- igraph::strength(g),
+  #          eccentricity = rev <- igraph::eccentricity(g),
+  #          coreness = rev <- igraph::coreness(g),
+  #   )
+  # } else {
+  #   rev <- rep(as.numeric(nodesize),length(igraph::V(g)))
+  # }
+  #
+  # # set colors and sizes for vertices
+  # #rev<-elascer(log1p(igraph::V(g)$degree))
+  #
+  # igraph::V(g)$size        <- rev
+  #
+  # rev <- rev/max(rev, na.rm = TRUE)
+  # rev[rev<=0.2]<-0.2
+  # rev[rev>=0.9]<-0.9
+  # igraph::V(g)$rev <- rev
+  #
+  # igraph::V(g)$color       <- grDevices::rgb(igraph::V(g)$rev, 1-igraph::V(g)$rev,  0, 1)
+  #
+  # # set vertex labels and their colors and sizes
+  # if(all(is.na(labels))){
+  #   igraph::V(g)$label       <- ""
+  # } else {
+  #   igraph::V(g)$label       <- labels
+  #
+  #   if(labelsize == "asnodesize"){igraph::V(g)$label.cex <- elascer(igraph::V(g)$size,lo = .4, hi = 1.1)}
+  #   if(is.numeric(labelsize)&length(labelsize)==1){igraph::V(g)$label.cex <- labelsize}
+  #   if(is.numeric(labelsize)&length(labelsize)==2){igraph::V(g)$label.cex <-  elascer(igraph::V(g)$size, lo = labelsize[1], hi = labelsize[2])}
+  #
+  #   igraph::V(g)$label.color <- "black"
+  #
+  #   igraph::V(g)$label.family = "Helvetica"
+  # }
+  #
+  # if(igraph::ecount(g)>0){
+  #   if(edgeweight%in%"weight"){
+  #     if(igraph::is_weighted(g)){
+  #       igraph::E(g)$width <- elascer(igraph::E(g)$weight,lo = .8, hi = 5)
+  #     }
+  #   } else {
+  #     if(is.numeric(edgeweight)){
+  #       igraph::E(g)$width <- as.numeric(edgeweight)
+  #     } else {
+  #       igraph::E(g)$width <- 1
+  #     }
+  #   }
+  #   igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
+  # }
+
+  if(doPlot){
+    # graphics::plot.new()
+    graphics::plot(g)
+  }
+
+  return(invisible(g))
+}
+
 
 
 # Complex Networks# graph2svg <- function(TDM,pname){
@@ -8936,6 +10030,149 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
 
 
 # Time Series HELPERS ----
+
+#' Sliding window analysis
+#'
+#' @param FUN Which function should be used in the sliding window analysis? Options are: `rp`, `rp_measures`, `rp_diagprofile`, `rn`, `rn_measures` (default = `rp`)
+#' @param y1 A numeric vector or time series
+#' @param y2 A numeric vector or time series (optional)
+#' @param win Window size in which to evaluate `fun` (default = minimum of length of `y1` or `y2`)
+#' @param step Stepsize for sliding windows (default = size of `win`, so no sliding window)
+#' @param animate If `TRUE` and the function argument `doPlot = TRUE`, an animation of the graph output for subsequent windows will be generated using package [gganimate] (default = `FALSE`)
+#' @param silent Silent-ish mode
+#' @param ... Any parameters to pass to the function `fun`
+#'
+#' @return A list object with the output of `fun` for each window at each step.
+#' @export
+#'
+#' @keywords internal
+#'
+#'
+win_slide  <- function(FUN     = c("rp", "rp_measures", "rp_diagprofile", "rn", "rn_measures")[1],
+                       y1,
+                       y2      = NULL,
+                       win     = min(length(y1), ifelse(is.null(y2), (length(y1)+1), length(y2)), na.rm = TRUE),
+                       step    = win,
+                       animate = FALSE,
+                       silent  = TRUE,
+                       ...){
+
+  argList   <- list(...)
+  validArgs <- formals(FUN)
+  if(!all(names(argList) %in% names(validArgs))){
+    stop(paste0("Unknown argument to ",FUN,": ", names(argList)[!(names(argList) %in% names(validArgs))],"\n"))
+  } else {
+    useArgs <- validArgs
+    for(a in which(names(validArgs) %in% names(argList))){
+      useArgs[[a]] <- argList[[which(names(argList) %in% names(validArgs)[a])]]
+    }
+  }
+
+  # switch(FUN,
+  #        rp = ,
+  #        rp_measures = ,
+  #        rp_diagprofile = ,
+  #        rn = ,
+  #        rn_measures = )
+
+  if(is.null(y2)){
+    y2 <- y1
+    attributes(y2) <- attributes(y1)
+  }
+
+  if(!is.data.frame(y1)){
+    id <- deparse(substitute(y1))
+    y1 <- as.data.frame(y1)
+    if(length(id)==NCOL(y1)){
+      colnames(y1) <- id
+    }
+  }
+
+  if(!is.data.frame(y2)){
+    id <- deparse(substitute(y2))
+    y2 <- as.data.frame(y2)
+    if(length(id)==NCOL(y2)){
+      colnames(y2) <- id
+    }
+  }
+
+  if(NROW(y1)==NROW(y2)){
+    df <- cbind(y1,y2)
+  } else {
+    df <- as.data.frame(ts_trimfill(x = df$y1, y = df$y2, action = "fill", type = "end"))
+    colnames(df) <- colnames(cbind(y1,y2))
+  }
+
+  windowedAnalysis <- FALSE
+
+  if(win==NROW(df)|step==NROW(df)){
+    win <- step <- NROW(df)
+    wIndex <- seq(1,NROW(df))
+  } else {
+    windowedAnalysis <- TRUE
+    wIndex <- seq(1,NROW(df)-win, by = step)
+    cat(paste("\nCalculating",FUN,"in a window of size",win,"taking steps of",step,"data points. \n"))
+  }
+
+  if(windowedAnalysis){
+    # Check window length vs. embedding
+    if(win < useArgs$emLag*useArgs$emDim){
+      stop(paste0("The size of win = ", win, " must be larger than the product of emLag = ",useArgs$emLag, " and emDim = ", useArgs$emDim))
+    } else {
+
+      # Adjust time series lengths
+      winFit <- dplyr::last(wIndex)+win-NROW(df)
+      if(winFit>0){
+        yy1 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,1])
+        yy2 <- rep(NA,length(yy1))
+        if(!all(is.na(df[,2]))){
+          yy2 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,2])
+        }
+        if(!silent){
+          message(paste("\nAdded",winFit,"0s to make window and stepsize combination fit to time series length\n\n "))
+          }
+      } else {
+        if(winFit<=0){
+          yy1 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,1], action = "trim.cut")
+          yy2 <- rep(NA,length(yy1))
+          if(!all(is.na(df[,2]))){
+            yy2 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,2], action = "trim.cut")
+          }
+          if(!silent){
+            message(paste("\nTrimmed the series by",abs(winFit),"values to make window and stepsize combination fit to the time series length\n\n"))
+                    }
+        }
+        else {
+        if(!silent){message("\nWindow and stepsize fit the time series length [no adjustments]\n\n ")}
+          }
+        }
+
+      df <- cbind.data.frame(y1=yy1,y2=yy2)
+
+      if(silent){
+        cat("\nsst! [it's a silent-ish mode]\n\n")
+        }
+
+      wIndices <- plyr::llply(wIndex, function(w){seq(w,w+(win))})
+      names(wIndices) <- paste0("window: ",seq_along(wIndices)," | start: ",wIndex," | stop: ",wIndex+win)
+
+    }
+  } else {
+
+    wIndices <- list(wIndex)
+    names(wIndices) <- paste0("window: 1 | start: ",wIndex[1]," | stop: ",wIndex[NROW(df)])
+
+  } # If windowed
+
+  #cl <- parallel::makeCluster(mc.cores)
+  #parallel::clusterExport(cl = cl, c("crqa_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp","saveOut","path_out","file_ID","silent","..."))
+
+  # Create the data, for all windows,need this for parallel, but also speeds up processing in general.
+  dfList <- plyr::llply(wIndices, function(ind){cbind(y1 = df[ind,1],y2 = df[ind,2])})
+
+  out <- FUN(useArgs)
+}
+
 
 #' Permutation Test: Block Randomisation
 #'
@@ -9277,6 +10514,8 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
 #' @param returnOnlyIndices Return only the index of y for each surrogate dimension, not the values (default = `FALSE`)
 #' @param silent Silent-ish mode
 #'
+#' @note If `emLag = 0`, the assumption is the columns in `y` represent the dimensions and `y` will be returned with attributes `emLag = 0` and `emDim = NCOL(y)`. If `emLag > 0` and `NCOL(y)>1` the first column of `y` will used for embedding and a warning will be triggered.
+#'
 #' @return The lag embedded time series
 #' @family Time series operations
 #'
@@ -9288,17 +10527,16 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
 #'
 ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE){
 
-  id <- ifelse(is.null(colnames(y)),ifelse(is.null(names(y)),deparse(substitute(y)),names(y)[1]),colnames(y)[1])
+  id    <- ifelse(is.null(colnames(y)),ifelse(is.null(names(y)),deparse(substitute(y)),names(y)[1]),colnames(y)[1])
   y.ori <- y
-  N  <- NROW(y)
+  N     <- NROW(y)
 
-  if((emDim-1) * emLag > N){stop(paste0("Time series length (N = ",N,") is too short to embed in ",emDim," dimensions with delay ",emLag))}
-
-  if(!is.null(dim(y))){
+  if(!is.null(dim(y))&emLag>0){
     y <- y_data <- as.numeric(y[,1])
-    if(!silent){cat("\ntaking first column...\n")}
+    #if(!silent){cat("\ntaking first column...\n")}
+    warning(cat("\nMultiple columns available, taking first column of y...\n"))
   } else {
-    y <- y_data <- as.numeric(y)
+    y_data  <- y
   }
 
   if(any(stats::is.ts(y), zoo::is.zoo(y), xts::is.xts(y))){
@@ -9309,6 +10547,17 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
     emTime <- emLag
   }
 
+
+  if(emLag==0){
+
+    emY   <- matrix(nrow = N, ncol = NCOL(y.ori), byrow = TRUE, dimnames = list(NULL,colnames(y.ori)))
+    emY   <- as.matrix(y.ori)
+    emDim <- NCOL(y.ori)
+    emLag <- 0
+
+  } else {
+
+  if((emDim-1) * emLag > N){stop(paste0("Time series length (N = ",N,") is too short to embed in ",emDim," dimensions with delay ",emLag))}
 
 
   if(emDim > 1){
@@ -9322,12 +10571,15 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
     colnames(emY) <- paste0("tau.",0:(emDim-1))
 
   } else {
-    emY <-  matrix(nrow = N, ncol = 1, byrow = TRUE, dimnames = list(NULL,"tau.0"))
-    emY <-  y
+    ids <- colnames(y.ori)
+    emY <- as.matrix(y.ori)
+    dimnames(emY) <- list(NULL,paste0("tau.",ids))
   }
 
   # Alternative: rollapply(y, list(-d * seq(0, k-1)), c)
 
+
+  } # if emLag = 0
 
   attr(emY, "embedding.dims") <- emDim
   attr(emY, "embedding.lag")  <- emLag
@@ -9338,7 +10590,7 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
     attr(emY, "data.y") <- y_data
     return(as.matrix(emY))
   } else {
-    if(emDim>1){
+    if(emDim>1&emLag>0){
       for(c in 1:NCOL(emY)){
         emY[,c] <-  y_data[emY[,c]]
       }
@@ -9779,7 +11031,7 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
     dif <- diff(dy)
     dy  <- cbind((rbind(dif[1,], dif)+rbind(dif,dif[NROW(dif),]))/2)
     if(!is.null(maskEdges)){
-      maskWhich[[o]] <- c(1:o,(NROW(dy)-o):NROW(dy))
+      maskWhich[[o]] <- c(1:o,(NROW(dy)-o+1):NROW(dy))
     }
     if(keepDerivatives){
       keepDiffs[[o]] <- dy
@@ -10119,13 +11371,16 @@ ts_trimfill <- function(x,y,action=c("fill","trim.cut","trim.NA")[1],type=c("end
 #' @param step Size of steps between windows. Can be larger than `win`, but is ignored if `overlap` is not {NA}.
 #' @param overlap A value between `[0 .. 1]`. If overlap is not `NA` (default), the value of `step` is ignored and set to `floor(overlap*win)`. This produces indices in which the size of `step` is always smaller than `win`, e.g. for fluctuation analyses that use binning procedures to represent time scales.
 #' @param adjustY If not `NA`, or, `FALSE` a list object with fields that match one or more arguments of \link[casnet]{ts_trimfill} (except for `x,y`), e.g. `list(action="trim.NA",type="end",padding=NA,silent=TRUE)`. See `Return value` below for details.
+#' @param alignment Whether to right (`"r"`), center (`"c"`), or left (`"l"`) align the window.
 #'
 #' @return If `adjustY = FALSE`, or, a list object with fields that represent arguments of \link[casnet]{ts_trimfill}, then the (adjusted) vector `y` is returned with an attribute `"windower"`. This is a list object with fields that contain the indices for each window that fits on `y`, given `win`, `step` or `overlap` and the settings of `adjustY`. If `adjustY = NA`, only the list object is returned.
 #' @export
 #'
 #' @family Time series operations
+#' @family Tools for windowed analyses
+
 #'
-ts_windower <- function(y, win=length(y), step=round(win/2), overlap=NA, adjustY=NA){
+ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, alignment = c("r","c","l")[1]){
 
   adjustOK <- FALSE
   if(is.list(adjustY)){
@@ -10141,24 +11396,76 @@ ts_windower <- function(y, win=length(y), step=round(win/2), overlap=NA, adjustY
     }
   }
 
-  if(!is.na(overlap)){step <- floor(overlap*win)}
+  if(!is.na(win)&is.na(step)&is.na(overlap)){
+    step <- win
+    warning("step = NA! Stepsize was set to window size.")
+  }
+
+  if(!is.na(overlap)){
+    if(overlap%[]%c(0,1)){
+      if(!is.na(step)){
+        warning("Step will be ignored, because overlap has a value.")
+        }
+        step <- floor(overlap*win)
+      } else {
+        stop("Overlap must be in [0,1]")
+      }
+    }
 
   wIndices <- list()
-  wIndex   <- seq(1,(NROW(y)-win),step)
-  iDiff    <- (dplyr::last(wIndex) + win-1)-NROW(y)
+  wIndex <- seq(from = 1, to = (NROW(y) - win + step), by = step)
 
-  wIndices <- plyr::llply(wIndex,function(i){i:min(i+win-1,length(y))})
+  iDiff    <- (dplyr::last(wIndex)+win-1)-NROW(y)
+  if(abs(iDiff)>=(win/2)){
+   if(iDiff>0){
+     wIndex <- wIndex[1:(length(wIndex)-1)]
+   } else {
+     extra <- dplyr::last(wIndex)+1
+     wIndex[length(wIndex)+1] <- extra
+   }
+  }
+  wIndices <- plyr::llply(wIndex, function(i){i:min(i+win-1,length(y))})
 
   if(adjustOK){
     if(iDiff<0){
       if(adjustY$action%in%"fill"){
-        wIndices[[length(wIndices)]] <- c(wIndices[[length(wIndices)]],seq(max(wIndices[[length(wIndices)]]),max(wIndices[[length(wIndices)]])+abs(iDiff)))
+        wIndices[[length(wIndices)]] <- c(wIndices[[length(wIndices)]], seq(max(wIndices[[length(wIndices)]]), max(wIndices[[length(wIndices)]]) + abs(iDiff)))
       }
     }
   }
-  names(wIndex) <- paste("stepsize",floor(step*win),"| window",1:length(wIndex))
+
+  wID   <- seq_along(wIndices)
+  width <- nchar(paste(max(wID)))
+  names(wIndices) <- paste0("window: ", formatC(wID, width = width, format = "d", flag = "0"), " | start: ",wIndex," | stop: ",wIndex+win-1)
+
+  iDiff <- max(wIndices[[length(wIndices)]])-NROW(y)
+
+  if(iDiff!=0|any(lengths(wIndices)!=win)){
+    if(iDiff<0|any(lengths(wIndices)>win)){
+      wIndices[[length(wIndices)]] <- c(wIndices[[length(wIndices)]],(dplyr::last(wIndices[[length(wIndices)]])+1):NROW(y))
+      #warning("Last window was enlarged to include all data")
+      warning(paste0("Window ",seq_along(wIndices)[lengths(wIndices)>win])," is larger than window size ",win,".\n")
+    }
+    if(iDiff>0|any(lengths(wIndices)<win)){
+      wIndices[[length(wIndices)]] <- c(dplyr::first(wIndices[[length(wIndices)]]):NROW(y))
+      warning(paste0("Window ",seq_along(wIndices)[lengths(wIndices)<win])," is smaller than window size ",win,".\n")
+      #warning("Last window was shrunk to fit data")
+    }
+    names(wIndices)[length(wIndices)] <- paste0("window: ",max(seq_along(wIndices))," | start: ",max(wIndex)," | stop: ",max(wIndices[[length(wIndices)]]))
+  }
+
+  switch(alignment,
+         l = tIndex <- laply(wIndices, min),#seq(from = 1,     to = (NROW(y) - win + step), by = step),
+         c = tIndex <- laply(wIndices, mean),#seq(from = floor(win/2), to = (NROW(y) - floor(win/2) + step), by = step),
+         r = tIndex <- laply(wIndices, max) #seq(from = win,   to = NROW(y), by = step)
+  )
+
+  attr(x = wIndices, which = "time") <- tIndex
+
+  #names(wIndices) <- paste("stepsize",floor(step*win),"| window",1:length(wIndex))
   return(wIndices)
 }
+
 
 
 #' Detrend a time series
@@ -10411,7 +11718,9 @@ ts_sd <- function(y, na.rm = TRUE, type = c("Bessel","unadjusted")[1], silent=TR
   return(out)
 }
 
-#' Slice columns of a matrix in epochs
+#' Slice a Matrix
+#'
+#' Slices rows of a matrix into a list of matrices representing epochs of length `epochSz`.
 #'
 #' @param y A matrix with timeseries as columns
 #' @param epochSz Epoch size
@@ -10424,14 +11733,18 @@ ts_sd <- function(y, na.rm = TRUE, type = c("Bessel","unadjusted")[1], silent=TR
 #'
 #' @author Fred Hasselman
 #'
-#'
-ts_slice<-function(y,epochSz=4){
-  if(!is.matrix(y)){yy <- as.matrix(y)} else {yy<-y}
-  N<-dim(yy)
+ts_slice <- function(y , epochSz=4){
+  if(!is.matrix(y)){
+    yy <- as.matrix(y)
+  } else {
+    yy <- y
+  }
+
+  N <- dim(yy)
   wIndex <- plyr::llply(seq(1,N[1],epochSz),function(i) yy[i:min(i+epochSz-1,N[1]),1:N[2]])
   delID <- which(lengths(wIndex)!=epochSz)%00%NA
   for(del in delID){
-    if(!is.na(delID)){wIndex <- wIndex[-del]}
+    if(!any(is.na(delID))){wIndex <- wIndex[-del]}
   }
   names(wIndex) <- paste("epoch",1:length(wIndex),"| size",lengths(wIndex))
   return(wIndex)
@@ -10679,10 +11992,8 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 }
 
 
-
 #' Get some nice colours
 #'
-#' @param pal The colour pallette, one of `"pe"`,`"mm"`,`"le"``"an"` (default = `"pe"`)
 #' @param Ncols Number of colours
 #'
 #' @return A list of colours
@@ -10690,13 +12001,18 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 #'
 #' @examples
 #'
-#' getColours(Ncol=5)
+#' # Plot all available colours
+#' df <- expand.grid(x=1:8,y=1:8)[1:58,]
+#' plot(df$x,df$y,pch=15,col=getColours(Ncols=58),cex=5, axes = FALSE, ann = FALSE)
+#' text(df$x,df$y,paste(1:58),col="white")
 #'
-getColours <- function(pal = c("pe","mm","le","an")[1],Ncols = 20){
+getColours <- function(Ncols = 20){
   pl <- c("#A65141","#ABB2C4","#C89284","#7896BC","#E1CAC2","#536489","#ECE3CD","#575E7A","#BEBEC4","#C4AD75","#30261E","#BC964D","#3D434D","#D29E55","#B4B6A7","#9B7342","#E8D69D","#48211A","#EBDAB4","#3D4B68","#E8DCCF","#3E688C","#9D3D2D","#507074","#9A756C","#546959","#93725F","#858563","#E1D3B1","#A6B4BB","#78828C","#AA9C6A","#91A193","#CDB16E","#1B528D","#B8A98F","#6E432D","#4F5B71","#D9B196","#20304F","#827561","#98A39E","#8B4F31","#7E7B65","#C1B6A1","#775E45","#C0B3A2","#5A524A","#BBA27F","#3A3935","#C9BDA3","#626961","#8A4F42","#8D8A77","#947B5E","#5D3C30","#AA8470","#493A2C")
 
   if(Ncols<=58){
     cols <- pl[1:Ncols]
+  } else {
+    stop("Currently the max. number of colours is 58.")
   }
   return(cols)
 }
@@ -10726,9 +12042,11 @@ getColours <- function(pal = c("pe","mm","le","an")[1],Ncols = 20){
 #  right down to 0Hz.
 #
 #  (cc) Max Little, 2008. This software is licensed under the
+#
 #  Attribution-Share Alike 2.5 Generic Creative Commons license:
 #  http://creativecommons.org/licenses/by-sa/2.5/
 #  If you use this work, please cite:
+#
 #  Little MA et al. (2007), "Exploiting nonlinear recurrence and fractal
 #  scaling properties for voice disorder detection", Biomed Eng Online, 6:23
 #
@@ -10736,7 +12054,11 @@ getColours <- function(pal = c("pe","mm","le","an")[1],Ncols = 20){
 #  If you use this work, consider saying hi on comp.dsp
 #  Dale B. Dalrymple
 #'
-noise_powerlaw <- function(y = NULL, alpha=-1, N=100, standardise = FALSE, randomPower = FALSE, seed = NA){
+noise_powerlaw <- function(y = NULL, alpha=-1, N=512, standardise = FALSE, randomPower = FALSE, seed = NA){
+
+  if(alpha%)(%c(-2,2)){
+    warning("If alpha is outside [-2,2], result are likely not accurate.")
+  }
 
   if(!is.null(y)){
     N <- length(y)
@@ -10751,9 +12073,9 @@ noise_powerlaw <- function(y = NULL, alpha=-1, N=100, standardise = FALSE, rando
   alpha <- -1 * alpha
 
   # Nyquist
-  N2 = floor(N/2)-1
-  f = (2:(N2+1))
-  A2 = 1/(f^(alpha/2))
+  N2 <- floor(N/2)-1
+  f  <- 2:(N2+1)
+  A2 <- 1/(f^(alpha/2))
 
   if(!is.null(y)){
 
@@ -10791,7 +12113,7 @@ noise_powerlaw <- function(y = NULL, alpha=-1, N=100, standardise = FALSE, rando
 #' @return fGn
 #' @export
 #'
-noise_fGn <- function(H=0.5, N = 100, mu = NULL, sigma = NULL){
+noise_fGn <- function(H=0.5, N = 512, mu = NULL, sigma = NULL){
 
   # Determine whether fGn or fBn should be produced.
   if(H%)[%c(0,1)){stop("H must be in (0,1] for fGn!")}
@@ -10801,15 +12123,6 @@ noise_fGn <- function(H=0.5, N = 100, mu = NULL, sigma = NULL){
   if (H == 0.5){
     y <- stats::rnorm(N)  # If H=0.5, then fGn is equivalent to white Gaussian noise.
     } else {
-    # If this function was already in memory before being called this time,
-    # AND the values for N and H are the same as the last time it was
-    # called, then the following (persistent) variables do not need to be
-    # recalculated.  This was done to improve the speed of this function,
-    # especially when many samples of a single fGn (or fBn) process are
-    # needed by the calling function.
-    # persistent Zmag Nfft Nlast Hlast
-    #    if isempty(Zmag) | isempty(Nfft) | isempty(Nlast) |isempty(Hlast) | N ~= Nlast #| H ~= Hlast
-    # The persistent variables must be (re-)calculated.
     Nfft <- 2^ceiling(log2(2*(N-1)))
     NfftHalf <- round(Nfft/2);
     k <- c(0:NfftHalf, (NfftHalf-1):-1:1)
@@ -10856,7 +12169,7 @@ noise_fGn <- function(H=0.5, N = 100, mu = NULL, sigma = NULL){
 #' @return fBm
 #' @export
 #'
-noise_fBm <- function(H=1.5, N = 100, mu = NULL, sigma = NULL){
+noise_fBm <- function(H=1.5, N = 512, mu = NULL, sigma = NULL){
 
   # Determine whether fGn or fBn should be produced.
   if(H%)[%c(1,2)){stop("H must be in (1,2] for fBm!")}
@@ -10873,6 +12186,40 @@ noise_fBm <- function(H=1.5, N = 100, mu = NULL, sigma = NULL){
  }
 
  return(cumsum(y))
+}
+
+noise_multifractal <- function(type = c("fGn","fBn","PSD"), N = 512){
+
+  # numb1=10;
+  # numb2=1000;
+  # alpha=2;
+  # N1=numb1*(numb2+N);
+  #
+  # mGnSum=zeros(numb1,1);
+  # mGnSumm=zeros(numb1*(numb2-1),1);
+  # mGn=zeros(N,1);
+  #
+  # R=randn(N1,1);
+  # for t=1:N,
+  # for n=1:numb1;
+  # mGnSum(n)=(n^(Ht(t)-(1/alpha)))*R(1+(numb1*(numb2+t))-n);
+  # end;
+  # mGnSum1=sum(mGnSum);
+  # for nn=1:(numb1*(numb2-1));
+  # mGnSumm(nn)=(((numb1+nn)^(Ht(t)-(1/alpha)))-nn^(Ht(t)-(1/alpha)))*R(1+(numb1*(numb2-1+t))-nn);
+  # end;
+  # mGnSum2=sum(mGnSumm);
+  # mGn(t)=((numb1^(-Ht(t)))/gamma(Ht(t)-(1/alpha)+1))*(mGnSum1+mGnSum2);
+  # end;
+  #
+  # mBm=cumsum(mGn);
+
+  # switch(type,
+  #        fGn =
+  #
+  #        )
+
+
 }
 
 

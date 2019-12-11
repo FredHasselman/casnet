@@ -35,7 +35,7 @@ rp_lineDist(RM, DLmin = 2, VLmin = 2, HLmin = 2,
 
 \item{chromatic}{Chromatic RQA?}
 
-\item{matrices}{Return the matrices ?}
+\item{matrices}{Return the matrices?}
 }
 \value{
 A list object with distributions of line lengths. If \code{matrices = TRUE} datafr are returned whose columns represent the nonzero diagonals, verticals, or, horizontals.

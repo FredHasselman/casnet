@@ -4,7 +4,7 @@
 \alias{noise_powerlaw}
 \title{Generate noise series with power law scaling exponent}
 \usage{
-noise_powerlaw(y = NULL, alpha = -1, N = 100, standardise = FALSE,
+noise_powerlaw(y = NULL, alpha = -1, N = 512, standardise = FALSE,
   randomPower = FALSE, seed = NA)
 }
 \arguments{

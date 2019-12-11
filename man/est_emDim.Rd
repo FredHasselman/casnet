@@ -28,3 +28,12 @@ Embedding dimensions
 \description{
 A wrapper for nonlinearTseries::estimateEmbeddingDim
 }
+\details{
+A wrapper for \link[nonlinearTseries:estimateEmbeddingDim]{nonlinearTseries::estimateEmbeddingDim}
+}
+\seealso{
+Other Estimate Recurrence Parameters: \code{\link{est_emLag}},
+  \code{\link{est_parameters_roc}},
+  \code{\link{est_parameters}}, \code{\link{est_radius}}
+}
+\concept{Estimate Recurrence Parameters}

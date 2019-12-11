@@ -3,13 +3,13 @@
 \name{est_parameters}
 \alias{est_parameters}
 \alias{crqa_parameters}
-\title{Find optimal parameters for constructing a Recurrence Matrix}
+\title{Estimate (C)RQA parameters}
 \usage{
 est_parameters(y, lagMethods = c("first.minimum", "global.minimum",
   "max.lag"), estimateDimensions = "preferSmallestInLargestHood",
-  maxDim = 10, emLag = NULL, maxLag = floor(length(y)/(maxDim + 1)),
-  nnSizes = 2, nnRadius = 5, nnThres = 10, theiler = 0,
-  doPlot = TRUE, silent = TRUE, ...)
+  maxDim = 10, emLag = NULL, maxLag = floor(NROW(y)/(maxDim + 1)),
+  minVecLength = 20, nnSizes = 2, nnRadius = 5, nnThres = 10,
+  theiler = 0, doPlot = TRUE, silent = TRUE, ...)
 }
 \arguments{
 \item{y}{A numeric vector or time series}
@@ -30,6 +30,8 @@ est_parameters(y, lagMethods = c("first.minimum", "global.minimum",
 
 \item{maxLag}{Maximum embedding lag to consider. Default value is: \code{floor(length(y)/(maxDim+1))}}
 
+\item{minVecLength}{The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of \code{maxDim} that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = `20``)}
+
 \item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{2})}
 
 \item{nnRadius}{If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{5})}
@@ -48,7 +50,7 @@ est_parameters(y, lagMethods = c("first.minimum", "global.minimum",
 A list object containing the optimal values (as indicated by the user) and iteration history.
 }
 \description{
-A wrapper for various algorithms used to find optimal value pair for the embedding delay and the number of embedding dimensions
+Find optimal parameters for constructing a Recurrence Matrix. A wrapper for various algorithms used to find optimal values for the embedding delay and the number of embedding dimensions
 }
 \details{
 A number of functions are called to determie optimal parameters for delay embedding a time series:
@@ -58,7 +60,16 @@ A number of functions are called to determie optimal parameters for delay embedd
 \item{Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[casnet:est_emDim]{casnet::est_emDim()}}, which is a wrapper around \code{\link[fractal:FNN]{fractal::FNN()}}}
 }
 }
+\examples{
+
+set.seed(4321)
+est_parameters(rnorm(100))
+
+}
 \seealso{
-Other Estimate Recurrence Parameters: \code{\link{est_radius}}
+Other Estimate Recurrence Parameters: \code{\link{est_emDim}},
+  \code{\link{est_emLag}},
+  \code{\link{est_parameters_roc}},
+  \code{\link{est_radius}}
 }
 \concept{Estimate Recurrence Parameters}

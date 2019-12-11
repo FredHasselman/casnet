@@ -20,6 +20,11 @@ est_emLag(y, selection.methods = "first.minimum", maxLag = length(y)/4,
 The ami function with requested minima
 }
 \description{
-A wrapper for nonlinearTseries::timemLag
+A wrapper for \link[nonlinearTseries:timemLag]{nonlinearTseries::timemLag}
 }
-\concept{Estimate CRQA parameters}
+\seealso{
+Other Estimate Recurrence Parameters: \code{\link{est_emDim}},
+  \code{\link{est_parameters_roc}},
+  \code{\link{est_parameters}}, \code{\link{est_radius}}
+}
+\concept{Estimate Recurrence Parameters}

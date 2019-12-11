@@ -4,7 +4,7 @@
 \alias{noise_fBm}
 \title{Generate fractional Brownian motion}
 \usage{
-noise_fBm(H = 1.5, N = 100, mu = NULL, sigma = NULL)
+noise_fBm(H = 1.5, N = 512, mu = NULL, sigma = NULL)
 }
 \arguments{
 \item{H}{Hurst exponent}
