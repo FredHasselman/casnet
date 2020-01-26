@@ -4,10 +4,16 @@
 \alias{win_slide}
 \title{Sliding window analysis}
 \usage{
-win_slide(FUN = c("rp", "rp_measures", "rp_diagprofile", "rn",
-  "rn_measures")[1], y1, y2 = NULL, win = min(length(y1),
-  ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm = TRUE),
-  step = win, animate = FALSE, silent = TRUE, ...)
+win_slide(
+  FUN = c("rp", "rp_measures", "rp_diagprofile", "rn", "rn_measures")[1],
+  y1,
+  y2 = NULL,
+  win = min(length(y1), ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm = TRUE),
+  step = win,
+  animate = FALSE,
+  silent = TRUE,
+  ...
+)
 }
 \arguments{
 \item{FUN}{Which function should be used in the sliding window analysis? Options are: \code{rp}, \code{rp_measures}, \code{rp_diagprofile}, \code{rn}, \code{rn_measures} (default = \code{rp})}

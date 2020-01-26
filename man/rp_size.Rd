@@ -30,10 +30,14 @@ rp_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
 rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
-  \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rp_lineDist}},
-  \code{\link{rp_nzdiags}}, \code{\link{rp_plot}},
-  \code{\link{rp}}
+Other Distance matrix operations (recurrence plot): 
+\code{\link{bandReplace}()},
+\code{\link{di2bi}()},
+\code{\link{di2we}()},
+\code{\link{dist_hamming}()},
+\code{\link{rp_lineDist}()},
+\code{\link{rp_nzdiags}()},
+\code{\link{rp_plot}()},
+\code{\link{rp}()}
 }
 \concept{Distance matrix operations (recurrence plot)}

@@ -4,12 +4,20 @@
 \alias{dc_f}
 \title{Fluctuation Intensity}
 \usage{
-dc_f(df, win = NROW(df), scale_min, scale_max, doPlot = FALSE,
-  useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA,
-  timeStamp = "01-01-1999")
+dc_f(
+  df,
+  win = NROW(df),
+  scale_min,
+  scale_max,
+  doPlot = FALSE,
+  useVarNames = TRUE,
+  colOrder = TRUE,
+  useTimeVector = NA,
+  timeStamp = "01-01-1999"
+)
 }
 \arguments{
-\item{df}{A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in \code{df} should be on the same scale, an error will be thrown if the range of the time series in\code{df} is not \code{[scale_min,scale_max]}.}
+\item{df}{A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in \code{df} should be on the same scale, an error will be thrown if the range of the time series in\code{df} is not \verb{[scale_min,scale_max]}.}
 
 \item{win}{Size of window in which to calculate Dynamic Complexity. If \code{win < NROW(df)} the window will move along the time series with a stepsize of \code{1} (default = \code{NROW(df)})}
 
@@ -36,9 +44,12 @@ Fluctuation intensity is one of two components of which the product is the Dynam
 \seealso{
 Use \code{\link[=dc_win]{dc_win()}} to get the dynamic complexity measure.
 
-Other Dynamic Complexity functions: \code{\link{dc_ccp}},
-  \code{\link{dc_d}}, \code{\link{dc_win}},
-  \code{\link{plotDC_ccp}}, \code{\link{plotDC_lvl}},
-  \code{\link{plotDC_res}}
+Other Dynamic Complexity functions: 
+\code{\link{dc_ccp}()},
+\code{\link{dc_d}()},
+\code{\link{dc_win}()},
+\code{\link{plotDC_ccp}()},
+\code{\link{plotDC_lvl}()},
+\code{\link{plotDC_res}()}
 }
 \concept{Dynamic Complexity functions}

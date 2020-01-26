@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,10 +143,24 @@
     <p>Create a Distance Matrix</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rp</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>emDim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emRad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>to.ts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>to.sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>rp</span>(
+  <span class='no'>y1</span>,
+  <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>emDim</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>emRad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>to.ts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>to.sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>,
+  <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>returnMeasures</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>doEmbed</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -196,8 +210,16 @@
       <td><p>A value passed to <code><a href='est_radius.html'>est_radius(...,type="fixed", targetMeasure="RR")</a></code> if <code>is.na(emRad)==TRUE</code>.</p></td>
     </tr>
     <tr>
+      <th>returnMeasures</th>
+      <td><p>Should values be returned to the console window and as an attribute? (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
       <th>doPlot</th>
       <td><p>Plot the matrix by calling <code><a href='rp_plot.html'>rp_plot()</a></code> with defult settings</p></td>
+    </tr>
+    <tr>
+      <th>doEmbed</th>
+      <td><p>If <code>FALSE</code>, a distance matrix will be returned that is not embedded by <code>emDim</code> and <code>emLag</code>. If <code>y1</code> and/or <code>y2</code> are data frames, the columns will be used as dimensions (default = <code>TRUE</code>)</p></td>
     </tr>
     <tr>
       <th>silent</th>
@@ -222,11 +244,15 @@
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Distance matrix operations (recurrence plot): <code><a href='bandReplace.html'>bandReplace</a></code>,
-  <code><a href='di2bi.html'>di2bi</a></code>, <code><a href='di2we.html'>di2we</a></code>,
-  <code><a href='dist_hamming.html'>dist_hamming</a></code>, <code><a href='rp_lineDist.html'>rp_lineDist</a></code>,
-  <code><a href='rp_nzdiags.html'>rp_nzdiags</a></code>, <code><a href='rp_plot.html'>rp_plot</a></code>,
-  <code><a href='rp_size.html'>rp_size</a></code></p></div>
+    <div class='dont-index'><p>Other Distance matrix operations (recurrence plot): 
+<code><a href='bandReplace.html'>bandReplace</a>()</code>,
+<code><a href='di2bi.html'>di2bi</a>()</code>,
+<code><a href='di2we.html'>di2we</a>()</code>,
+<code><a href='dist_hamming.html'>dist_hamming</a>()</code>,
+<code><a href='rp_lineDist.html'>rp_lineDist</a>()</code>,
+<code><a href='rp_nzdiags.html'>rp_nzdiags</a>()</code>,
+<code><a href='rp_plot.html'>rp_plot</a>()</code>,
+<code><a href='rp_size.html'>rp_size</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

@@ -4,12 +4,28 @@
 \alias{rn}
 \title{Create a Recurrence Network Matrix}
 \usage{
-rn(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
-  directed = FALSE, weighted = FALSE, weightedBy = c("si", "rt",
-  "rf")[1], rescaleWeights = FALSE, fs = NA, includeDiagonal = FALSE,
-  to.ts = NULL, order.by = NULL, to.sparse = FALSE,
-  method = "Euclidean", targetValue = 0.05, returnGraph = FALSE,
-  doPlot = FALSE, silent = TRUE, ...)
+rn(
+  y1,
+  y2 = NULL,
+  emDim = 1,
+  emLag = 1,
+  emRad = NULL,
+  directed = FALSE,
+  weighted = FALSE,
+  weightedBy = c("si", "rt", "rf")[1],
+  rescaleWeights = FALSE,
+  fs = NA,
+  includeDiagonal = FALSE,
+  to.ts = NULL,
+  order.by = NULL,
+  to.sparse = FALSE,
+  method = "Euclidean",
+  targetValue = 0.05,
+  returnGraph = FALSE,
+  doPlot = FALSE,
+  silent = TRUE,
+  ...
+)
 }
 \arguments{
 \item{y1}{A numeric vector or time series}
@@ -28,9 +44,9 @@ rn(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 
 \item{weightedBy}{After setting values smaller than \code{emRad} to \code{0}, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (\code{"si"}). Other option are \code{"rt"} for \emph{recurrence time} and \code{"rf"} for \emph{recurrence time frequency}, Because vertices represent time points in \eqn{\epsilon}-thresholded recurrence networks, a difference of two vertex-indices represents duration. If an edge \code{e1} connects \code{v1} and \code{v10} then the \emph{recurrence time} will be the difference of the vertex indices, \code{9}, and the \emph{recurrence time frequency} will be \code{1/9}.}
 
-\item{rescaleWeights}{If set to \code{TRUE} and \code{weighted = TRUE}, all weight values will be rescaled to \code{[0,1]}, where \code{0} means no recurrence relation and \code{1} the maximum weight value.}
+\item{rescaleWeights}{If set to \code{TRUE} and \code{weighted = TRUE}, all weight values will be rescaled to \verb{[0,1]}, where \code{0} means no recurrence relation and \code{1} the maximum weight value.}
 
-\item{fs}{Sample frequency: A numeric value interpreted as the \code{number of observed samples per unit of time}. If the weights represent recurrence times (\code{"rt"}), they will be divided by the value in \code{fs}. If the weights represent recurrence time frequencies (\code{"rf"}), they will be multiplied by the value of \code{fs} (default = \code{NA})}
+\item{fs}{Sample frequency: A numeric value interpreted as the \verb{number of observed samples per unit of time}. If the weights represent recurrence times (\code{"rt"}), they will be divided by the value in \code{fs}. If the weights represent recurrence time frequencies (\code{"rf"}), they will be multiplied by the value of \code{fs} (default = \code{NA})}
 
 \item{includeDiagonal}{Should the diagonal of the matrix be included when creating the network (default = \code{FALSE})}
 
@@ -59,8 +75,11 @@ A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidenc
 This function serves as a wrapper for function \code{rp()}, it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)
 }
 \seealso{
-Other Distance matrix operations (recurrence network): \code{\link{di2bi}},
-  \code{\link{di2we}}, \code{\link{rn_plot}},
-  \code{\link{rn_recSpec}}, \code{\link{rn_scaleoGram}}
+Other Distance matrix operations (recurrence network): 
+\code{\link{di2bi}()},
+\code{\link{di2we}()},
+\code{\link{rn_plot}()},
+\code{\link{rn_recSpec}()},
+\code{\link{rn_scaleoGram}()}
 }
 \concept{Distance matrix operations (recurrence network)}

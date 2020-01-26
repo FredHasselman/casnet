@@ -24,27 +24,36 @@ Many fluctuation analyses assume a time series' Hurst exponent is within the ran
 \details{
 Following recommendations by \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)}, a global Hurst exponent is estimated using DFA and \code{y} is adjusted accordingly:
 \itemize{
-\item{\code{1.2 < H < 1.8} first derivative of y, atribute \code{Hadj = 1}}
+\item{\verb{1.2 < H < 1.8} first derivative of y, atribute \code{Hadj = 1}}
 \item{\code{H > 1.8} second derivative of y, atribute \code{Hadj = 2}}
 \item{\code{H < 0.2} y is centered and integrated, atribute \code{Hadj = -1}}
-\item{\code{0.2 <= H <= 1.2 } y is unaltered, atribute \code{Hadj = 0}}
+\item{\verb{0.2 <= H <= 1.2 } y is unaltered, atribute \code{Hadj = 0}}
 }
 }
 \references{
 Ihlen, E. A. F. E. (2012). Introduction to multifractal detrended fluctuation analysis in Matlab. Frontiers in physiology, 3, 141.
 }
 \seealso{
-Other Time series operations: \code{\link{ts_center}},
-  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
-  \code{\link{ts_detrend}}, \code{\link{ts_diff}},
-  \code{\link{ts_discrete}}, \code{\link{ts_duration}},
-  \code{\link{ts_embed}}, \code{\link{ts_integrate}},
-  \code{\link{ts_levels}}, \code{\link{ts_peaks}},
-  \code{\link{ts_permtest_block}},
-  \code{\link{ts_permtest_transmat}},
-  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
-  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
-  \code{\link{ts_symbolic}}, \code{\link{ts_trimfill}},
-  \code{\link{ts_windower}}
+Other Time series operations: 
+\code{\link{ts_center}()},
+\code{\link{ts_changeindex}()},
+\code{\link{ts_checkfix}()},
+\code{\link{ts_detrend}()},
+\code{\link{ts_diff}()},
+\code{\link{ts_discrete}()},
+\code{\link{ts_duration}()},
+\code{\link{ts_embed}()},
+\code{\link{ts_integrate}()},
+\code{\link{ts_levels}()},
+\code{\link{ts_peaks}()},
+\code{\link{ts_permtest_block}()},
+\code{\link{ts_permtest_transmat}()},
+\code{\link{ts_rasterize}()},
+\code{\link{ts_sd}()},
+\code{\link{ts_slice}()},
+\code{\link{ts_standardise}()},
+\code{\link{ts_symbolic}()},
+\code{\link{ts_trimfill}()},
+\code{\link{ts_windower}()}
 }
 \concept{Time series operations}

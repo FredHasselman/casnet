@@ -4,21 +4,27 @@
 \alias{flight_LevyPareto}
 \title{Create a Levy-Pareto flight}
 \usage{
-flight_LevyPareto(N = 1000, ndims = 2, alpha = 1.5, beta = 0,
-  scale = 1, location = 0)
+flight_LevyPareto(
+  N = 1000,
+  ndims = 2,
+  alpha = 1.5,
+  beta = 0,
+  scale = 1,
+  location = 0
+)
 }
 \arguments{
 \item{N}{Length of time series (default = \code{1000})}
 
 \item{ndims}{Number of dimensions (default = \code{2})}
 
-\item{alpha}{Index of stability parameter in \code{(0,2]}}
+\item{alpha}{Index of stability parameter in \verb{(0,2]}}
 
-\item{beta}{Skewness parameter in \code{[-1,1]}}
+\item{beta}{Skewness parameter in \verb{[-1,1]}}
 
-\item{scale}{Scale parameterin \code{(0,Inf)}}
+\item{scale}{Scale parameterin \verb{(0,Inf)}}
 
-\item{location}{Location (shift) parameter in \code{[-Inf,Inf]}}
+\item{location}{Location (shift) parameter in \verb{[-Inf,Inf]}}
 }
 \value{
 A data frame with \code{ndims} columns and \code{N} rows.
@@ -30,7 +36,7 @@ and skewness parameter \code{beta = 0}.
 }
 \details{
 Note that the increments are not strictly from the distribution called \strong{the} Levy distribution, but rather \strong{a}
-a Levy-with-Pareto-tail-type distribution (i.e. when \code{1 < alpha < 2}). Use \code{alpha = 1/2} and \code{beta = 1} if \strong{the} Levy distribution
+a Levy-with-Pareto-tail-type distribution (i.e. when \verb{1 < alpha < 2}). Use \code{alpha = 1/2} and \code{beta = 1} if \strong{the} Levy distribution
 is required.
 }
 \examples{

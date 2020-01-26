@@ -18,7 +18,8 @@ Attractor frame
 Find attractor states in a State Space Grid using a winnowing procedure.
 }
 \seealso{
-Other State Space Grid functions: \code{\link{factor_obs_exp}},
-  \code{\link{ssg_gwf2long}}
+Other State Space Grid functions: 
+\code{\link{factor_obs_exp}()},
+\code{\link{ssg_gwf2long}()}
 }
 \concept{State Space Grid functions}

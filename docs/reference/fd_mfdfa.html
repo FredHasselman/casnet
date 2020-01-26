@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,14 +143,25 @@
     <p>Multi-fractal Detrended Fluctuation Analysis</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fd_mfdfa</span>(<span class='no'>signal</span>, <span class='kw'>qq</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>10</span>, -<span class='fl'>5</span>:<span class='fl'>5</span>, <span class='fl'>10</span>), <span class='kw'>mins</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>maxs</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>ressc</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>m</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
+    <pre class="usage"><span class='fu'>fd_mfdfa</span>(
+  <span class='no'>y</span>,
+  <span class='kw'>qq</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>10</span>, -<span class='fl'>5</span>:<span class='fl'>5</span>, <span class='fl'>10</span>),
+  <span class='kw'>fs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>removeTrend</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"no"</span>, <span class='st'>"poly"</span>, <span class='st'>"adaptive"</span>, <span class='st'>"bridge"</span>)[<span class='fl'>2</span>],
+  <span class='kw'>polyOrder</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>standardise</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span>)[<span class='fl'>2</span>],
+  <span class='kw'>adjustSumOrder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>scaleMin</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>scaleMax</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log2</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>)/<span class='fl'>2</span>)),
+  <span class='kw'>scaleResolution</span> <span class='kw'>=</span> (<span class='no'>scaleMax</span> - <span class='no'>scaleMin</span>),
+  <span class='kw'>m</span> <span class='kw'>=</span> <span class='fl'>1</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>signal</th>
+      <th>y</th>
       <td><p>An input signal.</p></td>
     </tr>
     <tr>
@@ -158,16 +169,36 @@
       <td><p>A vector containing a range of values for the order of fluctuation <code>q</code>.</p></td>
     </tr>
     <tr>
-      <th>mins</th>
-      <td><p>Minimum scale to consider.</p></td>
+      <th>fs</th>
+      <td><p>Sample rate</p></td>
     </tr>
     <tr>
-      <th>maxs</th>
-      <td><p>Maximum scale to consider.</p></td>
+      <th>removeTrend</th>
+      <td><p>Method to use for detrending, see <code><a href='https://rdrr.io/pkg/fractal/man/DFA.html'>fractal::DFA()</a></code> (default = "poly")</p></td>
     </tr>
     <tr>
-      <th>ressc</th>
-      <td><p>rescc</p></td>
+      <th>polyOrder</th>
+      <td><p>Order of polynomial trend to remove if <code>removeTrend = "poly"</code></p></td>
+    </tr>
+    <tr>
+      <th>standardise</th>
+      <td><p>Standardise by the series using <code><a href='ts_standardise.html'>casnet::ts_standardise()</a></code> with <code>adjustN = FALSE</code> (default = "mean.sd")</p></td>
+    </tr>
+    <tr>
+      <th>adjustSumOrder</th>
+      <td><p>Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. <a href='https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg'>https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg</a>Ihlen (2012) (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>scaleMin</th>
+      <td><p>Minimium scale (as a power of 2) to use</p></td>
+    </tr>
+    <tr>
+      <th>scaleMax</th>
+      <td><p>Maximum scale (as a power of 2) to use</p></td>
+    </tr>
+    <tr>
+      <th>scaleResolution</th>
+      <td><p>The scales at which detrended fluctuation will be evaluated are calculatd as: <code>(scaleMax-scaleMin)/scaleResolution</code>. The default value yields no resolution of scales: <code>(scaleMax-scaleMin)</code>. Common values</p></td>
     </tr>
     <tr>
       <th>m</th>
@@ -177,14 +208,27 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>output</p>
+    <p>A dataframe with values of <code>q</code>,<code>H(q)</code>, <code><a href='https://rdrr.io/r/base/t.html'>t(q)</a></code>, <code>h(q)</code>, `D(q)``</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Fluctuation Analyses: <code><a href='fd_RR.html'>fd_RR</a></code>,
-  <code><a href='fd_allan.html'>fd_allan</a></code>, <code><a href='fd_dfa.html'>fd_dfa</a></code>,
-  <code><a href='fd_psd.html'>fd_psd</a></code>, <code><a href='fd_sda.html'>fd_sda</a></code>,
-  <code><a href='fd_sev.html'>fd_sev</a></code></p></div>
+    <div class='dont-index'><p>Other Fluctuation Analyses: 
+<code><a href='fd_RR.html'>fd_RR</a>()</code>,
+<code><a href='fd_allan.html'>fd_allan</a>()</code>,
+<code><a href='fd_dfa.html'>fd_dfa</a>()</code>,
+<code><a href='fd_psd.html'>fd_psd</a>()</code>,
+<code><a href='fd_sda.html'>fd_sda</a>()</code>,
+<code><a href='fd_sev.html'>fd_sev</a>()</code></p></div>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>33</span>)
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>fd_mfdfa</span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>4096</span>))
+
+<span class='no'>op</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span>(<span class='kw'>mfrow</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>,<span class='fl'>2</span>))
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>df</span>$<span class='no'>q</span>, <span class='no'>df</span>$<span class='no'>Hq</span>, <span class='kw'>type</span><span class='kw'>=</span><span class='st'>"l"</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>df</span>$<span class='no'>q</span>, <span class='no'>df</span>$<span class='no'>tq</span>, <span class='kw'>type</span><span class='kw'>=</span><span class='st'>"l"</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>df</span>$<span class='no'>q</span>, <span class='no'>df</span>$<span class='no'>Dq</span>, <span class='kw'>type</span><span class='kw'>=</span><span class='st'>"l"</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>df</span>$<span class='no'>hq</span>,<span class='no'>df</span>$<span class='no'>Dq</span>, <span class='kw'>type</span><span class='kw'>=</span><span class='st'>"l"</span>)</div><div class='img'><img src='fd_mfdfa-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span>(<span class='no'>op</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -192,6 +236,7 @@
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#see-also">See also</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

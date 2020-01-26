@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,9 +143,18 @@
     <p>Get the recurrence time distribution from a recurrence network.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rn_recSpec</span>(<span class='no'>RN</span>, <span class='kw'>fitRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fs</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</pre>
+    <pre class="usage"><span class='fu'>rn_recSpec</span>(
+  <span class='no'>RN</span>,
+  <span class='kw'>fitRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fs</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -197,9 +206,12 @@
     <p>A vector of frequencies of recurrence times and a plot (if requested)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Distance matrix operations (recurrence network): <code><a href='di2bi.html'>di2bi</a></code>,
-  <code><a href='di2we.html'>di2we</a></code>, <code><a href='rn_plot.html'>rn_plot</a></code>,
-  <code><a href='rn_scaleoGram.html'>rn_scaleoGram</a></code>, <code><a href='rn.html'>rn</a></code></p></div>
+    <div class='dont-index'><p>Other Distance matrix operations (recurrence network): 
+<code><a href='di2bi.html'>di2bi</a>()</code>,
+<code><a href='di2we.html'>di2we</a>()</code>,
+<code><a href='rn_plot.html'>rn_plot</a>()</code>,
+<code><a href='rn_scaleoGram.html'>rn_scaleoGram</a>()</code>,
+<code><a href='rn.html'>rn</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

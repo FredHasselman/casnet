@@ -4,17 +4,21 @@
 \alias{ts_duration}
 \title{Time series to Duration series}
 \usage{
-ts_duration(y, timeVec = stats::time(y), fs = stats::frequency(y),
-  tolerance = 0)
+ts_duration(
+  y,
+  timeVec = stats::time(y),
+  fs = stats::frequency(y),
+  tolerance = 0
+)
 }
 \arguments{
 \item{y}{A time series, numeric vector, or categorical variable.}
 
 \item{timeVec}{A vector, same length as \code{y} containing timestamps, or, sample indices.}
 
-\item{fs}{Optional sampling frequency if timeVec represents sample indices. An extra column \code{duration.fs} will be added which represents \code{1/fs * duration in samples}}
+\item{fs}{Optional sampling frequency if timeVec represents sample indices. An extra column \code{duration.fs} will be added which represents \verb{1/fs * duration in samples}}
 
-\item{tolerance}{A number \code{tol} indicating a range \code{[y-tol,y+tol]} to consider the same value. Useful when \code{y} is continuous (\code{default = 0})}
+\item{tolerance}{A number \code{tol} indicating a range \verb{[y-tol,y+tol]} to consider the same value. Useful when \code{y} is continuous (\code{default = 0})}
 }
 \value{
 A data frame
@@ -31,16 +35,26 @@ ts_duration(y = coder$beh, timeVec = coder$t)
 
 }
 \seealso{
-Other Time series operations: \code{\link{ts_center}},
-  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
-  \code{\link{ts_detrend}}, \code{\link{ts_diff}},
-  \code{\link{ts_discrete}}, \code{\link{ts_embed}},
-  \code{\link{ts_integrate}}, \code{\link{ts_levels}},
-  \code{\link{ts_peaks}}, \code{\link{ts_permtest_block}},
-  \code{\link{ts_permtest_transmat}},
-  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
-  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
-  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
-  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
+Other Time series operations: 
+\code{\link{ts_center}()},
+\code{\link{ts_changeindex}()},
+\code{\link{ts_checkfix}()},
+\code{\link{ts_detrend}()},
+\code{\link{ts_diff}()},
+\code{\link{ts_discrete}()},
+\code{\link{ts_embed}()},
+\code{\link{ts_integrate}()},
+\code{\link{ts_levels}()},
+\code{\link{ts_peaks}()},
+\code{\link{ts_permtest_block}()},
+\code{\link{ts_permtest_transmat}()},
+\code{\link{ts_rasterize}()},
+\code{\link{ts_sd}()},
+\code{\link{ts_slice}()},
+\code{\link{ts_standardise}()},
+\code{\link{ts_sumorder}()},
+\code{\link{ts_symbolic}()},
+\code{\link{ts_trimfill}()},
+\code{\link{ts_windower}()}
 }
 \concept{Time series operations}

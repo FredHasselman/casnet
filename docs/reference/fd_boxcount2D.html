@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,14 +143,29 @@
     <p>2D Boxcount for 1D signal</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fd_boxcount2D</span>(<span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>unitSquare</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>image2D</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>resolution</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>removeTrend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>polyOrder</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+    <pre class="usage"><span class='fu'>fd_boxcount2D</span>(
+  <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>unitSquare</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>image2D</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>resolution</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>removeTrend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>polyOrder</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>standardise</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span>)[<span class='fl'>1</span>],
-  <span class='kw'>adjustSumOrder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>scaleMin</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>scaleMax</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log2</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>)
-  * <span class='no'>resolution</span>)), <span class='kw'>scaleS</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>minData</span> <span class='kw'>=</span> <span class='fl'>2</span>^(<span class='no'>scaleMin</span> + <span class='fl'>1</span>),
-  <span class='kw'>maxData</span> <span class='kw'>=</span> <span class='fl'>2</span>^(<span class='no'>scaleMax</span> - <span class='fl'>1</span>), <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnLocalScaling</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</pre>
+  <span class='kw'>adjustSumOrder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>scaleMin</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>scaleMax</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log2</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>) * <span class='no'>resolution</span>)),
+  <span class='kw'>scaleS</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>minData</span> <span class='kw'>=</span> <span class='fl'>2</span>^(<span class='no'>scaleMin</span> + <span class='fl'>1</span>),
+  <span class='kw'>maxData</span> <span class='kw'>=</span> <span class='fl'>2</span>^(<span class='no'>scaleMax</span> - <span class='fl'>1</span>),
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnLocalScaling</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -260,10 +275,10 @@
 #&gt;  2D boxcount of 1D curve 
 #&gt; 
 #&gt;  Full range (n = 9)
-#&gt; FD = 1.49 
+#&gt; FD = 1.52 
 #&gt; 
 #&gt;  Exclude scales (n = 7)
-#&gt; FD = 1.49
+#&gt; FD = 1.52
 #&gt; 
 #&gt; ~~~o~~o~~casnet~~o~~o~~~</div><div class='input'>
 

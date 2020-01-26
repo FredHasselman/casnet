@@ -18,8 +18,11 @@ A \code{ggraph} graph object
 Display a recurrence network in a space representing Time (x-axis) x Scale (y-axis). The scale axis will be determined by the latency between the occurence of a value in the (embedded) time series vector and its recurrences in the future (i.e. only the upper triangle of the recurrence matrix will be displayed, excluding the diagonal).
 }
 \seealso{
-Other Distance matrix operations (recurrence network): \code{\link{di2bi}},
-  \code{\link{di2we}}, \code{\link{rn_plot}},
-  \code{\link{rn_recSpec}}, \code{\link{rn}}
+Other Distance matrix operations (recurrence network): 
+\code{\link{di2bi}()},
+\code{\link{di2we}()},
+\code{\link{rn_plot}()},
+\code{\link{rn_recSpec}()},
+\code{\link{rn}()}
 }
 \concept{Distance matrix operations (recurrence network)}

@@ -4,8 +4,14 @@
 \alias{mif}
 \title{Mutual Information Function}
 \usage{
-mif(y, lags = -10:10, nbins = ceiling(2 * NROW(y)^(1/3)),
-  doPlot = FALSE, surTest = FALSE, alpha = 0.05)
+mif(
+  y,
+  lags = -10:10,
+  nbins = ceiling(2 * NROW(y)^(1/3)),
+  doPlot = FALSE,
+  surTest = FALSE,
+  alpha = 0.05
+)
 }
 \arguments{
 \item{y}{A \code{Nx1} matrix for auto-mif, a \code{Nx2} matrix or data frame for cross-mif, a \code{Nx3} matrix or data frame for mif between col 1 and 2 conditional on col 3; or a \code{NxM} matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using functions in package \code{\link[infotheo:infotheo]{infotheo::infotheo()}} for \code{lags} lagged versions of the time series.}
@@ -53,7 +59,8 @@ y$y3 <- cumsum(rnorm(NROW(y)))
 
 }
 \seealso{
-Other Redundancy measures (mutual information): \code{\link{mi_interlayer}},
-  \code{\link{mi_mat}}
+Other Redundancy measures (mutual information): 
+\code{\link{mi_interlayer}()},
+\code{\link{mi_mat}()}
 }
 \concept{Redundancy measures (mutual information)}

@@ -4,8 +4,7 @@
 \alias{est_emLag}
 \title{Estimate embedding lag (tau)}
 \usage{
-est_emLag(y, selection.methods = "first.minimum", maxLag = length(y)/4,
-  ...)
+est_emLag(y, selection.methods = "first.minimum", maxLag = length(y)/4, ...)
 }
 \arguments{
 \item{y}{Time series or numeric vector}
@@ -23,8 +22,10 @@ The ami function with requested minima
 A wrapper for \link[nonlinearTseries:timemLag]{nonlinearTseries::timemLag}
 }
 \seealso{
-Other Estimate Recurrence Parameters: \code{\link{est_emDim}},
-  \code{\link{est_parameters_roc}},
-  \code{\link{est_parameters}}, \code{\link{est_radius}}
+Other Estimate Recurrence Parameters: 
+\code{\link{est_emDim}()},
+\code{\link{est_parameters_roc}()},
+\code{\link{est_parameters}()},
+\code{\link{est_radius}()}
 }
 \concept{Estimate Recurrence Parameters}

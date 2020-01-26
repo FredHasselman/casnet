@@ -4,13 +4,23 @@
 \alias{dc_win}
 \title{Dynamic Complexity}
 \usage{
-dc_win(df, win = NROW(df), scale_min, scale_max, doPlot = FALSE,
-  doPlotF = FALSE, doPlotD = FALSE, returnFandD = FALSE,
-  useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA,
-  timeStamp = "01-01-1999")
+dc_win(
+  df,
+  win = NROW(df),
+  scale_min,
+  scale_max,
+  doPlot = FALSE,
+  doPlotF = FALSE,
+  doPlotD = FALSE,
+  returnFandD = FALSE,
+  useVarNames = TRUE,
+  colOrder = TRUE,
+  useTimeVector = NA,
+  timeStamp = "01-01-1999"
+)
 }
 \arguments{
-\item{df}{A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in \code{df} should be on the same scale, an error will be thrown if the range of the time series in\code{df} is not \code{[scale_min,scale_max]}.}
+\item{df}{A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in \code{df} should be on the same scale, an error will be thrown if the range of the time series in\code{df} is not \verb{[scale_min,scale_max]}.}
 
 \item{win}{Size of window in which to calculate Dynamic Complexity. If \code{win < NROW(df)} the window will move along the time series with a stepsize of \code{1} (default = \code{NROW(df)})}
 
@@ -49,10 +59,13 @@ Haken, H. & Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. S
 Schiepek, G. K., St?ger-Schmidinger, B., Aichhorn, W., Sch?ller, H., & Aas, B. (2016). Systemic case formulation, individualized process monitoring, and state dynamics in a case of dissociative identity disorder. Frontiers in psychology, 7, 1545.
 }
 \seealso{
-Other Dynamic Complexity functions: \code{\link{dc_ccp}},
-  \code{\link{dc_d}}, \code{\link{dc_f}},
-  \code{\link{plotDC_ccp}}, \code{\link{plotDC_lvl}},
-  \code{\link{plotDC_res}}
+Other Dynamic Complexity functions: 
+\code{\link{dc_ccp}()},
+\code{\link{dc_d}()},
+\code{\link{dc_f}()},
+\code{\link{plotDC_ccp}()},
+\code{\link{plotDC_lvl}()},
+\code{\link{plotDC_res}()}
 }
 \author{
 Merlijn Olthof

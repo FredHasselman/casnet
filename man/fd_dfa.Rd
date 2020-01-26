@@ -4,13 +4,27 @@
 \alias{fd_dfa}
 \title{Detrended Fluctuation Analysis (DFA)}
 \usage{
-fd_dfa(y, fs = NULL, removeTrend = c("no", "poly", "adaptive",
-  "bridge")[2], polyOrder = 1, standardise = c("none", "mean.sd",
-  "median.mad")[2], adjustSumOrder = FALSE, scaleMin = 2,
-  scaleMax = floor(log2(NROW(y)/2)), scaleResolution = (scaleMax -
-  scaleMin), scaleS = NA, overlap = 0, minData = 4, doPlot = FALSE,
-  returnPlot = FALSE, returnPLAW = FALSE, returnInfo = FALSE,
-  silent = FALSE, noTitle = FALSE, tsName = "y")
+fd_dfa(
+  y,
+  fs = NULL,
+  removeTrend = c("no", "poly", "adaptive", "bridge")[2],
+  polyOrder = 1,
+  standardise = c("none", "mean.sd", "median.mad")[2],
+  adjustSumOrder = FALSE,
+  scaleMin = 2,
+  scaleMax = floor(log2(NROW(y)/2)),
+  scaleResolution = (scaleMax - scaleMin),
+  scaleS = NA,
+  overlap = 0,
+  minData = 4,
+  doPlot = FALSE,
+  returnPlot = FALSE,
+  returnPLAW = FALSE,
+  returnInfo = FALSE,
+  silent = FALSE,
+  noTitle = FALSE,
+  tsName = "y"
+)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -31,9 +45,9 @@ fd_dfa(y, fs = NULL, removeTrend = c("no", "poly", "adaptive",
 
 \item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}. The default value yields no resolution of scales: \code{(scaleMax-scaleMin)}. Common values}
 
-\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.}
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} will be ignored.}
 
-\item{overlap}{Turn DFA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})}
+\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})}
 
 \item{minData}{Minimum number of data points in a bin needed to calculate detrended fluctuation}
 
@@ -52,7 +66,7 @@ fd_dfa(y, fs = NULL, removeTrend = c("no", "poly", "adaptive",
 \item{tsName}{Name of y added as a subtitle to the plot}
 }
 \value{
-Estimate of Hurst exponent (slope of \code{log(bin)} vs. \code{log(RMSE))} and an FD estimate based on Hasselman(2013)
+Estimate of Hurst exponent (slope of \code{log(bin)} vs. \verb{log(RMSE))} and an FD estimate based on Hasselman(2013)
 A list object containing:
 \itemize{
 \item A data matrix \code{PLAW} with columns \code{freq.norm}, \code{size} and \code{bulk}.
@@ -68,10 +82,13 @@ fd_dfa
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{fd_RR}},
-  \code{\link{fd_allan}}, \code{\link{fd_mfdfa}},
-  \code{\link{fd_psd}}, \code{\link{fd_sda}},
-  \code{\link{fd_sev}}
+Other Fluctuation Analyses: 
+\code{\link{fd_RR}()},
+\code{\link{fd_allan}()},
+\code{\link{fd_mfdfa}()},
+\code{\link{fd_psd}()},
+\code{\link{fd_sda}()},
+\code{\link{fd_sev}()}
 }
 \author{
 Fred Hasselman

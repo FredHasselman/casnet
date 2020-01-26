@@ -4,8 +4,13 @@
 \alias{growth_ac}
 \title{Examples of dynamical growth models (maps)}
 \usage{
-growth_ac(Y0 = 0.01, r = 1, k = 1, N = 100, type = c("driving",
-  "damping", "logistic", "vanGeert")[1])
+growth_ac(
+  Y0 = 0.01,
+  r = 1,
+  k = 1,
+  N = 100,
+  type = c("driving", "damping", "logistic", "vanGeert")[1]
+)
 }
 \arguments{
 \item{Y0}{Initial value.}
@@ -29,7 +34,8 @@ Autocatlytic Growth: Iterating differential equations (maps)
 growth_ac(Y0 = 0.01, r = 4, type = "logistic")
 }
 \seealso{
-Other autocatalytic growth functions: \code{\link{growth_ac_cond}}
+Other autocatalytic growth functions: 
+\code{\link{growth_ac_cond}()}
 }
 \author{
 Fred Hasselman

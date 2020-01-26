@@ -6,7 +6,7 @@
 \alias{casnet-package}
 \title{casnet: A Toolbox for Studying Complex Adaptive Systems and NETworks}
 \description{
-\if{html}{\figure{logo.png}{options: align='right'}}
+\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
 A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
     - Recurrence Quantification Analyses (CrossRQA, Categorical RQA, Chromatic RQA, Anisotropic RQA).
@@ -23,7 +23,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Fred Hasselman \email{f.hasselman@pwo.ru.nl} (0000-0003-1384-8361)
+\strong{Maintainer}: Fred Hasselman \email{f.hasselman@pwo.ru.nl} (\href{https://orcid.org/0000-0003-1384-8361}{ORCID})
 
 Other contributors:
 \itemize{

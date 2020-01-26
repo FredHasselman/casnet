@@ -4,16 +4,23 @@
 \alias{dc_ccp}
 \title{Cumulative Complexity Peaks (CCP)}
 \usage{
-dc_ccp(df_win, alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE,
-  useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA,
-  timeStamp = "01-01-1999")
+dc_ccp(
+  df_win,
+  alpha_item = 0.05,
+  alpha_time = 0.05,
+  doPlot = FALSE,
+  useVarNames = TRUE,
+  colOrder = TRUE,
+  useTimeVector = NA,
+  timeStamp = "01-01-1999"
+)
 }
 \arguments{
 \item{df_win}{A data frame containing series of Dynamic Complexity values obtained by running function \code{\link[=dc_win]{dc_win()}}}
 
-\item{alpha_item}{The significance level of the one-sided Z-test used to determine which peaks are \code{> 0}.}
+\item{alpha_item}{The significance level of the one-sided Z-test used to determine which peaks are \verb{> 0}.}
 
-\item{alpha_time}{The significance level of the one-sided Z-test used to determine if the number of significant peaks (as determined  by \code{alpha_item}) at a specific time stamp are \code{> 0}.}
+\item{alpha_time}{The significance level of the one-sided Z-test used to determine if the number of significant peaks (as determined  by \code{alpha_item}) at a specific time stamp are \verb{> 0}.}
 
 \item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
 
@@ -41,10 +48,13 @@ Haken, H. & Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. S
 Schiepek, G. K., Tominschek, I., & Heinzel, S. (2014). Self-organization in psychotherapy: testing the synergetic model of change processes. Frontiers in psychology, 5, 1089.
 }
 \seealso{
-Other Dynamic Complexity functions: \code{\link{dc_d}},
-  \code{\link{dc_f}}, \code{\link{dc_win}},
-  \code{\link{plotDC_ccp}}, \code{\link{plotDC_lvl}},
-  \code{\link{plotDC_res}}
+Other Dynamic Complexity functions: 
+\code{\link{dc_d}()},
+\code{\link{dc_f}()},
+\code{\link{dc_win}()},
+\code{\link{plotDC_ccp}()},
+\code{\link{plotDC_lvl}()},
+\code{\link{plotDC_res}()}
 }
 \author{
 Merlijn Olthof

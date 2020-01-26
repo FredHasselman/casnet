@@ -4,9 +4,14 @@
 \alias{ts_levels}
 \title{Detect levels in time series}
 \usage{
-ts_levels(y, minDataSplit = 12,
-  minLevelDuration = round(minDataSplit/3), changeSensitivity = 0.01,
-  maxLevels = 30, method = c("anova", "poisson", "class", "exp")[1])
+ts_levels(
+  y,
+  minDataSplit = 12,
+  minLevelDuration = round(minDataSplit/3),
+  changeSensitivity = 0.01,
+  maxLevels = 30,
+  method = c("anova", "poisson", "class", "exp")[1]
+)
 }
 \arguments{
 \item{y}{A time series of numeric vector}
@@ -43,17 +48,27 @@ lines(ts_levels(rnorm(100),changeSensitivity = .1)$pred$p, col = "steelblue", lw
 
 }
 \seealso{
-Other Time series operations: \code{\link{ts_center}},
-  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
-  \code{\link{ts_detrend}}, \code{\link{ts_diff}},
-  \code{\link{ts_discrete}}, \code{\link{ts_duration}},
-  \code{\link{ts_embed}}, \code{\link{ts_integrate}},
-  \code{\link{ts_peaks}}, \code{\link{ts_permtest_block}},
-  \code{\link{ts_permtest_transmat}},
-  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
-  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
-  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
-  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
+Other Time series operations: 
+\code{\link{ts_center}()},
+\code{\link{ts_changeindex}()},
+\code{\link{ts_checkfix}()},
+\code{\link{ts_detrend}()},
+\code{\link{ts_diff}()},
+\code{\link{ts_discrete}()},
+\code{\link{ts_duration}()},
+\code{\link{ts_embed}()},
+\code{\link{ts_integrate}()},
+\code{\link{ts_peaks}()},
+\code{\link{ts_permtest_block}()},
+\code{\link{ts_permtest_transmat}()},
+\code{\link{ts_rasterize}()},
+\code{\link{ts_sd}()},
+\code{\link{ts_slice}()},
+\code{\link{ts_standardise}()},
+\code{\link{ts_sumorder}()},
+\code{\link{ts_symbolic}()},
+\code{\link{ts_trimfill}()},
+\code{\link{ts_windower}()}
 }
 \author{
 Fred Hasselman

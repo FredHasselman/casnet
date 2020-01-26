@@ -4,8 +4,13 @@
 \alias{plotMRN_win}
 \title{Plot windowed Multiplex Recurrence Network measures}
 \usage{
-plotMRN_win(df_mrn, measures = "mi", mrnWeights = "mi",
-  showSeries = FALSE, doPlot = TRUE)
+plotMRN_win(
+  df_mrn,
+  measures = "mi",
+  mrnWeights = "mi",
+  showSeries = FALSE,
+  doPlot = TRUE
+)
 }
 \arguments{
 \item{df_mrn}{Output from function \code{\link[=mrn]{mrn()}} with arguments set for a windowed analysis.}
@@ -25,7 +30,8 @@ a ggplot object
 Plot windowed Multiplex Recurrence Network measures
 }
 \seealso{
-Other Tools for windowed analyses: \code{\link{ts_windower}}
+Other Tools for windowed analyses: 
+\code{\link{ts_windower}()}
 }
 \concept{Tools for plotting multiplex recurrence networks}
 \concept{Tools for windowed analyses}

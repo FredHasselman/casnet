@@ -24,9 +24,10 @@ A wrapper around \code{\link[igraph:sample_pa]{igraph::sample_pa()}}
 \seealso{
 \code{\link[igraph:sample_pa]{igraph::sample_pa()}}
 
-Other tools for plotting networks: \code{\link{plotNET_SW}},
-  \code{\link{plotNET_groupColour}},
-  \code{\link{plotNET_groupWeight}},
-  \code{\link{plotNET_prep}}
+Other tools for plotting networks: 
+\code{\link{plotNET_SW}()},
+\code{\link{plotNET_groupColour}()},
+\code{\link{plotNET_groupWeight}()},
+\code{\link{plotNET_prep}()}
 }
 \concept{tools for plotting networks}

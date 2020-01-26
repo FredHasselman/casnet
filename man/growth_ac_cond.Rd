@@ -4,8 +4,13 @@
 \alias{growth_ac_cond}
 \title{Examples of conditional dynamical growth models (maps)}
 \usage{
-growth_ac_cond(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y
-  = 0.2, par = "r", val = 2), N = 100)
+growth_ac_cond(
+  Y0 = 0.01,
+  r = 0.1,
+  k = 2,
+  cond = cbind.data.frame(Y = 0.2, par = "r", val = 2),
+  N = 100
+)
 }
 \arguments{
 \item{Y0}{Initial value}
@@ -47,7 +52,8 @@ val = c(0.3, 3, 0.9, 0.1, 1.3))
 xyplot(growth_ac_cond(cond=cond))
 }
 \seealso{
-Other autocatalytic growth functions: \code{\link{growth_ac}}
+Other autocatalytic growth functions: 
+\code{\link{growth_ac}()}
 }
 \author{
 Fred Hasselman

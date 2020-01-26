@@ -4,16 +4,35 @@
 \alias{make_spiral_graph}
 \title{Make Spiral Graph}
 \usage{
-make_spiral_graph(g, type = "Archimedean", arcs = 6, a = 1,
-  b = NULL, rev = FALSE, curvature = -0.6, angle = 90,
-  markTimeBy = NULL, alphaV = 1, alphaE = 0.6, title = "",
-  subtitle = "", showEpochLegend = TRUE, markEpochsBy = NULL,
-  epochColours = NULL, epochLabel = "Epoch", showSizeLegend = FALSE,
-  sizeLabel = "Size", scaleVertexSize = c(1, 6),
-  vertexBorderColour = "black", scaleEdgeSize = 1/5,
-  edgeColourLabel = "Weight", showEdgeColourLegend = FALSE,
-  edgeColourByEpoch = TRUE, defaultEdgeColour = "grey70",
-  doPlot = TRUE)
+make_spiral_graph(
+  g,
+  type = "Archimedean",
+  arcs = 6,
+  a = 1,
+  b = NULL,
+  rev = FALSE,
+  curvature = -0.6,
+  angle = 90,
+  markTimeBy = NULL,
+  alphaV = 1,
+  alphaE = 0.6,
+  title = "",
+  subtitle = "",
+  showEpochLegend = TRUE,
+  markEpochsBy = NULL,
+  epochColours = NULL,
+  epochLabel = "Epoch",
+  showSizeLegend = FALSE,
+  sizeLabel = "Size",
+  scaleVertexSize = c(1, 6),
+  vertexBorderColour = "black",
+  scaleEdgeSize = 1/5,
+  edgeColourLabel = "Weight",
+  showEdgeColourLegend = FALSE,
+  edgeColourByEpoch = TRUE,
+  defaultEdgeColour = "grey70",
+  doPlot = TRUE
+)
 }
 \arguments{
 \item{g}{An igraph object. If (\code{rev = FALSE}) the vertex with the lowest index will be placed in the centre of the spiral, the highest index will be most outer vertex,}

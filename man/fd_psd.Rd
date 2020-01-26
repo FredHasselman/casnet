@@ -4,11 +4,20 @@
 \alias{fd_psd}
 \title{Power Spectral Density Slope (PSD).}
 \usage{
-fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE,
+fd_psd(
+  y,
+  fs = NULL,
+  standardise = TRUE,
+  detrend = TRUE,
   fitMethod = c("lowest25", "Wijnants", "Hurvich-Deo")[3],
-  doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
-  returnInfo = FALSE, silent = FALSE, noTitle = FALSE,
-  tsName = "y")
+  doPlot = FALSE,
+  returnPlot = FALSE,
+  returnPLAW = FALSE,
+  returnInfo = FALSE,
+  silent = FALSE,
+  noTitle = FALSE,
+  tsName = "y"
+)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -29,7 +38,7 @@ fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE,
 
 \item{returnInfo}{Return all the data used in SDA (default = \code{FALSE})}
 
-\item{silent}{Run in silent-ish mode (default = \code{TRUE)}}
+\item{silent}{Run in silent-ish mode (default = \verb{TRUE)}}
 
 \item{noTitle}{Do not generate a title (only the subtitle)}
 
@@ -39,7 +48,7 @@ fd_psd(y, fs = NULL, standardise = TRUE, detrend = TRUE,
 A list object containing:
 \itemize{
 \item A data matrix \code{PLAW} with columns \code{freq.norm}, \code{size} and \code{bulk}.
-\item Estimate of scaling exponent \code{alpha} based on a fit over the lowest 25\% frequencies (\code{low25}), or using the HD estimate \code{HD}.
+\item Estimate of scaling exponent \code{alpha} based on a fit over the lowest 25\\% frequencies (\code{low25}), or using the HD estimate \code{HD}.
 \item Estimate of the the Fractal Dimension (\code{FD}) using conversion formula's reported in Hasselman(2013).
 \item Information output by various functions.
 }
@@ -48,23 +57,19 @@ A list object containing:
 Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope.
 }
 \details{
-Calls function \code{\link[sapa:SDF]{sapa::SDF()}} to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), \code{SDF} is called using a Tukey window (\code{raised cosine \link[sapa]{taper}}).
 
-A line is fitted on the periodogram in log-log coordinates. The full ramge is fitted as well as one of three fit-ranges:
-\itemize{
-\item{\code{lowest25} - The 25\% lowest frequencies}
-\item{\code{Wijnants} - The 50 lowest frequencies (Wijnants et al., 2012)}
-\item{\code{HurvichDeo} - The Hurvich-Deo estimate, see (\code{\link[fractal:HDEst]{fractal::HDEst()}})}
-}
 }
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{fd_RR}},
-  \code{\link{fd_allan}}, \code{\link{fd_dfa}},
-  \code{\link{fd_mfdfa}}, \code{\link{fd_sda}},
-  \code{\link{fd_sev}}
+Other Fluctuation Analyses: 
+\code{\link{fd_RR}()},
+\code{\link{fd_allan}()},
+\code{\link{fd_dfa}()},
+\code{\link{fd_mfdfa}()},
+\code{\link{fd_sda}()},
+\code{\link{fd_sev}()}
 }
 \author{
 Fred Hasselman

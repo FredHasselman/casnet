@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,9 +143,17 @@
     <p>The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>elascer</span>(<span class='no'>x</span>, <span class='kw'>mn</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>mx</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>lo</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>hi</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>groupwise</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>keepNA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>boundaryPrecision</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='no'>.Machine</span>$<span class='no'>double.eps</span>^<span class='fl'>0.5</span>)</pre>
+    <pre class="usage"><span class='fu'>elascer</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>mn</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>mx</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>lo</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>hi</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>groupwise</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>keepNA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>boundaryPrecision</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>tol</span> <span class='kw'>=</span> <span class='no'>.Machine</span>$<span class='no'>double.eps</span>^<span class='fl'>0.5</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

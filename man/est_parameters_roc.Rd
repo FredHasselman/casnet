@@ -4,9 +4,15 @@
 \alias{est_parameters_roc}
 \title{Estimate}
 \usage{
-est_parameters_roc(y, emRad, emDim = 1, emLag = 1, noiseLevel = 0.75,
+est_parameters_roc(
+  y,
+  emRad,
+  emDim = 1,
+  emLag = 1,
+  noiseLevel = 0.75,
   standardise = c("mean.sd", "median.mad", "none")[3],
-  noiseType = c("normal", "uniform")[1])
+  noiseType = c("normal", "uniform")[1]
+)
 }
 \arguments{
 \item{y}{y}
@@ -30,9 +36,11 @@ data frame for ROC
 Estimate
 }
 \seealso{
-Other Estimate Recurrence Parameters: \code{\link{est_emDim}},
-  \code{\link{est_emLag}}, \code{\link{est_parameters}},
-  \code{\link{est_radius}}
+Other Estimate Recurrence Parameters: 
+\code{\link{est_emDim}()},
+\code{\link{est_emLag}()},
+\code{\link{est_parameters}()},
+\code{\link{est_radius}()}
 }
 \concept{Estimate Recurrence Parameters}
 \keyword{internal}

@@ -4,21 +4,27 @@
 \alias{flight_Rayleigh}
 \title{Create Rayleigh Flight (Brownian Motion)}
 \usage{
-flight_Rayleigh(N = 1000, ndims = 2, alpha = 2, beta = 0,
-  scale = 1, location = 0)
+flight_Rayleigh(
+  N = 1000,
+  ndims = 2,
+  alpha = 2,
+  beta = 0,
+  scale = 1,
+  location = 0
+)
 }
 \arguments{
 \item{N}{Length of time series (default = \code{1000})}
 
 \item{ndims}{Number of dimensions (default = \code{2})}
 
-\item{alpha}{Index of stability parameter in \code{(0,2]}}
+\item{alpha}{Index of stability parameter in \verb{(0,2]}}
 
-\item{beta}{Skewness parameter in \code{[-1,1]}}
+\item{beta}{Skewness parameter in \verb{[-1,1]}}
 
-\item{scale}{Scale parameterin \code{(0,Inf)}}
+\item{scale}{Scale parameterin \verb{(0,Inf)}}
 
-\item{location}{Location (shift) parameter in \code{[-Inf,Inf]}}
+\item{location}{Location (shift) parameter in \verb{[-Inf,Inf]}}
 }
 \value{
 A data frame with \code{ndims} columns and \code{N} rows.

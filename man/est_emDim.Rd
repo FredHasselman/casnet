@@ -4,8 +4,15 @@
 \alias{est_emDim}
 \title{Estimate number of embedding dimensions}
 \usage{
-est_emDim(y, delay = est_emLag(y), maxDim = 15, threshold = 0.95,
-  max.relative.change = 0.1, doPlot = FALSE, ...)
+est_emDim(
+  y,
+  delay = est_emLag(y),
+  maxDim = 15,
+  threshold = 0.95,
+  max.relative.change = 0.1,
+  doPlot = FALSE,
+  ...
+)
 }
 \arguments{
 \item{y}{Time series or numeric vector}
@@ -32,8 +39,10 @@ A wrapper for nonlinearTseries::estimateEmbeddingDim
 A wrapper for \link[nonlinearTseries:estimateEmbeddingDim]{nonlinearTseries::estimateEmbeddingDim}
 }
 \seealso{
-Other Estimate Recurrence Parameters: \code{\link{est_emLag}},
-  \code{\link{est_parameters_roc}},
-  \code{\link{est_parameters}}, \code{\link{est_radius}}
+Other Estimate Recurrence Parameters: 
+\code{\link{est_emLag}()},
+\code{\link{est_parameters_roc}()},
+\code{\link{est_parameters}()},
+\code{\link{est_radius}()}
 }
 \concept{Estimate Recurrence Parameters}

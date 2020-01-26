@@ -4,10 +4,21 @@
 \alias{rp_plot}
 \title{Plot (thresholded) distance matrix as a recurrence plot}
 \usage{
-rp_plot(RM, plotDimensions = FALSE, plotMeasures = FALSE,
-  plotRadiusRRbar = TRUE, drawGrid = FALSE, markEpochsLOI = NULL,
-  Chromatic = NULL, radiusValue = NA, title = "", xlabel = "",
-  ylabel = "", plotSurrogate = NA, returnOnlyObject = FALSE)
+rp_plot(
+  RM,
+  plotDimensions = FALSE,
+  plotMeasures = FALSE,
+  plotRadiusRRbar = TRUE,
+  drawGrid = FALSE,
+  markEpochsLOI = NULL,
+  Chromatic = NULL,
+  radiusValue = NA,
+  title = "",
+  xlabel = "",
+  ylabel = "",
+  plotSurrogate = NA,
+  returnOnlyObject = FALSE
+)
 }
 \arguments{
 \item{RM}{A distance matrix or recurrence matrix}
@@ -43,10 +54,14 @@ A nice plot of the recurrence matrix.
 Plot (thresholded) distance matrix as a recurrence plot
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
-  \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rp_lineDist}},
-  \code{\link{rp_nzdiags}}, \code{\link{rp_size}},
-  \code{\link{rp}}
+Other Distance matrix operations (recurrence plot): 
+\code{\link{bandReplace}()},
+\code{\link{di2bi}()},
+\code{\link{di2we}()},
+\code{\link{dist_hamming}()},
+\code{\link{rp_lineDist}()},
+\code{\link{rp_nzdiags}()},
+\code{\link{rp_size}()},
+\code{\link{rp}()}
 }
 \concept{Distance matrix operations (recurrence plot)}

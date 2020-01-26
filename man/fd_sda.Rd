@@ -4,13 +4,27 @@
 \alias{fd_sda}
 \title{Standardised Dispersion Analysis (SDA).}
 \usage{
-fd_sda(y, fs = NULL, standardise = c("mean.sd", "median.mad")[1],
-  detrend = FALSE, polyOrder = 1, adjustSumOrder = FALSE,
-  scaleMin = 2, scaleMax = floor(log2(NROW(y)/2)),
-  scaleResolution = 30, scaleS = NA, overlap = 0, minData = 4,
-  doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
-  returnInfo = FALSE, silent = FALSE, noTitle = FALSE,
-  tsName = "y")
+fd_sda(
+  y,
+  fs = NULL,
+  standardise = c("mean.sd", "median.mad")[1],
+  detrend = FALSE,
+  polyOrder = 1,
+  adjustSumOrder = FALSE,
+  scaleMin = 2,
+  scaleMax = floor(log2(NROW(y)/2)),
+  scaleResolution = 30,
+  scaleS = NA,
+  overlap = 0,
+  minData = 4,
+  doPlot = FALSE,
+  returnPlot = FALSE,
+  returnPLAW = FALSE,
+  returnInfo = FALSE,
+  silent = FALSE,
+  noTitle = FALSE,
+  tsName = "y"
+)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -31,9 +45,9 @@ fd_sda(y, fs = NULL, standardise = c("mean.sd", "median.mad")[1],
 
 \item{scaleResolution}{The scales at which the standardised fluctuations are calculated as: \code{(scaleMax-scaleMin)/scaleResolution}}
 
-\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the fluctuations. Arguments \code{scaleMax, scaleMin, scaleResolution} will be ignored.}
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} will be ignored.}
 
-\item{overlap}{Turn SDA into a sliding window analysis. A number in \code{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2} (default = \code{0})}
+\item{overlap}{Turn SDA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2} (default = \code{0})}
 
 \item{minData}{Minimum number of data points in a bin needed to calculate standardised dispersion}
 
@@ -67,10 +81,13 @@ fd_sda
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{fd_RR}},
-  \code{\link{fd_allan}}, \code{\link{fd_dfa}},
-  \code{\link{fd_mfdfa}}, \code{\link{fd_psd}},
-  \code{\link{fd_sev}}
+Other Fluctuation Analyses: 
+\code{\link{fd_RR}()},
+\code{\link{fd_allan}()},
+\code{\link{fd_dfa}()},
+\code{\link{fd_mfdfa}()},
+\code{\link{fd_psd}()},
+\code{\link{fd_sev}()}
 }
 \author{
 Fred Hasselman

@@ -5,13 +5,26 @@
 \alias{crqa_rp}
 \title{Get (C)RQA measures based on a binary matrix}
 \usage{
-rp_measures(RM, emRad = NA, DLmin = 2, VLmin = 2, HLmin = 2,
+rp_measures(
+  RM,
+  emRad = NA,
+  DLmin = 2,
+  VLmin = 2,
+  HLmin = 2,
   DLmax = length(Matrix::diag(RM)) - 1,
   VLmax = length(Matrix::diag(RM)) - 1,
-  HLmax = length(Matrix::diag(RM)) - 1, AUTO = NULL, theiler = NULL,
-  chromatic = FALSE, matrices = FALSE, doHalf = FALSE,
-  Nboot = NULL, CL = 0.95, targetValue = 0.05, doParallel = FALSE,
-  silent = TRUE)
+  HLmax = length(Matrix::diag(RM)) - 1,
+  AUTO = NULL,
+  theiler = NULL,
+  chromatic = FALSE,
+  matrices = FALSE,
+  doHalf = FALSE,
+  Nboot = NULL,
+  CL = 0.95,
+  targetValue = 0.05,
+  doParallel = FALSE,
+  silent = TRUE
+)
 }
 \arguments{
 \item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NA})}
@@ -57,7 +70,8 @@ A list object containing (C)RQA measures (and matrices if requested)
 A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures (anisotropic) will be caluclated.
 }
 \seealso{
-Other Recurrence Quantification Analysis: \code{\link{rp_cl}},
-  \code{\link{rp_measures_main}}
+Other Recurrence Quantification Analysis: 
+\code{\link{rp_cl}()},
+\code{\link{rp_measures_main}()}
 }
 \concept{Recurrence Quantification Analysis}

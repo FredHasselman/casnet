@@ -4,10 +4,16 @@
 \alias{plotNET_prep}
 \title{Plot Network Based on RQA}
 \usage{
-plotNET_prep(g, labels = NA, nodesize = c("degree", "hubscore",
-  "strength", "eccentricity", "coreness")[1], labelsize = "asnodesize",
-  edgeweight = "weight", removeZeroDegree = TRUE,
-  removeSelfLoops = TRUE, doPlot = TRUE)
+plotNET_prep(
+  g,
+  labels = NA,
+  nodesize = c("degree", "hubscore", "strength", "eccentricity", "coreness")[1],
+  labelsize = "asnodesize",
+  edgeweight = "weight",
+  removeZeroDegree = TRUE,
+  removeSelfLoops = TRUE,
+  doPlot = TRUE
+)
 }
 \arguments{
 \item{g}{An igraph object}
@@ -33,9 +39,10 @@ an igraph object
 Plot Network Based on RQA
 }
 \seealso{
-Other tools for plotting networks: \code{\link{plotNET_BA}},
-  \code{\link{plotNET_SW}},
-  \code{\link{plotNET_groupColour}},
-  \code{\link{plotNET_groupWeight}}
+Other tools for plotting networks: 
+\code{\link{plotNET_BA}()},
+\code{\link{plotNET_SW}()},
+\code{\link{plotNET_groupColour}()},
+\code{\link{plotNET_groupWeight}()}
 }
 \concept{tools for plotting networks}

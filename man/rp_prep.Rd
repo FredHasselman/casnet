@@ -4,10 +4,20 @@
 \alias{rp_prep}
 \title{Prepare matrix}
 \usage{
-rp_prep(RP, emRad = NULL, DLmin = 2, VLmin = 2, HLmin = 2,
-  DLmax = length(Matrix::diag(RP)), VLmax = length(Matrix::diag(RP)),
-  HLmax = length(Matrix::diag(RP)), AUTO = FALSE, chromatic = FALSE,
-  matrices = FALSE, doHalf = FALSE)
+rp_prep(
+  RP,
+  emRad = NULL,
+  DLmin = 2,
+  VLmin = 2,
+  HLmin = 2,
+  DLmax = length(Matrix::diag(RP)),
+  VLmax = length(Matrix::diag(RP)),
+  HLmax = length(Matrix::diag(RP)),
+  AUTO = FALSE,
+  chromatic = FALSE,
+  matrices = FALSE,
+  doHalf = FALSE
+)
 }
 \arguments{
 \item{RP}{Recurrence plot}

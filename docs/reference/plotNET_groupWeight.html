@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,9 +143,16 @@
     <p>Use a layout which takes a <code>weights</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotNET_groupWeight</span>(<span class='no'>g</span>, <span class='no'>groups</span>, <span class='kw'>weigth.within</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>weight.between</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>preserve.weight.within</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>preserve.weight.between</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnOnlyWeights</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>plotNET_groupWeight</span>(
+  <span class='no'>g</span>,
+  <span class='no'>groups</span>,
+  <span class='kw'>weigth.within</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>weight.between</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>preserve.weight.within</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>preserve.weight.between</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnOnlyWeights</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -189,10 +196,11 @@
     <p>A numeric vector with <code><a href='https://rdrr.io/r/base/length.html'>length(get.edgelist(g))</a></code> edge weights that will cluster groups defined in <code>membership</code> if a layout is used that can handle edge weights as a parameter (see examples).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other tools for plotting networks: <code><a href='plotNET_BA.html'>plotNET_BA</a></code>,
-  <code><a href='plotNET_SW.html'>plotNET_SW</a></code>,
-  <code><a href='plotNET_groupColour.html'>plotNET_groupColour</a></code>,
-  <code><a href='plotNET_prep.html'>plotNET_prep</a></code></p></div>
+    <div class='dont-index'><p>Other tools for plotting networks: 
+<code><a href='plotNET_BA.html'>plotNET_BA</a>()</code>,
+<code><a href='plotNET_SW.html'>plotNET_SW</a>()</code>,
+<code><a href='plotNET_groupColour.html'>plotNET_groupColour</a>()</code>,
+<code><a href='plotNET_prep.html'>plotNET_prep</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Make a star graph and let the odd numbers cluster together</span>

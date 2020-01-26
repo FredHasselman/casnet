@@ -4,8 +4,14 @@
 \alias{ts_diff}
 \title{Derivative of time series}
 \usage{
-ts_diff(y, order = 1, addColumns = TRUE, keepDerivatives = FALSE,
-  maskEdges = NULL, silent = TRUE)
+ts_diff(
+  y,
+  order = 1,
+  addColumns = TRUE,
+  keepDerivatives = FALSE,
+  maskEdges = NULL,
+  silent = TRUE
+)
 }
 \arguments{
 \item{y}{A timeseries object or numeric vector or a matrix in which columns are variables and rows are numeric values observed over time.}
@@ -61,16 +67,26 @@ abline(v=which(seq(-5,5,.1)==0), col= "red3", lwd=3)
 
 }
 \seealso{
-Other Time series operations: \code{\link{ts_center}},
-  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
-  \code{\link{ts_detrend}}, \code{\link{ts_discrete}},
-  \code{\link{ts_duration}}, \code{\link{ts_embed}},
-  \code{\link{ts_integrate}}, \code{\link{ts_levels}},
-  \code{\link{ts_peaks}}, \code{\link{ts_permtest_block}},
-  \code{\link{ts_permtest_transmat}},
-  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
-  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
-  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
-  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
+Other Time series operations: 
+\code{\link{ts_center}()},
+\code{\link{ts_changeindex}()},
+\code{\link{ts_checkfix}()},
+\code{\link{ts_detrend}()},
+\code{\link{ts_discrete}()},
+\code{\link{ts_duration}()},
+\code{\link{ts_embed}()},
+\code{\link{ts_integrate}()},
+\code{\link{ts_levels}()},
+\code{\link{ts_peaks}()},
+\code{\link{ts_permtest_block}()},
+\code{\link{ts_permtest_transmat}()},
+\code{\link{ts_rasterize}()},
+\code{\link{ts_sd}()},
+\code{\link{ts_slice}()},
+\code{\link{ts_standardise}()},
+\code{\link{ts_sumorder}()},
+\code{\link{ts_symbolic}()},
+\code{\link{ts_trimfill}()},
+\code{\link{ts_windower}()}
 }
 \concept{Time series operations}

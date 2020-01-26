@@ -4,10 +4,22 @@
 \alias{plotDC_lvl}
 \title{Plot Peaks versus Levels}
 \usage{
-plotDC_lvl(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE,
-  colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999",
-  doPlot = TRUE, title = "Peaks versus Levels Plot", subtitle = "",
-  xlabel = "Time", ylabel = "", levelName = "State variable")
+plotDC_lvl(
+  df_win,
+  df_ccp = NA,
+  df_lvl,
+  win,
+  useVarNames = TRUE,
+  colOrder = TRUE,
+  useTimeVector = NA,
+  timeStamp = "31-01-1999",
+  doPlot = TRUE,
+  title = "Peaks versus Levels Plot",
+  subtitle = "",
+  xlabel = "Time",
+  ylabel = "",
+  levelName = "State variable"
+)
 }
 \arguments{
 \item{df_win}{A data frame containing series of Dynamic Complexity values obtained by running function \code{\link[=dc_win]{dc_win()}}}
@@ -43,9 +55,12 @@ An invisible ggplot2 object.
 Produce a plot in which the output of \code{dc_win()} and \code{dc_ccp()} on the same multivariate timeseries data is combined with the output of \code{ts_level()} on a state variable of the same length as the multivariate data.
 }
 \seealso{
-Other Dynamic Complexity functions: \code{\link{dc_ccp}},
-  \code{\link{dc_d}}, \code{\link{dc_f}},
-  \code{\link{dc_win}}, \code{\link{plotDC_ccp}},
-  \code{\link{plotDC_res}}
+Other Dynamic Complexity functions: 
+\code{\link{dc_ccp}()},
+\code{\link{dc_d}()},
+\code{\link{dc_f}()},
+\code{\link{dc_win}()},
+\code{\link{plotDC_ccp}()},
+\code{\link{plotDC_res}()}
 }
 \concept{Dynamic Complexity functions}

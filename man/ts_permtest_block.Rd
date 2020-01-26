@@ -4,8 +4,16 @@
 \alias{ts_permtest_block}
 \title{Permutation Test: Block Randomisation}
 \usage{
-ts_permtest_block(y1, y2 = NULL, targetValue = 0, Nperms = 19,
-  sim = "geom", l = 3, alpha = 0.05, returnBootObject = FALSE)
+ts_permtest_block(
+  y1,
+  y2 = NULL,
+  targetValue = 0,
+  Nperms = 19,
+  sim = "geom",
+  l = 3,
+  alpha = 0.05,
+  returnBootObject = FALSE
+)
 }
 \arguments{
 \item{y1}{Time series 1. The goal of the permutation test will be to decide whether the difference \code{y1-targetValue != 0} for each time point, given \code{alpha}.}
@@ -16,7 +24,7 @@ ts_permtest_block(y1, y2 = NULL, targetValue = 0, Nperms = 19,
 
 \item{Nperms}{Number of permutations (default = \code{19})}
 
-\item{sim}{Value passed to the \code{sim} argument of \code{\link[boot:tsboot]{boot::tsboot()}} valid options are: \code{"model","fixed","geom","scramble"} (default = \code{"geom"})}
+\item{sim}{Value passed to the \code{sim} argument of \code{\link[boot:tsboot]{boot::tsboot()}} valid options are: \verb{"model","fixed","geom","scramble"} (default = \code{"geom"})}
 
 \item{l}{Block sizes to use, see \code{\link[boot:tsboot]{boot::tsboot()}} for details (default = \code{3})}
 
@@ -42,16 +50,26 @@ ts_permtest_block(y1 = y1, y2 = y2)
 
 }
 \seealso{
-Other Time series operations: \code{\link{ts_center}},
-  \code{\link{ts_changeindex}}, \code{\link{ts_checkfix}},
-  \code{\link{ts_detrend}}, \code{\link{ts_diff}},
-  \code{\link{ts_discrete}}, \code{\link{ts_duration}},
-  \code{\link{ts_embed}}, \code{\link{ts_integrate}},
-  \code{\link{ts_levels}}, \code{\link{ts_peaks}},
-  \code{\link{ts_permtest_transmat}},
-  \code{\link{ts_rasterize}}, \code{\link{ts_sd}},
-  \code{\link{ts_slice}}, \code{\link{ts_standardise}},
-  \code{\link{ts_sumorder}}, \code{\link{ts_symbolic}},
-  \code{\link{ts_trimfill}}, \code{\link{ts_windower}}
+Other Time series operations: 
+\code{\link{ts_center}()},
+\code{\link{ts_changeindex}()},
+\code{\link{ts_checkfix}()},
+\code{\link{ts_detrend}()},
+\code{\link{ts_diff}()},
+\code{\link{ts_discrete}()},
+\code{\link{ts_duration}()},
+\code{\link{ts_embed}()},
+\code{\link{ts_integrate}()},
+\code{\link{ts_levels}()},
+\code{\link{ts_peaks}()},
+\code{\link{ts_permtest_transmat}()},
+\code{\link{ts_rasterize}()},
+\code{\link{ts_sd}()},
+\code{\link{ts_slice}()},
+\code{\link{ts_standardise}()},
+\code{\link{ts_sumorder}()},
+\code{\link{ts_symbolic}()},
+\code{\link{ts_trimfill}()},
+\code{\link{ts_windower}()}
 }
 \concept{Time series operations}

@@ -5,16 +5,27 @@
 \alias{crqa_parameters}
 \title{Estimate (C)RQA parameters}
 \usage{
-est_parameters(y, lagMethods = c("first.minimum", "global.minimum",
-  "max.lag"), estimateDimensions = "preferSmallestInLargestHood",
-  maxDim = 10, emLag = NULL, maxLag = floor(NROW(y)/(maxDim + 1)),
-  minVecLength = 20, nnSizes = 2, nnRadius = 5, nnThres = 10,
-  theiler = 0, doPlot = TRUE, silent = TRUE, ...)
+est_parameters(
+  y,
+  lagMethods = c("first.minimum", "global.minimum", "max.lag"),
+  estimateDimensions = "preferSmallestInLargestHood",
+  maxDim = 10,
+  emLag = NULL,
+  maxLag = floor(NROW(y)/(maxDim + 1)),
+  minVecLength = 20,
+  nnSizes = 2,
+  nnRadius = 5,
+  nnThres = 10,
+  theiler = 0,
+  doPlot = TRUE,
+  silent = TRUE,
+  ...
+)
 }
 \arguments{
 \item{y}{A numeric vector or time series}
 
-\item{lagMethods}{A character vector with one or more of the following strings: \code{"first.minimum","global.minimum","max.lag"}. If \code{emLag} represents a valid lag this value will  be reported as "user.lag" (default = \code{c("first.minimum","global.minimum","max.lag")})}
+\item{lagMethods}{A character vector with one or more of the following strings: \verb{"first.minimum","global.minimum","max.lag"}. If \code{emLag} represents a valid lag this value will  be reported as "user.lag" (default = \code{c("first.minimum","global.minimum","max.lag")})}
 
 \item{estimateDimensions}{Decide on an optimal embedding dimension relative to the values in \code{maxDim} and \code{lagMethods}, according to a number of preferences passed as a character vector. The order in which the preferences appear in the vector affects the selection procedure, with index \code{1} being most important preference. The following options are available: \itemize{
 \item{\code{preferNone} - No optimal number will be picked all other preferences will be ignored}
@@ -67,9 +78,10 @@ est_parameters(rnorm(100))
 
 }
 \seealso{
-Other Estimate Recurrence Parameters: \code{\link{est_emDim}},
-  \code{\link{est_emLag}},
-  \code{\link{est_parameters_roc}},
-  \code{\link{est_radius}}
+Other Estimate Recurrence Parameters: 
+\code{\link{est_emDim}()},
+\code{\link{est_emLag}()},
+\code{\link{est_parameters_roc}()},
+\code{\link{est_radius}()}
 }
 \concept{Estimate Recurrence Parameters}

@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,9 +143,16 @@
     <p>Computes significant peaks in the dynamic complexity time series. Example: Schiepek, Tominschek &amp; Heinzel, 2014.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dc_ccp</span>(<span class='no'>df_win</span>, <span class='kw'>alpha_item</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>alpha_time</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>useTimeVector</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>timeStamp</span> <span class='kw'>=</span> <span class='st'>"01-01-1999"</span>)</pre>
+    <pre class="usage"><span class='fu'>dc_ccp</span>(
+  <span class='no'>df_win</span>,
+  <span class='kw'>alpha_item</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>alpha_time</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>useTimeVector</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>timeStamp</span> <span class='kw'>=</span> <span class='st'>"01-01-1999"</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -195,10 +202,13 @@
 <p>Schiepek, G. K., Tominschek, I., &amp; Heinzel, S. (2014). Self-organization in psychotherapy: testing the synergetic model of change processes. Frontiers in psychology, 5, 1089.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Dynamic Complexity functions: <code><a href='dc_d.html'>dc_d</a></code>,
-  <code><a href='dc_f.html'>dc_f</a></code>, <code><a href='dc_win.html'>dc_win</a></code>,
-  <code><a href='plotDC_ccp.html'>plotDC_ccp</a></code>, <code><a href='plotDC_lvl.html'>plotDC_lvl</a></code>,
-  <code><a href='plotDC_res.html'>plotDC_res</a></code></p></div>
+    <div class='dont-index'><p>Other Dynamic Complexity functions: 
+<code><a href='dc_d.html'>dc_d</a>()</code>,
+<code><a href='dc_f.html'>dc_f</a>()</code>,
+<code><a href='dc_win.html'>dc_win</a>()</code>,
+<code><a href='plotDC_ccp.html'>plotDC_ccp</a>()</code>,
+<code><a href='plotDC_lvl.html'>plotDC_lvl</a>()</code>,
+<code><a href='plotDC_res.html'>plotDC_res</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

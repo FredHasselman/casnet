@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,8 +143,14 @@
     <p>Calculate the lagged mutual information fucntion within (auto-mif) or between (cross-mif) time series, or, conditional on another time series (conditional-cross-mif). Alternatively, calculate the total information of a multivariate dataset for different lags.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mif</span>(<span class='no'>y</span>, <span class='kw'>lags</span> <span class='kw'>=</span> -<span class='fl'>10</span>:<span class='fl'>10</span>, <span class='kw'>nbins</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span>(<span class='fl'>2</span> * <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>)),
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>surTest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>)</pre>
+    <pre class="usage"><span class='fu'>mif</span>(
+  <span class='no'>y</span>,
+  <span class='kw'>lags</span> <span class='kw'>=</span> -<span class='fl'>10</span>:<span class='fl'>10</span>,
+  <span class='kw'>nbins</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span>(<span class='fl'>2</span> * <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>)),
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>surTest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -180,8 +186,9 @@
     <p>The auto- or cross-mi function</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Redundancy measures (mutual information): <code><a href='mi_interlayer.html'>mi_interlayer</a></code>,
-  <code><a href='mi_mat.html'>mi_mat</a></code></p></div>
+    <div class='dont-index'><p>Other Redundancy measures (mutual information): 
+<code><a href='mi_interlayer.html'>mi_interlayer</a>()</code>,
+<code><a href='mi_mat.html'>mi_mat</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -226,33 +233,33 @@
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
 <span class='no'>y</span>$<span class='no'>s</span> <span class='kw'>&lt;-</span> <span class='no'>y2</span>+<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y2</span>))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.806580 1.704955 1.944587 1.835034 1.992138 1.992580 1.947652 2.036912 
+#&gt; 1.797108 1.713710 1.921446 1.810113 1.970283 1.987413 1.927730 2.069501 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.841540 1.872002 1.872002 1.872002 2.002114 1.969284 1.971542 2.003628 
+#&gt; 1.822566 1.878617 1.878617 1.878617 1.994880 1.950518 1.977648 1.978940 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 1.987575 1.789631 1.729699 1.726824 2.479943 1.839458 1.866192 1.857668 
+#&gt; 1.962697 1.791254 1.740091 1.706107 2.476214 1.794912 1.853147 1.872529 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.903964 1.878283 1.837191 1.815339 1.981295 1.916875 1.944174 2.121953 
+#&gt; 1.915484 1.907470 1.843760 1.831617 1.973862 1.977525 1.955104 2.105902 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 1.946313 1.915560 1.870796 1.878248 1.922366 1.808156 1.917618 1.881391 
+#&gt; 1.957366 1.962739 1.883271 1.860350 1.925634 1.760896 1.914528 1.852778 
 #&gt;       30 
-#&gt; 1.842507 
+#&gt; 1.857997 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
 <span class='no'>y</span>$<span class='no'>y3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>)))
 (<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 4.988127 4.982858 4.979822 4.978232 5.126411 5.126280 5.123692 5.121040 
+#&gt; 4.986357 4.988830 4.987553 4.991244 5.139406 5.137500 5.138411 5.126967 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.121899 5.121344 5.121344 5.121344 5.120177 5.122795 5.127237 5.130071 
+#&gt; 5.127818 5.127256 5.127256 5.127256 5.127849 5.130477 5.134928 5.139531 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.128344 4.978342 4.983496 4.984579 4.988362 4.991436 4.991012 4.993432 
+#&gt; 5.139578 4.987161 4.988794 4.988115 4.995444 4.998527 4.998112 5.004096 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 4.997282 5.133730 5.131121 5.136038 5.142443 5.145739 5.142186 5.152852 
+#&gt; 5.012627 5.139076 5.140042 5.141397 5.140654 5.139690 5.135012 5.136690 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.149952 5.148815 5.146989 5.151418 5.004805 5.006321 5.009472 5.011056 
+#&gt; 5.140962 5.147014 5.152398 5.155028 5.001190 5.006321 5.013096 5.012186 
 #&gt;       30 
-#&gt; 5.010914 
+#&gt; 5.012045 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y;Z;...;N)"</div><div class='input'>
 

@@ -4,12 +4,19 @@
 \alias{fd_mfdfa}
 \title{Multi-fractal Detrended Fluctuation Analysis}
 \usage{
-fd_mfdfa(y, qq = c(-10, -5:5, 10), fs = NULL, removeTrend = c("no",
-  "poly", "adaptive", "bridge")[2], polyOrder = 1,
+fd_mfdfa(
+  y,
+  qq = c(-10, -5:5, 10),
+  fs = NULL,
+  removeTrend = c("no", "poly", "adaptive", "bridge")[2],
+  polyOrder = 1,
   standardise = c("none", "mean.sd", "median.mad")[2],
-  adjustSumOrder = FALSE, scaleMin = 2,
-  scaleMax = floor(log2(NROW(y)/2)), scaleResolution = (scaleMax -
-  scaleMin), m = 1)
+  adjustSumOrder = FALSE,
+  scaleMin = 2,
+  scaleMax = floor(log2(NROW(y)/2)),
+  scaleResolution = (scaleMax - scaleMin),
+  m = 1
+)
 }
 \arguments{
 \item{y}{An input signal.}
@@ -54,9 +61,12 @@ par(op)
 
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{fd_RR}},
-  \code{\link{fd_allan}}, \code{\link{fd_dfa}},
-  \code{\link{fd_psd}}, \code{\link{fd_sda}},
-  \code{\link{fd_sev}}
+Other Fluctuation Analyses: 
+\code{\link{fd_RR}()},
+\code{\link{fd_allan}()},
+\code{\link{fd_dfa}()},
+\code{\link{fd_psd}()},
+\code{\link{fd_sda}()},
+\code{\link{fd_sev}()}
 }
 \concept{Fluctuation Analyses}

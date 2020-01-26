@@ -4,8 +4,12 @@
 \alias{ssg_gwf2long}
 \title{Import GridWare files}
 \usage{
-ssg_gwf2long(gwf_name, delta_t = 0.01, returnOnlyData = TRUE,
-  saveLongFormat = FALSE)
+ssg_gwf2long(
+  gwf_name,
+  delta_t = 0.01,
+  returnOnlyData = TRUE,
+  saveLongFormat = FALSE
+)
 }
 \arguments{
 \item{gwf_name}{Name of the GridWare project file. A directory named \code{../gwf_name_trjs} must be present at the location of the project file.}
@@ -23,7 +27,8 @@ A data frame containing State Space Grid trajectories, or a list object with add
 Import GridWare files
 }
 \seealso{
-Other State Space Grid functions: \code{\link{factor_obs_exp}},
-  \code{\link{ssg_winnowing}}
+Other State Space Grid functions: 
+\code{\link{factor_obs_exp}()},
+\code{\link{ssg_winnowing}()}
 }
 \concept{State Space Grid functions}

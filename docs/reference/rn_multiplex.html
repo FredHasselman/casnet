@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,13 +143,26 @@
     <p>This function will create a Multiplex Recurrence Network from a list of igraph objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: <em>Layer similarity</em> (<code>MRNweightedBy</code> is set to <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>) and <em>Layer importance</em> (<code>MRNweightedBy</code> is <code>"RankorderDC"</code>). The former generates weighted MRN based on Interlayer Mutual Information or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument <code>MRNrankedBy</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rn_multiplex</span>(<span class='no'>layers</span>, <span class='kw'>MRNweightedBy</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InterlayerMI"</span>, <span class='st'>"Edgeoverlap"</span>,
-  <span class='st'>"RankDC"</span>)[<span class='fl'>1</span>], <span class='kw'>MRNrankedBy</span> <span class='kw'>=</span> <span class='st'>"degree"</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>step</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>doSave</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>createAnimation</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>useImageMagick</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>loopAnimation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>transitionLength</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>stateLength</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>gifWidth</span> <span class='kw'>=</span> <span class='fl'>600</span>, <span class='kw'>gifRes</span> <span class='kw'>=</span> <span class='fl'>150</span>, <span class='kw'>noParts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>imageDir</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>rn_multiplex</span>(
+  <span class='no'>layers</span>,
+  <span class='kw'>MRNweightedBy</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InterlayerMI"</span>, <span class='st'>"Edgeoverlap"</span>, <span class='st'>"RankDC"</span>)[<span class='fl'>1</span>],
+  <span class='kw'>MRNrankedBy</span> <span class='kw'>=</span> <span class='st'>"degree"</span>,
+  <span class='kw'>win</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>step</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>doSave</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>createAnimation</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>useImageMagick</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>loopAnimation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>transitionLength</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>stateLength</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>gifWidth</span> <span class='kw'>=</span> <span class='fl'>600</span>,
+  <span class='kw'>gifRes</span> <span class='kw'>=</span> <span class='fl'>150</span>,
+  <span class='kw'>noParts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>imageDir</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -184,7 +197,7 @@
     </tr>
     <tr>
       <th>createAnimation</th>
-      <td><p>If <code>createAnimation = TRUE</code> <em>and</em> <code>doPlot = TRUE</code> <em>and</em> a windowed analysis is conducted, an animation will be produced using either package gganimate (if <code>useImageMagick = FALSE</code>) or animation (if <code>useImageMagick = FALSE</code>). The main difference is that gganimate has nice animation transition features, but plots the MRN using ggplot2, which does not have great options for displaying the nodes as images. With package animation a sequence of igraph plots will be converted to an animation. If <code>doSave = TRUE</code> the animation will be saved in <code>imageDir</code> as an animated gif by calling either <code><a href='https://rdrr.io/pkg/gganimate/man/anim_save.html'>gganimate::anim_save()</a></code>, or <code><a href='https://rdrr.io/pkg/animation/man/saveGIF.html'>animation::saveGIF()</a></code> (default = <code>FALSE</code>)</p></td>
+      <td><p>If <code>createAnimation = TRUE</code> <em>and</em> <code>doPlot = TRUE</code> <em>and</em> a windowed analysis is conducted, an animation will be produced using either package gganimate (if <code>useImageMagick = FALSE</code>) or animation (if <code>useImageMagick = FALSE</code>). The main difference is that gganimate has nice animation transition features, but plots the MRN using ggplot2, which does not have great options for displaying the nodes as images. With package animation a sequence of igraph plots will be converted to an animation. If <code>doSave = TRUE</code> the animation will be saved in <code>imageDir</code> as an animated gif by calling either <code><a href='https://gganimate.com/reference/anim_save.html'>gganimate::anim_save()</a></code>, or <code><a href='https://rdrr.io/pkg/animation/man/saveGIF.html'>animation::saveGIF()</a></code> (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>useImageMagick</th>
@@ -232,12 +245,17 @@
 
     <p>A matrix with edge weights between layers that represent the measure <code>MRNweightedBy</code>.</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

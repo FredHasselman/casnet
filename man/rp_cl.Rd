@@ -5,17 +5,34 @@
 \alias{crqa_cl}
 \title{Fast (C)RQA (command line crp)}
 \usage{
-rp_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
-  VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
-  (length(y1) + 1), length(y2)), na.rm = TRUE), step = win,
-  JRP = FALSE, distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+rp_cl(
+  y1,
+  y2 = NULL,
+  emDim = 1,
+  emLag = 1,
+  emRad = NA,
+  DLmin = 2,
+  VLmin = 2,
+  theiler = 0,
+  win = min(length(y1), ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm = TRUE),
+  step = win,
+  JRP = FALSE,
+  distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
   standardise = c("none", "mean.sd", "median.mad")[1],
-  returnMeasures = TRUE, returnRPvector = FALSE,
-  returnLineDist = FALSE, doPlot = c("noplot", "rp", "distmat")[[1]],
-  path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
-  path_out = NULL, file_ID = NULL, silent = TRUE,
-  surrogateTest = FALSE, targetValue = 0.05, useParallel = FALSE,
-  ...)
+  returnMeasures = TRUE,
+  returnRPvector = FALSE,
+  returnLineDist = FALSE,
+  doPlot = c("noplot", "rp", "distmat")[[1]],
+  path_to_rp = getOption("casnet.path_to_rp"),
+  saveOut = FALSE,
+  path_out = NULL,
+  file_ID = NULL,
+  silent = TRUE,
+  surrogateTest = FALSE,
+  targetValue = 0.05,
+  useParallel = FALSE,
+  ...
+)
 }
 \arguments{
 \item{y1}{Time series 1}
@@ -40,7 +57,7 @@ rp_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{JRP}{Wether to calculate a Joint Recurrence Plot (default = \code{FALSE})}
 
-\item{distNorm}{One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
+\item{distNorm}{One of "EUCLIDEAN" (default), \verb{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
 
 \item{standardise}{Standardise data: \code{"none"} (default), \code{"mean.sd"}, or \code{"median.mad"}}
 
@@ -62,7 +79,7 @@ rp_cl(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{silent}{Do not display any messages (default = \code{TRUE})}
 
-\item{surrogateTest}{Perform surrogate tests. If \code{TRUE}, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments \code{ns = 39, fft = TRUE, amplitude = TRUE})}
+\item{surrogateTest}{Perform surrogate tests. If \code{TRUE}, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments \verb{ns = 39, fft = TRUE, amplitude = TRUE})}
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}. This is useful for windowed analysis, it will estimate a new radius for each window.}
 
@@ -104,8 +121,8 @@ A list object containing 1-3 elements, depending on arguments requesting output.
 This function will run the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{commandline Recurrence Plots} executable provided by Norbert Marwan.
 }
 \details{
-The \code{rp} executable is installed when the function is called for the first time and is renamed to \code{rp}, from a platform specific filename downloaded from http://tocsy.pik-potsdam.de/commandline-rp.php or extracted from an archive located in the directory: \code{...\\casnet\\commandline_rp\\}.
-The file is copied to the directory: \code{...\\casnet\\exec\\}
+The \code{rp} executable is installed when the function is called for the first time and is renamed to \code{rp}, from a platform specific filename downloaded from http://tocsy.pik-potsdam.de/commandline-rp.php or extracted from an archive located in the directory: \verb{...\\\\casnet\\\\commandline_rp\\\\}.
+The file is copied to the directory: \verb{...\\\\casnet\\\\exec\\\\}
 The latter location is stored as an option and can be read by calling \code{getOption("casnet.path_to_rp")}.
 }
 \note{
@@ -125,17 +142,18 @@ More information about recurrence analysis can be found on the \href{http://www.
 }
 \section{Troubleshooting}{
 
-Some notes on resolving errors with \code{rp}.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in \code{...\\casnet\\commandline_rp\\crp_cl.zip}. If that fails, the copy will have failed. It should be relatively easy to get \code{crqa_cl()} working using custom settings:
+Some notes on resolving errors with \code{rp}.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in \verb{...\\\\casnet\\\\commandline_rp\\\\crp_cl.zip}. If that fails, the copy will have failed. It should be relatively easy to get \code{crqa_cl()} working using custom settings:
 
 \itemize{
-\item \emph{Copy failed} - Every time the function \code{crqa_cl()} is called it will check whether a log file \code{rp_instal_log.txt} is present in the \code{...\\casnet\\exec\\} directory. If you delete the \code{rp_instal_log.txt} file, and call the function, another attempt will be madxe to download a copy of the executable.
-\item \emph{Copy still fails and/or no permission to copy} - If you cannot acces the directory \code{...\\casnet\\commandline_rp\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{Commandline Recurrence Plots} page and copy to a directory you do have the rights to: \emph{execute} commands, \emph{write} and \emph{read} files. Make sure you rename the file to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as the argument \code{path_to_rp} in the \code{crqa_cl(..,, path_to_rp = "YOUR_PATH")} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}.
+\item \emph{Copy failed} - Every time the function \code{crqa_cl()} is called it will check whether a log file \code{rp_instal_log.txt} is present in the \verb{...\\\\casnet\\\\exec\\\\} directory. If you delete the \code{rp_instal_log.txt} file, and call the function, another attempt will be madxe to download a copy of the executable.
+\item \emph{Copy still fails and/or no permission to copy} - If you cannot acces the directory \verb{...\\\\casnet\\\\commandline_rp\\\\}, download the appropriate executable from the \href{http://tocsy.pik-potsdam.de/commandline-rp.php}{Commandline Recurrence Plots} page and copy to a directory you do have the rights to: \emph{execute} commands, \emph{write} and \emph{read} files. Make sure you rename the file to \code{rp} (\code{rp.exe} on Windows OS). Then, either pass the path to \code{rp} as the argument \code{path_to_rp} in the \code{crqa_cl(..,, path_to_rp = "YOUR_PATH")} function call, or, as a more permanent solution, set the \code{path_to_rp} option by calling \code{options(casnet.path_to_rp="YOUR_PATH")}.
 \item \emph{Error in execution of \code{rp}} - This can have a variety of causes, the \code{rp} executable is called using \code{\link[=system2]{system2()}} and makes use of the \code{\link[=normalizePath]{normalizePath()}} function with argument \code{mustWork = FALSE}. Problems caused by specific OS, machine, or, locale problems (e.g. the \code{winslash} can be reported as an \href{https://github.com/FredHasselman/casnet/issues}{issue on Github}). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing \code{getOption("casnet.rp_prefix")}. On Windows OS this should return an empty character vector, on Linux or macOS it should return \code{"./"}. You can manually set the correct prefix by calling \code{options(casnet.rp_prefix="CORRECT OS PREFIX")} and fill in the prefix that is correct for your OS
 }
 }
 
 \seealso{
-Other Recurrence Quantification Analysis: \code{\link{rp_measures_main}},
-  \code{\link{rp_measures}}
+Other Recurrence Quantification Analysis: 
+\code{\link{rp_measures_main}()},
+\code{\link{rp_measures}()}
 }
 \concept{Recurrence Quantification Analysis}

@@ -140,7 +140,7 @@ est_parameters <- function(y,
 
             Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
             for(D in seq_along(emDims)){
-              RM <- rp(y,y, emDim = emDims[D], emLag = emLags$lag[L])
+              RM <- rp(y,y, emDim = emDims[D], emLag = emLags$lag[L],returnMeasures = FALSE)
               RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
               Nn.min[D]  <- min(RM, na.rm = TRUE)
               Nn.max[D]  <- max(RM, na.rm = TRUE)
@@ -787,6 +787,7 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 #' @param weighted If `FALSE` a binary matrix will be returned. If `TRUE` every value larger than `emRad` will be `0`, but values smaller than `emRad` will be retained (default = `FALSE`)
 #' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`.
+#' @param returnMeasures Should values be returned to the console window and as an attribute? (default = `FALSE`)
 #' @param doPlot Plot the matrix by calling [rp_plot()] with defult settings
 #' @param doEmbed If `FALSE`, a distance matrix will be returned that is not embedded by `emDim` and `emLag`. If `y1` and/or `y2` are data frames, the columns will be used as dimensions (default = `TRUE`)
 #' @param silent Silent-ish mode
@@ -818,6 +819,7 @@ rp <- function(y1, y2 = NULL,
                weighted = FALSE,
                method = "Euclidean",
                targetValue  = .05,
+               returnMeasures = FALSE,
                doPlot = FALSE,
                doEmbed = TRUE,
                silent = TRUE,
@@ -893,6 +895,11 @@ rp <- function(y1, y2 = NULL,
     }
   }
 
+  if(returnMeasures){
+    rpOut <-  rp_measures(RM = dmat)
+  } else {
+    rpOut <- NA
+  }
 
   if(to.sparse){
     attributes(dmat)$emDims1  <- et1
@@ -903,6 +910,7 @@ rp <- function(y1, y2 = NULL,
     attributes(dmat)$emLag <- emLag
     attributes(dmat)$emDim <- emDim
     attributes(dmat)$emRad <- emRad%00%NA
+    attributes(dmat)$measures <- rpOut
   } else {
     attr(dmat,"emDims1") <- et1
     attr(dmat,"emDims2") <- et2
@@ -912,6 +920,7 @@ rp <- function(y1, y2 = NULL,
     attr(dmat,"emLag") <- emLag
     attr(dmat,"emDim") <- emDim
     attr(dmat,"emRad") <- emRad%00%NA
+    attr(dmat,"measures") <- rpOut
   }
 
   dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
@@ -1025,8 +1034,7 @@ rp_measures <- function(RM,
         emLag <- 1
       }
 
-      emRad <- est_radius(RM = RM,
-                           emDim = emDim, emLag = emLag, targetValue = targetValue, tol = .2, radiusOnFail = "percentile", silent = silent)
+      emRad <- est_radius(RM = RM, emDim = emDim, emLag = emLag, targetValue = targetValue, tol = .2, radiusOnFail = "percentile", silent = silent)
       if(emRad$Converged){
         emRad <- emRad$Radius
       } else {
@@ -1064,7 +1072,42 @@ rp_measures <- function(RM,
                       chromatic = chromatic,
                       matrices  = matrices)
 
-  #
+ outTable <- list(`Global Measures` = data.frame(`Global` = "Recurrence Matrix",
+                                                 `Max rec points` = NROW(RM)*NCOL(RM)-NCOL(RM),
+                                                 `N rec points` = out$RP_N,
+                                                 `Recurrence Rate` = out$RR,
+                                                 `Singular points` = out$SING_N,
+                                                  Divergence = out$DIV_dl,
+                                                  Repetitiveness = out$REP_av,
+                                                  Anisotropy = out$ANI),
+                  `Line-based Measures` = data.frame(`Line-based` = c("Diagonal", "Vertical", "Horizontal"),
+                                                        `N lines`   = c(out$N_dl,out$N_vl, out$N_hl),
+                                                        `N points on lines` = c(out$N_dlp,out$N_vlp,out$N_hlp),
+                                                        `Measure` = c("Determinism","V Laminarity","H Laminarity"),
+                                                        `Rate`    = c(out$DET, out$LAM_vl, out$LAM_hl),
+                                                        `Mean`    = c(out$MEAN_dl, out$TT_vl, out$TT_vl),
+                                                        `Max`     = c(out$MAX_dl, out$MAX_vl, out$MAX_hl),
+                                                        `Entropy of lengths` = c(out$ENT_dl, out$ENT_vl, out$ENT_hl),
+                                                        `Relative entropy` = c(out$ENTrel_dl, out$ENTrel_vl, out$ENTrel_hl),
+                                                        `CoV of lengths`   = c(out$CoV_dl, out$CoV_vl, out$CoV_hl)))
+
+ cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+ cat(paste("\n",names(outTable)[1],"\n"))
+ print(format(outTable$`Global Measures`))
+ cat(paste("\n\n",names(outTable)[2],"\n"))
+ print(format(outTable$`Line-based Measures`))
+ cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+
+
+ attr(out,"measuresTable") <- outTable
+
+ # tb <- c("|  N rec. points  |       RR        | Singular points |    Divergence   |  Repetiteveness |    Anisotropy   |",
+ #         "|-----------------|-----------------|-----------------|-----------------|-----------------|-----------------|".
+ #         )
+ #
+ #cat(c("Global Recurrence Measures\n",paste0(tb,"\n")))
+
+
   #   if(is.null(Nboot)){Nboot = 1}
   #
   #   out <- crqa_rp_measures(RM,
@@ -1134,7 +1177,7 @@ rp_measures <- function(RM,
   #     rqout <- dfori
   #   }
 
-  return(out)
+  return(invisible(out))
 }
 
 
@@ -10534,7 +10577,9 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
   if(!is.null(dim(y))&emLag>0){
     y <- y_data <- as.numeric(y[,1])
     #if(!silent){cat("\ntaking first column...\n")}
-    warning(cat("\nMultiple columns available, taking first column of y...\n"))
+    if(NCOL(y)>1){
+      warning(cat("\nMultiple columns available, taking first column of y...\n"))
+      }
   } else {
     y_data  <- y
   }
@@ -11455,9 +11500,9 @@ ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, align
   }
 
   switch(alignment,
-         l = tIndex <- laply(wIndices, min),#seq(from = 1,     to = (NROW(y) - win + step), by = step),
-         c = tIndex <- laply(wIndices, mean),#seq(from = floor(win/2), to = (NROW(y) - floor(win/2) + step), by = step),
-         r = tIndex <- laply(wIndices, max) #seq(from = win,   to = NROW(y), by = step)
+         l = tIndex <- plyr::laply(wIndices, min),#seq(from = 1,     to = (NROW(y) - win + step), by = step),
+         c = tIndex <- plyr::laply(wIndices, mean),#seq(from = floor(win/2), to = (NROW(y) - floor(win/2) + step), by = step),
+         r = tIndex <- plyr::laply(wIndices, max) #seq(from = win,   to = NROW(y), by = step)
   )
 
   attr(x = wIndices, which = "time") <- tIndex
@@ -12745,3 +12790,4 @@ repmat <- function(X,m,n){
   }
   return (out)
 }
+

@@ -4,8 +4,14 @@
 \alias{layout_as_spiral}
 \title{Layout a graph on a spiral}
 \usage{
-layout_as_spiral(g, type = c("Archimedean", "Bernoulli", "Fermat",
-  "Euler"), arcs = 6, a = 1, b = NULL, rev = FALSE)
+layout_as_spiral(
+  g,
+  type = c("Archimedean", "Bernoulli", "Fermat", "Euler"),
+  arcs = 6,
+  a = 1,
+  b = NULL,
+  rev = FALSE
+)
 }
 \arguments{
 \item{g}{An igraph object. If (\code{rev = FALSE}) the vertex with the lowest index will be placed in the centre of the spiral, the highest index will be most outer vertex,}

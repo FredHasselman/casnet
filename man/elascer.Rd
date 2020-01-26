@@ -4,9 +4,17 @@
 \alias{elascer}
 \title{Elastic Scaler - A Flexible Rescale Function}
 \usage{
-elascer(x, mn = NA, mx = NA, lo = 0, hi = 1, groupwise = FALSE,
-  keepNA = TRUE, boundaryPrecision = NA,
-  tol = .Machine$double.eps^0.5)
+elascer(
+  x,
+  mn = NA,
+  mx = NA,
+  lo = 0,
+  hi = 1,
+  groupwise = FALSE,
+  keepNA = TRUE,
+  boundaryPrecision = NA,
+  tol = .Machine$double.eps^0.5
+)
 }
 \arguments{
 \item{x}{Input vector or data frame.}
@@ -19,13 +27,13 @@ elascer(x, mn = NA, mx = NA, lo = 0, hi = 1, groupwise = FALSE,
 
 \item{hi}{Maximum value to rescale to, defaults to \code{1}.}
 
-\item{groupwise}{If \code{x} is a data frame with \code{2+} columns, \code{mn = NA} and/or \code{mx = NA} and \code{groupwise = TRUE}, scaling will occur}
+\item{groupwise}{If \code{x} is a data frame with \verb{2+} columns, \code{mn = NA} and/or \code{mx = NA} and \code{groupwise = TRUE}, scaling will occur}
 
 \item{keepNA}{Keep \code{NA} values?}
 
 \item{boundaryPrecision}{If set to \code{NA} the precision of the input will be the same as the precision of the output. This can cause problems when detecting values that lie just outside of, or, exactly on boundaries given by \code{lo} and \code{hi}, e.g. after saving the data using a default precision. Setting \code{boundaryPrecision} to an integer value will ensure that the boundaries of the new scale are given by \code{round(..., digits = boundaryPrecision)}. Alternatively one could just round all the output after rescaling to a desired precision (default = \code{NA})}
 
-\item{tol}{The tolerance for deciding wether a value is on the boundary \code{lo} or \code{hi} (default = \code{.Machine$double.eps^0.5)})}
+\item{tol}{The tolerance for deciding wether a value is on the boundary \code{lo} or \code{hi} (default = \verb{.Machine$double.eps^0.5)})}
 }
 \value{
 scaled inout

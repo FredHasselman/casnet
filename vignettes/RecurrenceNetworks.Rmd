@@ -68,7 +68,7 @@ plot(ts(series$TS_1))
 
 arcs=6
 
-est_parameters(series$TS_1)
+est_parameters(y = series$TS_1)
 
 # By passing emRad = NA, a radius will be calculated
 RN1 <- casnet::rn(y1 = series$TS_1, emDim = 7, emLag = 2, emRad = NA, targetValue = .01)
@@ -77,9 +77,9 @@ casnet::rn_plot(RN1)
 # Get RQA measures
 rqa1 <- rp_measures(RN1)
 
-knitr::kable(rqa1,digits = 2) %>%
-  kable_styling() %>%
-  scroll_box(width = "100%", height = "100px")
+# knitr::kable(rqa1,digits = 2) %>%
+#   kable_styling() %>%
+#   scroll_box(width = "100%", height = "100px")
 
 g1  <- igraph::graph_from_adjacency_matrix(RN1, mode="undirected", diag = FALSE)
 igraph::V(g1)$size <- igraph::degree(g1)
@@ -115,9 +115,10 @@ rn_plot(RN2)
 
 # Get RQA measures
 rqa2 <- rp_measures(RN2)
-knitr::kable(rqa2,digits = 2) %>%
-  kable_styling() %>%
-  scroll_box(width = "100%", height = "100px")
+
+# knitr::kable(rqa2,digits = 2) %>%
+#   kable_styling() %>%
+#   scroll_box(width = "100%", height = "100px")
 
 g2 <- graph_from_adjacency_matrix(RN2, mode="undirected", diag = FALSE)
 V(g2)$size <- degree(g2)
@@ -152,9 +153,10 @@ rn_plot(RN3)
 
 # Get RQA measures
 rqa3 <- rp_measures(RN3)
-knitr::kable(rqa3,digits = 2) %>%
-  kable_styling() %>%
-  scroll_box(width = "100%", height = "100px")
+
+# knitr::kable(rqa3,digits = 2) %>%
+#   kable_styling() %>%
+#   scroll_box(width = "100%", height = "100px")
 
 g3 <- graph_from_adjacency_matrix(RN3, mode="undirected", diag = FALSE)
 V(g3)$size <- degree(g3)

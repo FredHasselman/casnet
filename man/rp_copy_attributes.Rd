@@ -4,8 +4,11 @@
 \alias{rp_copy_attributes}
 \title{Copy Matrix Attributes}
 \usage{
-rp_copy_attributes(source, target, source_remove = c("names",
-  "row.names", "class", "dim", "dimnames", "x"))
+rp_copy_attributes(
+  source,
+  target,
+  source_remove = c("names", "row.names", "class", "dim", "dimnames", "x")
+)
 }
 \arguments{
 \item{source}{Source matrix}

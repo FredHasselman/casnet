@@ -4,8 +4,13 @@
 \alias{factor_obs_exp}
 \title{Add expected factor labels to observed values}
 \usage{
-factor_obs_exp(observed_Ncat, observed_labels, expected_Ncat = 0,
-  expected_labels = "", varname = "")
+factor_obs_exp(
+  observed_Ncat,
+  observed_labels,
+  expected_Ncat = 0,
+  expected_labels = "",
+  varname = ""
+)
 }
 \arguments{
 \item{observed_Ncat}{obsN}
@@ -25,7 +30,8 @@ character vector
 Add expected factor labels to observed values
 }
 \seealso{
-Other State Space Grid functions: \code{\link{ssg_gwf2long}},
-  \code{\link{ssg_winnowing}}
+Other State Space Grid functions: 
+\code{\link{ssg_gwf2long}()},
+\code{\link{ssg_winnowing}()}
 }
 \concept{State Space Grid functions}

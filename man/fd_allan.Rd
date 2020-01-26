@@ -4,10 +4,18 @@
 \alias{fd_allan}
 \title{Allan Variance Analysis}
 \usage{
-fd_allan(y, fs = stats::tsp(stats::hasTsp(y))[3], useSD = FALSE,
-  doPlot = FALSE, returnPlot = FALSE, returnPLAW = FALSE,
-  returnInfo = FALSE, silent = FALSE, noTitle = FALSE,
-  tsName = "y")
+fd_allan(
+  y,
+  fs = stats::tsp(stats::hasTsp(y))[3],
+  useSD = FALSE,
+  doPlot = FALSE,
+  returnPlot = FALSE,
+  returnPLAW = FALSE,
+  returnInfo = FALSE,
+  silent = FALSE,
+  noTitle = FALSE,
+  tsName = "y"
+)
 }
 \arguments{
 \item{y}{A numeric vector or time series object}
@@ -37,9 +45,12 @@ A dataframe with the Allan Factor (variance), Alan standard deviation and error 
 Allan Variance Analysis
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{fd_RR}},
-  \code{\link{fd_dfa}}, \code{\link{fd_mfdfa}},
-  \code{\link{fd_psd}}, \code{\link{fd_sda}},
-  \code{\link{fd_sev}}
+Other Fluctuation Analyses: 
+\code{\link{fd_RR}()},
+\code{\link{fd_dfa}()},
+\code{\link{fd_mfdfa}()},
+\code{\link{fd_psd}()},
+\code{\link{fd_sda}()},
+\code{\link{fd_sev}()}
 }
 \concept{Fluctuation Analyses}

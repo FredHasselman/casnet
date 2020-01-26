@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Slice columns of a matrix in epochs — ts_slice • casnet</title>
+<title>Slice a Matrix — ts_slice • casnet</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -42,8 +42,8 @@
 
 
 
-<meta property="og:title" content="Slice columns of a matrix in epochs — ts_slice" />
-<meta property="og:description" content="Slice columns of a matrix in epochs" />
+<meta property="og:title" content="Slice a Matrix — ts_slice" />
+<meta property="og:description" content="Slices rows of a matrix into a list of matrices representing epochs of length epochSz." />
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -134,13 +134,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Slice columns of a matrix in epochs</h1>
+    <h1>Slice a Matrix</h1>
     <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
     <div class="hidden name"><code>ts_slice.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Slice columns of a matrix in epochs</p>
+    <p>Slices rows of a matrix into a list of matrices representing epochs of length <code>epochSz</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>ts_slice</span>(<span class='no'>y</span>, <span class='kw'>epochSz</span> <span class='kw'>=</span> <span class='fl'>4</span>)</pre>
@@ -163,18 +163,27 @@
     <p>A list with epochs</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Time series operations: <code><a href='ts_center.html'>ts_center</a></code>,
-  <code><a href='ts_changeindex.html'>ts_changeindex</a></code>, <code><a href='ts_checkfix.html'>ts_checkfix</a></code>,
-  <code><a href='ts_detrend.html'>ts_detrend</a></code>, <code><a href='ts_diff.html'>ts_diff</a></code>,
-  <code><a href='ts_discrete.html'>ts_discrete</a></code>, <code><a href='ts_duration.html'>ts_duration</a></code>,
-  <code><a href='ts_embed.html'>ts_embed</a></code>, <code><a href='ts_integrate.html'>ts_integrate</a></code>,
-  <code><a href='ts_levels.html'>ts_levels</a></code>, <code><a href='ts_peaks.html'>ts_peaks</a></code>,
-  <code><a href='ts_permtest_block.html'>ts_permtest_block</a></code>,
-  <code><a href='ts_permtest_transmat.html'>ts_permtest_transmat</a></code>,
-  <code><a href='ts_rasterize.html'>ts_rasterize</a></code>, <code><a href='ts_sd.html'>ts_sd</a></code>,
-  <code><a href='ts_standardise.html'>ts_standardise</a></code>, <code><a href='ts_sumorder.html'>ts_sumorder</a></code>,
-  <code><a href='ts_symbolic.html'>ts_symbolic</a></code>, <code><a href='ts_trimfill.html'>ts_trimfill</a></code>,
-  <code><a href='ts_windower.html'>ts_windower</a></code></p></div>
+    <div class='dont-index'><p>Other Time series operations: 
+<code><a href='ts_center.html'>ts_center</a>()</code>,
+<code><a href='ts_changeindex.html'>ts_changeindex</a>()</code>,
+<code><a href='ts_checkfix.html'>ts_checkfix</a>()</code>,
+<code><a href='ts_detrend.html'>ts_detrend</a>()</code>,
+<code><a href='ts_diff.html'>ts_diff</a>()</code>,
+<code><a href='ts_discrete.html'>ts_discrete</a>()</code>,
+<code><a href='ts_duration.html'>ts_duration</a>()</code>,
+<code><a href='ts_embed.html'>ts_embed</a>()</code>,
+<code><a href='ts_integrate.html'>ts_integrate</a>()</code>,
+<code><a href='ts_levels.html'>ts_levels</a>()</code>,
+<code><a href='ts_peaks.html'>ts_peaks</a>()</code>,
+<code><a href='ts_permtest_block.html'>ts_permtest_block</a>()</code>,
+<code><a href='ts_permtest_transmat.html'>ts_permtest_transmat</a>()</code>,
+<code><a href='ts_rasterize.html'>ts_rasterize</a>()</code>,
+<code><a href='ts_sd.html'>ts_sd</a>()</code>,
+<code><a href='ts_standardise.html'>ts_standardise</a>()</code>,
+<code><a href='ts_sumorder.html'>ts_sumorder</a>()</code>,
+<code><a href='ts_symbolic.html'>ts_symbolic</a>()</code>,
+<code><a href='ts_trimfill.html'>ts_trimfill</a>()</code>,
+<code><a href='ts_windower.html'>ts_windower</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

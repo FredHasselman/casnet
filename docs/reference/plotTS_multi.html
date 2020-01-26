@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,10 +143,21 @@
     <p>Plot Multivariate Time Series Data</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotTS_multi</span>(<span class='no'>df</span>, <span class='kw'>timeVec</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>groupVec</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>xlabel</span> <span class='kw'>=</span> <span class='st'>"Time"</span>, <span class='kw'>ylabel</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>returnPlotData</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>useRibbon</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
+    <pre class="usage"><span class='fu'>plotTS_multi</span>(
+  <span class='no'>df</span>,
+  <span class='kw'>timeVec</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>groupVec</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>subtitle</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>xlabel</span> <span class='kw'>=</span> <span class='st'>"Time"</span>,
+  <span class='kw'>ylabel</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>returnPlotData</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>useRibbon</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>1</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -218,8 +229,7 @@
 
 <span class='kw'>for</span>(<span class='no'>c</span> <span class='kw'>in</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span>(<span class='no'>noises</span>)){
  <span class='no'>y</span>[,<span class='no'>c</span>] <span class='kw'>&lt;-</span> <span class='fu'><a href='noise_powerlaw.html'>noise_powerlaw</a></span>(<span class='kw'>N</span><span class='kw'>=</span><span class='no'>N</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='no'>noises</span>[<span class='no'>c</span>])
- }
- <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span>(<span class='no'>y</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='no'>noises</span>)
+ }</div><div class='output co'>#&gt; <span class='warning'>Warning: If alpha is outside [-2,2], result are likely not accurate.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: If alpha is outside [-2,2], result are likely not accurate.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: If alpha is outside [-2,2], result are likely not accurate.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: If alpha is outside [-2,2], result are likely not accurate.</span></div><div class='input'> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span>(<span class='no'>y</span>) <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='no'>noises</span>)
 
  <span class='fu'>plotTS_multi</span>(<span class='no'>y</span>)</div><div class='output co'>#&gt; <span class='error'>Error in llply(seq_along(yOrder), function(n) rep(offsets[n], sum(tmp$timeSeries %in%     names(offsets)[n]))): could not find function "llply"</span></div><div class='input'>
 </div></pre>

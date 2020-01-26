@@ -24,9 +24,10 @@ A wrapper around \code{\link[igraph:sample_smallworld]{igraph::sample_smallworld
 \seealso{
 \code{\link[igraph:sample_smallworld]{igraph::sample_smallworld()}}
 
-Other tools for plotting networks: \code{\link{plotNET_BA}},
-  \code{\link{plotNET_groupColour}},
-  \code{\link{plotNET_groupWeight}},
-  \code{\link{plotNET_prep}}
+Other tools for plotting networks: 
+\code{\link{plotNET_BA}()},
+\code{\link{plotNET_groupColour}()},
+\code{\link{plotNET_groupWeight}()},
+\code{\link{plotNET_prep}()}
 }
 \concept{tools for plotting networks}

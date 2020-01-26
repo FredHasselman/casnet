@@ -4,10 +4,19 @@
 \alias{fd_sev}
 \title{Calculate FD using Sevcik's method}
 \usage{
-fd_sev(y, detrend = FALSE, adjustSumOrder = FALSE,
-  smallNapprox = FALSE, doPlot = FALSE, returnPlot = FALSE,
-  returnPLAW = FALSE, returnInfo = FALSE, silent = FALSE,
-  noTitle = FALSE, tsName = "y")
+fd_sev(
+  y,
+  detrend = FALSE,
+  adjustSumOrder = FALSE,
+  smallNapprox = FALSE,
+  doPlot = FALSE,
+  returnPlot = FALSE,
+  returnPLAW = FALSE,
+  returnInfo = FALSE,
+  silent = FALSE,
+  noTitle = FALSE,
+  tsName = "y"
+)
 }
 \arguments{
 \item{y}{A time series or numeric vector}
@@ -42,10 +51,13 @@ Calculate FD using Sevcik's method
 Sevcik, C. (1998). A procedure to Estimate the Fractal Dimension of Waveforms. Paper available at http://arxiv.org/pdf/1003.5266.pdf
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{fd_RR}},
-  \code{\link{fd_allan}}, \code{\link{fd_dfa}},
-  \code{\link{fd_mfdfa}}, \code{\link{fd_psd}},
-  \code{\link{fd_sda}}
+Other Fluctuation Analyses: 
+\code{\link{fd_RR}()},
+\code{\link{fd_allan}()},
+\code{\link{fd_dfa}()},
+\code{\link{fd_mfdfa}()},
+\code{\link{fd_psd}()},
+\code{\link{fd_sda}()}
 }
 \author{
 Fred Hasselman

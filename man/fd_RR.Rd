@@ -23,9 +23,12 @@ Relative Rougness is a ratio of local variance (autocovariance at lag-1) to glob
 \item{Marmelat, V., Torre, K., & Delignieres, D. (2012). Relative roughness: an index for testing the suitability of the monofractal model. \emph{Frontiers in Physiology, 3}, 208.}}
 }
 \seealso{
-Other Fluctuation Analyses: \code{\link{fd_allan}},
-  \code{\link{fd_dfa}}, \code{\link{fd_mfdfa}},
-  \code{\link{fd_psd}}, \code{\link{fd_sda}},
-  \code{\link{fd_sev}}
+Other Fluctuation Analyses: 
+\code{\link{fd_allan}()},
+\code{\link{fd_dfa}()},
+\code{\link{fd_mfdfa}()},
+\code{\link{fd_psd}()},
+\code{\link{fd_sda}()},
+\code{\link{fd_sev}()}
 }
 \concept{Fluctuation Analyses}

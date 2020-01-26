@@ -9,9 +9,18 @@
 \alias{casnet-deprecated}
 \title{Deprecated functions in package \pkg{casnet}.}
 \usage{
-dyn_comp(df, col_first, col_last, win = NROW(df), fromScaleMin = NULL,
-  fromScaleMax = NULL, toScaleMin = NULL, toScaleMax = NULL,
-  rescale = TRUE, doPlot = FALSE)
+dyn_comp(
+  df,
+  col_first,
+  col_last,
+  win = NROW(df),
+  fromScaleMin = NULL,
+  fromScaleMax = NULL,
+  toScaleMin = NULL,
+  toScaleMax = NULL,
+  rescale = TRUE,
+  doPlot = FALSE
+)
 
 DC_F(df, win, xmin, xmax, col_first, col_last)
 

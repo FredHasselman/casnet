@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,12 +143,28 @@
     <p>This function serves as a wrapper for function <code><a href='rp.html'>rp()</a></code>, it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rn</span>(<span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>emDim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>emRad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>directed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>weightedBy</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"si"</span>, <span class='st'>"rt"</span>,
-  <span class='st'>"rf"</span>)[<span class='fl'>1</span>], <span class='kw'>rescaleWeights</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fs</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>includeDiagonal</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>to.ts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>to.sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>, <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>returnGraph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>rn</span>(
+  <span class='no'>y1</span>,
+  <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>emDim</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>emRad</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>directed</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>weightedBy</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"si"</span>, <span class='st'>"rt"</span>, <span class='st'>"rf"</span>)[<span class='fl'>1</span>],
+  <span class='kw'>rescaleWeights</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fs</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
+  <span class='kw'>includeDiagonal</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>to.ts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>to.sparse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"Euclidean"</span>,
+  <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>returnGraph</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -240,9 +256,12 @@
     <p>A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidence) matrix.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Distance matrix operations (recurrence network): <code><a href='di2bi.html'>di2bi</a></code>,
-  <code><a href='di2we.html'>di2we</a></code>, <code><a href='rn_plot.html'>rn_plot</a></code>,
-  <code><a href='rn_recSpec.html'>rn_recSpec</a></code>, <code><a href='rn_scaleoGram.html'>rn_scaleoGram</a></code></p></div>
+    <div class='dont-index'><p>Other Distance matrix operations (recurrence network): 
+<code><a href='di2bi.html'>di2bi</a>()</code>,
+<code><a href='di2we.html'>di2we</a>()</code>,
+<code><a href='rn_plot.html'>rn_plot</a>()</code>,
+<code><a href='rn_recSpec.html'>rn_recSpec</a>()</code>,
+<code><a href='rn_scaleoGram.html'>rn_scaleoGram</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

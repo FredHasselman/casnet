@@ -4,8 +4,14 @@
 \alias{rp_nzdiags}
 \title{rp_nzdiags}
 \usage{
-rp_nzdiags(RM = NULL, d = NULL, returnVectorList = TRUE,
-  returnNZtriplets = FALSE, removeNZ = TRUE, silent = TRUE)
+rp_nzdiags(
+  RM = NULL,
+  d = NULL,
+  returnVectorList = TRUE,
+  returnNZtriplets = FALSE,
+  removeNZ = TRUE,
+  silent = TRUE
+)
 }
 \arguments{
 \item{RM}{A binary (0,1) matrix.}
@@ -27,11 +33,15 @@ A matrix object with nonzero diagonals as columns and/or a dataframe with coordi
 Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument \code{d}.
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
-  \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rp_lineDist}},
-  \code{\link{rp_plot}}, \code{\link{rp_size}},
-  \code{\link{rp}}
+Other Distance matrix operations (recurrence plot): 
+\code{\link{bandReplace}()},
+\code{\link{di2bi}()},
+\code{\link{di2we}()},
+\code{\link{dist_hamming}()},
+\code{\link{rp_lineDist}()},
+\code{\link{rp_plot}()},
+\code{\link{rp_size}()},
+\code{\link{rp}()}
 }
 \author{
 Fred Hasselman

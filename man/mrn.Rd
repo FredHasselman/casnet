@@ -4,14 +4,28 @@
 \alias{mrn}
 \title{Multiplex Recurrence Network}
 \usage{
-mrn(layers, weightedBy = c("InterlayerMI", "InterlayerCor",
-  "Edgeoverlap", "AnisotropicCRQA")[1], CRQA_vertexSequence = "degree",
-  CRQA_measure = c("RR", "DET", "LAM")[1], win = NA, step = NA,
-  overlap = NA, alignment = "r", doPlot = FALSE, doSave = FALSE,
-  createAnimation = FALSE, useImageMagick = FALSE,
-  loopAnimation = TRUE, transitionLength = 3, stateLength = 1,
-  gifWidth = 600, gifRes = 150, noParts = TRUE, imageDir = NA,
-  silent = TRUE)
+mrn(
+  layers,
+  weightedBy = c("InterlayerMI", "InterlayerCor", "Edgeoverlap", "AnisotropicCRQA")[1],
+  CRQA_vertexSequence = "degree",
+  CRQA_measure = c("RR", "DET", "LAM")[1],
+  win = NA,
+  step = NA,
+  overlap = NA,
+  alignment = "r",
+  doPlot = FALSE,
+  doSave = FALSE,
+  createAnimation = FALSE,
+  useImageMagick = FALSE,
+  loopAnimation = TRUE,
+  transitionLength = 3,
+  stateLength = 1,
+  gifWidth = 600,
+  gifRes = 150,
+  noParts = TRUE,
+  imageDir = NA,
+  silent = TRUE
+)
 }
 \arguments{
 \item{layers}{A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.}
@@ -36,7 +50,7 @@ mrn(layers, weightedBy = c("InterlayerMI", "InterlayerCor",
 
 \item{stateLength}{Value of \code{state_length} if \link{gganimate} is used, or the  \code{interval} in seconds for \code{\link[animation:ani.pause]{animation::ani.pause()}} (default = \code{1})}
 
-\item{gifWidth}{Width of the animated \code{gif} in pixels. The default width will be \code{600/150 = 4 in} or \code{10.16 cm} (default = \code{600})}
+\item{gifWidth}{Width of the animated \code{gif} in pixels. The default width will be \verb{600/150 = 4 in} or \verb{10.16 cm} (default = \code{600})}
 
 \item{gifRes}{Resolution of the animated \code{gif} in \code{ppi} (default =\code{150})}
 

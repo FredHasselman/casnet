@@ -4,8 +4,13 @@
 \alias{plotRED_acf}
 \title{Plot ACF and PACF}
 \usage{
-plotRED_acf(y, Lmax = max(round(NROW(y)/4), 10), alpha = 0.05,
-  doPlot = TRUE, returnCorFun = FALSE)
+plotRED_acf(
+  y,
+  Lmax = max(round(NROW(y)/4), 10),
+  alpha = 0.05,
+  doPlot = TRUE,
+  returnCorFun = FALSE
+)
 }
 \arguments{
 \item{y}{A time series or numeric vector}
@@ -25,6 +30,7 @@ Either an invisible ggplot2 object r a list containing the plot and the data
 Plot ACF and PACF
 }
 \seealso{
-Other Plot redundancy functions: \code{\link{plotRED_mif}}
+Other Plot redundancy functions: 
+\code{\link{plotRED_mif}()}
 }
 \concept{Plot redundancy functions}

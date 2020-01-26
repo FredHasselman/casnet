@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,10 +143,18 @@
     <p>Allan Variance Analysis</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fd_allan</span>(<span class='no'>y</span>, <span class='kw'>fs</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/tsp.html'>tsp</a></span>(<span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/tsp.html'>hasTsp</a></span>(<span class='no'>y</span>))[<span class='fl'>3</span>], <span class='kw'>useSD</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</pre>
+    <pre class="usage"><span class='fu'>fd_allan</span>(
+  <span class='no'>y</span>,
+  <span class='kw'>fs</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/tsp.html'>tsp</a></span>(<span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/tsp.html'>hasTsp</a></span>(<span class='no'>y</span>))[<span class='fl'>3</span>],
+  <span class='kw'>useSD</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -198,10 +206,13 @@
     <p>A dataframe with the Allan Factor (variance), Alan standard deviation and error due to bin size</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Fluctuation Analyses: <code><a href='fd_RR.html'>fd_RR</a></code>,
-  <code><a href='fd_dfa.html'>fd_dfa</a></code>, <code><a href='fd_mfdfa.html'>fd_mfdfa</a></code>,
-  <code><a href='fd_psd.html'>fd_psd</a></code>, <code><a href='fd_sda.html'>fd_sda</a></code>,
-  <code><a href='fd_sev.html'>fd_sev</a></code></p></div>
+    <div class='dont-index'><p>Other Fluctuation Analyses: 
+<code><a href='fd_RR.html'>fd_RR</a>()</code>,
+<code><a href='fd_dfa.html'>fd_dfa</a>()</code>,
+<code><a href='fd_mfdfa.html'>fd_mfdfa</a>()</code>,
+<code><a href='fd_psd.html'>fd_psd</a>()</code>,
+<code><a href='fd_sda.html'>fd_sda</a>()</code>,
+<code><a href='fd_sev.html'>fd_sev</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

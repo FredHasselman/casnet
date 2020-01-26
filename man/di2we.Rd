@@ -20,15 +20,22 @@ A matrix with 0s and values < threshold distance value
 Distance matrix to weighted matrix based on threshold value
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
-  \code{\link{di2bi}}, \code{\link{dist_hamming}},
-  \code{\link{rp_lineDist}}, \code{\link{rp_nzdiags}},
-  \code{\link{rp_plot}}, \code{\link{rp_size}},
-  \code{\link{rp}}
+Other Distance matrix operations (recurrence plot): 
+\code{\link{bandReplace}()},
+\code{\link{di2bi}()},
+\code{\link{dist_hamming}()},
+\code{\link{rp_lineDist}()},
+\code{\link{rp_nzdiags}()},
+\code{\link{rp_plot}()},
+\code{\link{rp_size}()},
+\code{\link{rp}()}
 
-Other Distance matrix operations (recurrence network): \code{\link{di2bi}},
-  \code{\link{rn_plot}}, \code{\link{rn_recSpec}},
-  \code{\link{rn_scaleoGram}}, \code{\link{rn}}
+Other Distance matrix operations (recurrence network): 
+\code{\link{di2bi}()},
+\code{\link{rn_plot}()},
+\code{\link{rn_recSpec}()},
+\code{\link{rn_scaleoGram}()},
+\code{\link{rn}()}
 }
 \concept{Distance matrix operations (recurrence network)}
 \concept{Distance matrix operations (recurrence plot)}

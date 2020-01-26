@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,9 +143,17 @@
     <p>Identify Vertex and/or Edge groups by colour.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotNET_groupColour</span>(<span class='no'>g</span>, <span class='no'>groups</span>, <span class='kw'>colourV</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>alphaV</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>colourE</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>alphaE</span> <span class='kw'>=</span> <span class='fl'>0.8</span>, <span class='kw'>groupColours</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>defaultEdgeColour</span> <span class='kw'>=</span> <span class='st'>"grey70"</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>plotNET_groupColour</span>(
+  <span class='no'>g</span>,
+  <span class='no'>groups</span>,
+  <span class='kw'>colourV</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>alphaV</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>colourE</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>alphaE</span> <span class='kw'>=</span> <span class='fl'>0.8</span>,
+  <span class='kw'>groupColours</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>defaultEdgeColour</span> <span class='kw'>=</span> <span class='st'>"grey70"</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -193,10 +201,11 @@
     <p>An igraph object with vertices and/or edges coloured by groups listed in <code>groups</code></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other tools for plotting networks: <code><a href='plotNET_BA.html'>plotNET_BA</a></code>,
-  <code><a href='plotNET_SW.html'>plotNET_SW</a></code>,
-  <code><a href='plotNET_groupWeight.html'>plotNET_groupWeight</a></code>,
-  <code><a href='plotNET_prep.html'>plotNET_prep</a></code></p></div>
+    <div class='dont-index'><p>Other tools for plotting networks: 
+<code><a href='plotNET_BA.html'>plotNET_BA</a>()</code>,
+<code><a href='plotNET_SW.html'>plotNET_SW</a>()</code>,
+<code><a href='plotNET_groupWeight.html'>plotNET_groupWeight</a>()</code>,
+<code><a href='plotNET_prep.html'>plotNET_prep</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

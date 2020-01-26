@@ -98,7 +98,7 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -166,21 +166,21 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
 <li><p><code><a href='https://rlang.r-lib.org/reference/sym.html'>rlang::sym()</a></code> creates a symbol from a string and
 <code><a href='https://rlang.r-lib.org/reference/sym.html'>rlang::syms()</a></code> creates a list of symbols from a
 character vector.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::expr()</a></code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::quo()</a></code> quote
+<li><p><code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::expr()</a></code> and <code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::quo()</a></code> quote
 one expression. <code>quo()</code> wraps the quoted expression in a quosure.</p>
-<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code> and
-<code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::quos()</a></code> return a list of quoted expressions or
+<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::exprs()</a></code> and
+<code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::quos()</a></code> return a list of quoted expressions or
 quosures.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::enexpr()</a></code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::enquo()</a></code>
+<li><p><code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::enexpr()</a></code> and <code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::enquo()</a></code>
 capture the expression supplied as argument by the user of the
 current function (<code>enquo()</code> wraps this expression in a quosure).</p>
-<p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::enexprs()</a></code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::enquos()</a></code>
+<p><code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::enexprs()</a></code> and <code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::enquos()</a></code>
 capture multiple expressions supplied as arguments, including
 <code>...</code>.</p></li>
 </ul>
 
 <p><code>exprs()</code> is not exported to avoid conflicts with <code><a href='https://rdrr.io/pkg/Biobase/man/exprs.html'>Biobase::exprs()</a></code>,
-therefore one should always use <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code>.</p>
+therefore one should always use <code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::exprs()</a></code>.</p>
 <p>To learn more about tidy eval and how to use these tools, visit
 <a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/meta.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
     </div>

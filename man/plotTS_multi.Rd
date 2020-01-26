@@ -4,10 +4,21 @@
 \alias{plotTS_multi}
 \title{Plot Multivariate Time Series Data}
 \usage{
-plotTS_multi(df, timeVec = NA, groupVec = NA, useVarNames = TRUE,
-  colOrder = TRUE, doPlot = TRUE, title = "", subtitle = "",
-  xlabel = "Time", ylabel = "", returnPlotData = FALSE,
-  useRibbon = FALSE, overlap = 1)
+plotTS_multi(
+  df,
+  timeVec = NA,
+  groupVec = NA,
+  useVarNames = TRUE,
+  colOrder = TRUE,
+  doPlot = TRUE,
+  title = "",
+  subtitle = "",
+  xlabel = "Time",
+  ylabel = "",
+  returnPlotData = FALSE,
+  useRibbon = FALSE,
+  overlap = 1
+)
 }
 \arguments{
 \item{df}{A data frame with time series in columns.}

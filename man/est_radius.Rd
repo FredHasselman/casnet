@@ -5,14 +5,28 @@
 \alias{crqa_radius}
 \title{Find fixed or optimal radius}
 \usage{
-est_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
-  type = c("fixed", "optimal")[1], startRadius = NULL,
-  eachRadius = 1, targetMeasure = c("RR", "DET", "LAM", "T1",
-  "all")[1], targetValue = 0.05, tol = 0.1, maxIter = 100,
-  theiler = -1, histIter = FALSE, noiseLevel = 0.75,
-  noiseType = c("normal", "uniform")[1], plotROC = FALSE,
+est_radius(
+  RM = NULL,
+  y1 = NULL,
+  y2 = NULL,
+  emLag = 1,
+  emDim = 1,
+  type = c("fixed", "optimal")[1],
+  startRadius = NULL,
+  eachRadius = 1,
+  targetMeasure = c("RR", "DET", "LAM", "T1", "all")[1],
+  targetValue = 0.05,
+  tol = 0.1,
+  maxIter = 100,
+  theiler = -1,
+  histIter = FALSE,
+  noiseLevel = 0.75,
+  noiseType = c("normal", "uniform")[1],
+  plotROC = FALSE,
   standardise = c("mean.sd", "median.mad", "none")[3],
-  radiusOnFail = c("tiny", "huge", "percentile")[1], silent = FALSE)
+  radiusOnFail = c("tiny", "huge", "percentile")[1],
+  silent = FALSE
+)
 }
 \arguments{
 \item{RM}{Unthresholded Recurrence Matrix}
@@ -43,7 +57,7 @@ est_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 
 \item{histIter}{Return iteration history? (default = \code{FALSE})}
 
-\item{noiseLevel}{Noise level to construct the \code{signal + noiseLevel *} \eqn{N(\mu=0,\sigma=1)} (default = \code{0.75})}
+\item{noiseLevel}{Noise level to construct the \verb{signal + noiseLevel *} \eqn{N(\mu=0,\sigma=1)} (default = \code{0.75})}
 
 \item{noiseType}{Type}
 
@@ -51,7 +65,7 @@ est_radius(RM = NULL, y1 = NULL, y2 = NULL, emLag = 1, emDim = 1,
 
 \item{standardise}{Standardise}
 
-\item{radiusOnFail}{Radius to return when search fails \code{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \code{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \code{"percentile" = quantile(RM, prob = targetValue) of distances greater than 0}.}
+\item{radiusOnFail}{Radius to return when search fails \verb{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \verb{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \verb{"percentile" = quantile(RM, prob = targetValue) of distances greater than 0}.}
 
 \item{silent}{Silent-ish}
 }
@@ -62,9 +76,10 @@ A dataframe listing settings ussed to search for the radius, the radius found gi
 Find fixed or optimal radius
 }
 \seealso{
-Other Estimate Recurrence Parameters: \code{\link{est_emDim}},
-  \code{\link{est_emLag}},
-  \code{\link{est_parameters_roc}},
-  \code{\link{est_parameters}}
+Other Estimate Recurrence Parameters: 
+\code{\link{est_emDim}()},
+\code{\link{est_emLag}()},
+\code{\link{est_parameters_roc}()},
+\code{\link{est_parameters}()}
 }
 \concept{Estimate Recurrence Parameters}

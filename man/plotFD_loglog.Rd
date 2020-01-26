@@ -4,8 +4,14 @@
 \alias{plotFD_loglog}
 \title{Plot output from fluctuation analyses based on log-log regression}
 \usage{
-plotFD_loglog(fd.OUT, title = "", subtitle = "", xlabel = "Bin size",
-  ylabel = "Fluctuation", logBase = NA)
+plotFD_loglog(
+  fd.OUT,
+  title = "",
+  subtitle = "",
+  xlabel = "Bin size",
+  ylabel = "Fluctuation",
+  logBase = NA
+)
 }
 \arguments{
 \item{fd.OUT}{Output from one of the \code{fd_} functions that use log-log regression to get scaling exponents.}

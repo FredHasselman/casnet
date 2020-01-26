@@ -4,9 +4,17 @@
 \alias{rp_checkfix}
 \title{Check a Recurrence Matrix}
 \usage{
-rp_checkfix(RM, checkS4 = TRUE, checkAUTO = TRUE,
-  checkSPARSE = FALSE, checkTSPARSE = FALSE, fixS4 = FALSE,
-  fixAUTO = TRUE, fixSPARSE = FALSE, fixTSPARSE = FALSE)
+rp_checkfix(
+  RM,
+  checkS4 = TRUE,
+  checkAUTO = TRUE,
+  checkSPARSE = FALSE,
+  checkTSPARSE = FALSE,
+  fixS4 = FALSE,
+  fixAUTO = TRUE,
+  fixSPARSE = FALSE,
+  fixTSPARSE = FALSE
+)
 }
 \arguments{
 \item{RM}{RM}

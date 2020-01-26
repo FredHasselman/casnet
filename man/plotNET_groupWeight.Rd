@@ -4,9 +4,16 @@
 \alias{plotNET_groupWeight}
 \title{Set Edge weights by group}
 \usage{
-plotNET_groupWeight(g, groups, weigth.within = 100, weight.between = 1,
-  preserve.weight.within = FALSE, preserve.weight.between = FALSE,
-  doPlot = FALSE, returnOnlyWeights = TRUE)
+plotNET_groupWeight(
+  g,
+  groups,
+  weigth.within = 100,
+  weight.between = 1,
+  preserve.weight.within = FALSE,
+  preserve.weight.between = FALSE,
+  doPlot = FALSE,
+  returnOnlyWeights = TRUE
+)
 }
 \arguments{
 \item{g}{An igraph object whose edges (\code{get.edgelist(g)}) will be re-weighted according to the \code{membership} argument.}
@@ -56,9 +63,10 @@ plot(g)
 
 }
 \seealso{
-Other tools for plotting networks: \code{\link{plotNET_BA}},
-  \code{\link{plotNET_SW}},
-  \code{\link{plotNET_groupColour}},
-  \code{\link{plotNET_prep}}
+Other tools for plotting networks: 
+\code{\link{plotNET_BA}()},
+\code{\link{plotNET_SW}()},
+\code{\link{plotNET_groupColour}()},
+\code{\link{plotNET_prep}()}
 }
 \concept{tools for plotting networks}

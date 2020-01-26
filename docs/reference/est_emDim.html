@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,8 +143,15 @@
     <p>A wrapper for nonlinearTseries::estimateEmbeddingDim</p>
     </div>
 
-    <pre class="usage"><span class='fu'>est_emDim</span>(<span class='no'>y</span>, <span class='kw'>delay</span> <span class='kw'>=</span> <span class='fu'><a href='est_emLag.html'>est_emLag</a></span>(<span class='no'>y</span>), <span class='kw'>maxDim</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
-  <span class='kw'>max.relative.change</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>est_emDim</span>(
+  <span class='no'>y</span>,
+  <span class='kw'>delay</span> <span class='kw'>=</span> <span class='fu'><a href='est_emLag.html'>est_emLag</a></span>(<span class='no'>y</span>),
+  <span class='kw'>maxDim</span> <span class='kw'>=</span> <span class='fl'>15</span>,
+  <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
+  <span class='kw'>max.relative.change</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -182,11 +189,16 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Embedding dimensions</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>A wrapper for <a href='https://rdrr.io/pkg/nonlinearTseries/man/estimateEmbeddingDim.html'>nonlinearTseries::estimateEmbeddingDim</a></p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other Estimate Recurrence Parameters: <code><a href='est_emLag.html'>est_emLag</a></code>,
-  <code><a href='est_parameters_roc.html'>est_parameters_roc</a></code>,
-  <code><a href='est_parameters.html'>est_parameters</a></code>, <code><a href='est_radius.html'>est_radius</a></code></p></div>
+    <div class='dont-index'><p>Other Estimate Recurrence Parameters: 
+<code><a href='est_emLag.html'>est_emLag</a>()</code>,
+<code><a href='est_parameters_roc.html'>est_parameters_roc</a>()</code>,
+<code><a href='est_parameters.html'>est_parameters</a>()</code>,
+<code><a href='est_radius.html'>est_radius</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -194,6 +206,7 @@
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
       <li><a href="#see-also">See also</a></li>
     </ul>
 

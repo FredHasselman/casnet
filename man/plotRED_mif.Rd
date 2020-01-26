@@ -4,9 +4,15 @@
 \alias{plotRED_mif}
 \title{Plot various MI functions}
 \usage{
-plotRED_mif(mif.OUT = NULL, lags = 0:max(round(NROW(y)/4), 10),
-  nbins = ceiling(2 * NROW(y)^(1/3)), surTest = FALSE, alpha = 0.05,
-  doPlot = TRUE, returnMIFun = TRUE)
+plotRED_mif(
+  mif.OUT = NULL,
+  lags = 0:max(round(NROW(y)/4), 10),
+  nbins = ceiling(2 * NROW(y)^(1/3)),
+  surTest = FALSE,
+  alpha = 0.05,
+  doPlot = TRUE,
+  returnMIFun = TRUE
+)
 }
 \arguments{
 \item{mif.OUT}{Output from function \code{\link[=mif]{mif()}}}
@@ -30,6 +36,7 @@ Either an invisible ggplot2 object r a list containing the plot and the data
 Plot various MI functions
 }
 \seealso{
-Other Plot redundancy functions: \code{\link{plotRED_acf}}
+Other Plot redundancy functions: 
+\code{\link{plotRED_acf}()}
 }
 \concept{Plot redundancy functions}

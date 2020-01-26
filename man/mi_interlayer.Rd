@@ -23,8 +23,9 @@ Inter-layer mutual information
 If the networks are weighted the strength distribution will be used instead of the the degree distribution.
 }
 \seealso{
-Other Redundancy measures (mutual information): \code{\link{mi_mat}},
-  \code{\link{mif}}
+Other Redundancy measures (mutual information): 
+\code{\link{mi_mat}()},
+\code{\link{mif}()}
 }
 \concept{Multiplex Recurrence Networks}
 \concept{Redundancy measures (mutual information)}

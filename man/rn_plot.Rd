@@ -4,10 +4,20 @@
 \alias{rn_plot}
 \title{Plot (thresholded) distance matrix as a network}
 \usage{
-rn_plot(RN, plotDimensions = FALSE, plotMeasures = FALSE,
-  drawGrid = FALSE, markEpochsLOI = NULL, Chromatic = NULL,
-  radiusValue = NA, title = "", xlab = "", ylab = "",
-  plotSurrogate = NA, returnOnlyObject = FALSE)
+rn_plot(
+  RN,
+  plotDimensions = FALSE,
+  plotMeasures = FALSE,
+  drawGrid = FALSE,
+  markEpochsLOI = NULL,
+  Chromatic = NULL,
+  radiusValue = NA,
+  title = "",
+  xlab = "",
+  ylab = "",
+  plotSurrogate = NA,
+  returnOnlyObject = FALSE
+)
 }
 \arguments{
 \item{RN}{A distance matrix or recurrence matrix}
@@ -37,8 +47,11 @@ A nice plot of the recurrence network
 Plot (thresholded) distance matrix as a network
 }
 \seealso{
-Other Distance matrix operations (recurrence network): \code{\link{di2bi}},
-  \code{\link{di2we}}, \code{\link{rn_recSpec}},
-  \code{\link{rn_scaleoGram}}, \code{\link{rn}}
+Other Distance matrix operations (recurrence network): 
+\code{\link{di2bi}()},
+\code{\link{di2we}()},
+\code{\link{rn_recSpec}()},
+\code{\link{rn_scaleoGram}()},
+\code{\link{rn}()}
 }
 \concept{Distance matrix operations (recurrence network)}

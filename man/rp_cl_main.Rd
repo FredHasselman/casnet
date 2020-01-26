@@ -4,15 +4,31 @@
 \alias{rp_cl_main}
 \title{rp_cl_main}
 \usage{
-rp_cl_main(data, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
-  VLmin = 2, theiler = 0, win = min(length(y1), ifelse(is.null(y2),
-  (length(y1) + 1), length(y2)), na.rm = TRUE), step = step,
-  JRP = FALSE, distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
-  returnMeasures = TRUE, returnRPvector = FALSE,
-  returnLineDist = FALSE, doPlot = c("noplot", "rp", "distmat")[[1]],
-  path_to_rp = getOption("casnet.path_to_rp"), saveOut = FALSE,
-  path_out = NULL, file_ID = NULL, silent = TRUE,
-  targetValue = 0.05, useParallel = FALSE, ...)
+rp_cl_main(
+  data,
+  emDim = 1,
+  emLag = 1,
+  emRad = NA,
+  DLmin = 2,
+  VLmin = 2,
+  theiler = 0,
+  win = min(length(y1), ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm = TRUE),
+  step = step,
+  JRP = FALSE,
+  distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],
+  returnMeasures = TRUE,
+  returnRPvector = FALSE,
+  returnLineDist = FALSE,
+  doPlot = c("noplot", "rp", "distmat")[[1]],
+  path_to_rp = getOption("casnet.path_to_rp"),
+  saveOut = FALSE,
+  path_out = NULL,
+  file_ID = NULL,
+  silent = TRUE,
+  targetValue = 0.05,
+  useParallel = FALSE,
+  ...
+)
 }
 \arguments{
 \item{emDim}{Embedding dimensions (default = \code{1})}
@@ -33,7 +49,7 @@ rp_cl_main(data, emDim = 1, emLag = 1, emRad = NA, DLmin = 2,
 
 \item{JRP}{Wether to calculate a Joint Recurrence Plot (default = \code{FALSE})}
 
-\item{distNorm}{One of "EUCLIDEAN" (default), \code{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
+\item{distNorm}{One of "EUCLIDEAN" (default), \verb{"MAX", "MIN"}, or \code{"OP"} for an Order Pattern recurrence matrix}
 
 \item{returnMeasures}{Return the (C)RQA measures? (default = \code{TRUE})}
 

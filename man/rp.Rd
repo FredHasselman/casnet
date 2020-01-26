@@ -4,10 +4,24 @@
 \alias{rp}
 \title{Create a Distance Matrix}
 \usage{
-rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
-  to.ts = NULL, order.by = NULL, to.sparse = FALSE,
-  weighted = FALSE, method = "Euclidean", targetValue = 0.05,
-  doPlot = FALSE, doEmbed = TRUE, silent = TRUE, ...)
+rp(
+  y1,
+  y2 = NULL,
+  emDim = 1,
+  emLag = 1,
+  emRad = NULL,
+  to.ts = NULL,
+  order.by = NULL,
+  to.sparse = FALSE,
+  weighted = FALSE,
+  method = "Euclidean",
+  targetValue = 0.05,
+  returnMeasures = FALSE,
+  doPlot = FALSE,
+  doEmbed = TRUE,
+  silent = TRUE,
+  ...
+)
 }
 \arguments{
 \item{y1}{A numeric vector or time series}
@@ -32,6 +46,8 @@ rp(y1, y2 = NULL, emDim = 1, emLag = 1, emRad = NULL,
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
+\item{returnMeasures}{Should values be returned to the console window and as an attribute? (default = \code{FALSE})}
+
 \item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with defult settings}
 
 \item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag}. If \code{y1} and/or \code{y2} are data frames, the columns will be used as dimensions (default = \code{TRUE})}
@@ -55,10 +71,14 @@ A (Coss-) Recurrence matrix with attributes:
 Create a Distance Matrix
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): \code{\link{bandReplace}},
-  \code{\link{di2bi}}, \code{\link{di2we}},
-  \code{\link{dist_hamming}}, \code{\link{rp_lineDist}},
-  \code{\link{rp_nzdiags}}, \code{\link{rp_plot}},
-  \code{\link{rp_size}}
+Other Distance matrix operations (recurrence plot): 
+\code{\link{bandReplace}()},
+\code{\link{di2bi}()},
+\code{\link{di2we}()},
+\code{\link{dist_hamming}()},
+\code{\link{rp_lineDist}()},
+\code{\link{rp_nzdiags}()},
+\code{\link{rp_plot}()},
+\code{\link{rp_size}()}
 }
 \concept{Distance matrix operations (recurrence plot)}

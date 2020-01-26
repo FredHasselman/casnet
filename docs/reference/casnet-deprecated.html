@@ -80,7 +80,7 @@ available at help(&quot;-deprecated&quot;)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -149,9 +149,18 @@ functionality are also mentioned. Help pages for deprecated functions are
 available at <code><a href='https://rdrr.io/r/utils/help.html'>help("-deprecated")</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dyn_comp</span>(<span class='no'>df</span>, <span class='no'>col_first</span>, <span class='no'>col_last</span>, <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>df</span>), <span class='kw'>fromScaleMin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>fromScaleMax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>toScaleMin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>toScaleMax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>dyn_comp</span>(
+  <span class='no'>df</span>,
+  <span class='no'>col_first</span>,
+  <span class='no'>col_last</span>,
+  <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>df</span>),
+  <span class='kw'>fromScaleMin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fromScaleMax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>toScaleMin</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>toScaleMax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rescale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
 <span class='fu'>DC_F</span>(<span class='no'>df</span>, <span class='no'>win</span>, <span class='no'>xmin</span>, <span class='no'>xmax</span>, <span class='no'>col_first</span>, <span class='no'>col_last</span>)
 

@@ -4,10 +4,19 @@
 \alias{plotDC_res}
 \title{Plot Complexity Resonance Diagram}
 \usage{
-plotDC_res(df_win, win, useVarNames = TRUE, colOrder = TRUE,
-  useTimeVector = NA, timeStamp = "01-01-1999", doPlot = TRUE,
-  title = "Complexity Resonance Diagram", subtitle = "",
-  xlabel = "Time", ylabel = "")
+plotDC_res(
+  df_win,
+  win,
+  useVarNames = TRUE,
+  colOrder = TRUE,
+  useTimeVector = NA,
+  timeStamp = "01-01-1999",
+  doPlot = TRUE,
+  title = "Complexity Resonance Diagram",
+  subtitle = "",
+  xlabel = "Time",
+  ylabel = ""
+)
 }
 \arguments{
 \item{df_win}{A data frame containing series of Dynamic Complexity values obtained by running function \code{\link[=dc_win]{dc_win()}}}
@@ -37,9 +46,12 @@ An invisible ggplot2 object.
 Plot Complexity Resonance Diagram
 }
 \seealso{
-Other Dynamic Complexity functions: \code{\link{dc_ccp}},
-  \code{\link{dc_d}}, \code{\link{dc_f}},
-  \code{\link{dc_win}}, \code{\link{plotDC_ccp}},
-  \code{\link{plotDC_lvl}}
+Other Dynamic Complexity functions: 
+\code{\link{dc_ccp}()},
+\code{\link{dc_d}()},
+\code{\link{dc_f}()},
+\code{\link{dc_win}()},
+\code{\link{plotDC_ccp}()},
+\code{\link{plotDC_lvl}()}
 }
 \concept{Dynamic Complexity functions}

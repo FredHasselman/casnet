@@ -4,9 +4,17 @@
 \alias{plotNET_groupColour}
 \title{Vertex and Edge Group Colours}
 \usage{
-plotNET_groupColour(g, groups, colourV = TRUE, alphaV = 1,
-  colourE = FALSE, alphaE = 0.8, groupColours = NULL,
-  defaultEdgeColour = "grey70", doPlot = TRUE)
+plotNET_groupColour(
+  g,
+  groups,
+  colourV = TRUE,
+  alphaV = 1,
+  colourE = FALSE,
+  alphaE = 0.8,
+  groupColours = NULL,
+  defaultEdgeColour = "grey70",
+  doPlot = TRUE
+)
 }
 \arguments{
 \item{g}{An igraph object}
@@ -34,9 +42,10 @@ An igraph object with vertices and/or edges coloured by groups listed in \code{g
 Identify Vertex and/or Edge groups by colour.
 }
 \seealso{
-Other tools for plotting networks: \code{\link{plotNET_BA}},
-  \code{\link{plotNET_SW}},
-  \code{\link{plotNET_groupWeight}},
-  \code{\link{plotNET_prep}}
+Other tools for plotting networks: 
+\code{\link{plotNET_BA}()},
+\code{\link{plotNET_SW}()},
+\code{\link{plotNET_groupWeight}()},
+\code{\link{plotNET_prep}()}
 }
 \concept{tools for plotting networks}

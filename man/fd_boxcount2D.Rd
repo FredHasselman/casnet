@@ -4,14 +4,29 @@
 \alias{fd_boxcount2D}
 \title{2D Boxcount for 1D signal}
 \usage{
-fd_boxcount2D(y = NA, unitSquare = TRUE, image2D = NA,
-  resolution = 1, removeTrend = FALSE, polyOrder = 1,
+fd_boxcount2D(
+  y = NA,
+  unitSquare = TRUE,
+  image2D = NA,
+  resolution = 1,
+  removeTrend = FALSE,
+  polyOrder = 1,
   standardise = c("none", "mean.sd", "median.mad")[1],
-  adjustSumOrder = FALSE, scaleMin = 0, scaleMax = floor(log2(NROW(y)
-  * resolution)), scaleS = NA, minData = 2^(scaleMin + 1),
-  maxData = 2^(scaleMax - 1), doPlot = FALSE, returnPlot = FALSE,
-  returnPLAW = FALSE, returnInfo = FALSE, returnLocalScaling = FALSE,
-  silent = FALSE, noTitle = FALSE, tsName = "y")
+  adjustSumOrder = FALSE,
+  scaleMin = 0,
+  scaleMax = floor(log2(NROW(y) * resolution)),
+  scaleS = NA,
+  minData = 2^(scaleMin + 1),
+  maxData = 2^(scaleMax - 1),
+  doPlot = FALSE,
+  returnPlot = FALSE,
+  returnPLAW = FALSE,
+  returnInfo = FALSE,
+  returnLocalScaling = FALSE,
+  silent = FALSE,
+  noTitle = FALSE,
+  tsName = "y"
+)
 }
 \arguments{
 \item{y}{A numeric vector or time series object.}
@@ -24,7 +39,7 @@ fd_boxcount2D(y = NA, unitSquare = TRUE, image2D = NA,
 
 \item{removeTrend}{If \code{TRUE}, will call \link[casnet]{ts_detrend} on \code{y} (default = \code{FALSE})}
 
-\item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = }TRUE``}
+\item{polyOrder}{Order of polynomial trend to remove if \verb{removeTrend = }TRUE``}
 
 \item{standardise}{Standardise \code{y} using \code{\link[casnet:ts_standardise]{casnet::ts_standardise()}} with \code{adjustN = FALSE} (default = \code{none})}
 
@@ -63,7 +78,7 @@ The boxcount fractal dimension and the 'local' boscount fractal dimension
 2D Boxcount for 1D signal
 }
 \note{
-This function was inspired by the \code{Matlab} function \code{boxcount.m} \href{http://www.fast.u-psud.fr/~moisy/ml/boxcount/html/demo.html}{written by F. Moisy}. \code{Fred Hasselman} adapted the function for \code{R} for the purpose of the unit square boxcount analysis for 1D time series. The original Matlab toolbox has more options and contains more functions (e.g. \code{1D} and \code{3D} boxcount).
+This function was inspired by the \code{Matlab} function \code{boxcount.m} \href{http://www.fast.u-psud.fr/~moisy/ml/boxcount/html/demo.html}{written by F. Moisy}. \verb{Fred Hasselman} adapted the function for \code{R} for the purpose of the unit square boxcount analysis for 1D time series. The original Matlab toolbox has more options and contains more functions (e.g. \verb{1D} and \verb{3D} boxcount).
 }
 \examples{
 
