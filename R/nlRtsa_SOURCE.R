@@ -436,7 +436,7 @@ est_radius <- function(RM = NULL,
       rp.size <- length(RMs)
       Measure <- RT/rp.size
 
-      # crpOut <- crqa_rp(RM = RMs, emRad = tryRadius, AUTO=AUTO)
+      # crpOut <- rp_measures(RM = RMs, emRad = tryRadius, AUTO=AUTO)
       #Measure  <-  crpOut[[targetMeasure]]
       #crpOut <- data.frame(RR = RR, RT = RT, size = length(RMs))
       #Measure <- RR
@@ -1110,7 +1110,7 @@ rp_measures <- function(RM,
 
   #   if(is.null(Nboot)){Nboot = 1}
   #
-  #   out <- crqa_rp_measures(RM,
+  #   out <- rp_measures_measures(RM,
   #                            emRad= emRad,
   #                            DLmin = DLmin,
   #                            VLmin = VLmin,
@@ -1133,7 +1133,7 @@ rp_measures <- function(RM,
   #   if(Nboot>1){cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations.\n"))
   #     bootout <- col.ind  %>%
   #       bootstrap(Nboot) %>%
-  #       do(crqa_rp_measures(RM[row.ind,unlist(.)],
+  #       do(rp_measures_measures(RM[row.ind,unlist(.)],
   #                            emRad= emRad,
   #                            DLmin = DLmin,
   #                            VLmin = VLmin,
@@ -2597,7 +2597,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param plotRadiusRRbar The `Radius-RR-bar` is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of `RR` values one would get if a certain distance threshold were chosen (`default = TRUE`)
 #' @param drawGrid Draw a grid on the recurrence plot (`default = FALSE`)
 #' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (`default = NULL`)
-#' @param Chromatic If `TRUE` and there are more than two discrete values in `RM`, give recurrent points a distinct colour. If `RM` was returned by `crqa_rp(..., chromatic = TRUE)`, the recurrence plot will colour-code recurrent points according to the category values in `attributes(RM)$chromaticRP` (`default = FALSE`)
+#' @param Chromatic If `TRUE` and there are more than two discrete values in `RM`, give recurrent points a distinct colour. If `RM` was returned by `rp_measures(..., chromatic = TRUE)`, the recurrence plot will colour-code recurrent points according to the category values in `attributes(RM)$chromaticRP` (`default = FALSE`)
 #' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `est_radius()` will be called with default settings (find a radius that yields .05 recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
 #' @param title A title for the plot
 #' @param xlabel An x-axis label
@@ -2714,17 +2714,17 @@ rp_plot <- function(RM,
 
   # Get CRQA measures
   if(plotMeasures){
-    # if(is.na(radiusValue)){
-    #   if(!is.null(attributes(RM)$emRad)){
-    #     radiusValue <- attr(RM,"emRad")
-    #   } else {
-    #     radiusValue <- est_radius(RM,silent = TRUE)$Radius
-    #   }
-    # }
+    if(is.na(radiusValue)){
+      if(!is.null(attributes(RM)$emRad)){
+        radiusValue <- attr(RM,"emRad")
+      } else {
+        radiusValue <- est_radius(RM,silent = TRUE)$Radius
+      }
+    }
     if(unthresholded){
-      rpOUT   <- crqa_rp(RM, emRad = radiusValue, AUTO = AUTO)
+      rpOUT   <- rp_measures(RM, emRad = radiusValue, AUTO = AUTO)
     } else {
-      rpOUT   <- crqa_rp(RM, AUTO = AUTO)
+      rpOUT   <- rp_measures(RM, AUTO = AUTO)
     }
   }
 
@@ -2789,7 +2789,7 @@ rp_plot <- function(RM,
       distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){
         suppressWarnings(est_radius(RM,targetValue = t,silent = TRUE, maxIter = 100, radiusOnFail = "percentile"))
       })
-      #ldply(distrange[2:6],function(d) cbind(epsilon=d,RR=crqa_rp(RM = RM, emRad = d)$RR))
+      #ldply(distrange[2:6],function(d) cbind(epsilon=d,RR=rp_measures(RM = RM, emRad = d)$RR))
 
 
       RecScale <- data.frame(RR=distrange$Measure,epsilon=distrange$Radius)
@@ -3256,7 +3256,7 @@ rp_size <- function(mat, AUTO=NULL, theiler = NULL){
 
 #' Empty results vector
 #'
-#' @return an empty crqa_rp
+#' @return an empty rp_measures
 #' @keywords internal
 #' @export
 #'

@@ -7,7 +7,7 @@
 rp_empty()
 }
 \value{
-an empty crqa_rp
+an empty rp_measures
 }
 \description{
 Empty results vector
