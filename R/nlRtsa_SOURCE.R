@@ -3849,6 +3849,7 @@ rn <- function(y1, y2 = NULL,
                targetValue = .05,
                returnGraph = FALSE,
                doPlot = FALSE,
+               doEmbed = TRUE,
                silent = TRUE,
                ...){
 
@@ -3856,7 +3857,7 @@ rn <- function(y1, y2 = NULL,
            emDim = emDim, emLag = emLag, emRad = emRad,
            to.ts = to.ts, order.by = order.by, to.sparse = to.sparse,
            weighted = weighted,targetValue = targetValue,
-           method = method, doPlot = FALSE, silent = silent)
+           method = method, doPlot = FALSE, doEmbed = doEmbed, silent = silent)
 
 
   if(to.sparse){
@@ -3884,11 +3885,11 @@ rn <- function(y1, y2 = NULL,
     edgeFrame             <- igraph::as_data_frame(grW,"edges")
     E(grW)$rec_distance   <- E(grW)$weight
     E(grW)$rec_time       <- edgeFrame$to-edgeFrame$from
-    E(grW)$rec_timefreq   <- 1/(edgeFrame$rec_time+1) #.Machine$double.eps)
+    E(grW)$rec_timefreq   <- 1/(edgeFrame$weight+1) #.Machine$double.eps)
 
     if(is.numeric(fs)){
-      if(weightedBy=="rf"){edgeFrame$rectime <- edgeFrame$rectime * fs}
-      if(weightedBy=="rt"){edgeFrame$rectime <- edgeFrame$rectime / fs}
+      if(weightedBy=="rf"){edgeFrame$weight <- edgeFrame$rectime * fs}
+      if(weightedBy=="rt"){edgeFrame$weight <- edgeFrame$rectime / fs}
     }
 
     switch(weightedBy,
@@ -10410,7 +10411,7 @@ ts_permtest_transmat <- function(y1, y2 = NULL,
 ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = NULL, discretize=FALSE, nbins = 5){
 
 
-  if(is.discrete(y)){
+  if(plyr::is.discrete(y)){
     y <- as.numeric_discrete(y)
     #y <- ts_checkfix(y,checkNumericVector = TRUE, fixNumericVector = TRUE, checkWholeNumbers = TRUE, fixWholeNumbers = TRUE)
   }

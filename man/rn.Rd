@@ -23,6 +23,7 @@ rn(
   targetValue = 0.05,
   returnGraph = FALSE,
   doPlot = FALSE,
+  doEmbed = TRUE,
   silent = TRUE,
   ...
 )
@@ -63,6 +64,8 @@ rn(
 \item{returnGraph}{Return an \code{\link[igraph:igraph]{igraph::igraph()}} object (default = \code{FALSE})}
 
 \item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with defult settings}
+
+\item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag}. If \code{y1} and/or \code{y2} are data frames, the columns will be used as dimensions (default = \code{TRUE})}
 
 \item{silent}{Silent-ish mode}
 
