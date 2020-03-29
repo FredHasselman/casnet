@@ -15,6 +15,7 @@ rp(
   to.sparse = FALSE,
   weighted = FALSE,
   method = "Euclidean",
+  rescaleDist = c("none", "maxDist", "meanDist")[1],
   targetValue = 0.05,
   returnMeasures = FALSE,
   doPlot = FALSE,
@@ -43,6 +44,8 @@ rp(
 \item{weighted}{If \code{FALSE} a binary matrix will be returned. If \code{TRUE} every value larger than \code{emRad} will be \code{0}, but values smaller than \code{emRad} will be retained (default = \code{FALSE})}
 
 \item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+
+\item{rescaleDist}{Should the distance matrix be rescaled? Options are "none", "maxDist" to create a unit scale, "meanScale" to creat z-scores based on the mean distance. (default = \code{"none"})}
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 

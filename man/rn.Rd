@@ -11,6 +11,7 @@ rn(
   emLag = 1,
   emRad = NULL,
   directed = FALSE,
+  cumulative = TRUE,
   weighted = FALSE,
   weightedBy = c("si", "rt", "rf")[1],
   rescaleWeights = FALSE,
@@ -40,6 +41,8 @@ rn(
 \item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
 
 \item{directed}{Should the matrix be considered to represent a directed network? (default = \code{FALSE})}
+
+\item{cumulative}{To make the network represent cumulative time, set \code{directed = TRUE} and \code{cumulative = TRUE}. This will set the upper triangle of the recurrence matrix to \code{0} and ensures that the network edges represent recurrenct values that have occurred in the \code{past} relative to the current opbserved value. If \code{directed = FALSE} the argument is ignored (default = \code{TRUE}).}
 
 \item{weighted}{Should the matrix be considered to represent a weighted network? (default = \code{FALSE})}
 

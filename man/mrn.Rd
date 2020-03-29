@@ -13,58 +13,35 @@ mrn(
   step = NA,
   overlap = NA,
   alignment = "r",
+  cumulative = TRUE,
   doPlot = FALSE,
-  doSave = FALSE,
-  createAnimation = FALSE,
-  useImageMagick = FALSE,
-  loopAnimation = TRUE,
-  transitionLength = 3,
-  stateLength = 1,
-  gifWidth = 600,
-  gifRes = 150,
-  noParts = TRUE,
-  imageDir = NA,
   silent = TRUE
 )
 }
 \arguments{
 \item{layers}{A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.}
 
-\item{win}{The window size passed to \code{\link[casnet:ts_window]{casnet::ts_window()}} in which to evaluate \code{"InterLayerMI"} or \code{"EdgeOvelap"}. If \code{MRNweightedBy = "RankorderDC"}, it will be the size of the right aligned window in which Dynamic Complexity will be computed using \code{\link[casnet:dc_win]{casnet::dc_win()}} (default = \code{NA})}
+\item{weightedBy}{The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: \code{"InterLayerMI"} (Mutual information based on similarity of the vertex degree across layers), \code{"EdgeOverlap"} (proportion of vertices sharing the same edges across layers), \code{"RankorderDC"} (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in \code{AnisotropicCRQA}). Choosing \code{"InterLayerMI"}, \code{"InterlayerCor"}, or \code{"EdgeOverlap"} will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.}
+
+\item{CRQA_vertexSequence}{If \code{weightedBy = "AnisotropicCRQA"}, then \code{CRQA_vertexSequence} must be a valid \link{igraph} command that returns vertex properties, for example: \code{"degree"}, \code{"strength"},\code{"hub_score"},\code{"centr_degree"}, \code{"transitivity"}, \code{"betweenness"}. The appropriate measure type, e.g. for \code{"directed"}, or \code{"weighted"} graphs, will be inferred from the graph properties of the 1st graph object in the \code{layers} list. For best results with weighted measures, assign a value to \code{E(g)$weight} for each \code{g} in \code{layers}. (default = \code{"degree"})}
+
+\item{CRQA_measure}{Which CRQA measures should be used c("RR", "DET", "LAM"),}
+
+\item{win}{The window size passed to \code{\link[casnet:ts_window]{casnet::ts_window()}} in which to evaluate \code{"InterLayerMI"} or \code{"EdgeOvelap"}. If \code{weightedBy = "CRQA_vertexSequence"}, it will be the size of the right aligned window in which Dynamic Complexity will be computed using \code{\link[casnet:dc_win]{casnet::dc_win()}} (default = \code{NA})}
 
 \item{step}{The stepsize for the sliding window (default = \code{NA})}
 
-\item{overlap}{The window overlap passed to \code{\link[casnet:ts_window]{casnet::ts_window()}} if \code{MRNweightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
+\item{overlap}{The window overlap passed to \code{\link[casnet:ts_window]{casnet::ts_window()}} if \code{weightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
 
 \item{alignment}{Whether to right (\code{"r"}), center (\code{"c"}), or left (\code{"l"}) align the window.}
 
+\item{cumulative}{To make the network represent cumulative time, set \code{directed = TRUE} and \code{cumulative = TRUE}. This will set the upper triangle of the recurrence matrix to \code{0} and ensures that the network edges represent recurrenct values that have occurred in the \code{past} relative to the current opbserved value. If \code{directed = FALSE} the argument is ignored (default = \code{TRUE}).}
+
 \item{doPlot}{Plot the multiplex recurrence network (default = \code{TRUE}).}
-
-\item{createAnimation}{If \code{createAnimation = TRUE} \emph{and} \code{doPlot = TRUE} \emph{and} a windowed analysis is conducted, an animation will be produced using either package \link{gganimate} (if \code{useImageMagick = FALSE}) or \link{animation} (if \code{useImageMagick = FALSE}). The main difference is that \link{gganimate} has nice animation transition features, but plots the MRN using \link{ggplot2}, which does not have great options for displaying the nodes as images. With package \link{animation} a sequence of \link{igraph} plots will be converted to an animation. If \code{doSave = TRUE} the animation will be saved in \code{imageDir} as an animated gif by calling either \code{\link[gganimate:anim_save]{gganimate::anim_save()}}, or \code{\link[animation:saveGIF]{animation::saveGIF()}} (default = \code{FALSE})}
-
-\item{useImageMagick}{Should \href{https://imagemagick.org/index.php}{ImageMagick} be used to create the animation. \strong{NOTE:} ImageMagick has to be installed on your system, see \code{\link[animation:saveGIF]{animation::saveGIF()}} (default = \code{FALSE})}
-
-\item{loopAnimation}{Should the animation loop? (default = \code{TRUE})`}
-
-\item{transitionLength}{Length of each transition in the animation, ignored if \code{useImageMagick = TRUE} (default = \code{3})}
-
-\item{stateLength}{Value of \code{state_length} if \link{gganimate} is used, or the  \code{interval} in seconds for \code{\link[animation:ani.pause]{animation::ani.pause()}} (default = \code{1})}
-
-\item{gifWidth}{Width of the animated \code{gif} in pixels. The default width will be \verb{600/150 = 4 in} or \verb{10.16 cm} (default = \code{600})}
-
-\item{gifRes}{Resolution of the animated \code{gif} in \code{ppi} (default =\code{150})}
-
-\item{noParts}{Do not plot the individual graphs that make up the animation to the current \code{dev} (default = \code{TRUE})}
-
-\item{imageDir}{Directory to save the layer images and windowed MRN plots. If \code{NA}, the value returned by \code{getwd()} will be used, if \code{NULL} no windowed images will be saved (default = \code{NA})}
 
 \item{silent}{Silent-ish mode}
 
-\item{MRNweightedBy}{The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: \code{"InterLayerMI"} (Mutual information based on similarity of the vertex degree across layers), \code{"EdgeOverlap"} (proportion of vertices sharing the same edges across layers), \code{"RankorderDC"} (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in \code{MRNrankedBy}). Choosing \code{"InterLayerMI"}, \code{"InterlayerCor"}, or \code{"EdgeOverlap"} will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.}
-
 \item{windowedWeights}{If a windowed analysis is conducted and the edges of the graphs in \code{layers} have a weight property, there are a number of different ways to handle the weights depending on the value of \code{windowedWeights}: \code{"none"}, \code{"local"}, and \code{"cumulative"}. Value \code{"none"} will ignore the weights, \code{"local"} will limit the range of edges to those edges connecting the vertices contained within the window, \code{"cumulative"} will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = \code{none})}
-
-\item{MRNrankedBy}{If \code{MRNweightedBy = "RankorderDC"}, then \code{MRNrankedBy} must be a valid \link{igraph} command that returns vertex properties, for example: \code{"degree"}, \code{"strength"},\code{"hub_score"},\code{"centr_degree"}, \code{"transitivity"}, \code{"betweenness"}. The appropriate measure type, e.g. for \code{"directed"}, or \code{"weighted"} graphs, will be inferred from the graph properties of the 1st graph object in the \code{layers} list. For best results with weighted measures, assign a value to \code{E(g)$weight} for each \code{g} in \code{layers}. (default = \code{"degree"})}
 }
 \value{
 A list object with fields:
@@ -76,5 +53,5 @@ A list object with fields:
 }
 }
 \description{
-This function will create a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{MRNweightedBy} is set to \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}) and \emph{Layer importance} (\code{MRNweightedBy} is \code{"RankorderDC"}). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument \code{MRNrankedBy}.
+This function will create a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{weightedBy} is set to \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}) and \emph{Layer importance} (\code{weightedBy} is \code{"AnisotropicCRQA"}). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument \code{MRNrankedBy}.
 }

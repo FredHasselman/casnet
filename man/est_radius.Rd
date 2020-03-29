@@ -63,7 +63,7 @@ est_radius(
 
 \item{plotROC}{Generates an ROC plot if \code{type = "optimal"}}
 
-\item{standardise}{Standardise}
+\item{standardise}{Standardise \code{y} if \code{type == "optimal"}}
 
 \item{radiusOnFail}{Radius to return when search fails \verb{"tiny" = 0 + ,Machine.double.eps}, this will likely cause a matrix full of zeros. \verb{"huge" = 1 + max. distance in RM}, which will give a matrix full of ones, \verb{"percentile" = quantile(RM, prob = targetValue) of distances greater than 0}.}
 

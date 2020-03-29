@@ -8,7 +8,8 @@ win_slide(
   FUN = c("rp", "rp_measures", "rp_diagprofile", "rn", "rn_measures")[1],
   y1,
   y2 = NULL,
-  win = min(length(y1), ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm = TRUE),
+  win = min(length(y1), ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm =
+    TRUE),
   step = win,
   animate = FALSE,
   silent = TRUE,

@@ -12,7 +12,8 @@ rp_cl_main(
   DLmin = 2,
   VLmin = 2,
   theiler = 0,
-  win = min(length(y1), ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm = TRUE),
+  win = min(length(y1), ifelse(is.null(y2), (length(y1) + 1), length(y2)), na.rm =
+    TRUE),
   step = step,
   JRP = FALSE,
   distNorm = c("EUCLIDEAN", "MAX", "MIN", "OP")[[1]],

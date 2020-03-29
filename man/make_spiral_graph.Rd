@@ -14,8 +14,10 @@ make_spiral_graph(
   curvature = -0.6,
   angle = 90,
   markTimeBy = NULL,
+  labelSize = 3,
   alphaV = 1,
   alphaE = 0.6,
+  showArrows = FALSE,
   title = "",
   subtitle = "",
   showEpochLegend = TRUE,
@@ -52,6 +54,8 @@ make_spiral_graph(
 \item{angle}{The \code{angle} parameter for edges see \code{\link[=geom_curve]{geom_curve()}} (default = \code{90})}
 
 \item{markTimeBy}{Include a vector that indicates time. The time will be displayed on the plot. Pass \code{TRUE} to generate auto labels (experimental)}
+
+\item{labelSize}{The size of text in the annotation labels (default = \code{3})}
 
 \item{title}{A title for the plot}
 
