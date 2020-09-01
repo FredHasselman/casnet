@@ -76,8 +76,8 @@ df_vars <- manyAnalystsESM[,vars]
 # Plot the timeseries with NAs in red
 op <- par(mfrow = c(ceiling(length(vars)/4),4),mar =c(2,2,2,2))
 l_ply(seq_along(vars), function(c){
-  imputeTS::plotNA.distribution(x = as.numeric(df_vars[,c]), 
-                                main=colnames(df_vars)[c], 
+  imputeTS::ggplot_na_distribution(x = as.numeric(df_vars[,c]), 
+                                title=colnames(df_vars)[c], 
                                 xlab = "",ylab = "")
   })
 par(op)
@@ -108,14 +108,14 @@ out.cart  <- mice::complete(imp.cart)
 # Plot the timeseries with NAs in red
 for(c in c("angry"%ci%df_vars,"ruminate"%ci%df_vars)){
   cat("Remove NA\n")
-  imputeTS::plotNA.imputations(x.withNA = as.numeric(df_vars[,c]),
-                               x.withImputations = as.numeric(df_vars[,c]%00%0),
-                               main = paste(colnames(df_vars)[c],"NA removed"), xlab = "", ylab = "")
+  imputeTS::ggplot_na_imputations(x_with_na = as.numeric(df_vars[,c]),
+                               x_with_imputations = as.numeric(df_vars[,c]%00%0),
+                               title = paste(colnames(df_vars)[c],"NA removed"), xlab = "", ylab = "")
 
   cat("Classification And Regression Trees\n")
-  imputeTS::plotNA.imputations(x.withNA = as.numeric(df_vars[,c]),
-                               x.withImputations = as.numeric(out.cart[,c]),
-                               main = paste(colnames(df_vars)[c],"CART"), xlab = "", ylab = "")
+  imputeTS::ggplot_na_imputations(x_with_na = as.numeric(df_vars[,c]),
+                               x_with_imputations = as.numeric(out.cart[,c]),
+                               title = paste(colnames(df_vars)[c],"CART"), xlab = "", ylab = "")
 }
 
 ```
