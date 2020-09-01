@@ -16,7 +16,7 @@ ts_changeindex(
 \arguments{
 \item{y}{An indicator variable representing different levels of a variable or factor}
 
-\item{returnRectdata}{Return a dataframe suitable for shading a \code{ggplot2} graph with \code{\link[ggplot2:geom_rect]{ggplot2::geom_rect()}}}
+\item{returnRectdata}{Return a dataframe suitable for shading a \code{ggplot2} graph with \code{\link[ggplot2:geom_tile]{ggplot2::geom_rect()}}}
 
 \item{groupVar}{Pass a value (length 1) or variable (length of y) that can be used as a variable to join the indices by if \code{returnRectdata = TRUE}}
 

@@ -67,8 +67,8 @@ Find optimal parameters for constructing a Recurrence Matrix. A wrapper for vari
 A number of functions are called to determie optimal parameters for delay embedding a time series:
 
 \itemize{
-\item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[casnet:est_emLag]{casnet::est_emLag()}}, which is a wrapper around \code{\link[nonlinearTseries:timeLag]{nonlinearTseries::timeLag()}} with \code{technique="ami"} to get lags based on the mutual information function.}
-\item{Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[casnet:est_emDim]{casnet::est_emDim()}}, which is a wrapper around \code{\link[fractal:FNN]{fractal::FNN()}}}
+\item{Embedding lag (\eqn{\tau}, \code{emLag}): The default is to call \code{\link[=est_emLag]{est_emLag()}}, which is a wrapper around \code{\link[nonlinearTseries:timeLag]{nonlinearTseries::timeLag()}} with \code{technique="ami"} to get lags based on the mutual information function.}
+\item{Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[=est_emDim]{est_emDim()}}, which is a wrapper around \code{\link[fractal:FNN]{fractal::FNN()}}}
 }
 }
 \examples{

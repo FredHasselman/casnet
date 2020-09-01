@@ -20,19 +20,19 @@
 \description{
 \itemize{
 \item \code{\link[rlang:sym]{rlang::sym()}} creates a symbol from a string and
-\code{\link[rlang:syms]{rlang::syms()}} creates a list of symbols from a
+\code{\link[rlang:sym]{rlang::syms()}} creates a list of symbols from a
 character vector.
-\item \code{\link[rlang:expr]{rlang::expr()}} and \code{\link[rlang:quo]{rlang::quo()}} quote
+\item \code{\link[rlang:nse-defuse]{rlang::expr()}} and \code{\link[rlang:nse-defuse]{rlang::quo()}} quote
 one expression. \code{quo()} wraps the quoted expression in a quosure.
 
-The plural variants \code{\link[rlang:exprs]{rlang::exprs()}} and
-\code{\link[rlang:quos]{rlang::quos()}} return a list of quoted expressions or
+The plural variants \code{\link[rlang:nse-defuse]{rlang::exprs()}} and
+\code{\link[rlang:nse-defuse]{rlang::quos()}} return a list of quoted expressions or
 quosures.
-\item \code{\link[rlang:enexpr]{rlang::enexpr()}} and \code{\link[rlang:enquo]{rlang::enquo()}}
+\item \code{\link[rlang:nse-defuse]{rlang::enexpr()}} and \code{\link[rlang:nse-defuse]{rlang::enquo()}}
 capture the expression supplied as argument by the user of the
 current function (\code{enquo()} wraps this expression in a quosure).
 
-\code{\link[rlang:enexprs]{rlang::enexprs()}} and \code{\link[rlang:enquos]{rlang::enquos()}}
+\code{\link[rlang:nse-defuse]{rlang::enexprs()}} and \code{\link[rlang:nse-defuse]{rlang::enquos()}}
 capture multiple expressions supplied as arguments, including
 \code{...}.
 }

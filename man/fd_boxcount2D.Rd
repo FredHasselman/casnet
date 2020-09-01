@@ -41,7 +41,7 @@ fd_boxcount2D(
 
 \item{polyOrder}{Order of polynomial trend to remove if \verb{removeTrend = }TRUE``}
 
-\item{standardise}{Standardise \code{y} using \code{\link[casnet:ts_standardise]{casnet::ts_standardise()}} with \code{adjustN = FALSE} (default = \code{none})}
+\item{standardise}{Standardise \code{y} using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = \code{none})}
 
 \item{adjustSumOrder}{Adjust the order of the time series (by summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = `FALSE``)}
 

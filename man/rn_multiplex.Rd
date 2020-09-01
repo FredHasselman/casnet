@@ -45,11 +45,11 @@ rn_multiplex(
 
 \item{MRNrankedBy}{If \code{MRNweightedBy = "RankorderDC"}, then \code{MRNrankedBy} must be a valid \link{igraph} command that returns vertex properties, for example: \code{"degree"}, \code{"strength"},\code{"hub_score"},\code{"centr_degree"}, \code{"transitivity"}, \code{"betweenness"}. The appropriate measure type, e.g. for \code{"directed"}, or \code{"weighted"} graphs, will be inferred from the graph properties of the 1st graph object in the \code{layers} list. For best results with weighted measures, assign a value to \code{E(g)$weight} for each \code{g} in \code{layers}. (default = \code{"degree"})}
 
-\item{win}{The window size passed to \code{\link[casnet:ts_window]{casnet::ts_window()}} in which to evaluate \code{"InterLayerMI"} or \code{"EdgeOvelap"}. If \code{MRNweightedBy = "RankorderDC"}, it will be the size of the right aligned window in which Dynamic Complexity will be computed using \code{\link[casnet:dc_win]{casnet::dc_win()}} (default = \code{NA})}
+\item{win}{The window size passed to \code{\link[=ts_window]{ts_window()}} in which to evaluate \code{"InterLayerMI"} or \code{"EdgeOvelap"}. If \code{MRNweightedBy = "RankorderDC"}, it will be the size of the right aligned window in which Dynamic Complexity will be computed using \code{\link[=dc_win]{dc_win()}} (default = \code{NA})}
 
 \item{step}{The stepsize for the sliding window (default = \code{NA})}
 
-\item{overlap}{The window overlap passed to \code{\link[casnet:ts_window]{casnet::ts_window()}} if \code{MRNweightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
+\item{overlap}{The window overlap passed to \code{\link[=ts_window]{ts_window()}} if \code{MRNweightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
 
 \item{alignment}{Alignment of the window "l","c","r".}
 

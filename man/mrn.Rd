@@ -27,11 +27,11 @@ mrn(
 
 \item{CRQA_measure}{Which CRQA measures should be used c("RR", "DET", "LAM"),}
 
-\item{win}{The window size passed to \code{\link[casnet:ts_window]{casnet::ts_window()}} in which to evaluate \code{"InterLayerMI"} or \code{"EdgeOvelap"}. If \code{weightedBy = "CRQA_vertexSequence"}, it will be the size of the right aligned window in which Dynamic Complexity will be computed using \code{\link[casnet:dc_win]{casnet::dc_win()}} (default = \code{NA})}
+\item{win}{The window size passed to \code{\link[=ts_window]{ts_window()}} in which to evaluate \code{"InterLayerMI"} or \code{"EdgeOvelap"}. If \code{weightedBy = "CRQA_vertexSequence"}, it will be the size of the right aligned window in which Dynamic Complexity will be computed using \code{\link[=dc_win]{dc_win()}} (default = \code{NA})}
 
 \item{step}{The stepsize for the sliding window (default = \code{NA})}
 
-\item{overlap}{The window overlap passed to \code{\link[casnet:ts_window]{casnet::ts_window()}} if \code{weightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
+\item{overlap}{The window overlap passed to \code{\link[=ts_window]{ts_window()}} if \code{weightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
 
 \item{alignment}{Whether to right (\code{"r"}), center (\code{"c"}), or left (\code{"l"}) align the window.}
 

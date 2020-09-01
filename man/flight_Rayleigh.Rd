@@ -31,7 +31,7 @@ A data frame with \code{ndims} columns and \code{N} rows.
 }
 \description{
 Creates a Rayleigh flight by taking increments from the Normal distributions
-implemented as the stable distribution (\code{\link[stabledist:rstable]{stabledist::rstable()}}) with index paramter \code{alpha = 2}
+implemented as the stable distribution (\code{\link[stabledist:dist-stable]{stabledist::rstable()}}) with index paramter \code{alpha = 2}
 and skewness parameter \code{beta = 0}.
 }
 \examples{

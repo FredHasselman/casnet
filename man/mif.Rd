@@ -18,7 +18,7 @@ mif(
 
 \item{lags}{The lags to evaluate mutual information.}
 
-\item{nbins}{The number of bins passed to \code{\link[infotheo:discretize]{infotheo::discretize()}} if y is a matrix or \code{\link[casnet:ts_discrete]{casnet::ts_discrete()}}}
+\item{nbins}{The number of bins passed to \code{\link[infotheo:discretize]{infotheo::discretize()}} if y is a matrix or \code{\link[=ts_discrete]{ts_discrete()}}}
 
 \item{doPlot}{Produce a plot of the symbolic time series by calling \code{\link[=plotRED_mif]{plotRED_mif()}} (default = \code{FALSE})}
 

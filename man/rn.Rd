@@ -64,7 +64,7 @@ rn(
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
-\item{returnGraph}{Return an \code{\link[igraph:igraph]{igraph::igraph()}} object (default = \code{FALSE})}
+\item{returnGraph}{Return an \code{\link[igraph:aaa-igraph-package]{igraph::igraph()}} object (default = \code{FALSE})}
 
 \item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with defult settings}
 

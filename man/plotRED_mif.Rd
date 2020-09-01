@@ -19,7 +19,7 @@ plotRED_mif(
 
 \item{lags}{The lags to evaluate mutual information.}
 
-\item{nbins}{The number of bins passed to \code{\link[infotheo:discretize]{infotheo::discretize()}} if y is a matrix or \code{\link[casnet:ts_discrete]{casnet::ts_discrete()}}}
+\item{nbins}{The number of bins passed to \code{\link[infotheo:discretize]{infotheo::discretize()}} if y is a matrix or \code{\link[=ts_discrete]{ts_discrete()}}}
 
 \item{surTest}{If \code{TRUE}, a surrogate will be conducted using simple surrogates. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin \code{j} when the current value is in bin \code{j}. The number of surrogates needed will be computed based on the value of the \code{alpha} parameter, conceived as a one-sided test: \code{mi > 0}.}
 

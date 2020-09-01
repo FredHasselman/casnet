@@ -1385,6 +1385,9 @@ rp_diagProfile <- function(RM,
                              doPlot    = TRUE){
 
 
+  # crqa_results_xy <– crqa(ts1 = lorData$x, ts2 = lorData$y, delay = 9, embed = 4, rescale = 2, radius = 20, normalize = 2, mindiagline = 2, minvertline = 2, tw = 0, whiteline = FALSE, recpt = FALSE, side = “both”) # compute cross-recurrence plot
+  #
+
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
     stop("Expecting a binary (0,1) matrix.")
   }
@@ -1440,7 +1443,7 @@ rp_diagProfile <- function(RM,
       RMd <- rp(y1 = y1, y2 = TSrnd[,(r-1)],emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
     }
     #rp_lineDist(RM,d = diagWin, matrices = TRUE)
-    B <- rp_nzdiags(RMd, removeNZ = FALSE)
+    B <- rp_nzdiags(RMd, removeNZ = FALSE, d = diagWin)
     rm(RMd)
 
     diagID <- 1:NCOL(B)
@@ -1463,7 +1466,7 @@ rp_diagProfile <- function(RM,
     df$labels <- factor(df$labels,levels = df$labels,ordered = TRUE)
 
     out[[r]] <- df
-    rm(df,B,cID,diagID)
+    #rm(df,B,cID,diagID)
 
     cat(paste("\nProfile"),r)
   }
@@ -1479,7 +1482,7 @@ rp_diagProfile <- function(RM,
     dplyr::group_by(.data$Diagonal,.data$labels) %>%
     dplyr::summarise(meanRRrnd = mean(.data$RR), sdRRrnd = stats::sd(.data$RR))
 
-    if(Nshuffle==1){
+  if(Nshuffle==1){
     dy_m$sdRRrnd <- dy_m$meanRRrnd
   }
 
@@ -1501,7 +1504,7 @@ rp_diagProfile <- function(RM,
     Diags <- as.numeric(levels(df$labels))
     Diags[is.na(Diags)] <- 0
     if(length(diagWin)>21){
-      ext <- max(min(abs(Diags),na.rm = TRUE),abs(max(Diags,na.rm = TRUE)))
+      ext <- max(min(abs(Diags),na.rm = TRUE),abs(max(Diags,na.rm = TRUE)))-1
       breaks <- which(Diags%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
       labels <- sort(unique(c(Diags[breaks],0)))
       breaks <- sort(unique(c(breaks,stats::median(breaks))))
@@ -1525,18 +1528,21 @@ rp_diagProfile <- function(RM,
     col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
     siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
 
-    g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diags)) +
-      ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
-      ggplot2::geom_line(ggplot2::aes_(y=~RR), size = .5) +
+    g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
+      #ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey50")
+    if(doShuffle){
+     g <- g+ ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3)
+        }
+    g <- g +  ggplot2::geom_line(ggplot2::aes_(y=~RR), size = .5) +
       #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
-      ggplot2::geom_vline(xintercept = which(df$labels%in%c("LOS","LOI")), size=1, colour = "grey50") +
       ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
-      ggplot2::scale_x_continuous("Diagonals in recurrence Matrix") + #, breaks = breaks, labels = labels) +
+      ggplot2::scale_x_continuous("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
       ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
       ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
        ggplot2::scale_colour_manual(values = col) +
       # ggplot2::scale_size_manual(values = siz) +
-      ggplot2::theme_bw()
+      ggplot2::theme_bw() +
+      theme(panel.grid.minor = element_blank())
 
     print(g)
 
@@ -2195,8 +2201,20 @@ rp_cl_main <- function(data,
 #'
 #' @family Distance matrix operations (recurrence plot)
 #'
-rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=FALSE, removeNZ = TRUE,silent = TRUE){
+rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=FALSE, removeNZ = TRUE, silent = TRUE){
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
+
+  # if(!is.na(win)){
+  #   if(length(win)==1){
+  #     win <- c(-win,win)
+  #   }
+  #   if(length(win)==2){
+  #       win <- sort(win)
+  #   }
+  #   if(!length(win)%[]%c(1,2)){
+  #     stop("Windowsize must be NA, or a 1, or 2 element vector!")
+  #     }
+  # }
 
   if(grepl("matrix",class(RM),ignore.case = TRUE)){
 
@@ -2211,19 +2229,17 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
                            ndiag = (nzdiagsM@j)-(nzdiagsM@i))
     nzdiags <- dplyr::arrange(nzdiags,nzdiags$ndiag)
 
-    if(removeNZ){
-      if(!is.null(d)){
-        nd <- unique(nzdiags$ndiag)
-        # Get diagonals which have nonzero elements
-        d <- nd[nd%in%sort(as.vector(d))]
-      } else {
-        d <- unique(nzdiags$ndiag)
-      }
-    } else {
+    if(is.null(d)){
       d <-  c(-1*rev(1:(NCOL(nzdiagsM)-1)),0,1:(NCOL(nzdiagsM)-1))
     }
 
-    indMat <- col(RM)-row(RM)
+  if(removeNZ){
+      nd <- unique(nzdiags$ndiag)
+      # Get diagonals which have nonzero elements
+      d <- nd[nd%in%sort(as.vector(d))]
+    }
+
+    indMat  <- col(RM)-row(RM)
     indMatV <- as.vector(indMat)
 
     #cat("\nStart extraction of nonzero diagonals\n")
@@ -4961,7 +4977,7 @@ rn_measures <- function(g, cumulative = TRUE, silent = TRUE){
       if(cumulative){
       vertex_prop$LocalClustering  <- DirectedClustering::ClustBCG(igraph::as_adjacency_matrix(g, edges = TRUE, sparse = FALSE), "directed", isolates = "zero")$outCC
         degType <- "out"
-        efType <- "nodal"
+        efType <- "local"
       } else {
         vertex_prop$LocalClustering  <- DirectedClustering::ClustBCG(igraph::as_adjacency_matrix(g, edges = TRUE, sparse = FALSE), "directed", isolates = "zero")$totalCC
       }
@@ -7414,7 +7430,7 @@ fd_RR <- function(y){
 #'
 #' @details Calls function [sapa::SDF()] to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), `SDF` is called using a Tukey window (\code{raised cosine \link[sapa]{taper}}).
 #'
-#' A line is fitted on the periodogram in log-log coordinates. The full ramge is fitted as well as one of three fit-ranges:
+#' A line is fitted on the periodogram in log-log coordinates. The full range is fitted as well as one of three fit-ranges:
 #' \itemize{
 #' \item{`lowest25` - The 25\% lowest frequencies}
 #' \item{`Wijnants` - The 50 lowest frequencies (Wijnants et al., 2012)}

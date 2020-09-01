@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -43,9 +47,8 @@
 
 
 <meta property="og:title" content="Multiplex Recurrence Network — mrn" />
-<meta property="og:description" content="This function will create a Multiplex Recurrence Network from a list of igraph objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: Layer similarity (MRNweightedBy is set to &quot;InterLayerMI&quot;, &quot;InterLayerCor&quot;, or &quot;EdgeOvelap&quot;) and Layer importance (MRNweightedBy is &quot;RankorderDC&quot;). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument MRNrankedBy." />
+<meta property="og:description" content="This function will create a Multiplex Recurrence Network from a list of igraph objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: Layer similarity (weightedBy is set to &quot;InterLayerMI&quot;, &quot;InterLayerCor&quot;, or &quot;EdgeOvelap&quot;) and Layer importance (weightedBy is &quot;AnisotropicCRQA&quot;). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument MRNrankedBy." />
 <meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -63,7 +66,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -116,7 +119,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/FredHasselman/casnet">
+  <a href="https://github.com/FredHasselman/casnet/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -140,7 +143,7 @@
     </div>
 
     <div class="ref-description">
-    <p>This function will create a Multiplex Recurrence Network from a list of igraph objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: <em>Layer similarity</em> (<code>MRNweightedBy</code> is set to <code>"InterLayerMI"</code>, <code>"InterLayerCor"</code>, or <code>"EdgeOvelap"</code>) and <em>Layer importance</em> (<code>MRNweightedBy</code> is <code>"RankorderDC"</code>). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument <code>MRNrankedBy</code>.</p>
+    <p>This function will create a Multiplex Recurrence Network from a list of igraph objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: <em>Layer similarity</em> (<code>weightedBy</code> is set to <code>"InterLayerMI"</code>, <code>"InterLayerCor"</code>, or <code>"EdgeOvelap"</code>) and <em>Layer importance</em> (<code>weightedBy</code> is <code>"AnisotropicCRQA"</code>). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument <code>MRNrankedBy</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>mrn</span>(
@@ -152,17 +155,8 @@
   <span class='kw'>step</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
   <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
   <span class='kw'>alignment</span> <span class='kw'>=</span> <span class='st'>"r"</span>,
+  <span class='kw'>cumulative</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doSave</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>createAnimation</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>useImageMagick</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>loopAnimation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>transitionLength</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>stateLength</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>gifWidth</span> <span class='kw'>=</span> <span class='fl'>600</span>,
-  <span class='kw'>gifRes</span> <span class='kw'>=</span> <span class='fl'>150</span>,
-  <span class='kw'>noParts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>imageDir</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
   <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
@@ -174,8 +168,20 @@
       <td><p>A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.</p></td>
     </tr>
     <tr>
+      <th>weightedBy</th>
+      <td><p>The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: <code>"InterLayerMI"</code> (Mutual information based on similarity of the vertex degree across layers), <code>"EdgeOverlap"</code> (proportion of vertices sharing the same edges across layers), <code>"RankorderDC"</code> (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in <code>AnisotropicCRQA</code>). Choosing <code>"InterLayerMI"</code>, <code>"InterlayerCor"</code>, or <code>"EdgeOverlap"</code> will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.</p></td>
+    </tr>
+    <tr>
+      <th>CRQA_vertexSequence</th>
+      <td><p>If <code>weightedBy = "AnisotropicCRQA"</code>, then <code>CRQA_vertexSequence</code> must be a valid igraph command that returns vertex properties, for example: <code>"degree"</code>, <code>"strength"</code>,<code>"hub_score"</code>,<code>"centr_degree"</code>, <code>"transitivity"</code>, <code>"betweenness"</code>. The appropriate measure type, e.g. for <code>"directed"</code>, or <code>"weighted"</code> graphs, will be inferred from the graph properties of the 1st graph object in the <code>layers</code> list. For best results with weighted measures, assign a value to <code>E(g)$weight</code> for each <code>g</code> in <code>layers</code>. (default = <code>"degree"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>CRQA_measure</th>
+      <td><p>Which CRQA measures should be used c("RR", "DET", "LAM"),</p></td>
+    </tr>
+    <tr>
       <th>win</th>
-      <td><p>The window size passed to <code>casnet::ts_window()</code> in which to evaluate <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. If <code>MRNweightedBy = "RankorderDC"</code>, it will be the size of the right aligned window in which Dynamic Complexity will be computed using <code><a href='dc_win.html'>casnet::dc_win()</a></code> (default = <code>NA</code>)</p></td>
+      <td><p>The window size passed to <code>ts_window()</code> in which to evaluate <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. If <code>weightedBy = "CRQA_vertexSequence"</code>, it will be the size of the right aligned window in which Dynamic Complexity will be computed using <code><a href='dc_win.html'>dc_win()</a></code> (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>step</th>
@@ -183,67 +189,27 @@
     </tr>
     <tr>
       <th>overlap</th>
-      <td><p>The window overlap passed to <code>casnet::ts_window()</code> if <code>MRNweightedBy</code> is <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. The value of <code>step</code> will be ignored if <code>overlap</code> is not <code>NA</code>. (default = <code>NA</code>).</p></td>
+      <td><p>The window overlap passed to <code>ts_window()</code> if <code>weightedBy</code> is <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. The value of <code>step</code> will be ignored if <code>overlap</code> is not <code>NA</code>. (default = <code>NA</code>).</p></td>
     </tr>
     <tr>
       <th>alignment</th>
       <td><p>Whether to right (<code>"r"</code>), center (<code>"c"</code>), or left (<code>"l"</code>) align the window.</p></td>
     </tr>
     <tr>
+      <th>cumulative</th>
+      <td><p>To make the network represent cumulative time, set <code>directed = TRUE</code> and <code>cumulative = TRUE</code>. This will set the upper triangle of the recurrence matrix to <code>0</code> and ensures that the network edges represent recurrenct values that have occurred in the <code>past</code> relative to the current opbserved value. If <code>directed = FALSE</code> the argument is ignored (default = <code>TRUE</code>).</p></td>
+    </tr>
+    <tr>
       <th>doPlot</th>
       <td><p>Plot the multiplex recurrence network (default = <code>TRUE</code>).</p></td>
-    </tr>
-    <tr>
-      <th>createAnimation</th>
-      <td><p>If <code>createAnimation = TRUE</code> <em>and</em> <code>doPlot = TRUE</code> <em>and</em> a windowed analysis is conducted, an animation will be produced using either package gganimate (if <code>useImageMagick = FALSE</code>) or animation (if <code>useImageMagick = FALSE</code>). The main difference is that gganimate has nice animation transition features, but plots the MRN using ggplot2, which does not have great options for displaying the nodes as images. With package animation a sequence of igraph plots will be converted to an animation. If <code>doSave = TRUE</code> the animation will be saved in <code>imageDir</code> as an animated gif by calling either <code><a href='https://gganimate.com/reference/anim_save.html'>gganimate::anim_save()</a></code>, or <code><a href='https://rdrr.io/pkg/animation/man/saveGIF.html'>animation::saveGIF()</a></code> (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>useImageMagick</th>
-      <td><p>Should <a href='https://imagemagick.org/index.php'>ImageMagick</a> be used to create the animation. <strong>NOTE:</strong> ImageMagick has to be installed on your system, see <code><a href='https://rdrr.io/pkg/animation/man/saveGIF.html'>animation::saveGIF()</a></code> (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>loopAnimation</th>
-      <td><p>Should the animation loop? (default = <code>TRUE</code>)`</p></td>
-    </tr>
-    <tr>
-      <th>transitionLength</th>
-      <td><p>Length of each transition in the animation, ignored if <code>useImageMagick = TRUE</code> (default = <code>3</code>)</p></td>
-    </tr>
-    <tr>
-      <th>stateLength</th>
-      <td><p>Value of <code>state_length</code> if gganimate is used, or the  <code>interval</code> in seconds for <code><a href='https://rdrr.io/pkg/animation/man/ani.pause.html'>animation::ani.pause()</a></code> (default = <code>1</code>)</p></td>
-    </tr>
-    <tr>
-      <th>gifWidth</th>
-      <td><p>Width of the animated <code>gif</code> in pixels. The default width will be <code>600/150 = 4 in</code> or <code>10.16 cm</code> (default = <code>600</code>)</p></td>
-    </tr>
-    <tr>
-      <th>gifRes</th>
-      <td><p>Resolution of the animated <code>gif</code> in <code>ppi</code> (default =<code>150</code>)</p></td>
-    </tr>
-    <tr>
-      <th>noParts</th>
-      <td><p>Do not plot the individual graphs that make up the animation to the current <code>dev</code> (default = <code>TRUE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>imageDir</th>
-      <td><p>Directory to save the layer images and windowed MRN plots. If <code>NA</code>, the value returned by <code><a href='https://rdrr.io/r/base/getwd.html'>getwd()</a></code> will be used, if <code>NULL</code> no windowed images will be saved (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>silent</th>
       <td><p>Silent-ish mode</p></td>
     </tr>
     <tr>
-      <th>MRNweightedBy</th>
-      <td><p>The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: <code>"InterLayerMI"</code> (Mutual information based on similarity of the vertex degree across layers), <code>"EdgeOverlap"</code> (proportion of vertices sharing the same edges across layers), <code>"RankorderDC"</code> (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in <code>MRNrankedBy</code>). Choosing <code>"InterLayerMI"</code>, <code>"InterlayerCor"</code>, or <code>"EdgeOverlap"</code> will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.</p></td>
-    </tr>
-    <tr>
       <th>windowedWeights</th>
       <td><p>If a windowed analysis is conducted and the edges of the graphs in <code>layers</code> have a weight property, there are a number of different ways to handle the weights depending on the value of <code>windowedWeights</code>: <code>"none"</code>, <code>"local"</code>, and <code>"cumulative"</code>. Value <code>"none"</code> will ignore the weights, <code>"local"</code> will limit the range of edges to those edges connecting the vertices contained within the window, <code>"cumulative"</code> will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = <code>none</code>)</p></td>
-    </tr>
-    <tr>
-      <th>MRNrankedBy</th>
-      <td><p>If <code>MRNweightedBy = "RankorderDC"</code>, then <code>MRNrankedBy</code> must be a valid igraph command that returns vertex properties, for example: <code>"degree"</code>, <code>"strength"</code>,<code>"hub_score"</code>,<code>"centr_degree"</code>, <code>"transitivity"</code>, <code>"betweenness"</code>. The appropriate measure type, e.g. for <code>"directed"</code>, or <code>"weighted"</code> graphs, will be inferred from the graph properties of the 1st graph object in the <code>layers</code> list. For best results with weighted measures, assign a value to <code>E(g)$weight</code> for each <code>g</code> in <code>layers</code>. (default = <code>"degree"</code>)</p></td>
     </tr>
     </table>
 
@@ -258,13 +224,10 @@
 
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -275,7 +238,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
