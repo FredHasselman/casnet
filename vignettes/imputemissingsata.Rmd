@@ -132,7 +132,7 @@ For example, with uniform discrete numbers and/or scales that are bounded (eg. v
 # Use casnet::as.numeric_discrete() to turn a factor or charcter vector into a named numeric vector.
 ca <- as.numeric_discrete(df_vars$cat_ordered, keepNA = TRUE)
 imputations <- imputeTS::na.kalman(ca, model = "auto.arima")
-imputeTS::plotNA.imputations(x.withNA = ca, x.withTruth = as.numeric_discrete(cat_ordered), x.withImputations = imputations)
+imputeTS::ggplot_na_imputations(x_with_na = ca, x_with_truth = as.numeric_discrete(cat_ordered), x_with_imputations = imputations)
 ```
 
 There is a way to adjust the imputation procedure by transforming the data (thanks to Steffen Moritz, author of `imputeTS`, for suggesting this method). The ordered categorical series was created with bounds `1` and `20`.
@@ -147,8 +147,7 @@ imputations <- imputeTS::na.kalman(ca_t, model = "auto.arima")
 # Plot the result
 # Back-transform the imputed forecasts 
 imputationsBack <- (hi-lo)*exp(imputations)/(1+exp(imputations)) + lo
-
-imputeTS::plotNA.imputations(x.withNA = ca, x.withTruth = as.numeric_discrete(cat_ordered), x.withImputations = imputationsBack)
+imputeTS::ggplot_na_imputations(x_with_na = ca, x_with_truth = as.numeric_discrete(cat_ordered), x_with_imputations = imputationsBack)
 ```
 
 
@@ -224,22 +223,22 @@ print(colnames(df_vars)[c])
 withNA  <- as.numeric_discrete(df_vars[,c], keepNA = TRUE)
 Truth   <- as.numeric_discrete(truth[[c]], keepNA = TRUE)
 
-plotNA.imputations(x.withNA = withNA, 
-                   x.withImputations = out.linear[,c], 
-                   x.withTruth = Truth,
-                   main = "linear interpolation",
+ggplot_na_imputations(x_with_na = withNA, 
+                   x_with_imputations = out.linear[,c], 
+                   x_with_truth = Truth,
+                   title = "linear interpolation",
                    ylab = colnames(df_vars)[c])
   
-plotNA.imputations(x.withNA = withNA, 
-                   x.withImputations = as.numeric_discrete(out.auto[,c]), 
-                   x.withTruth = Truth,
-                   main = paste("auto:",imp.mice$method)[c],
+ggplot_na_imputations(x_with_na = withNA, 
+                   x_with_imputations = as.numeric_discrete(out.auto[,c]), 
+                   x_with_truth = Truth,
+                   title = paste("auto:",imp.mice$method)[c],
                    ylab = colnames(df_vars)[c])
   
-plotNA.imputations(x.withNA = withNA, 
-                     x.withImputations = as.numeric_discrete(out.cart[,c]), 
-                     x.withTruth =Truth,
-                     main="regression trees",
+ggplot_na_imputations(x_with_na = withNA, 
+                     x_with_imputations = as.numeric_discrete(out.cart[,c]), 
+                     x_with_truth =Truth,
+                     title="regression trees",
                      ylab = colnames(df_vars)[c])
 
 }
