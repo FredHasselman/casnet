@@ -132,7 +132,7 @@ For example, with uniform discrete numbers and/or scales that are bounded (eg. v
 # Use casnet::as.numeric_discrete() to turn a factor or charcter vector into a named numeric vector.
 ca <- as.numeric_discrete(df_vars$cat_ordered, keepNA = TRUE)
 imputations <- imputeTS::na.kalman(ca, model = "auto.arima")
-imputeTS::plotNA.imputations(x.withNA = ca, x.withTruth = as.numeric_discrete(cat_ordered), x.withImputations = imputations)
+imputeTS::ggplot_na_imputations(x_with_na = ca, x_with_truth = as.numeric_discrete(cat_ordered), x_with_imputations = imputations)
 ```
 
 There is a way to adjust the imputation procedure by transforming the data (thanks to Steffen Moritz, author of `imputeTS`, for suggesting this method). The ordered categorical series was created with bounds `1` and `20`.
@@ -147,8 +147,7 @@ imputations <- imputeTS::na.kalman(ca_t, model = "auto.arima")
 # Plot the result
 # Back-transform the imputed forecasts 
 imputationsBack <- (hi-lo)*exp(imputations)/(1+exp(imputations)) + lo
-
-imputeTS::plotNA.imputations(x.withNA = ca, x.withTruth = as.numeric_discrete(cat_ordered), x.withImputations = imputationsBack)
+imputeTS::ggplot_na_imputations(x_with_na = ca, x_with_truth = as.numeric_discrete(cat_ordered), x_with_imputations = imputationsBack)
 ```
 
 
