@@ -211,7 +211,7 @@ We can check "truth" values for the variables we created, which obviously cannot
 
 ### Visual inspection
 
-Function `imputeTS::plotNA.imputations()` is an excellent way to visualise the imputation result.
+Function `imputeTS::ggplot_na_imputations()` is an excellent way to visualise the imputation result.
 
 ```{r, fig.height=3}
 truth <- list(zscore, unif_discrete, cat_unordered, cat_ordered, df_vars$angry, df_vars$ruminate, df_vars$hours)

@@ -316,7 +316,7 @@
 <div id="visual-inspection" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visual-inspection" class="anchor"></a>Visual inspection</h3>
-<p>Function <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/plotNA.imputations.html">imputeTS::plotNA.imputations()</a></code> is an excellent way to visualise the imputation result.</p>
+<p>Function <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">imputeTS::ggplot_na_imputations()</a></code> is an excellent way to visualise the imputation result.</p>
 <div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="no">truth</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">zscore</span>, <span class="no">unif_discrete</span>, <span class="no">cat_unordered</span>, <span class="no">cat_ordered</span>, <span class="no">df_vars</span>$<span class="no">angry</span>, <span class="no">df_vars</span>$<span class="no">ruminate</span>, <span class="no">df_vars</span>$<span class="no">hours</span>)
 
 <span class="kw">for</span>(<span class="no">c</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NCOL</a></span>(<span class="no">df_vars</span>)){
