@@ -223,22 +223,22 @@ print(colnames(df_vars)[c])
 withNA  <- as.numeric_discrete(df_vars[,c], keepNA = TRUE)
 Truth   <- as.numeric_discrete(truth[[c]], keepNA = TRUE)
 
-plotNA.imputations(x.withNA = withNA, 
-                   x.withImputations = out.linear[,c], 
-                   x.withTruth = Truth,
-                   main = "linear interpolation",
+ggplot_na_imputations(x_with_na = withNA, 
+                   x_with_imputations = out.linear[,c], 
+                   x_with_truth = Truth,
+                   title = "linear interpolation",
                    ylab = colnames(df_vars)[c])
   
-plotNA.imputations(x.withNA = withNA, 
-                   x.withImputations = as.numeric_discrete(out.auto[,c]), 
-                   x.withTruth = Truth,
-                   main = paste("auto:",imp.mice$method)[c],
+ggplot_na_imputations(x_with_na = withNA, 
+                   x_with_imputations = as.numeric_discrete(out.auto[,c]), 
+                   x_with_truth = Truth,
+                   title = paste("auto:",imp.mice$method)[c],
                    ylab = colnames(df_vars)[c])
   
-plotNA.imputations(x.withNA = withNA, 
-                     x.withImputations = as.numeric_discrete(out.cart[,c]), 
-                     x.withTruth =Truth,
-                     main="regression trees",
+ggplot_na_imputations(x_with_na = withNA, 
+                     x_with_imputations = as.numeric_discrete(out.cart[,c]), 
+                     x_with_truth =Truth,
+                     title="regression trees",
                      ylab = colnames(df_vars)[c])
 
 }
