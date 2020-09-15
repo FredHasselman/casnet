@@ -32,9 +32,9 @@
   toset <- !(names(op.casnet) %in% names(op))
   if(any(toset)) options(op.casnet[toset])
 
-  for(p in c("grDevices","graphics","stats","utils","Matrix","plyr","dplyr","ggplot2","gganimate","ggimage","broom","invctr","igraph")){
+  for(p in c("grDevices","graphics","ggtable","stats","utils","Matrix","plyr","dplyr","ggplot2","gganimate","ggimage","broom","invctr","igraph")){
     requireNamespace(p, quietly = TRUE)
-    }
+  }
   invisible()
 }
 
@@ -43,6 +43,7 @@
 #'  Some systems not tested, but based on the cran page: [check flavors](https://cran.r-project.org/web/checks/check_flavors.html)
 #'
 #' @return A string, "osx", "windows", "linux"
+#'
 #' @export
 #'
 get_os <- function(){
@@ -153,6 +154,8 @@ set_os_options <- function(os = get_os()){
 
 #' Set command line RQA executable
 #'
+#' Sets the location of the command line RQA executable
+#'
 #' @return Message informing whether the procedure was succesful.
 #' @export
 #'
@@ -161,7 +164,6 @@ set_command_line_rp <- function(){
   copyright_text <- c("Note that the platform specific `rp` command line executables were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at: http://tocsy.pik-potsdam.de/ \n\n The full copyright statement on the website is as follows: \n\n  > \u00A9 2004-2017 SOME RIGHTS RESERVED  \n  > University of Potsdam, Interdisciplinary Center for Dynamics of Complex Systems, Germany  \n  > Potsdam Institute for Climate Impact Research, Transdisciplinary Concepts and Methods, Germany  \n  > This work is licensed under a [Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Germany License](https://creativecommons.org/licenses/by-nc-nd/2.0/de/).  \n\n  More information about recurrence quantification analysis can be found on the [Recurrence Plot website](http://www.recurrence-plot.tk).")
 
   dl_instruction <- c("Download failed!\nCopying failed!\n\nTo install do the following:\n1. Either go to https://github.com/FredHasselman/casnet/tree/master/inst and download and unzip 'commandline_rp.zip', or go to http://tocsy.pik-potsdam.de/commandline-rp.php \n2. Find the executable for your OS\n3. Copy it to the '/exec' directory under 'casnet' \n4. Rename to 'rp' or 'rp.exe' on Windows\n5. Put an empty text file in '/exec' with the following name 'rp_instal_log.txt' \n 6. Run this code to test if everything is ok: crqa_cl(rnorm(100))")
-
 
   os                <- get_os()
   casnet_OS_options <- set_os_options()

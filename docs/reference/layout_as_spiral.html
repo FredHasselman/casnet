@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Layout a graph on a spiral</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/plotFUN.R'><code>R/plotFUN.R</code></a></small>
     <div class="hidden name"><code>layout_as_spiral.Rd</code></div>
     </div>
 
@@ -147,12 +144,12 @@
     </div>
 
     <pre class="usage"><span class='fu'>layout_as_spiral</span>(
-  <span class='no'>g</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Archimedean"</span>, <span class='st'>"Bernoulli"</span>, <span class='st'>"Fermat"</span>, <span class='st'>"Euler"</span>),
-  <span class='kw'>arcs</span> <span class='kw'>=</span> <span class='fl'>6</span>,
-  <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>b</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>rev</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>g</span>,
+  type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Archimedean"</span>, <span class='st'>"Bernoulli"</span>, <span class='st'>"Fermat"</span>, <span class='st'>"Euler"</span>),
+  arcs = <span class='fl'>6</span>,
+  a = <span class='fl'>1</span>,
+  b = <span class='kw'>NULL</span>,
+  rev = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -190,20 +187,24 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>igraph</span>)</div><div class='output co'>#&gt; <span class='message'></span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://igraph.org'>igraph</a></span>)
+</div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘igraph’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:stats’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    decompose, spectrum</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:base’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    union</span></div><div class='input'>
-<span class='no'>g</span>  <span class='kw'>&lt;-</span> <span class='kw pkg'>igraph</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_gnp.html'>sample_gnp</a></span>(<span class='fl'>100</span>, <span class='fl'>1</span>/<span class='fl'>100</span>)
+<span class='kw'>g</span>  <span class='op'>&lt;-</span> <span class='kw'>igraph</span>::<span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_gnp.html'>sample_gnp</a></span>(<span class='fl'>100</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>100</span>)
 
 <span class='co'># Equiangular spiral: Any line from the origin cuts at the same angle.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>g</span>, <span class='kw'>layout</span> <span class='kw'>=</span> <span class='fu'>layout_as_spiral</span>(<span class='no'>g</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"Bernoulli"</span>, <span class='kw'>arcs</span> <span class='kw'>=</span> <span class='fl'>5</span>))</div><div class='img'><img src='layout_as_spiral-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>g</span>, layout = <span class='fu'>layout_as_spiral</span>(<span class='kw'>g</span>, type = <span class='st'>"Bernoulli"</span>, arcs = <span class='fl'>5</span>))
+</div><div class='img'><img src='layout_as_spiral-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># The arms of Fermat's spiral diverge quadratically.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>g</span>, <span class='kw'>layout</span> <span class='kw'>=</span> <span class='fu'>layout_as_spiral</span>(<span class='no'>g</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"Fermat"</span>, <span class='kw'>arcs</span> <span class='kw'>=</span> <span class='fl'>5</span>))</div><div class='img'><img src='layout_as_spiral-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>g</span>, layout = <span class='fu'>layout_as_spiral</span>(<span class='kw'>g</span>, type = <span class='st'>"Fermat"</span>, arcs = <span class='fl'>5</span>))
+</div><div class='img'><img src='layout_as_spiral-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Equidistance of intersection points along a line through the origin.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>g</span>, <span class='kw'>layout</span> <span class='kw'>=</span> <span class='fu'>layout_as_spiral</span>(<span class='no'>g</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"Archimedean"</span>, <span class='kw'>arcs</span> <span class='kw'>=</span> <span class='fl'>5</span>))</div><div class='img'><img src='layout_as_spiral-3.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>g</span>, layout = <span class='fu'>layout_as_spiral</span>(<span class='kw'>g</span>, type = <span class='st'>"Archimedean"</span>, arcs = <span class='fl'>5</span>))
+</div><div class='img'><img src='layout_as_spiral-3.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -220,7 +221,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

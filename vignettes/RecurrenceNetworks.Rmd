@@ -2,7 +2,7 @@
 title: "Recurrence Networks"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{RecurrenceNetworks}
+  %\VignetteIndexEntry{Recurrence Networks}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -43,7 +43,8 @@ We can turn the recurrence matrix into an adjecency matrix, an `igraph` object. 
 
 ```{r}
 library(igraph)
-library(qgraph)
+#library(qgraph)
+#library(survival)
 # Reload the data we used earlier
 series <- rio::import("https://github.com/complexity-methods/CSA-assignments/raw/master/assignment_data/BasicTSA_arma/series.xlsx")
 
@@ -89,7 +90,7 @@ g1r <- casnet::make_spiral_graph(g1,arcs = arcs, epochColours = getColours(arcs)
 # Network measures
 igraph::average.path.length(g1)
 igraph::transitivity(g1)
-qgraph::smallworldness(g1)
+# qgraph::smallworldness(g1)
 
 recs1 <- igraph::centr_degree(g1)
 
@@ -120,16 +121,16 @@ rqa2 <- rp_measures(RN2)
 #   kable_styling() %>%
 #   scroll_box(width = "100%", height = "100px")
 
-g2 <- graph_from_adjacency_matrix(RN2, mode="undirected", diag = FALSE)
+g2 <- igraph::graph_from_adjacency_matrix(RN2, mode="undirected", diag = FALSE)
 V(g2)$size <- degree(g2)
 g2r <- casnet::make_spiral_graph(g2,arcs = arcs,epochColours = getColours(arcs), markTimeBy = TRUE)
 
 # Network measures
-average.path.length(g2)
-transitivity(g2)
-smallworldness(g2)
+igraph::average.path.length(g2)
+igraph::transitivity(g2)
+# igraph::smallworldness(g2)
 
-recs2 <- centr_degree(g2)
+recs2 <- igraph::centr_degree(g2)
 
 (RP_N <- sum(recs2$res))
 rqa2$RP_N
@@ -158,16 +159,16 @@ rqa3 <- rp_measures(RN3)
 #   kable_styling() %>%
 #   scroll_box(width = "100%", height = "100px")
 
-g3 <- graph_from_adjacency_matrix(RN3, mode="undirected", diag = FALSE)
+g3 <- igraph::graph_from_adjacency_matrix(RN3, mode="undirected", diag = FALSE)
 V(g3)$size <- degree(g3)
-g3r <- casnet::make_spiral_graph(g3,arcs = arcs ,epochColours = getColours(arcs), markTimeBy = TRUE)
+g3r <- make_spiral_graph(g3,arcs = arcs ,epochColours = getColours(arcs), markTimeBy = TRUE)
 
 
-average.path.length(g3)
-transitivity(g3)
-smallworldness(g3)
+igraph::average.path.length(g3)
+igraph::transitivity(g3)
+# igraph::smallworldness(g3)
 
-recs3 <- centr_degree(g3)
+recs3 <- igraph::centr_degree(g3)
 
 (RP_N <- sum(recs3$res))
 rqa3$RP_N

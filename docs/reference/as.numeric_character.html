@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -107,9 +107,6 @@
     </li>
     <li>
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
-    </li>
-    <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -146,7 +143,7 @@
     <p>Converts a character vector to a named numeric vector, with the character elements as names.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>as.numeric_character</span>(<span class='no'>x</span>, <span class='kw'>sortUnique</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>keepNA</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>as.numeric_character</span>(<span class='kw'>x</span>, sortUnique = <span class='fl'>FALSE</span>, keepNA = <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -171,8 +168,9 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='no'>f</span> <span class='kw'>&lt;-</span> <span class='no'>letters</span>
-<span class='fu'>as.numeric_character</span>(<span class='no'>f</span>)</div><div class='output co'>#&gt;  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z 
+<span class='kw'>f</span> <span class='op'>&lt;-</span> <span class='kw'>letters</span>
+<span class='fu'>as.numeric_character</span>(<span class='kw'>f</span>)
+</div><div class='output co'>#&gt;  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z 
 #&gt;  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 </div><div class='input'>
 </div></pre>
   </div>
@@ -190,7 +188,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

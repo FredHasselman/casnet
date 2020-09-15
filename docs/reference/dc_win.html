@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="Dynamic Complexity — dc_win" />
-<meta property="og:description" content="Calculates Dynamic Complexity, a complexity index for short and coarse-grained time series (Schiepek &amp;amp; Strunk, 2010; Schiepek, 2003; Haken &amp;amp; Schiepek 2006)." />
+<meta property="og:description" content="Calculates Dynamic Complexity, a complexity index for short and coarse grained time series." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,27 +135,27 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Dynamic Complexity</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/dc.R'><code>R/dc.R</code></a></small>
     <div class="hidden name"><code>dc_win.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Calculates Dynamic Complexity, a complexity index for short and coarse-grained time series (Schiepek &amp; Strunk, 2010; Schiepek, 2003; Haken &amp; Schiepek 2006).</p>
+    <p>Calculates Dynamic Complexity, a complexity index for short and coarse grained time series.</p>
     </div>
 
     <pre class="usage"><span class='fu'>dc_win</span>(
-  <span class='no'>df</span>,
-  <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>df</span>),
-  <span class='no'>scale_min</span>,
-  <span class='no'>scale_max</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doPlotF</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doPlotD</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnFandD</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>useTimeVector</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>timeStamp</span> <span class='kw'>=</span> <span class='st'>"01-01-1999"</span>
+  <span class='kw'>df</span>,
+  win = <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>df</span>),
+  <span class='kw'>scale_min</span>,
+  <span class='kw'>scale_max</span>,
+  doPlot = <span class='fl'>FALSE</span>,
+  doPlotF = <span class='fl'>FALSE</span>,
+  doPlotD = <span class='fl'>FALSE</span>,
+  returnFandD = <span class='fl'>FALSE</span>,
+  useVarNames = <span class='fl'>TRUE</span>,
+  colOrder = <span class='fl'>TRUE</span>,
+  useTimeVector = <span class='fl'>NA</span>,
+  timeStamp = <span class='st'>"01-01-1999"</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -166,7 +163,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>df</th>
-      <td><p>A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in <code>df</code> should be on the same scale, an error will be thrown if the range of the time series in<code>df</code> is not <code>[scale_min,scale_max]</code>.</p></td>
+      <td><p>A data frame containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in <code>df</code> should be on the same scale, an error will be thrown if the range of the time series in<code>df</code> is not <code>[scale_min,scale_max]</code>.</p></td>
     </tr>
     <tr>
       <th>win</th>
@@ -186,8 +183,11 @@
     </tr>
     <tr>
       <th>doPlotF</th>
-      <td><p>If <code>TRUE</code> shows a Complexity Resonance Diagram of the Fluctuation Intensity and returns an invisible <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)
-#' @param doPlotD If <code>TRUE</code> shows a Complexity Resonance Diagram of the Distribution Uniformity and returns an invisible <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)</p></td>
+      <td><p>If <code>TRUE</code> shows a Complexity Resonance Diagram of the Fluctuation Intensity and returns an invisible <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>doPlotD</th>
+      <td><p>If <code>TRUE</code> shows a Complexity Resonance Diagram of the Distribution Uniformity and returns an invisible <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>returnFandD</th>
@@ -213,13 +213,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If <code>doPlot = TRUE</code>, a list object containing a data frame of Dynamic Complexity values and a <code>ggplot2</code> object of the dynamic complexity resonance diagram (e.g. Schiepek et al., 2016). If <code>doPlot = FALSE</code> the data frame with Dynamic Complexity series is returned.</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Schiepek, G., &amp; Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. Biological cybernetics, 102(3), 197-207.</p>
-<p>Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. European Journal of Psychological Assessment, 19, 175-184.</p>
-<p>Haken, H. &amp; Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.</p>
-<p>Schiepek, G. K., St?ger-Schmidinger, B., Aichhorn, W., Sch?ller, H., &amp; Aas, B. (2016). Systemic case formulation, individualized process monitoring, and state dynamics in a case of dissociative identity disorder. Frontiers in psychology, 7, 1545.</p>
+    <p>If <code>doPlot = TRUE</code>, a list object containing a data frame of Dynamic Complexity values and a <code>ggplot2</code> object of the dynamic complexity resonance diagram. If <code>doPlot = FALSE</code> the data frame with Dynamic Complexity series is returned.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Dynamic Complexity functions: 
@@ -229,6 +223,10 @@
 <code><a href='plotDC_ccp.html'>plotDC_ccp</a>()</code>,
 <code><a href='plotDC_lvl.html'>plotDC_lvl</a>()</code>,
 <code><a href='plotDC_res.html'>plotDC_res</a>()</code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Merlijn Olthof</p>
+<p>Fred Hasselman</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -245,7 +243,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

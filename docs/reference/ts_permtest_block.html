@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Permutation Test: Block Randomisation</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/ts.R'><code>R/ts.R</code></a></small>
     <div class="hidden name"><code>ts_permtest_block.Rd</code></div>
     </div>
 
@@ -147,14 +144,15 @@
     </div>
 
     <pre class="usage"><span class='fu'>ts_permtest_block</span>(
-  <span class='no'>y1</span>,
-  <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>Nperms</span> <span class='kw'>=</span> <span class='fl'>19</span>,
-  <span class='kw'>sim</span> <span class='kw'>=</span> <span class='st'>"geom"</span>,
-  <span class='kw'>l</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>returnBootObject</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>y1</span>,
+  y2 = <span class='kw'>NULL</span>,
+  targetValue = <span class='fl'>0</span>,
+  Nperms = <span class='fl'>19</span>,
+  sim = <span class='st'>"geom"</span>,
+  l = <span class='fl'>3</span>,
+  alpha = <span class='fl'>0.05</span>,
+  returnBootObject = <span class='fl'>FALSE</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -228,10 +226,11 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>4321</span>)
-<span class='no'>y1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>5000</span>)
-<span class='no'>y2</span> <span class='kw'>&lt;-</span> <span class='no'>y1</span>-(<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='no'>y1</span>)+<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>1</span>))
+<span class='kw'>y1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>5000</span>)
+<span class='kw'>y2</span> <span class='op'>&lt;-</span> <span class='kw'>y1</span><span class='op'>-</span>(<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='kw'>y1</span>)<span class='op'>+</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>1</span>))
 
-<span class='fu'>ts_permtest_block</span>(<span class='kw'>y1</span> <span class='kw'>=</span> <span class='no'>y1</span>, <span class='kw'>y2</span> <span class='kw'>=</span> <span class='no'>y2</span>)</div><div class='output co'>#&gt;      time        Ori targetValue Nperms Ori.Diff Ori.Rank Ori.Rank.p alpha
+<span class='fu'>ts_permtest_block</span>(y1 = <span class='kw'>y1</span>, y2 = <span class='kw'>y2</span>)
+</div><div class='output co'>#&gt;      time        Ori targetValue Nperms Ori.Diff Ori.Rank Ori.Rank.p alpha
 #&gt; 1       1 -0.2563779           0     19   lesser       11       0.55  0.05
 #&gt; 2       2 -0.2563779           0     19   lesser       11       0.55  0.05
 #&gt; 3       3 -0.2563779           0     19   lesser        8       0.40  0.05
@@ -10249,7 +10248,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fast (C)RQA (command line crp)</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/rp.R'><code>R/rp.R</code></a></small>
     <div class="hidden name"><code>rp_cl.Rd</code></div>
     </div>
 
@@ -147,33 +144,33 @@
     </div>
 
     <pre class="usage"><span class='fu'>rp_cl</span>(
-  <span class='no'>y1</span>,
-  <span class='kw'>y2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>emDim</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>emRad</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>DLmin</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>VLmin</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>theiler</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>min</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>y1</span>), <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='no'>y2</span>), (<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>y1</span>) + <span class='fl'>1</span>), <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>y2</span>)), <span class='kw'>na.rm</span> <span class='kw'>=</span>
+  <span class='kw'>y1</span>,
+  y2 = <span class='kw'>NULL</span>,
+  emDim = <span class='fl'>1</span>,
+  emLag = <span class='fl'>1</span>,
+  emRad = <span class='fl'>NA</span>,
+  DLmin = <span class='fl'>2</span>,
+  VLmin = <span class='fl'>2</span>,
+  theiler = <span class='fl'>0</span>,
+  win = <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>min</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>y1</span>), <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='kw'>y2</span>), (<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>y1</span>) <span class='op'>+</span> <span class='fl'>1</span>), <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>y2</span>)), na.rm =
     <span class='fl'>TRUE</span>),
-  <span class='kw'>step</span> <span class='kw'>=</span> <span class='no'>win</span>,
-  <span class='kw'>JRP</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>distNorm</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EUCLIDEAN"</span>, <span class='st'>"MAX"</span>, <span class='st'>"MIN"</span>, <span class='st'>"OP"</span>)<span class='kw'>[[</span><span class='fl'>1</span>]],
-  <span class='kw'>standardise</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span>)[<span class='fl'>1</span>],
-  <span class='kw'>returnMeasures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>returnRPvector</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnLineDist</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"noplot"</span>, <span class='st'>"rp"</span>, <span class='st'>"distmat"</span>)<span class='kw'>[[</span><span class='fl'>1</span>]],
-  <span class='kw'>path_to_rp</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"casnet.path_to_rp"</span>),
-  <span class='kw'>saveOut</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>path_out</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>file_ID</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>surrogateTest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>targetValue</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>useParallel</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>
+  step = <span class='kw'>win</span>,
+  JRP = <span class='fl'>FALSE</span>,
+  distNorm = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EUCLIDEAN"</span>, <span class='st'>"MAX"</span>, <span class='st'>"MIN"</span>, <span class='st'>"OP"</span>)[[<span class='fl'>1</span>]],
+  standardise = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span>)[<span class='fl'>1</span>],
+  returnMeasures = <span class='fl'>TRUE</span>,
+  returnRPvector = <span class='fl'>FALSE</span>,
+  returnLineDist = <span class='fl'>FALSE</span>,
+  doPlot = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"noplot"</span>, <span class='st'>"rp"</span>, <span class='st'>"distmat"</span>)[[<span class='fl'>1</span>]],
+  path_to_rp = <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"casnet.path_to_rp"</span>),
+  saveOut = <span class='fl'>FALSE</span>,
+  path_out = <span class='kw'>NULL</span>,
+  file_ID = <span class='kw'>NULL</span>,
+  silent = <span class='fl'>TRUE</span>,
+  surrogateTest = <span class='fl'>FALSE</span>,
+  targetValue = <span class='fl'>0.05</span>,
+  useParallel = <span class='fl'>FALSE</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -287,36 +284,36 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list object containing 1-3 elements, depending on arguments requesting output.</p>
-<ol>
-<li><p><code>rqa_measures</code> - A list of the (C)RQA measures returned if <code>returnMeasures = TRUE</code>:</p><ul>
-<li><p>RR = 'Recurrence rate'</p></li>
-<li><p>DET = 'Determinism'</p></li>
-<li><p>DET_RR = 'Ratio DET/RR'</p></li>
-<li><p>LAM = 'Laminarity'</p></li>
-<li><p>LAM_DET = 'Ratio LAM/DET'</p></li>
-<li><p>L_max = 'maximal diagonal line length'</p></li>
-<li><p>L_mean = 'mean diagonal line length'</p></li>
-<li><p>L_entr = 'Entropy of diagonal line length distribution'</p></li>
-<li><p>DIV =  'Divergence (1/L_max)'</p></li>
-<li><p>V_max = 'maximal vertical line length'</p></li>
-<li><p>TT = 'Trapping time'</p></li>
-<li><p>V_entr = 'Entropy of vertical line length distribution'</p></li>
-<li><p>T1 = 'Recurrence times 1st type'</p></li>
-<li><p>T2 = 'Recurrence times 2nd type'</p></li>
-<li><p>W_max = 'Max interval length'</p></li>
-<li><p>W_mean = 'Mean of interval lengths'</p></li>
-<li><p>W_entr = 'Entropy of interval length distribution'</p></li>
-<li><p>W_prob = 'Probability of interval'</p></li>
-<li><p>F_min = 'F min'</p></li>
-</ul></li>
+    <p>A list object containing 1-3 elements, depending on arguments requesting output.</p><ul>
+<li><p><code>rqa_measures</code> - A list of the (C)RQA measures returned if <code>returnMeasures = TRUE</code>:</p><ol>
+<li><p>RR = Recurrence rate</p></li>
+<li><p>DET = Determinism</p></li>
+<li><p>DET_RR = Ratio DET/RR</p></li>
+<li><p>LAM = Laminarity</p></li>
+<li><p>LAM_DET = Ratio LAM/DET</p></li>
+<li><p>L_max = maximal diagonal line length</p></li>
+<li><p>L_mean = mean diagonal line length</p></li>
+<li><p>L_entr = Entropy of diagonal line length distribution</p></li>
+<li><p>DIV =  Divergence (1/L_max)</p></li>
+<li><p>V_max = maximal vertical line length</p></li>
+<li><p>TT = Trapping time</p></li>
+<li><p>V_entr = Entropy of vertical line length distribution</p></li>
+<li><p>T1 = Recurrence times 1st type</p></li>
+<li><p>T2 = Recurrence times 2nd type</p></li>
+<li><p>W_max = Max interval length</p></li>
+<li><p>W_mean = Mean of interval lengths</p></li>
+<li><p>W_entr = Entropy of interval length distribution</p></li>
+<li><p>W_prob = Probability of interval</p></li>
+<li><p>F_min = F min</p></li>
+</ol></li>
 <li><p><code>rqa_rpvector</code> - The radius thresholded distance matrix (recurrence matrix), which can be visualised as a recurrence plot by calling <code><a href='rp_plot.html'>rp_plot()</a></code>. If a sliding window analysis is conducted this will be a list of matrices and could potentially grow too large to handle. It is recommended you save the output to disk by setting <code>saveOut = TRUE</code>.</p></li>
 <li><p><code>rqa_diagdist</code> - The distribution of diagonal line lengths</p></li>
-</ol>
+</ul>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The <code>rp</code> executable is installed when the function is called for the first time and is renamed to <code>rp</code>, from a platform specific filename downloaded from http://tocsy.pik-potsdam.de/commandline-rp.php or extracted from an archive located in the directory: <code>...\\casnet\\commandline_rp\\</code>.
+    <p>The <code>rp</code> executable is installed when the function is called for the first time and is renamed to <code>rp</code>, from a platform specific filename downloaded from http://tocsy.pik-potsdam.de/commandline-rp.php or extracted from an archive located in the directory:
+<code>...\\casnet\\commandline_rp\\</code>
 The file is copied to the directory: <code>...\\casnet\\exec\\</code>
 The latter location is stored as an option and can be read by calling <code><a href='https://rdrr.io/r/base/options.html'>getOption("casnet.path_to_rp")</a></code>.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
@@ -332,10 +329,9 @@ The latter location is stored as an option and can be read by calling <code><a h
 
     
 
-<p>Some notes on resolving errors with <code>rp</code>.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in <code>...\\casnet\\commandline_rp\\crp_cl.zip</code>. If that fails, the copy will have failed. It should be relatively easy to get <code>crqa_cl()</code> working using custom settings:</p>
-<ul>
-<li><p><em>Copy failed</em> - Every time the function <code>crqa_cl()</code> is called it will check whether a log file <code>rp_instal_log.txt</code> is present in the <code>...\\casnet\\exec\\</code> directory. If you delete the <code>rp_instal_log.txt</code> file, and call the function, another attempt will be madxe to download a copy of the executable.</p></li>
-<li><p><em>Copy still fails and/or no permission to copy</em> - If you cannot acces the directory <code>...\\casnet\\commandline_rp\\</code>, download the appropriate executable from the <a href='http://tocsy.pik-potsdam.de/commandline-rp.php'>Commandline Recurrence Plots</a> page and copy to a directory you do have the rights to: <em>execute</em> commands, <em>write</em> and <em>read</em> files. Make sure you rename the file to <code>rp</code> (<code>rp.exe</code> on Windows OS). Then, either pass the path to <code>rp</code> as the argument <code>path_to_rp</code> in the <code>crqa_cl(..,, path_to_rp = "YOUR_PATH")</code> function call, or, as a more permanent solution, set the <code>path_to_rp</code> option by calling <code><a href='https://rdrr.io/r/base/options.html'>options(casnet.path_to_rp="YOUR_PATH")</a></code>.</p></li>
+<p>Some notes on resolving errors with <code>rp</code>.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in <code>...\\casnet\\commandline_rp\\crp_cl.zip</code>. If that fails, the copy will have failed. It should be relatively easy to get <code>rp_cl()</code> working using custom settings:</p><ul>
+<li><p><em>Copy failed</em> - Every time the function <code>rp_cl()</code> is called it will check whether a log file <code>rp_instal_log.txt</code> is present in the <code>...\\casnet\\exec\\</code> directory. If you delete the <code>rp_instal_log.txt</code> file, and call the function, another attempt will be madxe to download a copy of the executable.</p></li>
+<li><p><em>Copy still fails and/or no permission to copy</em> - If you cannot acces the directory <code>...\\casnet\\commandline_rp\\</code>, download the appropriate executable from the <a href='http://tocsy.pik-potsdam.de/commandline-rp.php'>Commandline Recurrence Plots</a> page and copy to a directory you do have the rights to: <em>execute</em> commands, <em>write</em> and <em>read</em> files. Make sure you rename the file to <code>rp</code> (<code>rp.exe</code> on Windows OS). Then, either pass the path to <code>rp</code> as the argument <code>path_to_rp</code> in the <code>rp_cl(.., path_to_rp = "YOUR_PATH")</code> function call, or, as a more permanent solution, set the <code>path_to_rp</code> option by calling <code><a href='https://rdrr.io/r/base/options.html'>options(casnet.path_to_rp="YOUR_PATH")</a></code>.</p></li>
 <li><p><em>Error in execution of <code>rp</code></em> - This can have a variety of causes, the <code>rp</code> executable is called using <code><a href='https://rdrr.io/r/base/system2.html'>system2()</a></code> and makes use of the <code><a href='https://rdrr.io/r/base/normalizePath.html'>normalizePath()</a></code> function with argument <code>mustWork = FALSE</code>. Problems caused by specific OS, machine, or, locale problems (e.g. the <code>winslash</code> can be reported as an <a href='https://github.com/FredHasselman/casnet/issues'>issue on Github</a>). One execution error that occurs when the OS is not recognised properly can be resolved by chekcing <code><a href='https://rdrr.io/r/base/options.html'>getOption("casnet.rp_prefix")</a></code>. On Windows OS this should return an empty character vector, on Linux or macOS it should return <code>"./"</code>. You can manually set the correct prefix by calling <code><a href='https://rdrr.io/r/base/options.html'>options(casnet.rp_prefix="CORRECT OS PREFIX")</a></code> and fill in the prefix that is correct for your OS</p></li>
 </ul>
 
@@ -360,7 +356,7 @@ The latter location is stored as an option and can be read by calling <code><a h
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

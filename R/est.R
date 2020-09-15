@@ -1,0 +1,779 @@
+# package casnet ----
+#
+# Estimate Parameters ----
+#
+# est functions
+
+#' Estimate Radius.
+#'
+#' Find a fixed or optimal radius.
+#'
+#' @aliases crqa_radius
+#' @param RM Unthresholded Recurrence Matrix
+#' @param y1  A numeric vector or time series
+#' @param y2  A numeric vector or time series
+#' @param emLag Delay to use for embedding
+#' @param emDim Number of embedding dimensions
+#' @param type Either `"fixed"` (default) or `"optimal"`, `"fixed"` will search for a radius that is close to the value for the `targetMeasure` in `targetValue`, `"optimal"` will optimise the radius for the `targetMeasure`, `targetValue` is ignored.
+#' @param startRadius If `type = "fixed"` this is the starting value for the radius (default = percentile of unique distances in RM given by `targetValue`). If `type = "optimal"` this will be a range of radius values (in normalised SD units) that will be considered (default = `seq(0,2,by=.01)`)
+#' @param eachRadius If `type = "optimal"` this is the number of signal and noise series that will be generated for each level in `startRadius` (default = `1`)
+#' @param targetMeasure If `type = "optimal"`, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option `targetMeasure = "all"` will report all the optimal values obtained from one realisation of `startRadius * eachRadius` signal and noise series.
+#' @param targetValue When argument `type` is set to "fixed", the value represents the target value for the measure in `targetMeasure` (default = `RR = .05`).
+#' @param tol Tolerance for achieving `targetValue` for `targetMeasure` (default = `0.1`)
+#' @param maxIter If `type = "fixed"`: Maximum number of iterations to reach targetValue.
+#' @param theiler Size of theiler window (default `0`)
+#' @param histIter Return iteration history? (default = `FALSE`)
+#' @param noiseLevel Noise level to construct the `signal + noiseLevel *` \eqn{N(\mu=0,\sigma=1)} (default = `0.75`)
+#' @param noiseType Type
+#' @param plotROC Generates an ROC plot if `type = "optimal"`
+#' @param standardise Standardise `y` if `type == "optimal"`
+#' @param radiusOnFail Radius to return when search fails `"tiny" = 0 + ,Machine.double.eps`, this will likely cause a matrix full of zeros. `"huge" = 1 + max. distance in RM`, which will give a matrix full of ones, `"percentile" = quantile(RM, prob = targetValue) of distances greater than 0`.
+#' @param silent Silent-ish
+#'
+#' @family Estimate Recurrence Parameters
+#'
+#' @return A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
+#' @export
+#'
+est_radius <- function(RM = NULL,
+                       y1 = NULL,
+                       y2 = NULL,
+                       emLag = 1,
+                       emDim = 1,
+                       type           = c("fixed","optimal")[1],
+                       startRadius    = NULL,
+                       eachRadius     = 1,
+                       targetMeasure  = c("RR","DET","LAM","T1","all")[1],
+                       targetValue    = 0.05,
+                       tol            = 0.1,
+                       maxIter        = 100,
+                       theiler        = -1,
+                       histIter       = FALSE,
+                       noiseLevel     = 0.75,
+                       noiseType      = c("normal","uniform")[1],
+                       plotROC        = FALSE,
+                       standardise  = c("mean.sd","median.mad","none")[3],
+                       radiusOnFail   = c("tiny","huge","percentile")[1],
+                       silent         = FALSE){
+
+  optimOK <- FALSE
+  if(is.null(RM)&!is.null(y1)){
+    optimOK <- TRUE
+    RM <- rp(y1=y1, y2=y2,emDim=emDim, emLag=emLag)
+  }
+
+  # check auto-recurrence
+  RM   <- rp_checkfix(RM, checkAUTO = TRUE)
+  AUTO <- attr(RM,"AUTO")
+
+  if(AUTO){
+    if(!silent){cat(paste0("\nAuto-recurrence: Setting diagonal to (1 + max. distance) for analyses\n"))}
+    if(theiler < 0) theiler <- 0
+  }
+
+  if(is.null(startRadius)){
+    if(type=="fixed"){
+      startRadius <- as.numeric(stats::quantile(unique(as.vector(RM[lower.tri(RM)])),probs = ifelse(targetValue>=1,.05,targetValue)))
+    } else {
+      startRadius <- seq(0,1.5,by=0.001)
+    }
+  }
+
+  recmatsize <- rp_size(RM,AUTO,theiler)
+
+  if(theiler>=0){
+    RM <- bandReplace(RM,-theiler,theiler,1+max(RM),silent = silent)
+  }
+
+  if(type%in%"fixed"){
+
+    if(tol%][%c(0,1)){stop("Argument tol must be between 0 and 1.")}
+
+    tryRadius <- startRadius
+    Measure   <- 0
+    iter      <- 0
+    Converged <- FALSE
+    seqIter   <- 1:maxIter
+
+    iterList <- data.frame(iter        = seqIter,
+                           Measure     = Measure,
+                           Radius      = tryRadius,
+                           targetValue = targetValue,
+                           tollo       = targetValue*(1-tol),
+                           tolhi       = targetValue*(tol+1),
+                           startRadius = startRadius,
+                           rp.size = recmatsize,
+                           AUTO        = AUTO,
+                           Converged   = Converged, check.names = FALSE)
+
+    exitIter <- FALSE
+    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue, "for", targetMeasure,"\n"))}
+
+    # p <- dplyr::progress_estimated(maxIter)
+    while(!exitIter){
+
+
+      iter <- iter+1
+      #p$tick()$print()
+
+      RMs <- di2bi(RM,emRad = tryRadius, convMat = TRUE)
+      RT  <- Matrix::nnzero(RMs)
+      rp.size <- length(RMs)
+      Measure <- RT/rp.size
+
+      # crpOut <- rp_measures(RM = RMs, emRad = tryRadius, AUTO=AUTO)
+      #Measure  <-  crpOut[[targetMeasure]]
+      #crpOut <- data.frame(RR = RR, RT = RT, size = length(RMs))
+      #Measure <- RR
+
+      iterList[iter,] <-    cbind.data.frame(iter        = iter,
+                                             Measure     = Measure,
+                                             Radius      = tryRadius,
+                                             targetValue = targetValue,
+                                             tollo       = targetValue*(1-tol),
+                                             tolhi       = targetValue*(tol+1),
+                                             startRadius = startRadius,
+                                             rp.size = recmatsize,
+                                             AUTO        = AUTO,
+                                             Converged   = Converged)
+
+      if(any(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1)),(iter>=maxIter))){
+        if(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1))){
+          Converged <- TRUE
+          if(!silent){message("\nConverged! Found an appropriate radius...")}
+        }
+        iterList$Converged[iter] <- Converged
+        exitIter <- TRUE
+      }
+
+      if(round(Measure,digits = 2)>round(targetValue,digits = 2)){
+        tryRadius <- tryRadius*(min(0.8,tol*2))
+      } else {
+        tryRadius <- tryRadius*(min(1.8,1+(tol*2)))
+      }
+    } # While ....
+
+    if(iter>=maxIter){
+      warning("Max. iterations reached!")
+    }
+    if(Measure %][% c(targetValue*(1-tol),targetValue*(tol+1))){
+      iterList$Radius[iter] <- dplyr::case_when(
+        radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
+        radiusOnFail%in%"huge" ~ 1 + max(RM),
+        radiusOnFail%in%"percentile" ~ as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))),probs = ifelse(targetValue>=1,.05,targetValue)))
+      )
+      warning(paste0("\nTarget not found, try increasing tolerance, max. iterations, or, change value of startRadius.\nreturning radius: ",iterList$Radius[iter]))
+    }
+
+    ifelse(histIter,id<-c(1:iter),id<-iter)
+    return(iterList[id,])
+
+  } # if "fixed"
+
+  if(type%in%"optimal"){
+
+    if(optimOK){
+
+      if(!silent){cat(paste0("\nNormalisation set to: ",standardise,"!!\n"))}
+
+      startRadius <- rep(startRadius, each = eachRadius)
+
+      dfREC  <-  plyr::ldply(startRadius, function(r){roc_noise(y = y1,
+                                                                emDim = emDim,
+                                                                emLag = emLag,
+                                                                emRad = r,
+                                                                noiseLevel = noiseLevel,
+                                                                standardise = standardise,
+                                                                noiseType = noiseType)},
+                             .progress = plyr::progress_text(char = "o~o"))
+
+
+      dfREC      <-  dplyr::arrange(dfREC,dfREC$response,dfREC$emRad)
+      caseID    <- dfREC$response%in%"signal+noise"
+      controlID <- dfREC$response%in%"noise"
+
+      rocREC <- list(RR  = pROC::roc(cases=dfREC$RR[caseID], controls=dfREC$RR[controlID]),
+                     DET = pROC::roc(cases=dfREC$DET[caseID], controls=dfREC$DET[controlID]),
+                     LAM = pROC::roc(cases=dfREC$LAM[caseID], controls=dfREC$LAM[controlID]),
+                     T1  = pROC::roc(cases=dfREC$T1[caseID], controls=dfREC$T1[controlID]))
+
+
+      optimal.radius <- list(RR  = dfREC$emRad[(dfREC$RR>=min(pROC::coords(rocREC$RR,
+                                                                           "b",best.method="c",
+                                                                           ret="t")))][1],
+                             DET = dfREC$emRad[(dfREC$DET  >=min(pROC::coords(rocREC$DET,
+                                                                              "b",best.method="c",
+                                                                              ret="t")))][1],
+                             LAM = dfREC$emRad[(dfREC$LAM  >=min(pROC::coords(rocREC$LAM,
+                                                                              "b",best.method="c",
+                                                                              ret="t")))][1],
+                             T1  = dfREC$emRad[(dfREC$T1   >=min(pROC::coords(rocREC$T1,
+                                                                              "b",best.method="c",
+                                                                              ret="t")))][1]
+      )
+
+      optimal.value <- list(RR  = rp_cl(y1, emRad = optimal.radius$RR, emDim=emDim, emLag=emLag)[["RR"]],
+                            DET = rp_cl(y1, emRad = optimal.radius$DET, emDim=emDim, emLag=emLag)[["DET"]],
+                            LAM = rp_cl(y1, emRad = optimal.radius$LAM, emDim=emDim, emLag=emLag)[["LAM"]],
+                            T1  = rp_cl(y1, emRad = optimal.radius$T1, emDim=emDim, emLag=emLag)[["T1"]]
+      )
+
+      if(targetMeasure=="all"){
+
+        if(plotROC){
+
+          op <- graphics::par(pty="s", mfrow=c(2,2))
+
+          pROC::plot.roc(rocREC$RR,
+                         print.thres="best",
+                         print.thres.best.method="closest.topleft",
+                         print.thres.cex=.6,
+                         print.auc=TRUE,
+                         print.auc.x=.9,
+                         print.auc.y=.1,
+                         auc.polygon=TRUE,
+                         main = paste("RR =",round(optimal.value$RR,3),"- Radius =",optimal.radius$RR))
+
+          pROC::plot.roc(rocREC$DET,
+                         print.thres="best",
+                         print.thres.best.method="closest.topleft",
+                         print.thres.cex=.6,
+                         print.auc=TRUE,
+                         print.auc.x=.9,
+                         print.auc.y=.1,
+                         auc.polygon=TRUE,
+                         main = paste("DET =",round(optimal.value$DET,3),"- Radius =",optimal.radius$DET))
+
+          pROC::plot.roc(rocREC$LAM,
+                         print.thres="best",
+                         print.thres.best.method="closest.topleft",
+                         print.thres.cex=.6,
+                         print.auc=TRUE,
+                         print.auc.x=.9,
+                         print.auc.y=.1,
+                         auc.polygon=TRUE,
+                         main = paste("LAM =",round(optimal.value$LAM,3),"- Radius =",optimal.radius$LAM))
+
+          pROC::plot.roc(rocREC$T1,
+                         print.thres="best",
+                         print.thres.best.method="closest.topleft",
+                         print.thres.cex=.6,
+                         print.auc=TRUE,
+                         print.auc.x=.9,
+                         print.auc.y=.1,
+                         auc.polygon=TRUE,
+                         main = paste("T1 =",round(optimal.value$T1,3),"- Radius =",optimal.radius$T1))
+
+          #    plot(precision ~ recall, t(pROC::coords(rocREC, "all", ret = c("recall", "precision"))), type="l")
+          #  graphics::text(x=-5,y=0,labels=paste("Optimal radius for", targetMeasure,"=",optimal.value,"is:",optimal.radius))
+          graphics::par(op)
+        }
+
+        return(data.frame(measure = c("RR","DET","LAM","T1"),
+                          optimal = plyr::ldply(optimal.value)[-1],
+                          radius  = plyr::ldply(optimal.radius)[-1]
+        )
+        )
+
+      } else {
+
+        #  rocREC <- dplyr::case_when(
+        #    targetMeasure == "RR"  ~ list(rocREC=pROC::roc(controls=dfREC$RR[dfREC$response%in%"signal+noise"],
+        #                                                   cases=dfREC$RR[dfREC$response=="noise"])),
+        #    targetMeasure == "DET" ~ list(rocREC=pROC::roc(controls=dfREC$DET[dfREC$response%in%"signal+noise"],
+        #                                                   cases=dfREC$DET[dfREC$response=="noise"])),
+        #    targetMeasure == "LAM" ~ list(rocREC=pROC::roc(controls=dfREC$LAM[dfREC$response%in%"signal+noise"],
+        #                                                   cases=dfREC$LAM[dfREC$response=="noise"])),
+        #    targetMeasure == "T1"  ~ list(rocREC=pROC::roc(controls=dfREC$T1[dfREC$response%in%"signal+noise"],
+        #                                                   cases=dfREC$T1[dfREC$response=="noise"]))
+        #  )
+
+
+        optimal.radius <- optimal.radius[[targetMeasure]]
+        optimal.value <- optimal.value[[targetMeasure]]
+        rocREC        <- rocREC[[targetMeasure]]
+
+        if(plotROC){
+          op<-graphics::par(pty="s")
+          pROC::plot.roc(rocREC,
+                         print.thres="best",
+                         print.thres.best.method="closest.topleft",
+                         print.thres.cex=.6,
+                         print.auc=TRUE,
+                         print.auc.x=.9,
+                         print.auc.y=.1,
+                         auc.polygon=TRUE,
+                         main = paste(targetMeasure,"=",round(optimal.value,3),"- Radius =",optimal.radius))
+
+          #    plot(precision ~ recall, t(pROC::coords(rocREC, "all", ret = c("recall", "precision"))), type="l")
+          #  graphics::text(x=-5,y=0,labels=paste("Optimal radius for", targetMeasure,"=",optimal.value,"is:",optimal.radius))
+          graphics::par(op)
+        }
+
+      }
+
+      return(cbind.data.frame(measure=targetMeasure,
+                              optimal.value=optimal.value[[1]]%00%NA,
+                              optimal.radius=optimal.radius%00%NA))
+
+    } else {
+
+      stop("Need time series vector(s) to perform optimal Radius search.")
+
+    }
+  } # if "optimal"
+}
+
+
+#' Estimate RQA parameters
+#'
+#' Find optimal parameters for constructing a Recurrence Matrix. A wrapper for various algorithms used to find optimal values for the embedding delay and the number of embedding dimensions.
+#'
+#' @param y A numeric vector or time series
+#' @param emLag Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If `NULL` the lags based on the mutual information in `lagMethods` will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = `NULL`)
+#' @param lagMethods A character vector with one or more of the following strings: `"first.minimum","global.minimum","max.lag"`. If `emLag` represents a valid lag this value will be reported as `"user.lag"` (default = `c("first.minimum","global.minimum","max.lag")`)
+#' @param maxLag Maximum embedding lag to consider. Default value is: `floor(length(y)/(maxDim+1))`
+#' @param estimateDimensions Decide on an optimal embedding dimension relative to the values in `maxDim` and `lagMethods`, according to a number of preferences passed as a character vector. The order in which the preferences appear in the vector affects the selection procedure, with index `1` being most important preference. The following options are available:
+#'
+#' * `preferNone` - No optimal number will be picked all other preferences will be ignored
+#' * `preferSmallestDim` - Pick smallest number of dimensions associated with a percentage NN below `nnThres`
+#' * `preferSmallestNN` - Pick the number of dimensions that is associated with the smallest percentage NN below `nnThres`
+#' * `preferSmallestLag` - If the value of `nnThres` does not lead to a unique preference for a pair of dimension and lag values, use the pair with the smallest lag
+#' * `preferSmallestInLargestHood` - The default option: If no unique pair can be found, prefer pairs with smallest values for lag, dimensions, percentage NN for the largest NN size
+#'
+#' @param maxDim Maximum number of embedding dimensions to consider (default = `10`)
+#' @param minVecLength The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of `maxDim` that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = `20`)
+#' @param nnSizes Points whose distance is `nnSize` times further apart than the estimated size of the attractor will be declared false neighbours. See the argument `atol` in [fractal::FNN()] (default = `2`)
+#' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than `nnRadius`, the points are declared false neighbours. See the argument `rtol` in [fractal::FNN()] (default = `5`)
+#' @param nnThres Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = `10`)
+#' @param theiler Theiler window on distance matrix (default = `0`)
+#' @param doPlot Produce a diagnostic plot the results (default = `TRUE`)
+#' @param silent Silent-ish mode
+#' @param ... Other parameters passed to [nonlinearTseries::timeLag()]
+#'
+#' @return A list object containing the optimal values (as indicated by the user) and iteration history.
+#'
+#' @details A number of functions are called to determine optimal parameters for delay embedding a time series:
+#'
+#' * Embedding lag (`emLag`): The default is to call [casnet::est_emLag()], which is a wrapper around [nonlinearTseries::timeLag()] with `technique=ami` to get lags based on the mutual information function.
+#' * Embedding dimension (`m`, `emDim`): The default is to call [casnet::est_emDim()], which is a wrapper around [fractal::FNN()]
+#'
+#'
+#' @family Estimate Recurrence Parameters
+#'
+#' @export
+#'
+#' @examples
+#'
+#' set.seed(4321)
+#' est_parameters(rnorm(100))
+#'
+est_parameters <- function(y,
+                           lagMethods = c("first.minimum","global.minimum","max.lag"),
+                           estimateDimensions = "preferSmallestInLargestHood",
+                           maxDim   = 10,
+                           emLag     = NULL,
+                           maxLag   = floor(NROW(y)/(maxDim+1)),
+                           minVecLength = 20,
+                           nnSizes  = 2,
+                           nnRadius = 5,
+                           nnThres  = 10,
+                           theiler  = 0,
+                           doPlot   = TRUE,
+                           silent   = TRUE,
+                           ...){
+
+  if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
+
+  if(length(nnRadius)!=1){stop("nnRadius must have 1 numeric value")}
+  #if(length(nnSizes)!=4){stop("nnSizes must have 4 numeric values")}
+  y <- y[!is.na(y)]
+  #y <- ts_standardise(y, adjustN = FALSE)
+
+  if(minVecLength<20){
+    stop("Please collect more data!")
+  }
+
+  if(!is.na(maxDim%00%NA)&!is.na(maxLag%00%NA)){
+    if((NROW(y)-(maxDim*maxLag))<minVecLength){
+      maxDim <- (1:maxDim)[max(which(NROW(y)-(1:maxDim*maxLag)>=minVecLength), na.rm = TRUE)]
+      message(paste("Changed value of maxDim to",maxDim))
+    }
+  }
+
+  emDims <-  1:maxDim
+
+  doLags <- c(1:maxLag)
+  if(!is.null(emLag)){
+    if(NROW(emLag)==1){
+      lagMethods <- c(lagMethods, "user.lag") #  lag = emLag, ami = 0)
+      doLags <- unique(sort(c(1:maxLag,emLag)))
+    } else {
+      stop("emLag must have 1 numeric value")
+    }
+  }
+
+
+  if(nchar(estimateDimensions)>1){
+    mi <- mif(data.frame(y),lags = doLags)
+    #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
+    emLags <- cbind.data.frame(selection.methods = lagMethods, lag = NA)
+    for(m in seq_along(emLags$selection.methods)){
+      if(emLags$selection.methods[m]%in%"first.minimum"){
+        if(length(doLags)>2){
+          emLags$lag[m] <- which(ts_symbolic(data.frame(mi))%in%"trough")[1]%00%NA
+        } else {
+          warning("Only 2 lags to evaluate, setting 'first.minimum' to 1.")
+          emLags$lag[m] <- 1
+        }
+      }
+      if(emLags$selection.methods[m]=="global.minimum"){
+        emLags$lag[m] <- as.numeric(which.min(mi))
+      }
+      if(emLags$selection.methods[m]=="max.lag"){
+        emLags$lag[m] <- maxLag
+      }
+      if(emLags$selection.methods[m]=="user.lag"){
+        emLags$lag[m] <- emLag
+      }
+      if(is.na(emLags$lag[m])){
+        emLags$ami[m] <- NA
+      } else {
+        emLags$ami[m] <- mi[emLags$lag[m]]
+      }
+    }
+  } else {
+    emLags <- cbind.data.frame(selection.methods = "Not estimated", lag = NA, ami = NA)
+  }
+
+  # (fn.out <- tseriesChaos::false.nearest(lx, m=10, d=17, t=0, eps=sd(lx)/10, rt=20))
+  # plot(fn.out[1,],type="b")
+
+  if(any(estimateDimensions%in%c("preferNone","preferSmallestDim", "preferSmallestNN", "preferSmallestLag", "preferSmallestInLargestHood"))){
+
+    lagList <- list()
+    cnt = 0
+
+    for(N in seq_along(nnSizes)){
+      for(R in seq_along(nnRadius)){
+        for(L in seq_along(emLags$selection.method)){
+
+          if(!is.na(emLags$lag[L])){
+            cnt = cnt+1
+
+            Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
+            for(D in seq_along(emDims)){
+              RM <- rp(y,y, emDim = emDims[D], emLag = emLags$lag[L],returnMeasures = FALSE)
+              RM <- bandReplace(RM,-theiler,theiler,0,silent = silent)
+              Nn.min[D]  <- min(RM, na.rm = TRUE)
+              Nn.max[D]  <- max(RM, na.rm = TRUE)
+              Nn.sd[D]   <- stats::sd(RM, na.rm = TRUE)
+              Nn.mean[D] <- mean(RM, na.rm = TRUE)
+              rm(RM)
+            }
+
+            #surrDims <- nonlinearTseries::buildTakens(time.series =  as.numeric(y), embedding.dim =  emDims[[D]], time.lag = emLags$optimal.lag[L])
+
+            # (fn.out <- false.nearest(rnorm(1024), m=6, d=1, t=1, rt=3))
+            # plot(fn.out)
+
+            fnnSeries <- fractal::FNN(x = as.numeric(y),
+                                      dimension = maxDim,
+                                      tlag = emLags$lag[L],
+                                      rtol = nnRadius[R],
+                                      atol = nnSizes[N],
+                                      olag = 1
+            )
+          }
+
+          #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*sd(y))
+          #Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
+          #   if(D==1){Nn.max <- Nn}
+          lagList[[cnt]] <- data.frame(Nn.pct = as.numeric(fnnSeries[1,]),
+                                       Nsize = nnSizes[N],
+                                       Nradius = nnRadius[R],
+                                       emLag.method = emLags$selection.method[[L]],
+                                       emLag = emLags$lag[L],
+                                       emDim = emDims,
+                                       Nn.mean = Nn.mean,
+                                       Nn.sd  = Nn.sd,
+                                       Nn.min = Nn.min,
+                                       Nn.max = Nn.max)
+        }
+      }
+    }
+
+    df        <- plyr::ldply(lagList)
+    # df$Nn.pct <- df$Nn/df$Nn.max
+
+    opt <-plyr::ldply(unique(df$emLag), function(n){
+      id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
+      if(length(id)>0){
+        #idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
+        # if(length(idmin)>0){
+        #   return(df[idmin,])
+        #}
+        df <- df[id,]
+        return(df[!duplicated(df),])
+      } else {
+        return(df[which.min(df$Nn.pct[(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag"))]),])
+      }
+    }
+    )
+
+    opt <- switch(estimateDimensions,
+                  preferNone = opt[!duplicated(opt),],
+                  preferSmallestDim = opt[min(opt$emDim, na.rm=TRUE),],
+                  preferSmallestNN = opt[min(opt$NN.pct, na.rm=TRUE),],
+                  preferSmallestLag = opt[min(opt$emLag, na.rm=TRUE),],
+                  preferSmallestInLargestHood = opt[(min(opt$emLag, na.rm=TRUE)&min(opt$emDim, na.rm=TRUE)&max(opt$Nsize, na.rm = TRUE)),]
+    )
+
+    #opt <- opt[opt$emDim==min(opt$emDim),][1,]
+    opDim <- min(unique(opt$emDim), na.rm = TRUE)
+    #opt <- opt[!duplicated(opt),]
+
+  } else { # if estimateDim
+    opDim <- NA
+  }
+
+
+  #opDim <- min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE)
+  # opLag <- tau(y,
+  #              selection.methods = ami.method,
+  #              maxLag =maxLag)$opLag[1]
+  opLag <- min(unique(opt$emLag), na.rm = TRUE)
+  #opRad = NULL
+
+  opt <- opt[all(opt$emDim==opDim,opt$emLag==opLag),]
+
+  df$emLag <- factor(df$emLag)
+  df$Nns   <- interaction(df$Nsize,df$Nradius)
+  df$Nns.f  <-  factor(df$Nns, levels=levels(df$Nns), labels = paste0("size=",nnSizes," | radius=",nnRadius))
+
+  if(doPlot){
+
+    dfs <- data.frame(startAt= c(.5, graphics::hist(emDims,plot=FALSE)$mids),
+                      stopAt = c(graphics::hist(emDims,plot=FALSE)$mids,max(emDims)+.5),
+                      f=factor(seq_along(c(.5, graphics::hist(emDims,plot=FALSE)$mids))%%2))
+
+    #tmi <-  nonlinearTseries::mutualInformation(y, lag.max = maxLag, n.partitions = , do.plot = FALSE)
+
+    tmi <- mif(data.frame(y),lags = 1:maxLag)
+
+    dfMI <- data.frame(emDelay = as.numeric(names(tmi)),
+                       ami     = as.numeric(tmi))
+
+
+    #  RColorBrewer::brewer.pal(n = length(unique(df$emLag) name = "Set2")
+
+    # use: alpha()
+
+    Ncol <- length(emLags$selection.method[!is.na(emLags$lag)])
+    myPal <- RColorBrewer::brewer.pal(Ncol,"Set2")
+    myPalLag <- myPal
+    names(myPalLag) <- emLags$selection.method[!is.na(emLags$lag)]
+    myPalNn <- myPal
+    names(myPalNn) <- emLags$lag[!is.na(emLags$lag)]
+
+    gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
+      ggplot2::geom_rect(ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
+      ggplot2::scale_fill_manual(values = scales::alpha(c("grey", "white"),.2), guide=FALSE) +
+      ggplot2::geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
+      ggplot2::geom_hline(yintercept = c(0,100),   colour = "grey60") +
+      ggplot2::geom_hline(yintercept = 50, colour = "grey90") +
+      ggplot2::geom_line(position  = ggplot2::position_dodge(.4)) +
+      ggplot2::geom_point(position = ggplot2::position_dodge(.4)) +
+      ggplot2::annotate("text",x=maxDim/3,y=nnThres, label="threshold", size = .8) +
+      ggplot2::xlab("Embedding Dimension") +
+      ggplot2::ylab("Nearest neigbours (% of max.)") +
+      ggplot2::facet_wrap(~Nns.f, ncol=2) +
+      ggplot2::scale_x_continuous(breaks=emDims) +
+      ggplot2::scale_y_continuous(breaks = c(nnThres,50,100)) +
+      ggplot2::scale_color_manual("Lag", values = myPalNn ) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
+                     strip.text.x = element_text(colour = "black", face = "bold"),
+                     panel.spacing = ggplot2::unit(1, "lines"),
+                     legend.position = c(.9, .8),
+                     legend.background = element_rect(colour = "grey10",fill = "grey90"),
+                     legend.title = element_text(face = "bold"),
+                     legend.key = element_rect(colour = "grey90", fill = "grey90"),
+                     panel.grid.minor.x = element_blank(),
+                     panel.grid.major.y = element_blank(),
+                     panel.grid.minor.y = element_blank()
+      )
+
+    gDelay <- ggplot2::ggplot(dfMI, ggplot2::aes_(y = ~ami, x = ~emDelay)) +
+      ggplot2::geom_line() +
+      ggplot2::geom_vline(data = emLags,  ggplot2::aes_(colour=factor(emLags$selection.method),
+                                                        xintercept = ~lag), alpha = .3) +
+      ggplot2::geom_point(data = emLags,  ggplot2::aes_(x = ~lag, y = ~ami, colour = factor(emLags$selection.method)), size = 2) +
+      ggplot2::xlab("Embedding Lag") +
+      ggplot2::ylab("Average Mututal Information") +
+      ggplot2::scale_color_manual("Lag", values = myPalLag) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(legend.position = c(.95, .95),
+                     legend.justification = c("right", "top"),
+                     legend.box.just = "right",
+                     legend.margin = margin(6, 6, 6, 6),
+                     legend.background = element_rect(colour = "grey10",fill = "grey90"),
+                     legend.title = element_text(face = "bold"),
+                     legend.key = element_rect(colour = "grey90", fill = "grey90"),
+                     #panel.grid.major.x = element_blank(),
+                     panel.grid.minor.x = element_blank(),
+                     panel.grid.major.y = element_blank(),
+                     panel.grid.minor.y = element_blank()
+
+      )
+
+    g <- gridExtra::grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
+    #grid::grid.newpage()
+    grid::grid.draw(g)
+
+  } else {
+    g <- NA
+  }
+
+  return(invisible(list(optimLag  = opLag,
+                        optimDim  = opDim,
+                        optimRow  = opt,
+                        optimData = df,
+                        diagPlot = g)))
+}
+
+
+
+#' Estimate ROC radius
+#'
+#'  Experimental.
+#'
+#' @param y y
+#' @param emRad radius
+#' @param emDim embedding Dims
+#' @param emLag embedding Lag
+#' @param noiseLevel noise Level
+#' @param standardise Standardise y? Choose from "mean.sd","median.mad","none".
+#' @param noiseType Use a Normal distribution of uniform distribution for noiselevels
+#'
+#' @family Estimate Recurrence Parameters
+#'
+#' @return data frame for ROC
+#' @export
+#'
+#' @keywords internal
+est_parameters_roc <- function(y, emRad, emDim=1, emLag=1, noiseLevel=.75, standardise = c("mean.sd","median.mad","none")[3], noiseType = c("normal","uniform")[1]){
+  y <- dplyr::case_when(
+    standardise == "mean.sd"   ~ ts_standardise(y, type="mean.sd"),
+    standardise == "median.sd" ~ ts_standardise(y, type="median.mad"),
+    standardise == "none"      ~ y
+  )
+
+  yn <- dplyr::case_when(
+    noiseType == "normal"  ~ stats::rnorm(NROW(y), mean=round(mean(y, na.rm = TRUE),3), sd=stats::sd(y,na.rm = TRUE)),
+    noiseType == "uniform" ~ sign(stats::rnorm(1))*stats::runif(NROW(y), min=floor(min(y, na.rm = TRUE)), max = ceiling(max(y,na.rm = TRUE)))
+  )
+
+  noise_out   <- rp_cl(yn, emRad = emRad, emDim=emDim, emLag=emLag)
+  measure_out <- rp_cl((y  + noiseLevel * yn), emRad = emRad, emDim=emDim, emLag=emLag)
+
+  return(cbind.data.frame(radius   = emRad,
+                          response = c("signal+noise","noise"),
+                          rbind(measure_out,noise_out)))
+}
+
+
+#' Estimate embedding lag (tau)
+#'
+#' A wrapper for [nonlinearTseries::timeLag]
+#'
+#' @param y Time series or numeric vector
+#' @param selection.methods Selecting an optimal embedding lag (default: Return "first.e.decay", "first.zero", "first.minimum", "first.value", where value is 1/exp(1))
+#' @param maxLag Maximal lag to consider (default: 1/4 of timeseries length)
+#' @param ... Additional parameters
+#'
+#' @return The ami function with requested minima
+#'
+#' @export
+#'
+#' @family Estimate Recurrence Parameters
+#'
+est_emLag <- function(y,
+                      selection.methods = "first.minimum",
+                      maxLag = length(y)/4,
+                      ...){
+
+  y   <- y[!is.na(y)]
+  tmi <- nonlinearTseries::mutualInformation(y,
+                                             lag.max = maxLag,
+                                             #n.partitions = floor((max(y)-min(y))/(2*stats::IQR(y)*length(y)^(-1/3))),
+                                             do.plot = FALSE
+  )
+
+  lags <- numeric(length=length(selection.methods))
+  cnt <- 0
+  for(sm in selection.methods){
+    cnt <- cnt + 1
+    lag <-try_CATCH(nonlinearTseries::timeLag(y,
+                                              technique = "ami",
+                                              selection.method = sm,
+                                              lag.max = maxLag,
+                                              do.plot = FALSE,
+                                              #n.partitions = floor((max(y)-min(y))/(2*stats::IQR(y)*length(y)^(-1/3)))
+    ))
+    if(any(grepl("Error",lag$value))){lags[cnt] <- NA} else {lags[cnt] <- lag$value}
+  }
+
+  #id.peaks <- find_peaks(tmi$mutual.information, m = 3, wells = TRUE)
+  id.min   <- tmi$time.lag[which.min(tmi$mutual.information)]
+  #as.numeric(tmi$mutual.information[id.peaks[id.min]])
+
+  out <-   cbind.data.frame(selection.method = c(selection.methods,
+                                                 "global.minimum",
+                                                 "maximum.lag"),
+                            optimal.lag = c(lags, id.min, maxLag)
+  )
+
+  #tmi$mutual.information[tmi$time.lag%in%out$optimal.lag]
+  out$ami <- sapply(out$optimal.lag, function(r){
+    if(is.na(r)){
+      NA
+    } else {
+      tmi$mutual.information[r]
+    }
+  })
+
+  #tout <- summarise(dplyr::group_by(out, opLag, ami), selection.method = paste0(unique(selection.method), collapse="|")
+
+  return(out)
+}
+
+
+#' Estimate number of embedding dimensions
+#'
+#' A wrapper for [nonlinearTseries::estimateEmbeddingDim]
+#'
+#' @param y Time series or numeric vector
+#' @param delay Embedding lag
+#' @param maxDim Maximum number of embedding dimensions
+#' @param threshold See [nonlinearTseries::estimateEmbeddingDim()]
+#' @param max.relative.change See [nonlinearTseries::estimateEmbeddingDim()]
+#' @param doPlot Plot
+#' @param ... Other arguments (not in use)
+#'
+#' @description A wrapper for nonlinearTseries::estimateEmbeddingDim
+#'
+#' @return Embedding dimensions
+#' @export
+#' @family Estimate Recurrence Parameters
+#'
+est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max.relative.change = .1, doPlot = FALSE, ...){
+  cbind.data.frame(EmbeddingLag   = delay,
+                   EmbeddingDim   = nonlinearTseries::estimateEmbeddingDim(y,
+                                                                           time.lag  = delay,
+                                                                           threshold = threshold,
+                                                                           max.relative.change = max.relative.change,
+                                                                           max.embedding.dim = maxDim,
+                                                                           do.plot = doPlot)
+  )
+}

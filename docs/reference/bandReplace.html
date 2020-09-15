@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -107,9 +107,6 @@
     </li>
     <li>
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
-    </li>
-    <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -146,7 +143,7 @@
     <p>Sets a band of matrix diagonals to any given value</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bandReplace</span>(<span class='no'>mat</span>, <span class='no'>lower</span>, <span class='no'>upper</span>, <span class='kw'>value</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>bandReplace</span>(<span class='kw'>mat</span>, <span class='kw'>lower</span>, <span class='kw'>upper</span>, value = <span class='fl'>NA</span>, silent = <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -187,13 +184,17 @@
 <code><a href='rp_plot.html'>rp_plot</a>()</code>,
 <code><a href='rp_size.html'>rp_size</a>()</code>,
 <code><a href='rp.html'>rp</a>()</code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Fred Hasselman</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Create a 10 by 10 matrix</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>Matrix</span>)
-<span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Matrix/man/Matrix.html'>Matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>10</span>),<span class='fl'>10</span>,<span class='fl'>10</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://Matrix.R-forge.R-project.org'>Matrix</a></span>)
+<span class='kw'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Matrix/man/Matrix.html'>Matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>10</span>),<span class='fl'>10</span>,<span class='fl'>10</span>)
 
-<span class='fu'>bandReplace</span>(<span class='no'>m</span>,-<span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>0</span>)   <span class='co'># Replace diagonal and adjacent bands with 0 (Theiler window of 1)</span></div><div class='output co'>#&gt; 10 x 10 Matrix of class "dgeMatrix"
+<span class='fu'>bandReplace</span>(<span class='kw'>m</span>,<span class='op'>-</span><span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>0</span>)   <span class='co'># Replace diagonal and adjacent bands with 0 (Theiler window of 1)</span>
+</div><div class='output co'>#&gt; 10 x 10 Matrix of class "dgeMatrix"
 #&gt;              [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
 #&gt;  [1,]  0.00000000  0.00000000 -0.91407483 -0.91407483 -0.91407483 -0.91407483
 #&gt;  [2,]  0.00000000  0.00000000  0.00000000  0.46815442  0.46815442  0.46815442
@@ -231,7 +232,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

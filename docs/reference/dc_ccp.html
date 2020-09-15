@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="Cumulative Complexity Peaks (CCP) — dc_ccp" />
-<meta property="og:description" content="Computes significant peaks in the dynamic complexity time series. Example: Schiepek, Tominschek &amp;amp; Heinzel, 2014." />
+<meta property="og:description" content="Computes significant peaks in the dynamic complexity time series." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,23 +135,23 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Cumulative Complexity Peaks (CCP)</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/dc.R'><code>R/dc.R</code></a></small>
     <div class="hidden name"><code>dc_ccp.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computes significant peaks in the dynamic complexity time series. Example: Schiepek, Tominschek &amp; Heinzel, 2014.</p>
+    <p>Computes significant peaks in the dynamic complexity time series.</p>
     </div>
 
     <pre class="usage"><span class='fu'>dc_ccp</span>(
-  <span class='no'>df_win</span>,
-  <span class='kw'>alpha_item</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>alpha_time</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>useTimeVector</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>timeStamp</span> <span class='kw'>=</span> <span class='st'>"01-01-1999"</span>
+  <span class='kw'>df_win</span>,
+  alpha_item = <span class='fl'>0.05</span>,
+  alpha_time = <span class='fl'>0.05</span>,
+  doPlot = <span class='fl'>FALSE</span>,
+  useVarNames = <span class='fl'>TRUE</span>,
+  colOrder = <span class='fl'>TRUE</span>,
+  useTimeVector = <span class='fl'>NA</span>,
+  timeStamp = <span class='st'>"01-01-1999"</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -197,12 +194,6 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A list with a dataframe of binary complexity peak indices and a cumulative complexity peak index, a CCP diagram.</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Schiepek, G., &amp; Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. Biological cybernetics, 102(3), 197-207.</p>
-<p>Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. European Journal of Psychological Assessment, 19, 175-184.</p>
-<p>Haken, H. &amp; Schiepek, G. (2006, 2. Aufl. 2010). Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten. G?ttingen: Hogrefe.</p>
-<p>Schiepek, G. K., Tominschek, I., &amp; Heinzel, S. (2014). Self-organization in psychotherapy: testing the synergetic model of change processes. Frontiers in psychology, 5, 1089.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Dynamic Complexity functions: 
@@ -212,6 +203,10 @@
 <code><a href='plotDC_ccp.html'>plotDC_ccp</a>()</code>,
 <code><a href='plotDC_lvl.html'>plotDC_lvl</a>()</code>,
 <code><a href='plotDC_res.html'>plotDC_res</a>()</code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Merlijn Olthof</p>
+<p>Fred Hasselman</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -228,7 +223,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

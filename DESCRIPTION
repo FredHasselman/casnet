@@ -1,7 +1,7 @@
 Package: casnet
 Type: Package
 Title: A Toolbox for Studying Complex Adaptive Systems and NETworks
-Version: 0.1.5
+Version: 0.1.6
 Authors@R: c(person(given = "Fred", family = "Hasselman", email = "f.hasselman@pwo.ru.nl", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1384-8361")), person(given = "Merlijn", family = "Olthof", email = "m.olthof@pwo.ru.nl", role = "ctb"))
 Maintainer: Fred Hasselman <f.hasselman@pwo.ru.nl>
 Description: A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
@@ -17,27 +17,24 @@ LazyData: true
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Imports:
+    reshape2,
+    plyr,
     dplyr,
     fractal,
     ggplot2,
-    gganimate,
-    gridExtra,
-    ifultools,
+    gtable,
+    ggimage,
     igraph,
-    lattice,
-    latticeExtra,
     Matrix,
     nonlinearTseries,
-    plyr,
     pracma,
+    png,
     proxy,
     scales,
     xts,
     zoo,
     tidyr,
     rio,
-    gtable,
-    reshape2,
     sapa,
     signal,
     lubridate,
@@ -45,35 +42,43 @@ Imports:
     tseries,
     parallel,
     DescTools,
-    pROC,
     purrr,
     rpart,
     rlang (>= 0.1.2),
     infotheo,
     methods,
-    RColorBrewer,
     tibble,
     broom,
     callr,
     readr,
-    ggraph,
     boot,
     invctr,
-    cowplot,
-    raster,
-    mice,
-    imputeTS
+    DirectedClustering,
+    brainGraph,
+    stabledist
 Suggests: 
+    RColorBrewer,
+    pROC,
+    progress,
+    animation,
     knitr,
     rmarkdown,
     graphics,
     grDevices,
+    gridExtra,
     stats,
     utils,
     devtools,
     tidyverse,
     testthat,
-    roxygen2
+    raster,
+    mice,
+    imputeTS,
+    gganimate,
+    roxygen2,
+    ggraph,
+    cowplot,
+    lattice
 VignetteBuilder: knitr
 Language: en-US
 URL: https://github.com/FredHasselman/casnet

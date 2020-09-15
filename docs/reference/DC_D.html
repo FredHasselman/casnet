@@ -51,9 +51,8 @@ Distribution Uniformity is one of two components of which the product is the Dyn
 <meta property="og:title" content="Distribution Uniformity
 
 Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure. — dc_d" />
-<meta property="og:description" content="
-
-" />
+<meta property="og:description" content="Distribution Uniformity
+Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -86,7 +85,7 @@ Distribution Uniformity is one of two components of which the product is the Dyn
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -113,9 +112,6 @@ Distribution Uniformity is one of two components of which the product is the Dyn
     </li>
     <li>
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
-    </li>
-    <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -146,26 +142,25 @@ Distribution Uniformity is one of two components of which the product is the Dyn
     <h1>Distribution Uniformity
 
 Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/dc.R'><code>R/dc.R</code></a></small>
     <div class="hidden name"><code>dc_d.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    
-
-
+    <p>Distribution Uniformity</p>
+<p>Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.</p>
     </div>
 
     <pre class="usage"><span class='fu'>dc_d</span>(
-  <span class='no'>df</span>,
-  <span class='kw'>win</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>df</span>),
-  <span class='no'>scale_min</span>,
-  <span class='no'>scale_max</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>useVarNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>colOrder</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>useTimeVector</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>timeStamp</span> <span class='kw'>=</span> <span class='st'>"01-01-1999"</span>
+  <span class='kw'>df</span>,
+  win = <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>df</span>),
+  <span class='kw'>scale_min</span>,
+  <span class='kw'>scale_max</span>,
+  doPlot = <span class='fl'>FALSE</span>,
+  useVarNames = <span class='fl'>TRUE</span>,
+  colOrder = <span class='fl'>TRUE</span>,
+  useTimeVector = <span class='fl'>NA</span>,
+  timeStamp = <span class='st'>"01-01-1999"</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -173,7 +168,7 @@ Distribution Uniformity is one of two components of which the product is the Dyn
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>df</th>
-      <td><p>A dataframe containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in <code>df</code> should be on the same scale, an error will be thrown if the range of the time series in<code>df</code> is not <code>[scale_min,scale_max]</code>.</p></td>
+      <td><p>A data frame containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in <code>df</code> should be on the same scale, an error will be thrown if the range of the time series in<code>df</code> is not <code>[scale_min,scale_max]</code>.</p></td>
     </tr>
     <tr>
       <th>win</th>
@@ -212,11 +207,6 @@ Distribution Uniformity is one of two components of which the product is the Dyn
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>a dataframe</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    
-
-
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Use <code><a href='dc_win.html'>dc_win()</a></code> to get the Dynamic Complexity measure.</p>
@@ -243,7 +233,7 @@ Distribution Uniformity is one of two components of which the product is the Dyn
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

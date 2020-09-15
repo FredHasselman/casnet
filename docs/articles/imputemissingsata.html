@@ -98,7 +98,7 @@
       <h1 data-toc-skip>Dealing with missing values in (discrete) time series</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2020-09-01</h4>
+            <h4 class="date">2020-09-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/imputemissingsata.Rmd"><code>vignettes/imputemissingsata.Rmd</code></a></small>
       <div class="hidden name"><code>imputemissingsata.Rmd</code></div>
@@ -117,40 +117,46 @@
 <h3 class="hasAnchor">
 <a href="#data-with-missing-values" class="anchor"></a>Data with missing values</h3>
 <p>We’ll create some variables from which we artifically remove datapoints. This allows us to evaluate how well the imputation methods perform in recovering the true values.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">54321</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">54321</span>)
 <span class="co"># Random normally distributed numbers</span>
-<span class="no">zscore</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="fl">122</span>)
-<span class="no">df_vars</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">zscore</span> <span class="kw">=</span> <span class="no">zscore</span>)
+<span class="kw">zscore</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(n = <span class="fl">122</span>)
+<span class="kw">df_vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(zscore = <span class="kw">zscore</span>)
 <span class="co"># Random discrete uniform numbers</span>
-<span class="no">df_vars</span>$<span class="no">unif_discrete</span> <span class="kw">&lt;-</span> <span class="no">unif_discrete</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(<span class="no">df_vars</span>),<span class="kw">min</span> <span class="kw">=</span> <span class="fl">0</span>,<span class="kw">max</span> <span class="kw">=</span> <span class="fl">6</span>))
-<span class="no">df_vars</span>$<span class="no">unif_discrete</span>[<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">5</span>,<span class="fl">10</span>:<span class="fl">15</span>,<span class="fl">74</span>:<span class="fl">78</span>,<span class="fl">102</span>,<span class="fl">111</span>,<span class="fl">120</span>)] <span class="kw">&lt;-</span> <span class="fl">NA</span>
+<span class="kw">df_vars</span><span class="op">$</span><span class="kw">unif_discrete</span> <span class="op">&lt;-</span> <span class="kw">unif_discrete</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(<span class="kw">df_vars</span>),min = <span class="fl">0</span>,max = <span class="fl">6</span>))
+<span class="kw">df_vars</span><span class="op">$</span><span class="kw">unif_discrete</span>[<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">5</span>,<span class="fl">10</span><span class="op">:</span><span class="fl">15</span>,<span class="fl">74</span><span class="op">:</span><span class="fl">78</span>,<span class="fl">102</span>,<span class="fl">111</span>,<span class="fl">120</span>)] <span class="op">&lt;-</span> <span class="fl">NA</span>
 <span class="co"># Unordered catagorical </span>
-<span class="no">df_vars</span>$<span class="no">cat_unordered</span> <span class="kw">&lt;-</span> <span class="no">cat_unordered</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(<span class="no">df_vars</span>),<span class="kw">min</span> <span class="kw">=</span> <span class="fl">1</span>,<span class="kw">max</span> <span class="kw">=</span> <span class="fl">7</span>)))
-<span class="no">df_vars</span>$<span class="no">cat_unordered</span>[<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">5</span>,<span class="fl">10</span>:<span class="fl">15</span>,<span class="fl">74</span>:<span class="fl">78</span>,<span class="fl">102</span>,<span class="fl">111</span>,<span class="fl">120</span>)] <span class="kw">&lt;-</span> <span class="fl">NA</span>
+<span class="kw">df_vars</span><span class="op">$</span><span class="kw">cat_unordered</span> <span class="op">&lt;-</span> <span class="kw">cat_unordered</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(<span class="kw">df_vars</span>),min = <span class="fl">1</span>,max = <span class="fl">7</span>)))
+<span class="kw">df_vars</span><span class="op">$</span><span class="kw">cat_unordered</span>[<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">5</span>,<span class="fl">10</span><span class="op">:</span><span class="fl">15</span>,<span class="fl">74</span><span class="op">:</span><span class="fl">78</span>,<span class="fl">102</span>,<span class="fl">111</span>,<span class="fl">120</span>)] <span class="op">&lt;-</span> <span class="fl">NA</span>
 <span class="co"># Ordered categroical</span>
-<span class="no">df_vars</span>$<span class="no">cat_ordered</span> <span class="kw">&lt;-</span> <span class="no">cat_ordered</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">ordered</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(<span class="no">df_vars</span>),<span class="kw">min</span> <span class="kw">=</span> <span class="fl">1</span>,<span class="kw">max</span> <span class="kw">=</span> <span class="fl">20</span>)))</pre></body></html></div>
+<span class="kw">df_vars</span><span class="op">$</span><span class="kw">cat_ordered</span> <span class="op">&lt;-</span> <span class="kw">cat_ordered</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">ordered</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span>(<span class="kw">df_vars</span>),min = <span class="fl">1</span>,max = <span class="fl">20</span>)))
+</pre></div>
 <p>We’ll also load the data analysed by Bastiaansen et al. (2019) and select some variables which have missing values.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co"># # Load data from OSF https://osf.io/tcnpd/</span>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="co"># # Load data from OSF https://osf.io/tcnpd/</span>
 <span class="co"># require(osfr)</span>
 <span class="co"># manyAnalystsESM &lt;- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)</span>
 
 <span class="co"># Or use the internal data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">manyAnalystsESM</span>)
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="kw">manyAnalystsESM</span>)
 
 <span class="co"># We want to use these variables</span>
 <span class="co"># Note: the infix function '%ci%' is from package 'invctr'</span>
-<span class="no">vars</span>    <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"angry"</span><span class="kw">%ci%</span><span class="no">manyAnalystsESM</span>,<span class="st">"ruminate"</span><span class="kw">%ci%</span><span class="no">manyAnalystsESM</span>,<span class="st">"hours"</span><span class="kw">%ci%</span><span class="no">manyAnalystsESM</span>)
+<span class="kw">vars</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"angry"</span><span class="op">%ci%</span><span class="kw">manyAnalystsESM</span>,<span class="st">"ruminate"</span><span class="op">%ci%</span><span class="kw">manyAnalystsESM</span>,<span class="st">"hours"</span><span class="op">%ci%</span><span class="kw">manyAnalystsESM</span>)
 
-<span class="no">df_vars</span> <span class="kw">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="no">df_vars</span>,<span class="no">manyAnalystsESM</span>[,<span class="no">vars</span>])
+<span class="kw">df_vars</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/pkg/mice/man/cbind.html">cbind</a></span>(<span class="kw">df_vars</span>,<span class="kw">manyAnalystsESM</span>[,<span class="kw">vars</span>])
 
 <span class="co"># Give zscore and ordered categorical gthe same NAs as variable 'angry'</span>
-<span class="no">df_vars</span>$<span class="no">zscore</span>[<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">df_vars</span>$<span class="no">angry</span>)] <span class="kw">&lt;-</span> <span class="fl">NA</span>
-<span class="no">df_vars</span>$<span class="no">cat_ordered</span>[<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">df_vars</span>$<span class="no">angry</span>)] <span class="kw">&lt;-</span> <span class="fl">NA</span></pre></body></html></div>
+<span class="kw">df_vars</span><span class="op">$</span><span class="kw">zscore</span>[<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="kw">df_vars</span><span class="op">$</span><span class="kw">angry</span>)] <span class="op">&lt;-</span> <span class="fl">NA</span>
+<span class="kw">df_vars</span><span class="op">$</span><span class="kw">cat_ordered</span>[<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="kw">df_vars</span><span class="op">$</span><span class="kw">angry</span>)] <span class="op">&lt;-</span> <span class="fl">NA</span>
+</pre></div>
 <p>Function <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/statsNA.html">imputeTS::statsNA()</a></code> can produce some helpful statistics on the <code>NA</code>s that might be present in your data.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="no">imputeTS</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="kw"><a href="https://github.com/SteffenMoritz/imputeTS">imputeTS</a></span>)
 
 <span class="co"># The variable 'angry'</span>
-<span class="kw pkg">imputeTS</span><span class="kw ns">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/statsNA.html">statsNA</a></span>(<span class="no">df_vars</span>$<span class="no">angry</span>)</pre></body></html></div>
+<span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/statsNA.html">statsNA</a></span>(<span class="kw">df_vars</span><span class="op">$</span><span class="kw">angry</span>)
+</pre></div>
 <pre><code>&gt; [1] "Length of time series:"
 &gt; [1] 122
 &gt; [1] "-------------------------"
@@ -184,8 +190,10 @@
 &gt; [1] "Overview NA series"
 &gt; [1] "  1 NA in a row: 7 times"
 &gt; [1] "  2 NA in a row: 1 times"</code></pre>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># Uniform discrete numbers</span>
-<span class="kw pkg">imputeTS</span><span class="kw ns">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/statsNA.html">statsNA</a></span>(<span class="no">df_vars</span>$<span class="no">unif_discrete</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co"># Uniform discrete numbers</span>
+<span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/statsNA.html">statsNA</a></span>(<span class="kw">df_vars</span><span class="op">$</span><span class="kw">unif_discrete</span>)
+</pre></div>
 <pre><code>&gt; [1] "Length of time series:"
 &gt; [1] 122
 &gt; [1] "-------------------------"
@@ -231,17 +239,19 @@
 <a href="#linear-interpolation" class="anchor"></a>Linear interpolation</h3>
 <p>One of the most straightforward inputation methods is linear interpolation. This is a relatively sensible method if there is just one time point missing. However, when several values are missing in a row, the linear interpolation might be unrealistic. Other methods that will give less plausible results for imputation of multiple missing values in a row are <em>last observation carried forward</em> and <em>next observation carried backward</em>, also available in <code>imputeTS</code> as <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.locf.html">na.locf(type = "locf")</a></code>, and <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.locf.html">na.locf(type = "nocb")</a></code> respectively.</p>
 <p>We’ll generate a data set with linear interpolation (also available are <code>spline</code> and <code>stine</code> interpolation), to compare to the more advanced multiple imputation methods discussed below.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">out.linear</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="fu">laply</span>(<span class="fl">1</span>:<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NCOL</a></span>(<span class="no">df_vars</span>), <span class="kw">function</span>(<span class="no">c</span>){
-  <span class="no">y</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">df_vars</span>[,<span class="no">c</span>], <span class="kw">keepNA</span> <span class="kw">=</span> <span class="fl">TRUE</span>))
-  <span class="no">idNA</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">y</span>)
-  <span class="no">yy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="kw pkg">imputeTS</span><span class="kw ns">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.interpolation.html">na.interpolation</a></span>(<span class="no">y</span>,<span class="kw">option</span> <span class="kw">=</span> <span class="st">"linear"</span>))
-  <span class="kw">if</span>(<span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span>(<span class="fu">is.wholenumber</span>(<span class="no">y</span>[!<span class="no">idNA</span>]))){
-    <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="no">yy</span>))
-  } <span class="kw">else</span> {
-      <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="no">yy</span>)
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="kw">out.linear</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/plyr/man/laply.html">laply</a></span>(<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NCOL</a></span>(<span class="kw">df_vars</span>), <span class="fu">function</span>(<span class="kw">c</span>){
+  <span class="kw">y</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(x = <span class="kw">df_vars</span>[,<span class="kw">c</span>], keepNA = <span class="fl">TRUE</span>))
+  <span class="kw">idNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="kw">y</span>)
+  <span class="kw">yy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mice/man/cbind.html">cbind</a></span>(<span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.interpolation.html">na.interpolation</a></span>(<span class="kw">y</span>,option = <span class="st">"linear"</span>))
+  <span class="co">if</span>(<span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/invctr/man/is.wholenumber.html">is.wholenumber</a></span>(<span class="kw">y</span>[<span class="op">!</span><span class="kw">idNA</span>]))){
+    <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw">yy</span>))
+  } <span class="co">else</span> {
+      <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="kw">yy</span>)
     }
   }))
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">out.linear</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df_vars</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">out.linear</span>) <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)
+</pre></div>
 <p>Note that we need to round the imputed values to get discrete values if the original variable was discrete.</p>
 </div>
 <div id="kalman-filter" class="section level3">
@@ -249,22 +259,26 @@
 <a href="#kalman-filter" class="anchor"></a>Kalman filter</h3>
 <p>Imputation by using the Kalman filter is a powerful method for imputing data. However, when dealing with discrete data, one has to take some additional steps in order to get meaningful results.</p>
 <p>For example, with uniform discrete numbers and/or scales that are bounded (eg. visual analog scale from <code>0-100</code>), the Kalman method will not correctly impute the data and might go outsdide the bounds of the scale.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># Use casnet::as.numeric_discrete() to turn a factor or charcter vector into a named numeric vector.</span>
-<span class="no">ca</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="no">df_vars</span>$<span class="no">cat_ordered</span>, <span class="kw">keepNA</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="no">imputations</span> <span class="kw">&lt;-</span> <span class="kw pkg">imputeTS</span><span class="kw ns">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.kalman.html">na.kalman</a></span>(<span class="no">ca</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"auto.arima"</span>)
-<span class="kw pkg">imputeTS</span><span class="kw ns">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(<span class="kw">x_with_na</span> <span class="kw">=</span> <span class="no">ca</span>, <span class="kw">x_with_truth</span> <span class="kw">=</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="no">cat_ordered</span>), <span class="kw">x_with_imputations</span> <span class="kw">=</span> <span class="no">imputations</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="co"># Use casnet::as.numeric_discrete() to turn a factor or charcter vector into a named numeric vector.</span>
+<span class="kw">ca</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw">df_vars</span><span class="op">$</span><span class="kw">cat_ordered</span>, keepNA = <span class="fl">TRUE</span>)
+<span class="kw">imputations</span> <span class="op">&lt;-</span> <span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.kalman.html">na.kalman</a></span>(<span class="kw">ca</span>, model = <span class="st">"auto.arima"</span>)
+<span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(x_with_na = <span class="kw">ca</span>, x_with_truth = <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw">cat_ordered</span>), x_with_imputations = <span class="kw">imputations</span>)
+</pre></div>
 <p><img src="imputemissingsata_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>There is a way to adjust the imputation procedure by transforming the data (thanks to Steffen Moritz, author of <code>imputeTS</code>, for suggesting this method). The ordered categorical series was created with bounds <code>1</code> and <code>20</code>.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># Bounds </span>
-<span class="no">lo</span> <span class="kw">&lt;-</span> <span class="fl">1</span>
-<span class="no">hi</span> <span class="kw">&lt;-</span> <span class="fl">20</span>
+<div class="sourceCode" id="cb9"><pre class="downlit">
+<span class="co"># Bounds </span>
+<span class="kw">lo</span> <span class="op">&lt;-</span> <span class="fl">1</span>
+<span class="kw">hi</span> <span class="op">&lt;-</span> <span class="fl">20</span>
 <span class="co"># Transform data, take care of dividsion by 0</span>
-<span class="no">ca_t</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(((<span class="no">ca</span>-<span class="no">lo</span>)+<span class="no">.Machine</span>$<span class="no">double.eps</span>)/((<span class="no">hi</span>-<span class="no">ca</span>)+<span class="no">.Machine</span>$<span class="no">double.eps</span>))
-<span class="no">imputations</span> <span class="kw">&lt;-</span> <span class="kw pkg">imputeTS</span><span class="kw ns">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.kalman.html">na.kalman</a></span>(<span class="no">ca_t</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"auto.arima"</span>)
+<span class="kw">ca_t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(((<span class="kw">ca</span><span class="op">-</span><span class="kw">lo</span>)<span class="op">+</span><span class="kw">.Machine</span><span class="op">$</span><span class="kw">double.eps</span>)<span class="op">/</span>((<span class="kw">hi</span><span class="op">-</span><span class="kw">ca</span>)<span class="op">+</span><span class="kw">.Machine</span><span class="op">$</span><span class="kw">double.eps</span>))
+<span class="kw">imputations</span> <span class="op">&lt;-</span> <span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/na.kalman.html">na.kalman</a></span>(<span class="kw">ca_t</span>, model = <span class="st">"auto.arima"</span>)
 <span class="co"># Plot the result</span>
 <span class="co"># Back-transform the imputed forecasts </span>
-<span class="no">imputationsBack</span> <span class="kw">&lt;-</span> (<span class="no">hi</span>-<span class="no">lo</span>)*<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">imputations</span>)/(<span class="fl">1</span>+<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">imputations</span>)) + <span class="no">lo</span>
-<span class="kw pkg">imputeTS</span><span class="kw ns">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(<span class="kw">x_with_na</span> <span class="kw">=</span> <span class="no">ca</span>, <span class="kw">x_with_truth</span> <span class="kw">=</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="no">cat_ordered</span>), <span class="kw">x_with_imputations</span> <span class="kw">=</span> <span class="no">imputationsBack</span>)</pre></body></html></div>
+<span class="kw">imputationsBack</span> <span class="op">&lt;-</span> (<span class="kw">hi</span><span class="op">-</span><span class="kw">lo</span>)<span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">imputations</span>)<span class="op">/</span>(<span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw">imputations</span>)) <span class="op">+</span> <span class="kw">lo</span>
+<span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(x_with_na = <span class="kw">ca</span>, x_with_truth = <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw">cat_ordered</span>), x_with_imputations = <span class="kw">imputationsBack</span>)
+</pre></div>
 <p><img src="imputemissingsata_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -278,35 +292,45 @@
 <h3 class="hasAnchor">
 <a href="#auto-select-method" class="anchor"></a>Auto-select method</h3>
 <p>We can just provide the <code><a href="https://rdrr.io/pkg/mice/man/mice.html">mice()</a></code> function our data set and it will take care of analysing the variables and selecting an appropriate imputation method.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="no">mice</span>)
+<div class="sourceCode" id="cb10"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="kw"><a href="https://github.com/stefvanbuuren/mice">mice</a></span>)
 <span class="co"># auto choice by mice algorithm</span>
-<span class="no">imp.mice</span> <span class="kw">&lt;-</span> <span class="kw pkg">mice</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/mice/man/mice.html">mice</a></span>(<span class="no">df_vars</span>, <span class="kw">printFlag</span> <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></body></html></div>
+<span class="kw">imp.mice</span> <span class="op">&lt;-</span> <span class="kw">mice</span>::<span class="fu"><a href="https://rdrr.io/pkg/mice/man/mice.html">mice</a></span>(<span class="kw">df_vars</span>, printFlag = <span class="fl">FALSE</span>)
+</pre></div>
 <p>The algorithm chooses methods <code>pmm</code>, <code>polyreg</code> and <code>polr</code>:</p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">imp.mice</span>$<span class="no">method</span></pre></body></html></div>
+<div class="sourceCode" id="cb11"><pre class="downlit">
+<span class="kw">imp.mice</span><span class="op">$</span><span class="kw">method</span>
+</pre></div>
 <pre><code>&gt;        zscore unif_discrete cat_unordered   cat_ordered         angry 
 &gt;         "pmm"         "pmm"     "polyreg"        "polr"         "pmm" 
 &gt;      ruminate         hours 
 &gt;         "pmm"         "pmm"</code></pre>
 <p>By default <code><a href="https://rdrr.io/pkg/mice/man/mice.html">mice()</a></code> will generate <code>5</code> iterations of each time series, that is, argument <code>maxit = 5</code>. If you inspect the <code>imp.mice</code> object you can see it is a list with several fields, the field <code>imp</code> is another list with fields named after the columns in our data set. Each field contains <code>5</code> iterations for the variable.</p>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span>(<span class="no">imp.mice</span>$<span class="no">imp</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb13"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span>(<span class="kw">imp.mice</span><span class="op">$</span><span class="kw">imp</span>)
+</pre></div>
 <pre><code>&gt;        zscore unif_discrete cat_unordered   cat_ordered         angry 
 &gt;             5             5             5             5             5 
 &gt;      ruminate         hours 
 &gt;             5             5</code></pre>
 <p>To generate replacements for the missing values from those <code>5</code> iterations we need to call the function <code><a href="https://rdrr.io/pkg/mice/man/complete.mids.html">complete()</a></code>.</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">out.auto</span> <span class="kw">&lt;-</span> <span class="kw pkg">mice</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/mice/man/complete.mids.html">complete</a></span>(<span class="no">imp.mice</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb15"><pre class="downlit">
+<span class="kw">out.auto</span> <span class="op">&lt;-</span> <span class="kw">mice</span>::<span class="fu"><a href="https://rdrr.io/pkg/mice/man/complete.mids.html">complete</a></span>(<span class="kw">imp.mice</span>)
+</pre></div>
 <p>Check the <code><a href="https://rdrr.io/pkg/mice/man/complete.mids.html">complete()</a></code> manual entry for some other interesting options.</p>
 </div>
 <div id="classification-regression-trees" class="section level3">
 <h3 class="hasAnchor">
 <a href="#classification-regression-trees" class="anchor"></a>Classification &amp; regression trees</h3>
 <p>We also choose an imputation method for all variables, one based on classification and regression trees (<code>cart</code>), it will give the same results as the method based on random forest imputation (<code>rf</code>).</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="co"># RF and CART return (identical) discrete numbers</span>
-<span class="no">imp.cart</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mice/man/mice.html">mice</a></span>(<span class="no">df_vars</span>, <span class="kw">meth</span> <span class="kw">=</span> <span class="st">'cart'</span>, <span class="kw">printFlag</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="no">out.cart</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mice/man/complete.mids.html">complete</a></span>(<span class="no">imp.cart</span>)
+<div class="sourceCode" id="cb16"><pre class="downlit">
+<span class="co"># RF and CART return (identical) discrete numbers</span>
+<span class="kw">imp.cart</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mice/man/mice.html">mice</a></span>(<span class="kw">df_vars</span>, meth = <span class="st">'cart'</span>, printFlag = <span class="fl">FALSE</span>)
+<span class="kw">out.cart</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mice/man/complete.mids.html">complete</a></span>(<span class="kw">imp.cart</span>)
 
 <span class="co"># imp.rf  &lt;- mice(df_vars, meth = 'rf')</span>
-<span class="co"># out.rf  &lt;- complete(imp.cart)</span></pre></body></html></div>
+<span class="co"># out.rf  &lt;- complete(imp.cart)</span>
+</pre></div>
 </div>
 </div>
 <div id="compare-different-imputation-methods" class="section level2">
@@ -317,34 +341,36 @@
 <h3 class="hasAnchor">
 <a href="#visual-inspection" class="anchor"></a>Visual inspection</h3>
 <p>Function <code><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">imputeTS::ggplot_na_imputations()</a></code> is an excellent way to visualise the imputation result.</p>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="no">truth</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">zscore</span>, <span class="no">unif_discrete</span>, <span class="no">cat_unordered</span>, <span class="no">cat_ordered</span>, <span class="no">df_vars</span>$<span class="no">angry</span>, <span class="no">df_vars</span>$<span class="no">ruminate</span>, <span class="no">df_vars</span>$<span class="no">hours</span>)
+<div class="sourceCode" id="cb17"><pre class="downlit">
+<span class="kw">truth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">zscore</span>, <span class="kw">unif_discrete</span>, <span class="kw">cat_unordered</span>, <span class="kw">cat_ordered</span>, <span class="kw">df_vars</span><span class="op">$</span><span class="kw">angry</span>, <span class="kw">df_vars</span><span class="op">$</span><span class="kw">ruminate</span>, <span class="kw">df_vars</span><span class="op">$</span><span class="kw">hours</span>)
 
-<span class="kw">for</span>(<span class="no">c</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NCOL</a></span>(<span class="no">df_vars</span>)){
+<span class="co">for</span>(<span class="kw">c</span> <span class="co">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NCOL</a></span>(<span class="kw">df_vars</span>)){
+  
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)[<span class="kw">c</span>])
+  
+<span class="kw">withNA</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw">df_vars</span>[,<span class="kw">c</span>], keepNA = <span class="fl">TRUE</span>)
+<span class="kw">Truth</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw">truth</span>[[<span class="kw">c</span>]], keepNA = <span class="fl">TRUE</span>)
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df_vars</span>)[<span class="no">c</span>])
+<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(x_with_na = <span class="kw">withNA</span>, 
+                   x_with_imputations = <span class="kw">out.linear</span>[,<span class="kw">c</span>], 
+                   x_with_truth = <span class="kw">Truth</span>,
+                   title = <span class="st">"linear interpolation"</span>,
+                   ylab = <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)[<span class="kw">c</span>])
+  
+<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(x_with_na = <span class="kw">withNA</span>, 
+                   x_with_imputations = <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw">out.auto</span>[,<span class="kw">c</span>]), 
+                   x_with_truth = <span class="kw">Truth</span>,
+                   title = <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"auto:"</span>,<span class="kw">imp.mice</span><span class="op">$</span><span class="kw">method</span>)[<span class="kw">c</span>],
+                   ylab = <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)[<span class="kw">c</span>])
+  
+<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(x_with_na = <span class="kw">withNA</span>, 
+                     x_with_imputations = <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="kw">out.cart</span>[,<span class="kw">c</span>]), 
+                     x_with_truth =<span class="kw">Truth</span>,
+                     title=<span class="st">"regression trees"</span>,
+                     ylab = <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)[<span class="kw">c</span>])
 
-<span class="no">withNA</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="no">df_vars</span>[,<span class="no">c</span>], <span class="kw">keepNA</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="no">Truth</span>   <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="no">truth</span><span class="kw">[[</span><span class="no">c</span>]], <span class="kw">keepNA</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-
-<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(<span class="kw">x_with_na</span> <span class="kw">=</span> <span class="no">withNA</span>,
-                   <span class="kw">x_with_imputations</span> <span class="kw">=</span> <span class="no">out.linear</span>[,<span class="no">c</span>],
-                   <span class="kw">x_with_truth</span> <span class="kw">=</span> <span class="no">Truth</span>,
-                   <span class="kw">title</span> <span class="kw">=</span> <span class="st">"linear interpolation"</span>,
-                   <span class="kw">ylab</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df_vars</span>)[<span class="no">c</span>])
-
-<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(<span class="kw">x_with_na</span> <span class="kw">=</span> <span class="no">withNA</span>,
-                   <span class="kw">x_with_imputations</span> <span class="kw">=</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="no">out.auto</span>[,<span class="no">c</span>]),
-                   <span class="kw">x_with_truth</span> <span class="kw">=</span> <span class="no">Truth</span>,
-                   <span class="kw">title</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"auto:"</span>,<span class="no">imp.mice</span>$<span class="no">method</span>)[<span class="no">c</span>],
-                   <span class="kw">ylab</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df_vars</span>)[<span class="no">c</span>])
-
-<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(<span class="kw">x_with_na</span> <span class="kw">=</span> <span class="no">withNA</span>,
-                     <span class="kw">x_with_imputations</span> <span class="kw">=</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span>(<span class="no">out.cart</span>[,<span class="no">c</span>]),
-                     <span class="kw">x_with_truth</span> <span class="kw">=</span><span class="no">Truth</span>,
-                     <span class="kw">title</span><span class="kw">=</span><span class="st">"regression trees"</span>,
-                     <span class="kw">ylab</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df_vars</span>)[<span class="no">c</span>])
-
-}</pre></body></html></div>
+}
+</pre></div>
 <pre><code>&gt; [1] "zscore"
 &gt; [1] "unif_discrete"
 &gt; [1] "cat_unordered"
@@ -357,25 +383,25 @@
 <h3 class="hasAnchor">
 <a href="#effect-on-analysis-results" class="anchor"></a>Effect on analysis results</h3>
 <p>Finally, we compare the effect of different methods on the results of analyses.</p>
-<div class="sourceCode" id="cb19"><html><body><pre class="r">for(c in 1:NCOL(df_vars)){
-  
-print(colnames(df_vars)[c])
-  
-withNA  &lt;- as.numeric_discrete(df_vars[,c], keepNA = FALSE)
-Truth   &lt;- as.numeric_discrete(truth[[c]], keepNA = FALSE)
-LINEAR  &lt;- as.numeric_discrete(unname(out.linear[,c]))
-AUTO    &lt;- as.numeric_discrete(out.auto[,c])
-CART    &lt;- as.numeric_discrete(out.cart[,c])
-
-
-df &lt;- data.frame(NAremoved = c(mean(withNA, na.rm = TRUE), sd(withNA)),
-                 N
-
-knitr::kable(x = ))
-
-
-
-}</pre></body></html></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="cf">for</span>(c <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">NCOL</span>(df_vars)){</span>
+<span id="cb19-2"><a href="#cb19-2"></a>  </span>
+<span id="cb19-3"><a href="#cb19-3"></a><span class="kw">print</span>(<span class="kw">colnames</span>(df_vars)[c])</span>
+<span id="cb19-4"><a href="#cb19-4"></a>  </span>
+<span id="cb19-5"><a href="#cb19-5"></a>withNA  &lt;-<span class="st"> </span><span class="kw">as.numeric_discrete</span>(df_vars[,c], <span class="dt">keepNA =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb19-6"><a href="#cb19-6"></a>Truth   &lt;-<span class="st"> </span><span class="kw">as.numeric_discrete</span>(truth[[c]], <span class="dt">keepNA =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb19-7"><a href="#cb19-7"></a>LINEAR  &lt;-<span class="st"> </span><span class="kw">as.numeric_discrete</span>(<span class="kw">unname</span>(out.linear[,c]))</span>
+<span id="cb19-8"><a href="#cb19-8"></a>AUTO    &lt;-<span class="st"> </span><span class="kw">as.numeric_discrete</span>(out.auto[,c])</span>
+<span id="cb19-9"><a href="#cb19-9"></a>CART    &lt;-<span class="st"> </span><span class="kw">as.numeric_discrete</span>(out.cart[,c])</span>
+<span id="cb19-10"><a href="#cb19-10"></a></span>
+<span id="cb19-11"><a href="#cb19-11"></a></span>
+<span id="cb19-12"><a href="#cb19-12"></a>df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">NAremoved =</span> <span class="kw">c</span>(<span class="kw">mean</span>(withNA, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="kw">sd</span>(withNA)),</span>
+<span id="cb19-13"><a href="#cb19-13"></a>                 N</span>
+<span id="cb19-14"><a href="#cb19-14"></a></span>
+<span id="cb19-15"><a href="#cb19-15"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="dt">x =</span> ))</span>
+<span id="cb19-16"><a href="#cb19-16"></a></span>
+<span id="cb19-17"><a href="#cb19-17"></a></span>
+<span id="cb19-18"><a href="#cb19-18"></a></span>
+<span id="cb19-19"><a href="#cb19-19"></a>}</span></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level1">
@@ -400,7 +426,7 @@ knitr::kable(x = ))
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
 </div>
 
       </footer>

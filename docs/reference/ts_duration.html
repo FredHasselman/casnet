@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Time series to Duration series</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/ts.R'><code>R/ts.R</code></a></small>
     <div class="hidden name"><code>ts_duration.Rd</code></div>
     </div>
 
@@ -147,10 +144,10 @@
     </div>
 
     <pre class="usage"><span class='fu'>ts_duration</span>(
-  <span class='no'>y</span>,
-  <span class='kw'>timeVec</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/time.html'>time</a></span>(<span class='no'>y</span>),
-  <span class='kw'>fs</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/time.html'>frequency</a></span>(<span class='no'>y</span>),
-  <span class='kw'>tolerance</span> <span class='kw'>=</span> <span class='fl'>0</span>
+  <span class='kw'>y</span>,
+  timeVec = <span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/time.html'>time</a></span>(<span class='kw'>y</span>),
+  fs = <span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/time.html'>frequency</a></span>(<span class='kw'>y</span>),
+  tolerance = <span class='fl'>0</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -202,11 +199,12 @@
 <code><a href='ts_windower.html'>ts_windower</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>invctr</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://github.com/FredHasselman/invctr'>invctr</a></span>)
 <span class='co'># Create data with events and their timecodes</span>
-<span class='no'>coder</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='kw'>beh</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"stare"</span>,<span class='st'>"stare"</span>,<span class='st'>"coffee"</span>,<span class='st'>"type"</span>,<span class='st'>"type"</span>,<span class='st'>"stare"</span>),<span class='kw'>t</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>,<span class='fl'>5</span>,<span class='fl'>10</span>,<span class='fl'>15</span>,<span class='fl'>20</span>,<span class='fl'>25</span>))
+<span class='kw'>coder</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(beh=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"stare"</span>,<span class='st'>"stare"</span>,<span class='st'>"coffee"</span>,<span class='st'>"type"</span>,<span class='st'>"type"</span>,<span class='st'>"stare"</span>),t=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>,<span class='fl'>5</span>,<span class='fl'>10</span>,<span class='fl'>15</span>,<span class='fl'>20</span>,<span class='fl'>25</span>))
 
-<span class='fu'>ts_duration</span>(<span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>coder</span>$<span class='no'>beh</span>, <span class='kw'>timeVec</span> <span class='kw'>=</span> <span class='no'>coder</span>$<span class='no'>t</span>)</div><div class='output co'>#&gt;   y y.name t.start t.end duration.time duration.samples duration.fs
+<span class='fu'>ts_duration</span>(y = <span class='kw'>coder</span><span class='op'>$</span><span class='kw'>beh</span>, timeVec = <span class='kw'>coder</span><span class='op'>$</span><span class='kw'>t</span>)
+</div><div class='output co'>#&gt;   y y.name t.start t.end duration.time duration.samples duration.fs
 #&gt; 1 1  stare       0    10            10                2           2
 #&gt; 2 2 coffee      10    15             5                1           1
 #&gt; 3 3   type      15    25            10                2           2
@@ -227,7 +225,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

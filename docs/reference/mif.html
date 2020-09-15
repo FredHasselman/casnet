@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Mutual Information Function</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/mrn.R'><code>R/mrn.R</code></a></small>
     <div class="hidden name"><code>mif.Rd</code></div>
     </div>
 
@@ -147,12 +144,12 @@
     </div>
 
     <pre class="usage"><span class='fu'>mif</span>(
-  <span class='no'>y</span>,
-  <span class='kw'>lags</span> <span class='kw'>=</span> -<span class='fl'>10</span>:<span class='fl'>10</span>,
-  <span class='kw'>nbins</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span>(<span class='fl'>2</span> * <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>)),
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>surTest</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.05</span>
+  <span class='kw'>y</span>,
+  lags = <span class='op'>-</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>10</span>,
+  nbins = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span>(<span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)<span class='op'>^</span>(<span class='fl'>1</span><span class='op'>/</span><span class='fl'>3</span>)),
+  doPlot = <span class='fl'>FALSE</span>,
+  surTest = <span class='fl'>FALSE</span>,
+  alpha = <span class='fl'>0.05</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -196,12 +193,13 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Lags to evaluate mututal information</span>
-<span class='no'>lags</span> <span class='kw'>&lt;-</span> -<span class='fl'>10</span>:<span class='fl'>30</span>
+<span class='kw'>lags</span> <span class='op'>&lt;-</span> <span class='op'>-</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>30</span>
 
 <span class='co'># Auto-mutual information</span>
-<span class='no'>y1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0</span>, <span class='fl'>100</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fl'>1</span>/<span class='fl'>8</span>)*<span class='no'>pi</span>)
+<span class='kw'>y1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0</span>, <span class='fl'>100</span>, by = <span class='fl'>1</span><span class='op'>/</span><span class='fl'>8</span>)<span class='op'>*</span><span class='kw'>pi</span>)
 
-(<span class='fu'>mif</span>(<span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='no'>y1</span>),<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
+(<span class='fu'>mif</span>(<span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='kw'>y1</span>),lags = <span class='kw'>lags</span>))
+</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
 #&gt; 1.653815 1.927735 1.646619 1.573201 1.567816 1.678095 1.455365 1.497499 
 #&gt;       -2       -1        0        1        2        3        4        5 
 #&gt; 1.476553 2.868931 2.868931 2.868931 1.476553 1.497499 1.455365 1.678095 
@@ -216,10 +214,11 @@
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;X)"</div><div class='input'>
 <span class='co'># Cross-mututal information, y2 is a lagged version y1</span>
-<span class='no'>y2</span> <span class='kw'>&lt;-</span> <span class='no'>y1</span>[<span class='fl'>10</span>:<span class='fl'>801</span>]
+<span class='kw'>y2</span> <span class='op'>&lt;-</span> <span class='kw'>y1</span>[<span class='fl'>10</span><span class='op'>:</span><span class='fl'>801</span>]
 
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='fu'><a href='ts_trimfill.html'>ts_trimfill</a></span>(<span class='no'>y1</span>, <span class='no'>y2</span>, <span class='kw'>action</span> <span class='kw'>=</span> <span class='st'>"trim.cut"</span>))
-(<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
+<span class='kw'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='fu'><a href='ts_trimfill.html'>ts_trimfill</a></span>(<span class='kw'>y1</span>, <span class='kw'>y2</span>, action = <span class='st'>"trim.cut"</span>))
+(<span class='fu'>mif</span>(<span class='kw'>y</span>,lags = <span class='kw'>lags</span>))
+</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
 #&gt; 1.623019 1.473869 1.859470 1.558334 1.621646 1.607086 1.562827 1.923477 
 #&gt;       -2       -1        0        1        2        3        4        5 
 #&gt; 1.550633 1.653815 1.653815 1.653815 1.921974 1.687149 1.582642 1.610835 
@@ -234,8 +233,9 @@
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y)"</div><div class='input'>
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
-<span class='no'>y</span>$<span class='no'>s</span> <span class='kw'>&lt;-</span> <span class='no'>y2</span>+<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y2</span>))
-(<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
+<span class='kw'>y</span><span class='op'>$</span><span class='kw'>s</span> <span class='op'>&lt;-</span> <span class='kw'>y2</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y2</span>))
+(<span class='fu'>mif</span>(<span class='kw'>y</span>,lags = <span class='kw'>lags</span>))
+</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
 #&gt; 1.797108 1.713710 1.921446 1.810113 1.970283 1.987413 1.927730 2.069501 
 #&gt;       -2       -1        0        1        2        3        4        5 
 #&gt; 1.822566 1.878617 1.878617 1.878617 1.994880 1.950518 1.977648 1.978940 
@@ -250,8 +250,9 @@
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
-<span class='no'>y</span>$<span class='no'>y3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>)))
-(<span class='fu'>mif</span>(<span class='no'>y</span>,<span class='kw'>lags</span> <span class='kw'>=</span> <span class='no'>lags</span>))</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
+<span class='kw'>y</span><span class='op'>$</span><span class='kw'>y3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)))
+(<span class='fu'>mif</span>(<span class='kw'>y</span>,lags = <span class='kw'>lags</span>))
+</div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
 #&gt; 4.986357 4.988830 4.987553 4.991244 5.139406 5.137500 5.138411 5.126967 
 #&gt;       -2       -1        0        1        2        3        4        5 
 #&gt; 5.127818 5.127256 5.127256 5.127256 5.127849 5.130477 5.134928 5.139531 
@@ -282,7 +283,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

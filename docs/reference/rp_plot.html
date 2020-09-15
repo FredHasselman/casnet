@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot (thresholded) distance matrix as a recurrence plot</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/rp.R'><code>R/rp.R</code></a></small>
     <div class="hidden name"><code>rp_plot.Rd</code></div>
     </div>
 
@@ -147,19 +144,19 @@
     </div>
 
     <pre class="usage"><span class='fu'>rp_plot</span>(
-  <span class='no'>RM</span>,
-  <span class='kw'>plotDimensions</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>plotMeasures</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>plotRadiusRRbar</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>drawGrid</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>markEpochsLOI</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>Chromatic</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>radiusValue</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>xlabel</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>ylabel</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>plotSurrogate</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>returnOnlyObject</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>RM</span>,
+  plotDimensions = <span class='fl'>FALSE</span>,
+  plotMeasures = <span class='fl'>FALSE</span>,
+  plotRadiusRRbar = <span class='fl'>TRUE</span>,
+  drawGrid = <span class='fl'>FALSE</span>,
+  markEpochsLOI = <span class='kw'>NULL</span>,
+  Chromatic = <span class='kw'>NULL</span>,
+  radiusValue = <span class='fl'>NA</span>,
+  title = <span class='st'>""</span>,
+  xlabel = <span class='st'>""</span>,
+  ylabel = <span class='st'>""</span>,
+  plotSurrogate = <span class='fl'>NA</span>,
+  returnOnlyObject = <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -249,7 +246,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Estimate (C)RQA parameters — est_parameters • casnet</title>
+<title>Estimate RQA parameters — est_parameters • casnet</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Estimate (C)RQA parameters — est_parameters" />
-<meta property="og:description" content="Find optimal parameters for constructing a Recurrence Matrix. A wrapper for various algorithms used to find optimal values for the embedding delay and the number of embedding dimensions" />
+<meta property="og:title" content="Estimate RQA parameters — est_parameters" />
+<meta property="og:description" content="Find optimal parameters for constructing a Recurrence Matrix. A wrapper for various algorithms used to find optimal values for the embedding delay and the number of embedding dimensions." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -137,30 +134,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Estimate (C)RQA parameters</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <h1>Estimate RQA parameters</h1>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/est.R'><code>R/est.R</code></a></small>
     <div class="hidden name"><code>est_parameters.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Find optimal parameters for constructing a Recurrence Matrix. A wrapper for various algorithms used to find optimal values for the embedding delay and the number of embedding dimensions</p>
+    <p>Find optimal parameters for constructing a Recurrence Matrix. A wrapper for various algorithms used to find optimal values for the embedding delay and the number of embedding dimensions.</p>
     </div>
 
     <pre class="usage"><span class='fu'>est_parameters</span>(
-  <span class='no'>y</span>,
-  <span class='kw'>lagMethods</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first.minimum"</span>, <span class='st'>"global.minimum"</span>, <span class='st'>"max.lag"</span>),
-  <span class='kw'>estimateDimensions</span> <span class='kw'>=</span> <span class='st'>"preferSmallestInLargestHood"</span>,
-  <span class='kw'>maxDim</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>emLag</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>maxLag</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='no'>y</span>)/(<span class='no'>maxDim</span> + <span class='fl'>1</span>)),
-  <span class='kw'>minVecLength</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-  <span class='kw'>nnSizes</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>nnRadius</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>nnThres</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>theiler</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>
+  <span class='kw'>y</span>,
+  lagMethods = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"first.minimum"</span>, <span class='st'>"global.minimum"</span>, <span class='st'>"max.lag"</span>),
+  estimateDimensions = <span class='st'>"preferSmallestInLargestHood"</span>,
+  maxDim = <span class='fl'>10</span>,
+  emLag = <span class='kw'>NULL</span>,
+  maxLag = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)<span class='op'>/</span>(<span class='kw'>maxDim</span> <span class='op'>+</span> <span class='fl'>1</span>)),
+  minVecLength = <span class='fl'>20</span>,
+  nnSizes = <span class='fl'>2</span>,
+  nnRadius = <span class='fl'>5</span>,
+  nnThres = <span class='fl'>10</span>,
+  theiler = <span class='fl'>0</span>,
+  doPlot = <span class='fl'>TRUE</span>,
+  silent = <span class='fl'>TRUE</span>,
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -172,7 +169,7 @@
     </tr>
     <tr>
       <th>lagMethods</th>
-      <td><p>A character vector with one or more of the following strings: <code>"first.minimum","global.minimum","max.lag"</code>. If <code>emLag</code> represents a valid lag this value will  be reported as "user.lag" (default = <code><a href='https://rdrr.io/r/base/c.html'>c("first.minimum","global.minimum","max.lag")</a></code>)</p></td>
+      <td><p>A character vector with one or more of the following strings: <code>"first.minimum","global.minimum","max.lag"</code>. If <code>emLag</code> represents a valid lag this value will be reported as <code>"user.lag"</code> (default = <code><a href='https://rdrr.io/r/base/c.html'>c("first.minimum","global.minimum","max.lag")</a></code>)</p></td>
     </tr>
     <tr>
       <th>estimateDimensions</th>
@@ -198,7 +195,7 @@
     </tr>
     <tr>
       <th>minVecLength</th>
-      <td><p>The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of <code>maxDim</code> that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = `20``)</p></td>
+      <td><p>The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of <code>maxDim</code> that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = <code>20</code>)</p></td>
     </tr>
     <tr>
       <th>nnSizes</th>
@@ -235,9 +232,8 @@
     <p>A list object containing the optimal values (as indicated by the user) and iteration history.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>A number of functions are called to determie optimal parameters for delay embedding a time series:</p>
-<ul>
-<li><p>Embedding lag (\(\tau\), <code>emLag</code>): The default is to call <code><a href='est_emLag.html'>est_emLag()</a></code>, which is a wrapper around <code><a href='https://rdrr.io/pkg/nonlinearTseries/man/timeLag.html'>nonlinearTseries::timeLag()</a></code> with <code>technique="ami"</code> to get lags based on the mutual information function.</p></li>
+    <p>A number of functions are called to determine optimal parameters for delay embedding a time series:</p><ul>
+<li><p>Embedding lag (<code>emLag</code>): The default is to call <code><a href='est_emLag.html'>est_emLag()</a></code>, which is a wrapper around <code><a href='https://rdrr.io/pkg/nonlinearTseries/man/timeLag.html'>nonlinearTseries::timeLag()</a></code> with <code>technique=ami</code> to get lags based on the mutual information function.</p></li>
 <li><p>Embedding dimension (<code>m</code>, <code>emDim</code>): The default is to call <code><a href='est_emDim.html'>est_emDim()</a></code>, which is a wrapper around <code><a href='https://rdrr.io/pkg/fractal/man/FNN.html'>fractal::FNN()</a></code></p></li>
 </ul>
 
@@ -252,7 +248,8 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>4321</span>)
-<span class='fu'>est_parameters</span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>))</div><div class='output co'>#&gt; <span class='message'>Changed value of maxDim to 8</span></div><div class='img'><img src='est_parameters-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>est_parameters</span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>))
+</div><div class='output co'>#&gt; <span class='message'>Changed value of maxDim to 8</span></div><div class='img'><img src='est_parameters-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -269,7 +266,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Adjust time series by summation order</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/ts.R'><code>R/ts.R</code></a></small>
     <div class="hidden name"><code>ts_sumorder.Rd</code></div>
     </div>
 
@@ -146,7 +143,7 @@
     <p>Many fluctuation analyses assume a time series' Hurst exponent is within the range of <code>0.2 - 1.2</code>. If this is not the case it is sensible to make adjustments to the time series, as well as the resutling Hurst exponent.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ts_sumorder</span>(<span class='no'>y</span>, <span class='kw'>scaleS</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>polyOrder</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>minData</span> <span class='kw'>=</span> <span class='fl'>4</span>)</pre>
+    <pre class="usage"><span class='fu'>ts_sumorder</span>(<span class='kw'>y</span>, scaleS = <span class='kw'>NULL</span>, polyOrder = <span class='fl'>1</span>, minData = <span class='fl'>4</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -223,7 +220,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

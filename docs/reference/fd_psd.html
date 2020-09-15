@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Power Spectral Density Slope (PSD).</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/fd.R'><code>R/fd.R</code></a></small>
     <div class="hidden name"><code>fd_psd.Rd</code></div>
     </div>
 
@@ -147,18 +144,18 @@
     </div>
 
     <pre class="usage"><span class='fu'>fd_psd</span>(
-  <span class='no'>y</span>,
-  <span class='kw'>fs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>standardise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>detrend</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>fitMethod</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"lowest25"</span>, <span class='st'>"Wijnants"</span>, <span class='st'>"Hurvich-Deo"</span>)[<span class='fl'>3</span>],
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnPLAW</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>returnInfo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>noTitle</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>tsName</span> <span class='kw'>=</span> <span class='st'>"y"</span>
+  <span class='kw'>y</span>,
+  fs = <span class='kw'>NULL</span>,
+  standardise = <span class='fl'>TRUE</span>,
+  detrend = <span class='fl'>TRUE</span>,
+  fitMethod = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"lowest25"</span>, <span class='st'>"Wijnants"</span>, <span class='st'>"Hurvich-Deo"</span>)[<span class='fl'>3</span>],
+  doPlot = <span class='fl'>FALSE</span>,
+  returnPlot = <span class='fl'>FALSE</span>,
+  returnPLAW = <span class='fl'>FALSE</span>,
+  returnInfo = <span class='fl'>FALSE</span>,
+  silent = <span class='fl'>FALSE</span>,
+  noTitle = <span class='fl'>FALSE</span>,
+  tsName = <span class='st'>"y"</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -225,8 +222,12 @@
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    
-
+    <p>Calls function <code><a href='https://rdrr.io/pkg/sapa/man/SDF.html'>sapa::SDF()</a></code> to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), <code>SDF</code> is called using a Tukey window (<code>raised cosine</code>, see <code><a href='https://rdrr.io/pkg/sapa/man/taper.html'>sapa::taper()</a></code>).</p>
+<p>A line is fitted on the periodogram in log-log coordinates. The full range is fitted as well as one of three fit-ranges:</p><ul>
+<li><p><code>lowest25</code> - The 25\<!-- % lowest frequencies --></p></li>
+<li><p><code>Wijnants</code> - The 50 lowest frequencies (Wijnants et al., 2012)</p></li>
+<li><p><code>HurvichDeo</code> - The Hurvich-Deo estimate, see <code><a href='https://rdrr.io/pkg/fractal/man/HDEst.html'>fractal::HDEst()</a></code></p></li>
+</ul>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -240,6 +241,9 @@
 <code><a href='fd_mfdfa.html'>fd_mfdfa</a>()</code>,
 <code><a href='fd_sda.html'>fd_sda</a>()</code>,
 <code><a href='fd_sev.html'>fd_sev</a>()</code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Fred Hasselman</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -256,7 +260,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

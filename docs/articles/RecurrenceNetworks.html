@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -65,9 +65,6 @@
     </li>
     <li>
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
-    </li>
-    <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -119,232 +116,245 @@
 </blockquote>
 <p>Package <code>casnet</code> has some functions to create recurrence networks, they are similar to the functions used for CRQA: * <code><a href="../reference/rn.html">rn()</a></code> is very similar to <code><a href="../reference/rp.html">rp()</a></code>, it will create a matrix based on embedding parameters. One difference is the option to create a weighted matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value is retained and acts as an edge-weight * <code><a href="../reference/rn_plot.html">rn_plot()</a></code> will produce the same as <code><a href="../reference/rp_plot.html">rp_plot()</a></code></p>
 <p>We can turn the recurrence matrix into an adjecency matrix, an <code>igraph</code> object. This means we can use all the <code>igraph</code> functions to calculate network measures.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">igraph</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">qgraph</span>)
-<span class="co">#&gt; Registered S3 methods overwritten by 'huge':</span>
-<span class="co">#&gt;   method    from   </span>
-<span class="co">#&gt;   plot.sim  BDgraph</span>
-<span class="co">#&gt;   print.sim BDgraph</span>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://igraph.org">igraph</a></span>)
+<span class="co">#library(qgraph)</span>
+<span class="co">#library(survival)</span>
 <span class="co"># Reload the data we used earlier</span>
-<span class="no">series</span> <span class="kw">&lt;-</span> <span class="kw pkg">rio</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="st">"https://github.com/complexity-methods/CSA-assignments/raw/master/assignment_data/BasicTSA_arma/series.xlsx"</span>)
+<span class="kw">series</span> <span class="op">&lt;-</span> <span class="kw">rio</span>::<span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="st">"https://github.com/complexity-methods/CSA-assignments/raw/master/assignment_data/BasicTSA_arma/series.xlsx"</span>)
 
 <span class="co"># Lets use a shorter dataset to speed things up</span>
-<span class="no">series</span> <span class="kw">&lt;-</span> <span class="no">series</span>[<span class="fl">1</span>:<span class="fl">500</span>,]</pre></body></html></div>
+<span class="kw">series</span> <span class="op">&lt;-</span> <span class="kw">series</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">500</span>,]
+</pre></div>
 <p>We’ll analyse the three time series as a recurrence network: * Compare the results, look at the SMall World Index and other measures - Remember: TS_1 was white noise, TS_2 was a sine with added noise, TS_3 was the logistic map in the chaotic regime. * Note that some of the RQA measures can be exactly calculated from the measures of the network representation. - Try to understand why the Recurrence is reprented as the *degree centrality() of the network (<code><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">igraph::centr_degree()</a></code>)</p>
 <div id="ts-1" class="section level3 unnumbered">
 <h3 class="hasAnchor">
 <a href="#ts-1" class="anchor"></a>TS 1</h3>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co">#----------------------</span>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix TS_1</span>
 <span class="co">#----------------------</span>
-<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="no">series</span>$<span class="no">TS_1</span>))</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="kw">series</span><span class="op">$</span><span class="kw">TS_1</span>))
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r">
-<span class="no">arcs</span><span class="kw">=</span><span class="fl">6</span>
+<div class="sourceCode" id="cb3"><pre class="downlit">
 
-<span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="no">series</span>$<span class="no">TS_1</span>)</pre></body></html></div>
+<span class="kw">arcs</span><span class="op">=</span><span class="fl">6</span>
+
+<span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(y = <span class="kw">series</span><span class="op">$</span><span class="kw">TS_1</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r">
+<div class="sourceCode" id="cb4"><pre class="downlit">
+
 <span class="co"># By passing emRad = NA, a radius will be calculated</span>
-<span class="no">RN1</span> <span class="kw">&lt;-</span> <span class="kw pkg">casnet</span><span class="kw ns">::</span><span class="fu"><a href="../reference/rn.html">rn</a></span>(<span class="kw">y1</span> <span class="kw">=</span> <span class="no">series</span>$<span class="no">TS_1</span>, <span class="kw">emDim</span> <span class="kw">=</span> <span class="fl">7</span>, <span class="kw">emLag</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">emRad</span> <span class="kw">=</span> <span class="fl">NA</span>, <span class="kw">targetValue</span> <span class="kw">=</span> <span class="fl">.01</span>)
+<span class="kw">RN1</span> <span class="op">&lt;-</span> <span class="kw">casnet</span>::<span class="fu"><a href="../reference/rn.html">rn</a></span>(y1 = <span class="kw">series</span><span class="op">$</span><span class="kw">TS_1</span>, emDim = <span class="fl">7</span>, emLag = <span class="fl">2</span>, emRad = <span class="fl">NA</span>, targetValue = <span class="fl">.01</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Searching for a radius that will yield 0.01 for RR</span>
-<span class="kw pkg">casnet</span><span class="kw ns">::</span><span class="fu"><a href="../reference/rn_plot.html">rn_plot</a></span>(<span class="no">RN1</span>)</pre></body></html></div>
+<span class="kw">casnet</span>::<span class="fu"><a href="../reference/rn_plot.html">rn_plot</a></span>(<span class="kw">RN1</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r">
+<div class="sourceCode" id="cb5"><pre class="downlit">
+
 <span class="co"># Get RQA measures</span>
-<span class="no">rqa1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span>(<span class="no">RN1</span>)
+<span class="kw">rqa1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span>(<span class="kw">RN1</span>)
 
 <span class="co"># knitr::kable(rqa1,digits = 2) %&gt;%</span>
 <span class="co">#   kable_styling() %&gt;%</span>
 <span class="co">#   scroll_box(width = "100%", height = "100px")</span>
 
-<span class="no">g1</span>  <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(<span class="no">RN1</span>, <span class="kw">mode</span><span class="kw">=</span><span class="st">"undirected"</span>, <span class="kw">diag</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(<span class="no">g1</span>)$<span class="no">size</span> <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(<span class="no">g1</span>)
-<span class="no">g1r</span> <span class="kw">&lt;-</span> <span class="kw pkg">casnet</span><span class="kw ns">::</span><span class="fu"><a href="../reference/make_spiral_graph.html">make_spiral_graph</a></span>(<span class="no">g1</span>,<span class="kw">arcs</span> <span class="kw">=</span> <span class="no">arcs</span>, <span class="kw">epochColours</span> <span class="kw">=</span> <span class="fu"><a href="../reference/getColours.html">getColours</a></span>(<span class="no">arcs</span>), <span class="kw">markTimeBy</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<span class="kw">g1</span>  <span class="op">&lt;-</span> <span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(<span class="kw">RN1</span>, mode=<span class="st">"undirected"</span>, diag = <span class="fl">FALSE</span>)
+<span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(<span class="kw">g1</span>)<span class="op">$</span><span class="kw">size</span> <span class="op">&lt;-</span> <span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(<span class="kw">g1</span>)
+<span class="kw">g1r</span> <span class="op">&lt;-</span> <span class="kw">casnet</span>::<span class="fu"><a href="../reference/make_spiral_graph.html">make_spiral_graph</a></span>(<span class="kw">g1</span>,arcs = <span class="kw">arcs</span>, epochColours = <span class="fu"><a href="../reference/getColours.html">getColours</a></span>(<span class="kw">arcs</span>), markTimeBy = <span class="fl">TRUE</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r">
+<div class="sourceCode" id="cb6"><pre class="downlit">
+
 
 <span class="co"># Network measures</span>
-<span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(<span class="no">g1</span>)
+<span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(<span class="kw">g1</span>)
 <span class="co">#&gt; [1] 4.242546</span>
-<span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(<span class="no">g1</span>)
+<span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(<span class="kw">g1</span>)
 <span class="co">#&gt; [1] 0.3158716</span>
-<span class="kw pkg">qgraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(<span class="no">g1</span>)
-<span class="co">#&gt;       smallworldness         trans_target averagelength_target </span>
-<span class="co">#&gt;           6.62627220           0.31587164         215.96216865 </span>
-<span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span>
-<span class="co">#&gt;           0.04074926           0.03252255           0.04839549 </span>
-<span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span>
-<span class="co">#&gt;         184.61036206         181.75142174         194.23978304</span>
+<span class="co"># qgraph::smallworldness(g1)</span>
 
-<span class="no">recs1</span> <span class="kw">&lt;-</span> <span class="kw pkg">igraph</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(<span class="no">g1</span>)
+<span class="kw">recs1</span> <span class="op">&lt;-</span> <span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(<span class="kw">g1</span>)
 
-(<span class="no">RP_N</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">recs1</span>$<span class="no">res</span>))
+(<span class="kw">RP_N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">recs1</span><span class="op">$</span><span class="kw">res</span>))
 <span class="co">#&gt; [1] 2368</span>
-<span class="no">rqa1</span>$<span class="no">RP_N</span>
+<span class="kw">rqa1</span><span class="op">$</span><span class="kw">RP_N</span>
 <span class="co">#&gt; [1] 2368</span>
 
-<span class="no">RP_N</span> / <span class="no">recs1</span>$<span class="no">theoretical_max</span>
+<span class="kw">RP_N</span> <span class="op">/</span> <span class="kw">recs1</span><span class="op">$</span><span class="kw">theoretical_max</span>
 <span class="co">#&gt; [1] 0.01000499</span>
-<span class="no">rqa1</span>$<span class="no">RR</span>
-<span class="co">#&gt; [1] 0.01000499</span></pre></body></html></div>
+<span class="kw">rqa1</span><span class="op">$</span><span class="kw">RR</span>
+<span class="co">#&gt; [1] 0.01000499</span>
+</pre></div>
 </div>
 <div id="ts-2" class="section level3 unnumbered">
 <h3 class="hasAnchor">
 <a href="#ts-2" class="anchor"></a>TS 2</h3>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="co">#----------------------</span>
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix TS_2</span>
 <span class="co">#----------------------</span>
-<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="no">series</span>$<span class="no">TS_2</span>))</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="kw">series</span><span class="op">$</span><span class="kw">TS_2</span>))
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r">
-<span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(<span class="no">series</span>$<span class="no">TS_2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+
+<span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(<span class="kw">series</span><span class="op">$</span><span class="kw">TS_2</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r">
-<span class="no">RN2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/rn.html">rn</a></span>(<span class="kw">y1</span> <span class="kw">=</span> <span class="no">series</span>$<span class="no">TS_2</span>, <span class="kw">emDim</span> <span class="kw">=</span> <span class="fl">7</span>, <span class="kw">emLag</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">emRad</span> <span class="kw">=</span> <span class="fl">NA</span>,  <span class="kw">targetValue</span> <span class="kw">=</span> <span class="fl">0.01</span>)
+<div class="sourceCode" id="cb9"><pre class="downlit">
+
+<span class="kw">RN2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rn.html">rn</a></span>(y1 = <span class="kw">series</span><span class="op">$</span><span class="kw">TS_2</span>, emDim = <span class="fl">7</span>, emLag = <span class="fl">2</span>, emRad = <span class="fl">NA</span>,  targetValue = <span class="fl">0.01</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Searching for a radius that will yield 0.01 for RR</span>
-<span class="fu"><a href="../reference/rn_plot.html">rn_plot</a></span>(<span class="no">RN2</span>)</pre></body></html></div>
+<span class="fu"><a href="../reference/rn_plot.html">rn_plot</a></span>(<span class="kw">RN2</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r">
+<div class="sourceCode" id="cb10"><pre class="downlit">
+
 <span class="co"># Get RQA measures</span>
-<span class="no">rqa2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span>(<span class="no">RN2</span>)
+<span class="kw">rqa2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span>(<span class="kw">RN2</span>)
 
 <span class="co"># knitr::kable(rqa2,digits = 2) %&gt;%</span>
 <span class="co">#   kable_styling() %&gt;%</span>
 <span class="co">#   scroll_box(width = "100%", height = "100px")</span>
 
-<span class="no">g2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(<span class="no">RN2</span>, <span class="kw">mode</span><span class="kw">=</span><span class="st">"undirected"</span>, <span class="kw">diag</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(<span class="no">g2</span>)$<span class="no">size</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(<span class="no">g2</span>)
-<span class="no">g2r</span> <span class="kw">&lt;-</span> <span class="kw pkg">casnet</span><span class="kw ns">::</span><span class="fu"><a href="../reference/make_spiral_graph.html">make_spiral_graph</a></span>(<span class="no">g2</span>,<span class="kw">arcs</span> <span class="kw">=</span> <span class="no">arcs</span>,<span class="kw">epochColours</span> <span class="kw">=</span> <span class="fu"><a href="../reference/getColours.html">getColours</a></span>(<span class="no">arcs</span>), <span class="kw">markTimeBy</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<span class="kw">g2</span> <span class="op">&lt;-</span> <span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(<span class="kw">RN2</span>, mode=<span class="st">"undirected"</span>, diag = <span class="fl">FALSE</span>)
+<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(<span class="kw">g2</span>)<span class="op">$</span><span class="kw">size</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(<span class="kw">g2</span>)
+<span class="kw">g2r</span> <span class="op">&lt;-</span> <span class="kw">casnet</span>::<span class="fu"><a href="../reference/make_spiral_graph.html">make_spiral_graph</a></span>(<span class="kw">g2</span>,arcs = <span class="kw">arcs</span>,epochColours = <span class="fu"><a href="../reference/getColours.html">getColours</a></span>(<span class="kw">arcs</span>), markTimeBy = <span class="fl">TRUE</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r">
+<div class="sourceCode" id="cb11"><pre class="downlit">
+
 <span class="co"># Network measures</span>
-<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(<span class="no">g2</span>)
+<span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(<span class="kw">g2</span>)
 <span class="co">#&gt; [1] 9.696495</span>
-<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(<span class="no">g2</span>)
+<span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(<span class="kw">g2</span>)
 <span class="co">#&gt; [1] 0.3422773</span>
-<span class="fu"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(<span class="no">g2</span>)
-<span class="co">#&gt;       smallworldness         trans_target averagelength_target </span>
-<span class="co">#&gt;          11.03601530           0.34227726          77.69775479 </span>
-<span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span>
-<span class="co">#&gt;           0.02322188           0.01651015           0.03130547 </span>
-<span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span>
-<span class="co">#&gt;          58.17549102          55.86782324          67.06936134</span>
+<span class="co"># igraph::smallworldness(g2)</span>
 
-<span class="no">recs2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(<span class="no">g2</span>)
+<span class="kw">recs2</span> <span class="op">&lt;-</span> <span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(<span class="kw">g2</span>)
 
-(<span class="no">RP_N</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">recs2</span>$<span class="no">res</span>))
+(<span class="kw">RP_N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">recs2</span><span class="op">$</span><span class="kw">res</span>))
 <span class="co">#&gt; [1] 2368</span>
-<span class="no">rqa2</span>$<span class="no">RP_N</span>
+<span class="kw">rqa2</span><span class="op">$</span><span class="kw">RP_N</span>
 <span class="co">#&gt; [1] 2368</span>
 
-<span class="no">RP_N</span> / <span class="no">recs2</span>$<span class="no">theoretical_max</span>
+<span class="kw">RP_N</span> <span class="op">/</span> <span class="kw">recs2</span><span class="op">$</span><span class="kw">theoretical_max</span>
 <span class="co">#&gt; [1] 0.01000499</span>
-<span class="no">rqa2</span>$<span class="no">RR</span>
-<span class="co">#&gt; [1] 0.01000499</span></pre></body></html></div>
+<span class="kw">rqa2</span><span class="op">$</span><span class="kw">RR</span>
+<span class="co">#&gt; [1] 0.01000499</span>
+</pre></div>
 </div>
 <div id="ts-3" class="section level3 unnumbered">
 <h3 class="hasAnchor">
 <a href="#ts-3" class="anchor"></a>TS 3</h3>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="co">#----------------------</span>
+<div class="sourceCode" id="cb12"><pre class="downlit">
+<span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix TS_3</span>
 <span class="co">#----------------------</span>
-<span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="no">series</span>$<span class="no">TS_3</span>))</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="kw">series</span><span class="op">$</span><span class="kw">TS_3</span>))
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb13"><html><body><pre class="r">
-<span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(<span class="no">series</span>$<span class="no">TS_3</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb13"><pre class="downlit">
+
+<span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(<span class="kw">series</span><span class="op">$</span><span class="kw">TS_3</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r">
-<span class="no">RN3</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/rn.html">rn</a></span>(<span class="kw">y1</span> <span class="kw">=</span> <span class="no">series</span>$<span class="no">TS_3</span>, <span class="kw">emDim</span> <span class="kw">=</span> <span class="fl">7</span>, <span class="kw">emLag</span> <span class="kw">=</span> <span class="fl">8</span>, <span class="kw">emRad</span> <span class="kw">=</span> <span class="fl">NA</span>, <span class="kw">targetValue</span> <span class="kw">=</span> <span class="fl">0.01</span>)
+<div class="sourceCode" id="cb14"><pre class="downlit">
+
+<span class="kw">RN3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rn.html">rn</a></span>(y1 = <span class="kw">series</span><span class="op">$</span><span class="kw">TS_3</span>, emDim = <span class="fl">7</span>, emLag = <span class="fl">8</span>, emRad = <span class="fl">NA</span>, targetValue = <span class="fl">0.01</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Searching for a radius that will yield 0.01 for RR</span>
-<span class="fu"><a href="../reference/rn_plot.html">rn_plot</a></span>(<span class="no">RN3</span>)</pre></body></html></div>
+<span class="fu"><a href="../reference/rn_plot.html">rn_plot</a></span>(<span class="kw">RN3</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r">
+<div class="sourceCode" id="cb15"><pre class="downlit">
+
 <span class="co"># Get RQA measures</span>
-<span class="no">rqa3</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span>(<span class="no">RN3</span>)
+<span class="kw">rqa3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span>(<span class="kw">RN3</span>)
 
 <span class="co"># knitr::kable(rqa3,digits = 2) %&gt;%</span>
 <span class="co">#   kable_styling() %&gt;%</span>
 <span class="co">#   scroll_box(width = "100%", height = "100px")</span>
 
-<span class="no">g3</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(<span class="no">RN3</span>, <span class="kw">mode</span><span class="kw">=</span><span class="st">"undirected"</span>, <span class="kw">diag</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(<span class="no">g3</span>)$<span class="no">size</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(<span class="no">g3</span>)
-<span class="no">g3r</span> <span class="kw">&lt;-</span> <span class="kw pkg">casnet</span><span class="kw ns">::</span><span class="fu"><a href="../reference/make_spiral_graph.html">make_spiral_graph</a></span>(<span class="no">g3</span>,<span class="kw">arcs</span> <span class="kw">=</span> <span class="no">arcs</span> ,<span class="kw">epochColours</span> <span class="kw">=</span> <span class="fu"><a href="../reference/getColours.html">getColours</a></span>(<span class="no">arcs</span>), <span class="kw">markTimeBy</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<span class="kw">g3</span> <span class="op">&lt;-</span> <span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span>(<span class="kw">RN3</span>, mode=<span class="st">"undirected"</span>, diag = <span class="fl">FALSE</span>)
+<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span>(<span class="kw">g3</span>)<span class="op">$</span><span class="kw">size</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span>(<span class="kw">g3</span>)
+<span class="kw">g3r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_spiral_graph.html">make_spiral_graph</a></span>(<span class="kw">g3</span>,arcs = <span class="kw">arcs</span> ,epochColours = <span class="fu"><a href="../reference/getColours.html">getColours</a></span>(<span class="kw">arcs</span>), markTimeBy = <span class="fl">TRUE</span>)
+</pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r">
+<div class="sourceCode" id="cb16"><pre class="downlit">
 
-<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(<span class="no">g3</span>)
+
+<span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/distances.html">average.path.length</a></span>(<span class="kw">g3</span>)
 <span class="co">#&gt; [1] 6.094221</span>
-<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(<span class="no">g3</span>)
+<span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/transitivity.html">transitivity</a></span>(<span class="kw">g3</span>)
 <span class="co">#&gt; [1] 0.3300908</span>
-<span class="fu"><a href="https://rdrr.io/pkg/qgraph/man/smallworldness.html">smallworldness</a></span>(<span class="no">g3</span>)
-<span class="co">#&gt;       smallworldness         trans_target averagelength_target </span>
-<span class="co">#&gt;         28.832107774          0.330090791         13.959812762 </span>
-<span class="co">#&gt;          trans_rnd_M         trans_rnd_lo         trans_rnd_up </span>
-<span class="co">#&gt;          0.010357977          0.004536316          0.018158236 </span>
-<span class="co">#&gt;  averagelength_rnd_M averagelength_rnd_lo averagelength_rnd_up </span>
-<span class="co">#&gt;         12.629830007         12.058357329         19.878833161</span>
+<span class="co"># igraph::smallworldness(g3)</span>
 
-<span class="no">recs3</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(<span class="no">g3</span>)
+<span class="kw">recs3</span> <span class="op">&lt;-</span> <span class="kw">igraph</span>::<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">centr_degree</a></span>(<span class="kw">g3</span>)
 
-(<span class="no">RP_N</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">recs3</span>$<span class="no">res</span>))
+(<span class="kw">RP_N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">recs3</span><span class="op">$</span><span class="kw">res</span>))
 <span class="co">#&gt; [1] 2030</span>
-<span class="no">rqa3</span>$<span class="no">RP_N</span>
+<span class="kw">rqa3</span><span class="op">$</span><span class="kw">RP_N</span>
 <span class="co">#&gt; [1] 2030</span>
 
-<span class="no">RP_N</span> / <span class="no">recs3</span>$<span class="no">theoretical_max</span>
+<span class="kw">RP_N</span> <span class="op">/</span> <span class="kw">recs3</span><span class="op">$</span><span class="kw">theoretical_max</span>
 <span class="co">#&gt; [1] 0.01000246</span>
-<span class="no">rqa3</span>$<span class="no">RR</span>
-<span class="co">#&gt; [1] 0.01000246</span></pre></body></html></div>
+<span class="kw">rqa3</span><span class="op">$</span><span class="kw">RR</span>
+<span class="co">#&gt; [1] 0.01000246</span>
+</pre></div>
 </div>
 </div>
 <div id="multiplex-recurrence-networks" class="section level2 tabset tabset-fade tabset-pills">
 <h2 class="hasAnchor">
 <a href="#multiplex-recurrence-networks" class="anchor"></a>Multiplex Recurrence Networks</h2>
 <p>Consider the three time series to be part of a multi-layer recurrence network. Common properties of the multiplex network are multi-layer mutual information and edge overlap.</p>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="co"># Inter-layer Mutual Information</span>
-(<span class="no">interlayer_mi12</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(<span class="no">g1</span>,<span class="no">g2</span>))
+<div class="sourceCode" id="cb17"><pre class="downlit">
+<span class="co"># Inter-layer Mutual Information</span>
+(<span class="kw">interlayer_mi12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(<span class="kw">g1</span>,<span class="kw">g2</span>))
 <span class="co">#&gt; [1] 2.20549</span>
 <span class="co">#&gt; attr(,"miType")</span>
 <span class="co">#&gt; [1] "inter-layer mutual information"</span>
-(<span class="no">interlayer_mi13</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(<span class="no">g1</span>,<span class="no">g3</span>))
+(<span class="kw">interlayer_mi13</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(<span class="kw">g1</span>,<span class="kw">g3</span>))
 <span class="co">#&gt; [1] 1.666615</span>
 <span class="co">#&gt; attr(,"miType")</span>
 <span class="co">#&gt; [1] "inter-layer mutual information"</span>
-(<span class="no">interlayer_mi23</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(<span class="no">g2</span>,<span class="no">g3</span>))
+(<span class="kw">interlayer_mi23</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mi_interlayer.html">mi_interlayer</a></span>(<span class="kw">g2</span>,<span class="kw">g3</span>))
 <span class="co">#&gt; [1] 2.155163</span>
 <span class="co">#&gt; attr(,"miType")</span>
 <span class="co">#&gt; [1] "inter-layer mutual information"</span>
 
 <span class="co"># mean I-L MI  </span>
-<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">interlayer_mi12</span>,<span class="no">interlayer_mi13</span>,<span class="no">interlayer_mi23</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">interlayer_mi12</span>,<span class="kw">interlayer_mi13</span>,<span class="kw">interlayer_mi23</span>))
 <span class="co">#&gt; [1] 2.009089</span>
 
 <span class="co"># Edge Overlap</span>
-(<span class="no">edge_overlap12</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g1</span> <span class="kw">%s%</span> <span class="no">g2</span>)) / (<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g1</span>))+<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g2</span>))))
+(<span class="kw">edge_overlap12</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g1</span> <span class="op">%s%</span> <span class="kw">g2</span>)) <span class="op">/</span> (<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g1</span>))<span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g2</span>))))
 <span class="co">#&gt; [1] 0.003800676</span>
-(<span class="no">edge_overlap13</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g1</span> <span class="kw">%s%</span> <span class="no">g3</span>)) / (<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g1</span>))+<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g3</span>))))
+(<span class="kw">edge_overlap13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g1</span> <span class="op">%s%</span> <span class="kw">g3</span>)) <span class="op">/</span> (<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g1</span>))<span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g3</span>))))
 <span class="co">#&gt; [1] 0.005457026</span>
-(<span class="no">edge_overlap23</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g2</span> <span class="kw">%s%</span> <span class="no">g3</span>)) / (<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g2</span>))+<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="no">g3</span>))))
+(<span class="kw">edge_overlap23</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g2</span> <span class="op">%s%</span> <span class="kw">g3</span>)) <span class="op">/</span> (<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g2</span>))<span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="kw">g3</span>))))
 <span class="co">#&gt; [1] 0.004092769</span>
 
 <span class="co"># mean EO </span>
-<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">edge_overlap12</span>,<span class="no">interlayer_mi13</span>,<span class="no">interlayer_mi23</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">edge_overlap12</span>,<span class="kw">interlayer_mi13</span>,<span class="kw">interlayer_mi23</span>))
 <span class="co">#&gt; [1] 1.275193</span>
 
 <span class="co"># Overall Edge Overlap</span>
-(<span class="no">eo_all</span>  <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/intersection.html">intersection</a></span>(<span class="no">g1</span>,<span class="no">g2</span>,<span class="no">g3</span>))))
+(<span class="kw">eo_all</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html">E</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/intersection.html">intersection</a></span>(<span class="kw">g1</span>,<span class="kw">g2</span>,<span class="kw">g3</span>))))
 <span class="co">#&gt; [1] 0</span>
-<span class="co">#(eo_mean &lt;- eo_all / (edge_overlap12+edge_overlap13+edge_overlap23))</span></pre></body></html></div>
+<span class="co">#(eo_mean &lt;- eo_all / (edge_overlap12+edge_overlap13+edge_overlap23))</span>
+</pre></div>
 </div>
 </div>
   </div>
@@ -364,7 +374,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

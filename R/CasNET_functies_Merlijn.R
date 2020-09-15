@@ -1,16 +1,3 @@
-# CasNET Functies Merlijn 03-2018
-#
-# Hoofd Functie 1: dyn_comp()
-# input: dataframe, window size, minimum value of measurement scale, maximum value of maximum scale, first column to be evaluated, last column to be evaluated.
-# output: dataset met dynamic complexity values, complexity resonance diagram
-# deze functie gebruikt DC_F(), DC_D(), Heaviside()
-#
-# Hoofd functie 2: crit_in()
-# input: dataframe, window size, minimum value of measurement scale, maximum value of maximum scale, first column to be evaluated, last column to be evaluated.
-# output: dataset met critical instability values per item en de som, critical instability diagram
-#
-
-
 #' @title Dynamic Complexity
 #'
 #' @description Calculate DynComp (deprecated, use [dc_win] instead)

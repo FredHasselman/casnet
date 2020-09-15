@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,61 +135,70 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Mutliplex Recurrence Network</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/mrn.R'><code>R/mrn.R</code></a></small>
     <div class="hidden name"><code>mrn_plot.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function will create a Multiplex Recurrence Network from a list of igraph objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: <em>Layer similarity</em> (<code>MRNweightedBy</code> is set to <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>) and <em>Layer importance</em> (<code>MRNweightedBy</code> is <code>"RankorderDC"</code>). The former generates weighted MRN based on Interlayer Mutual Information or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument <code>MRNrankedBy</code>.</p>
+    <p>This function will create a Multiplex Recurrence Network from a list of <a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph</a> objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: <em>Layer similarity</em> (<code>MRNweightedBy</code> is set to <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>) and <em>Layer importance</em> (<code>MRNweightedBy</code> is <code>"RankorderDC"</code>). The former generates weighted MRN based on Interlayer Mutual Information or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument <code>MRNrankedBy</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>mrn_plot</span>(
-  <span class='no'>MRN</span>,
-  <span class='kw'>MRNweightedBy</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InterlayerMI"</span>, <span class='st'>"Edgeoverlap"</span>, <span class='st'>"RankDC"</span>)[<span class='fl'>1</span>],
-  <span class='kw'>MRNrankedBy</span> <span class='kw'>=</span> <span class='st'>"degree"</span>,
-  <span class='kw'>win</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>step</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>overlap</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>doSave</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>coord</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>RNnodes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>scaleVertexSize</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.01</span>, <span class='fl'>5</span>),
-  <span class='kw'>vertexColour</span> <span class='kw'>=</span> <span class='fu'><a href='getColours.html'>getColours</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>layers</span>)),
-  <span class='kw'>vertexBorderColour</span> <span class='kw'>=</span> <span class='st'>"black"</span>,
-  <span class='kw'>showVertexLegend</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>showSizeLegend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>alphaV</span> <span class='kw'>=</span> <span class='fl'>0.7</span>,
-  <span class='kw'>scaleEdgeSize</span> <span class='kw'>=</span> <span class='fl'>1</span>/<span class='fl'>5</span>,
-  <span class='kw'>alphaE</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>showEdgeColourLegend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>curvature</span> <span class='kw'>=</span> -<span class='fl'>0.6</span>,
-  <span class='kw'>createAnimation</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>useImageMagick</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>loopAnimation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>transitionLength</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>stateLength</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>gifWidth</span> <span class='kw'>=</span> <span class='fl'>600</span>,
-  <span class='kw'>gifRes</span> <span class='kw'>=</span> <span class='fl'>150</span>,
-  <span class='kw'>noParts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>imageDir</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>layers</span>,
+  MRNweightedBy = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InterlayerMI"</span>, <span class='st'>"Edgeoverlap"</span>, <span class='st'>"RankDC"</span>)[<span class='fl'>1</span>],
+  MRNrankedBy = <span class='st'>"degree"</span>,
+  windowedWeights = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"local"</span>, <span class='st'>"cumulative"</span>)[<span class='fl'>1</span>],
+  win = <span class='fl'>NA</span>,
+  step = <span class='fl'>NA</span>,
+  overlap = <span class='fl'>NA</span>,
+  doPlot = <span class='fl'>FALSE</span>,
+  doSave = <span class='fl'>FALSE</span>,
+  coords = <span class='fl'>NA</span>,
+  RNnodes = <span class='fl'>FALSE</span>,
+  scaleVertexSize = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.01</span>, <span class='fl'>5</span>),
+  vertexColour = <span class='fu'><a href='getColours.html'>getColours</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>layers</span>)),
+  vertexBorderColour = <span class='st'>"black"</span>,
+  showVertexLegend = <span class='fl'>TRUE</span>,
+  showSizeLegend = <span class='fl'>FALSE</span>,
+  alphaV = <span class='fl'>0.7</span>,
+  scaleEdgeSize = <span class='fl'>1</span><span class='op'>/</span><span class='fl'>5</span>,
+  alphaE = <span class='fl'>0.5</span>,
+  showEdgeColourLegend = <span class='fl'>FALSE</span>,
+  curvature = <span class='op'>-</span><span class='fl'>0.6</span>,
+  createAnimation = <span class='fl'>FALSE</span>,
+  useImageMagick = <span class='fl'>FALSE</span>,
+  loopAnimation = <span class='fl'>TRUE</span>,
+  transitionLength = <span class='fl'>3</span>,
+  stateLength = <span class='fl'>1</span>,
+  gifWidth = <span class='fl'>600</span>,
+  gifRes = <span class='fl'>150</span>,
+  noParts = <span class='fl'>TRUE</span>,
+  imageDir = <span class='fl'>NA</span>,
+  silent = <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>layers</th>
+      <td><p>A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.</p></td>
+    </tr>
+    <tr>
       <th>MRNweightedBy</th>
       <td><p>The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: <code>"InterLayerMI"</code> (Mutual information based on similarity of the vertex degree across layers), <code>"EdgeOverlap"</code> (proportion of vertices sharing the same edges across layers), <code>"RankorderDC"</code> (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in <code>MRNrankedBy</code>). Choosing <code>"InterLayerMI"</code> or <code>"EdgeOverlap"</code> will decide which measure is displayed in the plot of the Multiplex RN, both measures will always be returned in the numerical output.</p></td>
     </tr>
     <tr>
       <th>MRNrankedBy</th>
-      <td><p>If <code>MRNweightedBy = "RankorderDC"</code>, then <code>MRNrankedBy</code> must be a valid igraph command that returns vertex properties, for example: <code>"degree"</code>, <code>"strength"</code>,<code>"hub_score"</code>,<code>"centr_degree"</code>, <code>"transitivity"</code>, <code>"betweenness"</code>. The appropriate measure type, e.g. for <code>"directed"</code>, or <code>"weighted"</code> graphs, will be inferred from the graph properties of the 1st graph object in the <code>layers</code> list. For best results with weighted measures, assign a value to <code>E(g)$weight</code> for each <code>g</code> in <code>layers</code>. (default = <code>"degree"</code>)</p></td>
+      <td><p>If <code>MRNweightedBy = "RankorderDC"</code>, then <code>MRNrankedBy</code> must be a valid <a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph</a> command that returns vertex properties, for example: <code>"degree"</code>, <code>"strength"</code>,<code>"hub_score"</code>,<code>"centr_degree"</code>, <code>"transitivity"</code>, <code>"betweenness"</code>. The appropriate measure type, e.g. for <code>"directed"</code>, or <code>"weighted"</code> graphs, will be inferred from the graph properties of the 1st graph object in the <code>layers</code> list. For best results with weighted measures, assign a value to <code>E(g)$weight</code> for each <code>g</code> in <code>layers</code>. (default = <code>"degree"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>windowedWeights</th>
+      <td><p>If a windowed analysis is conducted and the edges of the graphs in <code>layers</code> have a weight property, there are a number of different ways to handle the weights depending on the value of <code>windowedWeights</code>: <code>"none"</code>, <code>"local"</code>, and <code>"cumulative"</code>. Value <code>"none"</code> will ignore the weights, <code>"local"</code> will limit the range of edges to those edges connecting the vertices contained within the window, <code>"cumulative"</code> will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = <code>none</code>)</p></td>
     </tr>
     <tr>
       <th>win</th>
-      <td><p>The window size passed to <code>ts_window()</code> in which to evaluate <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. If <code>MRNweightedBy = "RankorderDC"</code>, it will be the size of the right aligned window in which Dynamic Complexity will be computed using <code><a href='dc_win.html'>dc_win()</a></code> (default = <code>NA</code>)</p></td>
+      <td><p>The window size passed to <code><a href='ts_windower.html'>ts_windower()</a></code> in which to evaluate <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. If <code>MRNweightedBy = "RankorderDC"</code>, it will be the size of the right aligned window in which Dynamic Complexity will be computed using <code><a href='dc_win.html'>dc_win()</a></code> (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>step</th>
@@ -200,11 +206,19 @@
     </tr>
     <tr>
       <th>overlap</th>
-      <td><p>The window overlap passed to <code>ts_window()</code> if <code>MRNweightedBy</code> is <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. The value of <code>step</code> will be ignored if <code>overlap</code> is not <code>NA</code>. (default = <code>NA</code>).</p></td>
+      <td><p>The window overlap passed to <code><a href='ts_windower.html'>ts_windower()</a></code> if <code>MRNweightedBy</code> is <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. The value of <code>step</code> will be ignored if <code>overlap</code> is not <code>NA</code>. (default = <code>NA</code>).</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
       <td><p>Plot the multiplex recurrence network (default = <code>TRUE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>doSave</th>
+      <td><p>Save the plots.</p></td>
+    </tr>
+    <tr>
+      <th>coords</th>
+      <td><p>A data frame with layout coordinastes generated by calling any of the <a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph</a> layout functions. If <code>NA</code> a circle layout will; be generated (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>RNnodes</th>
@@ -231,8 +245,16 @@
       <td><p>Should a legend be shown for the size of the nodes? (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
+      <th>alphaV</th>
+      <td><p>Set transparency for Vertices (default = <code>1</code>)</p></td>
+    </tr>
+    <tr>
       <th>scaleEdgeSize</th>
       <td><p>Scale the size of the edges by a constant: <code>E(g)$width * scaleEdgeSize</code> (default = <code>1/5</code>)</p></td>
+    </tr>
+    <tr>
+      <th>alphaE</th>
+      <td><p>Set transparency for Edges. A single numeric, or a vector of length <code><a href='https://rdrr.io/pkg/igraph/man/gsize.html'>ecount(g)</a></code> (default = <code>0.8</code>)</p></td>
     </tr>
     <tr>
       <th>showEdgeColourLegend</th>
@@ -240,11 +262,11 @@
     </tr>
     <tr>
       <th>curvature</th>
-      <td><p>The <code>curvature</code> parameter for edges see <code>geom_curve()</code> (default = <code>-0.7</code>)</p></td>
+      <td><p>The <code>curvature</code> parameter for edges see <code><a href='https://ggplot2.tidyverse.org/reference/geom_segment.html'>geom_curve()</a></code> (default = <code>-0.7</code>)</p></td>
     </tr>
     <tr>
       <th>createAnimation</th>
-      <td><p>If <code>createAnimation = TRUE</code> <em>and</em> <code>doPlot = TRUE</code> <em>and</em> a windowed analysis is conducted, an animation will be produced using either package gganimate (if <code>useImageMagick = FALSE</code>) or animation (if <code>useImageMagick = FALSE</code>). The main difference is that gganimate has nice animation transition features, but plots the MRN using ggplot2, which does not have great options for displaying the nodes as images. With package animation a sequence of igraph plots will be converted to an animation. If <code>doSave = TRUE</code> the animation will be saved in <code>imageDir</code> as an animated gif by calling either <code><a href='https://gganimate.com/reference/anim_save.html'>gganimate::anim_save()</a></code>, or <code><a href='https://rdrr.io/pkg/animation/man/saveGIF.html'>animation::saveGIF()</a></code> (default = <code>FALSE</code>)</p></td>
+      <td><p>If <code>createAnimation = TRUE</code> <em>and</em> <code>doPlot = TRUE</code> <em>and</em> a windowed analysis is conducted, an animation will be produced using either package <code>gganimate</code> (if <code>useImageMagick = FALSE</code>) or <code>animation</code> (if <code>useImageMagick = FALSE</code>). The main difference is that <code>gganimate</code> has nice animation transition features, but plots the MRN using <a href='https://ggplot2.tidyverse.org/reference/ggplot2-package.html'>ggplot2</a>, which does not have great options for displaying the nodes as images. With package <code>animation</code> a sequence of <a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph</a> plots will be converted to an animation. If <code>doSave = TRUE</code> the animation will be saved in <code>imageDir</code> as an animated gif by calling either <code><a href='https://gganimate.com/reference/anim_save.html'>gganimate::anim_save()</a></code>, or <code><a href='https://rdrr.io/pkg/animation/man/saveGIF.html'>animation::saveGIF()</a></code> (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>useImageMagick</th>
@@ -260,7 +282,7 @@
     </tr>
     <tr>
       <th>stateLength</th>
-      <td><p>Value of <code>state_length</code> if gganimate is used, or the  <code>interval</code> in seconds for <code><a href='https://rdrr.io/pkg/animation/man/ani.pause.html'>animation::ani.pause()</a></code> (default = <code>1</code>)</p></td>
+      <td><p>Value of <code>state_length</code> if <code>gganimate</code> is used, or the  <code>interval</code> in seconds for <code><a href='https://rdrr.io/pkg/animation/man/ani.pause.html'>animation::ani.pause()</a></code> (default = <code>1</code>)</p></td>
     </tr>
     <tr>
       <th>gifWidth</th>
@@ -281,18 +303,6 @@
     <tr>
       <th>silent</th>
       <td><p>Silent-ish mode</p></td>
-    </tr>
-    <tr>
-      <th>layers</th>
-      <td><p>A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.</p></td>
-    </tr>
-    <tr>
-      <th>windowedWeights</th>
-      <td><p>If a windowed analysis is conducted and the edges of the graphs in <code>layers</code> have a weight property, there are a number of different ways to handle the weights depending on the value of <code>windowedWeights</code>: <code>"none"</code>, <code>"local"</code>, and <code>"cumulative"</code>. Value <code>"none"</code> will ignore the weights, <code>"local"</code> will limit the range of edges to those edges connecting the vertices contained within the window, <code>"cumulative"</code> will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = <code>none</code>)</p></td>
-    </tr>
-    <tr>
-      <th>coords</th>
-      <td><p>A data frame with layout coordinastes generated by calling any of the igraph layout functions. If <code>NA</code> a circle layout will; be generated (default = <code>NA</code>)</p></td>
     </tr>
     </table>
 
@@ -319,7 +329,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -109,9 +109,6 @@
       <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
     </li>
     <li>
-      <a href="../articles/imputemissingsata.html">Dealing with missing values in (discrete) time series</a>
-    </li>
-    <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
     </li>
   </ul>
@@ -138,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Vertex and Edge Group Colours</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/plotFUN.R'><code>R/plotFUN.R</code></a></small>
     <div class="hidden name"><code>plotNET_groupColour.Rd</code></div>
     </div>
 
@@ -147,15 +144,15 @@
     </div>
 
     <pre class="usage"><span class='fu'>plotNET_groupColour</span>(
-  <span class='no'>g</span>,
-  <span class='no'>groups</span>,
-  <span class='kw'>colourV</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>alphaV</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>colourE</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>alphaE</span> <span class='kw'>=</span> <span class='fl'>0.8</span>,
-  <span class='kw'>groupColours</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>defaultEdgeColour</span> <span class='kw'>=</span> <span class='st'>"grey70"</span>,
-  <span class='kw'>doPlot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>g</span>,
+  <span class='kw'>groups</span>,
+  colourV = <span class='fl'>TRUE</span>,
+  alphaV = <span class='fl'>1</span>,
+  colourE = <span class='fl'>FALSE</span>,
+  alphaE = <span class='fl'>0.8</span>,
+  groupColours = <span class='kw'>NULL</span>,
+  defaultEdgeColour = <span class='st'>"grey70"</span>,
+  doPlot = <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -183,7 +180,7 @@
     </tr>
     <tr>
       <th>alphaE</th>
-      <td><p>Set transparency for Edges. A single numeric, or a vector of length <code>ecount(g)</code> (default = <code>0.8</code>)</p></td>
+      <td><p>Set transparency for Edges. A single numeric, or a vector of length <code><a href='https://rdrr.io/pkg/igraph/man/gsize.html'>ecount(g)</a></code> (default = <code>0.8</code>)</p></td>
     </tr>
     <tr>
       <th>groupColours</th>
@@ -225,7 +222,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

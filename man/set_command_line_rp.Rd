@@ -10,5 +10,5 @@ set_command_line_rp()
 Message informing whether the procedure was succesful.
 }
 \description{
-Set command line RQA executable
+Sets the location of the command line RQA executable
 }

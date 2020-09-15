@@ -7,7 +7,7 @@
 \alias{DC_D}
 \alias{crit_in}
 \alias{casnet-deprecated}
-\title{Deprecated functions in package \pkg{casnet}.}
+\title{Deprecated functions in package \link{casnet}.}
 \usage{
 dyn_comp(
   df,
@@ -32,7 +32,7 @@ crit_in(df, win)
 The functions listed below are deprecated and will be defunct in
 the near future. When possible, alternative functions with similar
 functionality are also mentioned. Help pages for deprecated functions are
-available at \code{help("-deprecated")}.
+available at \verb{help("-deprecated"}.
 }
 \section{\code{dyn_comp}}{
 
