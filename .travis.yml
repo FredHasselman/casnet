@@ -5,6 +5,7 @@ sudo: false
 cache: packages
 before_install:
   - tlmgr install index
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install libcgal-dev libglu1-mesa-dev mesa-common-dev; fi
 brew_packages:
   - udunits
 apt_packages:
@@ -16,3 +17,5 @@ addons:
            - sourceline: 'ppa:opencpu/imagemagick'
          packages:
            - libmagick++-dev
+           - libgdal-dev
+           - libproj-dev
