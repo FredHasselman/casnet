@@ -57,17 +57,19 @@ A list object containing:
 Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope.
 }
 \details{
-Calls function \code{\link[sapa:SDF]{sapa::SDF()}} to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), \code{SDF} is called using a Tukey window (\verb{raised cosine}, see \code{\link[sapa:taper]{sapa::taper()}}).
+Calls function \code{\link[stats:spec.pgram]{stats::spec.pgram()}} to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), \code{\link[stats:spec.pgram]{stats::spec.pgram()}} is called using a cosine taper = 0.5.
 
 A line is fitted on the periodogram in log-log coordinates. The full range is fitted as well as one of three fit-ranges:
 \itemize{
 \item \code{lowest25} - The 25\\% lowest frequencies
 \item \code{Wijnants} - The 50 lowest frequencies (Wijnants et al., 2012)
-\item \code{HurvichDeo} - The Hurvich-Deo estimate, see \code{\link[fractal:HDEst]{fractal::HDEst()}}
+\item \code{Hurvich-Deo} - The Hurvich-Deo estimate (Hurvich & Deo, 1999)
 }
 }
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+
+Hurvich, C.M., & Deo, R.R. (1999). Plug-in Selection of the Number of Frequencies in Regression Estimates of the Memory Parameter of a Long Memory Time Series. \emph{Journal of Time Series Analysis, 20(3)}, 331–341.
 }
 \seealso{
 Other Fluctuation Analyses: 

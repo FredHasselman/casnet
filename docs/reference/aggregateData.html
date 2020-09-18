@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Power Spectral Density Slope (PSD). — fd_psd • casnet</title>
+<title>aggregateData — aggregateData • casnet</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Power Spectral Density Slope (PSD). — fd_psd" />
-<meta property="og:description" content="Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope." />
+<meta property="og:title" content="aggregateData — aggregateData" />
+<meta property="og:description" content="aggregateData" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -134,117 +134,48 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Power Spectral Density Slope (PSD).</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/fd.R'><code>R/fd.R</code></a></small>
-    <div class="hidden name"><code>fd_psd.Rd</code></div>
+    <h1>aggregateData</h1>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <div class="hidden name"><code>aggregateData.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Estimate Alpha, Hurst Exponent and Fractal Dimension through log-log slope.</p>
+    <p>aggregateData</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fd_psd</span>(
-  <span class='kw'>y</span>,
-  fs = <span class='kw'>NULL</span>,
-  standardise = <span class='fl'>TRUE</span>,
-  detrend = <span class='fl'>TRUE</span>,
-  fitMethod = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"lowest25"</span>, <span class='st'>"Wijnants"</span>, <span class='st'>"Hurvich-Deo"</span>)[<span class='fl'>3</span>],
-  doPlot = <span class='fl'>FALSE</span>,
-  returnPlot = <span class='fl'>FALSE</span>,
-  returnPLAW = <span class='fl'>FALSE</span>,
-  returnInfo = <span class='fl'>FALSE</span>,
-  silent = <span class='fl'>FALSE</span>,
-  noTitle = <span class='fl'>FALSE</span>,
-  tsName = <span class='st'>"y"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>aggregateData</span>(<span class='kw'>x</span>, <span class='kw'>by</span>, <span class='kw'>FUN</span>, moving = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>y</th>
-      <td><p>A numeric vector or time series object.</p></td>
+      <th>x</th>
+      <td><p>x</p></td>
     </tr>
     <tr>
-      <th>fs</th>
-      <td><p>Sample rate (default = <code>NULL</code>)</p></td>
+      <th>by</th>
+      <td><p>by</p></td>
     </tr>
     <tr>
-      <th>standardise</th>
-      <td><p>standardise the series (default = <code>TRUE</code>).</p></td>
+      <th>FUN</th>
+      <td><p>FUNction</p></td>
     </tr>
     <tr>
-      <th>detrend</th>
-      <td><p>Subtract linear trend from the series (default = <code>TRUE</code>).</p></td>
+      <th>moving</th>
+      <td><p>moving</p></td>
     </tr>
     <tr>
-      <th>fitMethod</th>
-      <td><p>Method to decide on a frequency range for log-log fit. Can be one of: "lowest25","Wijnants","Hurvich-Deo" (default). See details for more info.</p></td>
-    </tr>
-    <tr>
-      <th>doPlot</th>
-      <td><p>Return the log-log spectrum with linear fit (default = <code>TRUE</code>).</p></td>
-    </tr>
-    <tr>
-      <th>returnPlot</th>
-      <td><p>Return ggplot2 object (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>returnPLAW</th>
-      <td><p>Return the power law data (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>returnInfo</th>
-      <td><p>Return all the data used in SDA (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>silent</th>
-      <td><p>Run in silent-ish mode (default = <code>TRUE)</code></p></td>
-    </tr>
-    <tr>
-      <th>noTitle</th>
-      <td><p>Do not generate a title (only the subtitle)</p></td>
-    </tr>
-    <tr>
-      <th>tsName</th>
-      <td><p>Name of y added as a subtitle to the plot</p></td>
+      <th>...</th>
+      <td><p>additional</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list object containing:</p><ul>
-<li><p>A data matrix <code>PLAW</code> with columns <code>freq.norm</code>, <code>size</code> and <code>bulk</code>.</p></li>
-<li><p>Estimate of scaling exponent <code>alpha</code> based on a fit over the lowest 25\<!-- % frequencies (\code{low25}), or using the HD estimate \code{HD}. --></p></li>
-<li><p>Estimate of the the Fractal Dimension (<code>FD</code>) using conversion formula's reported in Hasselman(2013).</p></li>
-<li><p>Information output by various functions.</p></li>
-</ul>
+    <p>output</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Calls function <code><a href='https://rdrr.io/r/stats/spec.pgram.html'>stats::spec.pgram()</a></code> to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), <code><a href='https://rdrr.io/r/stats/spec.pgram.html'>stats::spec.pgram()</a></code> is called using a cosine taper = 0.5.</p>
-<p>A line is fitted on the periodogram in log-log coordinates. The full range is fitted as well as one of three fit-ranges:</p><ul>
-<li><p><code>lowest25</code> - The 25\<!-- % lowest frequencies --></p></li>
-<li><p><code>Wijnants</code> - The 50 lowest frequencies (Wijnants et al., 2012)</p></li>
-<li><p><code>Hurvich-Deo</code> - The Hurvich-Deo estimate (Hurvich &amp; Deo, 1999)</p></li>
-</ul>
-
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <a href='http://doi.org/10.3389/fphys.2013.00075'>http://doi.org/10.3389/fphys.2013.00075</a></p>
-<p>Hurvich, C.M., &amp; Deo, R.R. (1999). Plug-in Selection of the Number of Frequencies in Regression Estimates of the Memory Parameter of a Long Memory Time Series. <em>Journal of Time Series Analysis, 20(3)</em>, 331–341.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other Fluctuation Analyses: 
-<code><a href='fd_RR.html'>fd_RR</a>()</code>,
-<code><a href='fd_allan.html'>fd_allan</a>()</code>,
-<code><a href='fd_dfa.html'>fd_dfa</a>()</code>,
-<code><a href='fd_mfdfa.html'>fd_mfdfa</a>()</code>,
-<code><a href='fd_sda.html'>fd_sda</a>()</code>,
-<code><a href='fd_sev.html'>fd_sev</a>()</code></p></div>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>Fred Hasselman</p>
+    <p>Based on "aggregateData" from discontinued package ifultools</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

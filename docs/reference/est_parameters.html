@@ -151,8 +151,8 @@
   emLag = <span class='kw'>NULL</span>,
   maxLag = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)<span class='op'>/</span>(<span class='kw'>maxDim</span> <span class='op'>+</span> <span class='fl'>1</span>)),
   minVecLength = <span class='fl'>20</span>,
-  nnSizes = <span class='fl'>2</span>,
-  nnRadius = <span class='fl'>5</span>,
+  nnSize = <span class='fl'>NA</span>,
+  nnRadius = <span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='kw'>y</span>)<span class='op'>/</span><span class='fl'>10</span>,
   nnThres = <span class='fl'>10</span>,
   theiler = <span class='fl'>0</span>,
   doPlot = <span class='fl'>TRUE</span>,
@@ -198,16 +198,16 @@
       <td><p>The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of <code>maxDim</code> that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = <code>20</code>)</p></td>
     </tr>
     <tr>
-      <th>nnSizes</th>
-      <td><p>Points whose distance is <code>nnSize</code> times further apart than the estimated size of the attractor will be declared false neighbours. See the argument <code>atol</code> in <code><a href='https://rdrr.io/pkg/fractal/man/FNN.html'>fractal::FNN()</a></code> (default = <code>2</code>)</p></td>
+      <th>nnSize</th>
+      <td><p>Neighbourhood diameter (integer, the <code>number.boxes</code> parameter of <code><a href='https://rdrr.io/pkg/tseriesChaos/man/false.nearest.html'>tseriesChaos::false.nearest()</a></code>) used to speed up neighbour search. (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>nnRadius</th>
-      <td><p>If the ratio of the distance between two points in successive dimensions is larger than <code>nnRadius</code>, the points are declared false neighbours. See the argument <code>rtol</code> in <code><a href='https://rdrr.io/pkg/fractal/man/FNN.html'>fractal::FNN()</a></code> (default = <code>5</code>)</p></td>
+      <td><p>Points smaller than the radius are considered neighbours (default = <code>sd(y)/10</code>)</p></td>
     </tr>
     <tr>
       <th>nnThres</th>
-      <td><p>Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = <code>10</code>)</p></td>
+      <td><p>Threshold value (in percentage 0-100) representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = <code>10</code>)</p></td>
     </tr>
     <tr>
       <th>theiler</th>
@@ -234,7 +234,7 @@
 
     <p>A number of functions are called to determine optimal parameters for delay embedding a time series:</p><ul>
 <li><p>Embedding lag (<code>emLag</code>): The default is to call <code><a href='est_emLag.html'>est_emLag()</a></code>, which is a wrapper around <code><a href='https://rdrr.io/pkg/nonlinearTseries/man/timeLag.html'>nonlinearTseries::timeLag()</a></code> with <code>technique=ami</code> to get lags based on the mutual information function.</p></li>
-<li><p>Embedding dimension (<code>m</code>, <code>emDim</code>): The default is to call <code><a href='est_emDim.html'>est_emDim()</a></code>, which is a wrapper around <code><a href='https://rdrr.io/pkg/fractal/man/FNN.html'>fractal::FNN()</a></code></p></li>
+<li><p>Embedding dimension (<code>m</code>, <code>emDim</code>): The default is to call <code><a href='est_emDim.html'>est_emDim()</a></code>, which is a wrapper around <code><a href='https://rdrr.io/pkg/tseriesChaos/man/false.nearest.html'>tseriesChaos::false.nearest()</a></code></p></li>
 </ul>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
@@ -248,8 +248,14 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>4321</span>)
-<span class='fu'>est_parameters</span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>))
-</div><div class='output co'>#&gt; <span class='message'>Changed value of maxDim to 8</span></div><div class='img'><img src='est_parameters-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>est_parameters</span>(y=<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>1000</span>), doPlot=<span class='fl'>FALSE</span>)
+</div><div class='output co'>#&gt; <span class='message'>Registered S3 method overwritten by 'quantmod':</span>
+#&gt; <span class='message'>  method            from</span>
+#&gt; <span class='message'>  as.zoo.data.frame zoo </span></div><div class='input'>
+<span class='kw'>y</span> <span class='op'>&lt;-</span> <span class='kw'>fractal</span>::<span class='kw'><a href='https://rdrr.io/pkg/fractal/man/lorenz.html'>lorenz</a></span>[,<span class='fl'>1</span>]
+<span class='kw'>fnnSeries</span> <span class='op'>&lt;-</span> <span class='fu'>false.nearest</span>(<span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span>(<span class='kw'>y</span>), m=<span class='fl'>10</span>, d=<span class='fl'>5</span>, t=<span class='fl'>0</span>)
+</div><div class='output co'>#&gt; <span class='error'>Error in false.nearest(as.numeric(y), m = 10, d = 5, t = 0): could not find function "false.nearest"</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>fnnSeries</span>)
+</div><div class='output co'>#&gt; <span class='error'>Error in plot(fnnSeries): object 'fnnSeries' not found</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

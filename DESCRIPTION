@@ -20,7 +20,6 @@ Imports:
     reshape2,
     plyr,
     dplyr,
-    fractal,
     ggplot2,
     gtable,
     ggimage,

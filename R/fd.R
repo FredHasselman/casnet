@@ -129,6 +129,7 @@ fd_RR <- function(y){
 #' @author Fred Hasselman
 #'
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
+#' @references Hurvich, C.M., & Deo, R.R. (1999). Plug-in Selection of the Number of Frequencies in Regression Estimates of the Memory Parameter of a Long Memory Time Series. *Journal of Time Series Analysis, 20(3)*, 331–341.
 #'
 #' @return A list object containing:
 #' \itemize{
@@ -142,13 +143,13 @@ fd_RR <- function(y){
 #'
 #' @export
 #'
-#' @details Calls function [sapa::SDF()] to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), `SDF` is called using a Tukey window (`raised cosine`, see [sapa::taper()]).
+#' @details Calls function [stats::spec.pgram()] to estimate the scaling exponent of a timeseries based on the periodogram frequency spectrum. After detrending and normalizing the signal (if requested), [stats::spec.pgram()] is called using a cosine taper = 0.5.
 #'
 #' A line is fitted on the periodogram in log-log coordinates. The full range is fitted as well as one of three fit-ranges:
 #'
 #' * `lowest25` - The 25\% lowest frequencies
 #' * `Wijnants` - The 50 lowest frequencies (Wijnants et al., 2012)
-#' * `HurvichDeo` - The Hurvich-Deo estimate, see [fractal::HDEst()]
+#' * `Hurvich-Deo` - The Hurvich-Deo estimate (Hurvich & Deo, 1999)
 #'
 #'
 fd_psd <- function(y,
@@ -185,16 +186,22 @@ fd_psd <- function(y,
 
   # fast = TRUE ensures padding with zeros to optimize FFT to highly composite number.
   # However, we just pad to nextPow2, except if length already is a power of 2.
-  npad <- 1+(stats::nextn(N,factors=2)-N)/N
-  npad <- stats::nextn(N)
+  # npad <- 1+(stats::nextn(N,factors=2)-N)/N
+  npad <- stats::nextn(N, factors = 2)
 
-  # if(N==npad) npad = 0
-  # psd  <- stats::spec.pgram(y, fast = FALSE, demean=FALSE, detrend=FALSE, plot=FALSE, pad=npad, taper=0.5)
+  if(N==npad){npad <- 0}
+  psd  <- stats::spec.pgram(y, fast = FALSE, demean=FALSE, detrend=FALSE, plot=FALSE, pad=npad, taper=0.5)
 
-  Tukey <- sapa::taper(type="raised cosine", flatness = 0.5, n.sample = N)
-  psd   <- sapa::SDF(y, taper. = Tukey, npad = npad)
+  # Tukey <- sapa::taper(type="raised cosine", flatness = 0.5, n.sample = N)
+  # psd   <- sapa::SDF(y, taper. = Tukey, npad = npad)
 
-  powspec <- cbind.data.frame(freq.norm = attr(psd, "frequency")[-1], size = attr(psd, "frequency")[-1]*stats::frequency(y), bulk = as.matrix(psd)[-1])
+ Nfreq <- NROW(psd$freq)
+ freq.norm <- psd$freq/frequency(y)
+ size <- psd$freq
+ bulk <- 2*psd$spec
+ #plot(x=log2(psd$freq), y=log2(psd$spec*2),pch=".")
+
+  powspec <- cbind.data.frame(freq.norm = freq.norm, size = size, bulk = as.matrix(bulk))
 
   # First check the global slope for anti-persistent noise (GT +0.20)
   # If so, fit the line starting from the highest frequency
@@ -206,13 +213,11 @@ fd_psd <- function(y,
   # If signal is continuous (sampled) consider Wijnants et al. (2013) log-log fitting procedure
   nr <- switch(fitMethod,
                "lowest25" = which(powspec$size>=0.25)[1],
-               "Hurvich-Deo" = fractal::HDEst(NFT = length(powspec$bulk), sdf = as.vector(powspec$bulk)),
+               "Hurvich-Deo" = HurvichDeo(nr = nr, spec = as.vector(powspec$bulk)),
                "Wijnants" = 50
   )
 
-  if(nr>=length(powspec$freq.norm)){nr <- length(powspec$freq.norm)-1}
-  exp1 <- fractal::hurstSpec(y, sdf.method="direct", freq.max = powspec$freq.norm[length(powspec$freq.norm)-1], taper.=Tukey )
-  exp2 <- fractal::hurstSpec(y, sdf.method="direct", freq.max = powspec$freq.norm[nr], taper.=Tukey)
+ if(nr>=length(powspec$freq.norm)){nr <- length(powspec$freq.norm)-1}
 
   ifelse((glob > 0.2), {
     lmfit1 <- stats::lm(log(rev(powspec$bulk)) ~ log(rev(powspec$size)))
@@ -222,15 +227,27 @@ fd_psd <- function(y,
     lmfit2 <- stats::lm(log(powspec$bulk[1:nr]) ~ log(powspec$size[1:nr]))
   })
 
+
+  if(N>4*50){
+    d <- 50
+  } else {
+    d <- round(N/4)
+  }
+  exp1 <- pracma::hurstexp(cumsum(y), d = d, display = FALSE)
+  # #fractal::hurstSpec(y, sdf.method="direct", freq.max = powspec$freq.norm[length(powspec$freq.norm)-1], taper.=Tukey )
+  exp2 <- pracma::hurstexp(cumsum(y), d = nr+1, display = FALSE)
+  # # fractal::hurstSpec(y, sdf.method="direct", freq.max = powspec$freq.norm[nr], taper.=Tukey)
+
+
   outList <- list(
     PLAW  = powspec,
     fullRange = list(sap = stats::coef(lmfit1)[2],
-                     H = exp1,
+                     H = exp1[1],
                      FD = sa2fd_psd(stats::coef(lmfit1)[2]),
                      fitlm1 = lmfit1,
                      method = paste0("All frequencies (n = ",length(powspec$freq.norm),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",sa2fd_psd(stats::coef(lmfit1)[2]))),
     fitRange  = list(sap = stats::coef(lmfit2)[2],
-                     H = exp2,
+                     H = exp2[1],
                      FD = sa2fd_psd(stats::coef(lmfit2)[2]),
                      fitlm2 = lmfit2,
                      method = paste0(fitMethod," (n = ",nr,")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",sa2fd_psd(stats::coef(lmfit2)[2]))),
@@ -338,7 +355,10 @@ fd_sda <- function(y,
 
   N             <- length(y)
   # Simple linear detrending.
-  if(detrend){y <- ts_detrend(y,polyOrder = polyOrder)} # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
+  if(detrend){
+    y <- ts_detrend(y,polyOrder = polyOrder)
+    }
+  # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
   # standardise using N instead of N-1.
   if(is.na(scaleS)){
     scaleS <- unique(round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution)))))
@@ -366,7 +386,7 @@ fd_sda <- function(y,
     Hglobal <- NA
   }
 
-  out <- fractal::dispersion(y, front = FALSE)
+  out <- SDA(y, front = FALSE)
 
   fitRange <- which(lengths(lapply(out$scale, function(s){ts_slice(y,s)}))>=minData)
 
@@ -429,7 +449,7 @@ fd_sda <- function(y,
 #'
 #' @param y    A numeric vector or time series object.
 #' @param fs   Sample rate
-#' @param removeTrend Method to use for detrending, see [fractal::DFA()] (default = "poly")
+#' @param removeTrend Method to use for detrending (default = "poly")
 #' @param polyOrder Order of polynomial trend to remove if `removeTrend = "poly"`
 #' @param standardise Standardise by the series using [casnet::ts_standardise()] with `adjustN = FALSE` (default = "mean.sd")
 #' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `FALSE`)

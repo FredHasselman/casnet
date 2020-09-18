@@ -12,8 +12,8 @@ est_parameters(
   emLag = NULL,
   maxLag = floor(NROW(y)/(maxDim + 1)),
   minVecLength = 20,
-  nnSizes = 2,
-  nnRadius = 5,
+  nnSize = NA,
+  nnRadius = sd(y)/10,
   nnThres = 10,
   theiler = 0,
   doPlot = TRUE,
@@ -43,11 +43,11 @@ est_parameters(
 
 \item{minVecLength}{The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of \code{maxDim} that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = \code{20})}
 
-\item{nnSizes}{Points whose distance is \code{nnSize} times further apart than the estimated size of the attractor will be declared false neighbours. See the argument \code{atol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{2})}
+\item{nnSize}{Neighbourhood diameter (integer, the \code{number.boxes} parameter of \code{\link[tseriesChaos:false.nearest]{tseriesChaos::false.nearest()}}) used to speed up neighbour search. (default = \code{NA})}
 
-\item{nnRadius}{If the ratio of the distance between two points in successive dimensions is larger than \code{nnRadius}, the points are declared false neighbours. See the argument \code{rtol} in \code{\link[fractal:FNN]{fractal::FNN()}} (default = \code{5})}
+\item{nnRadius}{Points smaller than the radius are considered neighbours (default = \code{sd(y)/10})}
 
-\item{nnThres}{Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = \code{10})}
+\item{nnThres}{Threshold value (in percentage 0-100) representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = \code{10})}
 
 \item{theiler}{Theiler window on distance matrix (default = \code{0})}
 
@@ -67,13 +67,17 @@ Find optimal parameters for constructing a Recurrence Matrix. A wrapper for vari
 A number of functions are called to determine optimal parameters for delay embedding a time series:
 \itemize{
 \item Embedding lag (\code{emLag}): The default is to call \code{\link[=est_emLag]{est_emLag()}}, which is a wrapper around \code{\link[nonlinearTseries:timeLag]{nonlinearTseries::timeLag()}} with \code{technique=ami} to get lags based on the mutual information function.
-\item Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[=est_emDim]{est_emDim()}}, which is a wrapper around \code{\link[fractal:FNN]{fractal::FNN()}}
+\item Embedding dimension (\code{m}, \code{emDim}): The default is to call \code{\link[=est_emDim]{est_emDim()}}, which is a wrapper around \code{\link[tseriesChaos:false.nearest]{tseriesChaos::false.nearest()}}
 }
 }
 \examples{
 
 set.seed(4321)
-est_parameters(rnorm(100))
+est_parameters(y=rnorm(1000), doPlot=FALSE)
+
+y <- fractal::lorenz[,1]
+fnnSeries <- false.nearest(as.numeric(y), m=10, d=5, t=0)
+plot(fnnSeries)
 
 }
 \seealso{

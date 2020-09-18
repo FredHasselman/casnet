@@ -343,9 +343,9 @@ est_radius <- function(RM = NULL,
 #'
 #' @param maxDim Maximum number of embedding dimensions to consider (default = `10`)
 #' @param minVecLength The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of `maxDim` that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = `20`)
-#' @param nnSizes Points whose distance is `nnSize` times further apart than the estimated size of the attractor will be declared false neighbours. See the argument `atol` in [fractal::FNN()] (default = `2`)
-#' @param nnRadius If the ratio of the distance between two points in successive dimensions is larger than `nnRadius`, the points are declared false neighbours. See the argument `rtol` in [fractal::FNN()] (default = `5`)
-#' @param nnThres Threshold value representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = `10`)
+#' @param nnSize Neighbourhood diameter (integer, the `number.boxes` parameter of [tseriesChaos::false.nearest()]) used to speed up neighbour search. (default = `NA`)
+#' @param nnRadius Points smaller than the radius are considered neighbours (default = `sd(y)/10`)
+#' @param nnThres Threshold value (in percentage 0-100) representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = `10`)
 #' @param theiler Theiler window on distance matrix (default = `0`)
 #' @param doPlot Produce a diagnostic plot the results (default = `TRUE`)
 #' @param silent Silent-ish mode
@@ -356,7 +356,7 @@ est_radius <- function(RM = NULL,
 #' @details A number of functions are called to determine optimal parameters for delay embedding a time series:
 #'
 #' * Embedding lag (`emLag`): The default is to call [casnet::est_emLag()], which is a wrapper around [nonlinearTseries::timeLag()] with `technique=ami` to get lags based on the mutual information function.
-#' * Embedding dimension (`m`, `emDim`): The default is to call [casnet::est_emDim()], which is a wrapper around [fractal::FNN()]
+#' * Embedding dimension (`m`, `emDim`): The default is to call [casnet::est_emDim()], which is a wrapper around [tseriesChaos::false.nearest()]
 #'
 #'
 #' @family Estimate Recurrence Parameters
@@ -366,7 +366,12 @@ est_radius <- function(RM = NULL,
 #' @examples
 #'
 #' set.seed(4321)
-#' est_parameters(rnorm(100))
+#' est_parameters(y=rnorm(1000), doPlot=FALSE)
+#'
+#' y <- fractal::lorenz[,1]
+#' fnnSeries <- false.nearest(as.numeric(y), m=10, d=5, t=0)
+#' plot(fnnSeries)
+
 #'
 est_parameters <- function(y,
                            lagMethods = c("first.minimum","global.minimum","max.lag"),
@@ -375,8 +380,8 @@ est_parameters <- function(y,
                            emLag     = NULL,
                            maxLag   = floor(NROW(y)/(maxDim+1)),
                            minVecLength = 20,
-                           nnSizes  = 2,
-                           nnRadius = 5,
+                           nnSize  = NA,
+                           nnRadius = sd(y)/10,
                            nnThres  = 10,
                            theiler  = 0,
                            doPlot   = TRUE,
@@ -386,7 +391,7 @@ est_parameters <- function(y,
   if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
 
   if(length(nnRadius)!=1){stop("nnRadius must have 1 numeric value")}
-  #if(length(nnSizes)!=4){stop("nnSizes must have 4 numeric values")}
+  if(length(nnSize)!=1){stop("nnSize must have 1 numeric value")}
   y <- y[!is.na(y)]
   #y <- ts_standardise(y, adjustN = FALSE)
 
@@ -454,7 +459,14 @@ est_parameters <- function(y,
     lagList <- list()
     cnt = 0
 
-    for(N in seq_along(nnSizes)){
+    if(is.na(nnSize)){
+      number.boxes <- NULL
+      nnSize <- "Auto"
+    } else {
+      number.boxes <- nnSize
+    }
+
+    #for(N in seq_along(nnSize)){
       for(R in seq_along(nnRadius)){
         for(L in seq_along(emLags$selection.method)){
 
@@ -473,24 +485,30 @@ est_parameters <- function(y,
             }
 
             #surrDims <- nonlinearTseries::buildTakens(time.series =  as.numeric(y), embedding.dim =  emDims[[D]], time.lag = emLags$optimal.lag[L])
-
-            # (fn.out <- false.nearest(rnorm(1024), m=6, d=1, t=1, rt=3))
+            #fnnSeries <- false.nearest(as.numeric(y), m=maxDim, d=emLags$lag[L], t=theiler, rt= nnRadius[R], eps = nnSize)
             # plot(fn.out)
 
-            fnnSeries <- fractal::FNN(x = as.numeric(y),
-                                      dimension = maxDim,
-                                      tlag = emLags$lag[L],
-                                      rtol = nnRadius[R],
-                                      atol = nnSizes[N],
-                                      olag = 1
-            )
+            fnnSeries <- fnn(y = y,
+                             emLag = emLags$lag[L],
+                             maxDim = maxDim,
+                             radius = nnRadius[R],
+                             number.boxes = number.boxes)
+
+            # fnnSeries <- fractal::FNN(x = as.numeric(y),
+            #                           dimension = maxDim,
+            #                           tlag = emLags$lag[L],
+            #                           rtol = nnRadius[R],
+            #                           atol = nnSize,
+            #                           olag = 1
+            # )
           }
 
-          #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSizes[N]*sd(y))
+          #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSize*sd(y))
           #Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
           #   if(D==1){Nn.max <- Nn}
-          lagList[[cnt]] <- data.frame(Nn.pct = as.numeric(fnnSeries[1,]),
-                                       Nsize = nnSizes[N],
+
+          lagList[[cnt]] <- data.frame(Nn.pct = fnnSeries[,1]/fnnSeries[1,1]*100,
+                                       Nsize = nnSize,
                                        Nradius = nnRadius[R],
                                        emLag.method = emLags$selection.method[[L]],
                                        emLag = emLags$lag[L],
@@ -499,11 +517,11 @@ est_parameters <- function(y,
                                        Nn.sd  = Nn.sd,
                                        Nn.min = Nn.min,
                                        Nn.max = Nn.max)
-        }
-      }
-    }
+        } #R
+      } #L
+   # } #N
 
-    df        <- plyr::ldply(lagList)
+    df <- plyr::ldply(lagList)
     # df$Nn.pct <- df$Nn/df$Nn.max
 
     opt <-plyr::ldply(unique(df$emLag), function(n){
@@ -526,7 +544,7 @@ est_parameters <- function(y,
                   preferSmallestDim = opt[min(opt$emDim, na.rm=TRUE),],
                   preferSmallestNN = opt[min(opt$NN.pct, na.rm=TRUE),],
                   preferSmallestLag = opt[min(opt$emLag, na.rm=TRUE),],
-                  preferSmallestInLargestHood = opt[(min(opt$emLag, na.rm=TRUE)&min(opt$emDim, na.rm=TRUE)&max(opt$Nsize, na.rm = TRUE)),]
+                  preferSmallestInLargestHood = opt[which(min(opt$emLag, na.rm=TRUE)&min(opt$emDim, na.rm=TRUE)&max(opt$Nradius, na.rm = TRUE)),]
     )
 
     #opt <- opt[opt$emDim==min(opt$emDim),][1,]
@@ -548,8 +566,8 @@ est_parameters <- function(y,
   opt <- opt[all(opt$emDim==opDim,opt$emLag==opLag),]
 
   df$emLag <- factor(df$emLag)
-  df$Nns   <- interaction(df$Nsize,df$Nradius)
-  df$Nns.f  <-  factor(df$Nns, levels=levels(df$Nns), labels = paste0("size=",nnSizes," | radius=",nnRadius))
+  # df$Nns   <- interaction(df$Nsize,df$Nradius)
+  df$Nns.f  <-  factor(paste("NN radius =",round(df$Nradius, digits = 4)))
 
   if(doPlot){
 

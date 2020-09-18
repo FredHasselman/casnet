@@ -1334,3 +1334,212 @@ repmat <- function(X,m,n){
   return (out)
 }
 
+
+# Functions from discontinued packages ----
+
+#' HDEst
+#'
+#' Latest version from discontinued package `fractal`.
+#'
+#' @param nr NFT
+#' @param spec sdf
+#' @param A A
+#' @param delta delta
+#'
+#' @return Hurvich-Deo estimate
+#'
+#' @export
+#' @keywords internal
+#'
+HurvichDeo <- function(nr, spec, A=0.3, delta=6/7){
+  # checkScalarType(NFT,"integer")
+  # checkScalarType(A,"numeric")
+  # checkScalarType(delta,"numeric")
+
+  # define frequencies
+  omega <- ((2 * pi)/nr) * (1:nr)
+
+  # notation as in reference: construct X matrix
+  L  <- round(A * nr^delta)
+  c1 <- rep(1, L)
+  c2 <- log(abs(2 * sin(omega[1:L]/2)))
+  c3 <- omega[1:L]^2/2
+  X  <- cbind(c1, c2, c3)
+
+  # construct least squares product matrix and find 3rd row:
+  TX    <- t(X)
+  ProdX <- solve(TX %*% X) %*% TX
+  b     <- ProdX[3,]
+
+  # evaluate K.hat, C.hat, and optimum m, as in Reference;
+  # use first L non-zero frequencies:
+  K.hat <- as.numeric(b %*% log(spec[1:L]))
+  if (K.hat == 0)
+    stop("Method fails: K.hat=0")
+  C.hat <- ((27/(128 * pi^2))^0.2) * (K.hat^2)^-0.2
+
+  round(C.hat * nr^0.8)
+}
+
+
+
+#' Standardised Dispersion Analysis
+#'
+#' @param x x
+#' @param front front
+#'
+#' @return output
+#' @export
+#'
+#' @keywords internal
+#' @note Based on "dispersion" from discontinued package fractal.
+#'
+SDA <- function(x, front=FALSE){
+
+  n.sample <- length(x)
+  if (n.sample < 32)
+    stop("Time series must contain at least 32 points")
+
+  scale <- as.integer(logScale(scale.min=1, scale.max=n.sample, scale.ratio=2))
+  sd <- unlist(lapply(scale, function(m, x, n.sample, front){
+    nscale   <- n.sample %/% m
+    dyad     <- nscale * m
+    n.offset <- ifelse1(front, n.sample - dyad, 0)
+    stdev(aggregateData(x[seq(1 + n.offset, length=dyad)],
+                        by=m, FUN=mean))
+  },
+  x=x,
+  n.sample=n.sample,
+  front=front))
+
+  list(sd=sd, scale=scale)
+}
+
+
+#' logScale
+#'
+#' @param scale.min min
+#' @param scale.max max
+#' @param scale.ratio ratio
+#' @param scale.res reolution
+#' @param coerce coerce?
+#'
+#' @return output
+#' @export
+#' @keywords internal
+#' @note Based on "logScale" from discontinued package ifultools.
+#'
+logScale <- function(scale.min, scale.max, scale.ratio=2, scale.res=NULL, coerce=NULL){
+  # check input arguments
+  if (!is.null(scale.res)){
+    scale.ratio <- 1 / scale.res + 1
+    }
+
+  # check input arguments
+  if (scale.ratio == 1){stop("scale.ratio cannot be unity")}
+  if (scale.ratio <= 0){stop("scale.ratio must be positive")}
+
+  n.scale <- splus2R::ifelse1(scale.ratio > 1, ceiling(log(scale.max/scale.min)/log(scale.ratio)),
+                     ceiling(log(scale.min/scale.max)/log(scale.ratio)))
+
+  scale    <- vector("numeric", length=n.scale)
+  scale[1] <- splus2R::ifelse1(scale.ratio > 1, scale.min, scale.max)
+
+  for (i in seq(2, n.scale)){
+    scale[i] <- scale[i - 1] * scale.ratio
+  }
+
+  if (!is.null(coerce) && is.function(coerce))
+    scale <- coerce(scale)
+
+  unique(scale)
+}
+
+
+
+
+#' aggregateData
+#'
+#' @param x x
+#' @param by by
+#' @param FUN FUNction
+#' @param moving moving
+#' @param ... additional
+#'
+#' @return output
+#' @export
+#' @keywords internal
+#' @note Based on "aggregateData" from discontinued package ifultools
+#'
+aggregateData <- function(x, by, FUN, moving=FALSE, ...){
+
+  x <- as.numeric(x)
+  if(!by%[]%c(1,length(x))){
+    stop("Range of x not on specified interval")
+    }
+  if (!is.function(FUN)){
+    stop("FUN must be a function")
+    }
+
+  n.sample <- length(x)
+
+  if (!moving){
+    n.usable <- (n.sample %/% by) * by
+
+    z <- as.vector(apply(matrix(x[1:n.usable], nrow=by), MARGIN=2, FUN=FUN, ...))
+    if (n.usable != n.sample){z <- c(z, as.vector(FUN(x[(n.usable+1):n.sample], ...)))}
+  }else{
+
+    moving  <- as.integer(moving)
+    if(!moving%[]%c(1, n.sample)){
+      stop("Range of x not on specified interval")
+    }
+    index   <- seq(moving)
+    n.group <- as.integer(floor((n.sample - moving)/ by + 1))
+    last    <- (n.group - 1)*by + moving
+
+    if (!n.group){
+      stop("Moving window not possible with input parameters")
+      }
+
+    z <- vector("numeric", length=n.group)
+
+    for (i in seq(n.group)){
+      z[i] <- FUN(x[index + by*(i-1)], ...)
+    }
+
+    if (last < n.sample){
+      z <- c(z, as.vector(FUN(x[(last+1):n.sample], ...)))
+      }
+  }
+
+  return(z)
+}
+
+#' False Nearest Neighbours
+#'
+#' Search for FNN to get an optimal Embedding Dimension using by using [nonlinearTseries::findAllNeighbours()] in a loop.
+#'
+#' @inheritParams est_parameters
+#' @param radius Size of the neighbourhood: Every point smaller than the radius will be considered a near neighbour, see [nonlinearTseries::findAllNeighbours()] (default = `sd(y)/10`).
+#' @param number.boxes Integer representing number of boxes to to speed up neighbour search, if `NULL` an optimal number will be chosen [nonlinearTseries::findAllNeighbours()] (default = `NULL`).
+#'
+#' @return FNN curve
+#' @export
+#'
+fnn <- function(y, emLag = 1, maxDim = 10, radius = sd(y)/10, number.boxes = NULL){
+
+  out <- matrix(NA, nrow=maxDim, ncol = 1)
+
+  # for(emL in 1:length(emLag)){
+  for(emD in 1: maxDim){
+
+    yy <- nonlinearTseries::buildTakens(time.series = y, embedding.dim = emD, time.lag = emLag)
+    nn <- nonlinearTseries::findAllNeighbours(as.matrix(yy[,1:emD]), radius = radius, number.boxes = number.boxes)
+    out[emD,1] <- sum(lengths(nn))
+
+   }
+  # }
+  return(out)
+}
+

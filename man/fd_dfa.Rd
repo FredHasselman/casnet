@@ -31,7 +31,7 @@ fd_dfa(
 
 \item{fs}{Sample rate}
 
-\item{removeTrend}{Method to use for detrending, see \code{\link[fractal:DFA]{fractal::DFA()}} (default = "poly")}
+\item{removeTrend}{Method to use for detrending (default = "poly")}
 
 \item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
 
