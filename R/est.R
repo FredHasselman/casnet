@@ -366,12 +366,7 @@ est_radius <- function(RM = NULL,
 #' @examples
 #'
 #' set.seed(4321)
-#' est_parameters(y=rnorm(1000), doPlot=FALSE)
-#'
-#' y <- fractal::lorenz[,1]
-#' fnnSeries <- false.nearest(as.numeric(y), m=10, d=5, t=0)
-#' plot(fnnSeries)
-
+#' est_parameters(y=rnorm(500))
 #'
 est_parameters <- function(y,
                            lagMethods = c("first.minimum","global.minimum","max.lag"),
