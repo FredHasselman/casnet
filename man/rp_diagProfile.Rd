@@ -10,6 +10,7 @@ rp_diagProfile(
   diagWin = NULL,
   xname = "X-axis",
   yname = "Y-axis",
+  theiler = 0,
   DLmin = 2,
   VLmin = 2,
   HLmin = 2,
@@ -34,6 +35,8 @@ rp_diagProfile(
 \item{xname}{Label for x-axis}
 
 \item{yname}{Label for y-axis}
+
+\item{theiler}{Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
 
 \item{DLmin}{Minimal diagonal line length (default = \code{2})}
 

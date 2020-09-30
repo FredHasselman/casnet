@@ -6,8 +6,8 @@
 \usage{
 plotRED_mif(
   mif.OUT = NULL,
-  lags = 0:max(round(NROW(y)/4), 10),
-  nbins = ceiling(2 * NROW(y)^(1/3)),
+  lags = attr(mif.OUT, "lags"),
+  nbins = attr(mif.OUT, "nbins"),
   surTest = FALSE,
   alpha = 0.05,
   doPlot = TRUE,

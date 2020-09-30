@@ -11,12 +11,15 @@ vignette: >
 
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
+  message = FALSE,
+	warning = FALSE,
+  comment = ">",
   paged.print = TRUE,
   fig.align = "center",
   fig.width = 7,
   fig.height=7,
-  width = 500
+  width = 500,
+  dpi=72
 )
 library(casnet)
 library(igraph)
@@ -53,10 +56,10 @@ series <- series[1:500,]
 ```
 
 We'll analyse the three time series as a recurrence network:
-* Compare the results, look at the SMall World Index and other measures
+* Compare the results by comparing the different measures
    - Remember: TS_1 was white noise, TS_2 was a sine with added noise, TS_3 was the logistic map in the chaotic regime.
 * Note that some of the RQA measures can be exactly calculated from the measures of the network representation.
-   - Try to understand why the Recurrence is reprented as the *degree centrality() of the network (`igraph::centr_degree()`)
+   - Try to understand why the Recurrence is represented as the *degree centrality* of the network (`igraph::centr_degree()`)
 
 
 ### TS 1 {-}
@@ -67,38 +70,28 @@ We'll analyse the three time series as a recurrence network:
 #----------------------
 plot(ts(series$TS_1))
 
-arcs=6
+arcs <- 6
 
-est_parameters(y = series$TS_1)
+# Because these are generated signals, look for a drop in FNN below 1%.
+p1 <- est_parameters(y = series$TS_1, nnThres = 1)
 
 # By passing emRad = NA, a radius will be calculated
-RN1 <- casnet::rn(y1 = series$TS_1, emDim = 7, emLag = 2, emRad = NA, targetValue = .01)
+RN1 <- casnet::rn(y1 = series$TS_1, emDim = p1$optimDim, emLag = p1$optimLag, emRad = NA, targetValue = 0.05)
 casnet::rn_plot(RN1)
 
 # Get RQA measures
-rqa1 <- rp_measures(RN1)
+rqa1 <- casnet::rp_measures(RN1, silent = FALSE)
 
-# knitr::kable(rqa1,digits = 2) %>%
-#   kable_styling() %>%
-#   scroll_box(width = "100%", height = "100px")
-
+# Create RN graph
 g1  <- igraph::graph_from_adjacency_matrix(RN1, mode="undirected", diag = FALSE)
 igraph::V(g1)$size <- igraph::degree(g1)
 g1r <- casnet::make_spiral_graph(g1,arcs = arcs, epochColours = getColours(arcs), markTimeBy = TRUE)
 
+# Get RN measures
+rn1 <- rn_measures(g1, silent = FALSE)
 
-# Network measures
-igraph::average.path.length(g1)
-igraph::transitivity(g1)
-# qgraph::smallworldness(g1)
-
-recs1 <- igraph::centr_degree(g1)
-
-(RP_N <- sum(recs1$res))
-rqa1$RP_N
-
-RP_N / recs1$theoretical_max
-rqa1$RR
+# Should be the same
+rqa1$RR==rn1$graph_measures$EdgeDensity
 ```
 
 ### TS 2 {-}
@@ -109,34 +102,26 @@ rqa1$RR
 #----------------------
 plot(ts(series$TS_2))
 
-est_parameters(series$TS_2)
+# Because these are generated signals, look for a drop in FNN below 1%.
+p2 <- est_parameters(y = series$TS_2, nnThres = 1)
 
-RN2 <- rn(y1 = series$TS_2, emDim = 7, emLag = 2, emRad = NA,  targetValue = 0.01)
+RN2 <- rn(y1 = series$TS_2, emDim = p2$optimDim, emLag = p2$optimLag, emRad = NA,  targetValue = 0.05)
 rn_plot(RN2)
 
 # Get RQA measures
-rqa2 <- rp_measures(RN2)
+rqa2 <- rp_measures(RN2, silent = FALSE)
 
-# knitr::kable(rqa2,digits = 2) %>%
-#   kable_styling() %>%
-#   scroll_box(width = "100%", height = "100px")
-
+# Create RN graph
 g2 <- igraph::graph_from_adjacency_matrix(RN2, mode="undirected", diag = FALSE)
 V(g2)$size <- degree(g2)
-g2r <- casnet::make_spiral_graph(g2,arcs = arcs,epochColours = getColours(arcs), markTimeBy = TRUE)
+g2r <- make_spiral_graph(g2,arcs = arcs ,epochColours = getColours(arcs), markTimeBy = TRUE)
 
-# Network measures
-igraph::average.path.length(g2)
-igraph::transitivity(g2)
-# igraph::smallworldness(g2)
+# Get RN measures
+rn2 <- rn_measures(g2, silent = FALSE)
 
-recs2 <- igraph::centr_degree(g2)
+# Should be the same
+rqa2$RR==rn2$graph_measures$EdgeDensity
 
-(RP_N <- sum(recs2$res))
-rqa2$RP_N
-
-RP_N / recs2$theoretical_max
-rqa2$RR
 ```
 
 ### TS 3 {-}
@@ -147,63 +132,75 @@ rqa2$RR
 #----------------------
 plot(ts(series$TS_3))
 
-est_parameters(series$TS_3)
+# Because these are generated signals, look for a drop in FNN below 1%.
+p3 <- est_parameters(y = series$TS_3, nnThres = 1)
 
-RN3 <- rn(y1 = series$TS_3, emDim = 7, emLag = 8, emRad = NA, targetValue = 0.01)
+RN3 <- rn(y1 = series$TS_3, emDim = p3$optimDim, emLag = p3$optimLag, emRad = NA, targetValue = 0.05)
 rn_plot(RN3)
 
 # Get RQA measures
-rqa3 <- rp_measures(RN3)
+rqa3 <- rp_measures(RN3, silent = FALSE)
 
-# knitr::kable(rqa3,digits = 2) %>%
-#   kable_styling() %>%
-#   scroll_box(width = "100%", height = "100px")
-
+# Create RN graph
 g3 <- igraph::graph_from_adjacency_matrix(RN3, mode="undirected", diag = FALSE)
 V(g3)$size <- degree(g3)
 g3r <- make_spiral_graph(g3,arcs = arcs ,epochColours = getColours(arcs), markTimeBy = TRUE)
 
+# Get RN measures
+rn3 <- rn_measures(g3, silent = FALSE)
 
-igraph::average.path.length(g3)
-igraph::transitivity(g3)
-# igraph::smallworldness(g3)
-
-recs3 <- igraph::centr_degree(g3)
-
-(RP_N <- sum(recs3$res))
-rqa3$RP_N
-
-RP_N / recs3$theoretical_max
-rqa3$RR
+# Should be the same
+rqa3$RR==rn3$graph_measures$EdgeDensity
 ```
 
 
 ## Multiplex Recurrence Networks {.tabset .tabset-fade .tabset-pills}
 
-
 Consider the three time series to be part of a multi-layer recurrence network.
-Common properties of the multiplex network are multi-layer mutual information and edge overlap.
+Common properties of the multiplex network are _inter-layer mutual information_ and _edge overlap_ can be calculated using function `casnet::mrn()`. One problem, the networks have to be all of the same size (same number of nodes, a multivariate time series), but here we have reconstructed the phase space using different embedding parameters... let's choose one set of parameters for all time series. 
 
-```{r}
-# Inter-layer Mutual Information
-(interlayer_mi12 <- mi_interlayer(g1,g2))
-(interlayer_mi13 <- mi_interlayer(g1,g3))
-(interlayer_mi23 <- mi_interlayer(g2,g3))
+```{r, message=FALSE, warning=FALSE, paged.print=TRUE}
+emDim <- mean(c(p1$optimDim,p2$optimDim,p3$optimDim))
+emLag <- median(c(p1$optimLag,p2$optimLag,p3$optimLag))
 
-# mean I-L MI  
-mean(c(interlayer_mi12,interlayer_mi13,interlayer_mi23))
+RNs <- plyr::llply(1:3, function(r) rn(y1 = series[,r], emDim = emDim, emLag = emLag, emRad = NA, targetValue = 0.05))
+layers <- plyr::llply(RNs, function(r) igraph::graph_from_adjacency_matrix(r, mode="undirected", diag = FALSE))
+names(layers) <- c("g1","g2","g3")
 
-# Edge Overlap
-(edge_overlap12 <- length(E(g1 %s% g2)) / (length(E(g1))+length(E(g2))))
-(edge_overlap13 <- length(E(g1 %s% g3)) / (length(E(g1))+length(E(g3))))
-(edge_overlap23 <- length(E(g2 %s% g3)) / (length(E(g2))+length(E(g3))))
+mrn(layers = layers)
+```
 
-# mean EO 
-mean(c(edge_overlap12,interlayer_mi13,interlayer_mi23))
+A variety of plots can be created using `casnet::mrn_plot()`
 
-# Overall Edge Overlap
-(eo_all  <- length(E(intersection(g1,g2,g3))))
-#(eo_mean <- eo_all / (edge_overlap12+edge_overlap13+edge_overlap23))
+```{r, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+# Simple
+mrn_plot(layers = layers, showEdgeColourLegend =TRUE)
+mrn_plot(layers = layers, MRNweightedBy = "EdgeOverlap", showEdgeColourLegend =TRUE)
+
+
+# Include picture of Layers 
+mrn_plot(layers = layers, RNnodes = TRUE)
+mrn_plot(layers = layers, RNnodes = TRUE,MRNweightedBy = "EdgeOverlap", showEdgeColourLegend =TRUE)
 ```
   
+## Time-varying Multiplex Recurrence Networks {.tabset .tabset-fade .tabset-pills}
+
+The MRN can be calculated in a sliding window, by setting the arguments `win` and `step`.
+
+```{r, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+# This will generate 26 windows
+MRN_win <- mrn(layers = layers, win = 250, step = 10)
+
+# The MRN are returned as a list
+MRN_win$interlayerMI
+
+# It may be informative to create an animation [not shown here because it displays in the Viewer]
+# MRN_ani <- mrn_plot(layers = layers, win = 250, step = 10, createAnimation = TRUE)
+
+# The animation is stored in an output field, but is also saved as a .gif, see the man pages for more options.
+# MRN_ani$MRNanimationGG
+
+```
   

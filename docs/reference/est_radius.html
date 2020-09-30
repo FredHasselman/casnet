@@ -149,6 +149,7 @@
   y2 = <span class='kw'>NULL</span>,
   emLag = <span class='fl'>1</span>,
   emDim = <span class='fl'>1</span>,
+  method = <span class='st'>"Euclidean"</span>,
   type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"fixed"</span>, <span class='st'>"optimal"</span>)[<span class='fl'>1</span>],
   startRadius = <span class='kw'>NULL</span>,
   eachRadius = <span class='fl'>1</span>,
@@ -156,7 +157,7 @@
   targetValue = <span class='fl'>0.05</span>,
   tol = <span class='fl'>0.1</span>,
   maxIter = <span class='fl'>100</span>,
-  theiler = <span class='op'>-</span><span class='fl'>1</span>,
+  theiler = <span class='fl'>0</span>,
   histIter = <span class='fl'>FALSE</span>,
   noiseLevel = <span class='fl'>0.75</span>,
   noiseType = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"normal"</span>, <span class='st'>"uniform"</span>)[<span class='fl'>1</span>],
@@ -179,15 +180,19 @@
     </tr>
     <tr>
       <th>y2</th>
-      <td><p>A numeric vector or time series</p></td>
+      <td><p>A numeric vector or time series for cross recurrence</p></td>
     </tr>
     <tr>
       <th>emLag</th>
-      <td><p>Delay to use for embedding</p></td>
+      <td><p>The embedding lag</p></td>
     </tr>
     <tr>
       <th>emDim</th>
-      <td><p>Number of embedding dimensions</p></td>
+      <td><p>The embedding dimensions</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://rdrr.io/pkg/proxy/man/dist.html'>proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
     </tr>
     <tr>
       <th>type</th>

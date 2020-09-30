@@ -135,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get some nice colours</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/plotFUN.R'><code>R/plotFUN.R</code></a></small>
     <div class="hidden name"><code>getColours.Rd</code></div>
     </div>
 
@@ -143,14 +143,22 @@
     <p>Get some nice colours</p>
     </div>
 
-    <pre class="usage"><span class='fu'>getColours</span>(Ncols = <span class='fl'>20</span>)</pre>
+    <pre class="usage"><span class='fu'>getColours</span>(<span class='kw'>Ncols</span>, continuous = <span class='fl'>FALSE</span>, Dcols = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>1</span>))</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>Ncols</th>
-      <td><p>Number of colours</p></td>
+      <td><p>Either an integer representing the number of requested colours, or, a numeric vector of integers between 1-58 to select specific colours. Run <code>getColours()</code> without arguments to see a plot of the colours that are available.</p></td>
+    </tr>
+    <tr>
+      <th>continuous</th>
+      <td><p>Return a discrete vector of colours, or, a function that represents a gradient between 2 or more colours? If <code>TRUE</code> then argument <code>Ncols</code> must be a numeric vector greater than length <code>2</code>. <strong>NOTE:</strong> The input to the gradient function must be (re-)scaled to fall between 0 and 1, e.g. using <code><a href='elascer.html'>elascer()</a></code>. (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>Dcols</th>
+      <td><p>If <code>continuous</code> is set to <code>TRUE</code>, this should be a vector of the same length as <code>Ncols</code> representing the relative distances between the colours in the gradient function using values between 0 and 1. (default = <code><a href='https://rdrr.io/r/base/c.html'>c(0,1)</a></code>)</p></td>
     </tr>
     </table>
 
@@ -161,10 +169,35 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Plot all available colours</span>
-<span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/expand.grid.html'>expand.grid</a></span>(x=<span class='fl'>1</span><span class='op'>:</span><span class='fl'>8</span>,y=<span class='fl'>1</span><span class='op'>:</span><span class='fl'>8</span>)[<span class='fl'>1</span><span class='op'>:</span><span class='fl'>58</span>,]
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>df</span><span class='op'>$</span><span class='kw'>x</span>,<span class='kw'>df</span><span class='op'>$</span><span class='kw'>y</span>,pch=<span class='fl'>15</span>,col=<span class='fu'>getColours</span>(Ncols=<span class='fl'>58</span>),cex=<span class='fl'>5</span>, axes = <span class='fl'>FALSE</span>, ann = <span class='fl'>FALSE</span>)
-</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/text.html'>text</a></span>(<span class='kw'>df</span><span class='op'>$</span><span class='kw'>x</span>,<span class='kw'>df</span><span class='op'>$</span><span class='kw'>y</span>,<span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>58</span>),col=<span class='st'>"white"</span>)
-</div><div class='img'><img src='getColours-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>getColours</span>()
+</div><div class='img'><img src='getColours-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt; NULL</div><div class='input'>
+<span class='co'># Get a specific number of colours</span>
+<span class='fu'>getColours</span>(<span class='fl'>5</span>)
+</div><div class='output co'>#&gt; [1] "#A65141" "#ABB2C4" "#C89284" "#7896BC" "#E1CAC2"</div><div class='input'>
+<span class='co'># Get specific colours</span>
+<span class='fu'>getColours</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4</span>,<span class='fl'>7</span>,<span class='fl'>1</span>,<span class='fl'>40</span>))
+</div><div class='output co'>#&gt; [1] "#7896BC" "#ECE3CD" "#A65141" "#20304F"</div><div class='input'>
+<span class='co'># Make a gradient from colour number 4 to 44 via 7</span>
+<span class='kw'>gradFunc</span> <span class='op'>&lt;-</span> <span class='fu'>getColours</span>(Ncols = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4</span>,<span class='fl'>7</span>,<span class='fl'>44</span>), continuous = <span class='fl'>TRUE</span>, Dcols = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>,<span class='fl'>.5</span>,<span class='fl'>1</span>))
+
+<span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(x=<span class='fl'>1</span><span class='op'>:</span><span class='fl'>50</span>, y=<span class='fu'><a href='https://rdrr.io/r/base/sort.html'>sort</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>50</span>)))
+<span class='co'># Make sure the input is on a scale of 0-1</span>
+<span class='kw'>df</span><span class='op'>$</span><span class='kw'>ycol</span> <span class='op'>&lt;-</span> <span class='fu'><a href='elascer.html'>elascer</a></span>(<span class='kw'>df</span><span class='op'>$</span><span class='kw'>y</span>)
+
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://ggplot2.tidyverse.org'>ggplot2</a></span>)
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span>(<span class='kw'>df</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(x=<span class='kw'>x</span>,y=<span class='kw'>y</span>,colour=<span class='kw'>ycol</span>)) <span class='op'>+</span>
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span>() <span class='op'>+</span>
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_gradient.html'>scale_colour_gradientn</a></span>(<span class='st'>"Gradient"</span>,colours = <span class='fu'>gradFunc</span>(<span class='kw'>df</span><span class='op'>$</span><span class='kw'>ycol</span>)) <span class='op'>+</span>
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_bw</a></span>()
+</div><div class='img'><img src='getColours-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># Make a gradient from colour number 4, to 9, to 7, to 36, to 44</span>
+<span class='kw'>gradFunc</span> <span class='op'>&lt;-</span> <span class='fu'>getColours</span>(Ncols = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4</span>,<span class='fl'>9</span>,<span class='fl'>7</span>,<span class='fl'>36</span>,<span class='fl'>44</span>), continuous = <span class='fl'>TRUE</span>, Dcols = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>,<span class='fl'>.33</span>,<span class='fl'>.5</span>,<span class='fl'>.66</span>,<span class='fl'>1</span>))
+
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span>(<span class='kw'>df</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(x=<span class='kw'>x</span>,y=<span class='kw'>y</span>,colour=<span class='kw'>ycol</span>)) <span class='op'>+</span>
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span>() <span class='op'>+</span>
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_gradient.html'>scale_colour_gradientn</a></span>(<span class='st'>"Gradient"</span>,colours = <span class='fu'>gradFunc</span>(<span class='kw'>df</span><span class='op'>$</span><span class='kw'>ycol</span>)) <span class='op'>+</span>
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_bw</a></span>()
+</div><div class='img'><img src='getColours-3.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

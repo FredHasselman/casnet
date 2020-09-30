@@ -135,7 +135,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Distance 2 weighted matrix</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/nlRtsa_SOURCE.R'><code>R/nlRtsa_SOURCE.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/matrixOps.R'><code>R/matrixOps.R</code></a></small>
     <div class="hidden name"><code>di2we.Rd</code></div>
     </div>
 
@@ -143,7 +143,7 @@
     <p>Distance matrix to weighted matrix based on threshold value</p>
     </div>
 
-    <pre class="usage"><span class='fu'>di2we</span>(<span class='kw'>distmat</span>, <span class='kw'>emRad</span>, convMat = <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>di2we</span>(<span class='kw'>distmat</span>, <span class='kw'>emRad</span>, theiler = <span class='fl'>0</span>, convMat = <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -155,6 +155,10 @@
     <tr>
       <th>emRad</th>
       <td><p>The radius or threshold value</p></td>
+    </tr>
+    <tr>
+      <th>theiler</th>
+      <td><p>Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = <code>0</code>)</p></td>
     </tr>
     <tr>
       <th>convMat</th>
@@ -180,7 +184,6 @@
 <code><a href='di2bi.html'>di2bi</a>()</code>,
 <code><a href='rn_plot.html'>rn_plot</a>()</code>,
 <code><a href='rn_recSpec.html'>rn_recSpec</a>()</code>,
-<code><a href='rn_scaleoGram.html'>rn_scaleoGram</a>()</code>,
 <code><a href='rn.html'>rn</a>()</code></p></div>
 
   </div>

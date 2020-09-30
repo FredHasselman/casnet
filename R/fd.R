@@ -196,7 +196,7 @@ fd_psd <- function(y,
   # psd   <- sapa::SDF(y, taper. = Tukey, npad = npad)
 
  Nfreq <- NROW(psd$freq)
- freq.norm <- psd$freq/frequency(y)
+ freq.norm <- psd$freq/stats::frequency(y)
  size <- psd$freq
  bulk <- 2*psd$spec
  #plot(x=log2(psd$freq), y=log2(psd$spec*2),pch=".")
@@ -325,6 +325,8 @@ fd_psd <- function(y,
 #' @export
 #'
 #' @family Fluctuation Analyses
+#'
+#'
 #'
 fd_sda <- function(y,
                    fs = NULL,

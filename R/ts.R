@@ -5,149 +5,6 @@
 # ts functions
 
 
-#' Sliding window analysis
-#'
-#' @param FUN Which function should be used in the sliding window analysis? Options are: `rp`, `rp_measures`, `rp_diagprofile`, `rn`, `rn_measures` (default = `rp`)
-#' @param y1 A numeric vector or time series
-#' @param y2 A numeric vector or time series (optional)
-#' @param win Window size in which to evaluate `fun` (default = minimum of length of `y1` or `y2`)
-#' @param step Stepsize for sliding windows (default = size of `win`, so no sliding window)
-#' @param animate If `TRUE` and the function argument `doPlot = TRUE`, an animation of the graph output for subsequent windows will be generated using package `gganimate` (default = `FALSE`)
-#' @param silent Silent-ish mode
-#' @param ... Any parameters to pass to the function `fun`
-#'
-#' @return A list object with the output of `fun` for each window at each step.
-#' @export
-#'
-#' @keywords internal
-#'
-#'
-win_slide  <- function(FUN     = c("rp", "rp_measures", "rp_diagprofile", "rn", "rn_measures")[1],
-                       y1,
-                       y2      = NULL,
-                       win     = min(length(y1), ifelse(is.null(y2), (length(y1)+1), length(y2)), na.rm = TRUE),
-                       step    = win,
-                       animate = FALSE,
-                       silent  = TRUE,
-                       ...){
-
-  argList   <- list(...)
-  validArgs <- formals(FUN)
-  if(!all(names(argList) %in% names(validArgs))){
-    stop(paste0("Unknown argument to ",FUN,": ", names(argList)[!(names(argList) %in% names(validArgs))],"\n"))
-  } else {
-    useArgs <- validArgs
-    for(a in which(names(validArgs) %in% names(argList))){
-      useArgs[[a]] <- argList[[which(names(argList) %in% names(validArgs)[a])]]
-    }
-  }
-
-  # switch(FUN,
-  #        rp = ,
-  #        rp_measures = ,
-  #        rp_diagprofile = ,
-  #        rn = ,
-  #        rn_measures = )
-
-  if(is.null(y2)){
-    y2 <- y1
-    attributes(y2) <- attributes(y1)
-  }
-
-  if(!is.data.frame(y1)){
-    id <- deparse(substitute(y1))
-    y1 <- as.data.frame(y1)
-    if(length(id)==NCOL(y1)){
-      colnames(y1) <- id
-    }
-  }
-
-  if(!is.data.frame(y2)){
-    id <- deparse(substitute(y2))
-    y2 <- as.data.frame(y2)
-    if(length(id)==NCOL(y2)){
-      colnames(y2) <- id
-    }
-  }
-
-  if(NROW(y1)==NROW(y2)){
-    df <- cbind(y1,y2)
-  } else {
-    df <- as.data.frame(ts_trimfill(x = df$y1, y = df$y2, action = "fill", type = "end"))
-    colnames(df) <- colnames(cbind(y1,y2))
-  }
-
-  windowedAnalysis <- FALSE
-
-  if(win==NROW(df)|step==NROW(df)){
-    win <- step <- NROW(df)
-    wIndex <- seq(1,NROW(df))
-  } else {
-    windowedAnalysis <- TRUE
-    wIndex <- seq(1,NROW(df)-win, by = step)
-    cat(paste("\nCalculating",FUN,"in a window of size",win,"taking steps of",step,"data points. \n"))
-  }
-
-  if(windowedAnalysis){
-    # Check window length vs. embedding
-    if(win < useArgs$emLag*useArgs$emDim){
-      stop(paste0("The size of win = ", win, " must be larger than the product of emLag = ",useArgs$emLag, " and emDim = ", useArgs$emDim))
-    } else {
-
-      # Adjust time series lengths
-      winFit <- dplyr::last(wIndex)+win-NROW(df)
-      if(winFit>0){
-        yy1 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,1])
-        yy2 <- rep(NA,length(yy1))
-        if(!all(is.na(df[,2]))){
-          yy2 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,2])
-        }
-        if(!silent){
-          message(paste("\nAdded",winFit,"0s to make window and stepsize combination fit to time series length\n\n "))
-        }
-      } else {
-        if(winFit<=0){
-          yy1 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,1], action = "trim.cut")
-          yy2 <- rep(NA,length(yy1))
-          if(!all(is.na(df[,2]))){
-            yy2 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,2], action = "trim.cut")
-          }
-          if(!silent){
-            message(paste("\nTrimmed the series by",abs(winFit),"values to make window and stepsize combination fit to the time series length\n\n"))
-          }
-        }
-        else {
-          if(!silent){message("\nWindow and stepsize fit the time series length [no adjustments]\n\n ")}
-        }
-      }
-
-      df <- cbind.data.frame(y1=yy1,y2=yy2)
-
-      if(silent){
-        cat("\nsst! [it's a silent-ish mode]\n\n")
-      }
-
-      wIndices <- plyr::llply(wIndex, function(w){seq(w,w+(win))})
-      names(wIndices) <- paste0("window: ",seq_along(wIndices)," | start: ",wIndex," | stop: ",wIndex+win)
-
-    }
-  } else {
-
-    wIndices <- list(wIndex)
-    names(wIndices) <- paste0("window: 1 | start: ",wIndex[1]," | stop: ",wIndex[NROW(df)])
-
-  } # If windowed
-
-  #cl <- parallel::makeCluster(mc.cores)
-  #parallel::clusterExport(cl = cl, c("rp_cl_main","wIndices","df","y1","y2","emDim","emLag","emRad","DLmin","VLmin","theiler", "win","step","JRP","distNorm","returnMeasures","returnRPvector","returnLineDist","doPlot","path_to_rp","saveOut","path_out","file_ID","silent","..."))
-
-  # Create the data, for all windows,need this for parallel, but also speeds up processing in general.
-  dfList <- plyr::llply(wIndices, function(ind){cbind(y1 = df[ind,1],y2 = df[ind,2])})
-
-  out <- FUN(useArgs)
-}
-
-
 #' Permutation Test: Block Randomisation
 #'
 #' Use block randomistion to get a permutation test evaluation of the deviation of an observed value at each time point from a target value. To do block permutation without any tests, pass `NULL` for argument `targetValue`.
@@ -921,8 +778,8 @@ symbolize <- function(xy) {
 #'
 #' @examples
 #'
-#' # Get an interesting numeric vector from package DescTools
-#' y <- DescTools::Fibonacci(1:26)
+#' # Here's an interesting numeric vector
+#'y<-c(1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,17711,28657,46368)
 #'
 #' # Return the first order derivative as a vector
 #' ts_diff(y=y,addColumns=FALSE)
@@ -931,7 +788,7 @@ symbolize <- function(xy) {
 #' plot(stats::ts(ts_diff(y=y, addColumns=TRUE)))
 #'
 #' # Works on multivariate data objects with mixed variable types
-#' df <- data.frame(x=letters, y=1:26, z=sin(y))
+#' df <- data.frame(x=letters, y=1:26, z=sin(1:26))
 #'
 #' # Returns only derivatives of the numeric colunmns
 #' ts_diff(y=df,addColumns=FALSE)

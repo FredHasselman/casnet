@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="Multiplex Recurrence Network — mrn" />
-<meta property="og:description" content="This function will create a Multiplex Recurrence Network from a list of igraph objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: Layer similarity (weightedBy is set to &quot;InterLayerMI&quot;, &quot;InterLayerCor&quot;, or &quot;EdgeOvelap&quot;) and Layer importance (weightedBy is &quot;AnisotropicCRQA&quot;). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument MRNrankedBy." />
+<meta property="og:description" content="This function will create a Multiplex Recurrence Network from a list of igraph objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: Layer similarity (MRNweightedBy is set to &quot;InterLayerMI&quot;, &quot;InterLayerCor&quot;, or &quot;EdgeOvelap&quot;) and Layer importance (not implemented yet). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -140,20 +140,17 @@
     </div>
 
     <div class="ref-description">
-    <p>This function will create a Multiplex Recurrence Network from a list of <a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph</a> objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: <em>Layer similarity</em> (<code>weightedBy</code> is set to <code>"InterLayerMI"</code>, <code>"InterLayerCor"</code>, or <code>"EdgeOvelap"</code>) and <em>Layer importance</em> (<code>weightedBy</code> is <code>"AnisotropicCRQA"</code>). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument <code>MRNrankedBy</code>.</p>
+    <p>This function will create a Multiplex Recurrence Network from a list of <a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph</a> objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: <em>Layer similarity</em> (<code>MRNweightedBy</code> is set to <code>"InterLayerMI"</code>, <code>"InterLayerCor"</code>, or <code>"EdgeOvelap"</code>) and <em>Layer importance</em> (not implemented yet). The former generates weighted MRN based on <em>Interlayer Mutual Information</em>, <em>Interlayer Correlation</em>, or <em>Edge Overlap</em>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>mrn</span>(
   <span class='kw'>layers</span>,
-  weightedBy = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InterlayerMI"</span>, <span class='st'>"InterlayerCor"</span>, <span class='st'>"Edgeoverlap"</span>, <span class='st'>"AnisotropicCRQA"</span>)[<span class='fl'>1</span>],
-  windowedWeights = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"local"</span>, <span class='st'>"cumulative"</span>)[<span class='fl'>1</span>],
-  CRQA_vertexSequence = <span class='st'>"degree"</span>,
-  CRQA_measure = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"RR"</span>, <span class='st'>"DET"</span>, <span class='st'>"LAM"</span>)[<span class='fl'>1</span>],
+  MRNweightedBy = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InterlayerMI"</span>, <span class='st'>"InterlayerCor"</span>, <span class='st'>"Edgeoverlap"</span>)[<span class='fl'>1</span>],
   win = <span class='fl'>NA</span>,
   step = <span class='fl'>NA</span>,
   overlap = <span class='fl'>NA</span>,
   alignment = <span class='st'>"r"</span>,
-  cumulative = <span class='fl'>TRUE</span>,
+  cumulative = <span class='fl'>FALSE</span>,
   doPlot = <span class='fl'>FALSE</span>,
   silent = <span class='fl'>TRUE</span>
 )</pre>
@@ -166,32 +163,20 @@
       <td><p>A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.</p></td>
     </tr>
     <tr>
-      <th>weightedBy</th>
-      <td><p>The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: <code>"InterLayerMI"</code> (Mutual information based on similarity of the vertex degree across layers), <code>"EdgeOverlap"</code> (proportion of vertices sharing the same edges across layers), <code>"RankorderDC"</code> (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in <code>AnisotropicCRQA</code>). Choosing <code>"InterLayerMI"</code>, <code>"InterlayerCor"</code>, or <code>"EdgeOverlap"</code> will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.</p></td>
-    </tr>
-    <tr>
-      <th>windowedWeights</th>
-      <td><p>If a windowed analysis is conducted and the edges of the graphs in <code>layers</code> have a weight property, there are a number of different ways to handle the weights depending on the value of <code>windowedWeights</code>: <code>"none"</code>, <code>"local"</code>, and <code>"cumulative"</code>. Value <code>"none"</code> will ignore the weights, <code>"local"</code> will limit the range of edges to those edges connecting the vertices contained within the window, <code>"cumulative"</code> will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = <code>none</code>)</p></td>
-    </tr>
-    <tr>
-      <th>CRQA_vertexSequence</th>
-      <td><p>If <code>weightedBy = "AnisotropicCRQA"</code>, then <code>CRQA_vertexSequence</code> must be a valid <a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph</a> command that returns vertex properties, for example: <code>"degree"</code>, <code>"strength"</code>,<code>"hub_score"</code>,<code>"centr_degree"</code>, <code>"transitivity"</code>, <code>"betweenness"</code>. The appropriate measure type, e.g. for <code>"directed"</code>, or <code>"weighted"</code> graphs, will be inferred from the graph properties of the 1st graph object in the <code>layers</code> list. For best results with weighted measures, assign a value to <code>E(g)$weight</code> for each <code>g</code> in <code>layers</code>. (default = <code>"degree"</code>)</p></td>
-    </tr>
-    <tr>
-      <th>CRQA_measure</th>
-      <td><p>Which CRQA measures should be used c("RR", "DET", "LAM"),</p></td>
+      <th>MRNweightedBy</th>
+      <td><p>The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: <code>"InterLayerMI"</code> (Mutual information based on similarity of the vertex degree across layers), <code>"EdgeOverlap"</code> (proportion of vertices sharing the same edges across layers). Choosing <code>"InterLayerMI"</code>, <code>"InterlayerCor"</code>, or <code>"EdgeOverlap"</code> will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.</p></td>
     </tr>
     <tr>
       <th>win</th>
-      <td><p>The window size passed to <code><a href='ts_windower.html'>ts_windower()</a></code> in which to evaluate <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. If <code>weightedBy = "CRQA_vertexSequence"</code>, it will be the size of the right aligned window in which Dynamic Complexity will be computed using <code><a href='dc_win.html'>dc_win()</a></code> (default = <code>NA</code>)</p></td>
+      <td><p>The window size passed to <code><a href='ts_windower.html'>ts_windower()</a></code> in which to evaluate <code>"InterLayerMI"</code>, <code>"InterLayerCor"</code>, or <code>"EdgeOvelap"</code>. (default = <code>NA</code>).</p></td>
     </tr>
     <tr>
       <th>step</th>
-      <td><p>The stepsize for the sliding window (default = <code>NA</code>)</p></td>
+      <td><p>The stepsize for the sliding window (default = <code>NA</code>).</p></td>
     </tr>
     <tr>
       <th>overlap</th>
-      <td><p>The window overlap passed to <code><a href='ts_windower.html'>ts_windower()</a></code> if <code>weightedBy</code> is <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. The value of <code>step</code> will be ignored if <code>overlap</code> is not <code>NA</code>. (default = <code>NA</code>).</p></td>
+      <td><p>The window overlap passed to <code><a href='ts_windower.html'>ts_windower()</a></code> if <code>MRNweightedBy</code> is <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. The value of <code>step</code> will be ignored if <code>overlap</code> is not <code>NA</code>. (default = <code>NA</code>).</p></td>
     </tr>
     <tr>
       <th>alignment</th>
@@ -203,11 +188,11 @@
     </tr>
     <tr>
       <th>doPlot</th>
-      <td><p>Plot the multiplex recurrence network (default = <code>TRUE</code>).</p></td>
+      <td><p>Plot the multiplex recurrence network (default = <code>FALSE</code>).</p></td>
     </tr>
     <tr>
       <th>silent</th>
-      <td><p>Silent-ish mode</p></td>
+      <td><p>Silent-ish mode. (default = FALSE).</p></td>
     </tr>
     </table>
 
@@ -221,6 +206,49 @@
 </ul>
 
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='co'># Create some layers</span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://igraph.org'>igraph</a></span>)
+
+<span class='kw'>layers</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(g1 = <span class='kw'>igraph</span>::<span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_smallworld.html'>sample_smallworld</a></span>(<span class='fl'>1</span>, <span class='fl'>100</span>, <span class='fl'>5</span>, <span class='fl'>0.05</span>),
+g2 = <span class='kw'>igraph</span>::<span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_smallworld.html'>sample_smallworld</a></span>(<span class='fl'>1</span>, <span class='fl'>100</span>, <span class='fl'>5</span>, <span class='fl'>0.5</span>),
+g3 = <span class='kw'>igraph</span>::<span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_smallworld.html'>sample_smallworld</a></span>(<span class='fl'>1</span>, <span class='fl'>100</span>, <span class='fl'>5</span>, <span class='fl'>1</span>))
+
+<span class='fu'>mrn</span>(layers = <span class='kw'>layers</span>)
+</div><div class='output co'>#&gt; 
+#&gt; ~~~o~~o~~casnet~~o~~o~~~
+#&gt; 
+#&gt; Welcome to the multiplex... in layer similarity mode!
+#&gt; 
+#&gt; 
+#&gt; ~~~o~~o~~casnet~~o~~o~~~</div><div class='output co'>#&gt; $interlayerMI
+#&gt; $interlayerMI$`window: 1 | start: 1 | stop: 100`
+#&gt;    g1       g2        g3
+#&gt; g1 NA 1.016009 0.9430457
+#&gt; g2 NA       NA 1.5627302
+#&gt; g3 NA       NA        NA
+#&gt; 
+#&gt; 
+#&gt; $edgeOverlap
+#&gt; $edgeOverlap$`window: 1 | start: 1 | stop: 100`
+#&gt;    g1    g2    g3
+#&gt; g1 NA 0.142 0.060
+#&gt; g2 NA    NA 0.049
+#&gt; g3 NA    NA    NA
+#&gt; 
+#&gt; 
+#&gt; $meanValues
+#&gt; $meanValues$`window: 1 | start: 1 | stop: 100`
+#&gt;    mi_mean    mi_sd    eo_mean      eo_sd eo_sum eo_all   eo_joint
+#&gt; 1 1.173928 0.338683 0.08366667 0.05081666   1500     16 0.01066667
+#&gt; 
+#&gt; 
+#&gt; $Nsize
+#&gt; [1] 100
+#&gt; </div><div class='input'>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

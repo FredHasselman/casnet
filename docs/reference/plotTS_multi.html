@@ -223,17 +223,8 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Generate some coloured noise</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://had.co.nz/plyr'>plyr</a></span>)
-<span class='kw'>N</span> <span class='op'>&lt;-</span> <span class='fl'>512</span>
-<span class='kw'>noises</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='op'>-</span><span class='fl'>3</span>,<span class='fl'>3</span>,by=<span class='fl'>.5</span>)
-<span class='kw'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>NA</span>,<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>noises</span>)<span class='op'>*</span><span class='kw'>N</span>), ncol=<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>noises</span>)))
-
-<span class='co'>for</span>(<span class='kw'>c</span> <span class='co'>in</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_along</a></span>(<span class='kw'>noises</span>)){
- <span class='kw'>y</span>[,<span class='kw'>c</span>] <span class='op'>&lt;-</span> <span class='fu'><a href='noise_powerlaw.html'>noise_powerlaw</a></span>(N=<span class='kw'>N</span>, alpha = <span class='kw'>noises</span>[<span class='kw'>c</span>])
- }
-</div><div class='output co'>#&gt; <span class='warning'>Warning: If alpha is outside [-2,2], result are likely not accurate.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: If alpha is outside [-2,2], result are likely not accurate.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: If alpha is outside [-2,2], result are likely not accurate.</span></div><div class='output co'>#&gt; <span class='warning'>Warning: If alpha is outside [-2,2], result are likely not accurate.</span></div><div class='input'> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span>(<span class='kw'>y</span>) <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='kw'>noises</span>)
-
- <span class='fu'>plotTS_multi</span>(<span class='kw'>y</span>)
+ <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>ColouredNoise</span>)
+ <span class='fu'>plotTS_multi</span>(<span class='kw'>ColouredNoise</span>)
 </div><div class='img'><img src='plotTS_multi-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>

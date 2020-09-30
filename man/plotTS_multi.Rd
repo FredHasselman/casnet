@@ -56,16 +56,7 @@ Plot Multivariate Time Series Data
 \examples{
 
 # Generate some coloured noise
-library(plyr)
-N <- 512
-noises <- seq(-3,3,by=.5)
-y <- data.frame(matrix(rep(NA,length(noises)*N), ncol=length(noises)))
-
-for(c in seq_along(noises)){
- y[,c] <- noise_powerlaw(N=N, alpha = noises[c])
- }
- colnames(y) <- paste0(noises)
-
- plotTS_multi(y)
+ data(ColouredNoise)
+ plotTS_multi(ColouredNoise)
 
 }

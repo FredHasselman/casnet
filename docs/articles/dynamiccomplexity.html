@@ -95,7 +95,7 @@
       <h1 data-toc-skip>Applied Synergetics: Dynamic Complexity in a Clinical Case Study</h1>
                         <h4 class="author">Fred Hasselman &amp; Merlijn Olthof</h4>
             
-            <h4 class="date">2020-09-18</h4>
+            <h4 class="date">2020-09-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/dynamiccomplexity.Rmd"><code>vignettes/dynamiccomplexity.Rmd</code></a></small>
       <div class="hidden name"><code>dynamiccomplexity.Rmd</code></div>
@@ -143,7 +143,7 @@
 
 <span class="co"># Plot the timeseries with NAs in red</span>
 <span class="kw">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(mfrow = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">vars</span>)<span class="op">/</span><span class="fl">4</span>),<span class="fl">4</span>),mar =<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>))
-<span class="fu"><a href="https://rdrr.io/pkg/plyr/man/l_ply.html">l_ply</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="kw">vars</span>), <span class="fu">function</span>(<span class="kw">c</span>){
+<span class="fu">l_ply</span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="kw">vars</span>), <span class="fu">function</span>(<span class="kw">c</span>){
   <span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_distribution.html">ggplot_na_distribution</a></span>(x = <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw">df_vars</span>[,<span class="kw">c</span>]), 
                                 title=<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)[<span class="kw">c</span>], 
                                 xlab = <span class="st">""</span>,ylab = <span class="st">""</span>)
@@ -227,7 +227,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(panel.grid.minor = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>(),
                      axis.text.x = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(angle = <span class="fl">90</span>, vjust =<span class="fl">0.5</span>))
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;"></p>
 </div>
 <div id="detecting-periods-of-relative-stability-using-recursive-partitioning" class="section level3">
 <h3 class="hasAnchor">
@@ -259,7 +259,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(panel.grid.minor = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>(),
                      axis.text.x = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(angle = <span class="fl">90</span>, vjust =<span class="fl">0.5</span>))
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>There appear to be more or less synchronous <code>jumps</code> and <code>stages</code>, or, <code>levels</code> in the raw data of variables <code>difficult</code> and <code>unsatisfy</code>. The levels in variable <code>hours</code>, representing hours of sleep seem to show the inverted pattern.</p>
 </div>
 </div>
@@ -275,19 +275,19 @@
 <span class="co"># NA removed </span>
 <span class="kw">dc.caseNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span>(<span class="kw">out.NA</span>, win = <span class="kw">win</span>, scale_min=<span class="fl">0</span>, scale_max=<span class="fl">100</span>, doPlot = <span class="fl">TRUE</span>, colOrder = <span class="fl">TRUE</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-6-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>Dynamic complexity is calculated as a product of <em>fluctuation intensity</em> calculated by function <code><a href="../reference/dc_f.html">dc_f()</a></code> and <em>distribution uniformity</em> calculated by <code><a href="../reference/dc_d.html">dc_d()</a></code>. These functions can be called seperately, or, you can set the argument <code>returnFandD = TRUE</code> in function <code><a href="../reference/dc_win.html">dc_win()</a></code>.</p>
 <p>There are several options for sorting the variables on the y-axis by setting the <code>colOrder</code> argument. If set to <code>TRUE</code> like the figure above the order variables appear as columns in the dataframe will be used. Setting it to <code>FALSE</code> will sort by vasriable name.</p>
 <p>We can use the <code>df</code> field of the <code><a href="../reference/dc_win.html">dc_win()</a></code> output as input for <code><a href="../reference/plotDC_res.html">plotDC_res()</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit">
 <span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span>(df_win = <span class="kw">dc.caseNA</span>, win = <span class="kw">win</span>, doPlot = <span class="fl">TRUE</span>, colOrder = <span class="fl">FALSE</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-7-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>An interesting option is to sort by the mean value of Dynamic Complexity, to do so set the <code>colOrder</code> argument to <code>NA</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span>(df_win = <span class="kw">dc.caseNA</span>, win = <span class="kw">win</span>, doPlot = <span class="fl">TRUE</span>, colOrder = <span class="fl">NA</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-8-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>Let’s compare to the <code>cart</code> imputation by MICE.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit">
 <span class="co"># CART with observed scale</span>
@@ -295,7 +295,7 @@
 
 <span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span>(df_win = <span class="kw">dc.caseIMP</span>, win = <span class="kw">win</span>, doPlot = <span class="fl">TRUE</span>, colOrder = <span class="fl">NA</span>, title = <span class="st">"Complexity Resonance Diagram (CART)"</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-9-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>There are some differences, and this is expected of course when imputing or removing <code>NA</code>s. To see how these differences may affect the inference of periods of destabilisation we run the <em>Cumulative Complexity Peak</em> analysis on both datasets.</p>
 <div id="cumulative-complexity-peaks" class="section level4">
 <h4 class="hasAnchor">
@@ -310,7 +310,7 @@
 <span class="kw">ccp.caseNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_ccp.html">dc_ccp</a></span>(df_win = <span class="kw">dc.caseNA</span>)
 <span class="fu"><a href="../reference/plotDC_ccp.html">plotDC_ccp</a></span>(df_ccp = <span class="kw">ccp.caseNA</span>, win = <span class="kw">win</span>, colOrder = <span class="fl">NA</span>, title = <span class="st">"Cumulative Complexity Peak Plot (Remove missing values)"</span>, useTimeVector = <span class="kw">daysNA</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit">
 <span class="kw">datesIMP</span>      <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">start</span>
 <span class="kw">dateTimesIMP</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span>(<span class="kw">datesIMP</span>, <span class="st">"%m/%d/%Y %H:%M"</span>)
@@ -320,7 +320,7 @@
            useTimeVector = <span class="kw">dateTimesIMP</span>, timeStamp = <span class="st">"31-01-99"</span>,
            title = <span class="st">"Cumulative Complexity Peak Plot (CART)"</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-10-2.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can query which timepoints a Complexity Peaks were registered.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit">
 <span class="co"># Remove NA</span>
@@ -336,8 +336,10 @@
 <span class="kw">dateTimesIMP</span>[<span class="kw">ccp.caseIMP</span><span class="op">$</span><span class="kw">sig.peaks</span><span class="op">&gt;</span><span class="fl">0</span>]
 </pre></div>
 <pre><code>&gt; [1] "2014-11-02 21:27:00 CET" "2014-11-03 09:54:00 CET"
-&gt; [3] "2014-11-10 21:05:00 CET" "2014-11-12 21:37:00 CET"
-&gt; [5] "2014-11-18 13:54:00 CET"</code></pre>
+&gt; [3] "2014-11-03 17:42:00 CET" "2014-11-10 21:05:00 CET"
+&gt; [5] "2014-11-12 21:37:00 CET" "2014-11-15 13:30:00 CET"
+&gt; [7] "2014-11-18 13:54:00 CET" "2014-11-25 21:22:00 CET"
+&gt; [9] "2014-11-26 17:30:00 CET"</code></pre>
 </div>
 </div>
 <div id="plot-state-versus-complexity" class="section level2">
@@ -360,27 +362,27 @@
 
 <span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseIMP</span>, df_win = <span class="kw">dc.caseIMP</span>, df_lvl = <span class="kw">df_lvl_hrs</span>, useTimeVector = <span class="kw">dateTimesS</span>, win = <span class="kw">win</span>, subtitle = <span class="st">"CART"</span>, levelName = <span class="st">"Hours sleep"</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit">
 <span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseNA</span>, df_win = <span class="kw">dc.caseNA</span>, df_lvl = <span class="kw">df_lvl_hrsNA</span>, useTimeVector = <span class="kw">dateTimesS</span>[<span class="kw">idNA</span>], win = <span class="kw">win</span>, subtitle = <span class="st">"Remove NA"</span>, levelName = <span class="st">"Hours sleep"</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-2.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit">
 <span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseIMP</span>, df_win = <span class="kw">dc.caseIMP</span>, df_lvl = <span class="kw">df_lvl_diff</span>, useTimeVector = <span class="kw">dateTimesS</span>, win = <span class="kw">win</span>, subtitle = <span class="st">"CART"</span>, levelName = <span class="st">"Difficulty sleeping"</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-3.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-3.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit">
 <span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseNA</span>, df_win = <span class="kw">dc.caseNA</span>, df_lvl = <span class="kw">df_lvl_diffNA</span>, useTimeVector = <span class="kw">dateTimesS</span>[<span class="kw">idNA</span>], win = <span class="kw">win</span>, subtitle = <span class="st">"Remove NA"</span>, levelName = <span class="st">"Difficulty sleeping"</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-4.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-4.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit">
 <span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseIMP</span>, df_win = <span class="kw">dc.caseIMP</span>, df_lvl = <span class="kw">df_lvl_unsat</span>, useTimeVector = <span class="kw">dateTimesS</span>, win = <span class="kw">win</span>, subtitle = <span class="st">"CART"</span>, levelName = <span class="st">"Unsatisfactory sleep"</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-5.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-5.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit">
 <span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseNA</span>, df_win = <span class="kw">dc.caseNA</span>, df_lvl = <span class="kw">df_lvl_unsatNA</span>, useTimeVector = <span class="kw">dateTimesS</span>[<span class="kw">idNA</span>], win = <span class="kw">win</span>, subtitle = <span class="st">"Remove NA"</span>, levelName = <span class="st">"Unsatisfactory sleep"</span>)
 </pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-6.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-6.png" width="504" style="display: block; margin: auto;"></p>
 <p>Look for max complexity peaks around level changes.</p>
 </div>
 <div id="references" class="section level2">

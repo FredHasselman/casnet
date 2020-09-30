@@ -9,7 +9,7 @@ Description: A collection of analytic tools for studying signals recorded from c
     - Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum).
     - Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA).
     - Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks, Multiplex Networks).
-YEAR: 2017
+YEAR: 2020
 License: GPL-3 + file LICENSE
 Depends: R (>= 2.10)
 Encoding: UTF-8
@@ -17,49 +17,40 @@ LazyData: true
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Imports:
-    reshape2,
     plyr,
     dplyr,
-    ggplot2,
+    tidyr,
+    lubridate,
+    magrittr,
+    tibble,
     gtable,
+    ggplot2,
     ggimage,
     igraph,
     Matrix,
     nonlinearTseries,
     pracma,
-    png,
     proxy,
+    invctr,
     scales,
-    xts,
-    zoo,
-    tidyr,
     rio,
     signal,
-    lubridate,
-    magrittr,
     tseries,
     parallel,
-    DescTools,
-    purrr,
     rpart,
     rlang (>= 0.1.2),
     infotheo,
     methods,
-    tibble,
-    broom,
-    callr,
-    readr,
     boot,
-    invctr,
-    splus2R,
-    DirectedClustering,
-    brainGraph,
-    stabledist
+    splus2R
 Suggests: 
-    RColorBrewer,
+    xts,
+    zoo,
     pROC,
     progress,
     animation,
+    gganimate,
+    png,
     knitr,
     rmarkdown,
     graphics,
@@ -73,12 +64,13 @@ Suggests:
     raster,
     mice,
     imputeTS,
-    gganimate,
     roxygen2,
-    ggraph,
     cowplot,
+    lattice,
     kableExtra,
-    lattice
+    DirectedClustering,
+    brainGraph,
+    stabledist
 VignetteBuilder: knitr
 Language: en-US
 URL: https://github.com/FredHasselman/casnet

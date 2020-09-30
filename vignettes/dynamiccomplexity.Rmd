@@ -25,7 +25,8 @@ knitr::opts_chunk$set(
 	warning = FALSE,
 	collapse = FALSE,
 	comment = ">",
-	width = 500
+	width = 500,
+	dpi = 72
 )
 library(invctr)
 library(casnet)

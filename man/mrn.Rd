@@ -6,15 +6,12 @@
 \usage{
 mrn(
   layers,
-  weightedBy = c("InterlayerMI", "InterlayerCor", "Edgeoverlap", "AnisotropicCRQA")[1],
-  windowedWeights = c("none", "local", "cumulative")[1],
-  CRQA_vertexSequence = "degree",
-  CRQA_measure = c("RR", "DET", "LAM")[1],
+  MRNweightedBy = c("InterlayerMI", "InterlayerCor", "Edgeoverlap")[1],
   win = NA,
   step = NA,
   overlap = NA,
   alignment = "r",
-  cumulative = TRUE,
+  cumulative = FALSE,
   doPlot = FALSE,
   silent = TRUE
 )
@@ -22,27 +19,21 @@ mrn(
 \arguments{
 \item{layers}{A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.}
 
-\item{weightedBy}{The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: \code{"InterLayerMI"} (Mutual information based on similarity of the vertex degree across layers), \code{"EdgeOverlap"} (proportion of vertices sharing the same edges across layers), \code{"RankorderDC"} (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in \code{AnisotropicCRQA}). Choosing \code{"InterLayerMI"}, \code{"InterlayerCor"}, or \code{"EdgeOverlap"} will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.}
+\item{MRNweightedBy}{The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: \code{"InterLayerMI"} (Mutual information based on similarity of the vertex degree across layers), \code{"EdgeOverlap"} (proportion of vertices sharing the same edges across layers). Choosing \code{"InterLayerMI"}, \code{"InterlayerCor"}, or \code{"EdgeOverlap"} will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.}
 
-\item{windowedWeights}{If a windowed analysis is conducted and the edges of the graphs in \code{layers} have a weight property, there are a number of different ways to handle the weights depending on the value of \code{windowedWeights}: \code{"none"}, \code{"local"}, and \code{"cumulative"}. Value \code{"none"} will ignore the weights, \code{"local"} will limit the range of edges to those edges connecting the vertices contained within the window, \code{"cumulative"} will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = \code{none})}
+\item{win}{The window size passed to \code{\link[=ts_windower]{ts_windower()}} in which to evaluate \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}. (default = \code{NA}).}
 
-\item{CRQA_vertexSequence}{If \code{weightedBy = "AnisotropicCRQA"}, then \code{CRQA_vertexSequence} must be a valid \link{igraph} command that returns vertex properties, for example: \code{"degree"}, \code{"strength"},\code{"hub_score"},\code{"centr_degree"}, \code{"transitivity"}, \code{"betweenness"}. The appropriate measure type, e.g. for \code{"directed"}, or \code{"weighted"} graphs, will be inferred from the graph properties of the 1st graph object in the \code{layers} list. For best results with weighted measures, assign a value to \code{E(g)$weight} for each \code{g} in \code{layers}. (default = \code{"degree"})}
+\item{step}{The stepsize for the sliding window (default = \code{NA}).}
 
-\item{CRQA_measure}{Which CRQA measures should be used c("RR", "DET", "LAM"),}
-
-\item{win}{The window size passed to \code{\link[=ts_windower]{ts_windower()}} in which to evaluate \code{"InterLayerMI"} or \code{"EdgeOvelap"}. If \code{weightedBy = "CRQA_vertexSequence"}, it will be the size of the right aligned window in which Dynamic Complexity will be computed using \code{\link[=dc_win]{dc_win()}} (default = \code{NA})}
-
-\item{step}{The stepsize for the sliding window (default = \code{NA})}
-
-\item{overlap}{The window overlap passed to \code{\link[=ts_windower]{ts_windower()}} if \code{weightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
+\item{overlap}{The window overlap passed to \code{\link[=ts_windower]{ts_windower()}} if \code{MRNweightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
 
 \item{alignment}{Whether to right (\code{"r"}), center (\code{"c"}), or left (\code{"l"}) align the window.}
 
 \item{cumulative}{To make the network represent cumulative time, set \code{directed = TRUE} and \code{cumulative = TRUE}. This will set the upper triangle of the recurrence matrix to \code{0} and ensures that the network edges represent recurrenct values that have occurred in the \code{past} relative to the current opbserved value. If \code{directed = FALSE} the argument is ignored (default = \code{TRUE}).}
 
-\item{doPlot}{Plot the multiplex recurrence network (default = \code{TRUE}).}
+\item{doPlot}{Plot the multiplex recurrence network (default = \code{FALSE}).}
 
-\item{silent}{Silent-ish mode}
+\item{silent}{Silent-ish mode. (default = FALSE).}
 }
 \value{
 A list object with fields:
@@ -54,5 +45,18 @@ A list object with fields:
 }
 }
 \description{
-This function will create a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{weightedBy} is set to \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}) and \emph{Layer importance} (\code{weightedBy} is \code{"AnisotropicCRQA"}). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument \code{MRNrankedBy}.
+This function will create a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{MRNweightedBy} is set to \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}) and \emph{Layer importance} (not implemented yet). The former generates weighted MRN based on \emph{Interlayer Mutual Information}, \emph{Interlayer Correlation}, or \emph{Edge Overlap}.
+}
+\examples{
+
+# Create some layers
+library(igraph)
+
+layers <- list(g1 = igraph::sample_smallworld(1, 100, 5, 0.05),
+g2 = igraph::sample_smallworld(1, 100, 5, 0.5),
+g3 = igraph::sample_smallworld(1, 100, 5, 1))
+
+mrn(layers = layers)
+
+
 }

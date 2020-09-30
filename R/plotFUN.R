@@ -5,99 +5,6 @@
 # plot functions
 
 
-#' gg_theme
-#'
-#' @param type      One of `"clean"`, or `"noax"`
-#'
-#' @details Will generate a `"clean"` ggplot theme, or a theme without any axes (`"noax"`).
-#'
-#' Some scientific journals explicitly request the Arial font should be used in figures. This can be achieved by using `.afm` font format (see, e.g. http://www.pure-mac.com/font.html).
-#'
-#' @return A theme for `ggplot2`.
-#' @export
-#'
-#' @examples
-#' library(ggplot2)
-#' g <- ggplot(data.frame(x = rnorm(n = 100), y = rnorm(n = 100)), aes(x = x, y = y)) + geom_point()
-#' g + gg_theme()
-#' g + gg_theme("noax")
-gg_theme <- function(type=c("clean","noax")){
-
-  if(length(type)>1){type <- type[1]}
-
-  switch(type,
-         clean = theme_bw(base_size = 16, base_family="sans") +
-           theme(axis.text.x     = element_text(size = 14),
-                 axis.title.y    = element_text(vjust = +1.5),
-                 panel.grid.major  = element_blank(),
-                 panel.grid.minor  = element_blank(),
-                 legend.background = element_blank(),
-                 legend.key = element_blank(),
-                 panel.border = element_blank(),
-                 panel.background = element_blank(),
-                 axis.line  = element_line(colour = "black")),
-         noax = theme(line = element_blank(),
-                      text  = element_blank(),
-                      title = element_blank(),
-                      plot.background = element_blank(),
-                      panel.border = element_blank(),
-                      panel.background = element_blank())
-  )
-}
-
-#' gg_plotHolder
-#'
-#' @return A blank `ggplot2` object that can be used in concordance with `grid.arrange`.
-#' @export
-#'
-#' @examples
-#' # Create a plot with marginal distributions.
-#' library(ggplot2)
-#' library(scales)
-#'
-#' df <- data.frame(x = rnorm(n = 100),
-#'                  y = rnorm(n = 100),
-#'                  group = factor(sample(x=c(0,1),
-#'                  size = 100, replace = TRUE)))
-#'
-#' scatterP <- ggplot(df, aes(x = x, y =y, colour = group)) +
-#'                    geom_point() +
-#'                    gg_theme()
-#'
-#' xDense <- ggplot(df, aes(x = x, fill = group)) +
-#'                  geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) +
-#'                  gg_theme("noax") +
-#'                  theme(legend.position = "none")
-#'
-#' yDense <- ggplot(df, aes(x = y, fill = group)) +
-#'                  geom_density(aes(y= ..count..),trim=FALSE, alpha=.5) +
-#'                  coord_flip() +
-#'                  gg_theme("noax") +
-#'                  theme(legend.position = "none")
-#'
-#' library(gridExtra)
-#' grid.arrange(xDense,
-#'              gg_plotHolder(),
-#'              scatterP,
-#'              yDense,
-#'              ncol=2, nrow=2,
-#'              widths=c(4, 1.4),
-#'              heights=c(1.4, 4))
-#'
-gg_plotHolder <- function(){
-  return(ggplot2::ggplot() +
-           ggplot2::geom_blank(ggplot2::aes_(1,1)) +
-           ggplot2::theme(line = element_blank(),
-                          text  = element_blank(),
-                          title = element_blank(),
-                          plot.background = element_blank(),
-                          panel.border = element_blank(),
-                          panel.background = element_blank())
-  )
-}
-
-
-
 #' Plot Multivariate Time Series Data
 #'
 #' @param df A data frame with time series in columns.
@@ -114,17 +21,8 @@ gg_plotHolder <- function(){
 #' @examples
 #'
 #' # Generate some coloured noise
-#' library(plyr)
-#' N <- 512
-#' noises <- seq(-3,3,by=.5)
-#' y <- data.frame(matrix(rep(NA,length(noises)*N), ncol=length(noises)))
-#'
-#' for(c in seq_along(noises)){
-#'  y[,c] <- noise_powerlaw(N=N, alpha = noises[c])
-#'  }
-#'  colnames(y) <- paste0(noises)
-#'
-#'  plotTS_multi(y)
+#'  data(ColouredNoise)
+#'  plotTS_multi(ColouredNoise)
 #'
 plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, colOrder = TRUE, doPlot = TRUE, title = '', subtitle = "", xlabel = "Time", ylabel = "", returnPlotData = FALSE, useRibbon = FALSE, overlap = 1){
 
@@ -149,13 +47,14 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
     }
   }
 
-  tmp <- tidyr::gather(df, key = timeSeries, value = y, -time, factor_key = colOrder)
+  tmp <- tidyr::gather(df, key = "timeSeries", value = "y", -(.data$time), factor_key = colOrder)
   #tmp$timeSeries <- ordered(tmp$timeSeries)
 
   yOrder <- groupVec
   names(yOrder) <- paste(groupVec)
-  offsets     <- names(yOrder) %>% {stats::setNames(0:(length(.) - 1), .)}
-  tmp$offsets <- unlist(llply(seq_along(yOrder), function(n) rep(offsets[n],sum(tmp$timeSeries%in%names(offsets)[n]))))
+  offsets     <- names(yOrder)
+  offsets <- {stats::setNames(0:(length(offsets) - 1), offsets)}
+  tmp$offsets <- unlist(plyr::llply(seq_along(yOrder), function(n) rep(offsets[n],sum(tmp$timeSeries%in%names(offsets)[n]))))
 
   ymin <- -.45 * overlap
   ymax <-  .45 * overlap
@@ -167,19 +66,20 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
 
   # Calculate and scale group densities
   pdat <- tmp %>%
-    dplyr::group_by(timeSeries) %>%
-    dplyr::mutate(y = elascer(y,lo = ymin, hi = ymax)) %>%
+    dplyr::group_by(.data$timeSeries) %>%
+    dplyr::mutate(y = elascer(.data$y,lo = ymin, hi = ymax)) %>%
     dplyr::ungroup()
   pdat$y_offset <- pdat$y + pdat$offsets
   pdat$ymin <- pdat$offsets
   pdat$ycol <- factor(pdat$offsets%%2)
+  pdat$timeSeries <- rev(tmp$timeSeries)
 
 
 
-  g <- ggplot(pdat, aes(x=time, y = y_offset, group = rev(timeSeries)))
+  g <- ggplot2::ggplot(pdat, ggplot2::aes_(x=~time, y = ~y_offset, group = ~timeSeries))
 
   if(useRibbon){
-    g <- g + geom_ribbon(aes(ymin = ymin, ymax = y_offset, fill = ycol, colour = ycol)) +
+    g <- g + geom_ribbon(aes_(ymin = ~ymin, ymax = ~y_offset, fill = ~ycol, colour = ~ycol)) +
       scale_fill_manual(values = c("0"="grey30","1"="grey70"), guide = "none") +
       scale_color_manual(values = c("0"="grey90","1"="grey90"), guide = "none")
   } else {
@@ -515,10 +415,11 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=1, colourE=FALSE
   }
 
   if(is.null(groupColours)){
-    if(length(unigroups)<=12){
-      groupColours <-  scales::brewer_pal(palette="Paired")(length(unigroups))
+    if(length(unigroups)<=58){
+      groupColours <-  getColours(Ncols = length(unigroups))
     } else {
-      groupColours <- scales::gradient_n_pal(scales::brewer_pal(palette="Paired")(12))(seq(0, 1, length.out = length(unigroups)))
+      groupColours <- getColours(Ncols = 1:58, continuous = TRUE, Dcols = seq(0, 1, length.out = 58))(seq(0,1,length.out=length(unigroups)))
+        # scales::gradient_n_pal(scales::brewer_pal(palette="Paired")(12))(seq(0, 1, length.out = length(unigroups)))
     }
     unicolours <- groupColours
   } else {
@@ -1042,7 +943,13 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
 #'
 #' @export
 #'
-plotRED_mif <- function(mif.OUT = NULL, lags = 0:max(round(NROW(y)/4),10), nbins = ceiling(2*NROW(y)^(1/3)), surTest = FALSE, alpha=.05 ,doPlot = TRUE, returnMIFun = TRUE){
+plotRED_mif <- function(mif.OUT = NULL,
+                        lags  = attr(mif.OUT,"lags"),
+                        nbins = attr(mif.OUT,"nbins"),
+                        surTest = FALSE,
+                        alpha=.05,
+                        doPlot = TRUE,
+                        returnMIFun = TRUE){
 
   if(is.null(mif.OUT)){
     stop("No data.")
@@ -1075,7 +982,7 @@ plotRED_mif <- function(mif.OUT = NULL, lags = 0:max(round(NROW(y)/4),10), nbins
     # }
     #geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
     ggplot2::geom_path(colour="grey50") +
-    ggplot2::geom_point(pch=21, cex=(1 + .01*(NROW(y)/nbins))) +
+    ggplot2::geom_point(pch=21, cex=(1 + .01*(NROW(mifun_long$mi)/nbins))) +
     ggplot2::facet_grid(type ~.) +
     # scale_fill_manual(bquote(p < .(siglevel)),values = cols,
     #                   labels =  list("yes"= expression(rho != 0),
@@ -1295,7 +1202,7 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
 
   df_ccp$sig.peaks <- lcol
   colnames(df_ccp)[colnames(df_ccp)%in%"sig.peaks"]<-"Sig. CCP"
-  dfp <- tidyr::gather(df_ccp, key = "variable", value = "value", -(time), factor_key = TRUE)
+  dfp <- tidyr::gather(df_ccp, key = "variable", value = "value", -c(.data$time), factor_key = TRUE)
   dfp$value <- factor(dfp$value,levels = c(0,1,5,10),
                       labels = c("0","Sig. DC level","5","Sig. CCP"))
 
@@ -1529,11 +1436,11 @@ plotMRN_win <- function(df_mrn,
 
     df   <- plyr::ldply(df_mrn$meanValues)
     df$t <- attr(df_mrn,"time")
-    df_long <- df %>% select(one_of(c("t","mi_mean","eo_mean"))) %>% tidyr::pivot_longer(-t,names_to = "measure",values_to = "y")
+    df_long <- df %>% dplyr::select(dplyr::one_of(c("t","mi_mean","eo_mean"))) %>% tidyr::pivot_longer(-t,names_to = "measure",values_to = "y")
 
 
 
-    g <-  ggplot(df_long, aes(x=t, y = y, colour = measure)) +
+    g <-  ggplot(df_long, aes_(x= ~t, y = ~y, colour = ~measure)) +
       geom_line() +
       facet_grid(measure~., scales="free_y") +
       scale_x_continuous(limits = c(0,max(df$t)),expand = c(0.1,0.1)) +
@@ -1755,6 +1662,8 @@ plotMRN_win <- function(df_mrn,
 #   )
 # }
 
+
+# Themes, layouts ----
 
 #' Layout a graph on a spiral
 #'
@@ -1981,8 +1890,6 @@ make_spiral_graph <- function(g,
     }
   }
 
-
-
   if(max(tbreaks)!=igraph::vcount(g)){
     tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
     #tlabels <- paste(tbreaks)
@@ -2000,7 +1907,6 @@ make_spiral_graph <- function(g,
     #tlabels <- paste(tbreaks)
     tlabels <- tlabels[tbreaks]
   }
-
 
   if(is.null(markEpochsBy)){
     markEpochsBy <- character(igraph::vcount(g))
@@ -2029,6 +1935,7 @@ make_spiral_graph <- function(g,
   if(!is.null(V(g)$size)){
     size <- V(g)$size
   }
+
   gNodes        <- as.data.frame(g$layout)
   gNodes$ID     <- as.numeric(V(g))
   gNodes$colour <- V(g)$colour
@@ -2084,17 +1991,17 @@ make_spiral_graph <- function(g,
     }
   }
 
-  gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
-    geom_curve(data=gEdges, aes(x = from.x,
-                                xend = to.x,
-                                y = from.y,
-                                yend = to.y,
-                                colour = colorVar),
-               curvature = curvature,
-               arrow = ar,
-               angle = angle,
-               size = gEdges$width * scaleEdgeSize,
-               alpha = alphaE) +
+  gg <- ggplot2::ggplot(gNodes, ggplot2::aes_(x = ~V1, y = ~V2)) +
+    ggplot2::geom_curve(data = gEdges, aes_(x = ~from.x,
+                                              xend = ~to.x,
+                                              y = ~from.y,
+                                              yend = ~to.y,
+                                              colour = ~colorVar),
+                        curvature = curvature,
+                        arrow = ar,
+                        angle = angle,
+                        size = gEdges$width * scaleEdgeSize,
+                        alpha = alphaE) +
     geom_point(aes(fill = labels, size = size), pch=21, colour = vBc, alpha = alphaV) +
     ggtitle(label = title, subtitle = subtitle) +
     scale_fill_manual(epochLabel, values = unique(gNodes$colour)) +
@@ -2147,229 +2054,147 @@ make_spiral_graph <- function(g,
 }
 
 
-#' Spiral Graph with Epoch Focus
+
+# [copied from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/ ]
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multi_PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+  if (numPlots==1) {
+    grid::grid.newpage()
+    grid::grid.draw(plots[[1]])
+    #print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid::grid.newpage()
+    grid::pushViewport(grid::viewport(layout = grid::grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      grid::grid.draw(plots[[i]], vp = grid::viewport(layout.pos.row = matchidx$row,
+                                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+
+
+#' Get some nice colours
 #'
-#' Turn an [igraph] object into a spiral graph returning a [ggplot2] object.
+#' @param Ncols Either an integer representing the number of requested colours, or, a numeric vector of integers between 1-58 to select specific colours. Run [getColours()] without arguments to see a plot of the colours that are available.
+#' @param continuous Return a discrete vector of colours, or, a function that represents a gradient between 2 or more colours? If `TRUE` then argument `Ncols` must be a numeric vector greater than length `2`. **NOTE:** The input to the gradient function must be (re-)scaled to fall between 0 and 1, e.g. using [elascer()]. (default = `FALSE`)
+#' @param Dcols If `continuous` is set to `TRUE`, this should be a vector of the same length as `Ncols` representing the relative distances between the colours in the gradient function using values between 0 and 1. (default = `c(0,1)`)
 #'
-#' @note To keep the igraph object, use the layout function [layout_as_spiral()] when plotting the graph.
-#'
-#' @inheritParams make_spiral_graph
-#' @inheritParams plotNET_groupColour
-#'
-#' @return A ggplot object.
-#'
+#' @return A list of colours
 #' @export
 #'
 #' @examples
 #'
-#' library(igraph)
-#' g  <- sample_gnp(200, 1/20)
-#' V(g)$size <- degree(g)
-#' make_spiral_graph(g, markTimeBy = TRUE, showSizeLegend = TRUE, sizeLabel = "Node degree")
+#' # Plot all available colours
+#' getColours()
 #'
-make_spiral_focus <- function(g,
-                              arcs = 6,
-                              a = 1,
-                              b = NULL,
-                              rev= FALSE,
-                              curvature = -0.6,
-                              angle = 90,
-                              markTimeBy = NULL,
-                              alphaV = 1,
-                              alphaE = .6,
-                              title = "",
-                              subtitle = "",
-                              showEpochLegend = TRUE,
-                              markEpochsBy = NULL,
-                              epochColours = NULL,
-                              epochLabel = "Epoch",
-                              showSizeLegend = FALSE,
-                              sizeLabel = "Size",
-                              scaleVertexSize = c(1,6),
-                              vertexBorderColour = "black",
-                              scaleEdgeSize = 1/5,
-                              defaultEdgeColour = "grey70",
-                              doPlot = TRUE){
+#' # Get a specific number of colours
+#' getColours(5)
+#'
+#' # Get specific colours
+#' getColours(c(4,7,1,40))
+#'
+#' # Make a gradient from colour number 4 to 44 via 7
+#' gradFunc <- getColours(Ncols = c(4,7,44), continuous = TRUE, Dcols = c(0,.5,1))
+#'
+#' df <- data.frame(x=1:50, y=sort(rnorm(50)))
+#' # Make sure the input is on a scale of 0-1
+#' df$ycol <- elascer(df$y)
+#'
+#' library(ggplot2)
+#' ggplot(df, aes(x=x,y=y,colour=ycol)) +
+#' geom_point() +
+#' scale_colour_gradientn("Gradient",colours = gradFunc(df$ycol)) +
+#' theme_bw()
+#'
+#' # Make a gradient from colour number 4, to 9, to 7, to 36, to 44
+#' gradFunc <- getColours(Ncols = c(4,9,7,36,44), continuous = TRUE, Dcols = c(0,.33,.5,.66,1))
+#'
+#' ggplot(df, aes(x=x,y=y,colour=ycol)) +
+#' geom_point() +
+#' scale_colour_gradientn("Gradient",colours = gradFunc(df$ycol)) +
+#' theme_bw()
+#'
+getColours <- function(Ncols, continuous = FALSE, Dcols = c(0,1)){
 
-  type   <- "Archimedean"
-  g_left <- g_right <- g
+  pl <- c("#A65141","#ABB2C4","#C89284","#7896BC","#E1CAC2","#536489","#ECE3CD","#575E7A","#BEBEC4","#C4AD75","#30261E","#BC964D","#3D434D","#D29E55","#B4B6A7","#9B7342","#E8D69D","#48211A","#EBDAB4","#3D4B68","#E8DCCF","#3E688C","#9D3D2D","#507074","#9A756C","#546959","#93725F","#858563","#E1D3B1","#A6B4BB","#78828C","#AA9C6A","#91A193","#CDB16E","#1B528D","#B8A98F","#6E432D","#4F5B71","#D9B196","#20304F","#827561","#98A39E","#8B4F31","#7E7B65","#C1B6A1","#775E45","#C0B3A2","#5A524A","#BBA27F","#3A3935","#C9BDA3","#626961","#8A4F42","#8D8A77","#947B5E","#5D3C30","#AA8470","#493A2C")
 
-  theta <- seq(0,arcs*pi,length.out = res)
-
-  if(type=="Archimedean"){
-    if(is.null(b)){
-      b <- 1
-    }
-    r  <- a + b*theta
-    g_right$layout <- matrix(cbind(r*cos(theta),r*sin(theta)),ncol = 2)
-    g_left$layout  <- matrix(cbind(r*cos(theta),r*sin(theta)),ncol = 2)
-    g_left
-
-  }
-
-  # g_right$layout <- layout_as_spiral(g, type = type, arcs = arcs, a = a, b = b, rev = rev)
-  # g_left$layout  <- -1*g_right$layout
-
-  g <- g_left + g_right
-
-  plot(g_left)
-  # g$layout <- layout_as_spiral(g, type = type, arcs = arcs, a = a, b = b, rev = rev)
-
-  if(is.null(markTimeBy)){
-    if(!is.null(markEpochsBy)){
-      grIDs <- ts_changeindex(markEpochsBy)
-      tbreaks <- unique(sort(c(grIDs$xmax,grIDs$xmax)))
-      tlabels <- ceiling(tbreaks)
+  cols <- NULL
+  if(!continuous){
+    if(missing(Ncols)){
+      df <- expand.grid(x=1:8,y=1:8)[1:58,]
+      plot(df$x,df$y,pch=15,col=getColours(Ncols=58),cex=5, axes = FALSE, ann = FALSE)
+      graphics::text(df$x,df$y,paste(1:58),col="white")
     } else {
-      x <- 1:igraph::vcount(g)
-      v <- seq(1,igraph::vcount(g),by=igraph::vcount(g)/arcs)
-      tbreaks <- c(1,which(diff(findInterval(x, v))!=0),igraph::vcount(g))
-      #tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
-      if(max(tbreaks)!=igraph::vcount(g)){
-        tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
-        tlabels <- paste(tbreaks)
-      }
-      if(min(tbreaks)>1){
-        tbreaks<- c(1,tbreaks)
-        tlabels <- paste(tbreaks)
-      }
-    }
-  } else {
-    if(is.numeric(markTimeBy)){
-      if(all(markTimeBy%in%1:igraph::vcount(g))){
-        tbreaks <- unique(markTimeBy)
-        if(!is.null(names(markTimeBy))){
-          tlabels <- names(unique(markTimeBy))
+      if(all(Ncols%[]%c(1,58))){
+        if(length(Ncols)==1){
+          cols <- pl[1:Ncols]
         } else {
-          tlabels <- paste(tbreaks)
-        }
+          if(length(Ncols)%[]%c(2,58)){
+            cols <- pl[Ncols]
+          }
+        } # Ncols >= 2
+
+      } else {
+        stop("Currently the max. number of colours is 58.")
       }
-    }
-    if(markTimeBy){
-      tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
-      if(max(tbreaks)>igraph::vcount(g)){tbreaks[which.max(tbreaks)]<-igraph::vcount(g)}
-      if(min(tbreaks)>1){tbreaks<- c(1,tbreaks)}
-      tlabels <- paste(tbreaks)
-    }
-  }
-
-  if(max(tbreaks)!=igraph::vcount(g)){
-    tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
-    tlabels <- paste(tbreaks)
-  }
-  if(min(tbreaks)>1){
-    tbreaks<- c(1,tbreaks)
-    tlabels <- paste(tbreaks)
-  }
-
-  if(is.null(markEpochsBy)){
-    markEpochsBy <- character(igraph::vcount(g))
-    for(i in 1:(length(tbreaks)-1)){
-      markEpochsBy[tbreaks[i]:tbreaks[i+1]] <- rep(paste0(tbreaks[i],"-",tbreaks[i+1]),length(tbreaks[i]:tbreaks[i+1]))
-    }
-    if(!is.null(epochColours)){
-      if(length(unique(markEpochsBy))>length(unique(epochColours))){
-        warning("Number of unique epochs is unequal to number of unique colours!\nUsing default colour scheme.")
-        epochColours <- NULL
+      return(cols)
+    } # missing(Ncols)
+  } else { # continuous
+    if(length(Ncols)>=2 & all(invctr::is.wholenumber(Ncols)) & all(Ncols%[]%c(1,58))){
+      if(length(Dcols)==length(Ncols)&all(Dcols%[]%c(0,1))){
+        cols <- scales::gradient_n_pal(colours = pl[Ncols], values = Dcols)
+      } else {
+        stop("If 'continuous = TRUE' then 'Dcols' must have the same length as 'Ncols' and contain values between 0 and 1.")
       }
-    }
-  }
-
-  g <- plotNET_groupColour(g,
-                           groups = markEpochsBy,
-                           colourV = TRUE,
-                           colourE = TRUE,
-                           groupColours = epochColours,
-                           defaultEdgeColour = defaultEdgeColour,
-                           doPlot = FALSE)
-
-  size <- 1
-  if(!is.null(V(g)$size)){
-    size <- V(g)$size
-  }
-  gNodes        <- as.data.frame(g$layout)
-  gNodes$ID     <- as.numeric(V(g))
-  gNodes$colour <- V(g)$colour
-  gNodes$labels <- factor(V(g)$groupnum, levels = unique(V(g)$groupnum), labels = unique(V(g)$group))
-  gNodes$size   <- size
-  gNodes$alpha  <- V(g)$alpha
-
-  width <- 1
-  if(!is.null(E(g)$width)){
-    width <- E(g)$width
-  }
-  gEdges        <- igraph::get.data.frame(g)
-  gEdges$from.x <- gNodes$V1[match(gEdges$from, gNodes$ID)]
-  gEdges$from.y <- gNodes$V2[match(gEdges$from, gNodes$ID)]
-  gEdges$to.x   <- gNodes$V1[match(gEdges$to, gNodes$ID)]
-  gEdges$to.y   <- gNodes$V2[match(gEdges$to, gNodes$ID)]
-  gEdges$width  <- width
-
-  if(is.null(vertexBorderColour))(
-    vBc <- gNodes$colour
-  ) else {
-    if(length(vertexBorderColour)==1|length(vertexBorderColour)==NROW(gNodes)){
-      vBc <- vertexBorderColour
     } else {
-      warning("Invalid value(s) for vertexBorderColour, using default.")
-      vertexBorderColour <- "black"
+      stop("If 'continuous = TRUE' then 'Ncols' must be a vector of ast least two integers between 1 and 58.")
     }
   }
-
-  # Fix same coords
-  sameID <- which(gEdges$from.x==gEdges$to.x)
-  if(length(sameID)>0){
-    gNodes$V2[gEdges$from[sameID]] <- gNodes$V2[gEdges$from[sameID]]+mean(diff(gNodes$V2))/2
-    gEdges$to.x[sameID] <- gEdges$to.x[sameID]+mean(diff(gEdges$to.x))/2
-    gEdges$to.y[sameID] <- gEdges$to.y[sameID]+mean(diff(gEdges$to.y))/2
-  }
-
-
-  gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
-    geom_curve(data=gEdges, aes(x = from.x, xend = to.x, y = from.y, yend = to.y),
-               curvature = curvature,
-               angle = angle,
-               size = gEdges$width * scaleEdgeSize,
-               colour= gEdges$color,
-               alpha = alphaE) +
-    geom_point(aes(fill = labels, size = size), pch=21, colour = vBc, alpha = alphaV) +
-    ggtitle(label = title, subtitle = subtitle) +
-    scale_fill_manual(epochLabel, values = unique(gNodes$colour)) +
-    scale_size(sizeLabel, range = scaleVertexSize)
-
-  if(showEpochLegend){
-    gg <- gg + guides(fill = guide_legend(title.position = "top",
-                                          byrow = TRUE,
-                                          override.aes = list(size=5, order = 0)))
-  } else {
-    gg <- gg + guides(fill = "none")
-  }
-
-  if(showSizeLegend){
-    gg <- gg + guides(size = guide_legend(title.position = "top",
-                                          byrow = TRUE,
-                                          override.aes = list(legend.key.size = unit(1.2,"lines"), order = 1)))
-  } else {
-    gg <- gg + guides(size = "none")
-  }
-
-  if(!is.null(markTimeBy)){
-    gg <- gg + annotate("label", x=gNodes$V1[tbreaks], y=gNodes$V2[tbreaks], label = tlabels)
-  }
-
-  gg <- gg +
-    coord_fixed() +
-    theme_void() +
-    theme(legend.title = element_text(face="bold"),
-          legend.position =  "top",
-          legend.margin = margin(t = 0,r = 1,l = 1,0))
-
-  if(doPlot){
-    print(gg)
-  }
-
-  return(invisible(gg))
+  return(cols)
 }
 
 
+# Empty plot
+gg_plotHolder <- function(){
+  return(ggplot2::ggplot() +
+           ggplot2::geom_blank(ggplot2::aes_(1,1)) +
+           ggplot2::theme(line = element_blank(),
+                          text  = element_blank(),
+                          title = element_blank(),
+                          plot.background = element_blank(),
+                          panel.border = element_blank(),
+                          panel.background = element_blank())
+  )
+
+}
 

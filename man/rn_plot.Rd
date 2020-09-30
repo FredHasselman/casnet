@@ -55,7 +55,6 @@ Other Distance matrix operations (recurrence network):
 \code{\link{di2bi}()},
 \code{\link{di2we}()},
 \code{\link{rn_recSpec}()},
-\code{\link{rn_scaleoGram}()},
 \code{\link{rn}()}
 }
 \concept{Distance matrix operations (recurrence network)}

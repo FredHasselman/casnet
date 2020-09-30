@@ -7,20 +7,17 @@
 
 #' Multiplex Recurrence Network
 #'
-#' @description This function will create a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: *Layer similarity* (`weightedBy` is set to `"InterLayerMI"`, `"InterLayerCor"`, or `"EdgeOvelap"`) and *Layer importance* (`weightedBy` is `"AnisotropicCRQA"`). The former generates weighted MRN based on Interlayer Mutual Information, Interlayer Correlation, or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument `MRNrankedBy`.
+#' @description This function will create a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: *Layer similarity* (`MRNweightedBy` is set to `"InterLayerMI"`, `"InterLayerCor"`, or `"EdgeOvelap"`) and *Layer importance* (not implemented yet). The former generates weighted MRN based on _Interlayer Mutual Information_, _Interlayer Correlation_, or _Edge Overlap_.
 #'
 #' @inheritParams ts_windower
 #' @inheritParams rn
 #' @param layers A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.
-#' @param weightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers), `"RankorderDC"` (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in `AnisotropicCRQA`). Choosing `"InterLayerMI"`, `"InterlayerCor"`, or `"EdgeOverlap"` will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.
-#' @param windowedWeights If a windowed analysis is conducted and the edges of the graphs in `layers` have a weight property, there are a number of different ways to handle the weights depending on the value of `windowedWeights`: `"none"`, `"local"`, and `"cumulative"`. Value `"none"` will ignore the weights, `"local"` will limit the range of edges to those edges connecting the vertices contained within the window, `"cumulative"` will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = `none`)
-#' @param CRQA_vertexSequence If `weightedBy = "AnisotropicCRQA"`, then `CRQA_vertexSequence` must be a valid [igraph] command that returns vertex properties, for example: `"degree"`, `"strength"`,`"hub_score"`,`"centr_degree"`, `"transitivity"`, `"betweenness"`. The appropriate measure type, e.g. for `"directed"`, or `"weighted"` graphs, will be inferred from the graph properties of the 1st graph object in the `layers` list. For best results with weighted measures, assign a value to `E(g)$weight` for each `g` in `layers`. (default = `"degree"`)
-#' @param CRQA_measure Which CRQA measures should be used c("RR", "DET", "LAM"),
-#' @param win The window size passed to [casnet::ts_windower()] in which to evaluate `"InterLayerMI"` or `"EdgeOvelap"`. If `weightedBy = "CRQA_vertexSequence"`, it will be the size of the right aligned window in which Dynamic Complexity will be computed using [casnet::dc_win()] (default = `NA`)
-#' @param step The stepsize for the sliding window (default = `NA`)
-#' @param overlap The window overlap passed to [casnet::ts_windower()] if `weightedBy` is `"InterLayerMI"` or `"EdgeOvelap"`. The value of `step` will be ignored if `overlap` is not `NA`. (default = `NA`).
-#' @param doPlot Plot the multiplex recurrence network (default = `TRUE`).
-#' @param silent Silent-ish mode
+#' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers). Choosing `"InterLayerMI"`, `"InterlayerCor"`, or `"EdgeOverlap"` will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.
+#' @param win The window size passed to [casnet::ts_windower()] in which to evaluate `"InterLayerMI"`, `"InterLayerCor"`, or `"EdgeOvelap"`. (default = `NA`).
+#' @param step The stepsize for the sliding window (default = `NA`).
+#' @param overlap The window overlap passed to [casnet::ts_windower()] if `MRNweightedBy` is `"InterLayerMI"` or `"EdgeOvelap"`. The value of `step` will be ignored if `overlap` is not `NA`. (default = `NA`).
+#' @param doPlot Plot the multiplex recurrence network (default = `FALSE`).
+#' @param silent Silent-ish mode. (default = FALSE).
 #'
 #' @return A list object with fields:
 #' * _interlayerMI_ - One or more matrices with edge weights between layers that represent the interlayer Mutual Information.
@@ -30,27 +27,26 @@
 #'
 #' @export
 #'
+#' @examples
+#'
+#' # Create some layers
+#' library(igraph)
+#'
+#' layers <- list(g1 = igraph::sample_smallworld(1, 100, 5, 0.05),
+#' g2 = igraph::sample_smallworld(1, 100, 5, 0.5),
+#' g3 = igraph::sample_smallworld(1, 100, 5, 1))
+#'
+#' mrn(layers = layers)
+#'
+#'
 mrn <- function(layers,
-                weightedBy = c("InterlayerMI", "InterlayerCor", "Edgeoverlap","AnisotropicCRQA")[1],
-                windowedWeights = c("none", "local", "cumulative")[1],
-                CRQA_vertexSequence = "degree",
-                CRQA_measure = c("RR", "DET", "LAM")[1],
+                MRNweightedBy = c("InterlayerMI", "InterlayerCor", "Edgeoverlap")[1],
                 win = NA,
                 step = NA,
                 overlap = NA,
                 alignment = "r",
-                cumulative = TRUE,
+                cumulative = FALSE,
                 doPlot = FALSE,
-                # doSave = FALSE,
-                # createAnimation = FALSE,
-                # useImageMagick = FALSE,
-                # loopAnimation = TRUE,
-                # transitionLength = 3,
-                # stateLength = 1,
-                # gifWidth = 600,
-                # gifRes = 150,
-                # noParts = TRUE,
-                # imageDir = NA,
                 silent = TRUE){
 
   cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
@@ -69,64 +65,34 @@ mrn <- function(layers,
     names(layers) <- paste0("layer",1:length(layers))
   }
 
-  # doSave <- TRUE
-  # if(is.null(imageDir)){
-  #   doSave <- FALSE
-  # }
-  #
-  #   if(is.na(imageDir)){
-  #     imageDir <- getwd()
-  #   } else {
-  #     if(!dir.exists(normalizePath(imageDir))){
-  #       stop(paste0("The directory '",imageDir,"' does not exist."))
-  #     }
-  #   }
-
   if(is.na(win)){
     win <- Nsize
   }
   if(is.na(step)){
-    step <- win
+    if(win==Nsize){
+      step <- 1
+    } else {
+      step <- win
+    }
   }
 
-  # if(win==Nsize|step==Nsize){
-  #   wIndexList <- list(win)
-  #   names(wIndexList) <- paste0("window: 1 | start: ",1," | stop: ",Nsize)
-  # } else {
   wIndexList <- ts_windower(y = 1:Nsize, win = win, step = step, overlap = overlap, adjustY = NA)
-  #}
 
   func <- "mi_interlayer"
   weighted <- igraph::is.weighted(layers[[1]])
   directed <- igraph::is.directed(layers[[1]])
 
-  if(weightedBy%in%"AnisotropicCRQA"){
-    if(CRQA_vertexSequence%in%ls(getNamespace("igraph"))){
-      args <- formals(weightedByFunction)
-      addArgs <- ""
-      if("directed" %in% names(args)){
-        addArgs <- c(addArgs,",directed = directed")
-      }
-      if("weighted" %in% names(args)){
-        addArgs <- c(addArgs,",weighted = weighted")
-      }
-      func <- paste0("igraph::",weightedByFunction,"(layers[[l]]",addArgs,")")
-    } else {
-      stop("Value of weightedByFunction is not a function of package igraph.")
-    }
-  }
-
   if(directed){
-    mode <- "lower"
-    combis <- DescTools::CombPairs(seq_along(layers))
-    layers <- llply(layers, function(g) igraph::as.undirected(g))
-    # combis <- DescTools::CombPairs(seq_along(layers),seq_along(layers))
-    # mode <- "directed"
-    # if(cumulative){
-    #   mode <- "lower"
-    # }
+    #mode <- "lower"
+    combis <- getPairs(seq_along(layers))
+    layers <- plyr::llply(layers, function(g) igraph::as.undirected(g))
+    combis <- getPairs(seq_along(layers),seq_along(layers))
+    mode <- "directed"
+    if(cumulative){
+      mode <- "upper"
+    }
   } else {
-    combis <- DescTools::CombPairs(seq_along(layers))
+    combis <- getPairs(seq_along(layers))
     mode <- "upper"
   }
 
@@ -182,175 +148,33 @@ mrn <- function(layers,
     stop("Not implemented yet!")
   }
 
-
-
   cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
 
   return(list(interlayerMI  = out_mi,
               edgeOverlap   = out_eo,
-              meanValues    = out_means))
+              meanValues    = out_means,
+              Nsize         = Nsize))
 }
 
-#
-#
-#   if(!all(plyr::laply(layers,function(g) igraph::is.igraph(g)))){
-#     stop("All elements of the layers list have to be an igraph object!")
-#   }
-#
-#   if(!all(diff(plyr::laply(layers, function(g) igraph::vcount(g)))==0)){
-#     stop("In a Multiplex Recurrence Network, the layer networks must all have the same number of vertices!")
-#   }
-#   Nsize <- igraph::vcount(layers[[1]])
-#
-#   if(is.null(names(layers))){
-#     names(layers) <- paste0("layer",1:length(layers))
-#   }
-#
-#   doSave <- TRUE
-#   if(is.null(imageDir)){
-#     doSave <- FALSE
-#   }
-#
-#   if(is.na(imageDir)){
-#     imageDir <- getwd()
-#   } else {
-#     if(!dir.exists(normalizePath(imageDir))){
-#       stop(paste0("The directory '",imageDir,"' does not exist."))
-#     }
-#   }
-#
-#   if(is.na(win)){
-#     win <- Nsize
-#   }
-#   if(is.na(step)){
-#     step <- win
-#   }
-#
-#   # if(win==Nsize|step==Nsize){
-#   #   wIndexList <- list(win)
-#   #   names(wIndexList) <- paste0("window: 1 | start: ",1," | stop: ",Nsize)
-#   # } else {
-#   wIndexList <- ts_windower(y = 1:Nsize, win = win, step = step, overlap = overlap, adjustY = NA, alignment = alignment)
-#   #}
-#
-#   func <- "mi_interlayer"
-#   weighted <- igraph::is.weighted(layers[[1]])
-#   directed <- igraph::is.directed(layers[[1]])
-#   if(weightedBy%in%"CRQA_vertexSequence"){
-#     if(weightedByFunction%in%ls(getNamespace("igraph"))){
-#       args <- formals(weightedByFunction)
-#       addArgs <- ""
-#       if("directed" %in% names(args)){
-#         addArgs <- c(addArgs,",directed = directed")
-#       }
-#       if("weighted" %in% names(args)){
-#         addArgs <- c(addArgs,",weighted = weighted")
-#       }
-#       func <- paste0("igraph::",weightedByFunction,"(layers[[l]]",addArgs,")")
-#     } else {
-#       stop("Value of weightedByFunction is not a function of package igraph.")
-#     }
-#   }
-#
-#   if(directed){
-#     combis <- DescTools::CombPairs(seq_along(layers),seq_along(layers))
-#     mode <- "directed"
-#   } else {
-#     combis <- DescTools::CombPairs(seq_along(layers))
-#     mode <- "upper"
-#   }
-#
-#   if(func%in%"mi_interlayer"){
-#
-#     cat(paste("\nWelcome to the multiplex... examining layer similarity!\n\n"))
-#
-#     out_mr <- out_mi <- out_eo <- out_means <- list()
-#
-#     pb <- progress::progress_bar$new(total = length(wIndexList))
-#
-#     for(w in seq_along(wIndexList)){
-#
-#       mr <- mp <- eo <- matrix(nrow=length(layers), ncol=length(layers), dimnames = list(names(layers),names(layers)))
-#
-#       for(i in seq_along(combis$X1)){
-#
-#         edgeFrame1 <- igraph::as_data_frame(layers[[combis$X1[i]]],"edges")
-#         edgeFrame1 <- edgeFrame1 %>% filter(edgeFrame1$from%[]%range(wIndexList[[w]])&edgeFrame1$to%[]%range(wIndexList[[w]]))
-#         ga  <- graph_from_data_frame(edgeFrame1, directed = directed)
-#
-#         edgeFrame2 <- igraph::as_data_frame(layers[[combis$X2[i]]],"edges")
-#         edgeFrame2 <- edgeFrame2 %>% filter(edgeFrame2$from%[]%range(wIndexList[[w]])&edgeFrame2$to%[]%range(wIndexList[[w]]))
-#         gb  <- graph_from_data_frame(edgeFrame2, directed = directed)
-#
-#         mp[combis$X1[i],combis$X2[i]] <- mi_interlayer(ga,gb)
-#         eo[combis$X1[i],combis$X2[i]] <- igraph::ecount(ga %s% gb) / min(c(igraph::ecount(ga), igraph::ecount(gb)), na.rm = TRUE)
-#         mr[combis$X1[i],combis$X2[i]] <- stats::cor(x=degree(ga,v = 1:vcount(ga)),y=degree(gb,v = 1:vcount(gb)))
-#
-#         #igraph::ecount(layers[[combis$X1[i]]] %s% layers[[combis$X2[i]]]) / (igraph::ecount(layers[[combis$X1[i]]]) + igraph::ecount(layers[[combis$X2[i]]]))
-#       }
-#
-#       mi_ave   <- mean(mp[upper.tri(mp)&mp>0], na.rm = TRUE)
-#       mi_sd    <- stats::sd(mp[upper.tri(mp)&mp>0], na.rm = TRUE)
-#       mr_ave   <- mean(abs(mr[upper.tri(mr)&mr!=0]), na.rm = TRUE)
-#       mr_sd    <- stats::sd(abs(mr[upper.tri(mr)&mr!=0]), na.rm = TRUE)
-#       eo_ave   <- mean(eo[upper.tri(eo)&eo>0], na.rm = TRUE)
-#       eo_sd    <- stats::sd(eo[upper.tri(eo)&eo>0], na.rm = TRUE)
-#       eo_sum   <- sum(plyr::laply(layers, function(g) length(igraph::E(g))),na.rm = TRUE)
-#       eo_all   <- eval(parse(text = paste0("igraph::ecount(intersection(",paste0("layers[[",1:NROW(layers),"]]",collapse=","),"))")))
-#       eo_joint <- eo_all / eo_sum
-#
-#       out_mi[[w]] <- mp
-#       out_mr[[w]] <- mr
-#       out_eo[[w]] <- eo
-#       out_means[[w]] <- data.frame(mi_mean = mi_ave, mi_sd = mi_sd,
-#                                    mr_mean = mr_ave, mr_sd = mr_sd,
-#                                    eo_mean = eo_ave, eo_sd = eo_sd,
-#                                    eo_sum  = eo_sum, eo_all = eo_all, eo_joint = eo_joint)
-#
-#       pb$tick()
-#
-#     } # wIndex
-#
-#     names(out_mi)    <- names(wIndexList)
-#     names(out_mr)    <- names(wIndexList)
-#     names(out_eo)    <- names(wIndexList)
-#     names(out_means) <- names(wIndexList)
-#
-#     out <- list(interlayerMI  = out_mi,
-#                 interlayerCor = out_mr,
-#                 edgeOverlap   = out_eo,
-#                 meanValues    = out_means)
-#     attr(out,"time") <- attr(wIndexList,"time")
-#
-#     df_mv <- ldply(layers, function(l) data.frame(y1 = V(l)$y1, y2 = V(l)$y2))
-#     attr(out,"y_layers") <- df_mv
-#
-#   }
-#   return(out)
-#}
 
 
-
-#' Mutliplex Recurrence Network
+#' Mutliplex Recurrence Network Plot
 #'
-#' @description This function will create a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: *Layer similarity* (`MRNweightedBy` is set to `"InterLayerMI"` or `"EdgeOvelap"`) and *Layer importance* (`MRNweightedBy` is `"RankorderDC"`). The former generates weighted MRN based on Interlayer Mutual Information or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument `MRNrankedBy`.
+#' @description This function will plot a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. or based on the output of function [mrn()]. The layers must have the same number of nodes.
 #'
 #' @inheritParams make_spiral_graph
 #' @inheritParams plotNET_groupColour
-#' @param layers A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.
-#' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers), `"RankorderDC"` (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in `MRNrankedBy`). Choosing `"InterLayerMI"` or `"EdgeOverlap"` will decide which measure is displayed in the plot of the Multiplex RN, both measures will always be returned in the numerical output.
-#' @param windowedWeights If a windowed analysis is conducted and the edges of the graphs in `layers` have a weight property, there are a number of different ways to handle the weights depending on the value of `windowedWeights`: `"none"`, `"local"`, and `"cumulative"`. Value `"none"` will ignore the weights, `"local"` will limit the range of edges to those edges connecting the vertices contained within the window, `"cumulative"` will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = `none`)
-#' @param MRNrankedBy If `MRNweightedBy = "RankorderDC"`, then `MRNrankedBy` must be a valid [igraph] command that returns vertex properties, for example: `"degree"`, `"strength"`,`"hub_score"`,`"centr_degree"`, `"transitivity"`, `"betweenness"`. The appropriate measure type, e.g. for `"directed"`, or `"weighted"` graphs, will be inferred from the graph properties of the 1st graph object in the `layers` list. For best results with weighted measures, assign a value to `E(g)$weight` for each `g` in `layers`. (default = `"degree"`)
-#' @param win The window size passed to [casnet::ts_windower()] in which to evaluate `"InterLayerMI"` or `"EdgeOvelap"`. If `MRNweightedBy = "RankorderDC"`, it will be the size of the right aligned window in which Dynamic Complexity will be computed using [casnet::dc_win()] (default = `NA`)
-#' @param step The stepsize for the sliding window (default = `NA`)
-#' @param overlap The window overlap passed to [casnet::ts_windower()] if `MRNweightedBy` is `"InterLayerMI"` or `"EdgeOvelap"`. The value of `step` will be ignored if `overlap` is not `NA`. (default = `NA`).
+#' @inheritParams mrn
+#' @param MRN The output from function [mrn()]
+#' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers). Choosing `"InterLayerMI"` or `"EdgeOverlap"` will decide which measure is displayed in the plot of the Multiplex RN, both measures will always be returned in the numerical output.
 #' @param doPlot Plot the multiplex recurrence network (default = `TRUE`).
 #' @param doSave Save the plots.
 #' @param coords A data frame with layout coordinastes generated by calling any of the [igraph] layout functions. If `NA` a circle layout will; be generated (default = `NA`)
-#' @param RNnodes Should the vertices represent the RN of the layers? This is recommended only for a small numbers of vertices. (default = `FALSE``)
+#' @param RNnodes Should the vertices of the MRN represent a plot of the RN of the layers? This is recommended only for a small numbers of vertices. (default = `FALSE``)
+#' @param vertexSizeBy A valid [igraph] function that calculates node based measures, or a numeric constant. (default = `"degree"`)
 #' @param vertexColour A vector of colours for the vertices. If this is a named list, names will be displayed in the legend.
 #' @param showVertexLegend Show the vertex colour legend?
-#' @param createAnimation If `createAnimation = TRUE` *and* `doPlot = TRUE` *and* a windowed analysis is conducted, an animation will be produced using either package `gganimate` (if `useImageMagick = FALSE`) or `animation` (if `useImageMagick = FALSE`). The main difference is that `gganimate` has nice animation transition features, but plots the MRN using [ggplot2], which does not have great options for displaying the nodes as images. With package `animation` a sequence of [igraph] plots will be converted to an animation. If `doSave = TRUE` the animation will be saved in `imageDir` as an animated gif by calling either [gganimate::anim_save()], or [animation::saveGIF()] (default = `FALSE`)
+#' @param createAnimation If `createAnimation = TRUE` *and* `doPlot = TRUE` *and* a windowed analysis is conducted, an animation will be produced using either package `gganimate` (if `useImageMagick = FALSE`) or `animation` (if `useImageMagick = TRUE`). The main difference is that `gganimate` has nice animation transition features, but plots the MRN using [ggplot2], which does not have great options for displaying the nodes as images. With package `animation` a sequence of [igraph] plots will be converted to an animation. If `doSave = TRUE` the animation will be saved in `imageDir` as an animated gif by calling either [gganimate::anim_save()], or [animation::saveGIF()] (default = `FALSE`)
 #' @param useImageMagick Should [ImageMagick](https://imagemagick.org/index.php) be used to create the animation. **NOTE:** ImageMagick has to be installed on your system, see [animation::saveGIF()] (default = `FALSE`)
 #' @param loopAnimation Should the animation loop? (default = `TRUE`)`
 #' @param transitionLength Length of each transition in the animation, ignored if `useImageMagick = TRUE` (default = `3`)
@@ -367,20 +191,30 @@ mrn <- function(layers,
 #'
 #' @examples
 #'
+#' #' # Create some layers
+#' library(igraph)
 #'
-mrn_plot     <- function(layers,
-                         MRNweightedBy = c("InterlayerMI", "Edgeoverlap","RankDC")[1],
-                         MRNrankedBy = "degree",
-                         windowedWeights = c("none","local","cumulative")[1],
+#' layers <- list(g1 = igraph::sample_smallworld(1, 100, 5, 0.05),
+#' g2 = igraph::sample_smallworld(1, 100, 5, 0.5),
+#' g3 = igraph::sample_smallworld(1, 100, 5, 1))
+#'
+#' mrn_plot(layers = layers,showEdgeColourLegend=TRUE)
+#'
+mrn_plot     <- function(layers = NA,
+                         MRN = NA,
+                         MRNweightedBy = c("InterLayerMI", "EdgeOverlap")[1],
                          win = NA,
                          step = NA,
                          overlap = NA,
-                         doPlot = FALSE,
+                         alignment =  "r",
+                         cumulative = FALSE,
+                         doPlot = TRUE,
                          doSave = FALSE,
                          coords = NA,
                          RNnodes = FALSE,
+                         vertexSizeBy = "degree",
                          scaleVertexSize = c(.01,5),
-                         vertexColour = getColours(length(layers)),
+                         vertexColour = NA,
                          vertexBorderColour = "black",
                          showVertexLegend = TRUE,
                          showSizeLegend = FALSE,
@@ -388,7 +222,7 @@ mrn_plot     <- function(layers,
                          scaleEdgeSize = 1/5,
                          alphaE = .5,
                          showEdgeColourLegend = FALSE,
-                         curvature = -0.6,
+                         curvature = -0.2,
                          createAnimation = FALSE,
                          useImageMagick = FALSE,
                          loopAnimation = TRUE,
@@ -399,8 +233,6 @@ mrn_plot     <- function(layers,
                          noParts = TRUE,
                          imageDir = NA,
                          silent = TRUE){
-
-  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
 
   doSave <- TRUE
   if(is.null(imageDir)){
@@ -415,112 +247,131 @@ mrn_plot     <- function(layers,
     }
   }
 
+  if(is.na(MRN)){
+
+    if(missing(layers)){
+      stop("Need either a list of graphs (layers), or output from function mrn()!")
+    }
+
+    MRN <- mrn(layers = layers,
+               MRNweightedBy = MRNweightedBy,
+               win = win,
+               step = step,
+               overlap = overlap,
+               alignment =  alignment,
+               cumulative = cumulative,
+               doPlot = FALSE,
+               silent = silent)
+
+  } else {
+    if(all(names(MRN)%in%c("interlayerMI","edgeOverlap","meanValues","Nsize"))){
+      cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+      cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
+    } else {
+      stop("MRN is not an object output by function mrn()")
+    }
+  }
+
+  Nsize <- MRN$Nsize
+
   if(is.na(win)){
     win <- Nsize
   }
   if(is.na(step)){
-    step <- win
+    if(win==Nsize){
+      step <- 1
+    } else {
+      step <- win
+    }
+  }
+
+  if(missing(layers)){
+    vertexColour <- getColours(NCOL(MRN$interlayerMI[[1]]))
+    names(vertexColour) <- colnames(MRN$interlayerMI[[1]])
+  } else {
+    vertexColour <- getColours(length(layers))
+    names(vertexColour) <- names(layers)
   }
 
   wIndexList <- ts_windower(y = 1:Nsize, win = win, step = step, overlap = overlap, adjustY = NA)
 
   func <- "mi_interlayer"
-  weighted <- igraph::is.weighted(layers[[1]])
-  directed <- igraph::is.directed(layers[[1]])
-
-  if(weightedBy%in%"AnisotropicCRQA"){
-    if(CRQA_vertexSequence%in%ls(getNamespace("igraph"))){
-      args <- formals(weightedByFunction)
-      addArgs <- ""
-      if("directed" %in% names(args)){
-        addArgs <- c(addArgs,",directed = directed")
-      }
-      if("weighted" %in% names(args)){
-        addArgs <- c(addArgs,",weighted = weighted")
-      }
-      func <- paste0("igraph::",weightedByFunction,"(layers[[l]]",addArgs,")")
-    } else {
-      stop("Value of weightedByFunction is not a function of package igraph.")
-    }
-  }
-
-  if(directed){
-    combis <- DescTools::CombPairs(seq_along(layers),seq_along(layers))
-    mode <- "directed"
-  } else {
-    combis <- DescTools::CombPairs(seq_along(layers))
-    mode <- "upper"
-  }
 
   if(func%in%"mi_interlayer"){
 
-    cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
-
     if(doPlot){
 
-      gList <- MRN <- list()
+      gList <- MRNlist <- list()
 
       if(MRNweightedBy%in%"InterLayerMI"){
-        RN <- out_mi
+        MRNlist <- MRN$interlayerMI
       } else {
-        RN <- out_eo
+        MRNlist <-MRN$edgeOverlap
       }
 
       if(RNnodes){
-        gSpiro  <- plyr::llply(layers, function(g) {
-          gg <- make_spiral_graph(g                  = g,
-                                  arcs               = 4,
-                                  curvature          = curvature,
-                                  a                  = .1,
-                                  b                  = 1,
-                                  alphaE             = alphaE,
-                                  alphaV             = alphaV,
-                                  scaleVertexSize    = scaleVertexSize,
-                                  scaleEdgeSize      = scaleEdgeSize,
-                                  showEpochLegend    = FALSE,
-                                  epochColours       = getColours(Ncols = 20),
-                                  showSizeLegend     = FALSE,
-                                  defaultEdgeColour  = "grey80",
-                                  vertexBorderColour = "gray99",
-                                  edgeColourByEpoch  = TRUE,
-                                  doPlot             = FALSE)
-          gg <- gg + theme(
-            panel.background      = element_rect(fill = "transparent"),
-            plot.background       = element_rect(fill = "transparent", color = NA),
-            panel.grid.major      = element_blank(),
-            panel.grid.minor      = element_blank(),
-            legend.background     = element_rect(fill = "transparent"),
-            legend.box.background = element_rect(fill = "transparent")
-          )
-        })
+        checkPkg("png")
 
-        g_rast <- list()
-        if(useImageMagick){
-          bg <- "transparent"
-        } else {
-          bg <- "white"
-        }
-        for(f in seq_along(gSpiro)){
-          ggplot2::ggsave(gSpiro[[f]],
-                          filename = file.path(imageDir,paste0(names(gSpiro)[f],".png")),
-                          device = "png", width = 100, height = 100, units = "mm", bg = bg, dpi = gifRes)
-          g_rast[[f]] <- png::readPNG(file.path(imageDir,paste0(names(gSpiro)[f],".png")), native=TRUE) #magick::image_read(file.path(imageDir,paste0(names(gSpiro)[f],".png")))
+        if(!missing(layers)){
+          gSpiro  <- plyr::llply(layers, function(g) {
+            gg <- make_spiral_graph(g                  = g,
+                                    arcs               = 4,
+                                    curvature          = curvature,
+                                    a                  = .1,
+                                    b                  = 1,
+                                    alphaE             = alphaE,
+                                    alphaV             = alphaV,
+                                    scaleVertexSize    = scaleVertexSize,
+                                    scaleEdgeSize      = scaleEdgeSize,
+                                    showEpochLegend    = FALSE,
+                                    epochColours       = getColours(Ncols = 20),
+                                    showSizeLegend     = FALSE,
+                                    defaultEdgeColour  = "grey80",
+                                    vertexBorderColour = "gray99",
+                                    edgeColourByEpoch  = TRUE,
+                                    doPlot             = FALSE)
 
+            gg <- gg + ggimage::theme_transparent() +
+              theme(
+              panel.background      = element_rect(fill = "transparent"),
+              plot.background       = element_rect(fill = "transparent", color = NA),
+              panel.grid.major      = element_blank(),
+              panel.grid.minor      = element_blank(),
+              legend.background     = element_rect(fill = "transparent"),
+              legend.box.background = element_rect(fill = "transparent")
+            )
+          })
 
-        }
+          g_rast <- list()
+          if(useImageMagick){
+            bg <- "transparent"
+          } else {
+            bg <- "white"
+          }
+          for(f in seq_along(gSpiro)){
+            ggplot2::ggsave(gSpiro[[f]],
+                            filename = file.path(imageDir,paste0(names(gSpiro)[f],".png")),
+                            device = "png", width = 100, height = 100, units = "mm", bg = bg, dpi = gifRes)
+            if(useImageMagick){
+              g_rast[[f]] <- png::readPNG(file.path(imageDir,paste0(names(gSpiro)[f],".png")), native=TRUE)
+            } else {
+              g_rast[[f]] <- ggimage::image_read2(file.path(imageDir,paste0(names(gSpiro)[f],".png")))
+            }
+          }
+        } # RNnodes
+      } # missing
 
-      } # RNnodes
+      for(w in seq_along(MRNlist)){
 
-      for(w in seq_along(RN)){
-
-        mp_net <- graph_from_adjacency_matrix(adjmatrix = RN[[w]],
-                                              mode      = mode,
+        mp_net <- graph_from_adjacency_matrix(adjmatrix = MRNlist[[w]],
+                                              mode      = "upper",
                                               diag      = FALSE,
-                                              weighted  = weighted)
-        if(is.na(coord)){
+                                              weighted  = TRUE)
+
+        if(is.na(coords)){
           coord <- layout_in_circle(mp_net)
         } else {
-          coord <- coord
+          coord <- coords
         }
 
         if(RNnodes){
@@ -529,18 +380,27 @@ mrn_plot     <- function(layers,
           V(mp_net)$size    <- 10
           V(mp_net)$size2   <- 10
         } else {
-          V(mp_net)$size    <- 1
+          if(is.numeric(vertexSizeBy)){
+            V(mp_net)$size    <- vertexSizeBy
+          } else {
+            if(vertexSizeBy%in%lsf.str("package:igraph")){
+              V(mp_net)$size  <- eval(parse(text=paste(vertexSizeBy,"(mp_net)")))
+            } else {
+              V(mp_net)$size    <- 1
+            }
+          }
         }
 
-        V(mp_net)$name    <- names(layers)
-        E(mp_net)$width   <- elascer(E(mp_net)$weight,lo = 1,hi = 5)
-        E(mp_net)$color   <- scales::gradient_n_pal(colours = c("steelblue","grey99","red3"), values = c(0,.5,1))(elascer(E(mp_net)$weight))
-        V(mp_net)$label   <- V(mp_net)$name
-
+        V(mp_net)$name  <- names(layers)
+        V(mp_net)$label <- V(mp_net)$name
+        V(mp_net)$alpha <- alphaV
+        V(mp_net)$color <- vertexColour
         V(mp_net)$label.family <- "sans"
         V(mp_net)$label.font <- 2
         mp_net$layout <- coord
 
+        E(mp_net)$width   <- elascer(E(mp_net)$weight,lo = 1,hi = 5)
+        E(mp_net)$color   <- getColours(Ncols = c(3,7,4), continuous = TRUE, Dcols = c(0,.5,1))(E(mp_net)$width/5)
 
         if(useImageMagick){
 
@@ -548,14 +408,14 @@ mrn_plot     <- function(layers,
             plot(mp_net)
           }
 
-          MRN[[w]] <- mp_net
+          MRNlist[[w]] <- mp_net
 
         } else {
 
-          gNodes        <- as.data.frame(mp_net$layout,what = "nodes")
+          gNodes        <- as.data.frame(mp_net$layout,what = "vertices")
           gNodes$ID     <- as.numeric(igraph::V(mp_net))
           gNodes$name   <- V(mp_net)$name
-          gNodes$colour <- V(mp_net)$colour
+          gNodes$color  <- V(mp_net)$color
           gNodes$alpha  <- V(mp_net)$alpha
           gNodes$size   <- V(mp_net)$size
 
@@ -563,7 +423,7 @@ mrn_plot     <- function(layers,
             gNodes$image  <- paste0(file.path(imageDir,paste0(gNodes$name,".png")))
           }
 
-          gEdges        <- igraph::get.data.frame(mp_net)
+          gEdges        <- igraph::get.data.frame(mp_net,what = "edges")
           if(any(is.character(gEdges$from))){
             cName <- "name"
           } else {
@@ -574,40 +434,57 @@ mrn_plot     <- function(layers,
           gEdges$to.x   <- gNodes$V1[match(gEdges$to, gNodes[[cName]])]
           gEdges$to.y   <- gNodes$V2[match(gEdges$to, gNodes[[cName]])]
 
+          # scales::gr colour_gradient2(low = "steelblue",
+          #                        high     = "red3",
+          #                        mid      = "grey90",
+          #                        na.value = scales::muted("slategray4"),
+          #                        midpoint = median(gEdges$weight))
 
-          gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
-            geom_curve(data=gEdges, aes(x = from.x,
-                                        xend = to.x,
-                                        y = from.y,
-                                        yend = to.y,
-                                        colour = weight,
-                                        size = weight*scaleEdgeSize),
+          edgeCols        <- gEdges$color
+          gEdges$size     <- gEdges$weight * scaleEdgeSize
+          gEdges$weight   <- factor(round(gEdges$weight, digits = 4))
+          names(edgeCols) <- paste(gEdges$weight)
+
+
+
+          gg <- ggplot(gNodes,aes_(x=~V1, y=~V2)) +
+            geom_curve(data=gEdges, aes_(x = ~from.x,
+                                        xend = ~to.x,
+                                        y = ~from.y,
+                                        yend = ~to.y,
+                                        colour = ~weight,
+                                        size = ~size),
                        alpha = alphaE,
                        curvature = curvature)
 
           if(RNnodes){
             gg <- gg + ggimage::geom_image(aes(image=image), size = .2)
+
           } else {
-            gg <- gg + geom_point(aes(fill = vertexColour, size = size), pch=21, colour = vertexBorderColour, alpha = alphaV)
+            gg <- gg + geom_point(aes_(size = ~size, fill = ~name), pch=21, colour = vertexBorderColour, alpha = alphaV) +
+              scale_fill_manual("Layers", values = vertexColour)
           }
 
-          gg <- gg + scale_size(range = scaleVertexSize) +
-            scale_colour_gradient2(low      = "steelblue",
-                                   high     = "red3",
-                                   mid      = "white",
-                                   na.value = scales::muted("slategray4"),
-                                   midpoint = median(gEdges$weight)) +
-            labs(title = names(RN)[w]) +
+          gg <- gg +
+            scale_size_binned(range = scaleVertexSize) +
+            scale_colour_manual(paste("Weighted by",MRNweightedBy), values = edgeCols) +
+            labs(title = names(MRNlist)[w]) +
             coord_cartesian(clip="off") +
             theme_void() + theme(plot.margin = margin(50,50,50,50, unit = "pt"),
                                  legend.margin = margin(l = 20, unit = "pt"),
                                  plot.title = element_text(margin = margin(b=20)))
 
           if(showVertexLegend){
-            gg <- gg + guides(fill = guide_legend(title.position = "top",
-                                                  byrow = TRUE,
-                                                  nrow=2,
-                                                  override.aes = list(size=5, order = 0)))
+            if(RNnodes){
+
+              gg <- gg + geom_text(aes_(label=~name))
+
+             } else {
+               gg <- gg + guides(fill = guide_legend(title.position = "top",
+                                                     byrow = TRUE,
+                                                     nrow=2,
+                                                     override.aes = list(size=5,order = 0)))
+            }
           } else {
             gg <- gg + guides(fill = "none")
           }
@@ -634,7 +511,7 @@ mrn_plot     <- function(layers,
             plot(gg)
           }
 
-          MRN[[w]] <- gg
+          MRNlist[[w]] <- gg
           gList[[w]] <- list(gNodes = gNodes,
                              gEdges = gEdges)
 
@@ -642,56 +519,56 @@ mrn_plot     <- function(layers,
 
       } # w
 
-      names(MRN)   <- names(wIndexList)
-
-
       if(!createAnimation){
-        return(list(MRN           = MRN,
-                    interlayerMI  = out_mi,
-                    edgeOverlap   = out_eo,
-                    meanValues    = out_means))
+        return(list(MRN           = MRNlist,
+                    interlayerMI  = MRN$interlayerMI,
+                    edgeOverlap   = MRN$edgeOverlap,
+                    meanValues    = MRN$out_means))
       } else {
 
         if(useImageMagick){
 
-          animation::ani.options(interval = stateLength, imgdir = imageDir, loop = loopAnimation, nmax = length(MRN),
-                                 ani.width = gifWidth, ani.res = gifRes)
+          checkPkg("animation")
+
+          animation::ani.options(interval = stateLength, imgdir = imageDir, loop = loopAnimation, nmax = length(MRNlist), ani.width = gifWidth, ani.res = gifRes)
 
           if(doSave){
 
             animation::saveGIF(
-              for(i in seq_along(MRN)){
-                plot(MRN[[i]], xlab = names(MRN)[i])
+              for(i in seq_along(MRNlist)){
+                plot(MRNlist[[i]], xlab = names(MRNlist)[i])
                 animation::ani.pause()
-              }, img.name = paste0(names(MRN)[i]), movie.name = paste0("MRN_animation_win",win,"_step",step,".gif")
+              }, img.name = paste0(names(MRNlist)[i]), movie.name = paste0("MRN_animation_win",win,"_step",step,".gif")
             )
 
           } else {
-            for(i in seq_along(MRN)){
-              plot(MRN[[i]], xlab = names(MRN)[i])
+            for(i in seq_along(MRNlist)){
+              plot(MRNlist[[i]], xlab = names(MRNlist)[i])
               animation::ani.pause()
             }
           }
 
-          return(list(MRN           = MRN,
-                      interlayerMI  = out_mi,
-                      edgeOverlap   = out_eo,
-                      meanValues    = out_means))
+          return(list(MRN           = MRNlist,
+                      interlayerMI  = MRN$interlayerMI,
+                      edgeOverlap   =  MRN$edgeOverlap,
+                      meanValues    =  MRN$out_means))
 
         } else {
+
+          checkPkg("gganimate")
 
           names(gList) <- names(wIndexList)
 
           gNodes <- plyr::ldply(gList , function(g) g$gNodes)
           gEdges <- plyr::ldply(gList , function(g) g$gEdges)
 
-          gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
-            geom_curve(data=gEdges, aes(x = from.x,
-                                        xend = to.x,
-                                        y = from.y,
-                                        yend = to.y,
-                                        size = weight,
-                                        colour = weight), curvature = 0)
+          gg <- ggplot(gNodes, aes_(x = ~V1, y = ~V2)) +
+            geom_curve(data = gEdges, aes_(x = ~from.x,
+                                    xend = ~to.x,
+                                    y = ~from.y,
+                                    yend = ~to.y,
+                                    size = ~weight,
+                                    colour = ~weight), curvature = 0)
           if(RNnodes){
             gg <- gg + ggimage::geom_image(aes(image=image), size = .2)
           }
@@ -702,7 +579,7 @@ mrn_plot     <- function(layers,
                                    na.value = scales::muted("slategray4"),
                                    midpoint = mean(gEdges$weight)) +
             labs(caption = "{closest_state}") +
-            gganimate::transition_states(factor(.id),
+            gganimate::transition_states(factor(~.id),
                                          transition_length = transitionLength,
                                          state_length = stateLength, wrap = loopAnimation) +
             gganimate::enter_fade() +
@@ -720,14 +597,15 @@ mrn_plot     <- function(layers,
                                  animation = gg, path = file.path(imageDir))
           }
 
-          return(list(MRN              = MRN,
+          return(list(MRN              = MRNlist,
                       MRNanimationData = gList,
                       MRNanimationGG   = invisible(gg),
-                      interlayerMI  = out_mi,
-                      edgeOverlap   = out_eo,
-                      meanValues    = out_means))
+                      interlayerMI  =  MRN$interlayerMI,
+                      edgeOverlap   =  MRN$edgeOverlap,
+                      meanValues    =  MRN$out_means))
         }
       }
+
     } else { #doPlot
       return(MRN)
     }
@@ -735,318 +613,12 @@ mrn_plot     <- function(layers,
   } else {    # NOT mi_interlayer
 
     cat(paste("\nWelcome to the multiplex... in layer importance mode!\n\n"))
-
-    mr <- mr_rank <- matrix(ncol = length(layers),
-                            nrow = Nsize,
-                            dimnames = list(NULL, names(layers)))
-
-    for(l in seq_along(layers)){
-      mr[,l] <- eval(parse(text = func))
-    }
-    mr <- data.frame(mr)
-
-    for(i in 1:NROW(mr_rank)){
-      mr_rank[i,] <- as.numeric(rank(mr[i,]))
-    }
-
-    mr_rank           <- data.frame(mr_rank)
-    colnames(mr_rank) <- paste0(colnames(mr),"_rank")
-
-    mr_rankDC         <- dc_win(df = mr_rank,
-                                win = win,
-                                scale_min = min(mr_rank, na.rm = TRUE),
-                                scale_max = max(mr_rank, na.rm = TRUE))
-    mr_rankDC$meanDC    <- rowMeans(mr_rankDC)
-    mr_rankDC$sdDC      <- as.numeric(colwise(sd, na.rm = TRUE)(data.frame(t(mr_rankDC))))
-    colnames(mr_rankDC) <- c(paste0(colnames(mr),"_DC"),"mean_DC","sd_DC")
-
-    mr$sum       <- rowSums(mr[,1:length(layers)],na.rm = TRUE)
-    mr$mean      <- rowMeans(mr[,1:length(layers)], na.rm = TRUE)
-    mr$sd        <- as.numeric(colwise(sd, na.rm = TRUE)(data.frame(t(mr[,1:length(layers)]))))
-    colnames(mr) <- paste0(c(paste0(names(layers),"_"),"sum_","mean_","sd_"),MRNrankedBy)
-
-    out_rank <- cbind(time = 1:NROW(mr), mr, mr_rank, mr_rankDC)
-    attr(out_rank,"MRNrankedBy") <- MRNrankedBy
-
-    if(doPlot){
-
-      mr_rank$Time <- 1:NROW(mr_rank)
-      df_ranks <- tidyr::gather(mr_rank, key = "Layer", value = "Rank", -c("Time"))
-      df_ranks$Layer <- gsub("_rank","",df_ranks$Layer)
-
-      g1 <- ggplot2::ggplot(df_ranks, aes(x = Time, y = Rank)) +
-        geom_step(aes(colour = Layer)) +
-        facet_grid(Layer~.) +
-        scale_y_continuous(name = paste0(MRNrankedBy," (rank)"), expand = c(0,0)) +
-        scale_x_continuous(name = "Time", expand = c(0,0)) +
-        scale_colour_manual("Layer", values = getColours()) +
-        guides(colour = "none") +
-        theme_bw()
-
-      g2 <- plotDC_res(mr_rankDC[1:length(layers)],
-                       win=win,
-                       subtitle = paste0("Dynamic Complexity of rank order of ",MRNrankedBy),
-                       doPlot = FALSE)
-
-      tmp <- data.frame(Time = 1:NROW(mr_rankDC))
-      tmp$mean_DC  <- mr_rankDC$mean_DC
-      tmp$upper_CI <- mr_rankDC$mean_DC+(mr_rankDC$sd_DC/sqrt(length(layers)))*1.96
-      tmp$lower_CI <- mr_rankDC$mean_DC-(mr_rankDC$sd_DC/sqrt(length(layers)))*1.96
-      df_DC <- tidyr::gather(tmp, key = "Mean", value = "DC", -c("Time"))
-      df_DC$Mean <- gsub("_"," ",df_DC$Mean)
-      cols <- getColours()[c(3,6,4)]
-      names(cols) <- c("upper CI","mean DC","lower CI")
-
-      g3 <- ggplot2::ggplot(df_DC, aes(x=Time,y=DC)) +
-        geom_line(aes(colour = Mean)) +
-        scale_y_continuous(name = paste0("Mean DC of ",MRNrankedBy," (rank)"), expand = c(0,0)) +
-        scale_x_continuous(name = "Time", expand = c(0,0), limits = c(win,Nsize)) +
-        scale_colour_manual(name = "", values = cols) +
-        theme_bw()
-
-      top_row <- cowplot::plot_grid(g1,g2,greedy = FALSE,nrow = 1)
-      gs      <- cowplot::plot_grid(top_row,g3, ncol = 1)
-
-      return(list(plot = invisible(gs), rankData = out_rank))
-
-    } else {
-
-      return(out_rank)
-
-    } # doPlot
-
+    cat(paste("\n\nNOT IMPLEMENTED\n\n"))
   } # rankDC
   cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
 }
 
 
-
-
-
-# mrn_plot <- function(layers){
-#
-#
-#
-#   if(MRNweightedBy%in%"InterLayerMI"){
-#     RN <- out_mi
-#   } else {
-#     RN <- out_eo
-#   }
-#
-#   gSpiro  <- plyr::llply(layers, function(g) {
-#     gg <- make_spiral_graph(g                  = g,
-#                             arcs               = 4,
-#                             curvature          = -.3,
-#                             a                  = .1,
-#                             b                  = 1,
-#                             alphaE             = .2,
-#                             alphaV             = .7,
-#                             scaleVertexSize    = c(.1,5),
-#                             showEpochLegend    = FALSE,
-#                             epochColours       = getColours(Ncols = 20),
-#                             showSizeLegend     = FALSE,
-#                             defaultEdgeColour  = "grey80",
-#                             vertexBorderColour = "gray99",
-#                             edgeColourByEpoch  = TRUE,
-#                             doPlot             = FALSE)
-#     gg <- gg + theme(
-#       panel.background      = element_rect(fill = "transparent"),
-#       plot.background       = element_rect(fill = "transparent", color = NA),
-#       panel.grid.major      = element_blank(),
-#       panel.grid.minor      = element_blank(),
-#       legend.background     = element_rect(fill = "transparent"),
-#       legend.box.background = element_rect(fill = "transparent")
-#     )
-#   })
-#
-#   g_rast <- gList <- MRN <- list()
-#   if(useImageMagick){
-#     bg <- "transparent"
-#   } else {
-#     bg <- "white"
-#   }
-#   for(f in seq_along(gSpiro)){
-#     ggplot2::ggsave(gSpiro[[f]],
-#                     filename = file.path(imageDir,paste0(names(gSpiro)[f],".png")),
-#                     device = "png", width = 100, height = 100, units = "mm", bg = bg, dpi = gifRes)
-#     g_rast[[f]] <- png::readPNG(file.path(imageDir,paste0(names(gSpiro)[f],".png")), native=TRUE) #magick::image_read(file.path(imageDir,paste0(names(gSpiro)[f],".png")))
-#
-#
-#   }
-#
-#   for(w in seq_along(RN)){
-#
-#     mp_net <- graph_from_adjacency_matrix(adjmatrix = RN[[w]],
-#                                           mode      = mode,
-#                                           diag      = FALSE,
-#                                           weighted  = weighted)
-#     coord <- layout_in_circle(mp_net)
-#
-#     V(mp_net)$raster  <- g_rast
-#     V(mp_net)$name    <- names(gSpiro)
-#     E(mp_net)$width   <- elascer(E(mp_net)$weight,lo = 1,hi = 10)
-#     E(mp_net)$color   <- scales::gradient_n_pal(colours = c("steelblue","grey99","red3"), values = c(0,.5,1))(elascer(E(mp_net)$weight))
-#     V(mp_net)$shape   <- "raster"
-#     V(mp_net)$label   <- V(mp_net)$name
-#     V(mp_net)$size    <- 50
-#     V(mp_net)$size2   <- 50
-#     V(mp_net)$label.family <- "sans"
-#     V(mp_net)$label.font <- 2
-#     mp_net$layout <- coord
-#
-#
-#     if(useImageMagick){
-#
-#       if(!noParts){
-#         plot(mp_net)
-#       }
-#
-#       MRN[[w]] <- mp_net
-#
-#     } else {
-#
-#       gNodes        <- as.data.frame(mp_net$layout,what = "nodes")
-#       gNodes$ID     <- as.numeric(igraph::V(mp_net))
-#       gNodes$name   <- V(mp_net)$name
-#       gNodes$colour <- V(mp_net)$colour
-#       gNodes$alpha  <- V(mp_net)$alpha
-#       gNodes$image  <- paste0(file.path(imageDir,paste0(gNodes$name,".png")))
-#
-#       gEdges        <- igraph::get.data.frame(mp_net)
-#       if(any(is.character(gEdges$from))){
-#         cName <- "name"
-#       } else {
-#         cName <- "ID"
-#       }
-#       gEdges$from.x <- gNodes$V1[match(gEdges$from, gNodes[[cName]])]
-#       gEdges$from.y <- gNodes$V2[match(gEdges$from, gNodes[[cName]])]
-#       gEdges$to.x   <- gNodes$V1[match(gEdges$to, gNodes[[cName]])]
-#       gEdges$to.y   <- gNodes$V2[match(gEdges$to, gNodes[[cName]])]
-#
-#
-#       gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
-#         geom_curve(data=gEdges, aes(x = from.x,
-#                                     xend = to.x,
-#                                     y = from.y,
-#                                     yend = to.y,
-#                                     size = weight,
-#                                     colour = weight), curvature = 0) +
-#         ggimage::geom_image(aes(image=image), size = .2) +
-#         scale_size(range = c(.01,5)) +
-#         scale_colour_gradient2(low      = "steelblue",
-#                                high     = "red3",
-#                                mid      = "white",
-#                                na.value = scales::muted("slategray4"),
-#                                midpoint = median(gEdges$weight)) +
-#         labs(title = names(RN)[w]) +
-#         coord_cartesian(clip="off") +
-#         theme_void() + theme(plot.margin = margin(50,50,50,50, unit = "pt"),
-#                              legend.margin = margin(l = 20, unit = "pt"),
-#                              plot.title = element_text(margin = margin(b=20)))
-#
-#       if(!noParts){
-#         plot(gg)
-#       }
-#
-#       MRN[[w]] <- gg
-#       gList[[w]] <- list(gNodes = gNodes,
-#                          gEdges = gEdges)
-#
-#     } # useImageMagick
-#
-#   } # w
-#
-#   names(MRN)   <- names(wIndexList)
-#
-#
-#   if(!createAnimation){
-#     return(list(MRN           = MRN,
-#                 interlayerMI  = out_mi,
-#                 edgeOverlap   = out_eo,
-#                 meanValues    = out_means))
-#   } else {
-#
-#     if(useImageMagick){
-#
-#       animation::ani.options(interval = stateLength, imgdir = imageDir, loop = loopAnimation, nmax = length(MRN),
-#                              ani.width = gifWidth, ani.res = gifRes)
-#
-#       if(doSave){
-#
-#         animation::saveGIF(
-#           for(i in seq_along(MRN)){
-#             plot(MRN[[i]], xlab = names(MRN)[i])
-#             animation::ani.pause()
-#           }, img.name = paste0(names(MRN)[i]), movie.name = paste0("MRN_animation_win",win,"_step",step,".gif")
-#         )
-#
-#       } else {
-#         for(i in seq_along(MRN)){
-#           plot(MRN[[i]], xlab = names(MRN)[i])
-#           animation::ani.pause()
-#         }
-#       }
-#
-#       return(list(MRN           = MRN,
-#                   interlayerMI  = out_mi,
-#                   edgeOverlap   = out_eo,
-#                   meanValues    = out_means))
-#
-#     } else {
-#
-#       names(gList) <- names(wIndexList)
-#
-#       gNodes <- plyr::ldply(gList , function(g) g$gNodes)
-#       gEdges <- plyr::ldply(gList , function(g) g$gEdges)
-#
-#       gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
-#         geom_curve(data=gEdges, aes(x = from.x,
-#                                     xend = to.x,
-#                                     y = from.y,
-#                                     yend = to.y,
-#                                     size = weight,
-#                                     colour = weight), curvature = 0) +
-#         ggimage::geom_image(aes(image=image), size = .2) +
-#         scale_size(range = c(.01,5)) +
-#         scale_colour_gradient2(low      = "steelblue",
-#                                high     = "red3",
-#                                mid      = "grey99",
-#                                na.value = scales::muted("slategray4"),
-#                                midpoint = mean(gEdges$weight)) +
-#         labs(caption = "{closest_state}") +
-#         gganimate::transition_states(factor(.id),
-#                                      transition_length = transitionLength,
-#                                      state_length = stateLength, wrap = loopAnimation) +
-#         gganimate::enter_fade() +
-#         gganimate::exit_fade() +
-#         coord_cartesian(clip="off") +
-#         theme_void() + theme(plot.margin = margin(50,50,50,50, unit = "pt"),
-#                              legend.margin = margin(l = 20, unit = "pt"),
-#                              plot.title = element_text(margin = margin(b=20)))
-#
-#       plot(gg)
-#
-#       if(doSave){
-#         #if(file.exists())
-#         gganimate::anim_save(filename =  paste0("MRN_animation_win",win,"_step",step,".gif"),
-#                              animation = gg, path = file.path(imageDir))
-#       }
-#
-#       return(list(MRN              = MRN,
-#                   MRNanimationData = gList,
-#                   MRNanimationGG   = invisible(gg),
-#                   interlayerMI  = out_mi,
-#                   edgeOverlap   = out_eo,
-#                   meanValues    = out_means))
-#       } else { #doPlot
-#   return(list(interlayerMI  = out_mi,
-#               edgeOverlap   = out_eo,
-#               meanValues    = out_means))
-# }
-#
-#
-#
-# }
 
 #' Mutual Information Function
 #'
@@ -1124,6 +696,8 @@ mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), doPlot = FALSE
   if(NCOL(y)==3){miType <- "I(X;Y|Z)"}
   if(NCOL(y)> 3){miType <- "I(X;Y;Z;...;N)"}
   attr(mif_out,"miType") <- miType
+  attr(mif_out,"lags")   <- lags
+  attr(mif_out,"nbins")   <- nbins
 
   if(doPlot){
     plotRED_mif(mif.OUT = mif_out, lags = lags, nbins = nbins)

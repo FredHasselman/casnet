@@ -37,8 +37,8 @@ The values at the edges of the derivatives represent endpoint averages and shoul
 }
 \examples{
 
-# Get an interesting numeric vector from package DescTools
-y <- DescTools::Fibonacci(1:26)
+# Here's an interesting numeric vector
+y<-c(1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,17711,28657,46368)
 
 # Return the first order derivative as a vector
 ts_diff(y=y,addColumns=FALSE)
@@ -47,7 +47,7 @@ ts_diff(y=y,addColumns=FALSE)
 plot(stats::ts(ts_diff(y=y, addColumns=TRUE)))
 
 # Works on multivariate data objects with mixed variable types
-df <- data.frame(x=letters, y=1:26, z=sin(y))
+df <- data.frame(x=letters, y=1:26, z=sin(1:26))
 
 # Returns only derivatives of the numeric colunmns
 ts_diff(y=df,addColumns=FALSE)

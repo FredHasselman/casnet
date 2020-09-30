@@ -43,6 +43,7 @@ rp <- function(y1, y2 = NULL,
                emDim = 1,
                emLag = 1,
                emRad = NULL,
+               theiler = 0,
                to.ts = NULL,
                order.by = NULL,
                to.sparse = FALSE,
@@ -91,7 +92,7 @@ rp <- function(y1, y2 = NULL,
   et1 <- ts_embed(y1, emDim, emLag, silent = silent)
   et2 <- ts_embed(y2, emDim, emLag, silent = silent)
 
-  dist_method <- try_CATCH(proxy::pr_DB$get_entry(method))
+  dist_method <- return_error(proxy::pr_DB$get_entry(method))
   if("error"%in%class(dist_method$value)){
     stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
   } else {
@@ -124,15 +125,27 @@ rp <- function(y1, y2 = NULL,
   if(rescaleDist=="maxDist"){dmat <- dmat/max(dmat,na.rm = TRUE)}
   if(rescaleDist=="meanDist"){dmat <- (dmat-mean(dmat, na.rm=TRUE))/sd(dmat, na.rm = TRUE)}
 
+  if(is.na(theiler%00%NA)){
+    if(!is.null(attributes(dmat)$theiler)){
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(dmat)$theiler,"was already removed."))
+              #theiler <- attr(RM,"theiler")
+    }
+    theiler <- 0
+  } else {
+    if(theiler < 0){
+      theiler <- 0
+    }
+  }
+
 
   if(!is.null(emRad)){
     if(is.na(emRad)){
       emRad <- est_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue)$Radius
     }
     if(weighted){
-      dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse)
+      dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse, theiler = theiler)
     } else {
-      dmat <- di2bi(dmat, emRad = emRad, convMat = to.sparse)
+      dmat <- di2bi(dmat, emRad = emRad, convMat = to.sparse, theiler = theiler)
     }
   }
 
@@ -207,14 +220,14 @@ rp <- function(y1, y2 = NULL,
 #' @param VLmax Maximal vertical line length (default = length of diagonal -1)
 #' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
 #' @param AUTO Auto-recurrence? (default = `FALSE`)
-#' @param theiler = Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = `0`)
+#' @param theiler Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = `0`)
 #' @param chromatic Force chromatic RQA? (default = `FALSE`)
 #' @param matrices Return matrices? (default = `FALSE`)
 #' @param doHalf Analyse half of the matrix? (default = `FALSE`)
 #' @param Nboot How many bootstrap replications? (default = `NULL`)
 #' @param CL Confidence limit for bootstrap results (default = `.95`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR", tol = .2)` if `is.na(emRad)==TRUE`, it will estimate a radius (default = `.05`).
-#' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using [purrr::map2()] to assign data and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
+#' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
 #' @param silent Do not display any messages (default = `TRUE`)
 
 #' @return A list object containing (C)RQA measures (and matrices if requested)
@@ -247,6 +260,7 @@ rp_measures <- function(RM,
   # Input should be a distance matrix, or a matrix of zeroes and ones with emRad = NULL, output is a list
   # Fred Hasselman - August 2013
 
+
   #require(parallel)
 
   # check auto-recurrence and make sure Matrix has sparse triplet representation
@@ -254,6 +268,18 @@ rp_measures <- function(RM,
 
   if(is.null(AUTO)){
     AUTO <- attr(RM,"AUTO")
+  }
+
+  if(is.na(theiler%00%NA)){
+    if(!is.null(attributes(RM)$theiler)){
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
+      #theiler <- attr(RM,"theiler")
+    }
+    theiler <- 0
+  } else {
+    if(theiler < 0){
+      theiler <- 0
+    }
   }
 
   if(is.na(emRad)){
@@ -300,7 +326,7 @@ rp_measures <- function(RM,
   }
   #rm(RM)
 
-  suppressWarnings(out <- rp_calc(RM,
+  suppressMessages(out <- rp_calc(RM,
                                   emRad = emRad,
                                   DLmin = DLmin,
                                   VLmin = VLmin,
@@ -598,6 +624,7 @@ rp_diagProfile <- function(RM,
                            diagWin = NULL,
                            xname = "X-axis",
                            yname = "Y-axis",
+                           theiler = 0,
                            DLmin = 2,
                            VLmin = 2,
                            HLmin = 2,
@@ -627,6 +654,19 @@ rp_diagProfile <- function(RM,
   if(is.null(AUTO)){
     AUTO <- attr(RM,"AUTO")
   }
+
+  if(is.na(theiler%00%NA)){
+    if(!is.null(attributes(RM)$theiler)){
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
+      #theiler <- attr(RM,"theiler")
+    }
+    theiler <- 0
+  } else {
+    if(theiler < 0){
+      theiler <- 0
+    }
+  }
+
 
   if(is.numeric(diagWin)){
     if(diagWin>0){
@@ -819,7 +859,7 @@ rp_diagProfile <- function(RM,
 #' @param silent Do not display any messages (default = `TRUE`)
 #' @param surrogateTest Perform surrogate tests. If `TRUE`, will run surrogate tests using default settings for a two-sided test of \eqn{H_0: The data generating process is a rescaled linear Gaussian process} at \eqn{\alpha = .05} (arguments `ns = 39, fft = TRUE, amplitude = TRUE`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`. This is useful for windowed analysis, it will estimate a new radius for each window.
-#' @param useParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis using [purrr::map2()] to assign data and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
+#' @param useParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis and [parallel::detectCores()] with`logical = TRUE` to decide on the available cores (default = `FALSE`)
 #' @param ... Additional parameters (currently not used)
 #'
 #' @details The `rp` executable is installed when the function is called for the first time and is renamed to `rp`, from a platform specific filename downloaded from http://tocsy.pik-potsdam.de/commandline-rp.php or extracted from an archive located in the directory:
@@ -1044,7 +1084,7 @@ rp_cl            <- function(y1,
 
     cl       <- parallel::makeCluster(cores_available)
 
-    parallel::clusterEvalQ(cl, library(callr))
+   # parallel::clusterEvalQ(cl, library(callr))
     parallel::clusterEvalQ(cl,library(utils))
     parallel::clusterEvalQ(cl,library(plyr))
     parallel::clusterEvalQ(cl,library(tidyverse))
@@ -1354,10 +1394,10 @@ rp_cl_main <- function(data,
 
   system2(command = file.path(path_to_rp,getOption("casnet.rp_command")), args = opts)
 
-  measures     <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",measOUT)),header=TRUE))
-  rpMAT        <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",plotOUT)),header=TRUE))
-  disthistDiag <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",histOUTdiag)), header=FALSE, sep = " "))
-  disthistHori <- try_CATCH(utils::read.delim(normalizePath(gsub("[']+","",histOUThori)), header=FALSE, sep = " "))
+  measures     <- return_error(utils::read.delim(normalizePath(gsub("[']+","",measOUT)),header=TRUE))
+  rpMAT        <- return_error(utils::read.delim(normalizePath(gsub("[']+","",plotOUT)),header=TRUE))
+  disthistDiag <- return_error(utils::read.delim(normalizePath(gsub("[']+","",histOUTdiag)), header=FALSE, sep = " "))
+  disthistHori <- return_error(utils::read.delim(normalizePath(gsub("[']+","",histOUThori)), header=FALSE, sep = " "))
 
   if(all(is.null(measures$warning),is.data.frame(measures$value))){
     measures <- measures$value
@@ -1681,10 +1721,26 @@ rp_lineDist <- function(RM,
     if(length(d)==1){d <- -d:d}
     if(length(d)==2){d <-  d[1]:d[2]}
   }
-  if(!is.null(theiler)){
-    if(length(d)<length(-theiler:theiler)){warning("Ignoring theiler window...")}
-    RM <- bandReplace(RM,-theiler,theiler,0)
-  }
+
+
+  if(is.na(theiler%00%NA)){
+    if(!is.null(attributes(RM)$theiler)){
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
+      #theiler <- attr(RM,"theiler")
+    }
+    theiler <- 0
+  } else {
+    if(theiler < 0){
+      theiler <- 0
+    }
+    }
+
+    if(theiler>0){
+      if(length(d)<length(-theiler:theiler)){warning("Ignoring theiler window...")}
+      RM <- bandReplace(RM,-theiler,theiler,0)
+    }
+
+
 
   if(Matrix::isSymmetric(Matrix::unname(RM))){
     if(all(Matrix::diag(RM)==1)){
@@ -1884,12 +1940,6 @@ rp_plot <- function(RM,
 
   useGtable <- TRUE
 
-  # # check patchwork
-  # if(!length(find.package("patchwork",quiet = TRUE))>0){
-  #   warning("Package patchwork is not installed...\n1. Install Xcode from App Store (MacOS) or rwintools.exe from CRAN (Windows) \n2. Install patchwork: devtools::install_github('thomasp85/patchwork')\n3. Install casnet: devtools::install_github('FredHasselman/casnet')\n....Using gtable instead, with limited options\n")
-  #   useGtable=TRUE
-  # }
-
   colvec <- c("#FFFFFF","#000000")
   names(colvec) <- c("0","1")
 
@@ -1902,7 +1952,7 @@ rp_plot <- function(RM,
     RM     <- rp_checkfix(RM, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
     meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
   } else {
-    meltRP <- reshape2::melt(as.matrix(RM))
+    meltRP <-  mat2ind(as.matrix(RM))
   }
 
   hasNA <- FALSE
@@ -1911,7 +1961,7 @@ rp_plot <- function(RM,
     meltRP$value[is.na(meltRP$value)] <- max(meltRP$value, na.rm = TRUE) + 1
   }
 
-  # check unthresholded
+  # Unthresholded START ----
   showL <- FALSE
   if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)|attr(RM,"weighted")){
 
@@ -1925,11 +1975,10 @@ rp_plot <- function(RM,
       warning("Can't show epochs on an unthresholded Recurrence Plot!")
     }
 
-  } else {
+  } else { # unthresholded
 
     unthresholded <- FALSE
 
-    # Check epochs ----
     if(!is.null(markEpochsLOI)){
       if(is.factor(markEpochsLOI)&length(markEpochsLOI)==max(c(NROW(RM),NCOL(RM)))){
         start <- max(meltRP$value, na.rm = TRUE) + 1
@@ -1960,7 +2009,11 @@ rp_plot <- function(RM,
       meltRP$value <- factor(meltRP$value, levels = c(0,1), labels = c("0","1"))
     }
   }
+  ## Unthresholded END ##
 
+  ## Get CRP Measures START----
+
+  ## Get Radius
   if(is.na(radiusValue)){
     if(!is.null(attr(RM,"emRad"))|!is.na(attr(RM,"emRad"))){
       radiusValue <- attr(RM,"emRad")
@@ -1970,7 +2023,7 @@ rp_plot <- function(RM,
         attr(RM,"emRad") <- radiusValue
       }
     }
-  }
+  } # is.na(radiusvalue)
 
   # Get CRQA measures
   if(plotMeasures){
@@ -1986,15 +2039,19 @@ rp_plot <- function(RM,
     } else {
       rpOUT   <- rp_measures(RM, AUTO = AUTO)
     }
-  }
+  } # plotmeasures
 
-  #meltRP$value <- log(meltRP$value+.Machine$double.eps)
-  # main plot ----
+  ## Get CRP Measures END ##
+
+
+
+
+  # Main plot ----
   gRP <-  ggplot2::ggplot(ggplot2::aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
     ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL) +
     ggplot2::geom_abline(slope = 1,colour = "grey50", size = 1)
 
-  ## unthresholded ----
+  ## Unthresholded START ----
   if(unthresholded){
 
     # #barValue <- 0.05
@@ -2018,7 +2075,6 @@ rp_plot <- function(RM,
                                                 space    = "Lab",
                                                 name     = "")
 
-
     } else {
 
       gRP <- gRP + ggplot2::scale_fill_gradient2(low      = "red3",
@@ -2029,12 +2085,12 @@ rp_plot <- function(RM,
                                                  limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                                                  space    = "Lab",
                                                  name     = "")
+    } # Weighted
 
-    }
 
-    ## RadiusRRbar ----
+    ## RadiusRRbar START ----
     if(plotRadiusRRbar){
-      # Create a custom legend ---
+      # Create a custom legend
       distrange  <- round(seq(0,max(RM,na.rm = TRUE),length.out=7),2)
       resol      <- sort(unique(round(as.vector(RM),2)))
       if(length(resol)<7){
@@ -2044,24 +2100,18 @@ rp_plot <- function(RM,
         resol <- round(seq(0,max(RM,na.rm = TRUE),length.out=100),2)
       }
       resol <- resol %>% tibble::as_tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
-      #resol <- resol[-1,]
 
       distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){
         suppressWarnings(est_radius(RM,targetValue = t,silent = TRUE, maxIter = 100, radiusOnFail = "percentile"))
       })
-      #ldply(distrange[2:6],function(d) cbind(epsilon=d,RR=rp_measures(RM = RM, emRad = d)$RR))
-
 
       RecScale <- data.frame(RR=distrange$Measure,epsilon=distrange$Radius)
       RecScale <- RecScale %>%
         dplyr::add_row(epsilon=mean(c(0,distrange$Radius[1])),RR=mean(c(0,distrange$Measure[1])),.before = 1) %>%
         dplyr::add_row(epsilon=max(RM),RR=1)
 
-
       resol$y <- elascer(x = resol$y,lo = min(log(RecScale$RR),na.rm = TRUE), hi = max(log(RecScale$RR),na.rm = TRUE))
-      #resol$value <- log(resol$value)
       resol <- resol[-1,]
-
 
       if(!is.na(radiusValue)){
         barValue <- round(RecScale$RR[which(round(RecScale$epsilon,4)>=radiusValue)[1]],4)
@@ -2101,12 +2151,16 @@ rp_plot <- function(RM,
                        plot.margin = margin(0,5,0,5, unit = "pt"))
     }
 
-  } else { # unthresholded
-
-
-
   }
+  # else { # unthresholded
+  #
+  # warning("This is a binary matrix. Cannot plot the Radius vs. RR bar!")
+  #
+  # }
+  ##RadiusRRbar END##
 
+
+  ## Create Theme START ----
   rptheme <- ggplot2::theme_bw() + ggplot2::theme(panel.background = element_blank(),
                                                   panel.grid.minor  = element_blank(),
                                                   panel.border = element_rect("grey50",fill=NA),
@@ -2121,7 +2175,8 @@ rp_plot <- function(RM,
   } else {
     rptheme <- rptheme +  theme(panel.grid.major  = element_blank(),
                                 panel.ontop = FALSE)
-  }
+  } #drawGrid
+
 
   if(showL){
     rptheme <- rptheme +  theme(legend.position = c(1.1,1),
@@ -2135,7 +2190,6 @@ rp_plot <- function(RM,
                                axis.title.x =element_blank())
   }
 
-
   if(!is.null(markEpochsLOI)){
     if(!unthresholded){
       gRP <- gRP +  ggplot2::scale_fill_manual(name  = "Key:",
@@ -2145,10 +2199,6 @@ rp_plot <- function(RM,
                                                guide = "legend",
                                                limits = levels(meltRP$value))
     }
-    # theme(panel.ontop = TRUE,
-    #       legend.position = "top",
-    #       legend.background = element_rect(colour =  "grey50"))
-    #geom_line(data = Edata, aes_(x=~x,y=~y,colour = ~value), size = 2, show.legend = TRUE) +
 
   } else {
     if(!unthresholded){
@@ -2158,41 +2208,8 @@ rp_plot <- function(RM,
                                                na.value = scales::muted("slategray4"),
                                                guide = "none")
     }
-  }
+  } # markEpochsLOI
 
-  # if(!is.null(markEpochsGrid)){
-  #   if(is.list(markEpochsGrid)&length(markEpochsGrid)==2){
-  #
-  #     markEpochsGrid[[1]] <- factor(markEpochsGrid[[1]])
-  #     markEpochsGrid[[2]] <- factor(markEpochsGrid[[2]])
-  #
-  #     cpalV <- paletteer::paletteer_d(package = "rcartocolor",palette = "Safe", n = nlevels(markEpochsGrid[[1]]))
-  #     names(cpalV) <- levels(markEpochsGrid[[1]])
-  #
-  #     dataV <- data.frame(t= as.numeric_character(markEpochsGrid[[1]]), xb=markEpochsGrid[[1]],col=NA)
-  #     for(c in unique(dataV$t)){
-  #       dataV$col[dataV$t%in%c] <- cpalV[c]
-  #     }
-  #
-  #     cpalH <- paletteer::paletteer_d(package = "rcartocolor",palette = "Vivid", n = nlevels(markEpochsGrid[[2]]))
-  #     names(cpalH) <- levels(markEpochsGrid[[2]])
-  #
-  #     dataH <- data.frame(t= as.numeric_character(markEpochsGrid[[2]]), yb=markEpochsGrid[[2]],col=NA)
-  #     for(c in unique(dataV$t)){
-  #       dataH$col[dataH$t%in%c] <- cpalH[c]
-  #     }
-  #
-  #       gRP <- gRP +
-  #         #geom_vline(data = dataV, aes_(xintercept = diff(c((max(~t, na.rm = TRUE)+1),~xb)!=0)), colour = dataV$col) +
-  #         #geom_hline(data = dataH, aes_(yintercept = diff(c((max(~t, na.rm = TRUE)+1),~yb)!=0)), colour = dataH$col) +
-  #         ggplot2::geom_vline(data = dataV, aes(xintercept = diff(c((max(t)+1),t))!=0), colour = dataV$col) +
-  #         ggplot2::geom_hline(data = dataH, aes(yintercept = diff(c((max(t)+1),t))!=0), colour = dataH$col) +
-  #         ggplot2::theme(panel.ontop = TRUE)
-  #
-  #     } else {
-  #       warning("Variable passed to 'markEpochsGrid' is not a list, and/or is not of length 2.")
-  #     }
-  #   }
 
   if(plyr::is.discrete(meltRP$Var1)){
     gRP <- gRP + ggplot2::scale_x_discrete(breaks=meltRP$Var1,expand = c(0,0))
@@ -2338,9 +2355,7 @@ rp_plot <- function(RM,
     # ,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
   }
 
-  if(useGtable){
-
-    #gRP <- gRP #+ theme(panel.background = element_rect(colour="white"))
+    # Build Graph using gtable
 
     g <- ggplot2::ggplotGrob(gRP)
 
@@ -2356,7 +2371,6 @@ rp_plot <- function(RM,
     if(plotMeasures){
       grA <- ggplot2::ggplotGrob(gA)
     }
-
 
     if(plotDimensions&!plotMeasures&unthresholded&plotRadiusRRbar){
       mat <- matrix(list(gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
@@ -2418,12 +2432,6 @@ rp_plot <- function(RM,
       gt  <- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
     }
 
-    # gindex <- subset(g$layout, name == "layout")
-    # g <- gtable::gtable_add_cols(g, grid::unit(.5, "grobwidth", data = g),0)
-    # g <- gtable::gtable_add_grob(g, ggplot2::ggplotGrob(gA), t=gindex$t, l=1, b=gindex$b, r=gindex$l)
-    #rm(gindex)
-    #}
-
     if(nchar(title)>0){
       grT <- ggplot2::ggplot(data.frame(x=1,y=1)) +
         ggplot2::geom_text(ggplot2::aes_(x=~x,y=~y), label=title) +
@@ -2434,36 +2442,8 @@ rp_plot <- function(RM,
       gt  <- gtable::gtable_add_grob(x = gt, grobs = ggplot2::ggplotGrob(grT), name = "Title", t=1, l=l)
     }
 
-    #  gt <- gtable::gtable_add_col_space(gt,)
-
     g <- gtable::gtable_add_padding(gt, unit(5, "pt"))
 
-  }
-
-
-  # else {
-  #
-  #   if(plotDimensions){
-  #
-  #     if(unthresholded){
-  #       g <- (gy2 + gRP + gDist + gg_plotHolder() + gy1 + gg_plotHolder() +
-  #               patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,10,1), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
-  #
-  #     } else {
-  #
-  #       if(plotMeasures){
-  #         g <- (gy2 + gRP + gA + gg_plotHolder() + gy1 + gg_plotHolder() +
-  #                 patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
-  #       } else {
-  #         g <- (gy2 + gRP + gg_plotHolder() + gg_plotHolder() + gy1 + gg_plotHolder() +
-  #                 patchwork::plot_layout(nrow = 2, ncol = 3, widths = c(1,9,2), heights = c(10,1)) + patchwork::plot_annotation(title = title, caption = ifelse(AUTO,"Auto-recurrence plot","Cross-recurrence plot")))
-  #       }
-  #     }
-  #
-  #   } else {
-  #     g <- gRP
-  #   }
-  # } # use gtable
 
   if(!returnOnlyObject){
     if(useGtable){
@@ -2502,13 +2482,18 @@ rp_size <- function(mat, AUTO=NULL, theiler = NULL){
   if(is.null(AUTO)){
     AUTO <- Matrix::isSymmetric(Matrix::unname(mat))
   }
-  if(is.null(theiler)){
+  if(is.na(theiler%00%NA)){
     if(!is.null(attributes(mat)$theiler)){
-      theiler <- attr(mat,"theiler")
-    } else {
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
+      #theiler <- attr(RM,"theiler")
+    }
+    theiler <- 0
+  } else {
+    if(theiler < 0){
       theiler <- 0
     }
   }
+
   return(cumprod(dim(mat))[2] - ifelse((AUTO&theiler==0),length(Matrix::diag(mat)),
                                        ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
 }
@@ -2864,209 +2849,29 @@ rp_prep <- function(RP,
 }
 
 
+#' False Nearest Neighbours
+#'
+#' Search for FNN to get an optimal Embedding Dimension using by using [nonlinearTseries::findAllNeighbours()] in a loop.
+#'
+#' @inheritParams est_parameters
+#' @param radius Size of the neighbourhood: Every point smaller than the radius will be considered a near neighbour, see [nonlinearTseries::findAllNeighbours()] (default = `sd(y)/10`).
+#' @param number.boxes Integer representing number of boxes to to speed up neighbour search, if `NULL` an optimal number will be chosen [nonlinearTseries::findAllNeighbours()] (default = `NULL`).
+#'
+#' @return FNN curve
+#' @export
+#'
+fnn <- function(y, emLag = 1, maxDim = 10, radius = sd(y)/10, number.boxes = NULL){
 
+  out <- matrix(NA, nrow=maxDim, ncol = 1)
 
-# plotRM.crqa <- function(RM,
-#                         useLattice = FALSE,
-#                         plotVars   = NULL,
-#                         plotTime   = NULL,
-#                         plotMatrix = TRUE){
-#   require(scales)
-#
-#   # RP dimensions
-#   nr <- dim(RM)[1]
-#   nc <- dim(RM)[2]
-#
-#   # Do some checks
-#   plotVarsOK <- FALSE
-#   plotTimeOK <- FALSE
-#
-#   if(any(class(RM)=="xts"|class(RM)=="zoo")){
-#     if(!is.null(attr(RM,"emDims1"))){
-#       plotVarsOK <- TRUE
-#       plotTimeOK <- TRUE
-#       plotVars   <- list(attributes(RM)$emDims1,attributes(RM)$emDims2)
-#       matNAmes   <- c(attr(RM,"emDims1.name"),attr(RM,"emDims1.name"))
-#       AUTO       <- attr(RM,"AUTO")
-#       RM         <- unclass(RM)
-#     }
-#   } else {
-#
-#    AUTO <-  ifelse(isSymmetric(RM),TRUE,FALSE)
-#
-#     if(is.list(plotVars)){
-#       if(all(lengths(plotVars)==c(nr,nc))){
-#         yr <- plotVars[[1]]
-#         yc <- plotVars[[2]]
-#         plotVarsOK <- TRUE
-#         if(any(ncol(yr)>10,ncol(yc)>10)){
-#           yr <- yr[,1:10]
-#           yc <- yc[,1:10]
-#           warning("Detected more than 10 embedding dims, will plot 1-10.")}
-#       } else {warning("Expecting: length(plotVars[[1]]) == dims(RM)[1] & length(plotVars[[2]]) == dims(RM)[2]\nFound: nrows = ",paste(lengths(plotVars),collapse ="; cols = "))}
-#     } else {warning("plotVars not a list.\n Not plotting dimensions.")}
-#
-#     # Plot Time?
-#     if(!is.null(plotTime)){
-#       if(is.POSIXct(as_datetime(dimnames(RM)[[2]]))){
-#         plotTimeOK <- TRUE
-#       }
-#     }
-#   }
-#
-#   #   if(!is.list(plotTime)){
-#   #     if(nc!=nr){
-#   #       warning("Unequal rows and columns, expecting a list with 2 time variables.")
-#   #     } else {
-#   #       if(NROW(plotTime==nr)){
-#   #         plotTimeRow <- plotTimeCol <- plotTime
-#   #         plotTimeOK <- TRUE
-#   #       } else {
-#   #         warning("Time variable length should equal nrows(RM) & ncols(RM).")
-#   #       } # if rows are not equal to length
-#   #     } #if row and columns equal
-#   #   } else {
-#   #     if(all(lengths(plotTime)==c(nr,nc))){
-#   #       plotTimeOK <- TRUE
-#   #       plotTimeRow <- plotTime[[1]]
-#   #       plotTimeCol <- plotTime[[2]]
-#   #     } else {
-#   #       warning("Expecting: length(plotTime[[1]]) == dims(RM)[1] & length(plotTime[[2]]) == dims(RM)[2]\nFound: nrows = ",paste(lengths(plotTime),collapse ="; cols = "))
-#   #     }
-#   #   }
-#   #   if(plotTimeOK){
-#   #     if(is.POSIXt(plotTimeRow)&is.POSIXt(plotTimeCol)){
-#   #       plyr::amv_dimnames(RM) <-list(plotTimeRow, plotTimeCol)
-#   #     } else {
-#   #       warning("plotTime is not a POSIXct or POSIXlt object.")
-#   #     }
-#   #   }
-#   # }
-#
-#   # AUTO or CROSS?
-#   if(AUTO){
-#     RM   <- Matrix::t(RM)
-#   }
-#
-#   if(nc*nr>10^6){
-#     message(paste("\nLarge RM with",nc*nr,"elements... \n >> This could take some time to plot!\n"))
-#   }
-#
-#   if(useLattice){
-#     require(lattice)
-#     require(latticeExtra)
-#
-#     ifelse(AUTO,
-#            Titles <- list(main="Auto Recurrence Plot", X = expression(Y[t]), Y = expression(Y[t])),
-#            Titles <- list(main="Cross Recurrence Plot", X = expression(X[t]), Y = expression(Y[t]))
-#     )
-#
-#     #binned <- ftable(as.vector(RM))
-#     dimnames(RM) <- list(NULL,NULL)
-#
-#     #Thresholded or Distance matrix?
-#     ifelse((all(as.vector(RM)==0|as.vector(RM)==1)),
-#            distPallette <- grDevices::colorRampPalette(c("white", "black"))(2),
-#            distPallette <- grDevices::colorRampPalette(colors = c("red3", "snow", "steelblue"),
-#                                             space = "Lab",
-#                                             interpolate = "spline")
-#     )
-#
-#     lp <- levelplot(as.matrix(RM),
-#                     colorkey = !AUTO,
-#                     region = TRUE,
-#                     col.regions = distPallette,
-#                     useRaster = TRUE,
-#                     aspect = nc/nr,
-#                     main = Titles$main,
-#                     xlab = Titles$X,
-#                     ylab = Titles$Y)
-#
-#
-#     if(plotVarsOK){
-#       lp
-#     }
-#
-#     if(plotMatrix){
-#       lp
-#       #grid.arrange(lp, txt, ncol=2, nrow=1, widths=c(4, 1), heights=c(4))
-#     }
-#
-#     return(lp)
-#
-#   } else {
-#
-#     require(gridExtra)
-#     require(ggplot2)
-#     require(reshape2)
-#
-#     meltRP  <- reshape2::melt((RM))
-#
-#     if(!all(dplyr::between(meltRP$value[!is.na(meltRP$value)],0,1))){
-#       meltRP$value <- scales::rescale(meltRP$value)
-#     }
-#
-#   # #  if(plotTimeOK){
-#   #     #if( (year(last(paste0(meltRP$Var1)))- year(meltRP$Var1[1]))>=1){
-#   #       meltRP$Var1 <- parse_date_time(as.character(meltRP$Var1), c("ymd", "ymd HM", "ymd HMS"))
-#   #       meltRP$Var2 <- parse_date_time(as.character(meltRP$Var2), c("ymd", "ymd HM", "ymd HMS"))
-#   #     #}
-#   #  # } else {
-#   #     meltRP$Var1 <- index(meltRP$value)
-#   #     meltRP$Var2 <- index(meltRP$value)
-#   #   #}
-#
-#   ##  colnames(meltRP)[1:2] <- matNAmes
-#
-#     grp <- ggplot(data = meltRP, aes_(x = meltRP[,2],
-#                                      y = meltRP[,1],
-#                                      fill = value)) + geom_raster()
-#
-#     if(all(as.vector(RM)==0|as.vector(RM)==1)){
-#       grp <- grp + scale_fill_grey(name="Manhattan")
-#     } else {
-#       grp <- grp +  scale_fill_gradient2(low      = "red3",
-#                                          high     = "steelblue",
-#                                          mid      = "white",
-#                                          na.value = scales::muted("slategray4"),
-#                                          midpoint = .5,
-#                                          limit    = c(0,1),
-#                                          space    = "Lab",
-#                                          name     = "Manhattan")
-#     }
-#
-#     if(AUTO){
-#       grp <- grp + labs(title = "Auto-Recurrence Plot\n")
-#     } else {
-#       grp <- grp + labs("Cross-Recurrence Plot\n")
-#     }
-#
-#     # if(plotTime){
-#     grp <- grp +
-#       scale_x_discrete(limits = c(first(meltRP$Var1),last(meltRP$Var2))) + #breaks = meltRP$Var2[seq(1,nrow(meltRP),round(nrow(meltRP)/5))]) +
-#       scale_y_discrete(limits = c(first(meltRP$Var1),last(meltRP$Var2))) #breaks = meltRP$Var1[seq(1,nrow(meltRP),round(nrow(meltRP)/5))])
-#
-#     grp <- grp + theme_bw() +  coord_fixed()
-#
-#       # theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 8, hjust = 1),
-#       #       axis.text.y = element_text(size = 8)) +
-#       #
-#
-#     if(plotVarsOK){
-#       grp
-#     }
-#
-#
-#     if(plotMatrix){
-#       grp
-#       #grid.arrange(lp, txt, ncol=2, nrow=1, widths=c(4, 1), heights=c(4))
-#     }
-#
-#     return(grp)
-#   }
-#
-#   # } else {
-#   #   warning("\nInput is not list output from function crqa().\n")
-#   # }
-#
-# }
+  # for(emL in 1:length(emLag)){
+  for(emD in 1: maxDim){
+
+    yy <- nonlinearTseries::buildTakens(time.series = y, embedding.dim = emD, time.lag = emLag)
+    nn <- nonlinearTseries::findAllNeighbours(as.matrix(yy[,1:emD]), radius = radius, number.boxes = number.boxes)
+    out[emD,1] <- sum(lengths(nn))
+
+  }
+  # }
+  return(out)
+}

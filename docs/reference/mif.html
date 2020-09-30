@@ -212,7 +212,13 @@
 #&gt;       30 
 #&gt; 1.734763 
 #&gt; attr(,"miType")
-#&gt; [1] "I(X;X)"</div><div class='input'>
+#&gt; [1] "I(X;X)"
+#&gt; attr(,"lags")
+#&gt;  [1] -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4   5   6   7   8
+#&gt; [20]   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27
+#&gt; [39]  28  29  30
+#&gt; attr(,"nbins")
+#&gt; [1] 19</div><div class='input'>
 <span class='co'># Cross-mututal information, y2 is a lagged version y1</span>
 <span class='kw'>y2</span> <span class='op'>&lt;-</span> <span class='kw'>y1</span>[<span class='fl'>10</span><span class='op'>:</span><span class='fl'>801</span>]
 
@@ -231,41 +237,59 @@
 #&gt;       30 
 #&gt; 1.510893 
 #&gt; attr(,"miType")
-#&gt; [1] "I(X;Y)"</div><div class='input'>
+#&gt; [1] "I(X;Y)"
+#&gt; attr(,"lags")
+#&gt;  [1] -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4   5   6   7   8
+#&gt; [20]   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27
+#&gt; [39]  28  29  30
+#&gt; attr(,"nbins")
+#&gt; [1] 19</div><div class='input'>
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
 <span class='kw'>y</span><span class='op'>$</span><span class='kw'>s</span> <span class='op'>&lt;-</span> <span class='kw'>y2</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y2</span>))
 (<span class='fu'>mif</span>(<span class='kw'>y</span>,lags = <span class='kw'>lags</span>))
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.797108 1.713710 1.921446 1.810113 1.970283 1.987413 1.927730 2.069501 
+#&gt; 1.811587 1.741921 1.948223 1.829110 1.957668 1.976480 1.921872 2.029502 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.822566 1.878617 1.878617 1.878617 1.994880 1.950518 1.977648 1.978940 
+#&gt; 1.829539 1.841772 1.841772 1.841772 1.981870 1.912914 1.948178 1.984967 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 1.962697 1.791254 1.740091 1.706107 2.476214 1.794912 1.853147 1.872529 
+#&gt; 1.970052 1.750787 1.753466 1.704676 2.493827 1.824687 1.861592 1.861961 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.915484 1.907470 1.843760 1.831617 1.973862 1.977525 1.955104 2.105902 
+#&gt; 1.886727 1.858509 1.814226 1.845090 1.971008 1.931950 1.905939 2.072356 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 1.957366 1.962739 1.883271 1.860350 1.925634 1.760896 1.914528 1.852778 
+#&gt; 1.910819 1.917387 1.859806 1.876210 1.981597 1.798201 1.941952 1.860176 
 #&gt;       30 
-#&gt; 1.857997 
+#&gt; 1.875081 
 #&gt; attr(,"miType")
-#&gt; [1] "I(X;Y|Z)"</div><div class='input'>
+#&gt; [1] "I(X;Y|Z)"
+#&gt; attr(,"lags")
+#&gt;  [1] -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4   5   6   7   8
+#&gt; [20]   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27
+#&gt; [39]  28  29  30
+#&gt; attr(,"nbins")
+#&gt; [1] 19</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
 <span class='kw'>y</span><span class='op'>$</span><span class='kw'>y3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)))
 (<span class='fu'>mif</span>(<span class='kw'>y</span>,lags = <span class='kw'>lags</span>))
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 4.986357 4.988830 4.987553 4.991244 5.139406 5.137500 5.138411 5.126967 
+#&gt; 5.006500 4.997671 4.996383 4.993673 5.145355 5.145201 5.142589 5.143853 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.127818 5.127256 5.127256 5.127256 5.127849 5.130477 5.134928 5.139531 
+#&gt; 5.136581 5.140598 5.140598 5.140598 5.138365 5.138588 5.135591 5.138436 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.139578 4.987161 4.988794 4.988115 4.995444 4.998527 4.998112 5.004096 
+#&gt; 5.139578 4.993118 4.992993 4.995855 5.001424 5.002742 5.004107 5.002990 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 5.012627 5.139076 5.140042 5.141397 5.140654 5.139690 5.135012 5.136690 
+#&gt; 5.007960 5.146876 5.144283 5.156363 5.162795 5.167232 5.162590 5.156443 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.140962 5.147014 5.152398 5.155028 5.001190 5.006321 5.013096 5.012186 
+#&gt; 5.155346 5.156016 5.159608 5.165859 5.013842 5.013560 5.023969 5.023073 
 #&gt;       30 
-#&gt; 5.012045 
+#&gt; 5.024764 
 #&gt; attr(,"miType")
-#&gt; [1] "I(X;Y;Z;...;N)"</div><div class='input'>
+#&gt; [1] "I(X;Y;Z;...;N)"
+#&gt; attr(,"lags")
+#&gt;  [1] -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4   5   6   7   8
+#&gt; [20]   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27
+#&gt; [39]  28  29  30
+#&gt; attr(,"nbins")
+#&gt; [1] 19</div><div class='input'>
 
 </div></pre>
   </div>

@@ -145,8 +145,8 @@
 
     <pre class="usage"><span class='fu'>plotRED_mif</span>(
   mif.OUT = <span class='kw'>NULL</span>,
-  lags = <span class='fl'>0</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)<span class='op'>/</span><span class='fl'>4</span>), <span class='fl'>10</span>),
-  nbins = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span>(<span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)<span class='op'>^</span>(<span class='fl'>1</span><span class='op'>/</span><span class='fl'>3</span>)),
+  lags = <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='kw'>mif.OUT</span>, <span class='st'>"lags"</span>),
+  nbins = <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='kw'>mif.OUT</span>, <span class='st'>"nbins"</span>),
   surTest = <span class='fl'>FALSE</span>,
   alpha = <span class='fl'>0.05</span>,
   doPlot = <span class='fl'>TRUE</span>,

@@ -45,7 +45,7 @@ rp_measures(
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
-\item{theiler}{= Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
+\item{theiler}{Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
 
 \item{chromatic}{Force chromatic RQA? (default = \code{FALSE})}
 
@@ -59,7 +59,7 @@ rp_measures(
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR", tol = .2)} if \code{is.na(emRad)==TRUE}, it will estimate a radius (default = \code{.05}).}
 
-\item{doParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a seperate process/core for each window in windowed (C)RQA analysis using \code{\link[purrr:map2]{purrr::map2()}} to assign data and \code{\link[parallel:detectCores]{parallel::detectCores()}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
+\item{doParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a seperate process/core for each window in windowed (C)RQA analysis and \code{\link[parallel:detectCores]{parallel::detectCores()}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
 
 \item{silent}{Do not display any messages (default = \code{TRUE})}
 }

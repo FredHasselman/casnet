@@ -10,6 +10,7 @@ rp(
   emDim = 1,
   emLag = 1,
   emRad = NULL,
+  theiler = 0,
   to.ts = NULL,
   order.by = NULL,
   to.sparse = FALSE,

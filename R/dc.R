@@ -305,7 +305,7 @@ get_fluct <- function(y_win,s){
   signs <- sign(diff(y_win))
   signs <- c(signs,signs[length(signs)])
   dur   <- ts_duration(signs)
-  return(sum(abs(y_win[dur$t.end]-y_win[dur$t.start])/dur$duration.time, na.rm = TRUE)/(s*(win-1)))
+  return(sum(abs(y_win[dur$t.end]-y_win[dur$t.start])/dur$duration.time, na.rm = TRUE)/(s*(y_win-1)))
 }
 
 

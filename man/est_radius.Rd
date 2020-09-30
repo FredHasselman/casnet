@@ -11,6 +11,7 @@ est_radius(
   y2 = NULL,
   emLag = 1,
   emDim = 1,
+  method = "Euclidean",
   type = c("fixed", "optimal")[1],
   startRadius = NULL,
   eachRadius = 1,
@@ -18,7 +19,7 @@ est_radius(
   targetValue = 0.05,
   tol = 0.1,
   maxIter = 100,
-  theiler = -1,
+  theiler = 0,
   histIter = FALSE,
   noiseLevel = 0.75,
   noiseType = c("normal", "uniform")[1],
@@ -33,11 +34,13 @@ est_radius(
 
 \item{y1}{A numeric vector or time series}
 
-\item{y2}{A numeric vector or time series}
+\item{y2}{A numeric vector or time series for cross recurrence}
 
-\item{emLag}{Delay to use for embedding}
+\item{emLag}{The embedding lag}
 
-\item{emDim}{Number of embedding dimensions}
+\item{emDim}{The embedding dimensions}
+
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
 \item{type}{Either \code{"fixed"} (default) or \code{"optimal"}, \code{"fixed"} will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}, \code{"optimal"} will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.}
 

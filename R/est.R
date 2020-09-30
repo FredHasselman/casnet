@@ -9,11 +9,8 @@
 #' Find a fixed or optimal radius.
 #'
 #' @aliases crqa_radius
+#' @inheritParams rp
 #' @param RM Unthresholded Recurrence Matrix
-#' @param y1  A numeric vector or time series
-#' @param y2  A numeric vector or time series
-#' @param emLag Delay to use for embedding
-#' @param emDim Number of embedding dimensions
 #' @param type Either `"fixed"` (default) or `"optimal"`, `"fixed"` will search for a radius that is close to the value for the `targetMeasure` in `targetValue`, `"optimal"` will optimise the radius for the `targetMeasure`, `targetValue` is ignored.
 #' @param startRadius If `type = "fixed"` this is the starting value for the radius (default = percentile of unique distances in RM given by `targetValue`). If `type = "optimal"` this will be a range of radius values (in normalised SD units) that will be considered (default = `seq(0,2,by=.01)`)
 #' @param eachRadius If `type = "optimal"` this is the number of signal and noise series that will be generated for each level in `startRadius` (default = `1`)
@@ -40,6 +37,7 @@ est_radius <- function(RM = NULL,
                        y2 = NULL,
                        emLag = 1,
                        emDim = 1,
+                       method = "Euclidean",
                        type           = c("fixed","optimal")[1],
                        startRadius    = NULL,
                        eachRadius     = 1,
@@ -47,7 +45,7 @@ est_radius <- function(RM = NULL,
                        targetValue    = 0.05,
                        tol            = 0.1,
                        maxIter        = 100,
-                       theiler        = -1,
+                       theiler        = 0,
                        histIter       = FALSE,
                        noiseLevel     = 0.75,
                        noiseType      = c("normal","uniform")[1],
@@ -59,8 +57,9 @@ est_radius <- function(RM = NULL,
   optimOK <- FALSE
   if(is.null(RM)&!is.null(y1)){
     optimOK <- TRUE
-    RM <- rp(y1=y1, y2=y2,emDim=emDim, emLag=emLag)
+    RM <- rp(y1=y1, y2=y2,emDim=emDim, emLag=emLag, method = method)
   }
+
 
   # check auto-recurrence
   RM   <- rp_checkfix(RM, checkAUTO = TRUE)
@@ -68,7 +67,18 @@ est_radius <- function(RM = NULL,
 
   if(AUTO){
     if(!silent){cat(paste0("\nAuto-recurrence: Setting diagonal to (1 + max. distance) for analyses\n"))}
-    if(theiler < 0) theiler <- 0
+  }
+
+  if(is.na(theiler%00%NA)){
+    if(!is.null(attributes(RM)$theiler)){
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
+      #theiler <- attr(RM,"theiler")
+    }
+    theiler <- 0
+  } else {
+    if(theiler < 0){
+      theiler <- 0
+    }
   }
 
   if(is.null(startRadius)){
@@ -178,7 +188,7 @@ est_radius <- function(RM = NULL,
 
       startRadius <- rep(startRadius, each = eachRadius)
 
-      dfREC  <-  plyr::ldply(startRadius, function(r){roc_noise(y = y1,
+      dfREC  <-  plyr::ldply(startRadius, function(r){est_parameters_roc(y = y1,
                                                                 emDim = emDim,
                                                                 emLag = emLag,
                                                                 emRad = r,
@@ -380,7 +390,7 @@ est_parameters <- function(y,
                            nnThres  = 10,
                            theiler  = 0,
                            doPlot   = TRUE,
-                           silent   = TRUE,
+                           silent   = FALSE,
                            ...){
 
   if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
@@ -577,13 +587,8 @@ est_parameters <- function(y,
     dfMI <- data.frame(emDelay = as.numeric(names(tmi)),
                        ami     = as.numeric(tmi))
 
-
-    #  RColorBrewer::brewer.pal(n = length(unique(df$emLag) name = "Set2")
-
-    # use: alpha()
-
     Ncol <- length(emLags$selection.method[!is.na(emLags$lag)])
-    myPal <- RColorBrewer::brewer.pal(Ncol,"Set2")
+    myPal <- getColours(Ncol)
     myPalLag <- myPal
     names(myPalLag) <- emLags$selection.method[!is.na(emLags$lag)]
     myPalNn <- myPal
@@ -727,7 +732,7 @@ est_emLag <- function(y,
   cnt <- 0
   for(sm in selection.methods){
     cnt <- cnt + 1
-    lag <-try_CATCH(nonlinearTseries::timeLag(y,
+    lag <-return_error(nonlinearTseries::timeLag(y,
                                               technique = "ami",
                                               selection.method = sm,
                                               lag.max = maxLag,

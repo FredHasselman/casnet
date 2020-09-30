@@ -32,7 +32,7 @@
   toset <- !(names(op.casnet) %in% names(op))
   if(any(toset)) options(op.casnet[toset])
 
-  for(p in c("grDevices","graphics","ggtable","stats","utils","Matrix","plyr","dplyr","ggplot2","gganimate","ggimage","broom","invctr","igraph")){
+  for(p in c("grDevices","graphics","ggtable","stats","utils","Matrix","plyr","dplyr","tidyr","ggplot2","invctr","igraph")){
     requireNamespace(p, quietly = TRUE)
   }
   invisible()
@@ -163,7 +163,7 @@ set_command_line_rp <- function(){
 
   copyright_text <- c("Note that the platform specific `rp` command line executables were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at: http://tocsy.pik-potsdam.de/ \n\n The full copyright statement on the website is as follows: \n\n  > \u00A9 2004-2017 SOME RIGHTS RESERVED  \n  > University of Potsdam, Interdisciplinary Center for Dynamics of Complex Systems, Germany  \n  > Potsdam Institute for Climate Impact Research, Transdisciplinary Concepts and Methods, Germany  \n  > This work is licensed under a [Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Germany License](https://creativecommons.org/licenses/by-nc-nd/2.0/de/).  \n\n  More information about recurrence quantification analysis can be found on the [Recurrence Plot website](http://www.recurrence-plot.tk).")
 
-  dl_instruction <- c("Download failed!\nCopying failed!\n\nTo install do the following:\n1. Either go to https://github.com/FredHasselman/casnet/tree/master/inst and download and unzip 'commandline_rp.zip', or go to http://tocsy.pik-potsdam.de/commandline-rp.php \n2. Find the executable for your OS\n3. Copy it to the '/exec' directory under 'casnet' \n4. Rename to 'rp' or 'rp.exe' on Windows\n5. Put an empty text file in '/exec' with the following name 'rp_instal_log.txt' \n 6. Run this code to test if everything is ok: crqa_cl(rnorm(100))")
+  dl_instruction <- c("Download failed!\nCopying failed!\n\nTo install do the following:\n1. Go to http://tocsy.pik-potsdam.de/commandline-rp.php \n2. Find the executable for your OS\n3. Copy it to the '/exec' directory under 'casnet' \n4. Rename to 'rp' or 'rp.exe' on Windows\n5. Put an empty text file in '/exec' with the following name 'rp_instal_log.txt' \n 6. Run this code to test if everything is ok: rp_cl(rnorm(100))")
 
   os                <- get_os()
   casnet_OS_options <- set_os_options()
@@ -185,12 +185,12 @@ set_command_line_rp <- function(){
 
   TRYSYS <- FALSE
 
-  # Check if the zipfile can be unpacked
-  ZIP = FALSE
-  if(file.exists(system.file("commandline_crp","cl_crp.zip", package="casnet"))){
-    utils::unzip(system.file("commandline_crp","cl_crp.zip", package="casnet"),exdir=system.file("commandline_crp",package="casnet"))
-    ZIP = TRUE
-  }
+  # # Check if the zipfile can be unpacked
+  # ZIP = FALSE
+  # if(file.exists(system.file("commandline_crp","cl_crp.zip", package="casnet"))){
+  #   utils::unzip(system.file("commandline_crp","cl_crp.zip", package="casnet"),exdir=system.file("commandline_crp",package="casnet"))
+  #   ZIP = TRUE
+  # }
 
   # Get the file from internet
   LOG <- try(utils::download.file(url = URL, mode = "wb", cacheOK = FALSE, destfile = normalizePath(file.path(execPath,rp_command), mustWork = FALSE)))
@@ -203,20 +203,20 @@ set_command_line_rp <- function(){
     message(paste0("Detected: ",sys,"\n  Copied: ",URL," to ",rp_command," in ",execPath," as the commandline CRP executable"))
     rio::export(data.frame(url=c(URL,copyright_text)),normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
   } else {
-    if(ZIP){
-      message(paste0("Detected: ",sys, "\n  FAILED to Copy: ",URL," to ",rp_command," in ",execPath," as the commandline CRP executable \n Trying .zip file..."))
-      sysCommand <- c(syscopy,paste(normalizePath(paste0(sourcePath,"/commandline_rp/",sys,"/",exe)), normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)))
-
-      if(all(nchar(sysCommand)>0)){
-        #callr::rcmd(cmd = sysCommand[[1]], cmdargs = sysCommand[[2]], wd = sourcePath, show = TRUE)
-        system2(command = sysCommand[[1]], args = sysCommand[[2]])
-        #callr::rcmd(sysCommand[[3]], cmdargs = sysCommand[[4]], wd = sourcePath, show = TRUE)
-        system2(command = sysCommand[[3]], args = sysCommand[[4]])
-        utils::write.table(data.frame(sysCommand=c(paste(sysCommand[[1]], sysCommand[[2]]), paste(sysCommand[[3]], sysCommand[[4]]),copyright_text)), normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
-      }
-    } else {
+    # if(ZIP){
+    #   message(paste0("Detected: ",sys, "\n  FAILED to Copy: ",URL," to ",rp_command," in ",execPath," as the commandline CRP executable \n Trying .zip file..."))
+    #   sysCommand <- c(syscopy,paste(normalizePath(paste0(sourcePath,"/commandline_rp/",sys,"/",exe)), normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)),"chmod",paste("a+x ",normalizePath(paste0(execPath,"/",rp_command), mustWork = FALSE)))
+    #
+    #   if(all(nchar(sysCommand)>0)){
+    #     #callr::rcmd(cmd = sysCommand[[1]], cmdargs = sysCommand[[2]], wd = sourcePath, show = TRUE)
+    #     system2(command = sysCommand[[1]], args = sysCommand[[2]])
+    #     #callr::rcmd(sysCommand[[3]], cmdargs = sysCommand[[4]], wd = sourcePath, show = TRUE)
+    #     system2(command = sysCommand[[3]], args = sysCommand[[4]])
+    #     utils::write.table(data.frame(sysCommand=c(paste(sysCommand[[1]], sysCommand[[2]]), paste(sysCommand[[3]], sysCommand[[4]]),copyright_text)), normalizePath(paste0(execPath,"/rp_install_log.txt"), mustWork = FALSE))
+    #   }
+    # } else {
       message(dl_instruction)
-    }
+    #}
   }
 
   message(paste0("\n==================COPYRIGHT=NOTICE==================\n\n",copyright_text,"\n\n==================COPYRIGHT=NOTICE==================\n"))

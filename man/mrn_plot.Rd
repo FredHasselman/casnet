@@ -2,22 +2,24 @@
 % Please edit documentation in R/mrn.R
 \name{mrn_plot}
 \alias{mrn_plot}
-\title{Mutliplex Recurrence Network}
+\title{Mutliplex Recurrence Network Plot}
 \usage{
 mrn_plot(
-  layers,
-  MRNweightedBy = c("InterlayerMI", "Edgeoverlap", "RankDC")[1],
-  MRNrankedBy = "degree",
-  windowedWeights = c("none", "local", "cumulative")[1],
+  layers = NA,
+  MRN = NA,
+  MRNweightedBy = c("InterLayerMI", "EdgeOverlap")[1],
   win = NA,
   step = NA,
   overlap = NA,
-  doPlot = FALSE,
+  alignment = "r",
+  cumulative = FALSE,
+  doPlot = TRUE,
   doSave = FALSE,
   coords = NA,
   RNnodes = FALSE,
+  vertexSizeBy = "degree",
   scaleVertexSize = c(0.01, 5),
-  vertexColour = getColours(length(layers)),
+  vertexColour = NA,
   vertexBorderColour = "black",
   showVertexLegend = TRUE,
   showSizeLegend = FALSE,
@@ -25,7 +27,7 @@ mrn_plot(
   scaleEdgeSize = 1/5,
   alphaE = 0.5,
   showEdgeColourLegend = FALSE,
-  curvature = -0.6,
+  curvature = -0.2,
   createAnimation = FALSE,
   useImageMagick = FALSE,
   loopAnimation = TRUE,
@@ -41,17 +43,19 @@ mrn_plot(
 \arguments{
 \item{layers}{A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.}
 
-\item{MRNweightedBy}{The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: \code{"InterLayerMI"} (Mutual information based on similarity of the vertex degree across layers), \code{"EdgeOverlap"} (proportion of vertices sharing the same edges across layers), \code{"RankorderDC"} (Dynamic Complexity of the inter layer vertex rank order based on the vertex property/measure in \code{MRNrankedBy}). Choosing \code{"InterLayerMI"} or \code{"EdgeOverlap"} will decide which measure is displayed in the plot of the Multiplex RN, both measures will always be returned in the numerical output.}
+\item{MRN}{The output from function \code{\link[=mrn]{mrn()}}}
 
-\item{MRNrankedBy}{If \code{MRNweightedBy = "RankorderDC"}, then \code{MRNrankedBy} must be a valid \link{igraph} command that returns vertex properties, for example: \code{"degree"}, \code{"strength"},\code{"hub_score"},\code{"centr_degree"}, \code{"transitivity"}, \code{"betweenness"}. The appropriate measure type, e.g. for \code{"directed"}, or \code{"weighted"} graphs, will be inferred from the graph properties of the 1st graph object in the \code{layers} list. For best results with weighted measures, assign a value to \code{E(g)$weight} for each \code{g} in \code{layers}. (default = \code{"degree"})}
+\item{MRNweightedBy}{The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: \code{"InterLayerMI"} (Mutual information based on similarity of the vertex degree across layers), \code{"EdgeOverlap"} (proportion of vertices sharing the same edges across layers). Choosing \code{"InterLayerMI"} or \code{"EdgeOverlap"} will decide which measure is displayed in the plot of the Multiplex RN, both measures will always be returned in the numerical output.}
 
-\item{windowedWeights}{If a windowed analysis is conducted and the edges of the graphs in \code{layers} have a weight property, there are a number of different ways to handle the weights depending on the value of \code{windowedWeights}: \code{"none"}, \code{"local"}, and \code{"cumulative"}. Value \code{"none"} will ignore the weights, \code{"local"} will limit the range of edges to those edges connecting the vertices contained within the window, \code{"cumulative"} will consider all edges connecting to vertices in the current window, including edges from vertices connecting from previous windows. (default = \code{none})}
+\item{win}{The window size passed to \code{\link[=ts_windower]{ts_windower()}} in which to evaluate \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}. (default = \code{NA}).}
 
-\item{win}{The window size passed to \code{\link[=ts_windower]{ts_windower()}} in which to evaluate \code{"InterLayerMI"} or \code{"EdgeOvelap"}. If \code{MRNweightedBy = "RankorderDC"}, it will be the size of the right aligned window in which Dynamic Complexity will be computed using \code{\link[=dc_win]{dc_win()}} (default = \code{NA})}
-
-\item{step}{The stepsize for the sliding window (default = \code{NA})}
+\item{step}{The stepsize for the sliding window (default = \code{NA}).}
 
 \item{overlap}{The window overlap passed to \code{\link[=ts_windower]{ts_windower()}} if \code{MRNweightedBy} is \code{"InterLayerMI"} or \code{"EdgeOvelap"}. The value of \code{step} will be ignored if \code{overlap} is not \code{NA}. (default = \code{NA}).}
+
+\item{alignment}{Whether to right (\code{"r"}), center (\code{"c"}), or left (\code{"l"}) align the window.}
+
+\item{cumulative}{To make the network represent cumulative time, set \code{directed = TRUE} and \code{cumulative = TRUE}. This will set the upper triangle of the recurrence matrix to \code{0} and ensures that the network edges represent recurrenct values that have occurred in the \code{past} relative to the current opbserved value. If \code{directed = FALSE} the argument is ignored (default = \code{TRUE}).}
 
 \item{doPlot}{Plot the multiplex recurrence network (default = \code{TRUE}).}
 
@@ -59,7 +63,9 @@ mrn_plot(
 
 \item{coords}{A data frame with layout coordinastes generated by calling any of the \link{igraph} layout functions. If \code{NA} a circle layout will; be generated (default = \code{NA})}
 
-\item{RNnodes}{Should the vertices represent the RN of the layers? This is recommended only for a small numbers of vertices. (default = `FALSE``)}
+\item{RNnodes}{Should the vertices of the MRN represent a plot of the RN of the layers? This is recommended only for a small numbers of vertices. (default = `FALSE``)}
+
+\item{vertexSizeBy}{A valid \link{igraph} function that calculates node based measures, or a numeric constant. (default = \code{"degree"})}
 
 \item{scaleVertexSize}{Scale the size of the vertices by setting a range for \code{\link[ggplot2:scale_size]{ggplot2::scale_size()}}. This will not affect the numbers on the size legend (default = \code{c(1,6)})}
 
@@ -81,7 +87,7 @@ mrn_plot(
 
 \item{curvature}{The \code{curvature} parameter for edges see \code{\link[=geom_curve]{geom_curve()}} (default = \code{-0.7})}
 
-\item{createAnimation}{If \code{createAnimation = TRUE} \emph{and} \code{doPlot = TRUE} \emph{and} a windowed analysis is conducted, an animation will be produced using either package \code{gganimate} (if \code{useImageMagick = FALSE}) or \code{animation} (if \code{useImageMagick = FALSE}). The main difference is that \code{gganimate} has nice animation transition features, but plots the MRN using \link{ggplot2}, which does not have great options for displaying the nodes as images. With package \code{animation} a sequence of \link{igraph} plots will be converted to an animation. If \code{doSave = TRUE} the animation will be saved in \code{imageDir} as an animated gif by calling either \code{\link[gganimate:anim_save]{gganimate::anim_save()}}, or \code{\link[animation:saveGIF]{animation::saveGIF()}} (default = \code{FALSE})}
+\item{createAnimation}{If \code{createAnimation = TRUE} \emph{and} \code{doPlot = TRUE} \emph{and} a windowed analysis is conducted, an animation will be produced using either package \code{gganimate} (if \code{useImageMagick = FALSE}) or \code{animation} (if \code{useImageMagick = TRUE}). The main difference is that \code{gganimate} has nice animation transition features, but plots the MRN using \link{ggplot2}, which does not have great options for displaying the nodes as images. With package \code{animation} a sequence of \link{igraph} plots will be converted to an animation. If \code{doSave = TRUE} the animation will be saved in \code{imageDir} as an animated gif by calling either \code{\link[gganimate:anim_save]{gganimate::anim_save()}}, or \code{\link[animation:saveGIF]{animation::saveGIF()}} (default = \code{FALSE})}
 
 \item{useImageMagick}{Should \href{https://imagemagick.org/index.php}{ImageMagick} be used to create the animation. \strong{NOTE:} ImageMagick has to be installed on your system, see \code{\link[animation:saveGIF]{animation::saveGIF()}} (default = \code{FALSE})}
 
@@ -105,9 +111,17 @@ mrn_plot(
 A matrix with edge weights between layers that represent the measure \code{MRNweightedBy}.
 }
 \description{
-This function will create a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{MRNweightedBy} is set to \code{"InterLayerMI"} or \code{"EdgeOvelap"}) and \emph{Layer importance} (\code{MRNweightedBy} is \code{"RankorderDC"}). The former generates weighted MRN based on Interlayer Mutual Information or Edge Overlap, the latter examines the relative importance of each layer by assigning a rank to each vertex (time point), based on a vertex measure passed in argument \code{MRNrankedBy}.
+This function will plot a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. or based on the output of function \code{\link[=mrn]{mrn()}}. The layers must have the same number of nodes.
 }
 \examples{
 
+#' # Create some layers
+library(igraph)
+
+layers <- list(g1 = igraph::sample_smallworld(1, 100, 5, 0.05),
+g2 = igraph::sample_smallworld(1, 100, 5, 0.5),
+g3 = igraph::sample_smallworld(1, 100, 5, 1))
+
+mrn_plot(layers = layers,showEdgeColourLegend=TRUE)
 
 }

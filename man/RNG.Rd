@@ -24,4 +24,4 @@ A dataset containing sequences of 100 numbers generated bij 242 participants who
 \references{
 Oomens, W., Maes, J. H., Hasselman, F., & Egger, J. I. (2015). A time series approach to random number generation: using recurrence quantification analysis to capture executive behavior. Frontiers in human neuroscience, 9
 }
-\keyword{datasets}
+\keyword{data}
