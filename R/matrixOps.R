@@ -26,11 +26,27 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
     convMat <- TRUE
   }
 
-  if(!is.null(theiler)&theiler>0){
-    if(length(diag(distmat))<length(-theiler:theiler)){warning("Ignoring theiler window...")}
-    distmat <- bandReplace(distmat,-theiler,theiler,0)
-    attr(distmat,"theiler") <- theiler
+  if(is.na(theiler%00%NA)){
+    if(!is.null(attributes(distmat)$theiler)){
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(distmat)$theiler,"was already removed."))
+      #theiler <- attr(RM,"theiler")
+    }
+    theiler <- 0
+  } else {
+    if(theiler < 0){
+      theiler <- 0
+    } else {
+      if(length(diag(distmat))<length(-theiler:theiler)){
+        message("Ignoring theiler window larger than matrix...")
+        theiler <- 0
+      } else {
+        attr(distmat,"theiler") <- theiler
+      }
+    }
   }
+
+  distmat <- bandReplace(distmat,-theiler,theiler,0)
+
 
   # RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   # RP[as.matrix(distmat <= emRad)] <- 1
@@ -84,11 +100,26 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
     convMat <- TRUE
   }
 
-  if(!is.null(theiler)&theiler>0){
-    if(length(diag(distmat))<length(-theiler:theiler)){warning("Ignoring theiler window...")}
-    distmat <- bandReplace(distmat,-theiler,theiler,0)
-    attr(distmat,"theiler") <- theiler
+  if(is.na(theiler%00%NA)){
+    if(!is.null(attributes(distmat)$theiler)){
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(distmat)$theiler,"was already removed."))
+      #theiler <- attr(RM,"theiler")
+    }
+    theiler <- 0
+  } else {
+    if(theiler <= 0){
+      theiler <- 0
+    } else {
+      if(length(diag(distmat))<length(-theiler:theiler)){
+        message("Ignoring theiler window larger than matrix...")
+        theiler <- 0
+      } else {
+        attr(distmat,"theiler") <- theiler
+      }
+    }
   }
+
+  distmat <- bandReplace(distmat,-theiler,theiler,0)
 
   # RP <- NetComp::matrix_threshold(distmat,threshold = emRad, minval = 1, maxval = 0)
   if(emRad==0) emRad <- .Machine$double.eps
@@ -220,6 +251,7 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
   if(upper<0){upper=abs(upper)
   warning("upper > 0 ...\n using: abs(upper)")
   }
+
   if(all(lower==0,upper==0)){
     #diag(mat) <- value
     if(!silent){message(paste0("lower and upper are both 0 (no band, just diagonal)\n using: diag(mat) <- ",round(value,4),"..."))}

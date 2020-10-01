@@ -18,11 +18,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="A Toolbox for Studying Complex Adaptive Systems and NETworks">
-<meta property="og:description" content="A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
-    - Recurrence Quantification Analyses (CrossRQA, Categorical RQA, Chromatic RQA, Anisotropic RQA).
-    - Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum).
-    - Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA).
-    - Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks, Multiplex Networks).">
+<meta property="og:description" content="A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:    
+    - (Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA)    
+    - Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)    
+    - Network based time series analyses and visualisation (Recurrence Networks, spiral graphs)    
+    - Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks)    ">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -96,11 +96,11 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="disclaimer-very-beta" class="section level1">
+<div id="disclaimer" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#disclaimer-very-beta" class="anchor"></a>Disclaimer: <strong>VERY BETA</strong>
-</h1></div>
-
+<a href="#disclaimer" class="anchor"></a>Disclaimer:</h1></div>
+<p><strong>Still EXPERIMENTAL after all these years…</strong></p>
+<p><a href="https://travis-ci.org/FredHasselman/casnet"><img src="https://travis-ci.org/FredHasselman/casnet.svg?branch=master" alt="Travis-CI Build Status"></a> <a href="https://ci.appveyor.com/project/FredHasselman/casnet"><img src="https://ci.appveyor.com/api/projects/status/github/FredHasselman/casnet?branch=master&amp;svg=true" alt="AppVeyor build status"></a> <a href="https://cran.r-project.org/package=casnet"><img src="https://www.r-pkg.org/badges/version/casnet" alt="CRAN status"></a> <a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="lifecycle"></a></p>
 </div>
 <div id="casnet-an-r-toolbox-for-studying-complex-adaptive-systems-and-networks-" class="section level1">
 <h1 class="hasAnchor">
@@ -108,30 +108,30 @@
 </h1>
 <p>A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:</p>
 <ul>
-<li>Recurrence Quantification Analyses (CrossRQA, Categorical RQA, Chromatic RQA, Anisotropic RQA)</li>
-<li>Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)</li>
-<li>Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA)</li>
-<li>Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks)</li>
-<li>SOON: Multiplex Recurrence Networks</li>
+<li>(Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA)</li>
+<li>Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)</li>
+<li>Network based time series analyses and visualisation (Recurrence Networks, spiral graphs)</li>
+<li>Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks)</li>
 </ul>
 <div id="installing-casnet" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installing-casnet" class="anchor"></a>Installing <strong>casnet</strong>
 </h2>
-<p>Either use <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github</a></code> or download the tar/zip</p>
-<div id="use-devtools" class="section level3">
-<h3 class="hasAnchor">
-<a href="#use-devtools" class="anchor"></a>Use <code>devtools</code>
-</h3>
-<p>Install directly from Github and check if the vignettes were installed.</p>
-<pre><code><a href="https://devtools.r-lib.org">library(devtools)
-install_github("FredHasselman/casnet", build_vignettes = TRUE)
-vignette("cl_RQA")</a></code></pre>
+<p>As soon as it is published on CRAN, install the latest stable release of casnet using <code><a href="https://rdrr.io/r/utils/install.packages.html">utils::install.packages(casnet, dependencies = TRUE)</a></code>.</p>
 </div>
+<div id="development-version" class="section level2">
+<h2 class="hasAnchor">
+<a href="#development-version" class="anchor"></a>Development version</h2>
+<p>Either use <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github</a></code> or <code><a href="https://remotes.r-lib.org/reference/install_github.html">remotes::install_github</a></code></p>
+<pre><code><a href="https://devtools.r-lib.org">library(devtools)
+install_github("FredHasselman/casnet")
+
+library(remotes)
+install_github("FredHasselman/casnet")</a></code></pre>
 <div id="vignette-build-failing" class="section level3">
 <h3 class="hasAnchor">
 <a href="#vignette-build-failing" class="anchor"></a>Vignette build failing?</h3>
-<p>If building the vignettes fails on installation, just omit the argument and locate the vignettes in the <code>inst/docs/</code> folder of the repository.</p>
+<p>If building the vignettes fails on installation (using <code>build_vignettes = TRUE</code>), just omit the argument and find them at online as <a href="https://fredhasselman.com/casnet/">Articles</a> or locate the vignettes in the <code>inst/docs/</code> folder of the repository.</p>
 </div>
 </div>
 </div>
@@ -170,16 +170,7 @@ vignette("cl_RQA")</a></code></pre>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://travis-ci.org/FredHasselman/casnet"><img src="https://travis-ci.org/FredHasselman/casnet.svg?branch=master" alt="Travis-CI Build Status"></a></li>
-<li><a href="https://ci.appveyor.com/project/FredHasselman/casnet"><img src="https://ci.appveyor.com/api/projects/status/github/FredHasselman/casnet?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
-<li><a href="https://cran.r-project.org/package=casnet"><img src="https://www.r-pkg.org/badges/version/casnet" alt="CRAN status"></a></li>
-<li><a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="lifecycle"></a></li>
-</ul>
-</div>
-</div>
+  </div>
 </div>
 
 

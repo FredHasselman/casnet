@@ -45,7 +45,7 @@ est_radius <- function(RM = NULL,
                        targetValue    = 0.05,
                        tol            = 0.1,
                        maxIter        = 100,
-                       theiler        = 0,
+                       theiler        = NULL,
                        histIter       = FALSE,
                        noiseLevel     = 0.75,
                        noiseType      = c("normal","uniform")[1],
@@ -71,8 +71,9 @@ est_radius <- function(RM = NULL,
 
   if(is.na(theiler%00%NA)){
     if(!is.null(attributes(RM)$theiler)){
-      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
-      #theiler <- attr(RM,"theiler")
+      if(attributes(RM)$theiler>0){
+        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
+      }
     }
     theiler <- 0
   } else {
@@ -89,11 +90,11 @@ est_radius <- function(RM = NULL,
     }
   }
 
-  recmatsize <- rp_size(RM,AUTO,theiler)
+  rp.size <- rp_size(RM,AUTO,theiler)
 
-  if(theiler>=0){
-    RM <- bandReplace(RM,-theiler,theiler,1+max(RM),silent = silent)
-  }
+  # if(theiler>0){
+  #   RM <- bandReplace(RM,-theiler,theiler,1+max(RM),silent = silent)
+  # }
 
   if(type%in%"fixed"){
 
@@ -104,6 +105,8 @@ est_radius <- function(RM = NULL,
     iter      <- 0
     Converged <- FALSE
     seqIter   <- 1:maxIter
+    stopRadius <- NA
+    RP_N <- NA
 
     iterList <- data.frame(iter        = seqIter,
                            Measure     = Measure,
@@ -112,7 +115,9 @@ est_radius <- function(RM = NULL,
                            tollo       = targetValue*(1-tol),
                            tolhi       = targetValue*(tol+1),
                            startRadius = startRadius,
-                           rp.size = recmatsize,
+                           stopRadius  = stopRadius,
+                           rp.size     = rp.size,
+                           rp.points   = RP_N,
                            AUTO        = AUTO,
                            Converged   = Converged, check.names = FALSE)
 
@@ -126,10 +131,19 @@ est_radius <- function(RM = NULL,
       iter <- iter+1
       #p$tick()$print()
 
-      RMs <- di2bi(RM,emRad = tryRadius, convMat = TRUE)
-      RT  <- Matrix::nnzero(RMs)
-      rp.size <- length(RMs)
-      Measure <- RT/rp.size
+      RMs <- di2bi(RM,emRad = tryRadius, convMat = TRUE, theiler = theiler)
+      #Total nr. recurrent points
+      RP_N <- Matrix::nnzero(RMs, na.counted = FALSE)
+      minDiag <- 0
+      if(AUTO){
+        if(all(Matrix::diag(RMs)==1)){
+          minDiag <- length(Matrix::diag(RMs))
+        }
+      }
+      RP_N <- RP_N-minDiag
+      #rp.size <- rp_size(RMs) #length(RMs)
+
+      Measure <- RP_N/rp.size
 
       # crpOut <- rp_measures(RM = RMs, emRad = tryRadius, AUTO=AUTO)
       #Measure  <-  crpOut[[targetMeasure]]
@@ -143,28 +157,34 @@ est_radius <- function(RM = NULL,
                                              tollo       = targetValue*(1-tol),
                                              tolhi       = targetValue*(tol+1),
                                              startRadius = startRadius,
-                                             rp.size = recmatsize,
+                                             stopRadius  = stopRadius,
+                                             rp.size     = rp.size,
+                                             rp.points   = RP_N,
                                              AUTO        = AUTO,
                                              Converged   = Converged)
 
       if(any(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1)),(iter>=maxIter))){
         if(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1))){
           Converged <- TRUE
-          if(!silent){message("\nConverged! Found an appropriate radius...")}
+          if(!silent){
+            message("\nConverged! Found an appropriate radius...")
+            }
         }
         iterList$Converged[iter] <- Converged
         exitIter <- TRUE
       }
 
       if(round(Measure,digits = 2)>round(targetValue,digits = 2)){
-        tryRadius <- tryRadius*(min(0.8,tol*2))
+        tryRadius <- tryRadius*(min(c(0.8,1-abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) # tol*2
       } else {
-        tryRadius <- tryRadius*(min(1.8,1+(tol*2)))
+        tryRadius <- tryRadius*(min(c(1.8,1+abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) #1+(tol*2)
       }
     } # While ....
 
     if(iter>=maxIter){
       warning("Max. iterations reached!")
+      iterList$stopRadius[iter] <- tryRadius
+      #iterlist$Measure[iter] <- Measure
     }
     if(Measure %][% c(targetValue*(1-tol),targetValue*(tol+1))){
       iterList$Radius[iter] <- dplyr::case_when(
@@ -173,6 +193,8 @@ est_radius <- function(RM = NULL,
         radiusOnFail%in%"percentile" ~ as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))),probs = ifelse(targetValue>=1,.05,targetValue)))
       )
       warning(paste0("\nTarget not found, try increasing tolerance, max. iterations, or, change value of startRadius.\nreturning radius: ",iterList$Radius[iter]))
+      iterList$stopRadius[iter] <- tryRadius
+      #iterlist$Measure[iter] <- Measure
     }
 
     ifelse(histIter,id<-c(1:iter),id<-iter)
@@ -390,7 +412,7 @@ est_parameters <- function(y,
                            nnThres  = 10,
                            theiler  = 0,
                            doPlot   = TRUE,
-                           silent   = FALSE,
+                           silent   = TRUE,
                            ...){
 
   if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}

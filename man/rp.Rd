@@ -10,7 +10,7 @@ rp(
   emDim = 1,
   emLag = 1,
   emRad = NULL,
-  theiler = 0,
+  theiler = NULL,
   to.ts = NULL,
   order.by = NULL,
   to.sparse = FALSE,
@@ -35,6 +35,8 @@ rp(
 \item{emLag}{The embedding lag}
 
 \item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
+
+\item{theiler}{Should a teiler winfow be used?}
 
 \item{to.ts}{Should \code{y1} and \code{y2} be converted to time series objects?}
 

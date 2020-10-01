@@ -11,6 +11,7 @@
 #' @param emDim The embedding dimensions
 #' @param emLag The embedding lag
 #' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If `NULL`, an unthresholded matrix will be created (default = `NULL`)
+#' @param theiler Should a teiler winfow be used?
 #' @param to.ts Should `y1` and `y2` be converted to time series objects?
 #' @param order.by If `to.ts = TRUE`, pass a vector of the same length as `y1` and `y2`. It will be used as the time index, if `NA` the vector indices will be used to represent time.
 #' @param to.sparse Should sparse matrices be used?
@@ -43,7 +44,7 @@ rp <- function(y1, y2 = NULL,
                emDim = 1,
                emLag = 1,
                emRad = NULL,
-               theiler = 0,
+               theiler = NULL,
                to.ts = NULL,
                order.by = NULL,
                to.sparse = FALSE,
@@ -127,8 +128,9 @@ rp <- function(y1, y2 = NULL,
 
   if(is.na(theiler%00%NA)){
     if(!is.null(attributes(dmat)$theiler)){
-      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(dmat)$theiler,"was already removed."))
-              #theiler <- attr(RM,"theiler")
+      if(attributes(dmat)$theiler>0){
+        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(dmat)$theiler,"was already removed."))
+      }
     }
     theiler <- 0
   } else {
@@ -272,8 +274,9 @@ rp_measures <- function(RM,
 
   if(is.na(theiler%00%NA)){
     if(!is.null(attributes(RM)$theiler)){
-      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
-      #theiler <- attr(RM,"theiler")
+      if(attributes(RM)$theiler>0){
+        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
+        }
     }
     theiler <- 0
   } else {
@@ -481,18 +484,24 @@ rp_measures_main <- function(RM,
                              doParallel = FALSE){
 
 
-  if(is.null(Nboot)){Nboot = 1}
+  if(is.null(Nboot)){
+    Nboot <- 1
+  }
+
+  if(Nboot>1|doParallel){
+    checkPkg("parallel")
+    mc.cores <- parallel::detectCores()-1
+    if(Nboot<mc.cores) mc.cores <- Nboot
+  }
 
   NRows <- NROW(RM)
   NCols <- NCOL(RM)
-  mc.cores <- parallel::detectCores()-1
-  if(Nboot<mc.cores) mc.cores <- Nboot
-
 
   if(doParallel){
+
     tstart <- Sys.time()
-    cl <- parallel::makeCluster(mc.cores)
-    out    <- parallel::mclapply(1, function(i){
+    cl  <- parallel::makeCluster(mc.cores)
+    out <- parallel::mclapply(1, function(i){
       #rp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))], ncol=NCols, nrow = NRows),
       rp_prep(RP = RM,
               emRad= emRad,
@@ -531,12 +540,11 @@ rp_measures_main <- function(RM,
 
   if(Nboot>1){
 
-
     cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations...\n"))
     cat(paste0("Estimated duration: ", round((difftime(tend,tstart, units = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
 
     tstart <-Sys.time()
-    cl <- parallel::makeCluster(mc.cores)
+    cl      <- parallel::makeCluster(mc.cores)
     bootOut <-  parallel::mclapply(1:Nboot, function(i){
       replicate <- as.data.frame(rp_prep(matrix(RM[ceiling(NCols*NRows*stats::runif(NCols*NRows))],
                                                 ncol=NCols, nrow = NRows),
@@ -657,8 +665,9 @@ rp_diagProfile <- function(RM,
 
   if(is.na(theiler%00%NA)){
     if(!is.null(attributes(RM)$theiler)){
-      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
-      #theiler <- attr(RM,"theiler")
+      if(attributes(RM)$theiler>0){
+        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
+      }
     }
     theiler <- 0
   } else {
@@ -1725,8 +1734,9 @@ rp_lineDist <- function(RM,
 
   if(is.na(theiler%00%NA)){
     if(!is.null(attributes(RM)$theiler)){
-      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
-      #theiler <- attr(RM,"theiler")
+      if(attributes(RM)$theiler>0){
+        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
+      }
     }
     theiler <- 0
   } else {
@@ -2484,8 +2494,9 @@ rp_size <- function(mat, AUTO=NULL, theiler = NULL){
   }
   if(is.na(theiler%00%NA)){
     if(!is.null(attributes(mat)$theiler)){
-      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
-      #theiler <- attr(RM,"theiler")
+      if(attributes(mat)$theiler>0){
+        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
+      }
     }
     theiler <- 0
   } else {

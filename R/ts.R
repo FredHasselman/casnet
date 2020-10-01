@@ -35,6 +35,8 @@
 #'
 ts_permtest_block <- function(y1, y2 = NULL, targetValue = 0, Nperms = 19, sim = "geom", l = 3, alpha = .05, returnBootObject = FALSE,...){
 
+  checkPkg("boot")
+
   tsSame <- function(y){
     y
   }
@@ -1354,6 +1356,9 @@ ts_detrend <- function(y, polyOrder=1){
 #'
 #'
 ts_levels <- function(y, minDataSplit=12, minLevelDuration=round(minDataSplit/3), changeSensitivity = 0.01, maxLevels=30, method=c("anova","poisson","class","exp")[1]){
+
+  checkPkg("rpart")
+
   x <- seq_along(y)
   dfs  <- data.frame(x=x, y=y)
   tree <- rpart::rpart(y ~ x,

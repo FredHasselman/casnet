@@ -663,6 +663,8 @@ mrn_plot     <- function(layers = NA,
 #'
 mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), doPlot = FALSE, surTest = FALSE, alpha = 0.05){
 
+  checkPkg("infotheo")
+
   if(is.null(dim(y))){
     y <- as.matrix(y,ncol=1)
   }
@@ -720,6 +722,9 @@ mif <- function(y, lags=-10:10, nbins = ceiling(2*NROW(y)^(1/3)), doPlot = FALSE
 #' @family Redundancy measures (mutual information)
 #'
 mi_mat <- function(y, ID1, ID2, discreteBins = ceiling(2*NROW(ID1)^(1/3))){
+
+  checkPkg("infotheo")
+
   Nc <- NCOL(y)
   if(!is.null(dim(y))){
     if(Nc == 1){out <- infotheo::mutinformation(X = infotheo::discretize(y[ID1,1], nbins = discreteBins),
@@ -797,6 +802,8 @@ mi_ts <- function(y1,y2=NULL, nbins=NA){
 #' @family Multiplex Recurrence Networks
 #'
 mi_interlayer <- function(g0,g1, probTable=FALSE){
+
+  checkPkg("infotheo")
 
   if(any(E(g0)$weight<0)){E(g0)$weight <- abs(E(g0)$weight)}
   if(any(E(g1)$weight<0)){E(g1)$weight <- abs(E(g1)$weight)}

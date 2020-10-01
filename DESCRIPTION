@@ -4,11 +4,11 @@ Title: A Toolbox for Studying Complex Adaptive Systems and NETworks
 Version: 0.1.6
 Authors@R: c(person(given = "Fred", family = "Hasselman", email = "f.hasselman@pwo.ru.nl", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1384-8361")), person(given = "Merlijn", family = "Olthof", email = "m.olthof@pwo.ru.nl", role = "ctb"))
 Maintainer: Fred Hasselman <f.hasselman@pwo.ru.nl>
-Description: A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
-    - Recurrence Quantification Analyses (CrossRQA, Categorical RQA, Chromatic RQA, Anisotropic RQA).
-    - Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum).
-    - Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA).
-    - Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks, Multiplex Networks).
+Description: A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:    
+    - (Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA)    
+    - Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)    
+    - Network based time series analyses and visualisation (Recurrence Networks, spiral graphs)    
+    - Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks)    
 YEAR: 2020
 License: GPL-3 + file LICENSE
 Depends: R (>= 2.10)
@@ -33,20 +33,19 @@ Imports:
     proxy,
     invctr,
     scales,
-    rio,
     signal,
     tseries,
-    parallel,
-    rpart,
     rlang (>= 0.1.2),
-    infotheo,
     methods,
-    boot,
     splus2R
 Suggests: 
     xts,
     zoo,
+    boot,
+    parallel,
+    rio,
     pROC,
+    rpart,
     progress,
     animation,
     gganimate,
@@ -70,6 +69,7 @@ Suggests:
     kableExtra,
     DirectedClustering,
     brainGraph,
+    infotheo,
     stabledist
 VignetteBuilder: knitr
 Language: en-US

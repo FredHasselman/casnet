@@ -19,7 +19,7 @@ est_radius(
   targetValue = 0.05,
   tol = 0.1,
   maxIter = 100,
-  theiler = 0,
+  theiler = NULL,
   histIter = FALSE,
   noiseLevel = 0.75,
   noiseType = c("normal", "uniform")[1],

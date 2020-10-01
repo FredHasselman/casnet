@@ -8,11 +8,11 @@
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
-A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:
-    - Recurrence Quantification Analyses (CrossRQA, Categorical RQA, Chromatic RQA, Anisotropic RQA).
-    - Fluctuation Analyses (DFA varieties, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum).
-    - Coupling Analyses (Cross Conformal Mapping, Detection of Coupling Direction, CRQA).
-    - Network based time series analyses (Recurrence Networks, Multifractal Spectrum Networks, Multiplex Networks).
+A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:    
+    - (Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA)    
+    - Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)    
+    - Network based time series analyses and visualisation (Recurrence Networks, spiral graphs)    
+    - Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks)
 }
 \seealso{
 Useful links:

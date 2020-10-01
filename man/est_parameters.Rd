@@ -17,7 +17,7 @@ est_parameters(
   nnThres = 10,
   theiler = 0,
   doPlot = TRUE,
-  silent = FALSE,
+  silent = TRUE,
   ...
 )
 }

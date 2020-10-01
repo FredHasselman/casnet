@@ -171,8 +171,8 @@
 <span class='kw'>y</span>  <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>)
 <span class='kw'>RN</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rn.html'>rn</a></span>(<span class='kw'>y</span>, emLag=<span class='fl'>1</span>, emDim=<span class='fl'>3</span>, emRad=<span class='fl'>NA</span>, weighted = <span class='fl'>TRUE</span>, weightedBy = <span class='st'>"rt"</span>, returnGraph = <span class='fl'>TRUE</span>)
 </div><div class='output co'>#&gt; 
-#&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses</div><div class='output co'>#&gt; <span class='message'>lower and upper are both 0 (no band, just diagonal)</span>
-#&gt; <span class='message'> using: diag(mat) &lt;- 6.4942...</span></div><div class='output co'>#&gt; 
+#&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses
+#&gt; 
 #&gt; Searching for a radius that will yield 0.05 for RR </div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Converged! Found an appropriate radius...</span></div><div class='input'><span class='fu'>rn_strengthDist</span>(<span class='kw'>RN</span><span class='op'>$</span><span class='kw'>g</span>)
 </div><div class='img'><img src='rn_strengthDist-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;    xDegree yStrength xDegree_log10 yStrength_log10 PowerLaw PowerLawExponent
