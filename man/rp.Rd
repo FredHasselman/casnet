@@ -52,9 +52,9 @@ rp(
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
-\item{returnMeasures}{Should values be returned to the console window and as an attribute? (default = \code{FALSE})}
+\item{returnMeasures}{Should the output of \code{\link[=rp_measures]{rp_measures()}} be returned as an attribute \code{"measures"} to the matrix? If \code{silent = FALSE} results will also be output to the console. (default = \code{FALSE})}
 
-\item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with defult settings}
+\item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with default settings}
 
 \item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag}. If \code{y1} and/or \code{y2} are data frames, the columns will be used as dimensions (default = \code{TRUE})}
 

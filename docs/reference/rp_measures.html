@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,26 +146,26 @@
     <p>A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures (anisotropic) will be caluclated.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rp_measures</span>(
-  <span class='kw'>RM</span>,
-  emRad = <span class='fl'>NA</span>,
-  DLmin = <span class='fl'>2</span>,
-  VLmin = <span class='fl'>2</span>,
-  HLmin = <span class='fl'>2</span>,
-  DLmax = <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>Matrix</span>::<span class='fu'>diag</span>(<span class='kw'>RM</span>)) <span class='op'>-</span> <span class='fl'>1</span>,
-  VLmax = <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>Matrix</span>::<span class='fu'>diag</span>(<span class='kw'>RM</span>)) <span class='op'>-</span> <span class='fl'>1</span>,
-  HLmax = <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>Matrix</span>::<span class='fu'>diag</span>(<span class='kw'>RM</span>)) <span class='op'>-</span> <span class='fl'>1</span>,
-  AUTO = <span class='kw'>NULL</span>,
-  theiler = <span class='kw'>NULL</span>,
-  chromatic = <span class='fl'>FALSE</span>,
-  matrices = <span class='fl'>FALSE</span>,
-  doHalf = <span class='fl'>FALSE</span>,
-  Nboot = <span class='kw'>NULL</span>,
-  CL = <span class='fl'>0.95</span>,
-  targetValue = <span class='fl'>0.05</span>,
-  doParallel = <span class='fl'>FALSE</span>,
-  silent = <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>rp_measures</span><span class='op'>(</span>
+  <span class='va'>RM</span>,
+  emRad <span class='op'>=</span> <span class='cn'>NA</span>,
+  DLmin <span class='op'>=</span> <span class='fl'>2</span>,
+  VLmin <span class='op'>=</span> <span class='fl'>2</span>,
+  HLmin <span class='op'>=</span> <span class='fl'>2</span>,
+  DLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  VLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  HLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  AUTO <span class='op'>=</span> <span class='cn'>NULL</span>,
+  theiler <span class='op'>=</span> <span class='cn'>NULL</span>,
+  chromatic <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  matrices <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  doHalf <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  Nboot <span class='op'>=</span> <span class='cn'>NULL</span>,
+  CL <span class='op'>=</span> <span class='fl'>0.95</span>,
+  targetValue <span class='op'>=</span> <span class='fl'>0.05</span>,
+  doParallel <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  silent <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

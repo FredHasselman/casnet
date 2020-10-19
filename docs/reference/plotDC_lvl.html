@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,22 +146,22 @@
     <p>Produce a plot in which the output of <code><a href='dc_win.html'>dc_win()</a></code> and <code><a href='dc_ccp.html'>dc_ccp()</a></code> on the same multivariate timeseries data is combined with the output of <code>ts_level()</code> on a state variable of the same length as the multivariate data.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotDC_lvl</span>(
-  <span class='kw'>df_win</span>,
-  df_ccp = <span class='fl'>NA</span>,
-  <span class='kw'>df_lvl</span>,
-  <span class='kw'>win</span>,
-  useVarNames = <span class='fl'>TRUE</span>,
-  colOrder = <span class='fl'>TRUE</span>,
-  useTimeVector = <span class='fl'>NA</span>,
-  timeStamp = <span class='st'>"31-01-1999"</span>,
-  doPlot = <span class='fl'>TRUE</span>,
-  title = <span class='st'>"Peaks versus Levels Plot"</span>,
-  subtitle = <span class='st'>""</span>,
-  xlabel = <span class='st'>"Time"</span>,
-  ylabel = <span class='st'>""</span>,
-  levelName = <span class='st'>"State variable"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>plotDC_lvl</span><span class='op'>(</span>
+  <span class='va'>df_win</span>,
+  df_ccp <span class='op'>=</span> <span class='cn'>NA</span>,
+  <span class='va'>df_lvl</span>,
+  <span class='va'>win</span>,
+  useVarNames <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  colOrder <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  useTimeVector <span class='op'>=</span> <span class='cn'>NA</span>,
+  timeStamp <span class='op'>=</span> <span class='st'>"31-01-1999"</span>,
+  doPlot <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  title <span class='op'>=</span> <span class='st'>"Peaks versus Levels Plot"</span>,
+  subtitle <span class='op'>=</span> <span class='st'>""</span>,
+  xlabel <span class='op'>=</span> <span class='st'>"Time"</span>,
+  ylabel <span class='op'>=</span> <span class='st'>""</span>,
+  levelName <span class='op'>=</span> <span class='st'>"State variable"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

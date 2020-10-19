@@ -27,11 +27,11 @@
 #'
 #' @examples
 #'
-#' set.seed(4321)
+#' \donttest{set.seed(4321)
 #' y1 <- rnorm(5000)
 #' y2 <- y1-(mean(y1)+rnorm(1))
 #'
-#' ts_permtest_block(y1 = y1, y2 = y2)
+#' ts_permtest_block(y1 = y1, y2 = y2)}
 #'
 ts_permtest_block <- function(y1, y2 = NULL, targetValue = 0, Nperms = 19, sim = "geom", l = 3, alpha = .05, returnBootObject = FALSE,...){
 
@@ -1638,11 +1638,12 @@ ts_integrate <-function(y){
 #'
 #' @examples
 #'
+#' \donttest{
 #' y <- rnorm(100)
 #' plot(ts(y))
 #'
 #' y_img <- ts_rasterize(y)
-#' image(y_img,col=c("white","black"))
+#' image(y_img,col=c("white","black"))}
 #'
 #'
 ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2){

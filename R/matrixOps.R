@@ -156,7 +156,7 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
 #' Matrix to indexed data frame
 #'
-#' Mimics the default behaviour of [reshape2::melt]
+#' Mimics the default behaviour of `reshape2::melt()`
 #'
 #' @param mat A matrix
 #'

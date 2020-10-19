@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,14 +146,14 @@
     <p>Iteratively differenced series up to <code>order</code>. The same length as the original series is recovered by calculating the mean of two vectors for each iteration: One with a duplicated first value and one with a duplicated last value.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ts_diff</span>(
-  <span class='kw'>y</span>,
-  order = <span class='fl'>1</span>,
-  addColumns = <span class='fl'>TRUE</span>,
-  keepDerivatives = <span class='fl'>FALSE</span>,
-  maskEdges = <span class='kw'>NULL</span>,
-  silent = <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>ts_diff</span><span class='op'>(</span>
+  <span class='va'>y</span>,
+  order <span class='op'>=</span> <span class='fl'>1</span>,
+  addColumns <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  keepDerivatives <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  maskEdges <span class='op'>=</span> <span class='cn'>NULL</span>,
+  silent <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -214,21 +217,21 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Here's an interesting numeric vector</span>
-<span class='kw'>y</span><span class='op'>&lt;-</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span>,<span class='fl'>5</span>,<span class='fl'>8</span>,<span class='fl'>13</span>,<span class='fl'>21</span>,<span class='fl'>34</span>,<span class='fl'>55</span>,<span class='fl'>89</span>,<span class='fl'>144</span>,<span class='fl'>233</span>,<span class='fl'>377</span>,<span class='fl'>610</span>,<span class='fl'>987</span>,<span class='fl'>1597</span>,<span class='fl'>2584</span>,<span class='fl'>4181</span>,<span class='fl'>6765</span>,<span class='fl'>10946</span>,<span class='fl'>17711</span>,<span class='fl'>28657</span>,<span class='fl'>46368</span>)
+<span class='va'>y</span><span class='op'>&lt;-</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>2</span>,<span class='fl'>3</span>,<span class='fl'>5</span>,<span class='fl'>8</span>,<span class='fl'>13</span>,<span class='fl'>21</span>,<span class='fl'>34</span>,<span class='fl'>55</span>,<span class='fl'>89</span>,<span class='fl'>144</span>,<span class='fl'>233</span>,<span class='fl'>377</span>,<span class='fl'>610</span>,<span class='fl'>987</span>,<span class='fl'>1597</span>,<span class='fl'>2584</span>,<span class='fl'>4181</span>,<span class='fl'>6765</span>,<span class='fl'>10946</span>,<span class='fl'>17711</span>,<span class='fl'>28657</span>,<span class='fl'>46368</span><span class='op'>)</span>
 
 <span class='co'># Return the first order derivative as a vector</span>
-<span class='fu'>ts_diff</span>(y=<span class='kw'>y</span>,addColumns=<span class='fl'>FALSE</span>)
+<span class='fu'>ts_diff</span><span class='op'>(</span>y<span class='op'>=</span><span class='va'>y</span>,addColumns<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;  [1]     0.0     0.5     1.0     1.5     2.5     4.0     6.5    10.5    17.0
 #&gt; [10]    27.5    44.5    72.0   116.5   188.5   305.0   493.5   798.5  1292.0
 #&gt; [19]  2090.5  3382.5  5473.0  8855.5 14328.5 17711.0</div><div class='input'>
 <span class='co'># Return original and derivative as a matrix</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/ts.html'>ts</a></span>(<span class='fu'>ts_diff</span>(y=<span class='kw'>y</span>, addColumns=<span class='fl'>TRUE</span>)))
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/ts.html'>ts</a></span><span class='op'>(</span><span class='fu'>ts_diff</span><span class='op'>(</span>y<span class='op'>=</span><span class='va'>y</span>, addColumns<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='ts_diff-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Works on multivariate data objects with mixed variable types</span>
-<span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(x=<span class='kw'>letters</span>, y=<span class='fl'>1</span><span class='op'>:</span><span class='fl'>26</span>, z=<span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>26</span>))
+<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>letters</span>, y<span class='op'>=</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>26</span>, z<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>26</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># Returns only derivatives of the numeric colunmns</span>
-<span class='fu'>ts_diff</span>(y=<span class='kw'>df</span>,addColumns=<span class='fl'>FALSE</span>)
+<span class='fu'>ts_diff</span><span class='op'>(</span>y<span class='op'>=</span><span class='va'>df</span>,addColumns<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    y_d1         z_d1
 #&gt; 1     1  0.067826442
 #&gt; 2     1 -0.350175488
@@ -257,7 +260,7 @@
 #&gt; 25    1  0.834068406
 #&gt; 26    1  0.894910201</div><div class='input'>
 <span class='co'># Returns original data with derivatives of the numeric columns</span>
-<span class='fu'>ts_diff</span>(y=<span class='kw'>df</span>, order=<span class='fl'>4</span>, addColumns=<span class='fl'>TRUE</span>)
+<span class='fu'>ts_diff</span><span class='op'>(</span>y<span class='op'>=</span><span class='va'>df</span>, order<span class='op'>=</span><span class='fl'>4</span>, addColumns<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;     y            z y_d4         z_d4
 #&gt; 1   1  0.841470985    0  0.191475573
 #&gt; 2   2  0.909297427    0  0.262795618
@@ -286,12 +289,12 @@
 #&gt; 25 25 -0.132351750    0 -0.021523512
 #&gt; 26 26  0.762558450    0  0.082040944</div><div class='input'>
 <span class='co'># Plot logistic S-curve and derivatives 1 to 3</span>
-<span class='kw'>S</span> <span class='op'>&lt;-</span> <span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='op'>-</span><span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span>))
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/ts.html'>ts</a></span>(<span class='fu'>ts_diff</span>(<span class='kw'>S</span>, order=<span class='fl'>3</span>, keepDerivatives = <span class='fl'>TRUE</span>)))
-</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/abline.html'>abline</a></span>(v=<span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='op'>-</span><span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span>)<span class='op'>==</span><span class='fl'>0</span>), col= <span class='st'>"red3"</span>, lwd=<span class='fl'>3</span>)
+<span class='va'>S</span> <span class='op'>&lt;-</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Logistic.html'>plogis</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/ts.html'>ts</a></span><span class='op'>(</span><span class='fu'>ts_diff</span><span class='op'>(</span><span class='va'>S</span>, order<span class='op'>=</span><span class='fl'>3</span>, keepDerivatives <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/abline.html'>abline</a></span><span class='op'>(</span>v<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span><span class='op'>)</span><span class='op'>==</span><span class='fl'>0</span><span class='op'>)</span>, col<span class='op'>=</span> <span class='st'>"red3"</span>, lwd<span class='op'>=</span><span class='fl'>3</span><span class='op'>)</span>
 </div><div class='img'><img src='ts_diff-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Plot again, but with masked edges</span>
-(<span class='kw'>maskEdge</span> <span class='op'>&lt;-</span> <span class='fu'>ts_diff</span>(<span class='kw'>S</span>, order=<span class='fl'>3</span>, keepDerivatives = <span class='fl'>TRUE</span>, maskEdges = <span class='fl'>NA</span>))
+<span class='op'>(</span><span class='va'>maskEdge</span> <span class='op'>&lt;-</span> <span class='fu'>ts_diff</span><span class='op'>(</span><span class='va'>S</span>, order<span class='op'>=</span><span class='fl'>3</span>, keepDerivatives <span class='op'>=</span> <span class='cn'>TRUE</span>, maskEdges <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;              S1        S1_d1         S1_d2         S1_d3
 #&gt; 1   0.006692851           NA            NA            NA
 #&gt; 2   0.007391541 0.0007348601            NA            NA
@@ -393,8 +396,8 @@
 #&gt; 98  0.990986701 0.0008946154 -8.797167e-05  8.486490e-06
 #&gt; 99  0.991837429 0.0008108787 -7.987762e-05            NA
 #&gt; 100 0.992608459 0.0007348601            NA            NA
-#&gt; 101 0.993307149           NA            NA            NA</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/ts.html'>ts</a></span>(<span class='kw'>maskEdge</span>))
-</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/abline.html'>abline</a></span>(v=<span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='op'>-</span><span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span>)<span class='op'>==</span><span class='fl'>0</span>), col= <span class='st'>"red3"</span>, lwd=<span class='fl'>3</span>)
+#&gt; 101 0.993307149           NA            NA            NA</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/ts.html'>ts</a></span><span class='op'>(</span><span class='va'>maskEdge</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/abline.html'>abline</a></span><span class='op'>(</span>v<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/which.html'>which</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>5</span>,<span class='fl'>5</span>,<span class='fl'>.1</span><span class='op'>)</span><span class='op'>==</span><span class='fl'>0</span><span class='op'>)</span>, col<span class='op'>=</span> <span class='st'>"red3"</span>, lwd<span class='op'>=</span><span class='fl'>3</span><span class='op'>)</span>
 </div><div class='img'><img src='ts_diff-3.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>

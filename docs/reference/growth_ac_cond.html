@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,13 +146,13 @@
     <p>Conditional Autocatlytic Growth: Iterating differential equations (maps)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>growth_ac_cond</span>(
-  Y0 = <span class='fl'>0.01</span>,
-  r = <span class='fl'>0.1</span>,
-  k = <span class='fl'>2</span>,
-  cond = <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind.data.frame</a></span>(Y = <span class='fl'>0.2</span>, par = <span class='st'>"r"</span>, val = <span class='fl'>2</span>),
-  N = <span class='fl'>100</span>
-)</pre>
+    <pre class="usage"><span class='fu'>growth_ac_cond</span><span class='op'>(</span>
+  Y0 <span class='op'>=</span> <span class='fl'>0.01</span>,
+  r <span class='op'>=</span> <span class='fl'>0.1</span>,
+  k <span class='op'>=</span> <span class='fl'>2</span>,
+  cond <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind.data.frame</a></span><span class='op'>(</span>Y <span class='op'>=</span> <span class='fl'>0.2</span>, par <span class='op'>=</span> <span class='st'>"r"</span>, val <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>,
+  N <span class='op'>=</span> <span class='fl'>100</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -186,32 +189,32 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Plot with the default settings</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://lattice.r-forge.r-project.org'>lattice</a></span>)
-<span class='fu'><a href='https://rdrr.io/pkg/lattice/man/xyplot.html'>xyplot</a></span>(<span class='fu'>growth_ac_cond</span>())
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://lattice.r-forge.r-project.org/'>lattice</a></span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/lattice/man/xyplot.html'>xyplot</a></span><span class='op'>(</span><span class='fu'>growth_ac_cond</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='growth_ac_cond-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># The function can take a set of conditional rules</span>
 <span class='co'># and apply them sequentially during the iterations.</span>
 <span class='co'># The conditional rules are passed as a `data.frame`</span>
 
-(<span class='kw'>cond</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind.data.frame</a></span>(Y = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.2</span>, <span class='fl'>0.6</span>), par = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"r"</span>, <span class='st'>"r"</span>), val = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.5</span>, <span class='fl'>0.1</span>)))
+<span class='op'>(</span><span class='va'>cond</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind.data.frame</a></span><span class='op'>(</span>Y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.6</span><span class='op'>)</span>, par <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"r"</span>, <span class='st'>"r"</span><span class='op'>)</span>, val <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.1</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;     Y par val
 #&gt; 1 0.2   r 0.5
-#&gt; 2 0.6   r 0.1</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/lattice/man/xyplot.html'>xyplot</a></span>(<span class='fu'>growth_ac_cond</span>(cond=<span class='kw'>cond</span>))
+#&gt; 2 0.6   r 0.1</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/lattice/man/xyplot.html'>xyplot</a></span><span class='op'>(</span><span class='fu'>growth_ac_cond</span><span class='op'>(</span>cond<span class='op'>=</span><span class='va'>cond</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='growth_ac_cond-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Combine a change of `r` and a change of `k`</span>
 
-(<span class='kw'>cond</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind.data.frame</a></span>(Y = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.2</span>, <span class='fl'>1.99</span>), par = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"r"</span>, <span class='st'>"k"</span>), val = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.5</span>, <span class='fl'>3</span>)))
+<span class='op'>(</span><span class='va'>cond</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind.data.frame</a></span><span class='op'>(</span>Y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>1.99</span><span class='op'>)</span>, par <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"r"</span>, <span class='st'>"k"</span><span class='op'>)</span>, val <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      Y par val
 #&gt; 1 0.20   r 0.5
-#&gt; 2 1.99   k 3.0</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/lattice/man/xyplot.html'>xyplot</a></span>(<span class='fu'>growth_ac_cond</span>(cond=<span class='kw'>cond</span>))
+#&gt; 2 1.99   k 3.0</div><div class='input'><span class='fu'><a href='https://rdrr.io/pkg/lattice/man/xyplot.html'>xyplot</a></span><span class='op'>(</span><span class='fu'>growth_ac_cond</span><span class='op'>(</span>cond<span class='op'>=</span><span class='va'>cond</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='growth_ac_cond-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># A fantasy growth process</span>
 
-<span class='kw'>cond</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind.data.frame</a></span>(Y = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>1.99</span>, <span class='fl'>1.999</span>, <span class='fl'>2.5</span>, <span class='fl'>2.9</span>),
-par = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"r"</span>, <span class='st'>"k"</span>, <span class='st'>"r"</span>, <span class='st'>"r"</span>,<span class='st'>"k"</span>),
-val = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.3</span>, <span class='fl'>3</span>, <span class='fl'>0.9</span>, <span class='fl'>0.1</span>, <span class='fl'>1.3</span>))
+<span class='va'>cond</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind.data.frame</a></span><span class='op'>(</span>Y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>1.99</span>, <span class='fl'>1.999</span>, <span class='fl'>2.5</span>, <span class='fl'>2.9</span><span class='op'>)</span>,
+par <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"r"</span>, <span class='st'>"k"</span>, <span class='st'>"r"</span>, <span class='st'>"r"</span>,<span class='st'>"k"</span><span class='op'>)</span>,
+val <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.3</span>, <span class='fl'>3</span>, <span class='fl'>0.9</span>, <span class='fl'>0.1</span>, <span class='fl'>1.3</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/pkg/lattice/man/xyplot.html'>xyplot</a></span>(<span class='fu'>growth_ac_cond</span>(cond=<span class='kw'>cond</span>))
+<span class='fu'><a href='https://rdrr.io/pkg/lattice/man/xyplot.html'>xyplot</a></span><span class='op'>(</span><span class='fu'>growth_ac_cond</span><span class='op'>(</span>cond<span class='op'>=</span><span class='va'>cond</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='growth_ac_cond-4.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,13 +146,13 @@
     <p>Plot ACF and PACF</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotRED_acf</span>(
-  <span class='kw'>y</span>,
-  Lmax = <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)<span class='op'>/</span><span class='fl'>4</span>), <span class='fl'>10</span>),
-  alpha = <span class='fl'>0.05</span>,
-  doPlot = <span class='fl'>TRUE</span>,
-  returnCorFun = <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>plotRED_acf</span><span class='op'>(</span>
+  <span class='va'>y</span>,
+  Lmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>4</span><span class='op'>)</span>, <span class='fl'>10</span><span class='op'>)</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.05</span>,
+  doPlot <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  returnCorFun <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

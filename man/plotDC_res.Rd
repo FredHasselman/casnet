@@ -13,6 +13,7 @@ plotDC_res(
   timeStamp = "01-01-1999",
   doPlot = TRUE,
   title = "Complexity Resonance Diagram",
+  resVariable = "Dynamic Complexity",
   subtitle = "",
   xlabel = "Time",
   ylabel = ""
@@ -34,6 +35,8 @@ plotDC_res(
 \item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
 
 \item{title}{A title for the plot.}
+
+\item{resVariable}{Variable displayed in the plot.}
 
 \item{subtitle}{A subtitle for the plot.}
 

@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,30 +146,30 @@
     <p>This function serves as a wrapper for function <code><a href='rp.html'>rp()</a></code>, it will add some attributes to the matrix related to network representation. These attributes will be used to decide which network type to generate (e.g. undirected, directed, weighted, etc.)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rn</span>(
-  <span class='kw'>y1</span>,
-  y2 = <span class='kw'>NULL</span>,
-  emDim = <span class='fl'>1</span>,
-  emLag = <span class='fl'>1</span>,
-  emRad = <span class='kw'>NULL</span>,
-  directed = <span class='fl'>FALSE</span>,
-  cumulative = <span class='fl'>TRUE</span>,
-  weighted = <span class='fl'>FALSE</span>,
-  weightedBy = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"si"</span>, <span class='st'>"rt"</span>, <span class='st'>"rf"</span>)[<span class='fl'>1</span>],
-  rescaleWeights = <span class='fl'>FALSE</span>,
-  fs = <span class='fl'>NA</span>,
-  includeDiagonal = <span class='fl'>FALSE</span>,
-  to.ts = <span class='kw'>NULL</span>,
-  order.by = <span class='kw'>NULL</span>,
-  to.sparse = <span class='fl'>FALSE</span>,
-  method = <span class='st'>"Euclidean"</span>,
-  targetValue = <span class='fl'>0.05</span>,
-  returnGraph = <span class='fl'>FALSE</span>,
-  doPlot = <span class='fl'>FALSE</span>,
-  doEmbed = <span class='fl'>TRUE</span>,
-  silent = <span class='fl'>TRUE</span>,
-  <span class='kw'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>rn</span><span class='op'>(</span>
+  <span class='va'>y1</span>,
+  y2 <span class='op'>=</span> <span class='cn'>NULL</span>,
+  emDim <span class='op'>=</span> <span class='fl'>1</span>,
+  emLag <span class='op'>=</span> <span class='fl'>1</span>,
+  emRad <span class='op'>=</span> <span class='cn'>NULL</span>,
+  directed <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cumulative <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  weighted <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  weightedBy <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"si"</span>, <span class='st'>"rt"</span>, <span class='st'>"rf"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
+  rescaleWeights <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  fs <span class='op'>=</span> <span class='cn'>NA</span>,
+  includeDiagonal <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  to.ts <span class='op'>=</span> <span class='cn'>NULL</span>,
+  order.by <span class='op'>=</span> <span class='cn'>NULL</span>,
+  to.sparse <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  method <span class='op'>=</span> <span class='st'>"Euclidean"</span>,
+  targetValue <span class='op'>=</span> <span class='fl'>0.05</span>,
+  returnGraph <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  doPlot <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  doEmbed <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  silent <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -245,7 +248,7 @@
     </tr>
     <tr>
       <th>doPlot</th>
-      <td><p>Plot the matrix by calling <code><a href='rp_plot.html'>rp_plot()</a></code> with defult settings</p></td>
+      <td><p>Plot the matrix by calling <code><a href='rp_plot.html'>rp_plot()</a></code> with default settings</p></td>
     </tr>
     <tr>
       <th>doEmbed</th>

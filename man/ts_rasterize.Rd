@@ -23,11 +23,12 @@ Turn a 1D time series vector into a 2D curve
 }
 \examples{
 
+\donttest{
 y <- rnorm(100)
 plot(ts(y))
 
 y_img <- ts_rasterize(y)
-image(y_img,col=c("white","black"))
+image(y_img,col=c("white","black"))}
 
 
 }

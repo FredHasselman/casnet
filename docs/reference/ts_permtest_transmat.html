@@ -107,6 +107,9 @@ This transition matrix will be used to resample values
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -151,15 +154,15 @@ This transition matrix will be used to resample values
 
     </div>
 
-    <pre class="usage"><span class='fu'>ts_permtest_transmat</span>(
-  <span class='kw'>y1</span>,
-  y2 = <span class='kw'>NULL</span>,
-  targetValue = <span class='fl'>0</span>,
-  nbins = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span>(<span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>y1</span>)<span class='op'>^</span>(<span class='fl'>1</span><span class='op'>/</span><span class='fl'>3</span>)),
-  Nperms = <span class='fl'>19</span>,
-  alpha = <span class='fl'>0.05</span>,
-  keepNA = <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>ts_permtest_transmat</span><span class='op'>(</span>
+  <span class='va'>y1</span>,
+  y2 <span class='op'>=</span> <span class='cn'>NULL</span>,
+  targetValue <span class='op'>=</span> <span class='fl'>0</span>,
+  nbins <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span><span class='op'>(</span><span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>y1</span><span class='op'>)</span><span class='op'>^</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>,
+  Nperms <span class='op'>=</span> <span class='fl'>19</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.05</span>,
+  keepNA <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -223,9 +226,9 @@ This transition matrix will be used to resample values
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>4321</span>)
-<span class='kw'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>5000</span>)
-<span class='fu'>ts_permtest_transmat</span>(<span class='kw'>y</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>4321</span><span class='op'>)</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>5000</span><span class='op'>)</span>
+<span class='fu'>ts_permtest_transmat</span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;       rbin          ry
 #&gt;  [1,]   16  0.02075621
 #&gt;  [2,]   20  0.78987315

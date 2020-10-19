@@ -4,15 +4,11 @@
 \name{casnet-package}
 \alias{casnet}
 \alias{casnet-package}
-\title{casnet: A Toolbox for Studying Complex Adaptive Systems and NETworks}
+\title{casnet: A Toolbox for Studying Complex Adaptive Systems and Networks}
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
-A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:    
-    - (Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA)    
-    - Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum)    
-    - Network based time series analyses and visualisation (Recurrence Networks, spiral graphs)    
-    - Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks)
+A collection of analytic tools for studying signals recorded from complex adaptive systems or networks: (Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA). Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum). Network based time series analyses and visualisation (Recurrence Networks, spiral graphs). Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks).
 }
 \seealso{
 Useful links:
@@ -23,7 +19,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Fred Hasselman \email{f.hasselman@pwo.ru.nl} (\href{https://orcid.org/0000-0003-1384-8361}{ORCID})
+\strong{Maintainer}: Fred Hasselman \email{f.hasselman@pwo.ru.nl} (\href{https://orcid.org/0000-0003-1384-8361}{ORCID}) [copyright holder]
 
 Other contributors:
 \itemize{

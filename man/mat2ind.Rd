@@ -13,7 +13,7 @@ mat2ind(mat)
 A data.frame with two index columns named \code{"Var1"} and \code{"Var2"}
 }
 \description{
-Mimics the default behaviour of \link[reshape2:melt]{reshape2::melt}
+Mimics the default behaviour of \code{reshape2::melt()}
 }
 \examples{
 

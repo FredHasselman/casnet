@@ -2,18 +2,11 @@
 title: "Quantifying Scaling Phenomena in Time Series"
 author: "Fred Hasselman"
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
-csl: apa.csl
-output: 
-  html_vignette:
-    toc: true
-    md_extensions: +bracketed_spans
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Quantifying Scaling Phenomena in Time Series}
   %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  chunk_output_type: console
+  %\VignetteEngine{knitr::rmarkdown} 
 ---
 
 ```{r setup, include = FALSE}

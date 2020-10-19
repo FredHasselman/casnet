@@ -20,7 +20,7 @@
 #'
 #' @examples
 #'
-#' # Generate some coloured noise
+#' # Use the coloured noise data set.
 #'  data(ColouredNoise)
 #'  plotTS_multi(ColouredNoise)
 #'
@@ -1014,6 +1014,7 @@ plotRED_mif <- function(mif.OUT = NULL,
 #'
 #' @inheritParams dc_ccp
 #' @inheritParams dc_win
+#' @param resVariable Variable displayed in the plot.
 #' @param title A title for the plot.
 #' @param subtitle A subtitle for the plot.
 #' @param xlabel A label for the x-axis.
@@ -1024,7 +1025,7 @@ plotRED_mif <- function(mif.OUT = NULL,
 #'
 #' @family Dynamic Complexity functions
 #'
-plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999", doPlot = TRUE, title = 'Complexity Resonance Diagram', subtitle = "", xlabel = "Time", ylabel = ""){
+plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999", doPlot = TRUE, title = 'Complexity Resonance Diagram', resVariable = "Dynamic Complexity", subtitle = "", xlabel = "Time", ylabel = ""){
 
   if(!useVarNames){
     df_win <- data.matrix(df_win)
@@ -1055,6 +1056,9 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
     labels <- labels[minorBreaks]
     labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
     majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+  } else {
+        #minorBreaks <- NULL
+        majorBreaks <- NULL
   }
 
   #
@@ -1101,7 +1105,7 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   #max(dfp$value, na.rm=TRUE)/2
   g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
     ggplot2::geom_raster(interpolate = FALSE) +
-    ggplot2::scale_fill_gradient2("Dynamic Complexity",low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
+    ggplot2::scale_fill_gradient2(resVariable,low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
 
     #   if(is.null(majorBreaks)){
     #   g <- g +

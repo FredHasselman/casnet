@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,14 +146,14 @@
     <p>Layout a graph on a spiral</p>
     </div>
 
-    <pre class="usage"><span class='fu'>layout_as_spiral</span>(
-  <span class='kw'>g</span>,
-  type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Archimedean"</span>, <span class='st'>"Bernoulli"</span>, <span class='st'>"Fermat"</span>, <span class='st'>"Euler"</span>),
-  arcs = <span class='fl'>6</span>,
-  a = <span class='fl'>1</span>,
-  b = <span class='kw'>NULL</span>,
-  rev = <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>layout_as_spiral</span><span class='op'>(</span>
+  <span class='va'>g</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Archimedean"</span>, <span class='st'>"Bernoulli"</span>, <span class='st'>"Fermat"</span>, <span class='st'>"Euler"</span><span class='op'>)</span>,
+  arcs <span class='op'>=</span> <span class='fl'>6</span>,
+  a <span class='op'>=</span> <span class='fl'>1</span>,
+  b <span class='op'>=</span> <span class='cn'>NULL</span>,
+  rev <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -187,23 +190,23 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://igraph.org'>igraph</a></span>)
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://igraph.org'>igraph</a></span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘igraph’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:stats’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    decompose, spectrum</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:base’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    union</span></div><div class='input'>
-<span class='kw'>g</span>  <span class='op'>&lt;-</span> <span class='kw'>igraph</span>::<span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_gnp.html'>sample_gnp</a></span>(<span class='fl'>100</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>100</span>)
+<span class='va'>g</span>  <span class='op'>&lt;-</span> <span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_gnp.html'>sample_gnp</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>100</span><span class='op'>)</span>
 
 <span class='co'># Equiangular spiral: Any line from the origin cuts at the same angle.</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>g</span>, layout = <span class='fu'>layout_as_spiral</span>(<span class='kw'>g</span>, type = <span class='st'>"Bernoulli"</span>, arcs = <span class='fl'>5</span>))
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>g</span>, layout <span class='op'>=</span> <span class='fu'>layout_as_spiral</span><span class='op'>(</span><span class='va'>g</span>, type <span class='op'>=</span> <span class='st'>"Bernoulli"</span>, arcs <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='layout_as_spiral-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># The arms of Fermat's spiral diverge quadratically.</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>g</span>, layout = <span class='fu'>layout_as_spiral</span>(<span class='kw'>g</span>, type = <span class='st'>"Fermat"</span>, arcs = <span class='fl'>5</span>))
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>g</span>, layout <span class='op'>=</span> <span class='fu'>layout_as_spiral</span><span class='op'>(</span><span class='va'>g</span>, type <span class='op'>=</span> <span class='st'>"Fermat"</span>, arcs <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='layout_as_spiral-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Equidistance of intersection points along a line through the origin.</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>g</span>, layout = <span class='fu'>layout_as_spiral</span>(<span class='kw'>g</span>, type = <span class='st'>"Archimedean"</span>, arcs = <span class='fl'>5</span>))
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>g</span>, layout <span class='op'>=</span> <span class='fu'>layout_as_spiral</span><span class='op'>(</span><span class='va'>g</span>, type <span class='op'>=</span> <span class='st'>"Archimedean"</span>, arcs <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='img'><img src='layout_as_spiral-3.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>

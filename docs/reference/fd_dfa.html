@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,27 +146,27 @@
     <p>fd_dfa</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fd_dfa</span>(
-  <span class='kw'>y</span>,
-  fs = <span class='kw'>NULL</span>,
-  removeTrend = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"no"</span>, <span class='st'>"poly"</span>, <span class='st'>"adaptive"</span>, <span class='st'>"bridge"</span>)[<span class='fl'>2</span>],
-  polyOrder = <span class='fl'>1</span>,
-  standardise = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span>)[<span class='fl'>2</span>],
-  adjustSumOrder = <span class='fl'>FALSE</span>,
-  scaleMin = <span class='fl'>2</span>,
-  scaleMax = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log2</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)<span class='op'>/</span><span class='fl'>2</span>)),
-  scaleResolution = (<span class='kw'>scaleMax</span> <span class='op'>-</span> <span class='kw'>scaleMin</span>),
-  scaleS = <span class='fl'>NA</span>,
-  overlap = <span class='fl'>0</span>,
-  minData = <span class='fl'>4</span>,
-  doPlot = <span class='fl'>FALSE</span>,
-  returnPlot = <span class='fl'>FALSE</span>,
-  returnPLAW = <span class='fl'>FALSE</span>,
-  returnInfo = <span class='fl'>FALSE</span>,
-  silent = <span class='fl'>FALSE</span>,
-  noTitle = <span class='fl'>FALSE</span>,
-  tsName = <span class='st'>"y"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>fd_dfa</span><span class='op'>(</span>
+  <span class='va'>y</span>,
+  fs <span class='op'>=</span> <span class='cn'>NULL</span>,
+  removeTrend <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"no"</span>, <span class='st'>"poly"</span>, <span class='st'>"adaptive"</span>, <span class='st'>"bridge"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span>,
+  polyOrder <span class='op'>=</span> <span class='fl'>1</span>,
+  standardise <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span>,
+  adjustSumOrder <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  scaleMin <span class='op'>=</span> <span class='fl'>2</span>,
+  scaleMax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log2</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>,
+  scaleResolution <span class='op'>=</span> <span class='op'>(</span><span class='va'>scaleMax</span> <span class='op'>-</span> <span class='va'>scaleMin</span><span class='op'>)</span>,
+  scaleS <span class='op'>=</span> <span class='cn'>NA</span>,
+  overlap <span class='op'>=</span> <span class='fl'>0</span>,
+  minData <span class='op'>=</span> <span class='fl'>4</span>,
+  doPlot <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  returnPlot <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  returnPLAW <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  returnInfo <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  silent <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  noTitle <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  tsName <span class='op'>=</span> <span class='st'>"y"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -248,7 +251,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Estimate of Hurst exponent (slope of <code><a href='https://rdrr.io/r/base/Log.html'>log(bin)</a></code> vs. <code>log(RMSE))</code> and an FD estimate based on Hasselman(2013)
+    <p>Estimate of Hurst exponent (slope of <code><a href='https://rdrr.io/r/base/Log.html'>log(bin)</a></code> vs. <code>log(RMSE))</code> and an FD estimate based on Hasselman (2013)
 A list object containing:</p><ul>
 <li><p>A data matrix <code>PLAW</code> with columns <code>freq.norm</code>, <code>size</code> and <code>bulk</code>.</p></li>
 <li><p>Estimate of scaling exponent <code>sap</code> based on a fit over the standard range (<code>fullRange</code>), or on a user defined range <code>fitRange</code>.</p></li>
@@ -258,7 +261,7 @@ A list object containing:</p><ul>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <a href='http://doi.org/10.3389/fphys.2013.00075'>http://doi.org/10.3389/fphys.2013.00075</a></p>
+    <p>Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Fluctuation Analyses: 

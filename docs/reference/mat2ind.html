@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="Matrix to indexed data frame — mat2ind" />
-<meta property="og:description" content="Mimics the default behaviour of reshape2::melt" />
+<meta property="og:description" content="Mimics the default behaviour of reshape2::melt()" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -140,10 +143,10 @@
     </div>
 
     <div class="ref-description">
-    <p>Mimics the default behaviour of <a href='https://rdrr.io/pkg/reshape2/man/melt.html'>reshape2::melt</a></p>
+    <p>Mimics the default behaviour of <code><a href='https://rdrr.io/pkg/reshape2/man/melt.html'>reshape2::melt()</a></code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>mat2ind</span>(<span class='kw'>mat</span>)</pre>
+    <pre class="usage"><span class='fu'>mat2ind</span><span class='op'>(</span><span class='va'>mat</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -160,7 +163,7 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'>mat2ind</span>(<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>100</span>,ncol=<span class='fl'>10</span>))
+<span class='fu'>mat2ind</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>100</span>,ncol<span class='op'>=</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;     Var1 Var2 value
 #&gt; 1      1    1     1
 #&gt; 2      2    1     2

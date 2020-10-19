@@ -61,6 +61,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -95,7 +98,7 @@
       <h1 data-toc-skip>Applied Synergetics: Dynamic Complexity in a Clinical Case Study</h1>
                         <h4 class="author">Fred Hasselman &amp; Merlijn Olthof</h4>
             
-            <h4 class="date">2020-10-01</h4>
+            <h4 class="date">2020-10-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/dynamiccomplexity.Rmd"><code>vignettes/dynamiccomplexity.Rmd</code></a></small>
       <div class="hidden name"><code>dynamiccomplexity.Rmd</code></div>
@@ -124,33 +127,31 @@
 <span class="co"># manyAnalystsESM &lt;- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)</span>
 
 <span class="co"># Or use the internal data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="kw">manyAnalystsESM</span>)
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">)</span></pre></div>
 </div>
 <div id="dealing-with-missing-values" class="section level3">
 <h3 class="hasAnchor">
 <a href="#dealing-with-missing-values" class="anchor"></a>Dealing with missing values</h3>
 <p>Most variables were measured three times in one day. We’ll check the time series for missing values using package <code>imputeTS</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="kw"><a href="https://github.com/SteffenMoritz/imputeTS">imputeTS</a></span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="kw"><a href="https://github.com/stefvanbuuren/mice">mice</a></span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SteffenMoritz/imputeTS">imputeTS</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/stefvanbuuren/mice">mice</a></span><span class="op">)</span>
 
 <span class="co"># We want to use these variables</span>
 <span class="co"># Note: the infix function '%ci%' is from package 'invctr'</span>
-<span class="kw">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="st">"energetic"</span><span class="op">%ci%</span><span class="kw">manyAnalystsESM</span>,<span class="st">"procrast"</span><span class="op">%ci%</span><span class="kw">manyAnalystsESM</span>),<span class="st">"avoid_people"</span><span class="op">%ci%</span><span class="kw">manyAnalystsESM</span>)
+<span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="st">"energetic"</span><span class="op">%ci%</span><span class="va">manyAnalystsESM</span>,<span class="st">"procrast"</span><span class="op">%ci%</span><span class="va">manyAnalystsESM</span><span class="op">)</span>,<span class="st">"avoid_people"</span><span class="op">%ci%</span><span class="va">manyAnalystsESM</span><span class="op">)</span>
 
-<span class="kw">df_vars</span> <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span>[,<span class="kw">vars</span>]
+<span class="va">df_vars</span> <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">[</span>,<span class="va">vars</span><span class="op">]</span>
 
 <span class="co"># Plot the timeseries with NAs in red</span>
-<span class="kw">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(mfrow = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">vars</span>)<span class="op">/</span><span class="fl">4</span>),<span class="fl">4</span>),mar =<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>))
-<span class="fu">l_ply</span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="kw">vars</span>), <span class="fu">function</span>(<span class="kw">c</span>){
-  <span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_distribution.html">ggplot_na_distribution</a></span>(x = <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw">df_vars</span>[,<span class="kw">c</span>]), 
-                                title=<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)[<span class="kw">c</span>], 
-                                xlab = <span class="st">""</span>,ylab = <span class="st">""</span>)
-  })
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span>(<span class="kw">op</span>)
-</pre></div>
-<p><code>NA</code> values seem to occur at the same time points across variables. This indicates the participant might have been unable to respond at those times and was not selectively omitting questions. See the vignette <a href="~/library/casnet/doc/imputemissingsata.html">Dealing with missing values in time series</a></p>
+<span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">vars</span><span class="op">)</span><span class="op">/</span><span class="fl">4</span><span class="op">)</span>,<span class="fl">4</span><span class="op">)</span>,mar <span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+<span class="fu">l_ply</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span><span class="op">(</span><span class="va">vars</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">c</span><span class="op">)</span><span class="op">{</span>
+  <span class="fu">imputeTS</span><span class="fu">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_distribution.html">ggplot_na_distribution</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">[</span>,<span class="va">c</span><span class="op">]</span><span class="op">)</span>, 
+                                title<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">)</span><span class="op">[</span><span class="va">c</span><span class="op">]</span>, 
+                                xlab <span class="op">=</span> <span class="st">""</span>,ylab <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></pre></div>
+<p><code>NA</code> values seem to occur at the same time points across variables. This indicates the participant might have been unable to respond at those times and was not selectively omitting questions. See the vignette <a href="https://fredhasselman.com/casnet/articles/imputemissingdata.html">Dealing with missing values in time series</a></p>
 <p>It’s a good practice to always compare results based on imputation to non-imputed data, se we’ll create two datasets:</p>
 <ol style="list-style-type: decimal">
 <li>Remove all <code>NA</code> values</li>
@@ -160,27 +161,26 @@
 <p>The function <code><a href="https://rdrr.io/pkg/mice/man/mice.html">mice()</a></code> will try to select an imputation method based on the variable type if we leave the <code>method</code> argument empty. Here we’ll use <code>method = "cart"</code> to impute all missing data using <em>Classification And Regression Trees</em>. The same results can be obtained using the <em>Random Forest</em> method.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
 <span class="co"># 1. Remove NA </span>
-<span class="kw">out.NA</span> <span class="op">&lt;-</span> <span class="kw">df_vars</span>[<span class="kw">stats</span>::<span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html">complete.cases</a></span>(<span class="kw">df_vars</span>),]
+<span class="va">out.NA</span> <span class="op">&lt;-</span> <span class="va">df_vars</span><span class="op">[</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html">complete.cases</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">)</span>,<span class="op">]</span>
 
 <span class="co"># 2. Classification And Regression Trees / Random Forests</span>
 <span class="co"># RF and CART return (identical) discrete numbers</span>
-<span class="kw">imp.cart</span>  <span class="op">&lt;-</span> <span class="kw">mice</span>::<span class="fu"><a href="https://rdrr.io/pkg/mice/man/mice.html">mice</a></span>(<span class="kw">df_vars</span>, method = <span class="st">'cart'</span>, printFlag = <span class="fl">FALSE</span>)
-<span class="kw">out.cart</span>  <span class="op">&lt;-</span> <span class="kw">mice</span>::<span class="fu"><a href="https://rdrr.io/pkg/mice/man/complete.mids.html">complete</a></span>(<span class="kw">imp.cart</span>)
+<span class="va">imp.cart</span>  <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mice/man/mice.html">mice</a></span><span class="op">(</span><span class="va">df_vars</span>, method <span class="op">=</span> <span class="st">'cart'</span>, printFlag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">out.cart</span>  <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mice/man/complete.mids.html">complete</a></span><span class="op">(</span><span class="va">imp.cart</span><span class="op">)</span>
 
 
 <span class="co"># Plot the timeseries with NAs in red</span>
-<span class="co">for</span>(<span class="kw">c</span> <span class="co">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"angry"</span><span class="op">%ci%</span><span class="kw">df_vars</span>,<span class="st">"ruminate"</span><span class="op">%ci%</span><span class="kw">df_vars</span>)){
-  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">"Remove NA\n"</span>)
-  <span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(x_with_na = <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw">df_vars</span>[,<span class="kw">c</span>]),
-                               x_with_imputations = <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw">df_vars</span>[,<span class="kw">c</span>]<span class="op">%00%</span><span class="fl">0</span>),
-                               title = <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)[<span class="kw">c</span>],<span class="st">"NA removed"</span>), xlab = <span class="st">""</span>, ylab = <span class="st">""</span>)
+<span class="kw">for</span><span class="op">(</span><span class="va">c</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"angry"</span><span class="op">%ci%</span><span class="va">df_vars</span>,<span class="st">"ruminate"</span><span class="op">%ci%</span><span class="va">df_vars</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Remove NA\n"</span><span class="op">)</span>
+  <span class="fu">imputeTS</span><span class="fu">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span><span class="op">(</span>x_with_na <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">[</span>,<span class="va">c</span><span class="op">]</span><span class="op">)</span>,
+                               x_with_imputations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">[</span>,<span class="va">c</span><span class="op">]</span><span class="op">%00%</span><span class="fl">0</span><span class="op">)</span>,
+                               title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">)</span><span class="op">[</span><span class="va">c</span><span class="op">]</span>,<span class="st">"NA removed"</span><span class="op">)</span>, xlab <span class="op">=</span> <span class="st">""</span>, ylab <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
 
-  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">"Classification And Regression Trees\n"</span>)
-  <span class="kw">imputeTS</span>::<span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span>(x_with_na = <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw">df_vars</span>[,<span class="kw">c</span>]),
-                               x_with_imputations = <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw">out.cart</span>[,<span class="kw">c</span>]),
-                               title = <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">df_vars</span>)[<span class="kw">c</span>],<span class="st">"CART"</span>), xlab = <span class="st">""</span>, ylab = <span class="st">""</span>)
-}
-</pre></div>
+  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Classification And Regression Trees\n"</span><span class="op">)</span>
+  <span class="fu">imputeTS</span><span class="fu">::</span><span class="fu"><a href="https://SteffenMoritz.github.io/imputeTS/reference/ggplot_na_imputations.html">ggplot_na_imputations</a></span><span class="op">(</span>x_with_na <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">[</span>,<span class="va">c</span><span class="op">]</span><span class="op">)</span>,
+                               x_with_imputations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">out.cart</span><span class="op">[</span>,<span class="va">c</span><span class="op">]</span><span class="op">)</span>,
+                               title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">)</span><span class="op">[</span><span class="va">c</span><span class="op">]</span>,<span class="st">"CART"</span><span class="op">)</span>, xlab <span class="op">=</span> <span class="st">""</span>, ylab <span class="op">=</span> <span class="st">""</span><span class="op">)</span>
+<span class="op">}</span></pre></div>
 <pre><code>&gt; Remove NA
 &gt; Classification And Regression Trees
 &gt; Remove NA
@@ -207,26 +207,25 @@
 <p>We’ll assume these variables indicate a “global sate” of the system.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
 <span class="co"># Use the date information in the dataset to create time series objects</span>
-<span class="kw">dates</span>      <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">start</span>[<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">unsatisfy</span>)]
-<span class="kw">days</span>       <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="kw">dates</span>, <span class="st">"%m/%d/%Y"</span>)
-<span class="kw">hours</span>      <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">hours</span>[<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">hours</span>)]
-<span class="kw">difficult</span>  <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">difficult</span>[<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">difficult</span>)]
-<span class="kw">unsatisfy</span>  <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">unsatisfy</span>[<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">unsatisfy</span>)]
+<span class="va">dates</span>      <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">unsatisfy</span><span class="op">)</span><span class="op">]</span>
+<span class="va">days</span>       <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="va">dates</span>, <span class="st">"%m/%d/%Y"</span><span class="op">)</span>
+<span class="va">hours</span>      <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">hours</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">hours</span><span class="op">)</span><span class="op">]</span>
+<span class="va">difficult</span>  <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">difficult</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">difficult</span><span class="op">)</span><span class="op">]</span>
+<span class="va">unsatisfy</span>  <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">unsatisfy</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">unsatisfy</span><span class="op">)</span><span class="op">]</span>
 
-<span class="kw">df_sleep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(days = <span class="kw">days</span>,
-                       hours_sleep = <span class="kw">hours</span>,
-                       difficult_sleep = <span class="kw">difficult</span>,
-                       unsatisfy_sleep = <span class="kw">unsatisfy</span>) <span class="op">%&gt;%</span> 
-  <span class="kw">tidyr</span>::<span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(key = <span class="kw">variable</span>, value = <span class="kw">quality_sleep</span>, <span class="op">-</span><span class="kw">days</span>, factor_key = <span class="fl">TRUE</span>)
+<span class="va">df_sleep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>days <span class="op">=</span> <span class="va">days</span>,
+                       hours_sleep <span class="op">=</span> <span class="va">hours</span>,
+                       difficult_sleep <span class="op">=</span> <span class="va">difficult</span>,
+                       unsatisfy_sleep <span class="op">=</span> <span class="va">unsatisfy</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span><span class="op">(</span>key <span class="op">=</span> <span class="va">variable</span>, value <span class="op">=</span> <span class="va">quality_sleep</span>, <span class="op">-</span><span class="va">days</span>, factor_key <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">df_sleep</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(x = <span class="kw">days</span>, y = <span class="kw">quality_sleep</span>)) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(linetype = <span class="fl">2</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(pch=<span class="fl">16</span>, size=<span class="fl">2</span>, colour = <span class="st">"steelblue"</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span>(<span class="kw">variable</span><span class="op">~</span><span class="kw">.</span>, scales = <span class="st">"free_y"</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_date</a></span>(breaks = <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw">days</span>)) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(panel.grid.minor = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>(),
-                     axis.text.x = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(angle = <span class="fl">90</span>, vjust =<span class="fl">0.5</span>))
-</pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_sleep</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">days</span>, y <span class="op">=</span> <span class="va">quality_sleep</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>pch<span class="op">=</span><span class="fl">16</span>, size<span class="op">=</span><span class="fl">2</span>, colour <span class="op">=</span> <span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">variable</span><span class="op">~</span><span class="va">.</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_date</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">days</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>panel.grid.minor <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,
+                     axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">90</span>, vjust <span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;"></p>
 </div>
 <div id="detecting-periods-of-relative-stability-using-recursive-partitioning" class="section level3">
@@ -235,30 +234,29 @@
 <p>We can use function <code><a href="../reference/ts_levels.html">ts_levels()</a></code> to evaluate whether there are sudden jumps (gains or losses) in the data. The method uses function <code><a href="https://rdrr.io/pkg/rpart/man/rpart.html">rpart::rpart()</a></code> and has several arguments that control when a level should be considered, that is, how many datapoints should a level last minimally; how much must the signal change before a new level is considered, etc. Check the manual pages for more details. `</p>
 <p>The value of <code>minDataSplit</code> tells the algorithm how many data points need to be in a segment before a change of level is considered. Here we choose <code>minDataSplit = 6</code>, which is 2 days.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="kw">minSplit</span> <span class="op">=</span> <span class="fl">6</span>
-<span class="kw">lvl1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">hours</span>, minDataSplit = <span class="kw">minSplit</span>)
-<span class="kw">lvl2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">difficult</span>, minDataSplit = <span class="kw">minSplit</span>) 
-<span class="kw">lvl3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">unsatisfy</span>, minDataSplit = <span class="kw">minSplit</span>) 
+<span class="va">minSplit</span> <span class="op">=</span> <span class="fl">6</span>
+<span class="va">lvl1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">hours</span>, minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span>
+<span class="va">lvl2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">difficult</span>, minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span> 
+<span class="va">lvl3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">unsatisfy</span>, minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span> 
 
 <span class="co"># ggplot likes the long data format</span>
-<span class="kw">df_sleep</span><span class="op">$</span><span class="kw">level</span> <span class="op">&lt;-</span>  
-  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(days = <span class="kw">days</span>,
-             hours_sleep_lvl = <span class="kw">lvl1</span><span class="op">$</span><span class="kw">pred</span><span class="op">$</span><span class="kw">p</span>,
-             difficult_sleep_lvl = <span class="kw">lvl2</span><span class="op">$</span><span class="kw">pred</span><span class="op">$</span><span class="kw">p</span>,
-             unsatisfy_sleep_lvl = <span class="kw">lvl3</span><span class="op">$</span><span class="kw">pred</span><span class="op">$</span><span class="kw">p</span>) <span class="op">%&gt;%</span> 
-  <span class="kw">tidyr</span>::<span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(key = <span class="kw">variable_lvl</span>, value = <span class="kw">level</span>, <span class="op">-</span><span class="kw">days</span>, factor_key = <span class="fl">TRUE</span>) <span class="op">%&gt;%</span>
-  <span class="kw">dplyr</span>::<span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="st">"level"</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">.</span>)
+<span class="va">df_sleep</span><span class="op">$</span><span class="va">level</span> <span class="op">&lt;-</span>  
+  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>days <span class="op">=</span> <span class="va">days</span>,
+             hours_sleep_lvl <span class="op">=</span> <span class="va">lvl1</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">p</span>,
+             difficult_sleep_lvl <span class="op">=</span> <span class="va">lvl2</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">p</span>,
+             unsatisfy_sleep_lvl <span class="op">=</span> <span class="va">lvl3</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">p</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span><span class="op">(</span>key <span class="op">=</span> <span class="va">variable_lvl</span>, value <span class="op">=</span> <span class="va">level</span>, <span class="op">-</span><span class="va">days</span>, factor_key <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="st">"level"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>
   
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">df_sleep</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(x = <span class="kw">days</span>)) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(y = <span class="kw">quality_sleep</span>), linetype = <span class="fl">2</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(y = <span class="kw">quality_sleep</span>), pch=<span class="fl">16</span>, size=<span class="fl">2</span>, colour = <span class="st">"steelblue"</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(y = <span class="kw">level</span>), colour = <span class="st">"red3"</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span>(<span class="kw">variable</span><span class="op">~</span><span class="kw">.</span>, scales = <span class="st">"free_y"</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_date</a></span>(breaks = <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw">days</span>)) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(panel.grid.minor = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>(),
-                     axis.text.x = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(angle = <span class="fl">90</span>, vjust =<span class="fl">0.5</span>))
-</pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df_sleep</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">days</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">quality_sleep</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">quality_sleep</span><span class="op">)</span>, pch<span class="op">=</span><span class="fl">16</span>, size<span class="op">=</span><span class="fl">2</span>, colour <span class="op">=</span> <span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">level</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"red3"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">variable</span><span class="op">~</span><span class="va">.</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_date</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">days</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>panel.grid.minor <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,
+                     axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">90</span>, vjust <span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>There appear to be more or less synchronous <code>jumps</code> and <code>stages</code>, or, <code>levels</code> in the raw data of variables <code>difficult</code> and <code>unsatisfy</code>. The levels in variable <code>hours</code>, representing hours of sleep seem to show the inverted pattern.</p>
 </div>
@@ -270,31 +268,27 @@
 <p>Use <code><a href="../reference/dc_win.html">dc_win()</a></code> to calculate Dynamic Complexity. The function can also call <code><a href="../reference/plotDC_res.html">plotDC_res()</a></code> to produce a <em>Complexity Resonance Diagram</em>.</p>
 <p>We need to make sure all variables are on the same scale, for this dataset there’s no need to transform, all data are on a scale of <code>0-100</code>. If no value is passed to arguments <code>from_scale_min</code> and <code>from_scale_max</code> and argument <code>rescale = TRUE</code> then the minimum and maximum value in each column will be used. This should be used if scale limits are unknown (or <code>-Inf</code> and <code>+Inf</code>). If the theoretical limits are known, they should be passed. If the data contain a mix of known scale ranges, transformation should be done manually.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="kw">win</span> <span class="op">=</span> <span class="fl">6</span>
+<span class="va">win</span> <span class="op">=</span> <span class="fl">6</span>
 
 <span class="co"># NA removed </span>
-<span class="kw">dc.caseNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span>(<span class="kw">out.NA</span>, win = <span class="kw">win</span>, scale_min=<span class="fl">0</span>, scale_max=<span class="fl">100</span>, doPlot = <span class="fl">TRUE</span>, colOrder = <span class="fl">TRUE</span>)
-</pre></div>
+<span class="va">dc.caseNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span><span class="op">(</span><span class="va">out.NA</span>, win <span class="op">=</span> <span class="va">win</span>, scale_min<span class="op">=</span><span class="fl">0</span>, scale_max<span class="op">=</span><span class="fl">100</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span>, colOrder <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-6-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>Dynamic complexity is calculated as a product of <em>fluctuation intensity</em> calculated by function <code><a href="../reference/dc_f.html">dc_f()</a></code> and <em>distribution uniformity</em> calculated by <code><a href="../reference/dc_d.html">dc_d()</a></code>. These functions can be called seperately, or, you can set the argument <code>returnFandD = TRUE</code> in function <code><a href="../reference/dc_win.html">dc_win()</a></code>.</p>
 <p>There are several options for sorting the variables on the y-axis by setting the <code>colOrder</code> argument. If set to <code>TRUE</code> like the figure above the order variables appear as columns in the dataframe will be used. Setting it to <code>FALSE</code> will sort by vasriable name.</p>
 <p>We can use the <code>df</code> field of the <code><a href="../reference/dc_win.html">dc_win()</a></code> output as input for <code><a href="../reference/plotDC_res.html">plotDC_res()</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span>(df_win = <span class="kw">dc.caseNA</span>, win = <span class="kw">win</span>, doPlot = <span class="fl">TRUE</span>, colOrder = <span class="fl">FALSE</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span><span class="op">(</span>df_win <span class="op">=</span> <span class="va">dc.caseNA</span>, win <span class="op">=</span> <span class="va">win</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span>, colOrder <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-7-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>An interesting option is to sort by the mean value of Dynamic Complexity, to do so set the <code>colOrder</code> argument to <code>NA</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span>(df_win = <span class="kw">dc.caseNA</span>, win = <span class="kw">win</span>, doPlot = <span class="fl">TRUE</span>, colOrder = <span class="fl">NA</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span><span class="op">(</span>df_win <span class="op">=</span> <span class="va">dc.caseNA</span>, win <span class="op">=</span> <span class="va">win</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span>, colOrder <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-8-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>Let’s compare to the <code>cart</code> imputation by MICE.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit">
 <span class="co"># CART with observed scale</span>
-<span class="kw">dc.caseIMP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span>(<span class="kw">out.cart</span>, win=<span class="kw">win</span>, scale_min=<span class="fl">0</span>, scale_max=<span class="fl">100</span>, colOrder = <span class="fl">TRUE</span>)
+<span class="va">dc.caseIMP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span><span class="op">(</span><span class="va">out.cart</span>, win<span class="op">=</span><span class="va">win</span>, scale_min<span class="op">=</span><span class="fl">0</span>, scale_max<span class="op">=</span><span class="fl">100</span>, colOrder <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span>(df_win = <span class="kw">dc.caseIMP</span>, win = <span class="kw">win</span>, doPlot = <span class="fl">TRUE</span>, colOrder = <span class="fl">NA</span>, title = <span class="st">"Complexity Resonance Diagram (CART)"</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_res.html">plotDC_res</a></span><span class="op">(</span>df_win <span class="op">=</span> <span class="va">dc.caseIMP</span>, win <span class="op">=</span> <span class="va">win</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span>, colOrder <span class="op">=</span> <span class="cn">NA</span>, title <span class="op">=</span> <span class="st">"Complexity Resonance Diagram (CART)"</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-9-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>There are some differences, and this is expected of course when imputing or removing <code>NA</code>s. To see how these differences may affect the inference of periods of destabilisation we run the <em>Cumulative Complexity Peak</em> analysis on both datasets.</p>
 <div id="cumulative-complexity-peaks" class="section level4">
@@ -304,41 +298,39 @@
 <p>If we plot 2 versions of the analysis, the differences between the methods are apparent, but overall both methods seem to recover the same periods of destabilisation.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit">
 <span class="co"># Use the date information in the dataset to create time series objects</span>
-<span class="kw">datesNA</span> <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">start</span>[<span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html">complete.cases</a></span>(<span class="kw">df_vars</span>)]
-<span class="kw">daysNA</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span>(<span class="kw">datesNA</span>, <span class="st">"%m/%d/%Y"</span>)
+<span class="va">datesNA</span> <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html">complete.cases</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">)</span><span class="op">]</span>
+<span class="va">daysNA</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="va">datesNA</span>, <span class="st">"%m/%d/%Y"</span><span class="op">)</span>
 
-<span class="kw">ccp.caseNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_ccp.html">dc_ccp</a></span>(df_win = <span class="kw">dc.caseNA</span>)
-<span class="fu"><a href="../reference/plotDC_ccp.html">plotDC_ccp</a></span>(df_ccp = <span class="kw">ccp.caseNA</span>, win = <span class="kw">win</span>, colOrder = <span class="fl">NA</span>, title = <span class="st">"Cumulative Complexity Peak Plot (Remove missing values)"</span>, useTimeVector = <span class="kw">daysNA</span>)
-</pre></div>
+<span class="va">ccp.caseNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_ccp.html">dc_ccp</a></span><span class="op">(</span>df_win <span class="op">=</span> <span class="va">dc.caseNA</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plotDC_ccp.html">plotDC_ccp</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.caseNA</span>, win <span class="op">=</span> <span class="va">win</span>, colOrder <span class="op">=</span> <span class="cn">NA</span>, title <span class="op">=</span> <span class="st">"Cumulative Complexity Peak Plot (Remove missing values)"</span>, useTimeVector <span class="op">=</span> <span class="va">daysNA</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="kw">datesIMP</span>      <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">start</span>
-<span class="kw">dateTimesIMP</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span>(<span class="kw">datesIMP</span>, <span class="st">"%m/%d/%Y %H:%M"</span>)
-<span class="kw">ccp.caseIMP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_ccp.html">dc_ccp</a></span>(df_win = <span class="kw">dc.caseIMP</span>)
+<span class="va">datesIMP</span>      <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span>
+<span class="va">dateTimesIMP</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span><span class="op">(</span><span class="va">datesIMP</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span>
+<span class="va">ccp.caseIMP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_ccp.html">dc_ccp</a></span><span class="op">(</span>df_win <span class="op">=</span> <span class="va">dc.caseIMP</span><span class="op">)</span>
 <span class="co"># Change the time stamp fromat</span>
-<span class="fu"><a href="../reference/plotDC_ccp.html">plotDC_ccp</a></span>(df_ccp = <span class="kw">ccp.caseIMP</span>, win = <span class="kw">win</span>, colOrder = <span class="fl">NA</span>, 
-           useTimeVector = <span class="kw">dateTimesIMP</span>, timeStamp = <span class="st">"31-01-99"</span>,
-           title = <span class="st">"Cumulative Complexity Peak Plot (CART)"</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_ccp.html">plotDC_ccp</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.caseIMP</span>, win <span class="op">=</span> <span class="va">win</span>, colOrder <span class="op">=</span> <span class="cn">NA</span>, 
+           useTimeVector <span class="op">=</span> <span class="va">dateTimesIMP</span>, timeStamp <span class="op">=</span> <span class="st">"31-01-99"</span>,
+           title <span class="op">=</span> <span class="st">"Cumulative Complexity Peak Plot (CART)"</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-10-2.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can query which timepoints a Complexity Peaks were registered.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit">
 <span class="co"># Remove NA</span>
-<span class="kw">dateTimesNA</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span>(<span class="kw">datesNA</span>, <span class="st">"%m/%d/%Y %H:%M"</span>)
-<span class="kw">dateTimesNA</span>[<span class="kw">ccp.caseNA</span><span class="op">$</span><span class="kw">sig.peaks</span><span class="op">&gt;</span><span class="fl">0</span>]
-</pre></div>
+<span class="va">dateTimesNA</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span><span class="op">(</span><span class="va">datesNA</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span>
+<span class="va">dateTimesNA</span><span class="op">[</span><span class="va">ccp.caseNA</span><span class="op">$</span><span class="va">sig.peaks</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">]</span></pre></div>
 <pre><code>&gt; [1] "2014-11-02 21:27:00 CET" "2014-11-03 09:54:00 CET"
 &gt; [3] "2014-11-03 17:42:00 CET" "2014-11-10 21:05:00 CET"
 &gt; [5] "2014-11-12 21:37:00 CET" "2014-11-18 13:54:00 CET"
 &gt; [7] "2014-11-27 09:29:00 CET"</code></pre>
 <div class="sourceCode" id="cb15"><pre class="downlit">
 <span class="co">#  CART</span>
-<span class="kw">dateTimesIMP</span>[<span class="kw">ccp.caseIMP</span><span class="op">$</span><span class="kw">sig.peaks</span><span class="op">&gt;</span><span class="fl">0</span>]
-</pre></div>
-<pre><code>&gt; [1] "2014-11-02 21:27:00 CET" "2014-11-03 09:54:00 CET"
-&gt; [3] "2014-11-03 17:42:00 CET" "2014-11-10 21:05:00 CET"
-&gt; [5] "2014-11-12 21:37:00 CET" "2014-11-18 13:54:00 CET"
-&gt; [7] "2014-11-26 13:12:00 CET"</code></pre>
+<span class="va">dateTimesIMP</span><span class="op">[</span><span class="va">ccp.caseIMP</span><span class="op">$</span><span class="va">sig.peaks</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">]</span></pre></div>
+<pre><code>&gt;  [1] "2014-11-02 21:27:00 CET" "2014-11-03 09:54:00 CET"
+&gt;  [3] "2014-11-10 17:45:00 CET" "2014-11-10 21:05:00 CET"
+&gt;  [5] "2014-11-12 21:37:00 CET" "2014-11-14 21:15:00 CET"
+&gt;  [7] "2014-11-15 09:18:00 CET" "2014-11-15 13:30:00 CET"
+&gt;  [9] "2014-11-18 13:54:00 CET" "2014-11-25 21:22:00 CET"
+&gt; [11] "2014-11-26 13:12:00 CET"</code></pre>
 </div>
 </div>
 <div id="plot-state-versus-complexity" class="section level2">
@@ -347,40 +339,34 @@
 <p>One could look for a single variable that best predicts level changes, e.g. by looking at crosscorrelation functions, or by extracting peak-complexity times and gain/loss events can average the time course of dynamic complexity in a number of ways. Here we use the</p>
 <div class="sourceCode" id="cb17"><pre class="downlit">
 <span class="co"># Dates for state variables</span>
-<span class="kw">dates</span>       <span class="op">&lt;-</span> <span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">start</span>
-<span class="kw">dateTimesS</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span>(<span class="kw">dates</span>, <span class="st">"%m/%d/%Y %H:%M"</span>))
-<span class="kw">idNA</span>        <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html">complete.cases</a></span>(<span class="kw">df_vars</span>)
+<span class="va">dates</span>       <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span>
+<span class="va">dateTimesS</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html">as.POSIXct</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span><span class="op">(</span><span class="va">dates</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">idNA</span>        <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html">complete.cases</a></span><span class="op">(</span><span class="va">df_vars</span><span class="op">)</span>
 
-<span class="kw">df_lvl_hrs</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">hours</span>,minDataSplit = <span class="kw">minSplit</span>)
-<span class="kw">df_lvl_diff</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">difficult</span>,minDataSplit = <span class="kw">minSplit</span>)
-<span class="kw">df_lvl_unsat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">unsatisfy</span>,minDataSplit = <span class="kw">minSplit</span>)
+<span class="va">df_lvl_hrs</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">hours</span>,minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span>
+<span class="va">df_lvl_diff</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">difficult</span>,minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span>
+<span class="va">df_lvl_unsat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">unsatisfy</span>,minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span>
 
-<span class="kw">df_lvl_hrsNA</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">hours</span>[<span class="kw">idNA</span>],minDataSplit = <span class="kw">minSplit</span>)
-<span class="kw">df_lvl_diffNA</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">difficult</span>[<span class="kw">idNA</span>],minDataSplit = <span class="kw">minSplit</span>)
-<span class="kw">df_lvl_unsatNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span>(<span class="kw">manyAnalystsESM</span><span class="op">$</span><span class="kw">unsatisfy</span>[<span class="kw">idNA</span>],minDataSplit = <span class="kw">minSplit</span>)
+<span class="va">df_lvl_hrsNA</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">hours</span><span class="op">[</span><span class="va">idNA</span><span class="op">]</span>,minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span>
+<span class="va">df_lvl_diffNA</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">difficult</span><span class="op">[</span><span class="va">idNA</span><span class="op">]</span>,minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span>
+<span class="va">df_lvl_unsatNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">unsatisfy</span><span class="op">[</span><span class="va">idNA</span><span class="op">]</span>,minDataSplit <span class="op">=</span> <span class="va">minSplit</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseIMP</span>, df_win = <span class="kw">dc.caseIMP</span>, df_lvl = <span class="kw">df_lvl_hrs</span>, useTimeVector = <span class="kw">dateTimesS</span>, win = <span class="kw">win</span>, subtitle = <span class="st">"CART"</span>, levelName = <span class="st">"Hours sleep"</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.caseIMP</span>, df_win <span class="op">=</span> <span class="va">dc.caseIMP</span>, df_lvl <span class="op">=</span> <span class="va">df_lvl_hrs</span>, useTimeVector <span class="op">=</span> <span class="va">dateTimesS</span>, win <span class="op">=</span> <span class="va">win</span>, subtitle <span class="op">=</span> <span class="st">"CART"</span>, levelName <span class="op">=</span> <span class="st">"Hours sleep"</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit">
-<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseNA</span>, df_win = <span class="kw">dc.caseNA</span>, df_lvl = <span class="kw">df_lvl_hrsNA</span>, useTimeVector = <span class="kw">dateTimesS</span>[<span class="kw">idNA</span>], win = <span class="kw">win</span>, subtitle = <span class="st">"Remove NA"</span>, levelName = <span class="st">"Hours sleep"</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.caseNA</span>, df_win <span class="op">=</span> <span class="va">dc.caseNA</span>, df_lvl <span class="op">=</span> <span class="va">df_lvl_hrsNA</span>, useTimeVector <span class="op">=</span> <span class="va">dateTimesS</span><span class="op">[</span><span class="va">idNA</span><span class="op">]</span>, win <span class="op">=</span> <span class="va">win</span>, subtitle <span class="op">=</span> <span class="st">"Remove NA"</span>, levelName <span class="op">=</span> <span class="st">"Hours sleep"</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-2.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit">
-<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseIMP</span>, df_win = <span class="kw">dc.caseIMP</span>, df_lvl = <span class="kw">df_lvl_diff</span>, useTimeVector = <span class="kw">dateTimesS</span>, win = <span class="kw">win</span>, subtitle = <span class="st">"CART"</span>, levelName = <span class="st">"Difficulty sleeping"</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.caseIMP</span>, df_win <span class="op">=</span> <span class="va">dc.caseIMP</span>, df_lvl <span class="op">=</span> <span class="va">df_lvl_diff</span>, useTimeVector <span class="op">=</span> <span class="va">dateTimesS</span>, win <span class="op">=</span> <span class="va">win</span>, subtitle <span class="op">=</span> <span class="st">"CART"</span>, levelName <span class="op">=</span> <span class="st">"Difficulty sleeping"</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-3.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit">
-<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseNA</span>, df_win = <span class="kw">dc.caseNA</span>, df_lvl = <span class="kw">df_lvl_diffNA</span>, useTimeVector = <span class="kw">dateTimesS</span>[<span class="kw">idNA</span>], win = <span class="kw">win</span>, subtitle = <span class="st">"Remove NA"</span>, levelName = <span class="st">"Difficulty sleeping"</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.caseNA</span>, df_win <span class="op">=</span> <span class="va">dc.caseNA</span>, df_lvl <span class="op">=</span> <span class="va">df_lvl_diffNA</span>, useTimeVector <span class="op">=</span> <span class="va">dateTimesS</span><span class="op">[</span><span class="va">idNA</span><span class="op">]</span>, win <span class="op">=</span> <span class="va">win</span>, subtitle <span class="op">=</span> <span class="st">"Remove NA"</span>, levelName <span class="op">=</span> <span class="st">"Difficulty sleeping"</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-4.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit">
-<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseIMP</span>, df_win = <span class="kw">dc.caseIMP</span>, df_lvl = <span class="kw">df_lvl_unsat</span>, useTimeVector = <span class="kw">dateTimesS</span>, win = <span class="kw">win</span>, subtitle = <span class="st">"CART"</span>, levelName = <span class="st">"Unsatisfactory sleep"</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.caseIMP</span>, df_win <span class="op">=</span> <span class="va">dc.caseIMP</span>, df_lvl <span class="op">=</span> <span class="va">df_lvl_unsat</span>, useTimeVector <span class="op">=</span> <span class="va">dateTimesS</span>, win <span class="op">=</span> <span class="va">win</span>, subtitle <span class="op">=</span> <span class="st">"CART"</span>, levelName <span class="op">=</span> <span class="st">"Unsatisfactory sleep"</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-5.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit">
-<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span>(df_ccp = <span class="kw">ccp.caseNA</span>, df_win = <span class="kw">dc.caseNA</span>, df_lvl = <span class="kw">df_lvl_unsatNA</span>, useTimeVector = <span class="kw">dateTimesS</span>[<span class="kw">idNA</span>], win = <span class="kw">win</span>, subtitle = <span class="st">"Remove NA"</span>, levelName = <span class="st">"Unsatisfactory sleep"</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plotDC_lvl.html">plotDC_lvl</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.caseNA</span>, df_win <span class="op">=</span> <span class="va">dc.caseNA</span>, df_lvl <span class="op">=</span> <span class="va">df_lvl_unsatNA</span>, useTimeVector <span class="op">=</span> <span class="va">dateTimesS</span><span class="op">[</span><span class="va">idNA</span><span class="op">]</span>, win <span class="op">=</span> <span class="va">win</span>, subtitle <span class="op">=</span> <span class="st">"Remove NA"</span>, levelName <span class="op">=</span> <span class="st">"Unsatisfactory sleep"</span><span class="op">)</span></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-6.png" width="504" style="display: block; margin: auto;"></p>
 <p>Look for max complexity peaks around level changes.</p>
 </div>
@@ -388,7 +374,7 @@
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
 <p>Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F., Boker, S. M., Ceulemans, E., Chen, M., … Bringmann, L. F. (2019, March 21). Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology. <a href="https://doi.org/10.31234/osf.io/c8vp7" class="uri">https://doi.org/10.31234/osf.io/c8vp7</a></p>
-<p>Fisher, A. J., &amp; Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. <em>Assessment, 23(4)</em>, 496–506. <a href="https://doi.org/10.1177/1073191116638735-Fisher" class="uri">https://doi.org/10.1177/1073191116638735-Fisher</a></p>
+<p>Fisher, A. J., &amp; Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. <em>Assessment, 23(4)</em>, 496–506. <a href="https://doi.org/10.1177/1073191116638735" class="uri">https://doi.org/10.1177/1073191116638735</a></p>
 <p>Haken H, &amp; Schiepek G. (2006). <em>Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten</em>. Hogrefe, Göttingen.</p>
 <p>Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. <em>European Journal of Psychological Assessment, 19</em>, 175-184. <a href="https://doi.org/10.1027//1015-5759.19.3.175" class="uri">https://doi.org/10.1027//1015-5759.19.3.175</a></p>
 <p>Schiepek, G., &amp; Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. <em>Biological cybernetics, 102(3)</em>, 197-207. <a href="https://doi.org/10.1007/s00422-009-0362-1" class="uri">https://doi.org/10.1007/s00422-009-0362-1</a></p>

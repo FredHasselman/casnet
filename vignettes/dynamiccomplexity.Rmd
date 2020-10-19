@@ -2,18 +2,12 @@
 title: "Applied Synergetics: Dynamic Complexity in a Clinical Case Study"
 author: "Fred Hasselman & Merlijn Olthof"
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
-csl: apa.csl
-output: 
-  html_vignette:
-    toc: true
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEncoding{UTF-8}
   \usepackage[utf8]{inputenc}
   %\VignetteIndexEntry{Applied Synergetics: Dynamic Complexity in a Clinical Case Study}
-  %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  chunk_output_type: console
+  %\VignetteEngine{knitr::rmarkdown} 
 ---
 
 ```{r setup, include = FALSE}
@@ -84,7 +78,7 @@ l_ply(seq_along(vars), function(c){
 par(op)
 ```
 
-`NA` values seem to occur at the same time points across variables. This indicates the participant might have been unable to respond at those times and was not selectively omitting questions. See the vignette [Dealing with missing values in time series](~/library/casnet/doc/imputemissingsata.html)
+`NA` values seem to occur at the same time points across variables. This indicates the participant might have been unable to respond at those times and was not selectively omitting questions. See the vignette [Dealing with missing values in time series](https://fredhasselman.com/casnet/articles/imputemissingdata.html)
 
 It's a good practice to always compare results based on imputation to non-imputed data, se we'll create two datasets:
 
@@ -318,7 +312,7 @@ Look for max complexity peaks around level changes.
 
 Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F., Boker, S. M., Ceulemans, E., Chen, M., … Bringmann, L. F. (2019, March 21). Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology. https://doi.org/10.31234/osf.io/c8vp7
 
-Fisher, A. J., & Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. *Assessment, 23(4)*, 496–506. https://doi.org/10.1177/1073191116638735-Fisher
+Fisher, A. J., & Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. *Assessment, 23(4)*, 496–506. https://doi.org/10.1177/1073191116638735
 
 Haken H, & Schiepek G. (2006). *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
 

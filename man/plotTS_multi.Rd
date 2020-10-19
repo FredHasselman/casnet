@@ -55,7 +55,7 @@ Plot Multivariate Time Series Data
 }
 \examples{
 
-# Generate some coloured noise
+# Use the coloured noise data set.
  data(ColouredNoise)
  plotTS_multi(ColouredNoise)
 

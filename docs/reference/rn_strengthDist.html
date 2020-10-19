@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,7 +146,7 @@
     <p>Calculates the Recurrence Rate versus Recurrence Time power-law</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rn_strengthDist</span>(<span class='kw'>g</span>, mode = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"in"</span>, <span class='st'>"out"</span>, <span class='st'>"all"</span>)[<span class='fl'>3</span>], doPlot = <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>rn_strengthDist</span><span class='op'>(</span><span class='va'>g</span>, mode <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"in"</span>, <span class='st'>"out"</span>, <span class='st'>"all"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span>, doPlot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -168,13 +171,13 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='kw'>y</span>  <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>)
-<span class='kw'>RN</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rn.html'>rn</a></span>(<span class='kw'>y</span>, emLag=<span class='fl'>1</span>, emDim=<span class='fl'>3</span>, emRad=<span class='fl'>NA</span>, weighted = <span class='fl'>TRUE</span>, weightedBy = <span class='st'>"rt"</span>, returnGraph = <span class='fl'>TRUE</span>)
+<span class='va'>y</span>  <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span>
+<span class='va'>RN</span> <span class='op'>&lt;-</span> <span class='fu'><a href='rn.html'>rn</a></span><span class='op'>(</span><span class='va'>y</span>, emLag<span class='op'>=</span><span class='fl'>1</span>, emDim<span class='op'>=</span><span class='fl'>3</span>, emRad<span class='op'>=</span><span class='cn'>NA</span>, weighted <span class='op'>=</span> <span class='cn'>TRUE</span>, weightedBy <span class='op'>=</span> <span class='st'>"rt"</span>, returnGraph <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; Auto-recurrence: Setting diagonal to (1 + max. distance) for analyses
 #&gt; 
 #&gt; Searching for a radius that will yield 0.05 for RR </div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Converged! Found an appropriate radius...</span></div><div class='input'><span class='fu'>rn_strengthDist</span>(<span class='kw'>RN</span><span class='op'>$</span><span class='kw'>g</span>)
+#&gt; <span class='message'>Converged! Found an appropriate radius...</span></div><div class='input'><span class='fu'>rn_strengthDist</span><span class='op'>(</span><span class='va'>RN</span><span class='op'>$</span><span class='va'>g</span><span class='op'>)</span>
 </div><div class='img'><img src='rn_strengthDist-1.png' alt='' width='700' height='433' /></div><div class='output co'>#&gt;    xDegree yStrength xDegree_log10 yStrength_log10 PowerLaw PowerLawExponent
 #&gt; 1        5       337     0.6989700        2.527630 2.172712         1.011334
 #&gt; 2        1        77     0.0000000        1.886491 1.465820         1.011334

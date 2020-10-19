@@ -67,7 +67,7 @@ A line is fitted on the periodogram in log-log coordinates. The full range is fi
 }
 }
 \references{
-Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 
 Hurvich, C.M., & Deo, R.R. (1999). Plug-in Selection of the Number of Frequencies in Regression Estimates of the Memory Parameter of a Long Memory Time Series. \emph{Journal of Time Series Analysis, 20(3)}, 331–341.
 }

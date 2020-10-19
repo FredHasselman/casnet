@@ -45,6 +45,13 @@ Distribution Uniformity
 
 Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.
 }
+\references{
+Haken H, & Schiepek G. (2006). \emph{Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten}. Hogrefe, Göttingen.
+
+Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. \emph{European Journal of Psychological Assessment, 19}, 175-184. https://doi.org/10.1027//1015-5759.19.3.175
+
+Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. \emph{Biological cybernetics, 102(3)}, 197-207. https://doi.org/10.1007/s00422-009-0362-1
+}
 \seealso{
 Use \code{\link[=dc_win]{dc_win()}} to get the Dynamic Complexity measure.
 

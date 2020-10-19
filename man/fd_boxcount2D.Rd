@@ -82,7 +82,7 @@ This function was inspired by the \code{Matlab} function \code{boxcount.m} \href
 }
 \examples{
 
-fd_boxcount2D(y = rnorm(100))
+\donttest{fd_boxcount2D(y = rnorm(100))}
 
 
 }

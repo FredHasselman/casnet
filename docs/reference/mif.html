@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,14 +146,14 @@
     <p>Calculate the lagged mutual information fucntion within (auto-mif) or between (cross-mif) time series, or, conditional on another time series (conditional-cross-mif). Alternatively, calculate the total information of a multivariate dataset for different lags.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mif</span>(
-  <span class='kw'>y</span>,
-  lags = <span class='op'>-</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>10</span>,
-  nbins = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span>(<span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)<span class='op'>^</span>(<span class='fl'>1</span><span class='op'>/</span><span class='fl'>3</span>)),
-  doPlot = <span class='fl'>FALSE</span>,
-  surTest = <span class='fl'>FALSE</span>,
-  alpha = <span class='fl'>0.05</span>
-)</pre>
+    <pre class="usage"><span class='fu'>mif</span><span class='op'>(</span>
+  <span class='va'>y</span>,
+  lags <span class='op'>=</span> <span class='op'>-</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>10</span>,
+  nbins <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>ceiling</a></span><span class='op'>(</span><span class='fl'>2</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>^</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>,
+  doPlot <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  surTest <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  alpha <span class='op'>=</span> <span class='fl'>0.05</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -193,12 +196,12 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Lags to evaluate mututal information</span>
-<span class='kw'>lags</span> <span class='op'>&lt;-</span> <span class='op'>-</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>30</span>
+<span class='va'>lags</span> <span class='op'>&lt;-</span> <span class='op'>-</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>30</span>
 
 <span class='co'># Auto-mutual information</span>
-<span class='kw'>y1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0</span>, <span class='fl'>100</span>, by = <span class='fl'>1</span><span class='op'>/</span><span class='fl'>8</span>)<span class='op'>*</span><span class='kw'>pi</span>)
+<span class='va'>y1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>100</span>, by <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fl'>8</span><span class='op'>)</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>)</span>
 
-(<span class='fu'>mif</span>(<span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='kw'>y1</span>),lags = <span class='kw'>lags</span>))
+<span class='op'>(</span><span class='fu'>mif</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='va'>y1</span><span class='op'>)</span>,lags <span class='op'>=</span> <span class='va'>lags</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
 #&gt; 1.653815 1.927735 1.646619 1.573201 1.567816 1.678095 1.455365 1.497499 
 #&gt;       -2       -1        0        1        2        3        4        5 
@@ -220,10 +223,10 @@
 #&gt; attr(,"nbins")
 #&gt; [1] 19</div><div class='input'>
 <span class='co'># Cross-mututal information, y2 is a lagged version y1</span>
-<span class='kw'>y2</span> <span class='op'>&lt;-</span> <span class='kw'>y1</span>[<span class='fl'>10</span><span class='op'>:</span><span class='fl'>801</span>]
+<span class='va'>y2</span> <span class='op'>&lt;-</span> <span class='va'>y1</span><span class='op'>[</span><span class='fl'>10</span><span class='op'>:</span><span class='fl'>801</span><span class='op'>]</span>
 
-<span class='kw'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='fu'><a href='ts_trimfill.html'>ts_trimfill</a></span>(<span class='kw'>y1</span>, <span class='kw'>y2</span>, action = <span class='st'>"trim.cut"</span>))
-(<span class='fu'>mif</span>(<span class='kw'>y</span>,lags = <span class='kw'>lags</span>))
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='fu'><a href='ts_trimfill.html'>ts_trimfill</a></span><span class='op'>(</span><span class='va'>y1</span>, <span class='va'>y2</span>, action <span class='op'>=</span> <span class='st'>"trim.cut"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>(</span><span class='fu'>mif</span><span class='op'>(</span><span class='va'>y</span>,lags <span class='op'>=</span> <span class='va'>lags</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
 #&gt; 1.623019 1.473869 1.859470 1.558334 1.621646 1.607086 1.562827 1.923477 
 #&gt;       -2       -1        0        1        2        3        4        5 
@@ -245,8 +248,8 @@
 #&gt; attr(,"nbins")
 #&gt; [1] 19</div><div class='input'>
 <span class='co'># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span>
-<span class='kw'>y</span><span class='op'>$</span><span class='kw'>s</span> <span class='op'>&lt;-</span> <span class='kw'>y2</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y2</span>))
-(<span class='fu'>mif</span>(<span class='kw'>y</span>,lags = <span class='kw'>lags</span>))
+<span class='va'>y</span><span class='op'>$</span><span class='va'>s</span> <span class='op'>&lt;-</span> <span class='va'>y2</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y2</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>(</span><span class='fu'>mif</span><span class='op'>(</span><span class='va'>y</span>,lags <span class='op'>=</span> <span class='va'>lags</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
 #&gt; 1.811587 1.741921 1.948223 1.829110 1.957668 1.976480 1.921872 2.029502 
 #&gt;       -2       -1        0        1        2        3        4        5 
@@ -268,8 +271,8 @@
 #&gt; attr(,"nbins")
 #&gt; [1] 19</div><div class='input'>
 <span class='co'># Multi-information, the information of the entire multivariate series at each lag</span>
-<span class='kw'>y</span><span class='op'>$</span><span class='kw'>y3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span>(<span class='kw'>y</span>)))
-(<span class='fu'>mif</span>(<span class='kw'>y</span>,lags = <span class='kw'>lags</span>))
+<span class='va'>y</span><span class='op'>$</span><span class='va'>y3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>(</span><span class='fu'>mif</span><span class='op'>(</span><span class='va'>y</span>,lags <span class='op'>=</span> <span class='va'>lags</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
 #&gt; 5.006500 4.997671 4.996383 4.993673 5.145355 5.145201 5.142589 5.143853 
 #&gt;       -2       -1        0        1        2        3        4        5 

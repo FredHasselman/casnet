@@ -19,8 +19,8 @@
 #' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
 #' @param rescaleDist Should the distance matrix be rescaled? Options are "none", "maxDist" to create a unit scale, "meanScale" to creat z-scores based on the mean distance. (default = `"none"`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`.
-#' @param returnMeasures Should values be returned to the console window and as an attribute? (default = `FALSE`)
-#' @param doPlot Plot the matrix by calling [rp_plot()] with defult settings
+#' @param returnMeasures Should the output of [rp_measures()] be returned as an attribute `"measures"` to the matrix? If `silent = FALSE` results will also be output to the console. (default = `FALSE`)
+#' @param doPlot Plot the matrix by calling [rp_plot()] with default settings
 #' @param doEmbed If `FALSE`, a distance matrix will be returned that is not embedded by `emDim` and `emLag`. If `y1` and/or `y2` are data frames, the columns will be used as dimensions (default = `TRUE`)
 #' @param silent Silent-ish mode
 #' @param ... Any paramters to pass to [rp_plot()] if `doPlot = TRUE`
@@ -152,7 +152,7 @@ rp <- function(y1, y2 = NULL,
   }
 
   if(returnMeasures){
-    rpOut <-  rp_measures(RM = dmat)
+    rpOut <-  rp_measures(RM = dmat, silent = silent)
   } else {
     rpOut <- NA
   }
@@ -877,10 +877,10 @@ rp_diagProfile <- function(RM,
 #' The latter location is stored as an option and can be read by calling `getOption("casnet.path_to_rp")`.
 #'
 #' @section Troubleshooting:
-#' Some notes on resolving errors with `rp`.The script will first try to download the correct executable, if that fails it will try to extract the file from a .zip archive in `...\\casnet\\commandline_rp\\crp_cl.zip`. If that fails, the copy will have failed. It should be relatively easy to get `rp_cl()` working using custom settings:
+#' Some notes on resolving errors with `rp`.The script will first try to download the correct executable, if that fails, the copy will have... failed. It should be relatively easy to get `rp_cl()` working though, by using some custom settings:
 #'
 #'
-#' + *Copy failed* - Every time the function `rp_cl()` is called it will check whether a log file `rp_instal_log.txt` is present in the `...\\casnet\\exec\\` directory. If you delete the `rp_instal_log.txt` file, and call the function, another attempt will be madxe to download a copy of the executable.
+#' + *Copy failed* - Every time the function `rp_cl()` is called it will check whether a log file `rp_instal_log.txt` is present in the `...\\casnet\\exec\\` directory. If you delete the `rp_instal_log.txt` file, and call the function, another attempt will be made to download a copy of the executable.
 #'
 #' + *Copy still fails and/or no permission to copy* - If you cannot acces the directory `...\\casnet\\commandline_rp\\`, download the appropriate executable from the [Commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php) page and copy to a directory you do have the rights to: *execute* commands, *write* and *read* files. Make sure you rename the file to `rp` (`rp.exe` on Windows OS). Then, either pass the path to `rp` as the argument `path_to_rp` in the `rp_cl(.., path_to_rp = "YOUR_PATH")` function call, or, as a more permanent solution, set the `path_to_rp` option by calling `options(casnet.path_to_rp="YOUR_PATH")`.
 #'

@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,17 +146,17 @@
     <p>The 'elastic scaler'will rescale numeric vectors (1D, or columns in a matrix or data.frame) to a user defined minimum and maximum, either based on the extrema in the data, or, a minimum and maximum defined by the user.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>elascer</span>(
-  <span class='kw'>x</span>,
-  mn = <span class='fl'>NA</span>,
-  mx = <span class='fl'>NA</span>,
-  lo = <span class='fl'>0</span>,
-  hi = <span class='fl'>1</span>,
-  groupwise = <span class='fl'>FALSE</span>,
-  keepNA = <span class='fl'>TRUE</span>,
-  boundaryPrecision = <span class='fl'>NA</span>,
-  tol = <span class='kw'>.Machine</span><span class='op'>$</span><span class='kw'>double.eps</span><span class='op'>^</span><span class='fl'>0.5</span>
-)</pre>
+    <pre class="usage"><span class='fu'>elascer</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  mn <span class='op'>=</span> <span class='cn'>NA</span>,
+  mx <span class='op'>=</span> <span class='cn'>NA</span>,
+  lo <span class='op'>=</span> <span class='fl'>0</span>,
+  hi <span class='op'>=</span> <span class='fl'>1</span>,
+  groupwise <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  keepNA <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  boundaryPrecision <span class='op'>=</span> <span class='cn'>NA</span>,
+  tol <span class='op'>=</span> <span class='va'>.Machine</span><span class='op'>$</span><span class='va'>double.eps</span><span class='op'>^</span><span class='fl'>0.5</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,56 +213,56 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Works on numeric objects</span>
-<span class='kw'>somenumbers</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='op'>-</span><span class='fl'>5</span>,<span class='fl'>100</span>,<span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='fl'>2</span>)),<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='fl'>1</span>),<span class='fl'>0</span>,<span class='op'>-</span><span class='kw'>pi</span>))
+<span class='va'>somenumbers</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>5</span>,<span class='fl'>100</span>,<span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>,<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>,<span class='fl'>0</span>,<span class='op'>-</span><span class='va'>pi</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># Using the defaults:</span>
 <span class='co'># 1. mn and mx are derived globally (groupWise = FALSE)</span>
 <span class='co'># 2. values rescaled to hi and lo are integers, 0 and 1 respectively</span>
-<span class='fu'>elascer</span>(<span class='kw'>somenumbers</span>)
+<span class='fu'>elascer</span><span class='op'>(</span><span class='va'>somenumbers</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;           V1         V2
 #&gt; 1 0.00000000 0.07350745
 #&gt; 2 1.00000000 0.04761905
 #&gt; 3 0.06108775 0.01769912</div><div class='input'>
 <span class='co'># If the data contain values &lt; mn they will return as &lt; lo</span>
-<span class='fu'>elascer</span>(<span class='kw'>somenumbers</span>,mn=<span class='op'>-</span><span class='fl'>100</span>)
+<span class='fu'>elascer</span><span class='op'>(</span><span class='va'>somenumbers</span>,mn<span class='op'>=</span><span class='op'>-</span><span class='fl'>100</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;          V1        V2
 #&gt; 1 0.4750000 0.5135914
 #&gt; 2 1.0000000 0.5000000
 #&gt; 3 0.5070711 0.4842920</div><div class='input'><span class='co'># If the data contain values &gt; mx they will return &gt; hi</span>
-<span class='fu'>elascer</span>(<span class='kw'>somenumbers</span>,mx=<span class='fl'>99</span>)
+<span class='fu'>elascer</span><span class='op'>(</span><span class='va'>somenumbers</span>,mx<span class='op'>=</span><span class='fl'>99</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;           V1         V2
 #&gt; 1 0.00000000 0.07421425
 #&gt; 2 1.00961538 0.04807692
 #&gt; 3 0.06167513 0.01786930</div><div class='input'>
 <span class='co'># Effect of setting groupWise</span>
-<span class='fu'>elascer</span>(<span class='kw'>somenumbers</span>,lo=<span class='op'>-</span><span class='fl'>1</span>,hi=<span class='fl'>1</span>)
+<span class='fu'>elascer</span><span class='op'>(</span><span class='va'>somenumbers</span>,lo<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span>,hi<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;           V1         V2
 #&gt; 1 -1.0000000 -0.8529851
 #&gt; 2  1.0000000 -0.9047619
-#&gt; 3 -0.8778245 -0.9646018</div><div class='input'><span class='fu'>elascer</span>(<span class='kw'>somenumbers</span>,lo=<span class='op'>-</span><span class='fl'>1</span>,hi=<span class='fl'>1</span>, groupwise = <span class='fl'>TRUE</span>)
+#&gt; 3 -0.8778245 -0.9646018</div><div class='input'><span class='fu'>elascer</span><span class='op'>(</span><span class='va'>somenumbers</span>,lo<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span>,hi<span class='op'>=</span><span class='fl'>1</span>, groupwise <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;           V1          V2
 #&gt; 1 -1.0000000  1.00000000
 #&gt; 2  1.0000000  0.07223889
 #&gt; 3 -0.8778245 -1.00000000</div><div class='input'>
-<span class='fu'>elascer</span>(<span class='kw'>somenumbers</span>,mn=<span class='op'>-</span><span class='fl'>10</span>,mx=<span class='fl'>100</span>,lo=<span class='op'>-</span><span class='fl'>1</span>,hi=<span class='fl'>4</span>)
+<span class='fu'>elascer</span><span class='op'>(</span><span class='va'>somenumbers</span>,mn<span class='op'>=</span><span class='op'>-</span><span class='fl'>10</span>,mx<span class='op'>=</span><span class='fl'>100</span>,lo<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span>,hi<span class='op'>=</span><span class='fl'>4</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;           V1         V2
 #&gt; 1 -0.7727273 -0.4218963
 #&gt; 2  4.0000000 -0.5454545
-#&gt; 3 -0.4811721 -0.6882542</div><div class='input'><span class='fu'>elascer</span>(<span class='kw'>somenumbers</span>,mn= <span class='fl'>NA</span>,mx=<span class='fl'>100</span>,lo=<span class='op'>-</span><span class='fl'>1</span>,hi=<span class='fl'>4</span>, groupwise = <span class='fl'>TRUE</span>)
+#&gt; 3 -0.4811721 -0.6882542</div><div class='input'><span class='fu'>elascer</span><span class='op'>(</span><span class='va'>somenumbers</span>,mn<span class='op'>=</span> <span class='cn'>NA</span>,mx<span class='op'>=</span><span class='fl'>100</span>,lo<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span>,hi<span class='op'>=</span><span class='fl'>4</span>, groupwise <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;           V1         V2
 #&gt; 1 -1.0000000 -0.7159306
 #&gt; 2  4.0000000 -0.8477049
 #&gt; 3 -0.6945613 -1.0000000</div><div class='input'>
 <span class='co'># Effect of setting boundaryPrecision</span>
-<span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span>(<span class='fl'>1</span><span class='op'>/</span><span class='fl'>3</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>7</span>)
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>3</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>7</span><span class='op'>)</span>
 
-<span class='kw'>re1</span> <span class='op'>&lt;-</span> <span class='fu'>elascer</span>(<span class='kw'>x</span>, lo = <span class='fl'>0</span>, hi = <span class='fl'>1</span><span class='op'>/</span><span class='fl'>13</span>, boundaryPrecision = <span class='fl'>NA</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='kw'>re1</span>)<span class='op'>==</span><span class='fl'>0.07692308</span> <span class='co'># FALSE</span>
-</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='kw'>re1</span>)<span class='op'>==</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>13</span>       <span class='co'># TRUE</span>
+<span class='va'>re1</span> <span class='op'>&lt;-</span> <span class='fu'>elascer</span><span class='op'>(</span><span class='va'>x</span>, lo <span class='op'>=</span> <span class='fl'>0</span>, hi <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fl'>13</span>, boundaryPrecision <span class='op'>=</span> <span class='cn'>NA</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>re1</span><span class='op'>)</span><span class='op'>==</span><span class='fl'>0.07692308</span> <span class='co'># FALSE</span>
+</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>re1</span><span class='op'>)</span><span class='op'>==</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>13</span>       <span class='co'># TRUE</span>
 </div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
-<span class='kw'>re2</span> <span class='op'>&lt;-</span> <span class='fu'>elascer</span>(<span class='kw'>x</span>, lo = <span class='fl'>0</span>, hi = <span class='fl'>1</span><span class='op'>/</span><span class='fl'>13</span>, boundaryPrecision = <span class='fl'>8</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='kw'>re2</span>)<span class='op'>==</span><span class='fl'>0.07692308</span> <span class='co'># TRUE</span>
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='kw'>re2</span>)<span class='op'>==</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>13</span>       <span class='co'># FALSE</span>
+<span class='va'>re2</span> <span class='op'>&lt;-</span> <span class='fu'>elascer</span><span class='op'>(</span><span class='va'>x</span>, lo <span class='op'>=</span> <span class='fl'>0</span>, hi <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fl'>13</span>, boundaryPrecision <span class='op'>=</span> <span class='fl'>8</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>re2</span><span class='op'>)</span><span class='op'>==</span><span class='fl'>0.07692308</span> <span class='co'># TRUE</span>
+</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>re2</span><span class='op'>)</span><span class='op'>==</span><span class='fl'>1</span><span class='op'>/</span><span class='fl'>13</span>       <span class='co'># FALSE</span>
 </div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
 </div></pre>
   </div>

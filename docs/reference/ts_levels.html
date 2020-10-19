@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,14 +146,14 @@
     <p>Use recursive partitioning function (<a href='https://rdrr.io/pkg/rpart/man/rpart.html'>rpart</a> to perform a 'classification' of relatively stable levels in a timeseries.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ts_levels</span>(
-  <span class='kw'>y</span>,
-  minDataSplit = <span class='fl'>12</span>,
-  minLevelDuration = <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='kw'>minDataSplit</span><span class='op'>/</span><span class='fl'>3</span>),
-  changeSensitivity = <span class='fl'>0.01</span>,
-  maxLevels = <span class='fl'>30</span>,
-  method = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"anova"</span>, <span class='st'>"poisson"</span>, <span class='st'>"class"</span>, <span class='st'>"exp"</span>)[<span class='fl'>1</span>]
-)</pre>
+    <pre class="usage"><span class='fu'>ts_levels</span><span class='op'>(</span>
+  <span class='va'>y</span>,
+  minDataSplit <span class='op'>=</span> <span class='fl'>12</span>,
+  minLevelDuration <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='va'>minDataSplit</span><span class='op'>/</span><span class='fl'>3</span><span class='op'>)</span>,
+  changeSensitivity <span class='op'>=</span> <span class='fl'>0.01</span>,
+  maxLevels <span class='op'>=</span> <span class='fl'>30</span>,
+  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"anova"</span>, <span class='st'>"poisson"</span>, <span class='st'>"class"</span>, <span class='st'>"exp"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -215,14 +218,14 @@
     <pre class="examples"><div class='input'>
 <span class='co'># Levels in white noise?</span>
 
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>4321</span>)
-<span class='kw'>wn</span> <span class='op'>&lt;-</span> <span class='fu'>ts_levels</span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>))
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='kw'>wn</span><span class='op'>$</span><span class='kw'>pred</span><span class='op'>$</span><span class='kw'>x</span>,<span class='kw'>wn</span><span class='op'>$</span><span class='kw'>pred</span><span class='op'>$</span><span class='kw'>y</span>, type = <span class='st'>"l"</span>)
-</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></span>(<span class='kw'>wn</span><span class='op'>$</span><span class='kw'>pred</span><span class='op'>$</span><span class='kw'>p</span>, col = <span class='st'>"red3"</span>, lwd = <span class='fl'>2</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>4321</span><span class='op'>)</span>
+<span class='va'>wn</span> <span class='op'>&lt;-</span> <span class='fu'>ts_levels</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>wn</span><span class='op'>$</span><span class='va'>pred</span><span class='op'>$</span><span class='va'>x</span>,<span class='va'>wn</span><span class='op'>$</span><span class='va'>pred</span><span class='op'>$</span><span class='va'>y</span>, type <span class='op'>=</span> <span class='st'>"l"</span><span class='op'>)</span>
+</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></span><span class='op'>(</span><span class='va'>wn</span><span class='op'>$</span><span class='va'>pred</span><span class='op'>$</span><span class='va'>p</span>, col <span class='op'>=</span> <span class='st'>"red3"</span>, lwd <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='input'>
 <span class='co'># This is due to the default changeSensitivity of 0.01</span>
 
-<span class='fu'><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></span>(<span class='fu'>ts_levels</span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>100</span>),changeSensitivity = <span class='fl'>.1</span>)<span class='op'>$</span><span class='kw'>pred</span><span class='op'>$</span><span class='kw'>p</span>, col = <span class='st'>"steelblue"</span>, lwd = <span class='fl'>2</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></span><span class='op'>(</span><span class='fu'>ts_levels</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span>,changeSensitivity <span class='op'>=</span> <span class='fl'>.1</span><span class='op'>)</span><span class='op'>$</span><span class='va'>pred</span><span class='op'>$</span><span class='va'>p</span>, col <span class='op'>=</span> <span class='st'>"steelblue"</span>, lwd <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='img'><img src='ts_levels-1.png' alt='' width='700' height='433' /></div><div class='input'>
 
 </div></pre>

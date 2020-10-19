@@ -66,7 +66,7 @@ fd_dfa(
 \item{tsName}{Name of y added as a subtitle to the plot}
 }
 \value{
-Estimate of Hurst exponent (slope of \code{log(bin)} vs. \verb{log(RMSE))} and an FD estimate based on Hasselman(2013)
+Estimate of Hurst exponent (slope of \code{log(bin)} vs. \verb{log(RMSE))} and an FD estimate based on Hasselman (2013)
 A list object containing:
 \itemize{
 \item A data matrix \code{PLAW} with columns \code{freq.norm}, \code{size} and \code{bulk}.
@@ -79,7 +79,7 @@ A list object containing:
 fd_dfa
 }
 \references{
-Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. \url{http://doi.org/10.3389/fphys.2013.00075}
+Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 }
 \seealso{
 Other Fluctuation Analyses: 

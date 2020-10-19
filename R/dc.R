@@ -24,6 +24,11 @@
 #'
 #' @return If `doPlot = TRUE`, a list object containing a data frame of Dynamic Complexity values and a `ggplot2` object of the dynamic complexity resonance diagram. If `doPlot = FALSE` the data frame with Dynamic Complexity series is returned.
 #'
+#'
+#' @references Haken H, & Schiepek G. (2006). *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
+#' @references Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. *European Journal of Psychological Assessment, 19*, 175-184. https://doi.org/10.1027//1015-5759.19.3.175
+#' @references  Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. *Biological cybernetics, 102(3)*, 197-207. https://doi.org/10.1007/s00422-009-0362-1
+#'
 #' @export
 #'
 #' @author Merlijn Olthof
@@ -122,6 +127,9 @@ dc_win <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, doPlo
 #' @author Merlijn Olthof
 #' @author Fred Hasselman
 #'
+#' @references Haken H, & Schiepek G. (2006). *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
+#' @references Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. *European Journal of Psychological Assessment, 19*, 175-184. https://doi.org/10.1027//1015-5759.19.3.175
+#' @references  Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. *Biological cybernetics, 102(3)*, 197-207. https://doi.org/10.1007/s00422-009-0362-1
 #'
 #' @family Dynamic Complexity functions
 #'
@@ -180,6 +188,10 @@ dc_ccp = function(df_win , alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE,
 #' @export
 #'
 #' @seealso Use [dc_win()] to get the dynamic complexity measure.
+#'
+#' @references Haken H, & Schiepek G. (2006). *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
+#' @references Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. *European Journal of Psychological Assessment, 19*, 175-184. https://doi.org/10.1027//1015-5759.19.3.175
+#' @references  Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. *Biological cybernetics, 102(3)*, 197-207. https://doi.org/10.1007/s00422-009-0362-1
 #'
 #' @family Dynamic Complexity functions
 #'
@@ -320,6 +332,9 @@ get_fluct <- function(y_win,s){
 #'
 #' @seealso Use [dc_win()] to get the Dynamic Complexity measure.
 #'
+#' @references Haken H, & Schiepek G. (2006). *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
+#' @references Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. *European Journal of Psychological Assessment, 19*, 175-184. https://doi.org/10.1027//1015-5759.19.3.175
+#' @references  Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. *Biological cybernetics, 102(3)*, 197-207. https://doi.org/10.1007/s00422-009-0362-1
 #' @family Dynamic Complexity functions
 #'
 dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
@@ -395,3 +410,139 @@ dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVar
   }
 }
 
+
+#' Windowed variance
+#'
+#' Calculate variance in a right-aligned sliding window on (multivariate) time series data.
+#'
+#' @note For different step-sizes or window alignments see [ts_windower()].
+#'
+#' @inheritParams dc_win
+#'
+#' @return Data frame with variance in requested window size.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' # Use ColouredNoise data, first scale each series to 0-1.
+#' data(ColouredNoise)
+#' var_win(elascer(ColouredNoise,groupwise = TRUE), win = 128, doPlot = TRUE)
+#'
+var_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
+
+  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+    time_vec <- stats::time(df)
+  } else {
+    time_vec <- NA
+  }
+
+  if(is.null(dim(df))){
+    if(is.numeric(df)){
+      df <- data.frame(df)
+    } else {
+      df <- data.frame(as.numeric_discrete(df))
+    }
+  }
+
+  if(win<=0){stop("Need a window > 0")}
+
+  tsNames <- colnames(df)
+
+  df_var <- matrix(NA, nrow=nrow(df), ncol=ncol(df))
+  df_var <- data.frame(df_var)
+
+  for(column in (1:NCOL(df))){
+    for (i in (0:(nrow(df)-win))){
+      df_var[(i+win), column] <- var(df[(i+1):(i+win), column], na.rm = TRUE)
+    }
+  }
+
+  #df_var <- df_var[1:nrow(df),]
+  attr(df_var,"time") <- time_vec
+  if(is.null(dim(df_var))){
+    df_var <- data.frame(df_var)
+  }
+
+  colnames(df_var) <- tsNames
+
+  g <- NULL
+  if(doPlot){
+    g <- plotDC_res(df_win = df_var, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot, title = "Variance Resonance Diagram", resVariable = "Auto-covariance")
+    return(list(data = df_var, graph = g))
+  } else {
+    return(df_var)
+  }
+}
+
+
+#' Windowed autocorrelation function
+#'
+#' Calculate the autocorrelation function in a right-aligned sliding window on (multivariate) time series data.
+#'
+#' @note For different step-sizes or window alignments see [ts_windower()].
+#'
+#' @inheritParams dc_win
+#'
+#' @return Data frame with autocorrelations in requested window size.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' @examples
+#'
+#' data(ColouredNoise)
+#' ac_win(elascer(ColouredNoise[,c(1,11,21,31,41)],groupwise = TRUE), win = 128, doPlot = TRUE)
+#'
+ac_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
+
+  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+    time_vec <- stats::time(df)
+  } else {
+    time_vec <- NA
+  }
+
+  if(is.null(dim(df))){
+    if(is.numeric(df)){
+      df <- data.frame(df)
+    } else {
+      df <- data.frame(as.numeric_discrete(df))
+    }
+  }
+
+  if(win<=0){stop("Need a window > 0")}
+
+  tsNames <- colnames(df)
+
+  df_ac <- matrix(NA, nrow=nrow(df), ncol=ncol(df))
+  df_ac <- data.frame(df_ac)
+
+  for(column in (1:NCOL(df))){
+    for (i in (0:(nrow(df)-win))){
+      x <- (df[(i+1):(i+win), column])
+
+      y <- acf(x, lag.max=1, plot=FALSE)
+      y2 <- unique(rapply(y, function(a) head(a,2)))
+      y3 <- as.numeric(y2[2])
+      if(is.na(y3)){y3<-1}
+
+      df_ac[i+win, column] <- y3
+    }
+  }
+
+  attr(df_ac,"time") <- time_vec
+  if(is.null(dim(df_ac))){
+    df_ac <- data.frame(df_ac)
+  }
+
+  colnames(df_ac) <- tsNames
+
+  g <- NULL
+  if(doPlot){
+    g <- plotDC_res(df_win = df_ac, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot, title = "Autocorrelation Resonance Diagram", resVariable = "Auto-correlation at lag 1")
+    return(invisible(list(data = df_ac, graph = g)))
+  } else {
+    return(df_ac)
+  }
+}

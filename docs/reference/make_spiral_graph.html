@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,37 +146,37 @@
     <p>Turn an <a href='https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html'>igraph</a> object into a spiral graph returning a <a href='https://ggplot2.tidyverse.org/reference/ggplot2-package.html'>ggplot2</a> object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>make_spiral_graph</span>(
-  <span class='kw'>g</span>,
-  type = <span class='st'>"Archimedean"</span>,
-  arcs = <span class='fl'>6</span>,
-  a = <span class='fl'>1</span>,
-  b = <span class='kw'>NULL</span>,
-  rev = <span class='fl'>FALSE</span>,
-  curvature = <span class='op'>-</span><span class='fl'>0.6</span>,
-  angle = <span class='fl'>90</span>,
-  markTimeBy = <span class='kw'>NULL</span>,
-  labelSize = <span class='fl'>3</span>,
-  alphaV = <span class='fl'>1</span>,
-  alphaE = <span class='fl'>0.6</span>,
-  showArrows = <span class='fl'>FALSE</span>,
-  title = <span class='st'>""</span>,
-  subtitle = <span class='st'>""</span>,
-  showEpochLegend = <span class='fl'>TRUE</span>,
-  markEpochsBy = <span class='kw'>NULL</span>,
-  epochColours = <span class='kw'>NULL</span>,
-  epochLabel = <span class='st'>"Epoch"</span>,
-  showSizeLegend = <span class='fl'>FALSE</span>,
-  sizeLabel = <span class='st'>"Size"</span>,
-  scaleVertexSize = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>6</span>),
-  vertexBorderColour = <span class='st'>"black"</span>,
-  scaleEdgeSize = <span class='fl'>1</span><span class='op'>/</span><span class='fl'>5</span>,
-  edgeColourLabel = <span class='st'>"Weight"</span>,
-  showEdgeColourLegend = <span class='fl'>FALSE</span>,
-  edgeColourByEpoch = <span class='fl'>TRUE</span>,
-  defaultEdgeColour = <span class='st'>"grey70"</span>,
-  doPlot = <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>make_spiral_graph</span><span class='op'>(</span>
+  <span class='va'>g</span>,
+  type <span class='op'>=</span> <span class='st'>"Archimedean"</span>,
+  arcs <span class='op'>=</span> <span class='fl'>6</span>,
+  a <span class='op'>=</span> <span class='fl'>1</span>,
+  b <span class='op'>=</span> <span class='cn'>NULL</span>,
+  rev <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  curvature <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.6</span>,
+  angle <span class='op'>=</span> <span class='fl'>90</span>,
+  markTimeBy <span class='op'>=</span> <span class='cn'>NULL</span>,
+  labelSize <span class='op'>=</span> <span class='fl'>3</span>,
+  alphaV <span class='op'>=</span> <span class='fl'>1</span>,
+  alphaE <span class='op'>=</span> <span class='fl'>0.6</span>,
+  showArrows <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  title <span class='op'>=</span> <span class='st'>""</span>,
+  subtitle <span class='op'>=</span> <span class='st'>""</span>,
+  showEpochLegend <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  markEpochsBy <span class='op'>=</span> <span class='cn'>NULL</span>,
+  epochColours <span class='op'>=</span> <span class='cn'>NULL</span>,
+  epochLabel <span class='op'>=</span> <span class='st'>"Epoch"</span>,
+  showSizeLegend <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  sizeLabel <span class='op'>=</span> <span class='st'>"Size"</span>,
+  scaleVertexSize <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>6</span><span class='op'>)</span>,
+  vertexBorderColour <span class='op'>=</span> <span class='st'>"black"</span>,
+  scaleEdgeSize <span class='op'>=</span> <span class='fl'>1</span><span class='op'>/</span><span class='fl'>5</span>,
+  edgeColourLabel <span class='op'>=</span> <span class='st'>"Weight"</span>,
+  showEdgeColourLegend <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  edgeColourByEpoch <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  defaultEdgeColour <span class='op'>=</span> <span class='st'>"grey70"</span>,
+  doPlot <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -305,11 +308,11 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='http://igraph.org'>igraph</a></span>)
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://igraph.org'>igraph</a></span><span class='op'>)</span>
 
-<span class='kw'>g</span>  <span class='op'>&lt;-</span> <span class='kw'>igraph</span>::<span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_gnp.html'>sample_gnp</a></span>(<span class='fl'>200</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>20</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/igraph/man/V.html'>V</a></span>(<span class='kw'>g</span>)<span class='op'>$</span><span class='kw'>size</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/igraph/man/degree.html'>degree</a></span>(<span class='kw'>g</span>)
-<span class='fu'>make_spiral_graph</span>(<span class='kw'>g</span>, markTimeBy = <span class='fl'>TRUE</span>, showSizeLegend = <span class='fl'>TRUE</span>, sizeLabel = <span class='st'>"Node degree"</span>)
+<span class='va'>g</span>  <span class='op'>&lt;-</span> <span class='fu'>igraph</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/igraph/man/sample_gnp.html'>sample_gnp</a></span><span class='op'>(</span><span class='fl'>200</span>, <span class='fl'>1</span><span class='op'>/</span><span class='fl'>20</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/igraph/man/V.html'>V</a></span><span class='op'>(</span><span class='va'>g</span><span class='op'>)</span><span class='op'>$</span><span class='va'>size</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/igraph/man/degree.html'>degree</a></span><span class='op'>(</span><span class='va'>g</span><span class='op'>)</span>
+<span class='fu'>make_spiral_graph</span><span class='op'>(</span><span class='va'>g</span>, markTimeBy <span class='op'>=</span> <span class='cn'>TRUE</span>, showSizeLegend <span class='op'>=</span> <span class='cn'>TRUE</span>, sizeLabel <span class='op'>=</span> <span class='st'>"Node degree"</span><span class='op'>)</span>
 </div><div class='img'><img src='make_spiral_graph-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>

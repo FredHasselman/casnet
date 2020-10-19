@@ -119,8 +119,14 @@ mrn <- function(layers,
         edgeFrame2 <- edgeFrame2 %>% filter(edgeFrame2$from%[]%range(wIndexList[[w]])&edgeFrame2$to%[]%range(wIndexList[[w]]))
         gb  <- graph_from_data_frame(edgeFrame2, directed = directed)
 
+        if(any(igraph::ecount(ga)==0,igraph::ecount(gb)==0)){
+          mp[combis$X1[i],combis$X2[i]] <- NA
+          eo[combis$X1[i],combis$X2[i]] <- NA
+        } else {
         mp[combis$X1[i],combis$X2[i]] <- mi_interlayer(ga,gb)
         eo[combis$X1[i],combis$X2[i]] <- igraph::ecount(ga %s% gb) / (igraph::ecount(ga) + igraph::ecount(gb))
+        }
+
         #igraph::ecount(layers[[combis$X1[i]]] %s% layers[[combis$X2[i]]]) / (igraph::ecount(layers[[combis$X1[i]]]) + igraph::ecount(layers[[combis$X2[i]]]))
       }
 

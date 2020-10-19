@@ -103,6 +103,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -143,18 +146,18 @@
     <p>Allan Variance Analysis</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fd_allan</span>(
-  <span class='kw'>y</span>,
-  fs = <span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/tsp.html'>tsp</a></span>(<span class='kw'>stats</span>::<span class='fu'><a href='https://rdrr.io/r/stats/tsp.html'>hasTsp</a></span>(<span class='kw'>y</span>))[<span class='fl'>3</span>],
-  useSD = <span class='fl'>FALSE</span>,
-  doPlot = <span class='fl'>FALSE</span>,
-  returnPlot = <span class='fl'>FALSE</span>,
-  returnPLAW = <span class='fl'>FALSE</span>,
-  returnInfo = <span class='fl'>FALSE</span>,
-  silent = <span class='fl'>FALSE</span>,
-  noTitle = <span class='fl'>FALSE</span>,
-  tsName = <span class='st'>"y"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>fd_allan</span><span class='op'>(</span>
+  <span class='va'>y</span>,
+  fs <span class='op'>=</span> <span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/tsp.html'>tsp</a></span><span class='op'>(</span><span class='fu'>stats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/tsp.html'>hasTsp</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>3</span><span class='op'>]</span>,
+  useSD <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  doPlot <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  returnPlot <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  returnPLAW <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  returnInfo <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  silent <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  noTitle <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  tsName <span class='op'>=</span> <span class='st'>"y"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

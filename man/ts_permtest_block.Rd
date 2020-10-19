@@ -43,11 +43,11 @@ Use block randomistion to get a permutation test evaluation of the deviation of 
 }
 \examples{
 
-set.seed(4321)
+\donttest{set.seed(4321)
 y1 <- rnorm(5000)
 y2 <- y1-(mean(y1)+rnorm(1))
 
-ts_permtest_block(y1 = y1, y2 = y2)
+ts_permtest_block(y1 = y1, y2 = y2)}
 
 }
 \seealso{

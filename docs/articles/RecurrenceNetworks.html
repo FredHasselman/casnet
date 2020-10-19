@@ -61,6 +61,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+    </li>
+    <li>
       <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
@@ -93,7 +96,9 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Recurrence Networks</h1>
+                        <h4 class="author">Fred Hasselman</h4>
             
+            <h4 class="date">2020-10-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/RecurrenceNetworks.Rmd"><code>vignettes/RecurrenceNetworks.Rmd</code></a></small>
       <div class="hidden name"><code>RecurrenceNetworks.Rmd</code></div>
@@ -117,15 +122,14 @@
 <p>Package <code>casnet</code> has some functions to create recurrence networks, they are similar to the functions used for CRQA: * <code><a href="../reference/rn.html">rn()</a></code> is very similar to <code><a href="../reference/rp.html">rp()</a></code>, it will create a matrix based on embedding parameters. One difference is the option to create a weighted matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value is retained and acts as an edge-weight * <code><a href="../reference/rn_plot.html">rn_plot()</a></code> will produce the same as <code><a href="../reference/rp_plot.html">rp_plot()</a></code></p>
 <p>We can turn the recurrence matrix into an adjecency matrix, an <code>igraph</code> object. This means we can use all the <code>igraph</code> functions to calculate network measures.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://igraph.org">igraph</a></span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org">igraph</a></span><span class="op">)</span>
 <span class="co">#library(qgraph)</span>
 <span class="co">#library(survival)</span>
 <span class="co"># Reload the data we used earlier</span>
-<span class="kw">series</span> <span class="op">&lt;-</span> <span class="kw">rio</span>::<span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="st">"https://github.com/complexity-methods/CSA-assignments/raw/master/assignment_data/BasicTSA_arma/series.xlsx"</span>)
+<span class="va">series</span> <span class="op">&lt;-</span> <span class="fu">rio</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span><span class="op">(</span><span class="st">"https://github.com/complexity-methods/CSA-assignments/raw/master/assignment_data/BasicTSA_arma/series.xlsx"</span><span class="op">)</span>
 
 <span class="co"># Lets use a shorter dataset to speed things up</span>
-<span class="kw">series</span> <span class="op">&lt;-</span> <span class="kw">series</span>[<span class="fl">1</span><span class="op">:</span><span class="fl">500</span>,]
-</pre></div>
+<span class="va">series</span> <span class="op">&lt;-</span> <span class="va">series</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">500</span>,<span class="op">]</span></pre></div>
 <p>We’ll analyse the three time series as a recurrence network: * Compare the results by comparing the different measures - Remember: TS_1 was white noise, TS_2 was a sine with added noise, TS_3 was the logistic map in the chaotic regime. * Note that some of the RQA measures can be exactly calculated from the measures of the network representation. - Try to understand why the Recurrence is represented as the <em>degree centrality</em> of the network (<code><a href="https://rdrr.io/pkg/igraph/man/centr_degree.html">igraph::centr_degree()</a></code>)</p>
 <div id="ts-1" class="section level3 unnumbered">
 <h3 class="hasAnchor">
@@ -134,16 +138,14 @@
 <span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix TS_1</span>
 <span class="co">#----------------------</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="kw">series</span><span class="op">$</span><span class="kw">TS_1</span>))
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">series</span><span class="op">$</span><span class="va">TS_1</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
 
-<span class="kw">arcs</span> <span class="op">&lt;-</span> <span class="fl">6</span>
+<span class="va">arcs</span> <span class="op">&lt;-</span> <span class="fl">6</span>
 
 <span class="co"># Because these are generated signals, look for a drop in FNN below 1%.</span>
-<span class="kw">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(y = <span class="kw">series</span><span class="op">$</span><span class="kw">TS_1</span>, nnThres = <span class="fl">1</span>)
-</pre></div>
+<span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">series</span><span class="op">$</span><span class="va">TS_1</span>, nnThres <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-2.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a></span>
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co"># By passing emRad = NA, a radius will be calculated</span></span>
@@ -210,14 +212,12 @@
 <span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix TS_2</span>
 <span class="co">#----------------------</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="kw">series</span><span class="op">$</span><span class="kw">TS_2</span>))
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">series</span><span class="op">$</span><span class="va">TS_2</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit">
 
 <span class="co"># Because these are generated signals, look for a drop in FNN below 1%.</span>
-<span class="kw">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(y = <span class="kw">series</span><span class="op">$</span><span class="kw">TS_2</span>, nnThres = <span class="fl">1</span>)
-</pre></div>
+<span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">series</span><span class="op">$</span><span class="va">TS_2</span>, nnThres <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-4-2.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a></span>
 <span id="cb9-2"><a href="#cb9-2"></a>RN2 &lt;-<span class="st"> </span><span class="kw">rn</span>(<span class="dt">y1 =</span> series<span class="op">$</span>TS_<span class="dv">2</span>, <span class="dt">emDim =</span> p2<span class="op">$</span>optimDim, <span class="dt">emLag =</span> p2<span class="op">$</span>optimLag, <span class="dt">emRad =</span> <span class="ot">NA</span>,  <span class="dt">targetValue =</span> <span class="fl">0.05</span>)</span>
@@ -283,14 +283,12 @@
 <span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix TS_3</span>
 <span class="co">#----------------------</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span>(<span class="kw">series</span><span class="op">$</span><span class="kw">TS_3</span>))
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">series</span><span class="op">$</span><span class="va">TS_3</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb13"><pre class="downlit">
 
 <span class="co"># Because these are generated signals, look for a drop in FNN below 1%.</span>
-<span class="kw">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span>(y = <span class="kw">series</span><span class="op">$</span><span class="kw">TS_3</span>, nnThres = <span class="fl">1</span>)
-</pre></div>
+<span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">series</span><span class="op">$</span><span class="va">TS_3</span>, nnThres <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-5-2.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a></span>
 <span id="cb14-2"><a href="#cb14-2"></a>RN3 &lt;-<span class="st"> </span><span class="kw">rn</span>(<span class="dt">y1 =</span> series<span class="op">$</span>TS_<span class="dv">3</span>, <span class="dt">emDim =</span> p3<span class="op">$</span>optimDim, <span class="dt">emLag =</span> p3<span class="op">$</span>optimLag, <span class="dt">emRad =</span> <span class="ot">NA</span>, <span class="dt">targetValue =</span> <span class="fl">0.05</span>)</span>

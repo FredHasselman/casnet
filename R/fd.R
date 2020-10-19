@@ -28,7 +28,7 @@ FDrel <- function(g){
 #' \deqn{D_{PSD}\approx\frac{3}{2}+\frac{14}{33}*\tanh\left(Slope * \ln(1+\sqrt{2})\right)}
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 #'
 #'
 sa2fd_psd <- function(sa, ...){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)))), digits = 2))}
@@ -51,7 +51,7 @@ sa2fd_psd <- function(sa, ...){return(round(3/2 + ((14/33)*tanh(sa*log(1+sqrt(2)
 #'
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 #'
 sa2fd_dfa <- function(sa, ...){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 
@@ -72,7 +72,7 @@ sa2fd_dfa <- function(sa, ...){return(round(2-(tanh(log(3)*sa)), digits = 2))}
 #' @export
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 #'
 #'
 sa2fd_sda <- function(sa, ...){return(1-sa)}
@@ -128,7 +128,7 @@ fd_RR <- function(y){
 #'
 #' @author Fred Hasselman
 #'
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 #' @references Hurvich, C.M., & Deo, R.R. (1999). Plug-in Selection of the Number of Frequencies in Regression Estimates of the Memory Parameter of a Long Memory Time Series. *Journal of Time Series Analysis, 20(3)*, 331–341.
 #'
 #' @return A list object containing:
@@ -312,7 +312,7 @@ fd_psd <- function(y,
 #' @param tsName Name of y added as a subtitle to the plot
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 #'
 #' @return A list object containing:
 #' \itemize{
@@ -470,7 +470,7 @@ fd_sda <- function(y,
 #' @param tsName Name of y added as a subtitle to the plot
 #'
 #'
-#' @return Estimate of Hurst exponent (slope of `log(bin)` vs. `log(RMSE))` and an FD estimate based on Hasselman(2013)
+#' @return Estimate of Hurst exponent (slope of `log(bin)` vs. `log(RMSE))` and an FD estimate based on Hasselman (2013)
 #' A list object containing:
 #' \itemize{
 #' \item A data matrix `PLAW` with columns `freq.norm`, `size` and `bulk`.
@@ -482,7 +482,7 @@ fd_sda <- function(y,
 #' @export
 #'
 #' @author Fred Hasselman
-#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. <http://doi.org/10.3389/fphys.2013.00075>
+#' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 #'
 #' @family Fluctuation Analyses
 #'
@@ -677,7 +677,7 @@ fd_dfa <- function(y,
 #'
 #' @examples
 #'
-#' fd_boxcount2D(y = rnorm(100))
+#' \donttest{fd_boxcount2D(y = rnorm(100))}
 #'
 #'
 fd_boxcount2D <- function(y = NA,
