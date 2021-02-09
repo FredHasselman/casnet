@@ -527,12 +527,13 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=1, colourE=FALSE
 #' @param xlabel x label
 #' @param ylabel y label
 #' @param logBase base of the log used
+#' @param doPlot Display the plot (A plot object is always returned invisibly)
 #'
 #' @return A ggplot object
 #'
 #' @export
 #'
-plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylabel="Fluctuation", logBase=NA){
+plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylabel="Fluctuation", logBase=NA, doPlot = TRUE){
 
   if(!all(c("PLAW","fullRange","fitRange")%in%names(fd.OUT))){
     stop("Object fd.OUT should have 3 fields: PLAW, fullRange and fitRange")
@@ -655,7 +656,9 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
 
 
   # graphics::plot.new()
+  if(doPlot){
   graphics::plot(g)
+    }
 
   return(invisible(g))
 }

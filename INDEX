@@ -1,107 +1,109 @@
-ac_win                                           Windowed autocorrelation function
-add_alpha                                        Add transparency to a colour
-as.numeric_character                             Character vector to named numeric vector
-as.numeric_discrete                              Discrete (factor or character) to numeric vector
-as.numeric_factor                                Numeric factor to numeric vector
-bandReplace                                      Replace matrix diagonals
-ColouredNoise                                    Coloured noise data
-dc_ccp                                           Cumulative Complexity Peaks (CCP)
-dc_d                                             Distribution Uniformity Distribution Uniformity is one of two components of which the product is
-                                                 the Dynamic Complexity measure.
-dc_f                                             Fluctuation Intensity
-dc_win                                           Dynamic Complexity
-di2bi                                            Distance to binary matrix
-di2we                                            Distance 2 weighted matrix
-dist_hamming                                     Calculate Hamming distance
-elascer                                          Elastic Scaler - A Flexible Rescale Function
-est_emDim                                        Estimate number of embedding dimensions
-est_emLag                                        Estimate embedding lag (tau)
-est_parameters                                   Estimate RQA parameters
-est_radius                                       Estimate Radius.
-fd_allan                                         Allan Variance Analysis
-fd_boxcount2D                                    2D Boxcount for 1D signal
-fd_dfa                                           Detrended Fluctuation Analysis (DFA)
-fd_mfdfa                                         Multi-fractal Detrended Fluctuation Analysis
-fd_psd                                           Power Spectral Density Slope (PSD).
-fd_RR                                            Relative Roughness
-fd_sda                                           Standardised Dispersion Analysis (SDA).
-fd_sev                                           Calculate FD using Sevcik's method
-flight_Cauchy                                    Create Cauchy Flight
-flight_LevyPareto                                Create a Levy-Pareto flight
-flight_Rayleigh                                  Create Rayleigh Flight (Brownian Motion)
-fnn                                              False Nearest Neighbours
-get_os                                           Which OS is running?
-getColours                                       Get some nice colours
-getPairs                                         Get all combinations
-growth_ac                                        Examples of dynamical growth models (maps)
-growth_ac_cond                                   Examples of conditional dynamical growth models (maps)
-layout_as_spiral                                 Layout a graph on a spiral
-make_spiral_graph                                Make Spiral Graph
-manyAnalystsESM                                  Data from the Many Analysts study.
-mat2ind                                          Matrix to indexed data frame
-mi_interlayer                                    Inter-layer mutual information
-mi_mat                                           Mutual Information variations
-mif                                              Mutual Information Function
-mrn                                              Multiplex Recurrence Network
-mrn_plot                                         Mutliplex Recurrence Network Plot
-noise_fBm                                        Generate fractional Brownian motion
-noise_fGn                                        Generate fractional Gaussian noise
-noise_powerlaw                                   Generate noise series with power law scaling exponent
-plotDC_ccp                                       Plot Cumulative Complexity Peaks
-plotDC_lvl                                       Plot Peaks versus Levels
-plotDC_res                                       Plot Complexity Resonance Diagram
-plotFD_loglog                                    Plot output from fluctuation analyses based on log-log regression
-plotMRN_win                                      Plot windowed Multiplex Recurrence Network measures
-plotNET_BA                                       Example of Barabasi scale-free network
-plotNET_groupColour                              Vertex and Edge Group Colours
-plotNET_groupWeight                              Set Edge weights by group
-plotNET_prep                                     Plot Network Based on RQA
-plotNET_SW                                       Example of Strogatz-Watts small-world network
-plotRED_acf                                      Plot ACF and PACF
-plotRED_mif                                      Plot various MI functions
-plotSUR_hist                                     Surrogate Test
-plotTS_multi                                     Plot Multivariate Time Series Data
-repmat                                           Repeat Copies of a Matrix
-rn                                               Create a Recurrence Network Matrix
-rn_measures                                      Recurrence Network Measures
-rn_plot                                          Plot (thresholded) distance matrix as a network
-rn_recSpec                                       Recurrence Time Spectrum
-rn_strengthDist                                  Strength versus Degree scaling relation
-RNG                                              Random Number Sequences
-rp                                               Create a Distance Matrix
-rp_cl                                            Fast (C)RQA (command line crp)
-rp_copy_attributes                               Copy Matrix Attributes
-rp_diagProfile                                   Diagonal Recurrence Profile
-rp_lineDist                                      Line length distributions
-rp_measures                                      Get (C)RQA measures based on a binary matrix
-rp_nzdiags                                       rp_nzdiags
-rp_plot                                          Plot (thresholded) distance matrix as a recurrence plot
-rp_size                                          rp_size
-sa2fd_dfa                                        Informed Dimension estimate from DFA slope (H)
-sa2fd_psd                                        Informed Dimension estimate from Spectral Slope (aplha)
-sa2fd_sda                                        Informed Dimension estimate from SDA slope.
-set_command_line_rp                              Set command line RQA executable
-SWtestE                                          Small World test
-ts_center                                        Center a vector
-ts_changeindex                                   Find change indices
-ts_checkfix                                      Check and/or Fix a vector
-ts_detrend                                       Detrend a time series
-ts_diff                                          Derivative of time series
-ts_discrete                                      Discrete representation
-ts_duration                                      Time series to Duration series
-ts_embed                                         Delay embedding of a time series
-ts_integrate                                     Create a timeseries profile
-ts_levels                                        Detect levels in time series
-ts_peaks                                         Find Peaks or Wells
-ts_permtest_block                                Permutation Test: Block Randomisation
-ts_permtest_transmat                             Permutation Test: Transition Matrix
-ts_rasterize                                     Turn a 1D time series vector into a 2D curve
-ts_sd                                            Standard Deviation estimates
-ts_slice                                         Slice a Matrix
-ts_standardise                                   Standardise a vector
-ts_sumorder                                      Adjust time series by summation order
-ts_symbolic                                      Symbolic representation
-ts_transmat                                      Transition matrix
-ts_trimfill                                      Trim or Fill Vectors
-ts_windower                                      Get sliding window indices
-var_win                                          Windowed variance
+ac_win                      Windowed autocorrelation function
+add_alpha                   Add transparency to a colour
+as.numeric_character        Character vector to named numeric vector
+as.numeric_discrete         Discrete (factor or character) to numeric vector
+as.numeric_factor           Numeric factor to numeric vector
+bandReplace                 Replace matrix diagonals
+ColouredNoise               Coloured noise data
+dc_ccp                      Cumulative Complexity Peaks (CCP)
+dc_d                        Distribution Uniformity Distribution Uniformity is one
+                            of two components of which the product is the Dynamic
+                            Complexity measure.
+dc_f                        Fluctuation Intensity
+dc_win                      Dynamic Complexity
+di2bi                       Distance to binary matrix
+di2we                       Distance 2 weighted matrix
+dist_hamming                Calculate Hamming distance
+elascer                     Elastic Scaler - A Flexible Rescale Function
+est_emDim                   Estimate number of embedding dimensions
+est_emLag                   Estimate embedding lag (tau)
+est_parameters              Estimate RQA parameters
+est_radius                  Estimate Radius.
+fd_allan                    Allan Variance Analysis
+fd_boxcount2D               2D Boxcount for 1D signal
+fd_dfa                      Detrended Fluctuation Analysis (DFA)
+fd_mfdfa                    Multi-fractal Detrended Fluctuation Analysis
+fd_psd                      Power Spectral Density Slope (PSD).
+fd_RR                       Relative Roughness
+fd_sda                      Standardised Dispersion Analysis (SDA).
+fd_sev                      Calculate FD using Sevcik's method
+flight_Cauchy               Create Cauchy Flight
+flight_LevyPareto           Create a Levy-Pareto flight
+flight_Rayleigh             Create Rayleigh Flight (Brownian Motion)
+fnn                         False Nearest Neighbours
+get_os                      Which OS is running?
+getColours                  Get some nice colours
+getPairs                    Get all combinations
+growth_ac                   Examples of dynamical growth models (maps)
+growth_ac_cond              Examples of conditional dynamical growth models (maps)
+layout_as_spiral            Layout a graph on a spiral
+make_spiral_graph           Make Spiral Graph
+manyAnalystsESM             Data from the Many Analysts study.
+mat2ind                     Matrix to indexed data frame
+mi_interlayer               Inter-layer mutual information
+mi_mat                      Mutual Information variations
+mif                         Mutual Information Function
+mrn                         Multiplex Recurrence Network
+mrn_plot                    Mutliplex Recurrence Network Plot
+noise_fBm                   Generate fractional Brownian motion
+noise_fGn                   Generate fractional Gaussian noise
+noise_powerlaw              Generate noise series with power law scaling exponent
+plotDC_ccp                  Plot Cumulative Complexity Peaks
+plotDC_lvl                  Plot Peaks versus Levels
+plotDC_res                  Plot Complexity Resonance Diagram
+plotFD_loglog               Plot output from fluctuation analyses based on log-log
+                            regression
+plotMRN_win                 Plot windowed Multiplex Recurrence Network measures
+plotNET_BA                  Example of Barabasi scale-free network
+plotNET_groupColour         Vertex and Edge Group Colours
+plotNET_groupWeight         Set Edge weights by group
+plotNET_prep                Plot Network Based on RQA
+plotNET_SW                  Example of Strogatz-Watts small-world network
+plotRED_acf                 Plot ACF and PACF
+plotRED_mif                 Plot various MI functions
+plotSUR_hist                Surrogate Test
+plotTS_multi                Plot Multivariate Time Series Data
+repmat                      Repeat Copies of a Matrix
+rn                          Create a Recurrence Network Matrix
+rn_measures                 Recurrence Network Measures
+rn_plot                     Plot (thresholded) distance matrix as a network
+rn_recSpec                  Recurrence Time Spectrum
+rn_strengthDist             Strength versus Degree scaling relation
+RNG                         Random Number Sequences
+rp                          Create a Distance Matrix
+rp_cl                       Fast (C)RQA (command line crp)
+rp_copy_attributes          Copy Matrix Attributes
+rp_diagProfile              Diagonal Recurrence Profile
+rp_lineDist                 Line length distributions
+rp_measures                 Get (C)RQA measures based on a binary matrix
+rp_nzdiags                  rp_nzdiags
+rp_plot                     Plot (thresholded) distance matrix as a recurrence plot
+rp_size                     rp_size
+sa2fd_dfa                   Informed Dimension estimate from DFA slope (H)
+sa2fd_psd                   Informed Dimension estimate from Spectral Slope (aplha)
+sa2fd_sda                   Informed Dimension estimate from SDA slope.
+set_command_line_rp         Set command line RQA executable
+SWtestE                     Small World test
+ts_center                   Center a vector
+ts_changeindex              Find change indices
+ts_checkfix                 Check and/or Fix a vector
+ts_detrend                  Detrend a time series
+ts_diff                     Derivative of time series
+ts_discrete                 Discrete representation
+ts_duration                 Time series to Duration series
+ts_embed                    Delay embedding of a time series
+ts_integrate                Create a timeseries profile
+ts_levels                   Detect levels in time series
+ts_peaks                    Find Peaks or Wells
+ts_permtest_block           Permutation Test: Block Randomisation
+ts_permtest_transmat        Permutation Test: Transition Matrix
+ts_rasterize                Turn a 1D time series vector into a 2D curve
+ts_sd                       Standard Deviation estimates
+ts_slice                    Slice a Matrix
+ts_standardise              Standardise a vector
+ts_sumorder                 Adjust time series by summation order
+ts_symbolic                 Symbolic representation
+ts_transmat                 Transition matrix
+ts_trimfill                 Trim or Fill Vectors
+ts_windower                 Get sliding window indices
+var_win                     Windowed variance

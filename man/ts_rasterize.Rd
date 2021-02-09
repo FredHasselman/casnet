@@ -7,7 +7,7 @@
 ts_rasterize(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 }
 \arguments{
-\item{y}{A 1D time series object or numeric verctor.}
+\item{y}{A 1D time series object or numeric vector.}
 
 \item{unitSquare}{Convert the series to a unit square? (default = \code{FALSE})}
 

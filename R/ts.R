@@ -1626,7 +1626,7 @@ ts_integrate <-function(y){
 
 #' Turn a 1D time series vector into a 2D curve
 #'
-#' @param y A 1D time series object or numeric verctor.
+#' @param y A 1D time series object or numeric vector.
 #' @param unitSquare Convert the series to a unit square? (default = `FALSE`)
 #' @param toSparse Convert to sparse Matrix (default = `FALSE`)
 #' @param resolution Factor by which dimensions will be multiplied (default = `2`)
@@ -1740,4 +1740,16 @@ ts_transmat <- function(yd, nbins = unique(yd)){
     }
   }
   return(transmat)
+}
+
+
+ts_cp <- function(ts, win, align = "right", keepNA = FALSE){
+
+y <-
+ idOK     <- !is.na(ts)
+ WINmean <- zoo::rollapply(x[idOK], width = win, mean, na.rm=TRUE, fill=NA, align=align)
+
+ y[idOK] <- ts[idOK]-WINmean[1:length(ts[idOK])]
+
+ df_se[idP,paste(cn,"cp")%ci%df_se] <- ts_integrate(y)
 }

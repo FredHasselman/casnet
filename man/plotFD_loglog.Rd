@@ -10,7 +10,8 @@ plotFD_loglog(
   subtitle = "",
   xlabel = "Bin size",
   ylabel = "Fluctuation",
-  logBase = NA
+  logBase = NA,
+  doPlot = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ plotFD_loglog(
 \item{ylabel}{y label}
 
 \item{logBase}{base of the log used}
+
+\item{doPlot}{Display the plot (A plot object is always returned invisibly)}
 }
 \value{
 A ggplot object

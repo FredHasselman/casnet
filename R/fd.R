@@ -261,13 +261,13 @@ fd_psd <- function(y,
 
   if(doPlot|returnPlot){
     if(noTitle){
-      title <- ""
+      title <- " "
     } else {
       title <- "log-log regression (PSD)"
     }
     if(doPlot){
 
-      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Normalised Frequency", ylabel = "Power")
+      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Normalised Frequency", ylabel = "Power", doPlot = doPlot)
 
       if(returnPlot){
         outList$plot <- g
@@ -419,13 +419,13 @@ fd_sda <- function(y,
 
   if(doPlot|returnPlot){
     if(noTitle){
-      title <- ""
+      title <- " "
     } else {
       title <- "log-log regression (SDA)"
     }
 
     if(doPlot){
-      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion")
+      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion", doPlot = doPlot)
       if(returnPlot){
         outList$plot <- g
       }
@@ -586,12 +586,12 @@ fd_dfa <- function(y,
 
   if(doPlot|returnPlot){
     if(noTitle){
-      title <- ""
+      title <- " "
     } else {
       title <- "log-log regression (DFA)"
     }
     if(doPlot){
-      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation")
+      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation", doPlot = doPlot)
       if(returnPlot){
         outList$plot <- g
       }
@@ -855,12 +855,12 @@ fd_boxcount2D <- function(y = NA,
 
   if(doPlot|returnPlot){
     if(noTitle){
-      title <- ""
+      title <- " "
     } else {
       title <- "log-log regression (2D Boxcount)"
     }
     if(doPlot){
-      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Box Size (log)", ylabel = "Box Count (-log)")
+      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Box Size (log)", ylabel = "Box Count (-log)", doPlot = doPlot)
 
       if(returnLocalScaling){
 
@@ -1071,7 +1071,7 @@ fd_sev <- function(y,
 
   if(doPlot|returnPlot){
     if(noTitle){
-      title <- ""
+      title <- " "
     } else {
       title <- "Sevcik's method (planar extent)"
     }
@@ -1188,7 +1188,7 @@ fd_allan <- function(y,
 
   if(doPlot|returnPlot){
     if(noTitle){
-      title <- ""
+      title <- " "
     } else {
       if(useSD){
         title <- "log-log regression (Allan Deviation)"
@@ -1196,7 +1196,7 @@ fd_allan <- function(y,
         title <- "log-log regression (Allan Variance)"
       }
     }
-    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Scale", ylabel = "Allan Variance")
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Scale", ylabel = "Allan Variance", doPlot = doPlot)
     if(doPlot){
       grid::grid.newpage()
       grid::grid.draw(g)

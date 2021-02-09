@@ -26,6 +26,7 @@
 #' @family Distance matrix operations (recurrence network)
 #'
 #'
+
 rn <- function(y1, y2 = NULL,
                emDim = 1,
                emLag = 1,
@@ -82,44 +83,47 @@ rn <- function(y1, y2 = NULL,
     # }
   }
 
-  if(weighted){
-    if(!weightedBy%in%c("si","rt","rf")){
-      stop("Invalid string in argument weightedBy!")
+  #
+  if(!is.null(emRad)){
+    if(weighted){
+      if(!weightedBy%in%c("si","rt","rf")){
+        stop("Invalid string in argument weightedBy!")
+      }
+
+      grW <- igraph::graph_from_adjacency_matrix(dmat, weighted = TRUE, mode = mode, diag = TRUE) #includeDiagonal)
+      edgeFrame             <- igraph::as_data_frame(grW,"edges")
+      E(grW)$rec_distance   <- E(grW)$weight
+      E(grW)$rec_time       <- abs(edgeFrame$to-edgeFrame$from)
+      E(grW)$rec_timefreq   <- 1/(edgeFrame$weight+1) #.Machine$double.eps)
+
+      if(is.numeric(fs)){
+        if(weightedBy=="rf"){edgeFrame$weight <- edgeFrame$rectime * fs}
+        if(weightedBy=="rt"){edgeFrame$weight <- edgeFrame$rectime / fs}
+      }
+
+      switch(weightedBy,
+             si = E(grW)$weight <- E(grW)$rec_distance,
+             rt = E(grW)$weight <- E(grW)$rec_time,
+             rf = E(grW)$weight <- E(grW)$rec_timefreq
+      )
+
+      # for(r in 1:NROW(edgeFrame)){
+      #   dmat[edgeFrame$from[r],edgeFrame$to[r]] <- 1/edgeFrame$rectime[r]
+      #   if(attr(dmat,"AUTO")){
+      #     dmat[edgeFrame$to[r],edgeFrame$from[r]] <- 1/edgeFrame$rectime[r]
+      #     }
+      #   }
+
+      tmp <- as_adjacency_matrix(grW, type = "both", sparse = to.sparse, attr = "weight")
+      #tmp <- bandReplace(tmp,0,0,0)
+      dmat <- rp_copy_attributes(source = dmat, target = tmp)
+      rm(tmp)
+
+      if(rescaleWeights==TRUE){
+        dmat <- dmat/max(dmat, na.rm = TRUE)
+      }
     }
-
-    grW <- igraph::graph_from_adjacency_matrix(dmat, weighted = TRUE, mode = mode, diag = TRUE) #includeDiagonal)
-    edgeFrame             <- igraph::as_data_frame(grW,"edges")
-    E(grW)$rec_distance   <- E(grW)$weight
-    E(grW)$rec_time       <- abs(edgeFrame$to-edgeFrame$from)
-    E(grW)$rec_timefreq   <- 1/(edgeFrame$weight+1) #.Machine$double.eps)
-
-    if(is.numeric(fs)){
-      if(weightedBy=="rf"){edgeFrame$weight <- edgeFrame$rectime * fs}
-      if(weightedBy=="rt"){edgeFrame$weight <- edgeFrame$rectime / fs}
-    }
-
-    switch(weightedBy,
-           si = E(grW)$weight <- E(grW)$rec_distance,
-           rt = E(grW)$weight <- E(grW)$rec_time,
-           rf = E(grW)$weight <- E(grW)$rec_timefreq
-    )
-
-    # for(r in 1:NROW(edgeFrame)){
-    #   dmat[edgeFrame$from[r],edgeFrame$to[r]] <- 1/edgeFrame$rectime[r]
-    #   if(attr(dmat,"AUTO")){
-    #     dmat[edgeFrame$to[r],edgeFrame$from[r]] <- 1/edgeFrame$rectime[r]
-    #     }
-    #   }
-
-    tmp <- as_adjacency_matrix(grW, type = "both", sparse = to.sparse, attr = "weight")
-    #tmp <- bandReplace(tmp,0,0,0)
-    dmat <- rp_copy_attributes(source = dmat, target = tmp)
-    rm(tmp)
-
-    if(rescaleWeights==TRUE){
-      dmat <- dmat/max(dmat, na.rm = TRUE)
-    }
-  }
+  } #if is.null(emRad)
 
   if(doPlot){
 
