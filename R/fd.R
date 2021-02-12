@@ -265,15 +265,16 @@ fd_psd <- function(y,
     } else {
       title <- "log-log regression (PSD)"
     }
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Normalised Frequency", ylabel = "Power", doPlot = doPlot)
+
     if(doPlot){
-
-      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Normalised Frequency", ylabel = "Power", doPlot = doPlot)
-
+      print(g)
+    }
       if(returnPlot){
         outList$plot <- g
       }
     }
-  }
+
 
   if(returnInfo){returnPLAW<-TRUE}
 
@@ -423,14 +424,15 @@ fd_sda <- function(y,
     } else {
       title <- "log-log regression (SDA)"
     }
-
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion", doPlot = doPlot)
     if(doPlot){
-      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion", doPlot = doPlot)
+     print(g)
+    }
       if(returnPlot){
         outList$plot <- g
       }
     }
-  }
+
 
   if(returnInfo){returnPLAW<-TRUE}
 
@@ -590,13 +592,15 @@ fd_dfa <- function(y,
     } else {
       title <- "log-log regression (DFA)"
     }
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation", doPlot = doPlot)
     if(doPlot){
-      g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation", doPlot = doPlot)
+      print(g)
+      }
       if(returnPlot){
         outList$plot <- g
       }
     }
-  }
+
 
   if(returnInfo){returnPLAW<-TRUE}
 

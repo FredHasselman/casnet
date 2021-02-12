@@ -33,7 +33,7 @@ library(kableExtra)
 A recurrence network is a representation of a recurrence matrix as a graph (a network). The nodes in the network represent time points, and if a value at any point in time will recur at some later point in time, an edge is drawn between the time points.
 
 
-## Recurrence Networks {.tabset .tabset-fade .tabset-pills}
+## Recurrence Networks 
 
 Recurrence networks are graphs created from a recurrence matrix. This means the nodes of the graph represent time points and the connections between nodes represent a recurrence relation betwen the values observed at those time points. That is, often the matrix represents recurrences in a reconstructed state space, the values are coordinates and therefore we would say the edges of a recurrence network represent a temporal relation between recurring states. The ultimate reference for learning everything about recurrence networks is:
 
@@ -44,7 +44,7 @@ Package `casnet` has some functions to create recurrence networks, they are simi
 * `rn()` is very similar to `rp()`, it will create a matrix based on embedding parameters. One difference is the option to create a weighted matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value is retained and acts as an edge-weight
 * `rn_plot()` will produce the same as `rp_plot()`
 
-We can turn the recurrence matrix into an adjecency matrix, an `igraph` object. This means we can use all the `igraph` functions to calculate network measures.
+We can turn the recurrence matrix into an adjacency matrix, an `igraph` object. This means we can use all the `igraph` functions to calculate network measures.
 
 ```{r}
 library(igraph)
@@ -156,7 +156,7 @@ rqa3$RR==rn3$graph_measures$EdgeDensity
 ```
 
 
-## Multiplex Recurrence Networks {.tabset .tabset-fade .tabset-pills}
+## Multiplex Recurrence Networks 
 
 Consider the three time series to be part of a multi-layer recurrence network.
 Common properties of the multiplex network are _inter-layer mutual information_ and _edge overlap_ can be calculated using function `casnet::mrn()`. One problem, the networks have to be all of the same size (same number of nodes, a multivariate time series), but here we have reconstructed the phase space using different embedding parameters... let's choose one set of parameters for all time series. 
@@ -186,7 +186,7 @@ mrn_plot(layers = layers, RNnodes = TRUE)
 mrn_plot(layers = layers, RNnodes = TRUE,MRNweightedBy = "EdgeOverlap", showEdgeColourLegend =TRUE)
 ```
   
-## Time-varying Multiplex Recurrence Networks {.tabset .tabset-fade .tabset-pills}
+## Time-varying Multiplex Recurrence Networks 
 
 The MRN can be calculated in a sliding window, by setting the arguments `win` and `step`.
 

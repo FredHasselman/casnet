@@ -98,7 +98,7 @@
       <h1 data-toc-skip>Recurrence Networks</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2021-01-26</h4>
+            <h4 class="date">2021-02-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/RecurrenceNetworks.Rmd"><code>vignettes/RecurrenceNetworks.Rmd</code></a></small>
       <div class="hidden name"><code>RecurrenceNetworks.Rmd</code></div>
@@ -112,7 +112,7 @@
 <a href="#recurrence-networks" class="anchor"></a><em>Recurrence Networks</em>
 </h1>
 <p>A recurrence network is a representation of a recurrence matrix as a graph (a network). The nodes in the network represent time points, and if a value at any point in time will recur at some later point in time, an edge is drawn between the time points.</p>
-<div id="recurrence-networks-1" class="section level2 tabset tabset-fade tabset-pills">
+<div id="recurrence-networks-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#recurrence-networks-1" class="anchor"></a>Recurrence Networks</h2>
 <p>Recurrence networks are graphs created from a recurrence matrix. This means the nodes of the graph represent time points and the connections between nodes represent a recurrence relation betwen the values observed at those time points. That is, often the matrix represents recurrences in a reconstructed state space, the values are coordinates and therefore we would say the edges of a recurrence network represent a temporal relation between recurring states. The ultimate reference for learning everything about recurrence networks is:</p>
@@ -120,7 +120,7 @@
 <p><a href="https://www.sciencedirect.com/science/article/abs/pii/S037015731830276X?via%3Dihub">Zou, Y., Donner, R. V., Marwan, N., Donges, J. F., &amp; Kurths, J. (2018). Complex network approaches to nonlinear time series analysis. Physics Reports</a></p>
 </blockquote>
 <p>Package <code>casnet</code> has some functions to create recurrence networks, they are similar to the functions used for CRQA: * <code><a href="../reference/rn.html">rn()</a></code> is very similar to <code><a href="../reference/rp.html">rp()</a></code>, it will create a matrix based on embedding parameters. One difference is the option to create a weighted matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value is retained and acts as an edge-weight * <code><a href="../reference/rn_plot.html">rn_plot()</a></code> will produce the same as <code><a href="../reference/rp_plot.html">rp_plot()</a></code></p>
-<p>We can turn the recurrence matrix into an adjecency matrix, an <code>igraph</code> object. This means we can use all the <code>igraph</code> functions to calculate network measures.</p>
+<p>We can turn the recurrence matrix into an adjacency matrix, an <code>igraph</code> object. This means we can use all the <code>igraph</code> functions to calculate network measures.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org">igraph</a></span><span class="op">)</span>
 <span class="co">#library(qgraph)</span>
@@ -348,7 +348,7 @@
 <span id="cb16-18"><a href="#cb16-18"></a><span class="op">&gt;</span><span class="st"> </span>[<span class="dv">1</span>] <span class="ot">TRUE</span></span></code></pre></div>
 </div>
 </div>
-<div id="multiplex-recurrence-networks" class="section level2 tabset tabset-fade tabset-pills">
+<div id="multiplex-recurrence-networks" class="section level2">
 <h2 class="hasAnchor">
 <a href="#multiplex-recurrence-networks" class="anchor"></a>Multiplex Recurrence Networks</h2>
 <p>Consider the three time series to be part of a multi-layer recurrence network. Common properties of the multiplex network are <em>inter-layer mutual information</em> and <em>edge overlap</em> can be calculated using function <code><a href="../reference/mrn.html">casnet::mrn()</a></code>. One problem, the networks have to be all of the same size (same number of nodes, a multivariate time series), but here we have reconstructed the phase space using different embedding parameters… let’s choose one set of parameters for all time series.</p>
@@ -534,7 +534,7 @@ mrn_plot(layers = layers, RNnodes = TRUE,MRNweightedBy = "EdgeOverlap", showEdge
 &gt; $meanValues
 &gt; NULL</code></pre>
 </div>
-<div id="time-varying-multiplex-recurrence-networks" class="section level2 tabset tabset-fade tabset-pills">
+<div id="time-varying-multiplex-recurrence-networks" class="section level2">
 <h2 class="hasAnchor">
 <a href="#time-varying-multiplex-recurrence-networks" class="anchor"></a>Time-varying Multiplex Recurrence Networks</h2>
 <p>The MRN can be calculated in a sliding window, by setting the arguments <code>win</code> and <code>step</code>.</p>
