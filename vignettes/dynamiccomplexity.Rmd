@@ -34,7 +34,7 @@ library(tidyverse)
 
 ## Early Warning Signals in a Clinical Case Study
 
-Dynamic assessment, for example, ecological momentary assesment (EMA), is used more frequently in scientific studies on mental health. Process monitoring with dynamic assessment can empower patients and benefits self-insight (van Os et al., 2017). Additionally, EMA time series can be analysed and the results can be used to inform the treatment process. 
+Dynamic assessment, for example, ecological momentary assessment (EMA), is used more frequently in scientific studies on mental health. Process monitoring with dynamic assessment can empower patients and benefits self-insight (van Os et al., 2017). Additionally, EMA time series can be analysed and the results can be used to inform the treatment process. 
 
 In this vignette, we'll use complex systems theory and methodology developed to analyse fluctuations in rating scale time series to perform a quantitative case study for real patient data. We'll analyze publicly available EMA data from 1 patient that was drawn from a personalized psychotherapy study (cf. Fisher & Boswell, 2016) and was analysed by several different teams in a 'Many Analysists' study: [*Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology*](https://doi.org/10.31234/osf.io/c8vp7) by Bastiaansen et al. (2019).
 
@@ -80,7 +80,7 @@ par(op)
 
 `NA` values seem to occur at the same time points across variables. This indicates the participant might have been unable to respond at those times and was not selectively omitting questions. See the vignette [Dealing with missing values in time series](https://fredhasselman.com/casnet/articles/imputemissingdata.html)
 
-It's a good practice to always compare results based on imputation to non-imputed data, se we'll create two datasets:
+It's a good practice to always compare results based on imputation to non-imputed data, so we'll create two datasets:
 
 1. Remove all `NA` values
 2. Ipute missing data using the *Multivariate Imputation by Chained Equations* method implemented in package `mice`.

@@ -9,9 +9,9 @@
 #'
 #' @param df A data frame with time series in columns.
 #' @inheritParams plotDC_res
-#' @param timeVec If numeric, the number of the column in `df` which contains a time=keeping variable. If `NA`, the time vector will be `1:NROW(df)` (default = `NA`)
+#' @param timeVec If numeric, the number of the column in `df` which contains a time keeping variable. If `NA`, the time vector will be `1:NROW(df)` (default = `NA`)
 #' @param groupVec A vector indicating the names of the time series in the columns of `df`. If `NA`, the column names of `df` will be used, excluding the `timeVec`, if present. (default = `NA`)
-#' @param returnPlotData Return the restructered data frame used to create the plot (default = `FALSE`)
+#' @param returnPlotData Return the restructured data frame used to create the plot (default = `FALSE`)
 #' @param useRibbon Neat for distributions
 #' @param overlap Multiplier for scaling the series around the y-offset. Default is `offset + elascer(y, lo = -.45*overlap, hi = .45*overlap)` and if `useRibbon = TRUE` it is `offset + elascer(y, lo = 0*overlap, hi = .95*overlap)`. (default = `1`)
 #'
@@ -26,20 +26,32 @@
 #'
 plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, colOrder = TRUE, doPlot = TRUE, title = '', subtitle = "", xlabel = "Time", ylabel = "", returnPlotData = FALSE, useRibbon = FALSE, overlap = 1){
 
+  cname <- "time"
+  i <-0
+  while(cname%in%colnames(df)){
+    i%++%1
+    cname <- paste0(cname,i)
+  }
   if(is.na(timeVec)){
-    df$time <- 1:NROW(df)
+    df[[cname]] <- 1:NROW(df)
   } else {
     if(is.numeric(timeVec)&length(timeVec)==1){
-      colnames(df)[timeVec] <- "time"
+      colnames(df)[timeVec] <- cname
     } else {
       stop("Argument timeVec is not interpretable as a column number.")
     }
   }
+
+  time <- df[[cname]]
+  df <- df %>% dplyr::select(where(is.numeric))
+  eval(parse(text=paste("df$",cname," <- time")))
+
+
   if(is.na(groupVec)){
     if(colOrder){
-      groupVec <- colnames(df)[-c("time"%ci%df)]
+      groupVec <- colnames(df)[-c(cname%ci%df)]
     } else {
-      groupVec <- sort(colnames(df)[-c("time"%ci%df)])
+      groupVec <- sort(colnames(df)[-c(cname%ci%df)])
     }
   } else {
     if(length(groupVec)!=(NCOL(df)-1)){
@@ -47,14 +59,16 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
     }
   }
 
-  tmp <- tidyr::gather(df, key = "timeSeries", value = "y", -(.data$time), factor_key = colOrder)
+  tmp <- tidyr::gather(df, key = "timeSeries", value = "y", -(.data[[cname]]), factor_key = colOrder)
   #tmp$timeSeries <- ordered(tmp$timeSeries)
+
+  colnames(tmp)[cname%ci%tmp] <- "time"
 
   yOrder <- groupVec
   names(yOrder) <- paste(groupVec)
   offsets     <- names(yOrder)
   offsets <- {stats::setNames(0:(length(offsets) - 1), offsets)}
-  tmp$offsets <- unlist(plyr::llply(seq_along(yOrder), function(n) rep(offsets[n],sum(tmp$timeSeries%in%names(offsets)[n]))))
+  tmp$offsets <- unlist(plyr::llply(seq_along(yOrder), function(n) rep(offsets[n], sum(tmp$timeSeries%in%names(offsets)[n]))))
 
   ymin <- -.45 * overlap
   ymax <-  .45 * overlap
@@ -62,6 +76,20 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
   if(useRibbon){
     ymin <- 0
     ymax <- .95 * overlap
+  }
+
+  xOrder <- as.numeric_discrete(time)
+
+  tmp$time    <- as.numeric(xOrder)
+  xBreaks <- hist(xOrder, plot = FALSE)$mids
+  xLabels <- names(xOrder)[xBreaks]
+
+  if(max(nchar(xLabels), na.rm = TRUE)>4){
+    ang <- 45
+    hj  <- 1
+  } else {
+    ang <- 0
+    hj  <- 0.5
   }
 
   # Calculate and scale group densities
@@ -88,7 +116,7 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
 
   g <- g +
     scale_y_continuous(ylabel, breaks = offsets, labels = names(offsets), expand = c(0,0)) +
-    scale_x_continuous(xlabel, expand = c(0,0)) +
+    scale_x_continuous(xlabel, breaks = xBreaks, labels = xLabels, expand = c(0,0)) +
     ggtitle(label = title, subtitle = subtitle) +
     theme_minimal()
 
@@ -96,11 +124,13 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
     g <- g +  theme(axis.text.y = element_text(size = 8, face = "plain"),
                     panel.grid.major = element_blank(),
                     panel.grid.minor = element_blank(),
+                    axis.text.x = element_text(angle = ang, vjust = 1, hjust = hj),
                     plot.margin = margin(0,1,1,1,"line"))
   } else{
     g <- g +   theme(axis.text.y = element_text(size = 8, face = "plain"),
                      panel.grid.minor.y = element_blank(),
                      panel.grid.minor.x = element_blank(),
+                     axis.text.x = element_text(angle = ang,  vjust = 1, hjust = hj),
                      plot.margin = margin(0,1,1,1,"line"))
   }
 
@@ -1846,68 +1876,87 @@ make_spiral_graph <- function(g,
 
   g$layout <- layout_as_spiral(g, type = type, arcs = arcs, a = a, b = b, rev = rev)
 
-  if(is.null(markTimeBy)){
-    if(!is.null(markEpochsBy)){
-      grIDs <- ts_changeindex(markEpochsBy)
-      tbreaks <- unique(sort(c(grIDs$xmax,grIDs$xmax)))
-      tlabels <- ceiling(tbreaks)
-      #markTimeBy <- TRUE
+  tbreaks <- NULL
+  tlabels <- NULL
+
+  if(!is.null(markEpochsBy)){
+    markEpochsBy <- as.numeric_discrete(factor(markEpochsBy))
+    grIDs <- ts_changeindex(markEpochsBy)
+    tbreaks <- unique(sort(c(grIDs$xmin,igraph::vcount(g))))
+    if(!is.null(names(markEpochsBy))){
+      tlabels <- names(markEpochsBy)[tbreaks]
     } else {
-      x <- 1:igraph::vcount(g)
-      v <- seq(1,igraph::vcount(g),by=igraph::vcount(g)/arcs)
-      tbreaks <- c(1,which(diff(findInterval(x, v))!=0),igraph::vcount(g))
-      #tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
-      if(max(tbreaks)!=igraph::vcount(g)){
-        tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
-        tlabels <- paste(tbreaks)
-      }
-      if(min(tbreaks)>1){
-        tbreaks<- c(1,tbreaks)
-        tlabels <- paste(tbreaks)
-      }
+      tlabels <- paste(tbreaks)
     }
-  } else {
-    if(is.numeric(markTimeBy)){
-      if(all(markTimeBy%in%1:igraph::vcount(g))){
-        tbreaks <- unique(markTimeBy)
-      }
-      if(!is.null(names(markTimeBy))){
-        tlabels <- unique(names(markTimeBy))
-      } else {
-        tlabels <- paste(tbreaks)
-      }
-    } else {
-      markTimeBy <- TRUE
-    }
+    markTimeBy <- TRUE
   }
+
+  #
+  #   if(is.null(tbreaks)){
+  #     x <- 1:igraph::vcount(g)
+  #     v <- seq(1,igraph::vcount(g),by=igraph::vcount(g)/arcs)
+  #     tbreaks <- c(1,which(diff(findInterval(x, v))!=0),igraph::vcount(g))
+  #     #tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
+  #     }
+  #     if(max(tbreaks)!=igraph::vcount(g)){
+  #       tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
+  #     }
+  #     if(min(tbreaks)>1){
+  #       tbreaks<- c(1,tbreaks)
+  #     }
+  #   if(is.null(tlabels)){
+  #     tlabels <- paste(tbreaks)
+  #   } else {
+  #     tlabels <- markEpochsBy[tbreaks]
+  #   }
+  #
+  #
+  # if(!is.null(markTimeBy)){
+  #   if(is.numeric(markTimeBy)){
+  #     if(all(markTimeBy%in%1:igraph::vcount(g))){
+  #       tbreaks <- unique(markTimeBy)
+  #     }
+  #     if(!is.null(names(markTimeBy))){
+  #       tlabels <- unique(names(markTimeBy))
+  #     } else {
+  #       tlabels <- paste(tbreaks)
+  #     }
+  #   } else {
+  #     markTimeBy <- TRUE
+  #   }
+  # }
 
   if(is.logical(markTimeBy)){
     if(markTimeBy){
+      if(is.null(tbreaks)){
       if(type == "Euler"){
-        tbreaks <- which(diff(as.numeric(cut(g$layout[,2], breaks = arcs,include.lowest = TRUE)))!=0)
+        tbreaks <- which(diff(as.numeric(cut(g$layout[,2], breaks = nbreaks,include.lowest = TRUE)))!=0)
         tbreaks[1] <- 1
         tbreaks[which.max(tbreaks)] <- igraph::vcount(g)
       } else {
         tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
       }
       if(max(tbreaks)>igraph::vcount(g)){tbreaks[which.max(tbreaks)]<-igraph::vcount(g)}
-      if(max(tbreaks)<igraph::vcount(g)){tbreaks<- c(tbreaks,igraph::vcount(g))}
+      if(max(tbreaks)<igraph::vcount(g)){tbreaks <- c(tbreaks,igraph::vcount(g))}
       if(min(tbreaks)>1){tbreaks<- c(1,tbreaks)}
-      tlabels <- paste(tbreaks)
+      }
+      if(is.null(tlabels)){
+        tlabels <- paste(tbreaks)
+      }
     }
   }
 
-  if(max(tbreaks)!=igraph::vcount(g)){
-    tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
-    #tlabels <- paste(tbreaks)
-    tlabels <- tlabels[tbreaks]
-  }
-
-  if(min(tbreaks)>1){
-    tbreaks<- c(1,tbreaks)
-    #tlabels <- paste(tbreaks)
-    tlabels <- tlabels[tbreaks]
-  }
+  # if(max(tbreaks)!=igraph::vcount(g)){
+  #   tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
+  #   #tlabels <- paste(tbreaks)
+  #   tlabels <- tlabels[tbreaks]
+  # }
+  #
+  # if(min(tbreaks)>1){
+  #   tbreaks<- c(1,tbreaks)
+  #   #tlabels <- paste(tbreaks)
+  #   tlabels <- tlabels[tbreaks]
+  # }
 
   if(length(which(diff(tbreaks)==1))>0){
     tbreaks <- tbreaks[-(which(diff(tbreaks)==1)+1)]
@@ -2043,7 +2092,7 @@ make_spiral_graph <- function(g,
   }
 
   if(!is.null(markTimeBy)){
-    gg <- gg + annotate("label", x=gNodes$V1[tbreaks], y=gNodes$V2[tbreaks], label = tlabels, size=labelSize)
+    gg <- gg + annotate("label", x=gNodes$V1[tbreaks], y=gNodes$V2[tbreaks], label = gNodes$labels[tbreaks], size=labelSize)
   }
 
   gg <- gg +

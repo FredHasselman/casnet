@@ -23,7 +23,7 @@ plotTS_multi(
 \arguments{
 \item{df}{A data frame with time series in columns.}
 
-\item{timeVec}{If numeric, the number of the column in \code{df} which contains a time=keeping variable. If \code{NA}, the time vector will be \code{1:NROW(df)} (default = \code{NA})}
+\item{timeVec}{If numeric, the number of the column in \code{df} which contains a time keeping variable. If \code{NA}, the time vector will be \code{1:NROW(df)} (default = \code{NA})}
 
 \item{groupVec}{A vector indicating the names of the time series in the columns of \code{df}. If \code{NA}, the column names of \code{df} will be used, excluding the \code{timeVec}, if present. (default = \code{NA})}
 
@@ -41,7 +41,7 @@ plotTS_multi(
 
 \item{ylabel}{A label for the y-axis.}
 
-\item{returnPlotData}{Return the restructered data frame used to create the plot (default = \code{FALSE})}
+\item{returnPlotData}{Return the restructured data frame used to create the plot (default = \code{FALSE})}
 
 \item{useRibbon}{Neat for distributions}
 

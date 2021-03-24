@@ -45,8 +45,17 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
     }
   }
 
-  distmat <- bandReplace(distmat,-theiler,theiler,0)
+  distmat <- rp_checkfix(distmat, checkAUTO = TRUE, fixAUTO = TRUE)
+  attributes(distmat)
 
+  LOS <- diag(distmat)
+  if(attributes(distmat)$AUTO){
+    distmat <- bandReplace(distmat,-theiler,theiler,max(distmat, na.rm = TRUE)+1)
+    distmat <- bandReplace(distmat,0,0,0)
+  } else {
+    distmat <- bandReplace(distmat,-theiler,theiler,max(distmat, na.rm = TRUE)+1)
+    diag(distmat) <- LOS
+  }
 
   # RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   # RP[as.matrix(distmat <= emRad)] <- 1

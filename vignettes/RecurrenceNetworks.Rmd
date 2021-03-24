@@ -23,62 +23,85 @@ knitr::opts_chunk$set(
   width = 500,
   dpi=72
 )
-library(casnet)
-library(igraph)
 library(kableExtra)
 ```
 
 # *Recurrence Networks*
 
-A recurrence network is a representation of a recurrence matrix as a graph (a network). The nodes in the network represent time points, and if a value at any point in time will recur at some later point in time, an edge is drawn between the time points.
+Recurrence networks are graphs created from a recurrence matrix. This means the nodes (vertices) of the graph represent values observed at specific time points and the connections (edges) between nodes represent a recurrence relation between the values observed at those time points. In a reconstructed or multidimensional (coarse grained) state space, the values represent some measure of distance between the observed states (coordinates in state space). 
 
-
-## Recurrence Networks 
-
-Recurrence networks are graphs created from a recurrence matrix. This means the nodes of the graph represent time points and the connections between nodes represent a recurrence relation betwen the values observed at those time points. That is, often the matrix represents recurrences in a reconstructed state space, the values are coordinates and therefore we would say the edges of a recurrence network represent a temporal relation between recurring states. The ultimate reference for learning everything about recurrence networks is:
+We can turn the recurrence matrix into an adjacency matrix, e.g. an `igraph` object in `R`. This means we can use all the `igraph` functions to calculate network measures. The main differences between the recurrence matrix as used for (C)RQA and the adjacency matrix is that the latter can represent weighted, as well as directed recurrence networks. The interpretation of the network measures calculated from a recurrence network is somewhat different from when the nodes do not represent time. The ultimate reference for learning about recurrence networks is:
 
 > [Zou, Y., Donner, R. V., Marwan, N., Donges, J. F., & Kurths, J. (2018). Complex network approaches to nonlinear time series analysis. Physics Reports](https://www.sciencedirect.com/science/article/abs/pii/S037015731830276X?via%3Dihub)
 
 
 Package `casnet` has some functions to create recurrence networks, they are similar to the functions used for CRQA:
-* `rn()` is very similar to `rp()`, it will create a matrix based on embedding parameters. One difference is the option to create a weighted matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value is retained and acts as an edge-weight
-* `rn_plot()` will produce the same as `rp_plot()`
+* `rn()` is very similar to `rp()`, it will create a matrix based on embedding parameters, or on a multivariate dataset. One difference is the option to create a weighted and/or directed matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value (or recurrence time) is retained and acts as an edge-weight
+* `rn_plot()` will produce similar plots as `rp_plot()`, with some differences for weighted and directed networks
+* `rn_measures()` produces several common network measures used with recurrence networks.
 
-We can turn the recurrence matrix into an adjacency matrix, an `igraph` object. This means we can use all the `igraph` functions to calculate network measures.
+
+### ESM data {-}
+
+We'll use the same dataset as in the vignette [*Dynamic Complexity*](https://fredhasselman.com/casnet/articles/dynamiccomplexity.html) by Bastiaansen et al. (2019). Load it from the Open Science Framework, or use the internal data.
 
 ```{r}
-library(igraph)
-#library(qgraph)
-#library(survival)
-# Reload the data we used earlier
-series <- rio::import("https://github.com/complexity-methods/CSA-assignments/raw/master/assignment_data/BasicTSA_arma/series.xlsx")
+library(casnet)
+library(invctr)
+# # Load data from OSF https://osf.io/tcnpd/
+# require(osfr)
+# manyAnalystsESM <- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)
 
-# Lets use a shorter dataset to speed things up
-series <- series[1:500,]
+# Or use the internal data
+data(manyAnalystsESM)
 ```
 
-We'll analyse the three time series as a recurrence network:
-* Compare the results by comparing the different measures
-   - Remember: TS_1 was white noise, TS_2 was a sine with added noise, TS_3 was the logistic map in the chaotic regime.
-* Note that some of the RQA measures can be exactly calculated from the measures of the network representation.
-   - Try to understand why the Recurrence is represented as the *degree centrality* of the network (`igraph::centr_degree()`)
+A visual inspection of the data reveals some variables can be omitted and cases with missing values need to be imputed or removed. We'll use the same strategy as explained in the [*Dynamic Complexity*](https://fredhasselman.com/casnet/articles/dynamiccomplexity.html) vignette.
 
+```{r, imputeNA}
+library(tidyverse)
+library(igraph)
 
-### TS 1 {-}
+plotTS_multi(manyAnalystsESM, subtitle = "Raw data")
+
+# Use the date information in the dataset to create time series objects
+dates   <- format(strptime(manyAnalystsESM$start[!is.na(manyAnalystsESM$start)], "%m/%d/%Y %H:%M"), "%d-%m-%Y\n%H:%M")
+weeknum <- as.numeric(format(strptime(manyAnalystsESM$start[!is.na(manyAnalystsESM$start)], "%m/%d/%Y %H:%M"),format = "%V"))
+
+# days       <- format(strptime(dates, "%m/%d/%Y %H:%M"), "%d-%m-%Y")
+# time       <- format(strptime(dates, "%m/%d/%Y %H:%M"), "%H:%M")
+
+# Don't use columns 1, 26-28, 30-35
+df <- manyAnalystsESM[,-c(1:3, 26:28, 30:35)]
+
+# 1. Remove NA 
+out.NA <- df[stats::complete.cases(df),]
+
+# 2. Classification And Regression Trees / Random Forests
+imp.cart  <- mice::mice(df, method = 'cart', printFlag = FALSE)
+out.cart  <- mice::complete(imp.cart)
+
+out.cart$dates <- dates
+plotTS_multi(out.cart, subtitle = "Imputed data", timeVec = "dates"%ci%out.cart)
+```
+
+The first step is to create a recurrence matrix and consider it an adjacency matrix. This matrix can be created based on the reconstructed state space using the method of delay embedding, or, on a multidimensional state space in which the dimensions are a (subset) of the multivariate time series.
+
+## **Reconstructed State Space** {-}
+
+Below is an example of how to create a recurrence network based on a reconstructed state space. We'll examine the variables `restless` and `procrast`.
 
 ```{r message=FALSE, warning=FALSE}
 #----------------------
-# Adjacency matrix TS_1
+# Adjacency matrix 
 #----------------------
-plot(ts(series$TS_1))
+library(casnet)
 
-arcs <- 6
+p1 <- est_parameters(y = out.cart$restless)
+p2 <- est_parameters(y = out.cart$procrast)
 
-# Because these are generated signals, look for a drop in FNN below 1%.
-p1 <- est_parameters(y = series$TS_1, nnThres = 1)
-
-# By passing emRad = NA, a radius will be calculated
-RN1 <- casnet::rn(y1 = series$TS_1, emDim = p1$optimDim, emLag = p1$optimLag, emRad = NA, targetValue = 0.05)
+# By passing emRad = NA, a radius will be calculated based on 5% recurrence
+RN1 <- casnet::rn(y1 = out.cart$restless, emDim = p1$optimDim, emLag = p1$optimLag, emRad = NA, targetValue = 0.05)
 casnet::rn_plot(RN1)
 
 # Get RQA measures
@@ -87,7 +110,11 @@ rqa1 <- casnet::rp_measures(RN1, silent = FALSE)
 # Create RN graph
 g1  <- igraph::graph_from_adjacency_matrix(RN1, mode="undirected", diag = FALSE)
 igraph::V(g1)$size <- igraph::degree(g1)
-g1r <- casnet::make_spiral_graph(g1,arcs = arcs, epochColours = getColours(arcs), markTimeBy = TRUE)
+g1r <- casnet::make_spiral_graph(g1, 
+                                 markEpochsBy = weeknum[1:vcount(g1)], 
+                                 markTimeBy = TRUE)
+
+
 
 # Get RN measures
 rn1 <- rn_measures(g1, silent = FALSE)
@@ -98,7 +125,7 @@ rqa1$RR==rn1$graph_measures$EdgeDensity
 
 ### TS 2 {-}
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, eval=FALSE}
 #----------------------
 # Adjacency matrix TS_2
 #----------------------
@@ -116,7 +143,7 @@ rqa2 <- rp_measures(RN2, silent = FALSE)
 # Create RN graph
 g2 <- igraph::graph_from_adjacency_matrix(RN2, mode="undirected", diag = FALSE)
 V(g2)$size <- degree(g2)
-g2r <- make_spiral_graph(g2,arcs = arcs ,epochColours = getColours(arcs), markTimeBy = TRUE)
+g2r <- make_spiral_graph(g2, arcs = arcs, epochColours = getColours(arcs), markTimeBy = TRUE)
 
 # Get RN measures
 rn2 <- rn_measures(g2, silent = FALSE)
@@ -128,7 +155,7 @@ rqa2$RR==rn2$graph_measures$EdgeDensity
 
 ### TS 3 {-}
 
-```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+```{r message=FALSE, warning=FALSE, paged.print=TRUE, eval=FALSE}
 #----------------------
 # Adjacency matrix TS_3
 #----------------------
@@ -161,7 +188,7 @@ rqa3$RR==rn3$graph_measures$EdgeDensity
 Consider the three time series to be part of a multi-layer recurrence network.
 Common properties of the multiplex network are _inter-layer mutual information_ and _edge overlap_ can be calculated using function `casnet::mrn()`. One problem, the networks have to be all of the same size (same number of nodes, a multivariate time series), but here we have reconstructed the phase space using different embedding parameters... let's choose one set of parameters for all time series. 
 
-```{r, message=FALSE, warning=FALSE, paged.print=TRUE}
+```{r, message=FALSE, warning=FALSE, paged.print=TRUE, eval=FALSE}
 emDim <- mean(c(p1$optimDim,p2$optimDim,p3$optimDim))
 emLag <- median(c(p1$optimLag,p2$optimLag,p3$optimLag))
 
@@ -174,7 +201,7 @@ mrn(layers = layers)
 
 A variety of plots can be created using `casnet::mrn_plot()`
 
-```{r, message=FALSE, warning=FALSE, paged.print=TRUE}
+```{r, message=FALSE, warning=FALSE, paged.print=TRUE, eval=FALSE}
 
 # Simple
 mrn_plot(layers = layers, showEdgeColourLegend =TRUE)
@@ -190,7 +217,7 @@ mrn_plot(layers = layers, RNnodes = TRUE,MRNweightedBy = "EdgeOverlap", showEdge
 
 The MRN can be calculated in a sliding window, by setting the arguments `win` and `step`.
 
-```{r, message=FALSE, warning=FALSE, paged.print=TRUE}
+```{r, message=FALSE, warning=FALSE, paged.print=TRUE, eval=FALSE}
 
 # This will generate 26 windows
 MRN_win <- mrn(layers = layers, win = 250, step = 10)

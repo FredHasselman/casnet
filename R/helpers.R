@@ -153,6 +153,10 @@ as.numeric_character <- function(x, sortUnique = FALSE, keepNA = FALSE){
 #'
 as.numeric_discrete <- function(x, keepNA = FALSE, sortUnique = FALSE){
 
+  if(is.date(x)){
+    x <- as.character(x)
+  }
+
   if(plyr::is.discrete(x)){
     if(is.factor(x)){
       if(suppressWarnings(all(is.na(as.numeric(levels(x)))))){
@@ -184,6 +188,19 @@ as.numeric_discrete <- function(x, keepNA = FALSE, sortUnique = FALSE){
   return(y)
 }
 
+#' It's a Date!
+#'
+#'  Check if a vector is of the Date format.
+#'
+#' @param x A vector
+#'
+#' @return TRUE if it's a Date.
+#'
+#' @export
+#'
+is.date <- function(x){
+  inherits(x, 'Date')
+}
 
 
 

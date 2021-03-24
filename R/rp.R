@@ -806,21 +806,24 @@ rp_diagProfile <- function(RM,
     col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
     siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
 
-    g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
-      #ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey50")
-      if(doShuffle){
-        g <- g+ ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3)
-      }
-    g <- g +  ggplot2::geom_line(ggplot2::aes_(y=~RR), size = .5) +
-      #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
-      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
-      ggplot2::scale_x_continuous("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
-      ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
-      ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
-      ggplot2::scale_colour_manual(values = col) +
-      # ggplot2::scale_size_manual(values = siz) +
-      ggplot2::theme_bw() +
-      theme(panel.grid.minor = element_blank())
+    g <- ggplot(df, aes(x = as.numeric_discrete(~labels), y = ~RR, colour = ~variable)) +
+      geom_line() + theme_bw()
+
+    # g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
+    #   #ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey50")
+    #   if(doShuffle){
+    #     g <- g+ ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3)
+    #   }
+    # g <- g +  ggplot2::geom_line(ggplot2::aes_(y=~RR), size = .5) +
+    #   #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
+    #   ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
+    #   ggplot2::scale_x_continuous("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
+    #   ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
+    #   ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
+    #   ggplot2::scale_colour_manual(values = col) +
+    #   # ggplot2::scale_size_manual(values = siz) +
+    #   ggplot2::theme_bw() +
+    #   theme(panel.grid.minor = element_blank())
 
     print(g)
 
