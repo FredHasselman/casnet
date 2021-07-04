@@ -67,7 +67,8 @@ Suggests:
     DirectedClustering,
     brainGraph,
     infotheo,
-    stabledist
+    stabledist,
+    partykit
 Language: en-US
 URL: https://github.com/FredHasselman/casnet
 BugReports: https://github.com/FredHasselman/casnet/issues

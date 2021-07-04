@@ -23,6 +23,10 @@ rn_transition(
 
 \item{doNetworkPlot}{default(\code{TRUE})}
 
+\item{excludeOther}{Should the phase "Other" be excluded from plots? (default = \code{FALSE})}
+
+\item{excludeNorec}{Should the category "No recurrence" be excluded from plots? (default = \code{TRUE})}
+
 \item{returnGraph}{Return an \code{\link[igraph:aaa-igraph-package]{igraph::igraph()}} object (default = \code{FALSE})}
 }
 \value{

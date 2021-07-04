@@ -54,11 +54,33 @@ inf_MSE(
 
 \item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
 
+\item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
+
+\item{scaleMin}{Minimium scale (as a power of 2) to use}
+
+\item{scaleMax}{Maximum scale (as a power of 2) to use}
+
 \item{scaleDiff}{Steps between scaleMin and scaleMax (default = \code{1})}
+
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} will be ignored.}
+
+\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})}
+
+\item{minData}{Minimum number of data points in a bin needed to calculate detrended fluctuation}
+
+\item{doPlot}{Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).}
+
+\item{returnPlot}{Return ggplot2 object (default = \code{FALSE})}
+
+\item{returnPLAW}{Return the power law data (default = \code{FALSE})}
 
 \item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
 
 \item{silent}{Silent-ish mode}
+
+\item{noTitle}{Do not generate a title (only the subtitle)}
+
+\item{tsName}{Name of y added as a subtitle to the plot}
 }
 \value{
 MSE

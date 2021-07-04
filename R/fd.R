@@ -1523,6 +1523,7 @@ inf_SampEn <- function(y,
 #'
 #' @inheritParams ts_coarsegrain
 #' @inheritParams inf_SampEn
+#' @inheritParams fd_dfa
 #' @param transformBefore Detrend/standardise before coarse graining. If set to `FALSE`, each coarsegrained series will be detrended/standardised separately (default = `TRUE`)
 #'
 #' @note The transformation settings (detrending and/or normalisation) and `transformBefore` will determine the value of the product r x D if `D = NA`.

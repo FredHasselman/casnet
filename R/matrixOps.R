@@ -133,7 +133,7 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 #' @family Distance matrix operations (recurrence plot)
 #' @family Distance matrix operations (recurrence network)
 #'
-di2ch <- function(distmat, y, emRad, AUTO = NA, theiler = 0, convMat = FALSE){
+di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
 
   matPack <- FALSE
   if(any(grepl("Matrix",class(distmat)))){

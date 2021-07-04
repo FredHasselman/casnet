@@ -66,6 +66,8 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
+\item{chromatic}{Perform a chromatic RQA. This assumes the recurring values represent the labels of an unordered categorical variable (default = \code{FALSE})}
+
 \item{returnMeasures}{Should the output of \code{\link[=rp_measures]{rp_measures()}} be returned as an attribute \code{"measures"} to the matrix? If \code{silent = FALSE} results will also be output to the console. (default = \code{FALSE})}
 
 \item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with default settings}

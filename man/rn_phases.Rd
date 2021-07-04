@@ -50,8 +50,6 @@ rn_phases(
 \item{excludeOther}{Should the phase "Other" be excluded from plots? (default = \code{FALSE})}
 
 \item{excludeNorec}{Should the category "No recurrence" be excluded from plots? (default = \code{TRUE})}
-
-\item{rescaleDimensions}{If the dimensions are not on the same scale, transform by using \code{"standardise"} or \code{"unit"}, otherwise use \code{"none"} (default = \code{"unit"})}
 }
 \value{
 A data frame with information about the phases.

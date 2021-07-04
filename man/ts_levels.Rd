@@ -56,10 +56,6 @@ lines(wn$pred$p, col = "red3", lwd = 2)
 wn2 <- ts_levels(y,changeSensitivity = .1)
 lines(wn2$pred$p, col = "steelblue", lwd = 2)
 
-# Plot the tree
-
-ts_levels(y, doTreePlot = TRUE)
-
 
 }
 \seealso{

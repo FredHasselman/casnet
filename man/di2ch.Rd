@@ -4,7 +4,7 @@
 \alias{di2ch}
 \title{Distance 2 chromatic matrix}
 \usage{
-di2ch(distmat, y, emRad, AUTO = NA, theiler = 0, convMat = FALSE)
+di2ch(distmat, y, emRad, theiler = 0, convMat = FALSE)
 }
 \arguments{
 \item{distmat}{Distance matrix}

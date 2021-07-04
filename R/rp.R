@@ -26,6 +26,7 @@
 #' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
 #' @param rescaleDist Should the distance matrix be rescaled? Options are "none", "maxDist" to create a unit scale, "meanScale" to creat z-scores based on the mean distance. (default = `"none"`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`.
+#' @param chromatic Perform a chromatic RQA. This assumes the recurring values represent the labels of an unordered categorical variable (default = `FALSE`)
 #' @param returnMeasures Should the output of [rp_measures()] be returned as an attribute `"measures"` to the matrix? If `silent = FALSE` results will also be output to the console. (default = `FALSE`)
 #' @param doPlot Plot the matrix by calling [rp_plot()] with default settings
 #' @param doEmbed If `FALSE`, a distance matrix will be returned that is not embedded by `emDim` and `emLag` (Multidimensional RQA). If `y1` and/or `y2` are data frames, the columns will be used as the state space dimensions (default = `TRUE`)
@@ -350,7 +351,7 @@ rp_measures <- function(RM,
         meltRP <-  mat2ind(as.matrix(RM))
       }
 
-      chromas <- meltRP %>% filter(value!=0)
+      chromas <- meltRP %>% dplyr::filter(value!=0)
       chromas <- as.numeric_discrete(sort(unique(chromas$value)))
       rm(meltRP)
 

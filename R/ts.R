@@ -1380,15 +1380,10 @@ ts_detrend <- function(y, polyOrder=1){
 #' wn2 <- ts_levels(y,changeSensitivity = .1)
 #' lines(wn2$pred$p, col = "steelblue", lwd = 2)
 #'
-#' # Plot the tree
-#'
-#' ts_levels(y, doTreePlot = TRUE)
-#'
 #'
 ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/3), changeSensitivity = 0.01, maxLevels=30, method=c("anova","poisson","class","exp")[1], minChange = sd(y, na.rm = TRUE), doLevelPlot = FALSE, doTreePlot = FALSE){
 
   checkPkg("rpart")
-
 
   x <- seq_along(y)
   dfs  <- data.frame(x=x, y=y)

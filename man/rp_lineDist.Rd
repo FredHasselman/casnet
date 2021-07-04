@@ -50,7 +50,7 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
-\item{chromatic}{Force chromatic RQA? If \code{NA} the value of the \code{RM} attribute \code{"chromatic"} will be used, if present (default = \code{NA})}
+\item{chromatic}{Perform a chromatic RQA. This assumes the recurring values represent the labels of an unordered categorical variable (default = \code{FALSE})}
 
 \item{matrices}{Return matrices? (default = \code{FALSE})}
 }
