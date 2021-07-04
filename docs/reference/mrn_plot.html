@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -215,7 +215,7 @@
     </tr>
     <tr>
       <th>cumulative</th>
-      <td><p>To make the network represent cumulative time, set <code>directed = TRUE</code> and <code>cumulative = TRUE</code>. This will set the upper triangle of the recurrence matrix to <code>0</code> and ensures that the network edges represent recurrenct values that have occurred in the <code>past</code> relative to the current opbserved value. If <code>directed = FALSE</code> the argument is ignored (default = <code>TRUE</code>).</p></td>
+      <td><p>To make the network represent cumulative time, set <code>directed = TRUE</code> and <code>cumulative = TRUE</code>. This will set the upper triangle of the recurrence matrix to <code>0</code> and ensures that the network edges represent recurrent values that have occurred in the <code>past</code> relative to the current observed value (node). If <code>directed = FALSE</code> the argument is ignored (default = <code>TRUE</code>).</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
@@ -345,16 +345,16 @@ g3 <span class='op'>=</span> <span class='fu'>igraph</span><span class='fu'>::</
 #&gt; $interlayerMI
 #&gt; $interlayerMI$`window: 1 | start: 1 | stop: 100`
 #&gt;    g1       g2       g3
-#&gt; g1 NA 1.270959 1.120571
-#&gt; g2 NA       NA 1.683109
+#&gt; g1 NA 1.353591 1.236793
+#&gt; g2 NA       NA 1.470357
 #&gt; g3 NA       NA       NA
 #&gt; 
 #&gt; 
 #&gt; $edgeOverlap
 #&gt; $edgeOverlap$`window: 1 | start: 1 | stop: 100`
 #&gt;    g1    g2    g3
-#&gt; g1 NA 0.138 0.061
-#&gt; g2 NA    NA 0.061
+#&gt; g1 NA 0.148 0.052
+#&gt; g2 NA    NA 0.053
 #&gt; g3 NA    NA    NA
 #&gt; 
 #&gt; 

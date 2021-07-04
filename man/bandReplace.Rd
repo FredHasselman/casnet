@@ -33,6 +33,7 @@ bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands with 0 (Theiler wi
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
 \code{\link{dist_hamming}()},
 \code{\link{rp_lineDist}()},

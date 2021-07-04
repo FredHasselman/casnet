@@ -47,7 +47,9 @@ Get the recurrence time distribution from a recurrence network.
 \seealso{
 Other Distance matrix operations (recurrence network): 
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
+\code{\link{rn_phases}()},
 \code{\link{rn_plot}()},
 \code{\link{rn}()}
 }

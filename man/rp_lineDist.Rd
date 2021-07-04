@@ -21,7 +21,7 @@ rp_lineDist(
 )
 }
 \arguments{
-\item{RM}{A thresholded recurrence matrix (binary: 0 - 1)}
+\item{RM}{A distance matrix (set \code{emRad = NA} to estimate a radius), or a matrix of zeroes and ones}
 
 \item{DLmin}{Minimal diagonal line length (default = \code{2})}
 
@@ -35,17 +35,24 @@ rp_lineDist(
 
 \item{HLmax}{Maximal horizontal line length (default = length of diagonal -1)}
 
-\item{d}{Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \verb{-50,50,100}.}
+\item{d}{Vector of diagonals to be extracted from matrix \code{RP} before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., \code{d = 50} will extract the diagonal band \code{-50:50}. A two element vector will be interpreted as a band, e.g. \code{d = c(-50,100)} will extract diagonals \code{-50:100}. If \code{length(d) > 2}, the numbers will be interpreted to refer to individual diagonals, \code{d = c(-50,50,100)} will extract diagonals \verb{-50,50,100}. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}. A warning will be given is a theiler window was already applied to the matrix.}
 
-\item{theiler}{Size of the theiler window, e.g. \code{theiler = 1} removes diagonal bands -1,0,1 from the matrix. If \code{length(d)} is \code{NULL}, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if \code{length(d)>2}, or if it is larger than the matrix or band indicated by parameter \code{d}.}
+\item{theiler}{Use a \code{theiler} window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:
+\itemize{
+\item \code{0} will include the main diagonal in all RQA measure calculations.
+\item \code{1} will remove the main diagonal from all RQA measure calculations.
+\item \code{NA} (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting \code{theiler = 0} (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set \code{theiler = 1}.
+\item A value greater than \code{1} will remove that many diagonals around and including the diagonal from all RQA measure calculations. So \code{theiler = 2} means exclude \code{2} diagonals around the main diagonal, including the main diagonal itself: \verb{[-1,0,1]}.
+If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. \code{theiler = c(-1,5)} will exclude \verb{[-1,0,1,2,3,4,5]}. If \code{length(theiler) > 2}, the values will be considered individual diagonal ID's, e.g. \code{theiler = c(-3,-1,0,2,5)}, will exclude only those specific ID's. Also see the note.
+}}
 
 \item{invert}{Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.}
 
-\item{AUTO}{Is this an AUTO RQA?}
+\item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
-\item{chromatic}{Chromatic RQA?}
+\item{chromatic}{Force chromatic RQA? If \code{NA} the value of the \code{RM} attribute \code{"chromatic"} will be used, if present (default = \code{NA})}
 
-\item{matrices}{Return the matrices?}
+\item{matrices}{Return matrices? (default = \code{FALSE})}
 }
 \value{
 A list object with distributions of line lengths. If \code{matrices = TRUE} datafr are returned whose columns represent the nonzero diagonals, verticals, or, horizontals.
@@ -68,6 +75,7 @@ Copyright (C) 2009 Stefan Schinkel, University of Potsdam
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
 \code{\link{dist_hamming}()},
 \code{\link{rp_nzdiags}()},

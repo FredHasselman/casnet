@@ -7,9 +7,12 @@
 plotNET_prep(
   g,
   labels = NA,
-  nodesize = c("degree", "hubscore", "strength", "eccentricity", "coreness")[1],
-  labelsize = "asnodesize",
-  edgeweight = "weight",
+  nodeSize = c("degree", "hubscore", "strength", "eccentricity", "coreness")[1],
+  rescaleSize = c(3, 10),
+  nodeColour = TRUE,
+  labelSize = "asnodesize",
+  edgeWeight = "weight",
+  edgeColour = FALSE,
   removeZeroDegree = TRUE,
   removeSelfLoops = TRUE,
   doPlot = TRUE
@@ -18,13 +21,19 @@ plotNET_prep(
 \arguments{
 \item{g}{An igraph object}
 
-\item{labels}{Vertex labels}
+\item{labels}{Vertex labels. If \code{NA} is passed then first \code{V(g)$name} will be checked, for node labels. To create a plot without labels pass \code{NULL} (default = \code{NA})}
 
-\item{nodesize}{Set nodesizes by \code{degree(g, normalised = TRUE)} (default), \code{hubscore(g)$vector}, or, \code{strength(g)}, \code{eccentricity(g)}, \code{coreness(g)}. If a numeric value is passed all vertex sizes will be set to that value.}
+\item{nodeSize}{Set node sizes by \code{degree(g, normalised = TRUE)} (default), \code{hubscore(g)$vector}, or, \code{strength(g)}, \code{eccentricity(g)}, \code{coreness(g)}. If a numeric value is passed all vertex sizes will be set to that value.}
 
-\item{labelsize}{Set labelsize: "asnodesize" sets the \code{cex} for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the \code{cex} of all labels to that value. A numeric vector of length two, \code{c(min,max)} wil scale the node sizes to \code{min} and \code{max} which}
+\item{rescaleSize}{Use to rescale the measure indicated under \code{nodeSize} to \code{c(min,max)} for better node visibility. Pass \code{c(1,1)} for no rescaling (default = \code{c(3,10)})}
 
-\item{edgeweight}{Set size of edges to \code{"E(g)$weight"} by passing "weight". If a single numeric value is provided all edges will be set to that value.}
+\item{nodeColour}{Set to \code{TRUE} to colour nodes using the size of the node (default = \code{TRUE})}
+
+\item{labelSize}{Set labelsize: \code{"asnodesize"} sets the \code{cex} for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the \code{cex} of all labels to that value. A numeric vector of length two, \code{c(min,max)} will scale the label sizes to \code{min} and \code{max}}
+
+\item{edgeWeight}{Set size of edges to \code{"E(g)$weight"} by passing "weight". If a single numeric value is provided all edges will be set to that value.}
+
+\item{edgeColour}{Set to \code{TRUE} to colour edges using the weight of the edge (default = \code{FALSE})}
 
 \item{removeZeroDegree}{Remove vertices with \code{degree(g) == 0} (default = \code{TRUE})}
 

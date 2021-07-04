@@ -197,24 +197,43 @@ ts_permtest_transmat <- function(y1, y2 = NULL,
 #'
 #' @export
 #'
-ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = NULL, discretize=FALSE, nbins = 5){
+#' @examples
+#'
+#'  library(ggplot2)
+#'
+#'  set.seed(1234)
+#'  yy     <- noise_powerlaw(standardise = TRUE, N=50, alpha = -1)
+#'  tr     <- ts_levels(yy, doTreePlot = TRUE)
+#'  breaks <- ts_changeindex(tr$pred$p, returnRectdata = TRUE)
+#'  breaks$cols <- casnet::getColours(length(breaks$label))
+#'
+#'  ggplot(tr$pred) +
+#'    geom_rect(data = breaks, aes(xmin = xmin, xmax=xmax, ymin=ymin, ymax=ymax, colour = label, fill = label), alpha = .3) +
+#'    scale_colour_manual(values = breaks$cols) +
+#'    scale_fill_manual(values = breaks$cols) +
+#'    scale_x_continuous("time", expand = c(0,0)) +
+#'    geom_line(aes(x=x,y=y)) +
+#'    geom_step(aes(x=x,y=p), colour = "red3", size=1) +
+#'    theme_bw() + theme(panel.grid.minor = element_blank())
+#'
+ts_changeindex <- function(y, returnRectdata=FALSE, groupVar = NULL, labelVar = NULL, discretize=FALSE, nbins = 5){
 
-
-  if(plyr::is.discrete(y)){
+  if(is.null(names(y))){
     y <- as.numeric_discrete(y)
-    #y <- ts_checkfix(y,checkNumericVector = TRUE, fixNumericVector = TRUE, checkWholeNumbers = TRUE, fixWholeNumbers = TRUE)
   }
 
   if(!is.null(names(y))&is.null(labelVar)){
     labelVar <- names(y)
   }
 
-  if(length(unique(y))>10){
+  if(length(unique(labelVar))>10){
     warning("More than 10 epochs detected!")
   }
 
-  xmax <- c(which(diff(y)!=0),NROW(y))
-  xmin <- c(1,xmax)[1:NROW(xmax)]
+  xmax <- c((which(diff(y)!=0))+1, NROW(y))
+  names(xmax) <- labelVar[xmax]
+  xmin <- c(1,xmax[1:(NROW(xmax)-1)])
+  names(xmin) <- labelVar[xmin]
   group <- rep(1,length(xmin))
 
   if(!is.null(groupVar)){
@@ -238,7 +257,7 @@ ts_changeindex <- function(y, returnRectdata=TRUE, groupVar = NULL, labelVar = N
   if(returnRectdata){
     return(data.frame(group = group, xmin = xmin, xmax = xmax, ymin = -Inf, ymax = +Inf, label = label))
   } else {
-    return(c(1,xmin))
+    return(unique(c(xmin,xmax)[-c(1,length(c(xmin,xmax)))]))
   }
 }
 
@@ -383,30 +402,31 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
   }
 
 
-  if(emLag==0){
+  if(emLag==0){emDim <- 1}
 
-    emY   <- matrix(nrow = N, ncol = NCOL(y.ori), byrow = TRUE, dimnames = list(NULL,colnames(y.ori)))
-    emY   <- as.matrix(y.ori)
-    emDim <- NCOL(y.ori)
-    emLag <- 0
+  #   emY   <- matrix(nrow = N, ncol = NCOL(y.ori), byrow = TRUE, dimnames = list(NULL,colnames(y.ori)))
+  #   #emY   <- as.matrix(y.ori)
+  #
+  # } else {
 
-  } else {
-
-    if((emDim-1) * emLag > N){stop(paste0("Time series length (N = ",N,") is too short to embed in ",emDim," dimensions with delay ",emLag))}
+    if((emDim-1) * emLag > N){
+      stop(paste0("Time series length (N = ",N,") is too short to embed in ",emDim," dimensions with delay ",emLag))
+    }
 
 
     if(emDim > 1){
       lag.id    <- seq(1, (emDim*emLag), emLag)
-      maxN      <- N - max(lag.id)
+      maxN      <- (N+1) - max(lag.id)
       emY       <- matrix(nrow = maxN, ncol = emDim)
 
       for(tau in seq_along(lag.id)){
-        emY[,tau] = y[lag.id[tau]:(N-(rev(lag.id)[tau]))]
+        emY[,tau] = y[lag.id[tau]:((N+1)-(rev(lag.id)[tau]))]
       }
       colnames(emY) <- paste0("tau.",0:(emDim-1))
 
     } else {
       ids <- colnames(y.ori)
+      if(is.null(ids)){ids <- 0}
       emY <- as.matrix(y.ori)
       dimnames(emY) <- list(NULL,paste0("tau.",ids))
     }
@@ -414,7 +434,7 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
     # Alternative: rollapply(y, list(-d * seq(0, k-1)), c)
 
 
-  } # if emLag = 0
+  #} # if emLag = 0
 
   attr(emY, "embedding.dims") <- emDim
   attr(emY, "embedding.lag")  <- emLag
@@ -423,15 +443,16 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
 
   if(returnOnlyIndices){
     attr(emY, "data.y") <- y_data
-    return(as.matrix(emY))
+    return(emY)
   } else {
     if(emDim>1&emLag>0){
       for(c in 1:NCOL(emY)){
         emY[,c] <-  y_data[emY[,c]]
       }
-    } else{
-      emY <- as.matrix(y_data)
     }
+    #else{
+    #  emY <- as.matrix(y_data)
+    #}
     return(emY)
   }
 }
@@ -1332,6 +1353,9 @@ ts_detrend <- function(y, polyOrder=1){
 #' @param changeSensitivity A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if `method = "anova"`, the overall `R^2` after a level is introduced must increase by the value of `changeSensitivity`, see the `cp` parameter in [rpart::rpart.control].     (default = `0.01`)
 #' @param maxLevels Maximum number of levels in one series (default = `30`)
 #' @param method The partitioning method to use, see the manual pages of [rpart] for details.
+#' @param minChange After the call to [rpart], adjust detected level changes to a minimum absolute change in `y`. If a level change is smaller than `minChange`, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end (default  = `sd(y, na.rm = TRUE)`)
+#' @param doLevelPlot Should a plot with the original series and the levels be produced? (default = `FALSE`)
+#' @param doTreePlot Should a plot of the decision tree be produced. This requires package [partykit] (default = `FALSE`)
 #'
 #' @return A list object with fields `tree` and `pred`. The latter is a data frame with columns `x` (time), `y` (the variable of interest) and `p` the predicted levels in `y`.
 #'
@@ -1346,18 +1370,25 @@ ts_detrend <- function(y, polyOrder=1){
 #' # Levels in white noise?
 #'
 #' set.seed(4321)
-#' wn <- ts_levels(rnorm(100))
+#' y <- rnorm(100)
+#' wn <- ts_levels(y)
 #' plot(wn$pred$x,wn$pred$y, type = "l")
 #' lines(wn$pred$p, col = "red3", lwd = 2)
 #'
 #' # This is due to the default changeSensitivity of 0.01
 #'
-#' lines(ts_levels(rnorm(100),changeSensitivity = .1)$pred$p, col = "steelblue", lwd = 2)
+#' wn2 <- ts_levels(y,changeSensitivity = .1)
+#' lines(wn2$pred$p, col = "steelblue", lwd = 2)
+#'
+#' # Plot the tree
+#'
+#' ts_levels(y, doTreePlot = TRUE)
 #'
 #'
-ts_levels <- function(y, minDataSplit=12, minLevelDuration=round(minDataSplit/3), changeSensitivity = 0.01, maxLevels=30, method=c("anova","poisson","class","exp")[1]){
+ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/3), changeSensitivity = 0.01, maxLevels=30, method=c("anova","poisson","class","exp")[1], minChange = sd(y, na.rm = TRUE), doLevelPlot = FALSE, doTreePlot = FALSE){
 
   checkPkg("rpart")
+
 
   x <- seq_along(y)
   dfs  <- data.frame(x=x, y=y)
@@ -1372,6 +1403,19 @@ ts_levels <- function(y, minDataSplit=12, minLevelDuration=round(minDataSplit/3)
 
   dfs$p <- stats::predict(tree, data.frame(x=x))
 
+  if(doLevelPlot){
+   g <- ggplot2::ggplot(dfs) +
+      geom_line(aes(x=x,y=y)) +
+      geom_step(aes(x=x,y=p), colour = "red3", size=1) +
+      theme_bw() + theme(panel.grid.minor = element_blank())
+   print(g)
+  }
+
+  if(doTreePlot){
+    checkPkg("partykit")
+    plot(partykit::as.party(tree))
+  }
+
   return(list(tree  = tree,
               pred  = dfs))
 }
@@ -1380,7 +1424,7 @@ ts_levels <- function(y, minDataSplit=12, minLevelDuration=round(minDataSplit/3)
 #' Find Peaks or Wells
 #'
 #' @param y A time series or numeric vector
-#' @param window Window in whcih to look for peaks or wells
+#' @param window Window in which to look for peaks or wells
 #' @param includeWells Find wells?
 #' @param minPeakDist Minimum distance between peaks or wells
 #' @param minPeakHeight Minimum height / depth for a peak / well
@@ -1752,4 +1796,76 @@ y <-
  y[idOK] <- ts[idOK]-WINmean[1:length(ts[idOK])]
 
  df_se[idP,paste(cn,"cp")%ci%df_se] <- ts_integrate(y)
+}
+
+
+
+#' Course grain a time series
+#'
+#' Generate a course grained version of a time series by summarising values into bins.
+#'
+#' @param y A numeric vector
+#' @param grain The bin size in which to summarise the values (default = `2`)
+#' @param summaryFunction How should the data be summarized in the bins?
+#' @param retainLength Return only the bin values (`FALSE`), or retain the length of the original series? (default = `TRUE`)
+#'
+#' @return A coarse grained version of `y`.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' set.seed(1234)
+#' y <- rnorm(100)
+#' y1 <- ts_coarsegrain(y, grain = 3)
+#' y2 <- ts_coarsegrain(y, grain = 3, retainLength = TRUE)
+#' y3 <- ts_coarsegrain(y, grain = 3, retainLength = TRUE, summaryFunction = "max")
+#'
+#' t1 <- seq(1,length(y), by = 3)
+#'
+#' plot(t1+1, y1, col = "red3", type = "l", ylim = c(-3,3), xlab = "time", ylab = "Y")
+#' lines(y, col = "grey70")
+#' lines(y2, col = "steelblue")
+#' lines(y3, col = "green3")
+#' legend(60, -1.3, legend=c("Original", "Mean", "Mean + Retain Length", "Max + Retain Length"), lty = 1, col=c("grey70", "red3", "steelblue","green3"), cex = 0.7)
+#'
+#'
+ts_coarsegrain <- function(y, grain = 2, summaryFunction = c("mean","median","min","max")[1], retainLength = FALSE){
+
+  y <- as.numeric(y)
+
+  if(grain>length(y)){
+    stop("Cannot coarse grain beyond series length!")
+  }
+
+  if(is.na(grain%00%NA)|grain<1){
+    grain <- 1
+    u   <- length(y)
+  } else {
+    u <- ceiling(length(y)/grain)
+  }
+  yy <- matrix(0, nrow = grain, ncol = u)
+  yy[1:length(y)] <- y
+
+  if(NCOL(yy) != NCOL(y)){
+
+    yy <-  switch(summaryFunction,
+                  min  =  plyr::colwise(min, na.rm = TRUE)(data.frame(yy)),
+                  max  =  plyr::colwise(max, na.rm = TRUE)(data.frame(yy)),
+                  mean =  plyr::colwise(mean, na.rm = TRUE)(data.frame(yy)),
+                  median = plyr::colwise(median, na.rm = TRUE)(data.frame(yy))
+    )
+
+    if(retainLength){
+      yy <- rep(yy, each = grain)
+      if(NCOL(yy) != NCOL(y)){
+        warning("Coarse grained series is not exactly the same length as the original.")
+      }
+      #yy <- yy[1:length(y)]
+    }
+  }
+
+  attr(yy,"grain") <- grain
+
+  return(as.numeric(yy))
 }

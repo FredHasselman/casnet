@@ -25,7 +25,7 @@ plotTS_multi(
 
 \item{timeVec}{If numeric, the number of the column in \code{df} which contains a time keeping variable. If \code{NA}, the time vector will be \code{1:NROW(df)} (default = \code{NA})}
 
-\item{groupVec}{A vector indicating the names of the time series in the columns of \code{df}. If \code{NA}, the column names of \code{df} will be used, excluding the \code{timeVec}, if present. (default = \code{NA})}
+\item{groupVec}{A vector indicating the names of the time series in the columns of \code{df}. If \code{NA}, the column names of \code{df} will be used, excluding the \code{timeVec}, if present (default = \code{NA})}
 
 \item{useVarNames}{Use the column names of \code{df} as variable names in the Complexity Resonance Diagram (default = \code{TRUE})}
 
@@ -56,7 +56,7 @@ Plot Multivariate Time Series Data
 \examples{
 
 # Use the coloured noise data set.
- data(ColouredNoise)
- plotTS_multi(ColouredNoise)
+data(ColouredNoise)
+plotTS_multi(ColouredNoise)
 
 }

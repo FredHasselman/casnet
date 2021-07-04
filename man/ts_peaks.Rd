@@ -15,7 +15,7 @@ ts_peaks(
 \arguments{
 \item{y}{A time series or numeric vector}
 
-\item{window}{Window in whcih to look for peaks or wells}
+\item{window}{Window in which to look for peaks or wells}
 
 \item{includeWells}{Find wells?}
 

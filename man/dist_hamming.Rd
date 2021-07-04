@@ -23,6 +23,7 @@ Calculate Hamming distance
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
 \code{\link{rp_lineDist}()},
 \code{\link{rp_nzdiags}()},

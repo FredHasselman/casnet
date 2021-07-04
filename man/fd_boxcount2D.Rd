@@ -72,7 +72,7 @@ fd_boxcount2D(
 \item{tsName}{Name of y added as a subtitle to the plot (default = \code{y})}
 }
 \value{
-The boxcount fractal dimension and the 'local' boscount fractal dimension
+The boxcount fractal dimension and the 'local' boxcount fractal dimension
 }
 \description{
 2D Boxcount for 1D signal

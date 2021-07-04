@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -152,14 +152,17 @@
   emDim <span class='op'>=</span> <span class='fl'>1</span>,
   emLag <span class='op'>=</span> <span class='fl'>1</span>,
   emRad <span class='op'>=</span> <span class='cn'>NULL</span>,
-  theiler <span class='op'>=</span> <span class='cn'>NULL</span>,
+  theiler <span class='op'>=</span> <span class='cn'>NA</span>,
+  includeDiagonal <span class='op'>=</span> <span class='cn'>NA</span>,
   to.ts <span class='op'>=</span> <span class='cn'>NULL</span>,
   order.by <span class='op'>=</span> <span class='cn'>NULL</span>,
   to.sparse <span class='op'>=</span> <span class='cn'>FALSE</span>,
   weighted <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  weightedBy <span class='op'>=</span> <span class='st'>"si"</span>,
   method <span class='op'>=</span> <span class='st'>"Euclidean"</span>,
   rescaleDist <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"maxDist"</span>, <span class='st'>"meanDist"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
   targetValue <span class='op'>=</span> <span class='fl'>0.05</span>,
+  chromatic <span class='op'>=</span> <span class='cn'>FALSE</span>,
   returnMeasures <span class='op'>=</span> <span class='cn'>FALSE</span>,
   doPlot <span class='op'>=</span> <span class='cn'>FALSE</span>,
   doEmbed <span class='op'>=</span> <span class='cn'>TRUE</span>,
@@ -192,7 +195,17 @@
     </tr>
     <tr>
       <th>theiler</th>
-      <td><p>Should a teiler winfow be used?</p></td>
+      <td><p>Use a <code>theiler</code> window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:</p><ul>
+<li><p><code>0</code> will include the main diagonal in all RQA measure calculations.</p></li>
+<li><p><code>1</code> will remove the main diagonal from all RQA measure calculations.</p></li>
+<li><p><code>NA</code> (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting <code>theiler = 0</code> (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set <code>theiler = 1</code>.</p></li>
+<li><p>A value greater than <code>1</code> will remove that many diagonals around and including the diagonal from all RQA measure calculations. So <code>theiler = 2</code> means exclude <code>2</code> diagonals around the main diagonal, including the main diagonal itself: <code>[-1,0,1]</code>.
+If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code> it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. <code>theiler = c(-1,5)</code> will exclude <code>[-1,0,1,2,3,4,5]</code>. If <code>length(theiler) &gt; 2</code>, the values will be considered individual diagonal ID's, e.g. <code>theiler = c(-3,-1,0,2,5)</code>, will exclude only those specific ID's. Also see the note.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>includeDiagonal</th>
+      <td><p>Use to force inclusion of the diagonal when calculating RQA measures. The default <code>NA</code> behaves the same way as parameter <code>theiler</code>. If set to <code>TRUE</code> it will include the diagonal even in the case of Auto-RQA (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>to.ts</th>
@@ -211,8 +224,12 @@
       <td><p>If <code>FALSE</code> a binary matrix will be returned. If <code>TRUE</code> every value larger than <code>emRad</code> will be <code>0</code>, but values smaller than <code>emRad</code> will be retained (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
+      <th>weightedBy</th>
+      <td><p>After setting values smaller than <code>emRad</code> to <code>0</code>, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (<code>"si"</code>). Other option are <code>"rt"</code> for <em>recurrence time</em> and <code>"rf"</code> for <em>recurrence time frequency</em> (default = <code>"si"</code>)</p></td>
+    </tr>
+    <tr>
       <th>method</th>
-      <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://rdrr.io/pkg/proxy/man/dist.html'>proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
+      <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://rdrr.io/pkg/proxy/man/dist.html'>proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
     </tr>
     <tr>
       <th>rescaleDist</th>
@@ -232,7 +249,7 @@
     </tr>
     <tr>
       <th>doEmbed</th>
-      <td><p>If <code>FALSE</code>, a distance matrix will be returned that is not embedded by <code>emDim</code> and <code>emLag</code>. If <code>y1</code> and/or <code>y2</code> are data frames, the columns will be used as dimensions (default = <code>TRUE</code>)</p></td>
+      <td><p>If <code>FALSE</code>, a distance matrix will be returned that is not embedded by <code>emDim</code> and <code>emLag</code> (Multidimensional RQA). If <code>y1</code> and/or <code>y2</code> are data frames, the columns will be used as the state space dimensions (default = <code>TRUE</code>)</p></td>
     </tr>
     <tr>
       <th>silent</th>
@@ -240,7 +257,7 @@
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Any paramters to pass to <code><a href='rp_plot.html'>rp_plot()</a></code> if <code>doPlot = TRUE</code></p></td>
+      <td><p>Any parameters to pass to <code><a href='rp_plot.html'>rp_plot()</a></code> if <code>doPlot = TRUE</code></p></td>
     </tr>
     </table>
 
@@ -250,16 +267,20 @@
 <li><p><code>emdims1</code> and <code>emdims2</code> - A matrix of surrogate dimensions</p></li>
 <li><p><code>emdims1.name</code> and <code>emdims2.name</code> - Names of surrogate dimensions</p></li>
 <li><p><code>method</code> and <code>call</code> - The distance <code>method</code> used by <code><a href='https://rdrr.io/pkg/proxy/man/dist.html'>proxy::dist()</a></code></p></li>
-<li><p><code>weighetd</code> - Whether a weighted matrix is returned</p></li>
+<li><p><code>weighted</code> - Whether a weighted matrix is returned</p></li>
 <li><p><code>emDim</code>, <code>emLag</code> and <code>emRad</code> - The embedding parameters</p></li>
 <li><p><code>AUTO</code> - Whether the matrix represents AUTO recurrence</p></li>
 </ul>
 
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>The calculation of the (C)RQA measures in <a href='casnet-package.html'>casnet</a> can be different from other packages. For example, depending on the value of <code>theiler</code> the main diagonal can be included or excluded from the calculations, whereas some software will always include the diagonal.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Distance matrix operations (recurrence plot): 
 <code><a href='bandReplace.html'>bandReplace</a>()</code>,
 <code><a href='di2bi.html'>di2bi</a>()</code>,
+<code><a href='di2ch.html'>di2ch</a>()</code>,
 <code><a href='di2we.html'>di2we</a>()</code>,
 <code><a href='dist_hamming.html'>dist_hamming</a>()</code>,
 <code><a href='rp_lineDist.html'>rp_lineDist</a>()</code>,

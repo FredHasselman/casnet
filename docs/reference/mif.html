@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -251,17 +251,17 @@
 <span class='va'>y</span><span class='op'>$</span><span class='va'>s</span> <span class='op'>&lt;-</span> <span class='va'>y2</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>(</span><span class='fu'>mif</span><span class='op'>(</span><span class='va'>y</span>,lags <span class='op'>=</span> <span class='va'>lags</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.811587 1.741921 1.948223 1.829110 1.957668 1.976480 1.921872 2.029502 
+#&gt; 1.840541 1.706329 1.933714 1.863099 1.979608 1.986126 1.938037 2.050960 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.829539 1.841772 1.841772 1.841772 1.981870 1.912914 1.948178 1.984967 
+#&gt; 1.825910 1.867963 1.867963 1.867963 1.973578 1.965467 1.952748 1.970644 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 1.970052 1.750787 1.753466 1.704676 2.493827 1.824687 1.861592 1.861961 
+#&gt; 1.993402 1.776707 1.763177 1.722228 2.487123 1.836230 1.859945 1.884310 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.886727 1.858509 1.814226 1.845090 1.971008 1.931950 1.905939 2.072356 
+#&gt; 1.934752 1.894090 1.842180 1.864262 1.994258 1.978932 1.944717 2.110575 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 1.910819 1.917387 1.859806 1.876210 1.981597 1.798201 1.941952 1.860176 
+#&gt; 1.943457 1.909392 1.896430 1.866443 1.961917 1.848014 1.949544 1.860142 
 #&gt;       30 
-#&gt; 1.875081 
+#&gt; 1.882902 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"
 #&gt; attr(,"lags")
@@ -274,17 +274,17 @@
 <span class='va'>y</span><span class='op'>$</span><span class='va'>y3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>(</span><span class='fu'>mif</span><span class='op'>(</span><span class='va'>y</span>,lags <span class='op'>=</span> <span class='va'>lags</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 5.006500 4.997671 4.996383 4.993673 5.145355 5.145201 5.142589 5.143853 
+#&gt; 4.987693 4.985961 4.982922 4.983091 5.129502 5.127608 5.122598 5.116438 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.136581 5.140598 5.140598 5.140598 5.138365 5.138588 5.135591 5.138436 
+#&gt; 5.119055 5.120254 5.120254 5.120254 5.119086 5.121703 5.126143 5.131399 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.139578 4.993118 4.992993 4.995855 5.001424 5.002742 5.004107 5.002990 
+#&gt; 5.129674 4.981437 4.984830 4.984145 4.991469 4.994547 4.993457 5.000106 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 5.007960 5.146876 5.144283 5.156363 5.162795 5.167232 5.162590 5.156443 
+#&gt; 5.005072 5.137967 5.137147 5.142071 5.143118 5.147530 5.142862 5.146346 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.155346 5.156016 5.159608 5.165859 5.013842 5.013560 5.023969 5.023073 
+#&gt; 5.148833 5.151294 5.155561 5.161806 5.006170 5.011306 5.018088 5.018999 
 #&gt;       30 
-#&gt; 5.024764 
+#&gt; 5.020685 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y;Z;...;N)"
 #&gt; attr(,"lags")

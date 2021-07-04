@@ -45,7 +45,7 @@ est_radius <- function(RM = NULL,
                        targetValue    = 0.05,
                        tol            = 0.1,
                        maxIter        = 100,
-                       theiler        = NULL,
+                       theiler        = NA,
                        histIter       = FALSE,
                        noiseLevel     = 0.75,
                        noiseType      = c("normal","uniform")[1],
@@ -61,26 +61,16 @@ est_radius <- function(RM = NULL,
   }
 
 
+  if(any(is.na(RM))){
+    NAid <- which(is.na(as.matrix(RM)))
+    RM[NAid] <- max(RM, na.rm = TRUE)+1
+  }
+
   # check auto-recurrence
   RM   <- rp_checkfix(RM, checkAUTO = TRUE)
   AUTO <- attr(RM,"AUTO")
 
-  if(AUTO){
-    if(!silent){cat(paste0("\nAuto-recurrence: Setting diagonal to (1 + max. distance) for analyses\n"))}
-  }
-
-  if(is.na(theiler%00%NA)){
-    if(!is.null(attributes(RM)$theiler)){
-      if(attributes(RM)$theiler>0){
-        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
-      }
-    }
-    theiler <- 0
-  } else {
-    if(theiler < 0){
-      theiler <- 0
-    }
-  }
+  RM <- setTheiler(RM = RM, theiler = theiler, silent = TRUE)
 
   if(is.null(startRadius)){
     if(type=="fixed"){
@@ -90,11 +80,7 @@ est_radius <- function(RM = NULL,
     }
   }
 
-  rp.size <- rp_size(RM,AUTO,theiler)
-
-  # if(theiler>0){
-  #   RM <- bandReplace(RM,-theiler,theiler,1+max(RM),silent = silent)
-  # }
+  rp.size <- rp_size(RM,AUTO,theiler)$rp_size_theiler
 
   if(type%in%"fixed"){
 
@@ -131,16 +117,11 @@ est_radius <- function(RM = NULL,
       iter <- iter+1
       #p$tick()$print()
 
-      RMs <- di2bi(RM,emRad = tryRadius, convMat = TRUE, theiler = theiler)
+      RMs <- di2bi(RM, emRad = tryRadius, convMat = TRUE)
       #Total nr. recurrent points
       RP_N <- Matrix::nnzero(RMs, na.counted = FALSE)
-      minDiag <- 0
-      if(AUTO){
-        if(all(Matrix::diag(RMs)==1)){
-          minDiag <- length(Matrix::diag(RMs))
-        }
-      }
-      RP_N <- RP_N-minDiag
+
+      #RP_N <- RP_N-minDiag
       #rp.size <- rp_size(RMs) #length(RMs)
 
       Measure <- RP_N/rp.size
@@ -364,7 +345,7 @@ est_radius <- function(RM = NULL,
 #' @param y A numeric vector or time series
 #' @param emLag Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If `NULL` the lags based on the mutual information in `lagMethods` will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = `NULL`)
 #' @param lagMethods A character vector with one or more of the following strings: `"first.minimum","global.minimum","max.lag"`. If `emLag` represents a valid lag this value will be reported as `"user.lag"` (default = `c("first.minimum","global.minimum","max.lag")`)
-#' @param maxLag Maximum embedding lag to consider. Default value is: `floor(length(y)/(maxDim+1))`
+#' @param maxLag Maximum embedding lag to consider. If `NA` then the value is caclulated as `floor(length(y)/(maxDim+1))` (default = `NA`)
 #' @param estimateDimensions Decide on an optimal embedding dimension relative to the values in `maxDim` and `lagMethods`, according to a number of preferences passed as a character vector. The order in which the preferences appear in the vector affects the selection procedure, with index `1` being most important preference. The following options are available:
 #'
 #' * `preferNone` - No optimal number will be picked all other preferences will be ignored
@@ -376,7 +357,7 @@ est_radius <- function(RM = NULL,
 #' @param maxDim Maximum number of embedding dimensions to consider (default = `10`)
 #' @param minVecLength The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of `maxDim` that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = `20`)
 #' @param nnSize Neighbourhood diameter (integer, the `number.boxes` parameter of [tseriesChaos::false.nearest()]) used to speed up neighbour search. (default = `NA`)
-#' @param nnRadius Points smaller than the radius are considered neighbours (default = `sd(y)/10`)
+#' @param nnRadius Points smaller than the radius are considered neighbours. If `NA` the value will be `sd(y)/10`  (default = `NA`)
 #' @param nnThres Threshold value (in percentage 0-100) representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = `10`)
 #' @param theiler Theiler window on distance matrix (default = `0`)
 #' @param doPlot Produce a diagnostic plot the results (default = `TRUE`)
@@ -404,11 +385,11 @@ est_parameters <- function(y,
                            lagMethods = c("first.minimum","global.minimum","max.lag"),
                            estimateDimensions = "preferSmallestInLargestHood",
                            maxDim   = 10,
-                           emLag     = NULL,
-                           maxLag   = floor(NROW(y)/(maxDim+1)),
+                           emLag    = NULL,
+                           maxLag   = NA,
                            minVecLength = 20,
                            nnSize  = NA,
-                           nnRadius = sd(y)/10,
+                           nnRadius = NA,
                            nnThres  = 10,
                            theiler  = 0,
                            doPlot   = TRUE,
@@ -419,7 +400,17 @@ est_parameters <- function(y,
 
   if(length(nnRadius)!=1){stop("nnRadius must have 1 numeric value")}
   if(length(nnSize)!=1){stop("nnSize must have 1 numeric value")}
+
+  if(any(is.na(y))){warning("Removing NA in y before estimation!")}
   y <- y[!is.na(y)]
+
+  if(is.na(maxLag)){
+    maxLag <- floor(NROW(y)/(maxDim+1))
+  }
+  if(is.na(nnRadius)){
+    nnRadius <- sd(y, na.rm = TRUE)/10
+  }
+
   #y <- ts_standardise(y, adjustN = FALSE)
 
   if(minVecLength<20){
@@ -618,7 +609,7 @@ est_parameters <- function(y,
 
     gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
       ggplot2::geom_rect(ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
-      ggplot2::scale_fill_manual(values = scales::alpha(c("grey", "white"),.2), guide=FALSE) +
+      ggplot2::scale_fill_manual(values = scales::alpha(c("grey", "white"),.2), guide="none") +
       ggplot2::geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
       ggplot2::geom_hline(yintercept = c(0,100),   colour = "grey60") +
       ggplot2::geom_hline(yintercept = 50, colour = "grey90") +

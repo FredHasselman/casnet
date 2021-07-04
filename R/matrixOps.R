@@ -7,7 +7,6 @@
 #'
 #' @param distmat Distance matrix
 #' @param emRad The radius or threshold value
-#' @param theiler Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = `0`)
 #' @param convMat Should the matrix be converted from a `distmat` object of class [Matrix::Matrix()] to [base::matrix()] (or vice versa)
 #'
 #' @return A (sparse) matrix with only 0s and 1s
@@ -17,7 +16,7 @@
 #' @family Distance matrix operations (recurrence plot)
 #' @family Distance matrix operations (recurrence network)
 #'
-di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
+di2bi <- function(distmat, emRad = NA, convMat = FALSE){
 
   matPack <- FALSE
   # if already Matrix do not convert to matrix
@@ -26,39 +25,12 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
     convMat <- TRUE
   }
 
-  if(is.na(theiler%00%NA)){
-    if(!is.null(attributes(distmat)$theiler)){
-      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(distmat)$theiler,"was already removed."))
-      #theiler <- attr(RM,"theiler")
-    }
-    theiler <- 0
-  } else {
-    if(theiler < 0){
-      theiler <- 0
-    } else {
-      if(length(diag(distmat))<length(-theiler:theiler)){
-        message("Ignoring theiler window larger than matrix...")
-        theiler <- 0
-      } else {
-        attr(distmat,"theiler") <- theiler
-      }
-    }
-  }
-
   distmat <- rp_checkfix(distmat, checkAUTO = TRUE, fixAUTO = TRUE)
-  attributes(distmat)
-
-  LOS <- diag(distmat)
-  if(attributes(distmat)$AUTO){
-    distmat <- bandReplace(distmat,-theiler,theiler,max(distmat, na.rm = TRUE)+1)
-    distmat <- bandReplace(distmat,0,0,0)
-  } else {
-    distmat <- bandReplace(distmat,-theiler,theiler,max(distmat, na.rm = TRUE)+1)
-    diag(distmat) <- LOS
-  }
+  #attributes(distmat)
 
   # RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   # RP[as.matrix(distmat <= emRad)] <- 1
+  if(is.na(emRad)){emRad <- est_radius(distmat)$Radius}
   if(emRad==0){emRad <- .Machine$double.eps}
   # Always use sparse representation for conversion to save memory load
   ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
@@ -92,7 +64,7 @@ di2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 #' @param distmat Distance matrix
 #' @param emRad The radius or threshold value
 #' @param theiler Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = `0`)
-#' @param convMat convMat Should the matrix be converted from a `distmat` obkect of class [Matrix::Matrix()] to [base::matrix()] (or vice versa)
+#' @param convMat convMat Should the matrix be converted from a `distmat` object of class [Matrix::Matrix()] to [base::matrix()] (or vice versa)
 #'
 #' @return A matrix with 0s and values < threshold distance value
 #'
@@ -108,27 +80,6 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
     matPack <- TRUE
     convMat <- TRUE
   }
-
-  if(is.na(theiler%00%NA)){
-    if(!is.null(attributes(distmat)$theiler)){
-      message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(distmat)$theiler,"was already removed."))
-      #theiler <- attr(RM,"theiler")
-    }
-    theiler <- 0
-  } else {
-    if(theiler <= 0){
-      theiler <- 0
-    } else {
-      if(length(diag(distmat))<length(-theiler:theiler)){
-        message("Ignoring theiler window larger than matrix...")
-        theiler <- 0
-      } else {
-        attr(distmat,"theiler") <- theiler
-      }
-    }
-  }
-
-  distmat <- bandReplace(distmat,-theiler,theiler,0)
 
   # RP <- NetComp::matrix_threshold(distmat,threshold = emRad, minval = 1, maxval = 0)
   if(emRad==0) emRad <- .Machine$double.eps
@@ -161,6 +112,65 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
   return(RP)
 }
+
+
+
+
+#' Distance 2 chromatic matrix
+#'
+#' Distance matrix to chromatic matrix based on unordered categorical series
+#'
+#' @param distmat Distance matrix
+#' @param y One of the dimensions (as a data frame or matrix) of the RP which must contain unique unordered categorical values
+#' @param emRad The radius or threshold value
+#' @param theiler Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = `0`)
+#' @param convMat convMat Should the matrix be converted from a `distmat` object of class [Matrix::Matrix()] to [base::matrix()] (or vice versa)
+#'
+#' @return A matrix with 0s and the unordered categorical values that are recurring
+#'
+#' @export
+#'
+#' @family Distance matrix operations (recurrence plot)
+#' @family Distance matrix operations (recurrence network)
+#'
+di2ch <- function(distmat, y, emRad, AUTO = NA, theiler = 0, convMat = FALSE){
+
+  matPack <- FALSE
+  if(any(grepl("Matrix",class(distmat)))){
+    matPack <- TRUE
+    convMat <- TRUE
+  }
+
+  if(emRad==0) emRad <- .Machine$double.eps
+
+  ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
+
+  if(NROW(ij)>0){
+
+    # Always use sparse representation for conversion to save memory load
+    #xij <- data.frame(y =  sapply(which(distmat > emRad, arr.ind=TRUE)[,1],function(r){distmat[ij[[r,1]],ij[[r,2]]]}), which(distmat > emRad, arr.ind=TRUE))
+    xij <- data.frame(y =  sapply(seq_along(ij[,1]),function(r){y[ij[r,1]]}), ij)
+
+    suppressWarnings(RP <- Matrix::sparseMatrix(x=xij$y,i=xij$row,j=xij$col, dims = dim(distmat)))
+
+
+    #  if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
+
+
+  } else {
+
+    RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
+  }
+
+  if(convMat&matPack){RP <- Matrix::as.matrix(RP)}
+
+  RP <- rp_copy_attributes(source = distmat,  target = RP)
+  attributes(RP)$emRad <- emRad
+
+  return(RP)
+}
+
+
 
 
 #' Matrix to indexed data frame
@@ -254,20 +264,129 @@ dist_hamming <- function(X, Y=NULL, embedded=TRUE) {
 #'
 #' bandReplace(m,-1,1,0)   # Replace diagonal and adjacent bands with 0 (Theiler window of 1)
 bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
-  if(lower>0){lower=-1*lower
-  warning("lower > 0 ...\n using: -1*lower")
-  }
-  if(upper<0){upper=abs(upper)
-  warning("upper > 0 ...\n using: abs(upper)")
-  }
 
-  if(all(lower==0,upper==0)){
-    #diag(mat) <- value
-    if(!silent){message(paste0("lower and upper are both 0 (no band, just diagonal)\n using: diag(mat) <- ",round(value,4),"..."))}
-  }
+  # if(lower>0){lower=-1*lower
+  # warning("lower > 0 ...\n using: -1*lower")
+  # }
+  # if(upper<0){upper=abs(upper)
+  # warning("upper > 0 ...\n using: abs(upper)")
+  # }
+
+  # if(all(lower==0,upper==0)){
+  #   #diag(mat) <- value
+  #   if(!silent){message(paste0("lower and upper are both 0 (no band, just diagonal)\n using: diag(mat) <- ",round(value,4),"..."))}
+  # }
 
   delta <- col(mat)-row(mat)
   mat[delta >= lower & delta <= upper] <- value
 
   return(mat)
+}
+
+
+
+#' Set theiler window on a distance matrix or recurrence matrix.
+#'
+#' @inheritParams rp
+#' @inheritParams rp_measures
+#'
+#' @return The matrix with the diagonals indicated in the `theiler` argument set to either `max(RM)+1` (if `RM` is a distance matrix) or `0` (if `RM` is a recurrence matrix).
+#'
+#' @export
+#'
+#' @examples
+#'
+setTheiler <- function(RM, theiler = NA, silent = FALSE){
+
+  checkPkg("Matrix")
+  # Check auto-recurrence
+  RM <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE)
+
+  skip <- FALSE
+
+  # Theiler
+  if(!is.na(attributes(RM)$theiler%00%NA)){
+    if(is.numeric(attributes(RM)$theiler)){
+      if(!silent){message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size: ",attributes(RM)$theiler," was already removed."))}
+      skip <- TRUE
+    } else {
+      if(!silent){message(paste0("Value found in attribute 'theiler' is not numeric (",attributes(RM)$theiler,"), setting: 'theiler <- NA'"))}
+      theiler <- NA
+    }
+  } else {
+    if(!is.numeric(theiler)){
+      if(!is.na(theiler)){
+        if(!silent){message(paste0("Value passed to 'theiler' is not numeric (",attributes(RM)$theiler,"), setting: 'theiler <- NA'"))}
+      theiler <- NA
+    }
+   }
+  }
+
+  if(is.na(theiler)){
+    if(attributes(RM)$AUTO){
+      theiler <- 1
+    } else {
+      theiler <- 0
+    }
+  }
+
+  if(length(theiler==1)){
+    if(theiler < 0){theiler <- 0}
+    if(length(Matrix::diag(RM))<length(-theiler:theiler)){
+      if(!silent){message("Ignoring theiler window, it is larger than the matrix...")}
+      skip <- TRUE
+    }
+  }
+
+  if(length(theiler==2)){
+    if(length(Matrix::diag(RM))<length(min(theiler):max(theiler))){
+      if(!silent){message("Ignoring theiler window, it is larger than the matrix...")}
+      skip <- TRUE
+    }
+  }
+
+  if(length(theiler>2)){
+    if(any(length(Matrix::diag(RM))<abs(theiler))){
+      if(!silent){message("Ignoring theiler window, it contains diagonals that are larger than the matrix...")}
+      skip <- TRUE
+    }
+  }
+
+  if(!skip){
+
+    if(all(as.vector(RM)==0|as.vector(RM)==1)){
+      value <- 0
+    } else {
+      value <- max(RM, na.rm = TRUE)+1
+    }
+
+  #LOS <- diag(RM)
+
+    if(length(theiler)==1){
+      if(theiler > 1){
+        theiler <- (theiler-1)
+        RM <- bandReplace(mat = RM, lower = -theiler, upper = theiler, value = value)
+      } else {
+        if(theiler != 0){
+          RM <- bandReplace(mat = RM, lower = 0, upper = 0, value = value)
+        }
+      }
+    }
+
+  if(length(theiler)==2){
+      RM <- bandReplace(mat = RM, lower = min(theiler), upper = max(theiler), value = value)
+    }
+
+    if(length(theiler)>2){
+      theiler <- sort(theiler)
+      for(d in seq_along(theiler)){
+      RM <- bandReplace(mat = RM, lower = theiler[d], upper = theiler[d], value = value)
+      }
+    }
+
+    attr(RM,"theiler") <- theiler
+
+  } # skip
+
+  return(RM)
 }

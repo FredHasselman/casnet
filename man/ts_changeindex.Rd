@@ -6,7 +6,7 @@
 \usage{
 ts_changeindex(
   y,
-  returnRectdata = TRUE,
+  returnRectdata = FALSE,
   groupVar = NULL,
   labelVar = NULL,
   discretize = FALSE,
@@ -31,6 +31,26 @@ Either a vector with the indices of change in \code{y}, or, a data frame with va
 }
 \description{
 Find change indices
+}
+\examples{
+
+ library(ggplot2)
+
+ set.seed(1234)
+ yy     <- noise_powerlaw(standardise = TRUE, N=50, alpha = -1)
+ tr     <- ts_levels(yy, doTreePlot = TRUE)
+ breaks <- ts_changeindex(tr$pred$p, returnRectdata = TRUE)
+ breaks$cols <- casnet::getColours(length(breaks$label))
+
+ ggplot(tr$pred) +
+   geom_rect(data = breaks, aes(xmin = xmin, xmax=xmax, ymin=ymin, ymax=ymax, colour = label, fill = label), alpha = .3) +
+   scale_colour_manual(values = breaks$cols) +
+   scale_fill_manual(values = breaks$cols) +
+   scale_x_continuous("time", expand = c(0,0)) +
+   geom_line(aes(x=x,y=y)) +
+   geom_step(aes(x=x,y=p), colour = "red3", size=1) +
+   theme_bw() + theme(panel.grid.minor = element_blank())
+
 }
 \seealso{
 Other Time series operations: 

@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="rp_size — rp_size" />
-<meta property="og:description" content="rp_size" />
+<meta property="og:description" content="Calculate the maximum possible number of recurrent points in a recurrence matrix." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -143,16 +143,16 @@
     </div>
 
     <div class="ref-description">
-    <p>rp_size</p>
+    <p>Calculate the maximum possible number of recurrent points in a recurrence matrix.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>mat</span>, AUTO <span class='op'>=</span> <span class='cn'>NULL</span>, theiler <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>RM</span>, AUTO <span class='op'>=</span> <span class='cn'>NULL</span>, theiler <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>mat</th>
+      <th>RM</th>
       <td><p>A Matrix object</p></td>
     </tr>
     <tr>
@@ -168,11 +168,15 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Matrix size for computation of recurrence measures.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>This function can take into account the presence of a <code>theiler</code> window, that is the points in the window will be excluded from the calculation. For example, some scholars will exclude the main diagonal from the calculation of the recurrence rate.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Distance matrix operations (recurrence plot): 
 <code><a href='bandReplace.html'>bandReplace</a>()</code>,
 <code><a href='di2bi.html'>di2bi</a>()</code>,
+<code><a href='di2ch.html'>di2ch</a>()</code>,
 <code><a href='di2we.html'>di2we</a>()</code>,
 <code><a href='dist_hamming.html'>dist_hamming</a>()</code>,
 <code><a href='rp_lineDist.html'>rp_lineDist</a>()</code>,
@@ -186,10 +190,30 @@
 <span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Matrix/man/Matrix.html'>Matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>,<span class='fl'>10</span>,<span class='fl'>10</span><span class='op'>)</span>
 
 <span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>m</span>,<span class='cn'>TRUE</span>,<span class='fl'>0</span><span class='op'>)</span>   <span class='co'># Subtract diagonal</span>
-</div><div class='output co'>#&gt; [1] 90</div><div class='input'><span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>m</span>,<span class='cn'>FALSE</span>,<span class='fl'>0</span><span class='op'>)</span>  <span class='co'># Do not subtract diagonal</span>
-</div><div class='output co'>#&gt; [1] 100</div><div class='input'><span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>m</span>,<span class='cn'>NULL</span>,<span class='fl'>0</span><span class='op'>)</span>   <span class='co'># Matrix is symmetrical, AUTO is set to TRUE</span>
-</div><div class='output co'>#&gt; [1] 100</div><div class='input'><span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>m</span>,<span class='cn'>NULL</span>,<span class='fl'>1</span><span class='op'>)</span>   <span class='co'># Subtract a Theiler window of 1 around and including the diagonal</span>
-</div><div class='output co'>#&gt; [1] 72</div></pre>
+</div><div class='output co'>#&gt; $rp_size_total
+#&gt; [1] 100
+#&gt; 
+#&gt; $rp_size_theiler
+#&gt; [1] 100
+#&gt; </div><div class='input'><span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>m</span>,<span class='cn'>FALSE</span>,<span class='fl'>0</span><span class='op'>)</span>  <span class='co'># Do not subtract diagonal</span>
+</div><div class='output co'>#&gt; $rp_size_total
+#&gt; [1] 100
+#&gt; 
+#&gt; $rp_size_theiler
+#&gt; [1] 100
+#&gt; </div><div class='input'><span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>m</span>,<span class='cn'>NULL</span>,<span class='fl'>0</span><span class='op'>)</span>   <span class='co'># Matrix is symmetrical, AUTO is set to TRUE</span>
+</div><div class='output co'>#&gt; $rp_size_total
+#&gt; [1] 100
+#&gt; 
+#&gt; $rp_size_theiler
+#&gt; [1] 100
+#&gt; </div><div class='input'><span class='fu'>rp_size</span><span class='op'>(</span><span class='va'>m</span>,<span class='cn'>NULL</span>,<span class='fl'>1</span><span class='op'>)</span>   <span class='co'># Subtract a Theiler window of 1 around and including the diagonal</span>
+</div><div class='output co'>#&gt; $rp_size_total
+#&gt; [1] 100
+#&gt; 
+#&gt; $rp_size_theiler
+#&gt; [1] 90
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

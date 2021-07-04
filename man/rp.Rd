@@ -10,14 +10,17 @@ rp(
   emDim = 1,
   emLag = 1,
   emRad = NULL,
-  theiler = NULL,
+  theiler = NA,
+  includeDiagonal = NA,
   to.ts = NULL,
   order.by = NULL,
   to.sparse = FALSE,
   weighted = FALSE,
+  weightedBy = "si",
   method = "Euclidean",
   rescaleDist = c("none", "maxDist", "meanDist")[1],
   targetValue = 0.05,
+  chromatic = FALSE,
   returnMeasures = FALSE,
   doPlot = FALSE,
   doEmbed = TRUE,
@@ -36,7 +39,16 @@ rp(
 
 \item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
 
-\item{theiler}{Should a teiler winfow be used?}
+\item{theiler}{Use a \code{theiler} window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:
+\itemize{
+\item \code{0} will include the main diagonal in all RQA measure calculations.
+\item \code{1} will remove the main diagonal from all RQA measure calculations.
+\item \code{NA} (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting \code{theiler = 0} (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set \code{theiler = 1}.
+\item A value greater than \code{1} will remove that many diagonals around and including the diagonal from all RQA measure calculations. So \code{theiler = 2} means exclude \code{2} diagonals around the main diagonal, including the main diagonal itself: \verb{[-1,0,1]}.
+If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. \code{theiler = c(-1,5)} will exclude \verb{[-1,0,1,2,3,4,5]}. If \code{length(theiler) > 2}, the values will be considered individual diagonal ID's, e.g. \code{theiler = c(-3,-1,0,2,5)}, will exclude only those specific ID's. Also see the note.
+}}
+
+\item{includeDiagonal}{Use to force inclusion of the diagonal when calculating RQA measures. The default \code{NA} behaves the same way as parameter \code{theiler}. If set to \code{TRUE} it will include the diagonal even in the case of Auto-RQA (default = \code{NA})}
 
 \item{to.ts}{Should \code{y1} and \code{y2} be converted to time series objects?}
 
@@ -46,7 +58,9 @@ rp(
 
 \item{weighted}{If \code{FALSE} a binary matrix will be returned. If \code{TRUE} every value larger than \code{emRad} will be \code{0}, but values smaller than \code{emRad} will be retained (default = \code{FALSE})}
 
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+\item{weightedBy}{After setting values smaller than \code{emRad} to \code{0}, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (\code{"si"}). Other option are \code{"rt"} for \emph{recurrence time} and \code{"rf"} for \emph{recurrence time frequency} (default = \code{"si"})}
+
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
 \item{rescaleDist}{Should the distance matrix be rescaled? Options are "none", "maxDist" to create a unit scale, "meanScale" to creat z-scores based on the mean distance. (default = \code{"none"})}
 
@@ -56,11 +70,11 @@ rp(
 
 \item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with default settings}
 
-\item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag}. If \code{y1} and/or \code{y2} are data frames, the columns will be used as dimensions (default = \code{TRUE})}
+\item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag} (Multidimensional RQA). If \code{y1} and/or \code{y2} are data frames, the columns will be used as the state space dimensions (default = \code{TRUE})}
 
 \item{silent}{Silent-ish mode}
 
-\item{...}{Any paramters to pass to \code{\link[=rp_plot]{rp_plot()}} if \code{doPlot = TRUE}}
+\item{...}{Any parameters to pass to \code{\link[=rp_plot]{rp_plot()}} if \code{doPlot = TRUE}}
 }
 \value{
 A (Coss-) Recurrence matrix with attributes:
@@ -68,7 +82,7 @@ A (Coss-) Recurrence matrix with attributes:
 \item \code{emdims1} and \code{emdims2} - A matrix of surrogate dimensions
 \item \code{emdims1.name} and \code{emdims2.name} - Names of surrogate dimensions
 \item \code{method} and \code{call} - The distance \code{method} used by \code{\link[proxy:dist]{proxy::dist()}}
-\item \code{weighetd} - Whether a weighted matrix is returned
+\item \code{weighted} - Whether a weighted matrix is returned
 \item \code{emDim}, \code{emLag} and \code{emRad} - The embedding parameters
 \item \code{AUTO} - Whether the matrix represents AUTO recurrence
 }
@@ -76,10 +90,14 @@ A (Coss-) Recurrence matrix with attributes:
 \description{
 Create a Distance Matrix
 }
+\note{
+The calculation of the (C)RQA measures in \link{casnet} can be different from other packages. For example, depending on the value of \code{theiler} the main diagonal can be included or excluded from the calculations, whereas some software will always include the diagonal.
+}
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
 \code{\link{dist_hamming}()},
 \code{\link{rp_lineDist}()},

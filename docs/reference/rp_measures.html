@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -152,14 +152,17 @@
   DLmin <span class='op'>=</span> <span class='fl'>2</span>,
   VLmin <span class='op'>=</span> <span class='fl'>2</span>,
   HLmin <span class='op'>=</span> <span class='fl'>2</span>,
-  DLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
-  VLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
-  HLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  DLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span>,
+  VLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span>,
+  HLmax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'>diag</span><span class='op'>(</span><span class='va'>RM</span><span class='op'>)</span><span class='op'>)</span>,
   AUTO <span class='op'>=</span> <span class='cn'>NULL</span>,
-  theiler <span class='op'>=</span> <span class='cn'>NULL</span>,
-  chromatic <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  theiler <span class='op'>=</span> <span class='cn'>NA</span>,
+  includeDiagonal <span class='op'>=</span> <span class='cn'>NA</span>,
+  chromatic <span class='op'>=</span> <span class='cn'>NA</span>,
+  anisotropyHV <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  asymmetryUL <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  recurrenceTimes <span class='op'>=</span> <span class='cn'>FALSE</span>,
   matrices <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  doHalf <span class='op'>=</span> <span class='cn'>FALSE</span>,
   Nboot <span class='op'>=</span> <span class='cn'>NULL</span>,
   CL <span class='op'>=</span> <span class='fl'>0.95</span>,
   targetValue <span class='op'>=</span> <span class='fl'>0.05</span>,
@@ -172,11 +175,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>RM</th>
-      <td><p>A distance matrix, or a matrix of zeroes and ones (you must set <code>emRad = NA</code>)</p></td>
+      <td><p>A distance matrix (set <code>emRad = NA</code> to estimate a radius), or a matrix of zeroes and ones</p></td>
     </tr>
     <tr>
       <th>emRad</th>
-      <td><p>Threshold for distance value that counts as a recurrence</p></td>
+      <td><p>Threshold for distance value that counts as a recurrence (ignored is <code>RM</code> is a binary matrix)</p></td>
     </tr>
     <tr>
       <th>DLmin</th>
@@ -208,19 +211,37 @@
     </tr>
     <tr>
       <th>theiler</th>
-      <td><p>Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = <code>0</code>)</p></td>
+      <td><p>Use a <code>theiler</code> window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:</p><ul>
+<li><p><code>0</code> will include the main diagonal in all RQA measure calculations.</p></li>
+<li><p><code>1</code> will remove the main diagonal from all RQA measure calculations.</p></li>
+<li><p><code>NA</code> (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting <code>theiler = 0</code> (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set <code>theiler = 1</code>.</p></li>
+<li><p>A value greater than <code>1</code> will remove that many diagonals around and including the diagonal from all RQA measure calculations. So <code>theiler = 2</code> means exclude <code>2</code> diagonals around the main diagonal, including the main diagonal itself: <code>[-1,0,1]</code>.
+If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code> it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. <code>theiler = c(-1,5)</code> will exclude <code>[-1,0,1,2,3,4,5]</code>. If <code>length(theiler) &gt; 2</code>, the values will be considered individual diagonal ID's, e.g. <code>theiler = c(-3,-1,0,2,5)</code>, will exclude only those specific ID's. Also see the note.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>includeDiagonal</th>
+      <td><p>Should the diagonal be included in the calculation of the Recurrence Rate? If <code>NA</code> the value will be decided by the symmetry of the matrix, the diagonal will be removed for Auto RQA (<code>AUTO = TRUE</code>) but not for Cross RQA (<code>AUTO = FALSE</code>)  (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>chromatic</th>
-      <td><p>Force chromatic RQA? (default = <code>FALSE</code>)</p></td>
+      <td><p>Force chromatic RQA? If <code>NA</code> the value of the <code>RM</code> attribute <code>"chromatic"</code> will be used, if present (default = <code>NA</code>)</p></td>
+    </tr>
+    <tr>
+      <th>anisotropyHV</th>
+      <td><p>Return anisotropy ratio measures based on Horizontal and Vertical lines. The ratios are calculated as <code>(horizontal - vertical) / (horizontal + vertical)</code>. So a value of 0 means no anisotropy, negative ratios indicate the measures based on vertical lines had  higher values, positive ratios indicate the measures based on horizontal lines had higher values  (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>asymmetryUL</th>
+      <td><p>Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as <code>(upper - lower) / (upper + lower)</code>. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>recurrenceTimes</th>
+      <td><p>Return measures based on 'white lines', the recurrence times (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>matrices</th>
       <td><p>Return matrices? (default = <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>doHalf</th>
-      <td><p>Analyse half of the matrix? (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>Nboot</th>

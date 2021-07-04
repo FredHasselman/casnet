@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -92,13 +92,13 @@
 
       
 
-      </header><script src="dynamiccomplexity_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="dynamiccomplexity_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Applied Synergetics: Dynamic Complexity in a Clinical Case Study</h1>
                         <h4 class="author">Fred Hasselman &amp; Merlijn Olthof</h4>
             
-            <h4 class="date">2021-02-12</h4>
+            <h4 class="date">2021-07-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/dynamiccomplexity.Rmd"><code>vignettes/dynamiccomplexity.Rmd</code></a></small>
       <div class="hidden name"><code>dynamiccomplexity.Rmd</code></div>
@@ -114,7 +114,7 @@
 <div id="early-warning-signals-in-a-clinical-case-study" class="section level2">
 <h2 class="hasAnchor">
 <a href="#early-warning-signals-in-a-clinical-case-study" class="anchor"></a>Early Warning Signals in a Clinical Case Study</h2>
-<p>Dynamic assessment, for example, ecological momentary assesment (EMA), is used more frequently in scientific studies on mental health. Process monitoring with dynamic assessment can empower patients and benefits self-insight (van Os et al., 2017). Additionally, EMA time series can be analysed and the results can be used to inform the treatment process.</p>
+<p>Dynamic assessment, for example, ecological momentary assessment (EMA), is used more frequently in scientific studies on mental health. Process monitoring with dynamic assessment can empower patients and benefits self-insight (van Os et al., 2017). Additionally, EMA time series can be analysed and the results can be used to inform the treatment process.</p>
 <p>In this vignette, we’ll use complex systems theory and methodology developed to analyse fluctuations in rating scale time series to perform a quantitative case study for real patient data. We’ll analyze publicly available EMA data from 1 patient that was drawn from a personalized psychotherapy study (cf. Fisher &amp; Boswell, 2016) and was analysed by several different teams in a ‘Many Analysists’ study: <a href="https://doi.org/10.31234/osf.io/c8vp7"><em>Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology</em></a> by Bastiaansen et al. (2019).</p>
 <p>We use the theoretical and analytic framework developed by Haken and Schiepek (2006), based on the mathematical theory of <em>Synergetics</em>, specifically the <em>Dynamic Complexity Measure</em> (Schiepek &amp; Strunk, 2010). The main purpose of the vignette is to showcase the <em>Dynamic Complexity functions</em> family in <code>casnet</code>. The choice for the imputation method is explained in the vignette <em>Dealing with missing values in time series</em>.</p>
 <div id="load-clincal-case-data-from-osf" class="section level3">
@@ -152,7 +152,7 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></code></pre></div>
 <p><code>NA</code> values seem to occur at the same time points across variables. This indicates the participant might have been unable to respond at those times and was not selectively omitting questions. See the vignette <a href="https://fredhasselman.com/casnet/articles/imputemissingdata.html">Dealing with missing values in time series</a></p>
-<p>It’s a good practice to always compare results based on imputation to non-imputed data, se we’ll create two datasets:</p>
+<p>It’s a good practice to always compare results based on imputation to non-imputed data, so we’ll create two datasets:</p>
 <ol style="list-style-type: decimal">
 <li>Remove all <code>NA</code> values</li>
 <li>Ipute missing data using the <em>Multivariate Imputation by Chained Equations</em> method implemented in package <code>mice</code>.</li>
@@ -325,11 +325,10 @@
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#  CART</span>
 <span class="va">dateTimesIMP</span><span class="op">[</span><span class="va">ccp.caseIMP</span><span class="op">$</span><span class="va">sig.peaks</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">]</span></code></pre></div>
-<pre><code>&gt;  [1] "2014-11-01 09:01:00 CET" "2014-11-02 21:27:00 CET"
-&gt;  [3] "2014-11-03 09:54:00 CET" "2014-11-03 17:42:00 CET"
-&gt;  [5] "2014-11-10 21:05:00 CET" "2014-11-12 21:37:00 CET"
-&gt;  [7] "2014-11-14 21:15:00 CET" "2014-11-15 09:18:00 CET"
-&gt;  [9] "2014-11-15 13:30:00 CET" "2014-11-18 13:54:00 CET"</code></pre>
+<pre><code>&gt; [1] "2014-11-02 21:27:00 CET" "2014-11-03 09:54:00 CET"
+&gt; [3] "2014-11-03 17:42:00 CET" "2014-11-10 21:05:00 CET"
+&gt; [5] "2014-11-12 21:37:00 CET" "2014-11-18 13:54:00 CET"
+&gt; [7] "2014-11-26 13:12:00 CET"</code></pre>
 </div>
 </div>
 <div id="plot-state-versus-complexity" class="section level2">

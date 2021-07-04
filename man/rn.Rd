@@ -10,13 +10,13 @@ rn(
   emDim = 1,
   emLag = 1,
   emRad = NULL,
+  theiler = 0,
   directed = FALSE,
   cumulative = TRUE,
   weighted = FALSE,
   weightedBy = c("si", "rt", "rf")[1],
   rescaleWeights = FALSE,
   fs = NA,
-  includeDiagonal = FALSE,
   to.ts = NULL,
   order.by = NULL,
   to.sparse = FALSE,
@@ -40,9 +40,18 @@ rn(
 
 \item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
 
+\item{theiler}{Use a \code{theiler} window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:
+\itemize{
+\item \code{0} will include the main diagonal in all RQA measure calculations.
+\item \code{1} will remove the main diagonal from all RQA measure calculations.
+\item \code{NA} (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting \code{theiler = 0} (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set \code{theiler = 1}.
+\item A value greater than \code{1} will remove that many diagonals around and including the diagonal from all RQA measure calculations. So \code{theiler = 2} means exclude \code{2} diagonals around the main diagonal, including the main diagonal itself: \verb{[-1,0,1]}.
+If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. \code{theiler = c(-1,5)} will exclude \verb{[-1,0,1,2,3,4,5]}. If \code{length(theiler) > 2}, the values will be considered individual diagonal ID's, e.g. \code{theiler = c(-3,-1,0,2,5)}, will exclude only those specific ID's. Also see the note.
+}}
+
 \item{directed}{Should the matrix be considered to represent a directed network? (default = \code{FALSE})}
 
-\item{cumulative}{To make the network represent cumulative time, set \code{directed = TRUE} and \code{cumulative = TRUE}. This will set the upper triangle of the recurrence matrix to \code{0} and ensures that the network edges represent recurrenct values that have occurred in the \code{past} relative to the current opbserved value. If \code{directed = FALSE} the argument is ignored (default = \code{TRUE}).}
+\item{cumulative}{To make the network represent cumulative time, set \code{directed = TRUE} and \code{cumulative = TRUE}. This will set the upper triangle of the recurrence matrix to \code{0} and ensures that the network edges represent recurrent values that have occurred in the \code{past} relative to the current observed value (node). If \code{directed = FALSE} the argument is ignored (default = \code{TRUE}).}
 
 \item{weighted}{Should the matrix be considered to represent a weighted network? (default = \code{FALSE})}
 
@@ -52,15 +61,13 @@ rn(
 
 \item{fs}{Sample frequency: A numeric value interpreted as the \verb{number of observed samples per unit of time}. If the weights represent recurrence times (\code{"rt"}), they will be divided by the value in \code{fs}. If the weights represent recurrence time frequencies (\code{"rf"}), they will be multiplied by the value of \code{fs} (default = \code{NA})}
 
-\item{includeDiagonal}{Should the diagonal of the matrix be included when creating the network (default = \code{FALSE})}
-
 \item{to.ts}{Should \code{y1} and \code{y2} be converted to time series objects?}
 
 \item{order.by}{If \code{to.ts = TRUE}, pass a vector of the same length as \code{y1} and \code{y2}. It will be used as the time index, if \code{NA} the vector indices will be used to represent time.}
 
 \item{to.sparse}{Should sparse matrices be used?}
 
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
@@ -68,7 +75,7 @@ rn(
 
 \item{doPlot}{Plot the matrix by calling \code{\link[=rp_plot]{rp_plot()}} with default settings}
 
-\item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag}. If \code{y1} and/or \code{y2} are data frames, the columns will be used as dimensions (default = \code{TRUE})}
+\item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag} (Multidimensional RQA). If \code{y1} and/or \code{y2} are data frames, the columns will be used as the state space dimensions (default = \code{TRUE})}
 
 \item{silent}{Silent-ish mode}
 
@@ -83,7 +90,9 @@ This function serves as a wrapper for function \code{rp()}, it will add some att
 \seealso{
 Other Distance matrix operations (recurrence network): 
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
+\code{\link{rn_phases}()},
 \code{\link{rn_plot}()},
 \code{\link{rn_recSpec}()}
 }

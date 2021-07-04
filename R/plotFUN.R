@@ -10,21 +10,22 @@
 #' @param df A data frame with time series in columns.
 #' @inheritParams plotDC_res
 #' @param timeVec If numeric, the number of the column in `df` which contains a time keeping variable. If `NA`, the time vector will be `1:NROW(df)` (default = `NA`)
-#' @param groupVec A vector indicating the names of the time series in the columns of `df`. If `NA`, the column names of `df` will be used, excluding the `timeVec`, if present. (default = `NA`)
+#' @param groupVec A vector indicating the names of the time series in the columns of `df`. If `NA`, the column names of `df` will be used, excluding the `timeVec`, if present (default = `NA`)
 #' @param returnPlotData Return the restructured data frame used to create the plot (default = `FALSE`)
 #' @param useRibbon Neat for distributions
 #' @param overlap Multiplier for scaling the series around the y-offset. Default is `offset + elascer(y, lo = -.45*overlap, hi = .45*overlap)` and if `useRibbon = TRUE` it is `offset + elascer(y, lo = 0*overlap, hi = .95*overlap)`. (default = `1`)
 #'
 #' @return A [ggplot] object.
+#'
 #' @export
 #'
 #' @examples
 #'
 #' # Use the coloured noise data set.
-#'  data(ColouredNoise)
-#'  plotTS_multi(ColouredNoise)
+#' data(ColouredNoise)
+#' plotTS_multi(ColouredNoise)
 #'
-plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, colOrder = TRUE, doPlot = TRUE, title = '', subtitle = "", xlabel = "Time", ylabel = "", returnPlotData = FALSE, useRibbon = FALSE, overlap = 1){
+plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, colOrder = TRUE, doPlot = TRUE, title = "", subtitle = "", xlabel = "Time", ylabel = "", returnPlotData = FALSE, useRibbon = FALSE, overlap = 1){
 
   cname <- "time"
   i <-0
@@ -216,10 +217,13 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
 #' Plot Network Based on RQA
 #'
 #' @param g An igraph object
-#' @param labels Vertex labels
-#' @param nodesize Set nodesizes by `degree(g, normalised = TRUE)` (default), `hubscore(g)$vector`, or, `strength(g)`, `eccentricity(g)`, `coreness(g)`. If a numeric value is passed all vertex sizes will be set to that value.
-#' @param labelsize Set labelsize: "asnodesize" sets the `cex` for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the `cex` of all labels to that value. A numeric vector of length two, `c(min,max)` wil scale the node sizes to `min` and `max` which
-#' @param edgeweight Set size of edges to `"E(g)$weight"` by passing "weight". If a single numeric value is provided all edges will be set to that value.
+#' @param labels Vertex labels. If `NA` is passed then first `V(g)$name` will be checked, for node labels. To create a plot without labels pass `NULL` (default = `NA`)
+#' @param nodeSize Set node sizes by `degree(g, normalised = TRUE)` (default), `hubscore(g)$vector`, or, `strength(g)`, `eccentricity(g)`, `coreness(g)`. If a numeric value is passed all vertex sizes will be set to that value.
+#' @param rescaleSize Use to rescale the measure indicated under `nodeSize` to `c(min,max)` for better node visibility. Pass `c(1,1)` for no rescaling (default = `c(3,10)`)
+#' @param labelSize Set labelsize: `"asnodesize"` sets the `cex` for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the `cex` of all labels to that value. A numeric vector of length two, `c(min,max)` will scale the label sizes to `min` and `max`
+#' @param nodeColour Set to `TRUE` to colour nodes using the size of the node (default = `TRUE`)
+#' @param edgeWeight Set size of edges to `"E(g)$weight"` by passing "weight". If a single numeric value is provided all edges will be set to that value.
+#' @param edgeColour Set to `TRUE` to colour edges using the weight of the edge (default = `FALSE`)
 #' @param removeZeroDegree Remove vertices with `degree(g) == 0` (default = `TRUE`)
 #' @param removeSelfLoops Calls `simplify(g)` (default = `TRUE`)
 #' @param doPlot Plot the igraph object.
@@ -231,12 +235,17 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
 #'
 plotNET_prep <- function(g,
                          labels     = NA,
-                         nodesize   = c("degree","hubscore","strength","eccentricity","coreness")[1],
-                         labelsize  = "asnodesize",
-                         edgeweight = "weight",
+                         nodeSize   = c("degree","hubscore","strength","eccentricity","coreness")[1],
+                         rescaleSize = c(3,10),
+                         nodeColour = TRUE,
+                         labelSize  = "asnodesize",
+                         edgeWeight = "weight",
+                         edgeColour = FALSE,
                          removeZeroDegree = TRUE,
                          removeSelfLoops  = TRUE,
                          doPlot     = TRUE){
+
+  checkPkg("igraph")
 
   if(removeSelfLoops){
     g <- simplify(g)
@@ -246,8 +255,8 @@ plotNET_prep <- function(g,
   }
 
   rev <- NA
-  if(is.character(nodesize)){
-    switch(nodesize,
+  if(is.character(nodeSize)){
+    switch(nodeSize,
            # degree   = rev <- elascer(log1p(igraph::degree(g,normalized = TRUE))),
            # hubscore = rev <- elascer(log1p(igraph::hub_score(g)$vector))
            # strength = rev <- elascer(log1p(igraph::strength(g)$vector)))
@@ -258,50 +267,67 @@ plotNET_prep <- function(g,
            coreness = rev <- igraph::coreness(g),
     )
   } else {
-    rev <- rep(as.numeric(nodesize),length(igraph::V(g)))
+    rev <- rep(as.numeric(nodeSize),length(igraph::V(g)))
   }
 
   # set colors and sizes for vertices
   #rev<-elascer(log1p(igraph::V(g)$degree))
 
-  igraph::V(g)$size        <- rev
+  igraph::V(g)$size        <- elascer(rev, lo = rescaleSize[1], hi = rescaleSize[2])
 
   rev <- rev/max(rev, na.rm = TRUE)
   rev[rev<=0.2]<-0.2
   rev[rev>=0.9]<-0.9
   igraph::V(g)$rev <- rev
 
-  igraph::V(g)$color       <- grDevices::rgb(igraph::V(g)$rev, 1-igraph::V(g)$rev,  0, 1)
+  gradFunc <- getColours(Ncols = c(2,7,1), continuous = TRUE, Dcols = c(0,.5,1))
+  igraph::V(g)$color <- gradFunc(elascer(igraph::V(g)$size))
 
   # set vertex labels and their colors and sizes
   if(all(is.na(labels))){
-    igraph::V(g)$label       <- ""
-  } else {
-    igraph::V(g)$label       <- labels
+    if(!is.null(V(g)$name)){
+      igraph::V(g)$label <- igraph::V(g)$name
+    } else {
+        V(g)$label <- ""
+      }
+    } else {
+      if(is.null(labels)){
+        V(g)$label <- ""
+      } else {
+       if(is.character(labels)&(length(labels)==igraph::vcount(g))){
+         V(g)$label <- labels
+       } else
+         warning("Length of labels does not equal number of nodes.")
+      }
+    }
 
-    if(labelsize == "asnodesize"){igraph::V(g)$label.cex <- elascer(igraph::V(g)$size,lo = .4, hi = 1.1)}
-    if(is.numeric(labelsize)&length(labelsize)==1){igraph::V(g)$label.cex <- labelsize}
-    if(is.numeric(labelsize)&length(labelsize)==2){igraph::V(g)$label.cex <-  elascer(igraph::V(g)$size, lo = labelsize[1], hi = labelsize[2])}
+    if(labelSize == "asnodesize"){igraph::V(g)$label.cex <- elascer(igraph::V(g)$size,lo = .4, hi = 1.1)}
+    if(is.numeric(labelSize)&length(labelSize)==1){igraph::V(g)$label.cex <- labelSize}
+    if(is.numeric(labelSize)&length(labelSize)==2){igraph::V(g)$label.cex <- elascer(igraph::V(g)$size, lo = labelSize[1], hi = labelSize[2])}
 
     igraph::V(g)$label.color <- "black"
-
     igraph::V(g)$label.family = "Helvetica"
-  }
 
   if(igraph::ecount(g)>0){
-    if(edgeweight%in%"weight"){
+    if(edgeWeight%in%"weight"){
       if(igraph::is_weighted(g)){
         igraph::E(g)$width <- elascer(igraph::E(g)$weight,lo = .8, hi = 5)
       }
     } else {
-      if(is.numeric(edgeweight)){
-        igraph::E(g)$width <- as.numeric(edgeweight)
+      if(is.numeric(edgeWeight)){
+        igraph::E(g)$width <- as.numeric(edgeWeight)
       } else {
         igraph::E(g)$width <- 1
       }
     }
-    igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
   }
+
+    if(edgeColour){
+      gradFunc <- getColours(Ncols = c(21,5,1), continuous = TRUE, Dcols = c(0,.5,1))
+      igraph::E(g)$color <- gradFunc(elascer(igraph::E(g)$width))
+    } else {
+      igraph::E(g)$color <- grDevices::rgb(0.5, 0.5, 0.5, 1)
+    }
 
   if(doPlot){
     # graphics::plot.new()
@@ -1495,8 +1521,8 @@ plotMRN_win <- function(df_mrn,
 
   #
   # rev <- NA
-  # if(is.character(nodesize)){
-  #   switch(nodesize,
+  # if(is.character(nodeSize)){
+  #   switch(nodeSize,
   #          # degree   = rev <- elascer(log1p(igraph::degree(g,normalized = TRUE))),
   #          # hubscore = rev <- elascer(log1p(igraph::hub_score(g)$vector))
   #          # strength = rev <- elascer(log1p(igraph::strength(g)$vector)))
@@ -1507,7 +1533,7 @@ plotMRN_win <- function(df_mrn,
   #          coreness = rev <- igraph::coreness(g),
   #   )
   # } else {
-  #   rev <- rep(as.numeric(nodesize),length(igraph::V(g)))
+  #   rev <- rep(as.numeric(nodeSize),length(igraph::V(g)))
   # }
   #
   # # set colors and sizes for vertices
@@ -1528,9 +1554,9 @@ plotMRN_win <- function(df_mrn,
   # } else {
   #   igraph::V(g)$label       <- labels
   #
-  #   if(labelsize == "asnodesize"){igraph::V(g)$label.cex <- elascer(igraph::V(g)$size,lo = .4, hi = 1.1)}
-  #   if(is.numeric(labelsize)&length(labelsize)==1){igraph::V(g)$label.cex <- labelsize}
-  #   if(is.numeric(labelsize)&length(labelsize)==2){igraph::V(g)$label.cex <-  elascer(igraph::V(g)$size, lo = labelsize[1], hi = labelsize[2])}
+  #   if(labelSize == "asnodesize"){igraph::V(g)$label.cex <- elascer(igraph::V(g)$size,lo = .4, hi = 1.1)}
+  #   if(is.numeric(labelSize)&length(labelSize)==1){igraph::V(g)$label.cex <- labelSize}
+  #   if(is.numeric(labelSize)&length(labelSize)==2){igraph::V(g)$label.cex <-  elascer(igraph::V(g)$size, lo = labelSize[1], hi = labelSize[2])}
   #
   #   igraph::V(g)$label.color <- "black"
   #
@@ -1802,11 +1828,10 @@ layout_as_spiral <- function(g,
   return(df)
 }
 
+
 #' Make Spiral Graph
 #'
 #' Turn an [igraph] object into a spiral graph returning a [ggplot2] object.
-#'
-#' @note To keep the igraph object, use the layout function [layout_as_spiral()] when plotting the graph.
 #'
 #' @inheritParams layout_as_spiral
 #' @inheritParams plotNET_groupColour
@@ -1822,7 +1847,7 @@ layout_as_spiral <- function(g,
 #' @param epochColours A vector of length `vcount(g)` with colour codes (default = `NULL`)
 #' @param epochLabel A title for the epoch legend (default = `"Epoch"`)
 #' @param showSizeLegend Should a legend be shown for the size of the nodes? (default = `FALSE`)
-#' @param sizeLabel Use to indicate if `V(g)$size` represents some measure, e.g. [igraph::degree()], or, [igraph::hub_score()] (default = `"Size"`)
+#' @param sizeLabel Guide label, use it to indicate if `V(g)$size` represents some measure, e.g. [igraph::degree()], or, [igraph::hub_score()], [igraph::strength()] (default = `"Size"`)
 #' @param scaleVertexSize Scale the size of the vertices by setting a range for [ggplot2::scale_size()]. This will not affect the numbers on the size legend (default = `c(1,6)`)
 #' @param vertexBorderColour Draw a border around the vertices. Pass `NULL` to use the same colour as the fill colour (default = `"black"`)
 #' @param edgeColourLabel Use to indicate if `E(g)$color` represents color coding based on some property. (default = `"Weight"`)
@@ -1831,6 +1856,8 @@ layout_as_spiral <- function(g,
 #' @param edgeColourByEpoch Should edges that connect to the same epoch be assigned the epoch colour? This will ignore edge colour info in `E(g)$color`. (default = `TRUE`)
 #' @param defaultEdgeColour Colour of edges that do not connect to the same epoch (default = `"grey70"`)
 #' @param doPlot Produce a plot? (default = `TRUE`)
+#'
+#' @note To keep the igraph object, use the layout function [layout_as_spiral()] when plotting the graph.
 #'
 #' @return A ggplot object.
 #'
@@ -1876,93 +1903,75 @@ make_spiral_graph <- function(g,
 
   g$layout <- layout_as_spiral(g, type = type, arcs = arcs, a = a, b = b, rev = rev)
 
-  tbreaks <- NULL
-  tlabels <- NULL
-
-  if(!is.null(markEpochsBy)){
-    markEpochsBy <- as.numeric_discrete(factor(markEpochsBy))
-    grIDs <- ts_changeindex(markEpochsBy)
-    tbreaks <- unique(sort(c(grIDs$xmin,igraph::vcount(g))))
-    if(!is.null(names(markEpochsBy))){
-      tlabels <- names(markEpochsBy)[tbreaks]
+  if(is.null(markTimeBy)){
+    if(!is.null(markEpochsBy)){
+      grIDs <- ts_changeindex(markEpochsBy)
+      tbreaks <- unique(sort(c(grIDs$xmax,grIDs$xmax)))
+      tlabels <- ceiling(tbreaks)
+      #markTimeBy <- TRUE
     } else {
-      tlabels <- paste(tbreaks)
+      x <- 1:igraph::vcount(g)
+      v <- seq(1,igraph::vcount(g),by=igraph::vcount(g)/arcs)
+      tbreaks <- c(1,which(diff(findInterval(x, v))!=0),igraph::vcount(g))
+      #tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
+      if(max(tbreaks)!=igraph::vcount(g)){
+        tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
+        tlabels <- paste(tbreaks)
+      }
+      if(min(tbreaks)>1){
+        tbreaks<- c(1,tbreaks)
+        tlabels <- paste(tbreaks)
+      }
     }
-    markTimeBy <- TRUE
+  } else {
+    if(is.numeric(markTimeBy)){
+      if(all(markTimeBy%in%1:igraph::vcount(g))){
+        tbreaks <- unique(markTimeBy)
+      }
+      if(!is.null(names(markTimeBy))){
+        tlabels <- unique(names(markTimeBy))
+      } else {
+        tlabels <- paste(tbreaks)
+      }
+    } else {
+      markTimeBy <- TRUE
+    }
   }
-
-  #
-  #   if(is.null(tbreaks)){
-  #     x <- 1:igraph::vcount(g)
-  #     v <- seq(1,igraph::vcount(g),by=igraph::vcount(g)/arcs)
-  #     tbreaks <- c(1,which(diff(findInterval(x, v))!=0),igraph::vcount(g))
-  #     #tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
-  #     }
-  #     if(max(tbreaks)!=igraph::vcount(g)){
-  #       tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
-  #     }
-  #     if(min(tbreaks)>1){
-  #       tbreaks<- c(1,tbreaks)
-  #     }
-  #   if(is.null(tlabels)){
-  #     tlabels <- paste(tbreaks)
-  #   } else {
-  #     tlabels <- markEpochsBy[tbreaks]
-  #   }
-  #
-  #
-  # if(!is.null(markTimeBy)){
-  #   if(is.numeric(markTimeBy)){
-  #     if(all(markTimeBy%in%1:igraph::vcount(g))){
-  #       tbreaks <- unique(markTimeBy)
-  #     }
-  #     if(!is.null(names(markTimeBy))){
-  #       tlabels <- unique(names(markTimeBy))
-  #     } else {
-  #       tlabels <- paste(tbreaks)
-  #     }
-  #   } else {
-  #     markTimeBy <- TRUE
-  #   }
-  # }
 
   if(is.logical(markTimeBy)){
     if(markTimeBy){
-      if(is.null(tbreaks)){
       if(type == "Euler"){
-        tbreaks <- which(diff(as.numeric(cut(g$layout[,2], breaks = nbreaks,include.lowest = TRUE)))!=0)
+        tbreaks <- which(diff(as.numeric(cut(g$layout[,2], breaks = arcs,include.lowest = TRUE)))!=0)
         tbreaks[1] <- 1
         tbreaks[which.max(tbreaks)] <- igraph::vcount(g)
       } else {
         tbreaks <- which(diff(c(g$layout[1,1],g$layout[,2],g$layout[1,2])>=g$layout[1,2])!=0)
       }
       if(max(tbreaks)>igraph::vcount(g)){tbreaks[which.max(tbreaks)]<-igraph::vcount(g)}
-      if(max(tbreaks)<igraph::vcount(g)){tbreaks <- c(tbreaks,igraph::vcount(g))}
+      if(max(tbreaks)<igraph::vcount(g)){tbreaks<- c(tbreaks,igraph::vcount(g))}
       if(min(tbreaks)>1){tbreaks<- c(1,tbreaks)}
-      }
-      if(is.null(tlabels)){
-        tlabels <- paste(tbreaks)
-      }
+      tlabels <- paste(tbreaks)
     }
   }
 
-  # if(max(tbreaks)!=igraph::vcount(g)){
-  #   tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
-  #   #tlabels <- paste(tbreaks)
-  #   tlabels <- tlabels[tbreaks]
-  # }
-  #
-  # if(min(tbreaks)>1){
-  #   tbreaks<- c(1,tbreaks)
-  #   #tlabels <- paste(tbreaks)
-  #   tlabels <- tlabels[tbreaks]
-  # }
+  if(max(tbreaks)!=igraph::vcount(g)){
+    tbreaks[which.max(tbreaks)]<-igraph::vcount(g)
+    #tlabels <- paste(tbreaks)
+    tlabels <- tlabels[tbreaks]
+  }
+
+  if(min(tbreaks)>1){
+    tbreaks<- c(1,tbreaks)
+    #tlabels <- paste(tbreaks)
+    tlabels <- tlabels[tbreaks]
+  }
 
   if(length(which(diff(tbreaks)==1))>0){
     tbreaks <- tbreaks[-(which(diff(tbreaks)==1)+1)]
     #tlabels <- paste(tbreaks)
     tlabels <- tlabels[tbreaks]
   }
+
 
   if(is.null(markEpochsBy)){
     markEpochsBy <- character(igraph::vcount(g))
@@ -1991,7 +2000,6 @@ make_spiral_graph <- function(g,
   if(!is.null(V(g)$size)){
     size <- V(g)$size
   }
-
   gNodes        <- as.data.frame(g$layout)
   gNodes$ID     <- as.numeric(V(g))
   gNodes$colour <- V(g)$colour
@@ -2047,17 +2055,17 @@ make_spiral_graph <- function(g,
     }
   }
 
-  gg <- ggplot2::ggplot(gNodes, ggplot2::aes_(x = ~V1, y = ~V2)) +
-    ggplot2::geom_curve(data = gEdges, aes_(x = ~from.x,
-                                              xend = ~to.x,
-                                              y = ~from.y,
-                                              yend = ~to.y,
-                                              colour = ~colorVar),
-                        curvature = curvature,
-                        arrow = ar,
-                        angle = angle,
-                        size = gEdges$width * scaleEdgeSize,
-                        alpha = alphaE) +
+  gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
+    geom_curve(data=gEdges, aes(x = from.x,
+                                xend = to.x,
+                                y = from.y,
+                                yend = to.y,
+                                colour = colorVar),
+               curvature = curvature,
+               arrow = ar,
+               angle = angle,
+               size = gEdges$width * scaleEdgeSize,
+               alpha = alphaE) +
     geom_point(aes(fill = labels, size = size), pch=21, colour = vBc, alpha = alphaV) +
     ggtitle(label = title, subtitle = subtitle) +
     scale_fill_manual(epochLabel, values = unique(gNodes$colour)) +
@@ -2092,7 +2100,7 @@ make_spiral_graph <- function(g,
   }
 
   if(!is.null(markTimeBy)){
-    gg <- gg + annotate("label", x=gNodes$V1[tbreaks], y=gNodes$V2[tbreaks], label = gNodes$labels[tbreaks], size=labelSize)
+    gg <- gg + annotate("label", x=gNodes$V1[tbreaks], y=gNodes$V2[tbreaks], label = tlabels, size=labelSize)
   }
 
   gg <- gg +
@@ -2109,56 +2117,6 @@ make_spiral_graph <- function(g,
   return(invisible(gg))
 }
 
-
-
-# [copied from http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/ ]
-#
-# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
-# - cols:   Number of columns in layout
-# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
-#
-# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
-# then plot 1 will go in the upper left, 2 will go in the upper right, and
-# 3 will go all the way across the bottom.
-#
-multi_PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-
-  numPlots = length(plots)
-
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-
-  if (numPlots==1) {
-    grid::grid.newpage()
-    grid::grid.draw(plots[[1]])
-    #print(plots[[1]])
-
-  } else {
-    # Set up the page
-    grid::grid.newpage()
-    grid::pushViewport(grid::viewport(layout = grid::grid.layout(nrow(layout), ncol(layout))))
-
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-
-      grid::grid.draw(plots[[i]], vp = grid::viewport(layout.pos.row = matchidx$row,
-                                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-
-
-
 #' Get some nice colours
 #'
 #' @param Ncols Either an integer representing the number of requested colours, or, a numeric vector of integers between 1-58 to select specific colours. Run [getColours()] without arguments to see a plot of the colours that are available.
@@ -2170,7 +2128,7 @@ multi_PLOT <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 #'
 #' @examples
 #'
-#' # Plot all available colours
+#' # This will plot all available colours with their numbers
 #' getColours()
 #'
 #' # Get a specific number of colours

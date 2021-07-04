@@ -12,7 +12,7 @@
 #' @param df A data frame containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in `df` should be on the same scale, an error will be thrown if the range of the time series in`df` is not `[scale_min,scale_max]`.
 #' @param win Size of window in which to calculate Dynamic Complexity. If `win < NROW(df)` the window will move along the time series with a stepsize of `1` (default = `NROW(df)`)
 #' @param scale_min The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to the correct value.
-#' @param scale_max The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value.
+#' @param scale_max The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to the correct value.
 #' @param doPlot If `TRUE` shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible [ggplot2::ggplot()] object. (default = `FALSE`)
 #' @param doPlotF If `TRUE` shows a Complexity Resonance Diagram of the Fluctuation Intensity and returns an invisible [ggplot2::ggplot()] object. (default = `FALSE`)
 #' @param doPlotD If `TRUE` shows a Complexity Resonance Diagram of the Distribution Uniformity and returns an invisible [ggplot2::ggplot()] object. (default = `FALSE`)

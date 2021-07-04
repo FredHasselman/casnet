@@ -10,7 +10,10 @@ ts_levels(
   minLevelDuration = round(minDataSplit/3),
   changeSensitivity = 0.01,
   maxLevels = 30,
-  method = c("anova", "poisson", "class", "exp")[1]
+  method = c("anova", "poisson", "class", "exp")[1],
+  minChange = sd(y, na.rm = TRUE),
+  doLevelPlot = FALSE,
+  doTreePlot = FALSE
 )
 }
 \arguments{
@@ -25,6 +28,12 @@ ts_levels(
 \item{maxLevels}{Maximum number of levels in one series (default = \code{30})}
 
 \item{method}{The partitioning method to use, see the manual pages of \link{rpart} for details.}
+
+\item{minChange}{After the call to \link{rpart}, adjust detected level changes to a minimum absolute change in \code{y}. If a level change is smaller than \code{minChange}, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end (default  = \code{sd(y, na.rm = TRUE)})}
+
+\item{doLevelPlot}{Should a plot with the original series and the levels be produced? (default = \code{FALSE})}
+
+\item{doTreePlot}{Should a plot of the decision tree be produced. This requires package \link{partykit} (default = \code{FALSE})}
 }
 \value{
 A list object with fields \code{tree} and \code{pred}. The latter is a data frame with columns \code{x} (time), \code{y} (the variable of interest) and \code{p} the predicted levels in \code{y}.
@@ -37,13 +46,19 @@ Use recursive partitioning function (\link[rpart]{rpart} to perform a 'classific
 # Levels in white noise?
 
 set.seed(4321)
-wn <- ts_levels(rnorm(100))
+y <- rnorm(100)
+wn <- ts_levels(y)
 plot(wn$pred$x,wn$pred$y, type = "l")
 lines(wn$pred$p, col = "red3", lwd = 2)
 
 # This is due to the default changeSensitivity of 0.01
 
-lines(ts_levels(rnorm(100),changeSensitivity = .1)$pred$p, col = "steelblue", lwd = 2)
+wn2 <- ts_levels(y,changeSensitivity = .1)
+lines(wn2$pred$p, col = "steelblue", lwd = 2)
+
+# Plot the tree
+
+ts_levels(y, doTreePlot = TRUE)
 
 
 }

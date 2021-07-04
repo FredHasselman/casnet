@@ -26,7 +26,7 @@ dc_win(
 
 \item{scale_min}{The theoretical minimum value of the scale. Used to calculate expected values, so it is important to set this to the correct value.}
 
-\item{scale_max}{The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to rhe correct value.}
+\item{scale_max}{The theoretical maximum value of the scale. Used to calculate expected values, so it is important to set this to the correct value.}
 
 \item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
 

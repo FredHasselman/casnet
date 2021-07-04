@@ -4,10 +4,10 @@
 \alias{rp_size}
 \title{rp_size}
 \usage{
-rp_size(mat, AUTO = NULL, theiler = NULL)
+rp_size(RM, AUTO = NULL, theiler = NULL)
 }
 \arguments{
-\item{mat}{A Matrix object}
+\item{RM}{A Matrix object}
 
 \item{AUTO}{Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass \code{FALSE} to prevent this behaviour. If \code{NULL} (default) \code{AUTO} will take on the value of \code{isSymmetric(mat)}.}
 
@@ -17,7 +17,10 @@ rp_size(mat, AUTO = NULL, theiler = NULL)
 Matrix size for computation of recurrence measures.
 }
 \description{
-rp_size
+Calculate the maximum possible number of recurrent points in a recurrence matrix.
+}
+\details{
+This function can take into account the presence of a \code{theiler} window, that is the points in the window will be excluded from the calculation. For example, some scholars will exclude the main diagonal from the calculation of the recurrence rate.
 }
 \examples{
 # Create a 10 by 10 matrix
@@ -33,6 +36,7 @@ rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the di
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
 \code{\link{dist_hamming}()},
 \code{\link{rp_lineDist}()},

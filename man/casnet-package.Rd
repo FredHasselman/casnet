@@ -19,7 +19,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Fred Hasselman \email{f.hasselman@pwo.ru.nl} (\href{https://orcid.org/0000-0003-1384-8361}{ORCID}) [copyright holder]
+\strong{Maintainer}: Fred Hasselman \email{fred.hasselman@ru.nl} (\href{https://orcid.org/0000-0003-1384-8361}{ORCID}) [copyright holder]
 
 Other contributors:
 \itemize{

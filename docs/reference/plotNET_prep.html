@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -149,9 +149,12 @@
     <pre class="usage"><span class='fu'>plotNET_prep</span><span class='op'>(</span>
   <span class='va'>g</span>,
   labels <span class='op'>=</span> <span class='cn'>NA</span>,
-  nodesize <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"degree"</span>, <span class='st'>"hubscore"</span>, <span class='st'>"strength"</span>, <span class='st'>"eccentricity"</span>, <span class='st'>"coreness"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
-  labelsize <span class='op'>=</span> <span class='st'>"asnodesize"</span>,
-  edgeweight <span class='op'>=</span> <span class='st'>"weight"</span>,
+  nodeSize <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"degree"</span>, <span class='st'>"hubscore"</span>, <span class='st'>"strength"</span>, <span class='st'>"eccentricity"</span>, <span class='st'>"coreness"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
+  rescaleSize <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>10</span><span class='op'>)</span>,
+  nodeColour <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  labelSize <span class='op'>=</span> <span class='st'>"asnodesize"</span>,
+  edgeWeight <span class='op'>=</span> <span class='st'>"weight"</span>,
+  edgeColour <span class='op'>=</span> <span class='cn'>FALSE</span>,
   removeZeroDegree <span class='op'>=</span> <span class='cn'>TRUE</span>,
   removeSelfLoops <span class='op'>=</span> <span class='cn'>TRUE</span>,
   doPlot <span class='op'>=</span> <span class='cn'>TRUE</span>
@@ -166,19 +169,31 @@
     </tr>
     <tr>
       <th>labels</th>
-      <td><p>Vertex labels</p></td>
+      <td><p>Vertex labels. If <code>NA</code> is passed then first <code>V(g)$name</code> will be checked, for node labels. To create a plot without labels pass <code>NULL</code> (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
-      <th>nodesize</th>
-      <td><p>Set nodesizes by <code><a href='https://rdrr.io/pkg/igraph/man/degree.html'>degree(g, normalised = TRUE)</a></code> (default), <code>hubscore(g)$vector</code>, or, <code><a href='https://rdrr.io/pkg/igraph/man/strength.html'>strength(g)</a></code>, <code><a href='https://rdrr.io/pkg/igraph/man/eccentricity.html'>eccentricity(g)</a></code>, <code><a href='https://rdrr.io/pkg/igraph/man/coreness.html'>coreness(g)</a></code>. If a numeric value is passed all vertex sizes will be set to that value.</p></td>
+      <th>nodeSize</th>
+      <td><p>Set node sizes by <code><a href='https://rdrr.io/pkg/igraph/man/degree.html'>degree(g, normalised = TRUE)</a></code> (default), <code>hubscore(g)$vector</code>, or, <code><a href='https://rdrr.io/pkg/igraph/man/strength.html'>strength(g)</a></code>, <code><a href='https://rdrr.io/pkg/igraph/man/eccentricity.html'>eccentricity(g)</a></code>, <code><a href='https://rdrr.io/pkg/igraph/man/coreness.html'>coreness(g)</a></code>. If a numeric value is passed all vertex sizes will be set to that value.</p></td>
     </tr>
     <tr>
-      <th>labelsize</th>
-      <td><p>Set labelsize: "asnodesize" sets the <code>cex</code> for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the <code>cex</code> of all labels to that value. A numeric vector of length two, <code><a href='https://rdrr.io/r/base/c.html'>c(min,max)</a></code> wil scale the node sizes to <code>min</code> and <code>max</code> which</p></td>
+      <th>rescaleSize</th>
+      <td><p>Use to rescale the measure indicated under <code>nodeSize</code> to <code><a href='https://rdrr.io/r/base/c.html'>c(min,max)</a></code> for better node visibility. Pass <code><a href='https://rdrr.io/r/base/c.html'>c(1,1)</a></code> for no rescaling (default = <code><a href='https://rdrr.io/r/base/c.html'>c(3,10)</a></code>)</p></td>
     </tr>
     <tr>
-      <th>edgeweight</th>
+      <th>nodeColour</th>
+      <td><p>Set to <code>TRUE</code> to colour nodes using the size of the node (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>labelSize</th>
+      <td><p>Set labelsize: <code>"asnodesize"</code> sets the <code>cex</code> for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the <code>cex</code> of all labels to that value. A numeric vector of length two, <code><a href='https://rdrr.io/r/base/c.html'>c(min,max)</a></code> will scale the label sizes to <code>min</code> and <code>max</code></p></td>
+    </tr>
+    <tr>
+      <th>edgeWeight</th>
       <td><p>Set size of edges to <code>"E(g)$weight"</code> by passing "weight". If a single numeric value is provided all edges will be set to that value.</p></td>
+    </tr>
+    <tr>
+      <th>edgeColour</th>
+      <td><p>Set to <code>TRUE</code> to colour edges using the weight of the edge (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>removeZeroDegree</th>

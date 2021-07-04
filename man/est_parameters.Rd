@@ -10,10 +10,10 @@ est_parameters(
   estimateDimensions = "preferSmallestInLargestHood",
   maxDim = 10,
   emLag = NULL,
-  maxLag = floor(NROW(y)/(maxDim + 1)),
+  maxLag = NA,
   minVecLength = 20,
   nnSize = NA,
-  nnRadius = sd(y)/10,
+  nnRadius = NA,
   nnThres = 10,
   theiler = 0,
   doPlot = TRUE,
@@ -39,13 +39,13 @@ est_parameters(
 
 \item{emLag}{Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If \code{NULL} the lags based on the mutual information in \code{lagMethods} will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = \code{NULL})}
 
-\item{maxLag}{Maximum embedding lag to consider. Default value is: \code{floor(length(y)/(maxDim+1))}}
+\item{maxLag}{Maximum embedding lag to consider. If \code{NA} then the value is caclulated as \code{floor(length(y)/(maxDim+1))} (default = \code{NA})}
 
 \item{minVecLength}{The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of \code{maxDim} that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = \code{20})}
 
 \item{nnSize}{Neighbourhood diameter (integer, the \code{number.boxes} parameter of \code{\link[tseriesChaos:false.nearest]{tseriesChaos::false.nearest()}}) used to speed up neighbour search. (default = \code{NA})}
 
-\item{nnRadius}{Points smaller than the radius are considered neighbours (default = \code{sd(y)/10})}
+\item{nnRadius}{Points smaller than the radius are considered neighbours. If \code{NA} the value will be \code{sd(y)/10}  (default = \code{NA})}
 
 \item{nnThres}{Threshold value (in percentage 0-100) representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = \code{10})}
 

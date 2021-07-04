@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -160,7 +160,7 @@
   targetValue <span class='op'>=</span> <span class='fl'>0.05</span>,
   tol <span class='op'>=</span> <span class='fl'>0.1</span>,
   maxIter <span class='op'>=</span> <span class='fl'>100</span>,
-  theiler <span class='op'>=</span> <span class='cn'>NULL</span>,
+  theiler <span class='op'>=</span> <span class='cn'>NA</span>,
   histIter <span class='op'>=</span> <span class='cn'>FALSE</span>,
   noiseLevel <span class='op'>=</span> <span class='fl'>0.75</span>,
   noiseType <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"normal"</span>, <span class='st'>"uniform"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
@@ -195,7 +195,7 @@
     </tr>
     <tr>
       <th>method</th>
-      <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://rdrr.io/pkg/proxy/man/dist.html'>proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
+      <td><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href='https://rdrr.io/pkg/proxy/man/dist.html'>proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></td>
     </tr>
     <tr>
       <th>type</th>

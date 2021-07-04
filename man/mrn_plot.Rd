@@ -55,7 +55,7 @@ mrn_plot(
 
 \item{alignment}{Whether to right (\code{"r"}), center (\code{"c"}), or left (\code{"l"}) align the window.}
 
-\item{cumulative}{To make the network represent cumulative time, set \code{directed = TRUE} and \code{cumulative = TRUE}. This will set the upper triangle of the recurrence matrix to \code{0} and ensures that the network edges represent recurrenct values that have occurred in the \code{past} relative to the current opbserved value. If \code{directed = FALSE} the argument is ignored (default = \code{TRUE}).}
+\item{cumulative}{To make the network represent cumulative time, set \code{directed = TRUE} and \code{cumulative = TRUE}. This will set the upper triangle of the recurrence matrix to \code{0} and ensures that the network edges represent recurrent values that have occurred in the \code{past} relative to the current observed value (node). If \code{directed = FALSE} the argument is ignored (default = \code{TRUE}).}
 
 \item{doPlot}{Plot the multiplex recurrence network (default = \code{TRUE}).}
 

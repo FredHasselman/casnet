@@ -77,7 +77,7 @@ make_spiral_graph(
 
 \item{showSizeLegend}{Should a legend be shown for the size of the nodes? (default = \code{FALSE})}
 
-\item{sizeLabel}{Use to indicate if \code{V(g)$size} represents some measure, e.g. \code{\link[igraph:degree]{igraph::degree()}}, or, \code{\link[igraph:hub_score]{igraph::hub_score()}} (default = \code{"Size"})}
+\item{sizeLabel}{Guide label, use it to indicate if \code{V(g)$size} represents some measure, e.g. \code{\link[igraph:degree]{igraph::degree()}}, or, \code{\link[igraph:hub_score]{igraph::hub_score()}}, \code{\link[igraph:strength]{igraph::strength()}} (default = \code{"Size"})}
 
 \item{scaleVertexSize}{Scale the size of the vertices by setting a range for \code{\link[ggplot2:scale_size]{ggplot2::scale_size()}}. This will not affect the numbers on the size legend (default = \code{c(1,6)})}
 

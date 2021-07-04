@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -92,13 +92,13 @@
 
       
 
-      </header><script src="CRQA_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="CRQA_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>(Cross-) Recurrence Quantification Analysis</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2021-02-12</h4>
+            <h4 class="date">2021-07-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/CRQA.Rmd"><code>vignettes/CRQA.Rmd</code></a></small>
       <div class="hidden name"><code>CRQA.Rmd</code></div>
@@ -168,22 +168,22 @@
 <pre><code>&gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
-&gt;  Global Measures 
-&gt;              Global Max.rec.points N.rec.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix           9900         3104       0.3135354            1324
-&gt;   Divergence Repetitiveness Anisotropy
-&gt; 1  0.1111111       1.174157          1
+&gt; Global Measures
+&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
+&gt; 1 Recurrence Matrix               9900     3104           0.314            1324
+&gt;   Divergence Repetitiveness
+&gt; 1      0.111           2.35
 &gt; 
 &gt; 
-&gt;  Line-based Measures 
-&gt;   Line.based N.lines N.points.on.lines      Measure      Rate     Mean Max
-&gt; 1   Diagonal     668              1780  Determinism 0.5734536 2.664671   9
-&gt; 2   Vertical     959              2090 V Laminarity 0.6733247 2.179353   3
-&gt; 3 Horizontal     959              2090 H Laminarity 0.6733247 2.179353   3
+&gt; Line-based Measures
+&gt;   Line.based N.lines N.points.on.lines      Measure  Rate Mean Max
+&gt; 1   Diagonal     668              1780  Determinism 0.573 2.66   9
+&gt; 2   Vertical     959              2090 V Laminarity 0.673 2.18   3
+&gt; 3 Horizontal     959              2090 H Laminarity 0.673 2.18   3
 &gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1          1.1141896        0.2424724      0.3923046
-&gt; 2          0.4704117        0.1023720      0.1761294
-&gt; 3          0.4704117        0.1023720      0.1761294
+&gt; 1               1.11            0.242          0.392
+&gt; 2               0.47            0.102          0.176
+&gt; 3               0.47            0.102          0.176
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -191,22 +191,22 @@
 <pre><code>&gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
-&gt;  Global Measures 
-&gt;              Global Max.rec.points N.rec.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix           9900         3094       0.3125253            1456
-&gt;   Divergence Repetitiveness Anisotropy
-&gt; 1  0.1428571      0.9010989          1
+&gt; Global Measures
+&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
+&gt; 1 Recurrence Matrix               9900     3094           0.313            1456
+&gt;   Divergence Repetitiveness
+&gt; 1      0.143            1.8
 &gt; 
 &gt; 
-&gt;  Line-based Measures 
-&gt;   Line.based N.lines N.points.on.lines      Measure      Rate     Mean Max
-&gt; 1   Diagonal     668              1638  Determinism 0.5294118 2.452096   7
-&gt; 2   Vertical     682              1476 V Laminarity 0.4770524 2.164223   3
-&gt; 3 Horizontal     682              1476 H Laminarity 0.4770524 2.164223   3
+&gt; Line-based Measures
+&gt;   Line.based N.lines N.points.on.lines      Measure  Rate Mean Max
+&gt; 1   Diagonal     668              1638  Determinism 0.529 2.45   7
+&gt; 2   Vertical     682              1476 V Laminarity 0.477 2.16   3
+&gt; 3 Horizontal     682              1476 H Laminarity 0.477 2.16   3
 &gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1          0.8901225       0.19371040      0.3195282
-&gt; 2          0.4466065       0.09719148      0.1713084
-&gt; 3          0.4466065       0.09719148      0.1713084
+&gt; 1              0.890            0.193          0.320
+&gt; 2              0.447            0.097          0.171
+&gt; 3              0.447            0.097          0.171
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -227,20 +227,20 @@
 <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span>subj163<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_1</span><span class="op">)</span>, subj291<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>&gt;                      1            1
 &gt; emRad        1.0000000    1.0000000
-&gt; RP_N      3104.0000000 3104.0000000
+&gt; RP_max    9900.0000000 9900.0000000
 &gt; RR           0.3135354    0.3135354
 &gt; SING_N    1324.0000000 1324.0000000
 &gt; SING_rate    0.4265464    0.4265464
+&gt; RP_N      3104.0000000 3104.0000000
 &gt; DIV_dl       0.1111111    0.1111111
-&gt; REP_av       1.1741573    1.1741573
-&gt; ANI          1.0000000    1.0000000
+&gt; REP_av       2.3483146    2.3483146
 &gt; N_dl       668.0000000  668.0000000
 &gt; N_dlp     1780.0000000 1780.0000000
 &gt; DET          0.5734536    0.5734536
 &gt; MEAN_dl      2.6646707    2.6646707
 &gt; MAX_dl       9.0000000    9.0000000
 &gt; ENT_dl       1.1141896    1.1141896
-&gt; ENTrel_dl    0.2424724    0.2424724
+&gt; ENTrel_dl    0.2419432    0.2419432
 &gt; CoV_dl       0.3923046    0.3923046
 &gt; N_vl       959.0000000  959.0000000
 &gt; N_vlp     2090.0000000 2090.0000000
@@ -248,7 +248,7 @@
 &gt; TT_vl        2.1793535    2.1793535
 &gt; MAX_vl       3.0000000    3.0000000
 &gt; ENT_vl       0.4704117    0.4704117
-&gt; ENTrel_vl    0.1023720    0.1023720
+&gt; ENTrel_vl    0.1021486    0.1021486
 &gt; CoV_vl       0.1761294    0.1761294
 &gt; REP_vl       1.1741573    1.1741573
 &gt; N_hlp     2090.0000000 2090.0000000
@@ -257,17 +257,17 @@
 &gt; TT_hl        2.1793535    2.1793535
 &gt; MAX_hl       3.0000000    3.0000000
 &gt; ENT_hl       0.4704117    0.4704117
-&gt; ENTrel_hl    0.1023720    0.1023720
+&gt; ENTrel_hl    0.1021486    0.1021486
 &gt; CoV_hl       0.1761294    0.1761294
 &gt; REP_hl       1.1741573    1.1741573</code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># The tables are stored in an attribute</span>
 <span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">crqa_1</span>,<span class="st">"measuresTable"</span><span class="op">)</span></code></pre></div>
 <pre><code>&gt; $`Global Measures`
-&gt;              Global Max.rec.points N.rec.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix           9900         3104       0.3135354            1324
-&gt;   Divergence Repetitiveness Anisotropy
-&gt; 1  0.1111111       1.174157          1
+&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
+&gt; 1 Recurrence Matrix               9900     3104       0.3135354            1324
+&gt;   Divergence Repetitiveness
+&gt; 1  0.1111111       2.348315
 &gt; 
 &gt; $`Line-based Measures`
 &gt;   Line.based N.lines N.points.on.lines      Measure      Rate     Mean Max
@@ -275,16 +275,16 @@
 &gt; 2   Vertical     959              2090 V Laminarity 0.6733247 2.179353   3
 &gt; 3 Horizontal     959              2090 H Laminarity 0.6733247 2.179353   3
 &gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1          1.1141896        0.2424724      0.3923046
-&gt; 2          0.4704117        0.1023720      0.1761294
-&gt; 3          0.4704117        0.1023720      0.1761294</code></pre>
+&gt; 1          1.1141896        0.2419432      0.3923046
+&gt; 2          0.4704117        0.1021486      0.1761294
+&gt; 3          0.4704117        0.1021486      0.1761294</code></pre>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">crqa_2</span>,<span class="st">"measuresTable"</span><span class="op">)</span></code></pre></div>
 <pre><code>&gt; $`Global Measures`
-&gt;              Global Max.rec.points N.rec.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix           9900         3094       0.3125253            1456
-&gt;   Divergence Repetitiveness Anisotropy
-&gt; 1  0.1428571      0.9010989          1
+&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
+&gt; 1 Recurrence Matrix               9900     3094       0.3125253            1456
+&gt;   Divergence Repetitiveness
+&gt; 1  0.1428571       1.802198
 &gt; 
 &gt; $`Line-based Measures`
 &gt;   Line.based N.lines N.points.on.lines      Measure      Rate     Mean Max
@@ -292,9 +292,9 @@
 &gt; 2   Vertical     682              1476 V Laminarity 0.4770524 2.164223   3
 &gt; 3 Horizontal     682              1476 H Laminarity 0.4770524 2.164223   3
 &gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1          0.8901225       0.19371040      0.3195282
-&gt; 2          0.4466065       0.09719148      0.1713084
-&gt; 3          0.4466065       0.09719148      0.1713084</code></pre>
+&gt; 1          0.8901225       0.19328765      0.3195282
+&gt; 2          0.4466065       0.09697937      0.1713084
+&gt; 3          0.4466065       0.09697937      0.1713084</code></pre>
 <p>The sequence generated by participant 163 has a higher <strong>DET</strong>erminism (<code>DET = .40</code>) than the sequence by particpant 291 (<code>DET = .19</code>). The ratio of points on a diagonal line to the total number of recurrent point also quantifies this difference (<code>DET_RR</code>). Also interesting to note, both participants have a <strong>LAM</strong>inarity score of <code>0</code>. This implies they avoided to produce patterns in which the exact same numbers were repeated in succession. This is a tell-tale sign of the <em>non-random</em> origins of these sequences.</p>
 </div>
 <div id="hypothesis-testing-using-constrained-data-realisations" class="section level2">
@@ -323,22 +323,22 @@
 <pre><code>&gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
-&gt;  Global Measures 
-&gt;              Global Max.rec.points N.rec.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix           9900         3104       0.3135354            1474
-&gt;   Divergence Repetitiveness Anisotropy
-&gt; 1  0.1666667       1.142945          1
+&gt; Global Measures
+&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
+&gt; 1 Recurrence Matrix               9900     3104           0.314            1474
+&gt;   Divergence Repetitiveness
+&gt; 1      0.167           2.29
 &gt; 
 &gt; 
-&gt;  Line-based Measures 
-&gt;   Line.based N.lines N.points.on.lines      Measure      Rate     Mean Max
-&gt; 1   Diagonal     652              1630  Determinism 0.5251289 2.500000   6
-&gt; 2   Vertical     673              1863 V Laminarity 0.6001933 2.768202   6
-&gt; 3 Horizontal     673              1863 H Laminarity 0.6001933 2.768202   6
+&gt; Line-based Measures
+&gt;   Line.based N.lines N.points.on.lines      Measure  Rate Mean Max
+&gt; 1   Diagonal     652              1630  Determinism 0.525 2.50   6
+&gt; 2   Vertical     673              1863 V Laminarity 0.600 2.77   6
+&gt; 3 Horizontal     673              1863 H Laminarity 0.600 2.77   6
 &gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1          0.9496474        0.2066643      0.3299676
-&gt; 2          1.1353416        0.2470755      0.3826106
-&gt; 3          1.1353416        0.2470755      0.3826106
+&gt; 1               0.95            0.206          0.330
+&gt; 2               1.14            0.247          0.383
+&gt; 3               1.14            0.247          0.383
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -346,22 +346,22 @@
 <pre><code>&gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~
 &gt; 
-&gt;  Global Measures 
-&gt;              Global Max.rec.points N.rec.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix           9900         3094       0.3125253            1524
-&gt;   Divergence Repetitiveness Anisotropy
-&gt; 1  0.1666667       1.007643          1
+&gt; Global Measures
+&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
+&gt; 1 Recurrence Matrix               9900     3094           0.313            1524
+&gt;   Divergence Repetitiveness
+&gt; 1      0.167           2.02
 &gt; 
 &gt; 
-&gt;  Line-based Measures 
-&gt;   Line.based N.lines N.points.on.lines      Measure      Rate     Mean Max
-&gt; 1   Diagonal     652              1570  Determinism 0.5074337 2.407975   6
-&gt; 2   Vertical     680              1582 V Laminarity 0.5113122 2.326471   4
-&gt; 3 Horizontal     680              1582 H Laminarity 0.5113122 2.326471   4
+&gt; Line-based Measures
+&gt;   Line.based N.lines N.points.on.lines      Measure  Rate Mean Max
+&gt; 1   Diagonal     652              1570  Determinism 0.507 2.41   6
+&gt; 2   Vertical     680              1582 V Laminarity 0.511 2.33   4
+&gt; 3 Horizontal     680              1582 H Laminarity 0.511 2.33   4
 &gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1          0.8384475        0.1824648      0.3094559
-&gt; 2          0.7212808        0.1569667      0.2542265
-&gt; 3          0.7212808        0.1569667      0.2542265
+&gt; 1              0.838            0.182          0.309
+&gt; 2              0.721            0.157          0.254
+&gt; 3              0.721            0.157          0.254
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -373,20 +373,20 @@
 <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span>subj163<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_1</span><span class="op">)</span>, subj163rnd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_1rnd</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>&gt;                      1            1
 &gt; emRad        1.0000000    1.0000000
-&gt; RP_N      3104.0000000 3104.0000000
+&gt; RP_max    9900.0000000 9900.0000000
 &gt; RR           0.3135354    0.3135354
 &gt; SING_N    1324.0000000 1474.0000000
 &gt; SING_rate    0.4265464    0.4748711
+&gt; RP_N      3104.0000000 3104.0000000
 &gt; DIV_dl       0.1111111    0.1666667
-&gt; REP_av       1.1741573    1.1429448
-&gt; ANI          1.0000000    1.0000000
+&gt; REP_av       2.3483146    2.2858896
 &gt; N_dl       668.0000000  652.0000000
 &gt; N_dlp     1780.0000000 1630.0000000
 &gt; DET          0.5734536    0.5251289
 &gt; MEAN_dl      2.6646707    2.5000000
 &gt; MAX_dl       9.0000000    6.0000000
 &gt; ENT_dl       1.1141896    0.9496474
-&gt; ENTrel_dl    0.2424724    0.2066643
+&gt; ENTrel_dl    0.2419432    0.2062133
 &gt; CoV_dl       0.3923046    0.3299676
 &gt; N_vl       959.0000000  673.0000000
 &gt; N_vlp     2090.0000000 1863.0000000
@@ -394,7 +394,7 @@
 &gt; TT_vl        2.1793535    2.7682021
 &gt; MAX_vl       3.0000000    6.0000000
 &gt; ENT_vl       0.4704117    1.1353416
-&gt; ENTrel_vl    0.1023720    0.2470755
+&gt; ENTrel_vl    0.1021486    0.2465363
 &gt; CoV_vl       0.1761294    0.3826106
 &gt; REP_vl       1.1741573    1.1429448
 &gt; N_hlp     2090.0000000 1863.0000000
@@ -403,7 +403,7 @@
 &gt; TT_hl        2.1793535    2.7682021
 &gt; MAX_hl       3.0000000    6.0000000
 &gt; ENT_hl       0.4704117    1.1353416
-&gt; ENTrel_hl    0.1023720    0.2470755
+&gt; ENTrel_hl    0.1021486    0.2465363
 &gt; CoV_hl       0.1761294    0.3826106
 &gt; REP_hl       1.1741573    1.1429448</code></pre>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
@@ -411,20 +411,20 @@
 <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span>subj291<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_2</span><span class="op">)</span>,  subj291rnd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_2rnd</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>&gt;                      1            1
 &gt; emRad     1.000000e+00    1.0000000
-&gt; RP_N      3.094000e+03 3094.0000000
+&gt; RP_max    9.900000e+03 9900.0000000
 &gt; RR        3.125253e-01    0.3125253
 &gt; SING_N    1.456000e+03 1524.0000000
 &gt; SING_rate 4.705882e-01    0.4925663
+&gt; RP_N      3.094000e+03 3094.0000000
 &gt; DIV_dl    1.428571e-01    0.1666667
-&gt; REP_av    9.010989e-01    1.0076433
-&gt; ANI       1.000000e+00    1.0000000
+&gt; REP_av    1.802198e+00    2.0152866
 &gt; N_dl      6.680000e+02  652.0000000
 &gt; N_dlp     1.638000e+03 1570.0000000
 &gt; DET       5.294118e-01    0.5074337
 &gt; MEAN_dl   2.452096e+00    2.4079755
 &gt; MAX_dl    7.000000e+00    6.0000000
 &gt; ENT_dl    8.901225e-01    0.8384475
-&gt; ENTrel_dl 1.937104e-01    0.1824648
+&gt; ENTrel_dl 1.932876e-01    0.1820666
 &gt; CoV_dl    3.195282e-01    0.3094559
 &gt; N_vl      6.820000e+02  680.0000000
 &gt; N_vlp     1.476000e+03 1582.0000000
@@ -432,7 +432,7 @@
 &gt; TT_vl     2.164223e+00    2.3264706
 &gt; MAX_vl    3.000000e+00    4.0000000
 &gt; ENT_vl    4.466065e-01    0.7212808
-&gt; ENTrel_vl 9.719148e-02    0.1569667
+&gt; ENTrel_vl 9.697937e-02    0.1566241
 &gt; CoV_vl    1.713084e-01    0.2542265
 &gt; REP_vl    9.010989e-01    1.0076433
 &gt; N_hlp     1.476000e+03 1582.0000000
@@ -441,7 +441,7 @@
 &gt; TT_hl     2.164223e+00    2.3264706
 &gt; MAX_hl    3.000000e+00    4.0000000
 &gt; ENT_hl    4.466065e-01    0.7212808
-&gt; ENTrel_hl 9.719148e-02    0.1569667
+&gt; ENTrel_hl 9.697937e-02    0.1566241
 &gt; CoV_hl    1.713084e-01    0.2542265
 &gt; REP_hl    9.010989e-01    1.0076433</code></pre>
 <p>Note that the number of recurrent points (<code>RR</code>) does not change whe we shuffle the data. What changes is the number of recurrent points that form line structures in the recurrence plot. Randomising the number sequences causes vertical line structures to appear in the recurrence plot (<code>LAM</code>, <code>V_max</code>, <code>V_entr</code>, <code>TT</code>), this is what we would expect if the data generating process were indeed a random process. Having no such structures means there were hardly any sequences consisting of repetitions of the same number. Participants may have adopted a strategy to avoid such sequences because they erroneously believed this to be a feature of non-random sequences.</p>

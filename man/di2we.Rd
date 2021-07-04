@@ -13,7 +13,7 @@ di2we(distmat, emRad, theiler = 0, convMat = FALSE)
 
 \item{theiler}{Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
 
-\item{convMat}{convMat Should the matrix be converted from a \code{distmat} obkect of class \code{\link[Matrix:Matrix]{Matrix::Matrix()}} to \code{\link[base:matrix]{base::matrix()}} (or vice versa)}
+\item{convMat}{convMat Should the matrix be converted from a \code{distmat} object of class \code{\link[Matrix:Matrix]{Matrix::Matrix()}} to \code{\link[base:matrix]{base::matrix()}} (or vice versa)}
 }
 \value{
 A matrix with 0s and values < threshold distance value
@@ -25,6 +25,7 @@ Distance matrix to weighted matrix based on threshold value
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{dist_hamming}()},
 \code{\link{rp_lineDist}()},
 \code{\link{rp_nzdiags}()},
@@ -34,6 +35,8 @@ Other Distance matrix operations (recurrence plot):
 
 Other Distance matrix operations (recurrence network): 
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
+\code{\link{rn_phases}()},
 \code{\link{rn_plot}()},
 \code{\link{rn_recSpec}()},
 \code{\link{rn}()}

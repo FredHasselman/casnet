@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -171,11 +171,11 @@
     </tr>
     <tr>
       <th>timeVec</th>
-      <td><p>If numeric, the number of the column in <code>df</code> which contains a time=keeping variable. If <code>NA</code>, the time vector will be <code>1:NROW(df)</code> (default = <code>NA</code>)</p></td>
+      <td><p>If numeric, the number of the column in <code>df</code> which contains a time keeping variable. If <code>NA</code>, the time vector will be <code>1:NROW(df)</code> (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>groupVec</th>
-      <td><p>A vector indicating the names of the time series in the columns of <code>df</code>. If <code>NA</code>, the column names of <code>df</code> will be used, excluding the <code>timeVec</code>, if present. (default = <code>NA</code>)</p></td>
+      <td><p>A vector indicating the names of the time series in the columns of <code>df</code>. If <code>NA</code>, the column names of <code>df</code> will be used, excluding the <code>timeVec</code>, if present (default = <code>NA</code>)</p></td>
     </tr>
     <tr>
       <th>useVarNames</th>
@@ -207,7 +207,7 @@
     </tr>
     <tr>
       <th>returnPlotData</th>
-      <td><p>Return the restructered data frame used to create the plot (default = <code>FALSE</code>)</p></td>
+      <td><p>Return the restructured data frame used to create the plot (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>useRibbon</th>
@@ -226,8 +226,8 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Use the coloured noise data set.</span>
- <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ColouredNoise</span><span class='op'>)</span>
- <span class='fu'>plotTS_multi</span><span class='op'>(</span><span class='va'>ColouredNoise</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ColouredNoise</span><span class='op'>)</span>
+<span class='fu'>plotTS_multi</span><span class='op'>(</span><span class='va'>ColouredNoise</span><span class='op'>)</span>
 </div><div class='img'><img src='plotTS_multi-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>

@@ -21,7 +21,7 @@ Get some nice colours
 }
 \examples{
 
-# Plot all available colours
+# This will plot all available colours with their numbers
 getColours()
 
 # Get a specific number of colours

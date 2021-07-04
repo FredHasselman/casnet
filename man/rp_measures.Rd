@@ -11,14 +11,17 @@ rp_measures(
   DLmin = 2,
   VLmin = 2,
   HLmin = 2,
-  DLmax = length(Matrix::diag(RM)) - 1,
-  VLmax = length(Matrix::diag(RM)) - 1,
-  HLmax = length(Matrix::diag(RM)) - 1,
+  DLmax = length(Matrix::diag(RM)),
+  VLmax = length(Matrix::diag(RM)),
+  HLmax = length(Matrix::diag(RM)),
   AUTO = NULL,
-  theiler = NULL,
-  chromatic = FALSE,
+  theiler = NA,
+  includeDiagonal = NA,
+  chromatic = NA,
+  anisotropyHV = FALSE,
+  asymmetryUL = FALSE,
+  recurrenceTimes = FALSE,
   matrices = FALSE,
-  doHalf = FALSE,
   Nboot = NULL,
   CL = 0.95,
   targetValue = 0.05,
@@ -27,9 +30,9 @@ rp_measures(
 )
 }
 \arguments{
-\item{RM}{A distance matrix, or a matrix of zeroes and ones (you must set \code{emRad = NA})}
+\item{RM}{A distance matrix (set \code{emRad = NA} to estimate a radius), or a matrix of zeroes and ones}
 
-\item{emRad}{Threshold for distance value that counts as a recurrence}
+\item{emRad}{Threshold for distance value that counts as a recurrence (ignored is \code{RM} is a binary matrix)}
 
 \item{DLmin}{Minimal diagonal line length (default = \code{2})}
 
@@ -45,13 +48,26 @@ rp_measures(
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
-\item{theiler}{Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
+\item{theiler}{Use a \code{theiler} window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:
+\itemize{
+\item \code{0} will include the main diagonal in all RQA measure calculations.
+\item \code{1} will remove the main diagonal from all RQA measure calculations.
+\item \code{NA} (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting \code{theiler = 0} (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set \code{theiler = 1}.
+\item A value greater than \code{1} will remove that many diagonals around and including the diagonal from all RQA measure calculations. So \code{theiler = 2} means exclude \code{2} diagonals around the main diagonal, including the main diagonal itself: \verb{[-1,0,1]}.
+If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. \code{theiler = c(-1,5)} will exclude \verb{[-1,0,1,2,3,4,5]}. If \code{length(theiler) > 2}, the values will be considered individual diagonal ID's, e.g. \code{theiler = c(-3,-1,0,2,5)}, will exclude only those specific ID's. Also see the note.
+}}
 
-\item{chromatic}{Force chromatic RQA? (default = \code{FALSE})}
+\item{includeDiagonal}{Should the diagonal be included in the calculation of the Recurrence Rate? If \code{NA} the value will be decided by the symmetry of the matrix, the diagonal will be removed for Auto RQA (\code{AUTO = TRUE}) but not for Cross RQA (\code{AUTO = FALSE})  (default = \code{NA})}
+
+\item{chromatic}{Force chromatic RQA? If \code{NA} the value of the \code{RM} attribute \code{"chromatic"} will be used, if present (default = \code{NA})}
+
+\item{anisotropyHV}{Return anisotropy ratio measures based on Horizontal and Vertical lines. The ratios are calculated as \code{(horizontal - vertical) / (horizontal + vertical)}. So a value of 0 means no anisotropy, negative ratios indicate the measures based on vertical lines had  higher values, positive ratios indicate the measures based on horizontal lines had higher values  (default = \code{FALSE})}
+
+\item{asymmetryUL}{Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as \code{(upper - lower) / (upper + lower)}. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = \code{FALSE})}
+
+\item{recurrenceTimes}{Return measures based on 'white lines', the recurrence times (default = \code{FALSE})}
 
 \item{matrices}{Return matrices? (default = \code{FALSE})}
-
-\item{doHalf}{Analyse half of the matrix? (default = \code{FALSE})}
 
 \item{Nboot}{How many bootstrap replications? (default = \code{NULL})}
 

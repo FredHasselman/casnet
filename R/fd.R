@@ -673,7 +673,7 @@ fd_dfa <- function(y,
 #' @param noTitle Do not generate a title (only the subtitle)
 #' @param tsName Name of y added as a subtitle to the plot (default = `y`)
 #'
-#' @return The boxcount fractal dimension and the 'local' boscount fractal dimension
+#' @return The boxcount fractal dimension and the 'local' boxcount fractal dimension
 #'
 #' @note This function was inspired by the `Matlab` function `boxcount.m` [written by F. Moisy](http://www.fast.u-psud.fr/~moisy/ml/boxcount/html/demo.html). `Fred Hasselman` adapted the function for `R` for the purpose of the unit square boxcount analysis for 1D time series. The original Matlab toolbox has more options and contains more functions (e.g. `1D` and `3D` boxcount).
 #'
@@ -1397,6 +1397,311 @@ monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments
     return(H)
   }
 }
+
+#
+#
+# ts_sampEn <- function (y, edim = 2, r = 0.2 * sd(ts), tau = 1){
+#
+#   stopifnot(is.numeric(ts), is.numeric(edim))
+#   if (tau > 1) {
+#     s <- seq(1, length(ts), by = tau)
+#     ts <- ts[s]
+#   }
+#   N <- length(ts)
+#   correl <- numeric(2)
+#   datamat <- zeros(edim + 1, N - edim)
+#   for (i in 1:(edim + 1)) datamat[i, ] <- ts[i:(N - edim +
+#                                                   i - 1)]
+#   for (m in edim:(edim + 1)) {
+#     count <- zeros(1, N - edim)
+#     tempmat <- datamat[1:m, ]
+#     for (i in 1:(N - m - 1)) {
+#       X <- abs(tempmat[, (i + 1):(N - edim)] - repmat(tempmat[,
+#                                                               i, drop = FALSE], 1, N - edim - i))
+#       dst <- apply(X, 2, max)
+#       d <- (dst < r)
+#       count[i] <- sum(d)/(N - edim)
+#     }
+#     correl[m - edim + 1] <- sum(count)/(N - edim)
+#   }
+#   return(log(correl[1]/correl[2]))
+# }
+
+
+#' Sample Entropy
+#'
+#'
+#' @inheritParams fd_dfa
+#' @param m The size of the window in which tho evaluate whether a pattern repeats (default = `2`)
+#' @param r A factor that will determine the threshold for similarity of values, calculated as r x D (default = `0.2`)
+#' @param D Commonly the standard deviation of the time series, the similarity threshold will be calculated as r x D. Note that if the series is detrended and/or standardised and `D = NA` the standard deviation will be calculated after the transformations (default = `NA`)
+#' @param scaleDiff Steps between scaleMin and scaleMax (default = `1`)
+#'
+#'
+#' @return The sample entropy (SampEn) of the time series y. The relative entropy, SampEn / (-1 * log(1/length(y))) is returned in the attribute `Relative Entropy`
+#'
+#' @export
+#'
+#' @seealso [info_MSE]
+#'
+#' @family Information based complexity measures
+#'
+#' @examples
+#'
+#'
+#' y <- rnorm(100)
+#'
+#' # Similarity threshold is r x D = 0.2 * sd(y)
+#' inf_SampEn(y)
+#'
+#' # Similarity threshold is r = 0.2
+#' inf_SampEn(y, D = 1)
+#'
+inf_SampEn <- function(y,
+                      m = 2,
+                      r = 0.2,
+                      D = NA,
+                      fs = NULL,
+                      standardise = c("mean.sd","median.mad")[1],
+                      detrend = FALSE,
+                      polyOrder=1,
+                      returnInfo = FALSE,
+                      silent = FALSE){
+
+
+  if(!stats::is.ts(y)){
+    if(is.null(fs)){fs <- 1}
+    y <- stats::ts(y, frequency = fs)
+    if(!silent){cat("\n\nfd_SampEn:\tSample rate was set to 1.\n\n")}
+  }
+
+  N <- length(y)
+  # Simple linear detrending.
+  if(detrend){
+    y <- ts_detrend(y, polyOrder = polyOrder)
+  }
+
+  # Standardise by N
+  if(any(standardise%in%c("mean.sd","median.mad"))){
+    y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
+  }
+
+  if(is.na(D)){
+    D <- sd(y, na.rm = TRUE)
+  }
+
+  # (m+1)-element sequences
+  N <- length(y)
+  X <- matrix(0, nrow = N-m, ncol = m+1)
+  for(i in 1:(m + 1)){
+    X[,i] = y[((i-1)+1):(N-m+(i-1))]
+  }
+
+  # matching (m+1)-element sequences
+  A <- sum(proxy::dist(X, method = "Chebyshev") < (r * D))
+
+  # matching m-element sequences
+  X <- X[, 1:m]
+  B = sum(proxy::dist(X, method = "Chebyshev") < (r * D))
+
+  # take log
+  if(A==0 | B==0){
+  e <- NA
+  } else {
+  e <- log(B / A)
+  }
+
+  attr(e,"Relative Entropy") <- e/(-1 * log(1/N))
+
+ return(e)
+}
+
+
+#' Multi-Scale Entropy
+#'
+#' Calculate the Multi-Scale (Sample) Entropy of a time series.
+#'
+#' @inheritParams ts_coarsegrain
+#' @inheritParams inf_SampEn
+#' @param transformBefore Detrend/standardise before coarse graining. If set to `FALSE`, each coarsegrained series will be detrended/standardised separately (default = `TRUE`)
+#'
+#' @note The transformation settings (detrending and/or normalisation) and `transformBefore` will determine the value of the product r x D if `D = NA`.
+#'
+#' @return MSE
+#'
+#' @export
+#'
+#' @family Information based complexity measures
+#'
+#' @examples
+#'
+#' y <- rnorm(100)
+#'
+#' out <- inf_MSE(y, r=.5, scaleMin=1, scaleMax=10, returnInfo = TRUE, doPlot = FALSE)
+#'
+#'
+inf_MSE <- function(y,
+                    summaryFunction = c("mean","median","min","max")[1],
+                    retainLength = FALSE,
+                    m = 2,
+                    r = 0.2,
+                    D = NA,
+                    fs = NULL,
+                    transformBefore = TRUE,
+                    standardise = c("none","mean.sd","median.mad")[1],
+                    detrend = FALSE,
+                    polyOrder = 1,
+                    adjustSumOrder = FALSE,
+                    scaleMin = 1,
+                    scaleMax = floor(NROW(y)/10),
+                    scaleDiff = 1,
+                    scaleS = NA,
+                    overlap = 0,
+                    minData = 4,
+                    relativeEntropy = FALSE,
+                    doPlot = FALSE,
+                    returnPlot = FALSE,
+                    returnPLAW = FALSE,
+                    returnInfo = FALSE,
+                    silent = FALSE,
+                    noTitle = FALSE,
+                    tsName="y"
+){
+
+  if(transformBefore){
+
+    # Simple linear detrending.
+    if(detrend){
+      y <- ts_detrend(y, polyOrder = polyOrder)
+    }
+
+    # Standardise by N
+    if(any(standardise%in%c("mean.sd","median.mad"))){
+      y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
+    }
+
+    if(is.na(D)){
+      D <- sd(y, na.rm = TRUE)
+    }
+
+    standardise <- "none"
+    detrend <- FALSE
+
+  }
+
+  #N <- length(y)
+
+  scaleFactor <- scaleMin:scaleMax
+  out <- data.frame(scale = scaleFactor, SampEn = NA, SampEn_Relative = NA)
+
+  for(g in seq_along(scaleFactor)){
+
+    tmp <- ts_coarsegrain(y = y,
+                          grain = scaleFactor[g],
+                          summaryFunction = summaryFunction,
+                          retainLength = retainLength)
+
+    ent <- inf_SampEn(y = tmp,
+                               m = m,
+                               r = r,
+                               D = D,
+                               fs = fs,
+                               standardise = standardise,
+                               detrend = detrend,
+                               polyOrder = polyOrder,
+                               returnInfo = returnInfo,
+                               silent = TRUE)
+
+    out$SampEn[g] <- ent
+    out$SampEn_Relative[g] <- attr(ent,"Relative Entropy")
+
+    rm(tmp, ent)
+  }
+
+
+  fitRange <- 2:(length(scaleFactor)-2)
+
+  lmfit1        <- stats::lm(out$SampEn ~ out$scale)
+  lmfit2        <- stats::lm(out$SampEn[fitRange] ~ out$scale[fitRange])
+
+  outList <- list(
+    PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/out$scale,
+                              size = out$scale,
+                              bulk = out$SampEn),
+    fullRange = list(sap = stats::coef(lmfit1)[2],
+                     H = NA, #1+stats::coef(lmfit1)[2] + Hadj,
+                     FD = NA, #sa2fd_sda(stats::coef(lmfit1)[2]),
+                     fitlm1 = lmfit1,
+                     method = paste0("Full range (n = ",length(out$scale),")\nSlope = ",round(stats::coef(lmfit1)[2],2))), #," | FD = ",round(sa2fd_sda(stats::coef(lmfit1)[2]),2))),
+    fitRange  = list(sap = stats::coef(lmfit2)[2],
+                     H = NA, #1+stats::coef(lmfit2)[2] + Hadj,
+                     FD = NA, #sa2fd_sda(stats::coef(lmfit2)[2]),
+                     fitlm2 = lmfit2,
+                     method = paste0("Fit range (n = ",length(out$scale[fitRange]),")\nSlope = ",round(stats::coef(lmfit2)[2],2))), #," | FD = ",round(sa2fd_sda(stats::coef(lmfit2)[2]),2))),
+    info = out,
+    plot = NA,
+    analysis = list(
+      name = "Multi Scale Entropy",
+      logBaseFit = "no",
+      logBasePlot = "no")
+  )
+
+  if(doPlot|returnPlot){
+
+    xlabel <- "Scale Factor"
+    ylabel <- "Sample Entropy"
+
+    if(noTitle){
+      title <- " "
+    } else {
+      title <- "regression (MSE)"
+    }
+
+    logSlopes <- data.frame(x = c(outList$PLAW$size[1:NROW(outList[[2]]$fitlm1$fitted.values)],
+                                  outList$PLAW$size[1:NROW(outList[[3]]$fitlm2$fitted.values)]),
+                            outList = c(outList$PLAW$bulk[1:NROW(outList[[2]]$fitlm1$fitted.values)],
+                                        outList$PLAW$bulk[1:NROW(outList[[3]]$fitlm2$fitted.values)]),
+                            Method = c(rep(outList[[2]]$method,NROW(outList[[2]]$fitlm1$fitted.values)),
+                                       rep(outList[[3]]$method,NROW(outList[[3]]$fitlm2$fitted.values))))
+
+    g <- ggplot2::ggplot(data.frame(outList$PLAW), ggplot2::aes_(x=~size,y=~bulk), na.rm=TRUE) +
+      ggplot2::geom_point() +
+      ggplot2::ggtitle(label = title, subtitle = "Multi Scale Entropy") +
+      ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
+      ggplot2::scale_x_continuous(name = xlabel) + #, breaks = breaksX) +
+      ggplot2::scale_y_continuous(name = ylabel)  #, breaks = breaksY) +
+      ggplot2::scale_color_manual(values = c("red3","steelblue")) +
+      ggplot2::scale_fill_manual(values = c("red3","steelblue")) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
+                     legend.text = ggplot2::element_text(margin = ggplot2::margin(t = 5,b = 5, unit = "pt"), vjust = .5),
+                     plot.margin = ggplot2::margin(t = 5,b = 5, r = 5,l = 5, unit = "pt"))
+
+
+    #g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "no", ylabel = "Multi Scale Entropy", doPlot = doPlot)
+
+    if(doPlot){
+      print(g)
+    }
+    if(returnPlot){
+      outList$plot <- g
+    }
+  }
+
+
+  if(returnInfo){returnPLAW<-TRUE}
+
+  if(!silent){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+    cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method,"\n\n",outList$fitRange$method))
+    cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+  }
+
+  return(invisible(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot, TRUE)]))
+
+}
+
+
 
 
 #

@@ -10,7 +10,6 @@ rn_plot(
   plotMeasures = FALSE,
   drawGrid = FALSE,
   markEpochsLOI = NULL,
-  Chromatic = NULL,
   radiusValue = NA,
   title = "",
   xlabel = "",
@@ -24,15 +23,13 @@ rn_plot(
 
 \item{plotDimensions}{Should the state vectors be plotted if they are available as attributes of RM (default = \code{TRUE})}
 
-\item{plotMeasures}{Print common (C)RQA measures in the plot if the matrix is binary}
+\item{plotMeasures}{Print common (C)RQA measures in the plot if the matrix is binary (default = \code{FALSE})}
 
-\item{drawGrid}{Draw a grid on the recurrence plot (\code{default = FALSE})}
+\item{drawGrid}{Draw a grid on the recurrence plot (default = \code{FALSE})}
 
-\item{markEpochsLOI}{Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (\code{default = NULL})}
+\item{markEpochsLOI}{Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (default = \code{NULL})}
 
-\item{Chromatic}{If \code{TRUE} and there are more than two discrete values in \code{RM}, give recurrent points a distinct colour. If \code{RM} was returned by \code{rp_measures(..., chromatic = TRUE)}, the recurrence plot will colour-code recurrent points according to the category values in \code{attributes(RM)$chromaticRP} (\code{default = FALSE})}
-
-\item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{est_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
+\item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{est_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
 
 \item{title}{A title for the plot}
 
@@ -53,7 +50,9 @@ Plot (thresholded) distance matrix as a network
 \seealso{
 Other Distance matrix operations (recurrence network): 
 \code{\link{di2bi}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
+\code{\link{rn_phases}()},
 \code{\link{rn_recSpec}()},
 \code{\link{rn}()}
 }

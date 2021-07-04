@@ -1,9 +1,9 @@
 Package: casnet
 Type: Package
 Title: A Toolbox for Studying Complex Adaptive Systems and Networks
-Version: 0.1.6
-Authors@R: c(person(given = "Fred", family = "Hasselman", email = "f.hasselman@pwo.ru.nl", role = c("aut", "cre","cph"), comment = c(ORCID = "0000-0003-1384-8361")), person(given = "Merlijn", family = "Olthof", email = "m.olthof@pwo.ru.nl", role = "ctb"))
-Maintainer: Fred Hasselman <f.hasselman@pwo.ru.nl>
+Version: 0.2.0
+Authors@R: c(person(given = "Fred", family = "Hasselman", email = "fred.hasselman@ru.nl", role = c("aut", "cre","cph"), comment = c(ORCID = "0000-0003-1384-8361")), person(given = "Merlijn", family = "Olthof", email = "m.olthof@pwo.ru.nl", role = "ctb"))
+Maintainer: Fred Hasselman <fred.hasselman@ru.nl>
 Description: A collection of analytic tools for studying signals recorded from complex adaptive systems or networks: (Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA). Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum). Network based time series analyses and visualisation (Recurrence Networks, spiral graphs). Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks).    
 Year: 2020
 License: GPL-3 + file LICENSE

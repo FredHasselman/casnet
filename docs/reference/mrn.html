@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -187,7 +187,7 @@
     </tr>
     <tr>
       <th>cumulative</th>
-      <td><p>To make the network represent cumulative time, set <code>directed = TRUE</code> and <code>cumulative = TRUE</code>. This will set the upper triangle of the recurrence matrix to <code>0</code> and ensures that the network edges represent recurrenct values that have occurred in the <code>past</code> relative to the current opbserved value. If <code>directed = FALSE</code> the argument is ignored (default = <code>TRUE</code>).</p></td>
+      <td><p>To make the network represent cumulative time, set <code>directed = TRUE</code> and <code>cumulative = TRUE</code>. This will set the upper triangle of the recurrence matrix to <code>0</code> and ensures that the network edges represent recurrent values that have occurred in the <code>past</code> relative to the current observed value (node). If <code>directed = FALSE</code> the argument is ignored (default = <code>TRUE</code>).</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
@@ -227,24 +227,24 @@ g3 <span class='op'>=</span> <span class='fu'>igraph</span><span class='fu'>::</
 #&gt; 
 #&gt; ~~~o~~o~~casnet~~o~~o~~~</div><div class='output co'>#&gt; $interlayerMI
 #&gt; $interlayerMI$`window: 1 | start: 1 | stop: 100`
-#&gt;    g1       g2        g3
-#&gt; g1 NA 1.016009 0.9430457
-#&gt; g2 NA       NA 1.5627302
-#&gt; g3 NA       NA        NA
+#&gt;    g1       g2       g3
+#&gt; g1 NA 1.094409 1.270959
+#&gt; g2 NA       NA 1.413667
+#&gt; g3 NA       NA       NA
 #&gt; 
 #&gt; 
 #&gt; $edgeOverlap
 #&gt; $edgeOverlap$`window: 1 | start: 1 | stop: 100`
 #&gt;    g1    g2    g3
-#&gt; g1 NA 0.142 0.060
-#&gt; g2 NA    NA 0.049
+#&gt; g1 NA 0.116 0.056
+#&gt; g2 NA    NA 0.065
 #&gt; g3 NA    NA    NA
 #&gt; 
 #&gt; 
 #&gt; $meanValues
 #&gt; $meanValues$`window: 1 | start: 1 | stop: 100`
-#&gt;    mi_mean    mi_sd    eo_mean      eo_sd eo_sum eo_all   eo_joint
-#&gt; 1 1.173928 0.338683 0.08366667 0.05081666   1500     16 0.01066667
+#&gt;    mi_mean     mi_sd eo_mean      eo_sd eo_sum eo_all   eo_joint
+#&gt; 1 1.259678 0.1599281   0.079 0.03235738   1500     19 0.01266667
 #&gt; 
 #&gt; 
 #&gt; $Nsize

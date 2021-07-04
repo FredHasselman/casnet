@@ -6,6 +6,8 @@
 checkPkg <- function(pkg){
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop(paste0("Package '", pkg,"' is needed for this function to work. Please install it."), call. = FALSE)
+  } else {
+    requireNamespace(pkg)
   }
 }
 
@@ -279,7 +281,15 @@ fltrIT <- function(TS,f){
 #' max(re2)==0.07692308 # TRUE
 #' max(re2)==1/13       # FALSE
 #'
-elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE, keepNA = TRUE, boundaryPrecision = NA, tol= .Machine$double.eps^0.5){
+elascer <- function(x,
+                    mn=NA,
+                    mx=NA,
+                    lo=0,
+                    hi=1,
+                    groupwise = FALSE,
+                    keepNA = TRUE,
+                    boundaryPrecision = NA,
+                    tol= .Machine$double.eps^0.5){
 
   doGroupwise <- FALSE
   mnNA <- FALSE
@@ -290,34 +300,39 @@ elascer <- function(x,mn=NA,mx=NA,lo=0,hi=1,groupwise = FALSE, keepNA = TRUE, bo
     if(groupwise&NCOL(x)>1){doGroupwise <- TRUE}
     if(is.na(mn)){
       mnNA <- TRUE
-      mn <- min(x,na.rm=TRUE)
-      }
+      mn <- min(x,na.rm=TRUE)%00%NA
+    }
     if(is.na(mx)){
       mxNA <- TRUE
-      mx <- max(x,na.rm=TRUE)
-      }
+      mx <- max(x,na.rm=TRUE)%00%NA
+    }
+    if(all(is.na(mn),is.na(mx))){
+      warning(paste("Only missing values in vector. Returning x."))
+      return(x)
+    }
   }
   x <- as.data.frame(x)
   isNA <- plyr::colwise(is.na)(x)
   u <- x
   for(i in 1:NCOL(x)){
     if(doGroupwise){
-      if(mnNA){mn<-min(x[,i],na.rm=TRUE)}
-      if(mxNA){mx<-max(x[,i],na.rm=TRUE)}
+      if(mnNA){mn<-min(x[,i],na.rm=TRUE)%00%NA}
+      if(mxNA){mx<-max(x[,i],na.rm=TRUE)%00%NA}
+      if(all(is.na(mn),is.na(mx))){warning(paste("Only missing values in column: ",i))}
     }
     if(mn>mx){warning("Minimum (mn) >= maximum (mx).")}
     if(lo>hi){warning("Lowest scale value (lo) >= highest scale value (hi).")}
     if(mn==mx){
-      u[,i]<-rep(mx,length(x[,i]))
-      } else {
+      u[,i]<-rep(hi,length(x[,i]))
+    } else {
       u[,i]<-(((x[,i]-mn)*(hi-lo))/((mx-mn))+lo)
       if(!keepNA){
-      id<-stats::complete.cases(u[,i])
-      u[!id,i]<-mn
+        id<-stats::complete.cases(u[,i])
+        u[!id,i]<-mn
       }
-      }
+    }
     if(!is.na(boundaryPrecision)){
-    # Make sure the end points of the scale are the same as passed in the argument
+      # Make sure the end points of the scale are the same as passed in the argument
       idLo <- u[,i]%[]%c(lo-tol,lo+tol)
       u[idLo,i] <- round(u[idLo,i], digits = boundaryPrecision)
       idHi <- u[,i]%[]%c(hi-tol,hi+tol)
@@ -370,7 +385,7 @@ Heaviside <- function(value){
 #' @keywords internal
 return_error <- function(expr){
 
- Error  <- NULL
+  Error  <- NULL
 
   catch_it <- function(error){
     Error <<- error
@@ -432,7 +447,7 @@ repmat <- function(X,m,n){
 #'
 HurvichDeo <- function(nr, spec, A=0.3, delta=6/7){
 
-    # define frequencies
+  # define frequencies
   omega <- ((2 * pi)/nr) * (1:nr)
 
   # notation as in reference: construct X matrix
@@ -509,14 +524,14 @@ scale_log <- function(scale.min, scale.max, scale.ratio=2, scale.res=NULL, coerc
   # check input arguments
   if (!is.null(scale.res)){
     scale.ratio <- 1 / scale.res + 1
-    }
+  }
 
   # check input arguments
   if (scale.ratio == 1){stop("scale.ratio cannot be unity")}
   if (scale.ratio <= 0){stop("scale.ratio must be positive")}
 
   n.scale <- splus2R::ifelse1(scale.ratio > 1, ceiling(log(scale.max/scale.min)/log(scale.ratio)),
-                     ceiling(log(scale.min/scale.max)/log(scale.ratio)))
+                              ceiling(log(scale.min/scale.max)/log(scale.ratio)))
 
   scale    <- vector("numeric", length=n.scale)
   scale[1] <- splus2R::ifelse1(scale.ratio > 1, scale.min, scale.max)
@@ -551,10 +566,10 @@ aggregate_bins <- function(x, by, FUN, moving=FALSE, ...){
   x <- as.numeric(x)
   if(!by%[]%c(1,length(x))){
     stop("Range of x not on specified interval")
-    }
+  }
   if (!is.function(FUN)){
     stop("FUN must be a function")
-    }
+  }
 
   n.sample <- length(x)
 
@@ -575,7 +590,7 @@ aggregate_bins <- function(x, by, FUN, moving=FALSE, ...){
 
     if (!n.group){
       stop("Moving window not possible with input parameters")
-      }
+    }
 
     z <- vector("numeric", length=n.group)
 
@@ -585,7 +600,7 @@ aggregate_bins <- function(x, by, FUN, moving=FALSE, ...){
 
     if (last < n.sample){
       z <- c(z, as.vector(FUN(x[(last+1):n.sample], ...)))
-      }
+    }
   }
 
   return(z)

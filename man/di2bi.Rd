@@ -4,14 +4,12 @@
 \alias{di2bi}
 \title{Distance to binary matrix}
 \usage{
-di2bi(distmat, emRad, theiler = 0, convMat = FALSE)
+di2bi(distmat, emRad = NA, convMat = FALSE)
 }
 \arguments{
 \item{distmat}{Distance matrix}
 
 \item{emRad}{The radius or threshold value}
-
-\item{theiler}{Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = \code{0})}
 
 \item{convMat}{Should the matrix be converted from a \code{distmat} object of class \code{\link[Matrix:Matrix]{Matrix::Matrix()}} to \code{\link[base:matrix]{base::matrix()}} (or vice versa)}
 }
@@ -24,6 +22,7 @@ Distance matrix to binary matrix based on threshold value
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
 \code{\link{dist_hamming}()},
 \code{\link{rp_lineDist}()},
@@ -33,7 +32,9 @@ Other Distance matrix operations (recurrence plot):
 \code{\link{rp}()}
 
 Other Distance matrix operations (recurrence network): 
+\code{\link{di2ch}()},
 \code{\link{di2we}()},
+\code{\link{rn_phases}()},
 \code{\link{rn_plot}()},
 \code{\link{rn_recSpec}()},
 \code{\link{rn}()}

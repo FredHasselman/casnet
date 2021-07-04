@@ -11,26 +11,35 @@
 #' @param emDim The embedding dimensions
 #' @param emLag The embedding lag
 #' @param emRad The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If `NULL`, an unthresholded matrix will be created (default = `NULL`)
-#' @param theiler Should a teiler winfow be used?
+#' @param theiler Use a `theiler` window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:
+#' * `0` will include the main diagonal in all RQA measure calculations.
+#' * `1` will remove the main diagonal from all RQA measure calculations.
+#' * `NA` (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting `theiler = 0` (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set `theiler = 1`.
+#' * A value greater than `1` will remove that many diagonals around and including the diagonal from all RQA measure calculations. So `theiler = 2` means exclude `2` diagonals around the main diagonal, including the main diagonal itself: `[-1,0,1]`.
+#' If `theiler` is a numeric vector of `length(theiler) == 2` it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. `theiler = c(-1,5)` will exclude `[-1,0,1,2,3,4,5]`. If `length(theiler) > 2`, the values will be considered individual diagonal ID's, e.g. `theiler = c(-3,-1,0,2,5)`, will exclude only those specific ID's. Also see the note.
+#' @param includeDiagonal Use to force inclusion of the diagonal when calculating RQA measures. The default `NA` behaves the same way as parameter `theiler`. If set to `TRUE` it will include the diagonal even in the case of Auto-RQA (default = `NA`)
 #' @param to.ts Should `y1` and `y2` be converted to time series objects?
 #' @param order.by If `to.ts = TRUE`, pass a vector of the same length as `y1` and `y2`. It will be used as the time index, if `NA` the vector indices will be used to represent time.
 #' @param to.sparse Should sparse matrices be used?
 #' @param weighted If `FALSE` a binary matrix will be returned. If `TRUE` every value larger than `emRad` will be `0`, but values smaller than `emRad` will be retained (default = `FALSE`)
-#' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to se a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
+#' @param weightedBy After setting values smaller than `emRad` to `0`, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (`"si"`). Other option are `"rt"` for *recurrence time* and `"rf"` for *recurrence time frequency* (default = `"si"`)
+#' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
 #' @param rescaleDist Should the distance matrix be rescaled? Options are "none", "maxDist" to create a unit scale, "meanScale" to creat z-scores based on the mean distance. (default = `"none"`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`.
 #' @param returnMeasures Should the output of [rp_measures()] be returned as an attribute `"measures"` to the matrix? If `silent = FALSE` results will also be output to the console. (default = `FALSE`)
 #' @param doPlot Plot the matrix by calling [rp_plot()] with default settings
-#' @param doEmbed If `FALSE`, a distance matrix will be returned that is not embedded by `emDim` and `emLag`. If `y1` and/or `y2` are data frames, the columns will be used as dimensions (default = `TRUE`)
+#' @param doEmbed If `FALSE`, a distance matrix will be returned that is not embedded by `emDim` and `emLag` (Multidimensional RQA). If `y1` and/or `y2` are data frames, the columns will be used as the state space dimensions (default = `TRUE`)
 #' @param silent Silent-ish mode
-#' @param ... Any paramters to pass to [rp_plot()] if `doPlot = TRUE`
+#' @param ... Any parameters to pass to [rp_plot()] if `doPlot = TRUE`
+#'
+#' @note The calculation of the (C)RQA measures in [casnet] can be different from other packages. For example, depending on the value of `theiler` the main diagonal can be included or excluded from the calculations, whereas some software will always include the diagonal.
 #'
 #' @return A (Coss-) Recurrence matrix with attributes:
 #'
 #' * `emdims1` and `emdims2` - A matrix of surrogate dimensions
 #' * `emdims1.name` and `emdims2.name` - Names of surrogate dimensions
 #' * `method` and `call` - The distance `method` used by [proxy::dist()]
-#' * `weighetd` - Whether a weighted matrix is returned
+#' * `weighted` - Whether a weighted matrix is returned
 #' * `emDim`, `emLag` and `emRad` - The embedding parameters
 #' * `AUTO` - Whether the matrix represents AUTO recurrence
 #'
@@ -44,14 +53,17 @@ rp <- function(y1, y2 = NULL,
                emDim = 1,
                emLag = 1,
                emRad = NULL,
-               theiler = NULL,
+               theiler = NA,
+               includeDiagonal = NA,
                to.ts = NULL,
                order.by = NULL,
                to.sparse = FALSE,
                weighted = FALSE,
+               weightedBy = "si",
                method = "Euclidean",
                rescaleDist = c("none","maxDist","meanDist")[1],
                targetValue  = .05,
+               chromatic = FALSE,
                returnMeasures = FALSE,
                doPlot = FALSE,
                doEmbed = TRUE,
@@ -66,7 +78,17 @@ rp <- function(y1, y2 = NULL,
 
   atlist <- attributes(y1)
   if(any(names(atlist) %in% c("emDims1","emDims2","emDims1.name","emDims2.name"))){
-    stop("Input is already a recurrence matrix created by 'rp()'. To create a binary matrix use 'di2bi()'. To create a weighetd matrix use 'di2we()'")
+    stop("Input is already a recurrence matrix created by 'rp()'. To manually create a binary matrix from a distance matrix use 'di2bi()'. To create a weighted matrix use 'di2we()'")
+  }
+
+
+  if(chromatic){
+    if(any(is.data.frame(y1),is.data.frame(y2))){
+      stop("Multidimensional Chromatic RQA has not been invented (yet)!")
+    }
+    uniqueID <- as.numeric_discrete(c(y1,y2))
+    y1  <- uniqueID[1:length(y1)]
+    y2  <- uniqueID[(length(y2)+1):length(uniqueID)]
   }
 
   if(!is.data.frame(y1)){
@@ -85,9 +107,12 @@ rp <- function(y1, y2 = NULL,
     }
   }
 
-  if(!doEmbed){
+  if(any(!doEmbed,chromatic)){
     emDim <- 1
     emLag <- 0
+    if(chromatic){
+      emRad <- 0
+    }
   }
 
   et1 <- ts_embed(y1, emDim, emLag, silent = silent)
@@ -100,7 +125,7 @@ rp <- function(y1, y2 = NULL,
     dmat <- proxy::dist(x = et1,
                         y = et2,
                         method = method,
-                        diag = ifelse(identical(et1,et2),FALSE,TRUE))
+                        diag = TRUE)
   }
 
   # Remove proxy class
@@ -122,37 +147,31 @@ rp <- function(y1, y2 = NULL,
     rownames(dmat) <- paste(order.by)
   }
 
-
-  if(rescaleDist=="maxDist"){dmat <- dmat/max(dmat,na.rm = TRUE)}
-  if(rescaleDist=="meanDist"){dmat <- (dmat-mean(dmat, na.rm=TRUE))/sd(dmat, na.rm = TRUE)}
-
-  if(is.na(theiler%00%NA)){
-    if(!is.null(attributes(dmat)$theiler)){
-      if(attributes(dmat)$theiler>0){
-        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(dmat)$theiler,"was already removed."))
-      }
-    }
-    theiler <- 0
-  } else {
-    if(theiler < 0){
-      theiler <- 0
-    }
+  if(!chromatic){
+    if(rescaleDist=="maxDist"){dmat <- dmat/max(dmat,na.rm = TRUE)}
+    if(rescaleDist=="meanDist"){dmat <- (dmat-mean(dmat, na.rm=TRUE))/sd(dmat, na.rm = TRUE)}
   }
-
 
   if(!is.null(emRad)){
     if(is.na(emRad)){
       emRad <- est_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue)$Radius
     }
-    if(weighted){
-      dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse, theiler = theiler)
+    if(chromatic){
+      dmat <- di2ch(dmat, y = et1, emRad = emRad, convMat = to.sparse)
     } else {
-      dmat <- di2bi(dmat, emRad = emRad, convMat = to.sparse, theiler = theiler)
+      if(weighted){
+        dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse)
+      } else {
+        dmat <- di2bi(dmat, emRad = emRad, convMat = to.sparse)
+      }
     }
   }
 
+  dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
+  dmat <- setTheiler(RM = dmat, theiler = theiler)
+
   if(returnMeasures){
-    rpOut <-  rp_measures(RM = dmat, silent = silent)
+    rpOut <-  rp_measures(RM = dmat, emRad = emRad%00%NA, silent = silent, theiler = theiler, includeDiagonal = includeDiagonal, chromatic = chromatic)
   } else {
     rpOut <- NA
   }
@@ -162,24 +181,29 @@ rp <- function(y1, y2 = NULL,
     attributes(dmat)$emDims2  <- et2
     attributes(dmat)$emDims1.name <- colnames(y1)
     attributes(dmat)$emDims2.name <- colnames(y2)
-    attributes(dmat)$weighted <- weighted
+    attributes(dmat)$embedded <- doEmbed
     attributes(dmat)$emLag <- emLag
     attributes(dmat)$emDim <- emDim
     attributes(dmat)$emRad <- emRad%00%NA
     attributes(dmat)$measures <- rpOut
+    attributes(dmat)$weighted <- weighted
+    attributes(dmat)$weightedBy <- weightedBy
+    attributes(dmat)$chromatic <- chromatic
   } else {
     attr(dmat,"emDims1") <- et1
     attr(dmat,"emDims2") <- et2
     attr(dmat,"emDims1.name") <- colnames(y1)
     attr(dmat,"emDims2.name") <- colnames(y2)
     attr(dmat,"weighted") <- weighted
+    attr(dmat,"embedded") <- doEmbed
     attr(dmat,"emLag") <- emLag
     attr(dmat,"emDim") <- emDim
     attr(dmat,"emRad") <- emRad%00%NA
     attr(dmat,"measures") <- rpOut
+    attr(dmat,"weighted") <- weighted
+    attr(dmat,"weightedBy") <- weightedBy
+    attr(dmat,"chromatic") <- chromatic
   }
-
-  dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
 
   if(doPlot){
 
@@ -213,8 +237,9 @@ rp <- function(y1, y2 = NULL,
 #' A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures (anisotropic) will be caluclated.
 #'
 #' @aliases crqa_rp
-#' @param RM A distance matrix, or a matrix of zeroes and ones (you must set `emRad = NA`)
-#' @param emRad Threshold for distance value that counts as a recurrence
+#' @inheritParams rp
+#' @param RM A distance matrix (set `emRad = NA` to estimate a radius), or a matrix of zeroes and ones
+#' @param emRad Threshold for distance value that counts as a recurrence (ignored is `RM` is a binary matrix)
 #' @param DLmin Minimal diagonal line length (default = `2`)
 #' @param VLmin Minimal vertical line length (default = `2`)
 #' @param HLmin Minimal horizontal line length (default = `2`)
@@ -222,10 +247,12 @@ rp <- function(y1, y2 = NULL,
 #' @param VLmax Maximal vertical line length (default = length of diagonal -1)
 #' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
 #' @param AUTO Auto-recurrence? (default = `FALSE`)
-#' @param theiler Use a theiler window around the line of identity / synchronisation to remove high auto-correlation at short time-lags (default = `0`)
-#' @param chromatic Force chromatic RQA? (default = `FALSE`)
+#' @param includeDiagonal Should the diagonal be included in the calculation of the Recurrence Rate? If `NA` the value will be decided by the symmetry of the matrix, the diagonal will be removed for Auto RQA (`AUTO = TRUE`) but not for Cross RQA (`AUTO = FALSE`)  (default = `NA`)
+#' @param chromatic Force chromatic RQA? If `NA` the value of the `RM` attribute `"chromatic"` will be used, if present (default = `NA`)
+#' @param anisotropyHV Return anisotropy ratio measures based on Horizontal and Vertical lines. The ratios are calculated as `(horizontal - vertical) / (horizontal + vertical)`. So a value of 0 means no anisotropy, negative ratios indicate the measures based on vertical lines had  higher values, positive ratios indicate the measures based on horizontal lines had higher values  (default = `FALSE`)
+#' @param asymmetryUL Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as `(upper - lower) / (upper + lower)`. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = `FALSE`)
+#' @param recurrenceTimes Return measures based on 'white lines', the recurrence times (default = `FALSE`)
 #' @param matrices Return matrices? (default = `FALSE`)
-#' @param doHalf Analyse half of the matrix? (default = `FALSE`)
 #' @param Nboot How many bootstrap replications? (default = `NULL`)
 #' @param CL Confidence limit for bootstrap results (default = `.95`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR", tol = .2)` if `is.na(emRad)==TRUE`, it will estimate a radius (default = `.05`).
@@ -244,14 +271,17 @@ rp_measures <- function(RM,
                         DLmin = 2,
                         VLmin = 2,
                         HLmin = 2,
-                        DLmax = length(Matrix::diag(RM))-1,
-                        VLmax = length(Matrix::diag(RM))-1,
-                        HLmax = length(Matrix::diag(RM))-1,
+                        DLmax = length(Matrix::diag(RM)),
+                        VLmax = length(Matrix::diag(RM)),
+                        HLmax = length(Matrix::diag(RM)),
                         AUTO      = NULL,
-                        theiler   = NULL,
-                        chromatic = FALSE,
+                        theiler   = NA,
+                        includeDiagonal = NA,
+                        chromatic = NA,
+                        anisotropyHV = FALSE,
+                        asymmetryUL = FALSE,
+                        recurrenceTimes = FALSE,
                         matrices  = FALSE,
-                        doHalf    = FALSE,
                         Nboot     = NULL,
                         CL        = .95,
                         targetValue = .05,
@@ -262,7 +292,6 @@ rp_measures <- function(RM,
   # Input should be a distance matrix, or a matrix of zeroes and ones with emRad = NULL, output is a list
   # Fred Hasselman - August 2013
 
-
   #require(parallel)
 
   # check auto-recurrence and make sure Matrix has sparse triplet representation
@@ -272,16 +301,11 @@ rp_measures <- function(RM,
     AUTO <- attr(RM,"AUTO")
   }
 
-  if(is.na(theiler%00%NA)){
-    if(!is.null(attributes(RM)$theiler)){
-      if(attributes(RM)$theiler>0){
-        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
-        }
-    }
-    theiler <- 0
-  } else {
-    if(theiler < 0){
-      theiler <- 0
+  if(is.na(chromatic)){
+    if(!is.null(attr(RM,"chromatic"))){
+      chromatic <- attr(RM,"chromatic")
+    } else {
+      chromatic <- FALSE
     }
   }
 
@@ -310,72 +334,203 @@ rp_measures <- function(RM,
       } else {
         emRad <- stats::sd(RM,na.rm = TRUE)
       }
-    }
+    } # not emRad attr
   }
 
   #uval <- unique(as.vector(RM))
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
-    if(!is.null(emRad)){
-      RM <- di2bi(RM,emRad)
-    } else{
-      if(!chromatic){
-        stop("Expecting a binary (0,1) matrix.\nUse 'est_radius()', or set 'chromatic = TRUE'")
+
+    if(chromatic){
+
+      # prepare data
+      if(attr(RM,"package")%00%""%in%"Matrix"){
+        RM     <- rp_checkfix(RM, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
+        meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
       } else {
-        stop("Chromatic RQA not implemented yet.")
+        meltRP <-  mat2ind(as.matrix(RM))
+      }
+
+      chromas <- meltRP %>% filter(value!=0)
+      chromas <- as.numeric_discrete(sort(unique(chromas$value)))
+      rm(meltRP)
+
+      if(NROW(chromas)>=(NROW(RM)/2)){
+        warning(paste("Chromatic RQA will have a large number of categories:",NROW(chromas)))
+      }
+
+
+      chromaList <- list()
+      matrixList <- list()
+
+      for(i in seq_along(chromas)){
+
+        RMtmp <- RM
+        RMtmp[RM!=i] <- 0
+        RMtmp[RM==i] <- 1
+
+        suppressMessages(tmpOut <- rp_calc(RMtmp,
+                                           emRad = emRad,
+                                           DLmin = DLmin,
+                                           VLmin = VLmin,
+                                           HLmin = HLmin,
+                                           DLmax = DLmax,
+                                           VLmax = VLmax,
+                                           HLmax = HLmax,
+                                           theiler = theiler,
+                                           AUTO  = AUTO,
+                                           includeDiagonal = includeDiagonal,
+                                           chromatic = chromatic,
+                                           anisotropyHV = anisotropyHV,
+                                           asymmetryUL = asymmetryUL,
+                                           recurrenceTimes = recurrenceTimes,
+                                           matrices  = matrices)
+        )
+
+        if(matrices){
+          chromaList[[i]] <- tmpOut$crqaMeasures
+          matrixList[[i]] <- tmpOut$crqaMatrices
+        } else {
+          chromaList[[i]] <- tmpOut
+        }
+        rm(RMtmp, tmpOut)
+      }
+
+      names(chromaList) <- names(chromas)
+      if(matrices){
+        names(matrixList) <- names(chromas)
+        out <- list(crqaMeasures = plyr::ldply(chromaList, .id = "chroma"),
+                    crqaMatrices =  matrixList)
+      } else {
+        out <- plyr::ldply(chromaList, .id = "chroma")
+      }
+
+    } else {
+      if(!is.null(emRad)){
+        RM <- di2bi(RM,emRad)
+      } else {
+        if(!chromatic){
+          stop("Expecting a binary (0,1) matrix.\nUse 'est_radius()', or set 'chromatic = TRUE'")
+        }
       }
     }
-    # } else {
-    #
   }
   #rm(RM)
 
-  suppressMessages(out <- rp_calc(RM,
-                                  emRad = emRad,
-                                  DLmin = DLmin,
-                                  VLmin = VLmin,
-                                  HLmin = HLmin,
-                                  DLmax = DLmax,
-                                  VLmax = VLmax,
-                                  HLmax = HLmax,
-                                  theiler = theiler,
-                                  AUTO  = AUTO,
-                                  chromatic = chromatic,
-                                  matrices  = matrices))
+  if(!chromatic){
+    suppressMessages(out <- rp_calc(RM,
+                                    emRad = emRad,
+                                    DLmin = DLmin,
+                                    VLmin = VLmin,
+                                    HLmin = HLmin,
+                                    DLmax = DLmax,
+                                    VLmax = VLmax,
+                                    HLmax = HLmax,
+                                    theiler = theiler,
+                                    AUTO  = AUTO,
+                                    includeDiagonal = includeDiagonal,
+                                    chromatic = chromatic,
+                                    anisotropyHV = anisotropyHV,
+                                    asymmetryUL = asymmetryUL,
+                                    recurrenceTimes = recurrenceTimes,
+                                    matrices  = matrices))
+    }
+
+    if(matrices){
+      tab <- out$crqaMeasures
+    } else {
+      tab <- out
+    }
+
+    outTable <- list(`Global Measures` = data.frame(`Global` = "Recurrence Matrix",
+                                                    `Max points-theiler` = tab$RP_max,
+                                                    `N points` = tab$RP_N,
+                                                    `Recurrence Rate` = tab$RR,
+                                                    `Singular points` = tab$SING_N%00%NA,
+                                                    Divergence = tab$DIV_dl,
+                                                    Repetitiveness = tab$REP_av),
+                     `Line-based Measures` = data.frame(`Line-based` = c("Diagonal", "Vertical", "Horizontal"),
+                                                        `N lines`   = c(tab$N_dl,tab$N_vl, tab$N_hl),
+                                                        `N points on lines` = c(tab$N_dlp%00%NA,tab$N_vlp%00%NA,tab$N_hlp%00%NA),
+                                                        `Measure` = c("Determinism","V Laminarity","H Laminarity"),
+                                                        `Rate`    = c(tab$DET, tab$LAM_vl, tab$LAM_hl),
+                                                        `Mean`    = c(tab$MEAN_dl, tab$TT_vl, tab$TT_vl),
+                                                        `Max`     = c(tab$MAX_dl, tab$MAX_vl, tab$MAX_hl),
+                                                        `Entropy of lengths` = c(tab$ENT_dl, tab$ENT_vl, tab$ENT_hl),
+                                                        `Relative entropy` = c(tab$ENTrel_dl, tab$ENTrel_vl, tab$ENTrel_hl),
+                                                        `CoV of lengths`   = c(tab$CoV_dl, tab$CoV_vl, tab$CoV_hl)))
+
+    if(anisotropyHV){
+
+      outTable$`Horizontal/Vertical line anisotropy` <-  data.frame(`Ratio` = "H/V line measures",
+                                                                    `N lines`  =  tab$Nlines_ani,
+                                                                    `N points on lines` = tab$N_hlp%00%NA/tab$N_vlp%00%NA,
+                                                                    `Measure` = "Laminarity",
+                                                                    `Rate`    = tab$LAM_ani,
+                                                                    `Mean`    = tab$MEAN_hvl_ani,
+                                                                    `Max`     = tab$MAX_hvl_ani,
+                                                                    `Entropy of lengths` = tab$ENT_hvl_ani)
+    }
+
+    if(asymmetryUL){
+
+      outTable$`Upper/Lower triangle asymmetry` <- list(
+        `Global Measures` =  data.frame(`Global Ratio` = "U/L of points",
+                                        `N points` = tab$ratios.ul.Npoints_ul_ani,
+                                        RR = tab$ratios.ul.RR_ul_ani,
+                                        `Singular points` = tab$ratios.ul.SING_N_ul_ani,
+                                        Divergence = tab$ratios.ul.DIV_ul_ani,
+                                        Repetetiveness = tab$ratios.ul.REP_ul_ani),
+        `Line-based Measures` = data.frame(
+          `Line ratio` = c("D lines", "V lines", "H lines"),
+          `N lines`  = c(tab$ratios.ul.NDlines_ul_ani,
+                         tab$ratios.ul.NVlines_ul_ani,
+                         tab$ratios.ul.NHlines_ul_ani),
+          `N points on lines` = c(tab$upper.tri.N_dlp/tab$lower.tri.N_dlp,
+                                  tab$upper.tri.N_vlp/tab$lower.tri.N_vlp,
+                                  tab$upper.tri.N_hlp/tab$lower.tri.N_hlp),
+          `Measure Ratio` = c("Determinism","V Laminarity", "H Laminarity"),
+          `Rate`    = c(tab$ratios.ul.DET_ul_ani, tab$ratios.ul.LAM_vl_ul_ani, tab$ratios.ul.LAM_hl_ul_ani),
+          `Mean`    = c(tab$ratios.ul.MEAN_dl_ul_ani, tab$ratios.ul.MEAN_vl_ul_ani, tab$ratios.ul.MEAN_hl_ul_ani),
+          `Max`     = c(tab$ratios.ul.MAX_dl_ul_ani, tab$ratios.ul.MAX_vl_ul_ani, tab$ratios.ul.MAX_hl_ul_ani),
+          `Entropy of lengths` = c(tab$ratios.ul.ENT_dl_ul_ani,
+                                   tab$ratios.ul.ENT_vl_ul_ani,
+                                   tab$ratios.ul.ENT_hl_ul_ani))
+      )
+    }
 
 
+    if(!silent){
+      cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+      if(chromatic){
+        cat(paste0("Chromatic RQA with categories: ", paste(chromas, collapse = ","),"\n"))
+      }
+      cat(paste0("\n",names(outTable)[1],"\n"))
+      print(format(outTable$`Global Measures`, digits = 3))
+      cat(paste0("\n\n",names(outTable)[2],"\n"))
+      print(format(outTable$`Line-based Measures`, digits = 3))
 
-  outTable <- list(`Global Measures` = data.frame(`Global` = "Recurrence Matrix",
-                                                  `Max rec points` = NROW(RM)*NCOL(RM)-NCOL(RM),
-                                                  `N rec points` = out$RP_N,
-                                                  `Recurrence Rate` = out$RR,
-                                                  `Singular points` = out$SING_N%00%NA,
-                                                  Divergence = out$DIV_dl,
-                                                  Repetitiveness = out$REP_av,
-                                                  Anisotropy = out$ANI),
-                   `Line-based Measures` = data.frame(`Line-based` = c("Diagonal", "Vertical", "Horizontal"),
-                                                      `N lines`   = c(out$N_dl,out$N_vl, out$N_hl),
-                                                      `N points on lines` = c(out$N_dlp%00%NA,out$N_vlp%00%NA,out$N_hlp%00%NA),
-                                                      `Measure` = c("Determinism","V Laminarity","H Laminarity"),
-                                                      `Rate`    = c(out$DET, out$LAM_vl, out$LAM_hl),
-                                                      `Mean`    = c(out$MEAN_dl, out$TT_vl, out$TT_vl),
-                                                      `Max`     = c(out$MAX_dl, out$MAX_vl, out$MAX_hl),
-                                                      `Entropy of lengths` = c(out$ENT_dl, out$ENT_vl, out$ENT_hl),
-                                                      `Relative entropy` = c(out$ENTrel_dl, out$ENTrel_vl, out$ENTrel_hl),
-                                                      `CoV of lengths`   = c(out$CoV_dl, out$CoV_vl, out$CoV_hl)))
+      if(anisotropyHV){
+        cat(paste0("\n\n",names(outTable)[3],"\n\n"))
+        print(format(outTable$`Horizontal/Vertical line anisotropy`, digits = 3))
+      }
 
-  if(!silent){
-    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
-    cat(paste("\n",names(outTable)[1],"\n"))
-    print(format(outTable$`Global Measures`))
-    cat(paste("\n\n",names(outTable)[2],"\n"))
-    print(format(outTable$`Line-based Measures`))
-    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
-  }
+      if(asymmetryUL){
+        cat(paste0("\n\n",names(outTable)[4],"\n\n"))
+        cat(" Global Measures\n")
+        print(format(outTable[[4]]$`Global Measures`, digits = 3))
+        cat(paste("\n\n Line-based Measures\n"))
+        print(format(outTable[[4]]$`Line-based Measures`, digits = 3))
+      }
+      cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+    }
 
-  attr(out,"measuresTable") <- outTable
+    attr(out,"measuresTable") <- outTable
 
-  # tb <- c("|  N rec. points  |       RR        | Singular points |    Divergence   |  Repetiteveness |    Anisotropy   |",
-  #         "|-----------------|-----------------|-----------------|-----------------|-----------------|-----------------|".
+    return(invisible(out))
+}
+
+  # tb <- c("| Max rec. points (post theiler) | N rec. points | RR | Singular points | Divergence | Repetiteveness | Anisotropy |",
+  #         "|--------------------------------|---------------|----|-----------------|------------|----------------|------------|".
   #         )
   #
   #cat(c("Global Recurrence Measures\n",paste0(tb,"\n")))
@@ -449,9 +604,6 @@ rp_measures <- function(RM,
   #   } else {
   #     rqout <- dfori
   #   }
-
-  return(invisible(out))
-}
 
 
 #' Get (C)RQA measures from a Recurrence Matrix
@@ -1096,7 +1248,7 @@ rp_cl            <- function(y1,
 
     cl       <- parallel::makeCluster(cores_available)
 
-   # parallel::clusterEvalQ(cl, library(callr))
+    # parallel::clusterEvalQ(cl, library(callr))
     parallel::clusterEvalQ(cl,library(utils))
     parallel::clusterEvalQ(cl,library(plyr))
     parallel::clusterEvalQ(cl,library(tidyverse))
@@ -1497,7 +1649,7 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
   #     }
   # }
 
-  if(grepl("matrix",class(RM),ignore.case = TRUE)){
+  if(grepl("matrix",class(RM)[1],ignore.case = TRUE)){
 
     if(all(RM>0)){warning("All matrix elements are nonzero.")}
 
@@ -1668,20 +1820,10 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 
 #' Line length distributions
 #'
-#' @param RM A thresholded recurrence matrix (binary: 0 - 1)
-#' @param DLmin Minimal diagonal line length (default = `2`)
-#' @param VLmin Minimal vertical line length (default = `2`)
-#' @param HLmin Minimal horizontal line length (default = `2`)
-#' @param DLmax Maximal diagonal line length (default = length of diagonal -1)
-#' @param VLmax Maximal vertical line length (default = length of diagonal -1)
-#' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
-#' @param d Vector of diagonals to be extracted from matrix `RP` before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., `d = 50` will extract the diagonal band `-50:50`. A two element vector will be interpreted as a band, e.g. `d = c(-50,100)` will extract diagonals `-50:100`. If `length(d) > 2`, the numbers will be interpreted to refer to individual diagonals, `d = c(-50,50,100)` will extract diagonals `-50,50,100`.
-#' @param theiler Size of the theiler window, e.g. `theiler = 1` removes diagonal bands -1,0,1 from the matrix. If `length(d)` is `NULL`, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if `length(d)>2`, or if it is larger than the matrix or band indicated by parameter `d`.
+#' @inheritParams rp
+#' @inheritParams rp_measures
+#' @param d Vector of diagonals to be extracted from matrix `RP` before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., `d = 50` will extract the diagonal band `-50:50`. A two element vector will be interpreted as a band, e.g. `d = c(-50,100)` will extract diagonals `-50:100`. If `length(d) > 2`, the numbers will be interpreted to refer to individual diagonals, `d = c(-50,50,100)` will extract diagonals `-50,50,100`. If `length(d)` is `NULL`, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if `length(d)>2`, or if it is larger than the matrix or band indicated by parameter `d`. A warning will be given is a theiler window was already applied to the matrix.
 #' @param invert Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
-#' @param AUTO Is this an AUTO RQA?
-#' @param chromatic Chromatic RQA?
-#' @param matrices Return the matrices?
-#'
 #'
 #' @description Extract lengths of diagonal, vertical and horizontal line segments from a recurrence matrix.
 #'
@@ -1721,61 +1863,31 @@ rp_lineDist <- function(RM,
 
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){stop("Matrix should be a binary (0,1) matrix!!")}
 
+  if(length(d)<=2){
+    suppressMessages(RM <- setTheiler(RM, theiler))
+  } else {
+    if(!is.null(attributes(RM)$theiler)){
+      message(paste0("Value found in attribute 'theiler'... assuming a theiler window was already applied to the matrix."))
+    }
+  }
+
   if(invert){
     RM <- Matrix::Matrix(1-RM,sparse = TRUE)
-    if(Matrix::isSymmetric(Matrix::unname(RM))){
-      RM <- bandReplace(RM,0,0,1)
-    }
   }
-
 
   if(!is.null(d)){
-    if(length(d)==1){d <- -d:d}
-    if(length(d)==2){d <-  d[1]:d[2]}
+    if(length(d)==1){d <- seq(-d,d)}
+    if(length(d)==2){d <- seq(min(d),max(d))}
   }
 
 
-  if(is.na(theiler%00%NA)){
-    if(!is.null(attributes(RM)$theiler)){
-      if(attributes(RM)$theiler>0){
-        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
-      }
-    }
-    theiler <- 0
-  } else {
-    if(theiler < 0){
-      theiler <- 0
-    }
-    }
+  B <- rp_nzdiags(RM)
+  V <- Matrix::as.matrix(RM)[,colSums(Matrix::as.matrix(RM))>0]
 
-    if(theiler>0){
-      if(length(d)<length(-theiler:theiler)){warning("Ignoring theiler window...")}
-      RM <- bandReplace(RM,-theiler,theiler,0)
-    }
+  RPt <- Matrix::t(RM)
 
-
-
-  if(Matrix::isSymmetric(Matrix::unname(RM))){
-    if(all(Matrix::diag(RM)==1)){
-      RP <- bandReplace(RM,0,0,0)
-    }
-  } else {
-    RP <- RM
-  }
-
-  B <- rp_nzdiags(RP)
-  V <- Matrix::as.matrix(RP)[,colSums(Matrix::as.matrix(RP))>0]
-
-  if(Matrix::isSymmetric(Matrix::unname(RM))){
-    if(all(Matrix::diag(RM)==1)){
-      RP <- bandReplace(Matrix::t(RM),0,0,0)
-    }
-  } else {
-    RP <- Matrix::t(RM)
-  }
-
-  H <- Matrix::as.matrix(RP)[,colSums(Matrix::as.matrix(RP))>0]
-  rm(RP)
+  H <- Matrix::as.matrix(RPt)[,colSums(Matrix::as.matrix(RPt))>0]
+  rm(RPt)
 
   # Get diagonal lines & pad with zeros
   diagonals   <- rbind.data.frame(rep(0,dim(B)[2]),
@@ -1899,7 +2011,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
   }
 
   if(checkTSPARSE){
-    if(class(RM)%in%names(methods::getClass("TsparseMatrix")@subclasses)){
+    if(class(RM)[1]%in%names(methods::getClass("TsparseMatrix")@subclasses)){
       yesTSPARSE <- TRUE
     }
   }
@@ -1907,7 +2019,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
     if(!yesS4){
       RM <- Matrix::Matrix(RM,sparse = TRUE)
     }
-    Mtype <- gsub("CMatrix","TMatrix",class(RM))
+    Mtype <- gsub("CMatrix","TMatrix",class(RM)[1])
     eval(parse(text=paste0("RM <- as(RM,'",Mtype,"')")))
   }
 
@@ -1920,14 +2032,15 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 
 #' Plot (thresholded) distance matrix as a recurrence plot
 #'
-#' @param RM A distance matrix or recurrence matrix
+#' @param RM A distance matrix or recurrence matrix, preferably generated by function [rp] or [rn].
 #' @param plotDimensions Should the state vectors be plotted if they are available as attributes of RM (default = `TRUE`)
-#' @param plotMeasures Print common (C)RQA measures in the plot if the matrix is binary
-#' @param plotRadiusRRbar The `Radius-RR-bar` is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of `RR` values one would get if a certain distance threshold were chosen (`default = TRUE`)
-#' @param drawGrid Draw a grid on the recurrence plot (`default = FALSE`)
-#' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (`default = NULL`)
-#' @param Chromatic If `TRUE` and there are more than two discrete values in `RM`, give recurrent points a distinct colour. If `RM` was returned by `rp_measures(..., chromatic = TRUE)`, the recurrence plot will colour-code recurrent points according to the category values in `attributes(RM)$chromaticRP` (`default = FALSE`)
-#' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `est_radius()` will be called with default settings (find a radius that yields .05 recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
+#' @param plotDimensionLegend If `plotDimensions = TRUE` plot a simple legend (default = `FALSE`)
+#' @param plotMeasures Print common (C)RQA measures in the plot if the matrix is binary (default = `FALSE`)
+#' @param plotRadiusRRbar The `Radius-RR-bar` is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of `RR` values one would get if a certain distance threshold were chosen (default = `TRUE`)
+#' @param drawGrid Draw a grid on the recurrence plot (default = `FALSE`)
+#' @param drawDiagonal One usually omits the main diagonal, the Line Of Incidence (LOI) from the calculation of Auto-RQA measures., it is however common to plot it. Set to `FALSE` to omit the LOI from an Auto-Recurrence Plot (default = `TRUE`)
+#' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (default = `NULL`)
+#' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `est_radius()` will be called with default settings (find a radius that yields .05 recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
 #' @param title A title for the plot
 #' @param xlabel An x-axis label
 #' @param ylabel An y-axis label
@@ -1941,11 +2054,12 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #'
 rp_plot <- function(RM,
                     plotDimensions = FALSE,
-                    plotMeasures   = FALSE,
+                    plotDimensionLegend = FALSE,
+                    plotMeasures = FALSE,
                     plotRadiusRRbar = TRUE,
                     drawGrid = FALSE,
+                    drawDiagonal = TRUE,
                     markEpochsLOI = NULL,
-                    Chromatic = NULL,
                     radiusValue = NA,
                     title = "", xlabel = "", ylabel="",
                     plotSurrogate = NA,
@@ -1957,8 +2071,24 @@ rp_plot <- function(RM,
   names(colvec) <- c("0","1")
 
   # check auto-recurrence and make sure Matrix has sparse triplet representation
-  RM   <- rp_checkfix(RM, checkAUTO = TRUE)
+  RM   <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkSPARSE = TRUE)
   AUTO <- attr(RM,"AUTO")
+
+  # Make sure we can draw a diagonal if requested
+  maxDist <- max(RM, na.rm = TRUE)
+  if(drawDiagonal&AUTO){
+    if(all(as.vector(RM)==0|as.vector(RM)==1)){
+      RM <- bandReplace(RM,0,0,1)
+    } else {
+      RM <- bandReplace(RM,0,0,(maxDist+1))
+    }
+  }
+
+  if(is.null(attr(RM,"chromatic"))){
+    chromatic <- FALSE
+  } else {
+    chromatic <- attr(RM,"chromatic")
+  }
 
   # prepare data
   if(attr(RM,"package")%00%""%in%"Matrix"){
@@ -1971,16 +2101,17 @@ rp_plot <- function(RM,
   hasNA <- FALSE
   if(any(is.na(meltRP$value))){
     hasNA <- TRUE
-    meltRP$value[is.na(meltRP$value)] <- max(meltRP$value, na.rm = TRUE) + 1
+    meltRP$value[is.na(meltRP$value)] <- (maxDist + 1)
   }
 
   # Unthresholded START ----
   showL <- FALSE
-  if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)|attr(RM,"weighted")){
+  if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)&!chromatic){
 
     unthresholded <- TRUE
 
-    if(attr(RM,"weighted")){
+    if(attr(RM,"weighted")%00%FALSE){
+      warning("Can't show the radius vs. RR bar on a weighted Recurrence Plot!")
       plotRadiusRRbar <- FALSE
     }
 
@@ -1988,9 +2119,14 @@ rp_plot <- function(RM,
       warning("Can't show epochs on an unthresholded Recurrence Plot!")
     }
 
+    # if(chromatic){
+    #   plotRadiusRRbar <- FALSE
+    # }
+
   } else { # unthresholded
 
     unthresholded <- FALSE
+    plotRadiusRRbar <- FALSE
 
     if(!is.null(markEpochsLOI)){
       if(is.factor(markEpochsLOI)&length(markEpochsLOI)==max(c(NROW(RM),NCOL(RM)))){
@@ -2017,9 +2153,21 @@ rp_plot <- function(RM,
         warning("Variable passed to 'markEpochsLOI' is not a factor or doesn't have correct length.")
       }
     } else {
+
+      if(chromatic){
+
+        colvec <- c("#FFFFFF",getColours(length(unique(meltRP$value))-1))
+        names(colvec) <- sort(unique(meltRP$value))
+        meltRP$value <- factor(meltRP$value, levels = sort(unique(meltRP$value)), labels = names(colvec))
+
+        showL <- TRUE
+
+      } else {
+
       colvec <- c("#FFFFFF","#000000")
       names(colvec) <- c("0","1")
       meltRP$value <- factor(meltRP$value, levels = c(0,1), labels = c("0","1"))
+      }
     }
   }
   ## Unthresholded END ##
@@ -2028,8 +2176,8 @@ rp_plot <- function(RM,
 
   ## Get Radius
   if(is.na(radiusValue)){
-    if(!is.null(attr(RM,"emRad"))|!is.na(attr(RM,"emRad"))){
-      radiusValue <- attr(RM,"emRad")
+    if(!is.null(attr(RM,"emRad"))|!is.na(attr(RM,"emRad")%00%-1)){
+      radiusValue <- attr(RM,"emRad")%00%NA
     } else {
       if(unthresholded|plotMeasures){
         radiusValue <- est_radius(RM,silent = TRUE)$Radius
@@ -2044,7 +2192,7 @@ rp_plot <- function(RM,
       if(!is.null(attributes(RM)$emRad)){
         radiusValue <- attr(RM,"emRad")
       } else {
-        radiusValue <- est_radius(RM,silent = TRUE)$Radius
+        radiusValue <- est_radius(RM, silent = TRUE)$Radius
       }
     }
     if(unthresholded){
@@ -2058,11 +2206,11 @@ rp_plot <- function(RM,
 
 
 
-
   # Main plot ----
   gRP <-  ggplot2::ggplot(ggplot2::aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
     ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL) +
     ggplot2::geom_abline(slope = 1,colour = "grey50", size = 1)
+
 
   ## Unthresholded START ----
   if(unthresholded){
@@ -2090,6 +2238,9 @@ rp_plot <- function(RM,
 
     } else {
 
+
+
+
       gRP <- gRP + ggplot2::scale_fill_gradient2(low      = "red3",
                                                  high     = "steelblue",
                                                  mid      = "white",
@@ -2098,6 +2249,7 @@ rp_plot <- function(RM,
                                                  limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                                                  space    = "Lab",
                                                  name     = "")
+
     } # Weighted
 
 
@@ -2215,11 +2367,22 @@ rp_plot <- function(RM,
 
   } else {
     if(!unthresholded){
+
+      if(chromatic){
+
+      gRP <- gRP +  ggplot2::scale_fill_manual(name  = "", breaks = sort(unique(meltRP$value)),
+                                               values = colvec,
+                                               na.translate = TRUE ,
+                                               na.value = scales::muted("slategray4"))
+
+      } else {
+
       gRP <- gRP +  ggplot2::scale_fill_manual(name  = "", breaks = c(0,1),
                                                values = colvec,
                                                na.translate = TRUE ,
                                                na.value = scales::muted("slategray4"),
                                                guide = "none")
+      }
     }
   } # markEpochsLOI
 
@@ -2337,6 +2500,26 @@ rp_plot <- function(RM,
       ggplot2::coord_flip(expand = FALSE) +
       ggplot2::scale_y_reverse(expand = c(0,0))
 
+
+    if(plotDimensionLegend){
+
+      # y1 <- data.frame(t1=attr(RM,"emDims1"))
+      # y2 <- data.frame(t2=attr(RM,"emDims2"))
+
+      y1l <- data.frame(Value     = rep(0,length(unique(y1$Dimension)),each=2),
+                        tm        = rep(0,length(unique(y1$Dimension)),each=2),
+                        Dimension =  rep(unique(y1$Dimension),each=2))
+
+      gdl <- ggplot2::ggplot(y1l, ggplot2::aes_(y=~Value, x=~tm, colour=~Dimension)) +
+        ggplot2::geom_line(show.legend = TRUE, size = 2) + ggplot2::scale_color_grey() +
+        scale_x_continuous() +
+        theme_void() + theme(legend.text = element_text(size=rel(2)),
+                             legend.title = element_text(size=rel(2)),
+                             legend.position = c(.5,.5))
+
+
+    }
+
   } # plotdimensions
 
 
@@ -2368,94 +2551,145 @@ rp_plot <- function(RM,
     # ,"\nLAM_hl:",rpOUT$LAM_vl, "| TT_hl:",rpOUT$TT_vl,"| ENTR_hl:",rpOUT$ENT_hl))
   }
 
-    # Build Graph using gtable
+  # Build Graph using gtable
 
-    g <- ggplot2::ggplotGrob(gRP)
+  g <- ggplot2::ggplotGrob(gRP)
 
-    if(plotDimensions){
-      gry2<-ggplot2::ggplotGrob(gy2)
-      gry1<-ggplot2::ggplotGrob(gy1)
+  if(plotDimensions){
+    gry2<-ggplot2::ggplotGrob(gy2)
+    gry1<-ggplot2::ggplotGrob(gy1)
+    if(plotDimensionLegend){
+      grDimL <- ggplot2::ggplotGrob(gdl)
     }
+  }
 
-    if(unthresholded&plotRadiusRRbar){
-      grDist <- ggplot2::ggplotGrob(gDist)
-    }
+  if(unthresholded&plotRadiusRRbar){
+    grDist <- ggplot2::ggplotGrob(gDist)
+  }
 
-    if(plotMeasures){
-      grA <- ggplot2::ggplotGrob(gA)
-    }
+  if(plotMeasures){
+    grA <- ggplot2::ggplotGrob(gA)
+  }
 
-    if(plotDimensions&!plotMeasures&unthresholded&plotRadiusRRbar){
-      mat <- matrix(list(gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
-      gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
-    }
 
-    if(plotDimensions&!plotMeasures&unthresholded&!plotRadiusRRbar){
-      mat <- matrix(list(gry2, grid::nullGrob(),g, gry1),nrow = 2)
-      gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
-    }
+  # cat(paste("\n\nplotMeasures =", plotMeasures,"\n"))
+  # cat(paste("plotDimensions =", plotDimensions,"\n"))
+  # cat(paste("plotDimensionLegend =", plotDimensionLegend,"\n"))
+  # cat(paste("unthresholded =", unthresholded,"\n"))
+  # cat(paste("plotRadiusRRbar =", plotRadiusRRbar,"\n"))
 
-    if(plotDimensions&!plotMeasures&!unthresholded){
-      mat <- matrix(list(gry2, grid::nullGrob(),g, gry1),nrow = 2)
-      gt  <- gtable::gtable_matrix("bi_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1, .25), "null"),respect = TRUE)
-    }
+  # Build list for the gtable
+  Lmat <- list()
+  if(plotMeasures){Lmat[[1]] <- grA} else {Lmat[[1]] <- NA}
+  if(plotMeasures){Lmat[[2]] <- grid::nullGrob()} else {Lmat[[2]] <- NA}
+  if(plotDimensions){Lmat[[3]] <- gry2} else {Lmat[[3]] <- NA}
+  if(plotDimensionLegend){Lmat[[4]] <- grDimL} else {if(plotDimensions){Lmat[[4]] <- grid::nullGrob()} else {Lmat[[4]] <- NA}}
+  Lmat[[5]] <- g
+  if(plotDimensions){Lmat[[6]] <- gry1} else {Lmat[[6]] <- NA}
+  if(unthresholded&plotRadiusRRbar){Lmat[[7]] <- grDist} else {Lmat[[7]] <- NA}
+  if(plotDimensions&unthresholded&plotRadiusRRbar){Lmat[[8]] <- grid::nullGrob()} else {Lmat[[8]] <- NA}
 
-    if(plotDimensions&plotMeasures&unthresholded&plotRadiusRRbar){
-      mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
-      gt  <- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
-    }
+  # Remove unused fields
+  Lmat[is.na(Lmat)] <- NULL
 
-    if(plotDimensions&plotMeasures&unthresholded&!plotRadiusRRbar){
-      mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
-      gt  <- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
-    }
+  w <- c(.35,.25, 1,.5)[c(plotMeasures,plotDimensions,TRUE,plotRadiusRRbar)]
+  h <- c(1,.25)[c(TRUE,plotDimensions)]
 
-    if(plotDimensions&plotMeasures&!unthresholded){
-      mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
-      gt  <- gtable::gtable_matrix("bi_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
-    }
+  widths  <- unit(w,"null")  #ifelse(plotMeasures, unit(c(.35,.25, 1,.5),  unit(c(.25, 1), "null")))
+  heights <- unit(h,"null") # ifelse(plotMeasures, unit(c(1), "null"), unit(c(1,.25), "null"))
 
-    if(!plotDimensions&plotMeasures&unthresholded&plotRadiusRRbar){
-      mat <- matrix(list(grA, g, grDist),nrow = 1)
-      gt  <- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
-    }
+  if(plotDimensions){
+    mrows <- 2
+  } else {
+    mrows <- 1
+  }
 
-    if(!plotDimensions&plotMeasures&unthresholded&!plotRadiusRRbar){
-      mat <- matrix(list(grA, g),nrow = 1)
-      gt  <- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
-    }
+  mat <- matrix(Lmat,nrow = mrows)
+  gt  <- gtable::gtable_matrix("rp", mat, widths = widths, heights =  heights, respect = TRUE)
 
-    if(!plotDimensions&plotMeasures&!unthresholded){
-      mat <- matrix(list(grA, g),nrow = 1)
-      gt  <- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
-    }
+  #  gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"), respect = TRUE)
 
-    if(!plotDimensions&!plotMeasures&unthresholded&plotRadiusRRbar){
-      mat <- matrix(list(g, grDist),nrow = 1)
-      gt  <- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
-    }
+  # if(plotDimensions&plotDimensionLegend&!plotMeasures&unthresholded&!plotRadiusRRbar){
+  #   mat <- matrix(list(gry2, grDimL, g, gry1),nrow = 2)
+  #   gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+  # }
+  #
+  # if(plotDimensions&plotDimensionLegend&!plotMeasures&unthresholded&plotRadiusRRbar){
+  #   mat <- matrix(list(gry2, grDimL, g, gry1, grDist, grid::nullGrob()),nrow = 2)
+  #   gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+  # }
+  #
+  # if(plotDimensions&!plotDimensionLegend&!plotMeasures&unthresholded&plotRadiusRRbar){
+  #   mat <- matrix(list(gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
+  #   gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+  # }
+  #
+  # if(plotDimensions&!plotMeasures&!plotDimensionLegend&unthresholded&!plotRadiusRRbar){
+  #   mat <- matrix(list(gry2, grid::nullGrob(),g, gry1),nrow = 2)
+  #   gt  <- gtable::gtable_matrix("di_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+  # }
+  #
+  # if(plotDimensions&!plotDimensionLegend&!plotMeasures&!unthresholded){
+  #   mat <- matrix(list(gry2, grid::nullGrob(),g, gry1),nrow = 2)
+  #   gt  <- gtable::gtable_matrix("bi_rp_dim", mat, widths = unit(c(.25, 1), "null"), heights =  unit(c(1, .25), "null"),respect = TRUE)
+  # }
+  #
+  # if(plotDimensions&!plotDimensionLegend&plotMeasures&unthresholded&plotRadiusRRbar){
+  #   mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1, grDist, grid::nullGrob()),nrow = 2)
+  #   gt  <- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1,.5), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+  # }
+  #
+  # if(plotDimensions&!plotDimensionLegend&plotMeasures&unthresholded&!plotRadiusRRbar){
+  #   mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
+  #   gt  <- gtable::gtable_matrix("di_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+  # }
+  #
+  # if(plotDimensions&!plotDimensionLegend&plotMeasures&!unthresholded){
+  #   mat <- matrix(list(grA, grid::nullGrob(), gry2, grid::nullGrob(),g, gry1),nrow = 2)
+  #   gt  <- gtable::gtable_matrix("bi_rp_dim_meas", mat, widths = unit(c(.35,.25, 1), "null"), heights =  unit(c(1,.25), "null"),respect = TRUE)
+  # }
+  #
+  # if(!plotDimensions&!plotDimensionLegend&plotMeasures&unthresholded&plotRadiusRRbar){
+  #   mat <- matrix(list(grA, g, grDist),nrow = 1)
+  #   gt  <- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+  # }
+  #
+  # if(!plotDimensions&!plotDimensionLegend&plotMeasures&unthresholded&!plotRadiusRRbar){
+  #   mat <- matrix(list(grA, g),nrow = 1)
+  #   gt  <- gtable::gtable_matrix("di_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+  # }
+  #
+  # if(!plotDimensions&!plotDimensionLegend&plotMeasures&!unthresholded){
+  #   mat <- matrix(list(grA, g),nrow = 1)
+  #   gt  <- gtable::gtable_matrix("bi_rp_meas", mat, widths = unit(c(.35, 1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+  # }
+  #
+  # if(!plotDimensions&!plotDimensionLegend&!plotDimensionLegend&!plotMeasures&unthresholded&plotRadiusRRbar){
+  #   mat <- matrix(list(g, grDist),nrow = 1)
+  #   gt  <- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1,.5), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+  # }
+  #
+  # if(!plotDimensions&!plotDimensionLegend&!plotMeasures&unthresholded&!plotRadiusRRbar){
+  #   mat <- matrix(list(g),nrow = 1)
+  #   gt  <- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+  # }
+  #
+  # if(!plotDimensions&!plotDimensionLegend&!plotMeasures&!unthresholded){
+  #   mat <- matrix(list(g),nrow = 1)
+  #   gt  <- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
+  # }
 
-    if(!plotDimensions&!plotMeasures&unthresholded&!plotRadiusRRbar){
-      mat <- matrix(list(g),nrow = 1)
-      gt  <- gtable::gtable_matrix("di_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
-    }
+  if(nchar(title)>0){
+    grT <- ggplot2::ggplot(data.frame(x=1,y=1)) +
+      ggplot2::geom_text(ggplot2::aes_(x=~x,y=~y), label=title) +
+      theme_void() +
+      theme(plot.margin = margin(0,0,0,0, unit = "pt"))
+    gt  <- gtable::gtable_add_rows(x = gt, heights =  unit(c(.1),"null"), pos=0)
+    l <- sum(c(plotDimensions,plotMeasures))+1
+    gt  <- gtable::gtable_add_grob(x = gt, grobs = ggplot2::ggplotGrob(grT), name = "Title", t=1, l=l)
+  }
 
-    if(!plotDimensions&!plotMeasures&!unthresholded){
-      mat <- matrix(list(g),nrow = 1)
-      gt  <- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
-    }
-
-    if(nchar(title)>0){
-      grT <- ggplot2::ggplot(data.frame(x=1,y=1)) +
-        ggplot2::geom_text(ggplot2::aes_(x=~x,y=~y), label=title) +
-        theme_void() +
-        theme(plot.margin = margin(0,0,0,0, unit = "pt"))
-      gt  <- gtable::gtable_add_rows(x = gt, heights =  unit(c(.1),"null"), pos=0)
-      l <- sum(c(plotDimensions,plotMeasures))+1
-      gt  <- gtable::gtable_add_grob(x = gt, grobs = ggplot2::ggplotGrob(grT), name = "Title", t=1, l=l)
-    }
-
-    g <- gtable::gtable_add_padding(gt, unit(5, "pt"))
+  g <- gtable::gtable_add_padding(gt, unit(5, "pt"))
 
 
   if(!returnOnlyObject){
@@ -2473,7 +2707,11 @@ rp_plot <- function(RM,
 
 #' rp_size
 #'
-#' @param mat A Matrix object
+#' Calculate the maximum possible number of recurrent points in a recurrence matrix.
+#'
+#' This function can take into account the presence of a `theiler` window, that is the points in the window will be excluded from the calculation. For example, some scholars will exclude the main diagonal from the calculation of the recurrence rate.
+#'
+#' @param RM A Matrix object
 #' @param AUTO Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass `FALSE` to prevent this behaviour. If `NULL` (default) `AUTO` will take on the value of `isSymmetric(mat)`.
 #' @param theiler Should a Theiler window be applied?
 #'
@@ -2491,25 +2729,50 @@ rp_plot <- function(RM,
 #' rp_size(m,FALSE,0)  # Do not subtract diagonal
 #' rp_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
 #' rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
-rp_size <- function(mat, AUTO=NULL, theiler = NULL){
-  if(is.null(AUTO)){
-    AUTO <- Matrix::isSymmetric(Matrix::unname(mat))
-  }
-  if(is.na(theiler%00%NA)){
-    if(!is.null(attributes(mat)$theiler)){
-      if(attributes(mat)$theiler>0){
-        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(mat)$theiler,"was already removed."))
+rp_size <- function(RM, AUTO=NULL, theiler = NULL){
+
+  if(is.null(theiler)){
+    if(is.null(attributes(RM)$theiler)){
+      if(AUTO){
+        theiler <- 0
+      } else {
+        theiler <- 1
       }
+    } else {
+      theiler <- attributes(RM)$theiler
     }
-    theiler <- 0
-  } else {
-    if(theiler < 0){
+  }
+
+  R_N <- cumprod(dim(RM))[2]
+  minDiag <- 0
+
+  if(is.na(theiler)){
+    if(attributes(RM)$AUTO){
+      theiler <- 1
+    } else {
       theiler <- 0
     }
   }
 
-  return(cumprod(dim(mat))[2] - ifelse((AUTO&theiler==0),length(Matrix::diag(mat)),
-                                       ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
+  if(length(theiler)==1){
+    if(theiler==1){
+      minDiag <- length(Matrix::diag(RM))
+    }
+    if(theiler>1){
+      minDiag <- sum(rep(length(Matrix::diag(RM)),length(seq(-theiler,theiler))) - abs(seq(-theiler,theiler)))
+    }
+  }
+
+  if(length(theiler)==2){
+    minDiag <- sum(rep(length(Matrix::diag(RM)),length(seq(min(theiler),max(theiler)))) - abs(seq(min(theiler),max(theiler))))
+  }
+
+  if(length(theiler)>2){
+    minDiag <- sum(rep(length(Matrix::diag(RM)),length(theiler)) - abs(theiler))
+  }
+
+  return(list(rp_size_total = R_N, rp_size_theiler = R_N - minDiag))
+  #cumprod(dim(mat))[2] - ifelse((includeDiag&theiler==0),length(Matrix::diag(mat)),ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
 }
 
 
@@ -2559,20 +2822,9 @@ rp_empty <- function(){
 
 #' rp_calc
 #'
-#' @param RM RM
-#' @param emRad r
-#' @param DLmin d
-#' @param VLmin v
-#' @param HLmin h
-#' @param DLmax dd
-#' @param VLmax vv
-#' @param HLmax hh
-#' @param theiler t
-#' @param AUTO a
-#' @param chromatic c
-#' @param matrices m
+#' @inheritParams rp_measures
 #'
-#' @return crqa measures
+#' @return CRQA measures and matrices of line distributions (if requested)
 #' @export
 #' @keywords internal
 #'
@@ -2581,22 +2833,43 @@ rp_calc <- function(RM,
                     DLmin = 2,
                     VLmin = 2,
                     HLmin = 2,
-                    DLmax = length(Matrix::diag(RM))-1,
-                    VLmax = length(Matrix::diag(RM))-1,
-                    HLmax = length(Matrix::diag(RM))-1,
-                    theiler = 0,
+                    DLmax = length(Matrix::diag(RM)),
+                    VLmax = length(Matrix::diag(RM)),
+                    HLmax = length(Matrix::diag(RM)),
+                    theiler   = NA,
                     AUTO      = NULL,
+                    includeDiagonal = NA,
                     chromatic = FALSE,
+                    anisotropyHV = FALSE,
+                    asymmetryUL = FALSE,
+                    recurrenceTimes = FALSE,
                     matrices  = FALSE){
 
-  recmatsize <- rp_size(RM, AUTO=AUTO)
+
+
+  RM <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE)
+
+  if(is.null(AUTO)){
+    AUTO <- attributes(RM)$AUTO
+  }
+
+  if(is.na(theiler)){
+    if(is.na(attributes(RM)$theiler)){
+      RM <- setTheiler(RM, )
+    }
+    theiler <- attributes(RM)$theiler
+  }
+
+  if(!is.na(includeDiagonal)){
+    AUTO <- includeDiagonal
+  }
+  recmatsize <- rp_size(RM, AUTO = AUTO, theiler = theiler)
 
   if(!is.null(attributes(RM)$emRad)){
     emRad <- attributes(RM)$emRad
   } else {
     emRad <- NA
   }
-
 
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
     if(!chromatic){
@@ -2606,20 +2879,11 @@ rp_calc <- function(RM,
     }
   }
 
-  #Total nr. recurrent points
+  # Total nr. recurrent points
   RP_N <- Matrix::nnzero(RM, na.counted = FALSE)
 
-  minDiag <- 0
-  if(Matrix::isSymmetric(Matrix::unname(RM))){
-    if(all(Matrix::diag(RM)==1)){
-      minDiag <- length(Matrix::diag(RM))
-    }
-  }
-
-  RP_N <- RP_N-minDiag
-
   #Proportion recurrence / Recurrence Rate
-  RR <- RP_N/recmatsize
+  RR <- RP_N/recmatsize$rp_size_theiler
 
   if(length(RR)==0){RR<-0}
 
@@ -2628,14 +2892,202 @@ rp_calc <- function(RM,
     return(rp_empty())
   }
 
+  lineMeasures_global <- rp_calc_lineMeasures(RM = RM,
+                                              RP_N = RP_N,
+                                              DLmin = DLmin, DLmax = DLmax,
+                                              VLmin = VLmin, VLmax = VLmax,
+                                              HLmin = HLmin, HLmax = HLmax,
+                                              theiler = theiler,
+                                              AUTO = AUTO,
+                                              chromatic = chromatic,
+                                              matrices = matrices)
+
+  if(matrices){
+    lineMatrices_global <- lineMeasures_global$crqaMatrices
+    lineMeasures_global <- lineMeasures_global$crqaMeasures
+  }
+
+  # Singularities
+  SING <- rp_lineDist(RM,
+                      DLmin = 1, DLmax = DLmax,
+                      VLmin = 1, VLmax = VLmax,
+                      HLmin = 1, HLmax = HLmax,
+                      theiler = theiler, AUTO = AUTO)
+
+  # table(SING_N$verticals.dist)
+  # table(SING_N$horizontals.dist)
+  SING_N  <-  table(SING$diagonals.dist)[1]
+  SING_rate <- SING_N / RP_N
+
+  # H/V Anisotropy ratios
+  if(anisotropyHV){
+    out_hv_ani <- data.frame(
+      Nlines_ani   = ((lineMeasures_global$N_hlp - lineMeasures_global$N_vlp)  / (lineMeasures_global$N_hlp  + lineMeasures_global$N_vlp))%00%NA,
+      LAM_ani      = (lineMeasures_global$LAM_hl - lineMeasures_global$LAM_vl) / (lineMeasures_global$LAM_hl + lineMeasures_global$LAM_vl),
+      MEAN_hvl_ani = (lineMeasures_global$TT_hl  - lineMeasures_global$TT_vl)  / (lineMeasures_global$TT_hl  + lineMeasures_global$TT_vl),
+      MAX_hvl_ani  = (lineMeasures_global$MAX_hl - lineMeasures_global$MAX_vl) / (lineMeasures_global$MAX_hl + lineMeasures_global$MAX_vl),
+      ENT_hvl_ani  = (lineMeasures_global$ENT_hl - lineMeasures_global$ENT_vl) / (lineMeasures_global$ENT_hl + lineMeasures_global$ENT_vl)
+    )
+  } else {
+    out_hv_ani <- NA
+  }
+
+
+  # U/L Anisotropy ratios
+  if(asymmetryUL){
+    RMu <- RM
+    RMu[lower.tri(RMu)] <- 0
+
+    recmatsize_u <- rp_size(RMu, AUTO = AUTO, theiler = theiler)
+
+    lineMeasures_upper <- rp_calc_lineMeasures(RM = RMu,
+                                               RP_N = RP_N,
+                                               DLmin = DLmin, DLmax = DLmax,
+                                               VLmin = VLmin, VLmax = VLmax,
+                                               HLmin = HLmin, HLmax = HLmax,
+                                               theiler = theiler,
+                                               AUTO = AUTO,
+                                               chromatic = chromatic,
+                                               matrices = FALSE)
+
+    # Total nr. recurrent points in upper
+    lineMeasures_upper$RP_N <- Matrix::nnzero(RMu, na.counted = FALSE)
+
+    #Proportion recurrence / Recurrence Rate un upper
+    lineMeasures_upper$RR <- lineMeasures_upper$RP_N / recmatsize_u$rp_size_theiler
+
+    if(length(lineMeasures_upper$RR)==0){lineMeasures_upper$RR<-0}
+
+
+    SING_u <- rp_lineDist(RMu,
+                          DLmin = 1, DLmax = DLmax,
+                          VLmin = 1, VLmax = VLmax,
+                          HLmin = 1, HLmax = HLmax,
+                          theiler = theiler, AUTO = AUTO)
+
+    lineMeasures_upper$SING_N  <-  table(SING_u$diagonals.dist)[1]
+
+    rm(RMu, recmatsize_u, SING_u)
+
+    RMl <- RM
+    RMl[upper.tri(RMl)] <- 0
+
+    recmatsize_l <- rp_size(RMl, AUTO = AUTO, theiler = theiler)
+
+    lineMeasures_lower <- rp_calc_lineMeasures(RM = RMl,
+                                               RP_N = RP_N,
+                                               DLmin = DLmin, DLmax = DLmax,
+                                               VLmin = VLmin, VLmax = VLmax,
+                                               HLmin = HLmin, HLmax = HLmax,
+                                               theiler = theiler,
+                                               AUTO = AUTO,
+                                               chromatic = chromatic,
+                                               matrices = FALSE)
+
+
+    # Total nr. recurrent points in lower
+    lineMeasures_lower$RP_N <- Matrix::nnzero(RMl, na.counted = FALSE)
+
+    #Proportion recurrence / Recurrence Rate in lower
+    lineMeasures_lower$RR <- lineMeasures_lower$RP_N / recmatsize_l$rp_size_theiler
+
+    if(length(lineMeasures_lower$RR)==0){lineMeasures_lower$RR<-0}
+
+    SING_l <- rp_lineDist(RMl,
+                          DLmin = 1, DLmax = DLmax,
+                          VLmin = 1, VLmax = VLmax,
+                          HLmin = 1, HLmax = HLmax,
+                          theiler = theiler, AUTO = AUTO)
+
+    lineMeasures_lower$SING_N  <-  table(SING_l$diagonals.dist)[1]
+    rm(RMl,SING_l)
+
+    # RATIOs
+    out_ul_ani <- data.frame(
+      Npoints_ul_ani = (lineMeasures_upper$RP_N   - lineMeasures_lower$RP_N)   / (lineMeasures_upper$RP_N   + lineMeasures_lower$RP_N),
+      NDlines_ul_ani = ((lineMeasures_upper$N_dlp - lineMeasures_lower$N_dlp)  / (lineMeasures_upper$N_dlp  + lineMeasures_lower$N_dlp))%00%NA,
+      NHlines_ul_ani = ((lineMeasures_upper$N_hlp - lineMeasures_lower$N_hlp)  / (lineMeasures_upper$N_hlp  + lineMeasures_lower$N_hlp))%00%NA,
+      NVlines_ul_ani = ((lineMeasures_upper$N_vlp - lineMeasures_lower$N_vlp)  / (lineMeasures_upper$N_vlp  + lineMeasures_lower$N_vlp))%00%NA,
+      RR_ul_ani      = ((lineMeasures_upper$RR    - lineMeasures_lower$RR)     / (lineMeasures_upper$RR     + lineMeasures_lower$RR))%00%NA,
+      SING_N_ul_ani  = (lineMeasures_upper$SING_N - lineMeasures_lower$SING_N) / (lineMeasures_upper$SING_N + lineMeasures_lower$SING_N),
+      DIV_ul_ani     = (lineMeasures_upper$DIV_dl - lineMeasures_lower$DIV_dl) / (lineMeasures_upper$DIV_dl + lineMeasures_lower$DIV_dl),
+      REP_ul_ani     = (lineMeasures_upper$REP_av - lineMeasures_lower$REP_av) / (lineMeasures_upper$REP_av + lineMeasures_lower$REP_av),
+      DET_ul_ani     = (lineMeasures_upper$DET    - lineMeasures_lower$DET)    / (lineMeasures_upper$DET    + lineMeasures_lower$DET),
+      LAM_hl_ul_ani  = (lineMeasures_upper$LAM_hl - lineMeasures_lower$LAM_hl) / (lineMeasures_upper$LAM_hl + lineMeasures_lower$LAM_hl),
+      LAM_vl_ul_ani  = (lineMeasures_upper$LAM_vl - lineMeasures_lower$LAM_vl) / (lineMeasures_upper$LAM_vl + lineMeasures_lower$LAM_vl),
+      MEAN_dl_ul_ani = (lineMeasures_upper$MEAN_dl- lineMeasures_lower$MEAN_dl)/ (lineMeasures_upper$MEAN_dl+ lineMeasures_lower$MEAN_dl),
+      MEAN_hl_ul_ani = (lineMeasures_upper$TT_hl  - lineMeasures_lower$TT_hl)  / (lineMeasures_upper$TT_hl  + lineMeasures_lower$TT_hl),
+      MEAN_vl_ul_ani = (lineMeasures_upper$TT_vl  - lineMeasures_lower$TT_vl)  / (lineMeasures_upper$TT_vl  + lineMeasures_lower$TT_vl),
+      MAX_dl_ul_ani  = (lineMeasures_upper$MAX_dl - lineMeasures_lower$MAX_dl) / (lineMeasures_upper$MAX_dl + lineMeasures_lower$MAX_dl),
+      MAX_hl_ul_ani  = (lineMeasures_upper$MAX_hl - lineMeasures_lower$MAX_hl) / (lineMeasures_upper$MAX_hl + lineMeasures_lower$MAX_hl),
+      MAX_vl_ul_ani  = (lineMeasures_upper$MAX_vl - lineMeasures_lower$MAX_vl) / (lineMeasures_upper$MAX_vl + lineMeasures_lower$MAX_vl),
+      ENT_dl_ul_ani  = (lineMeasures_upper$ENT_dl - lineMeasures_lower$ENT_dl) / (lineMeasures_upper$ENT_dl + lineMeasures_lower$ENT_dl),
+      ENT_hl_ul_ani  = (lineMeasures_upper$ENT_hl - lineMeasures_lower$ENT_hl) / (lineMeasures_upper$ENT_hl + lineMeasures_lower$ENT_hl),
+      ENT_vl_ul_ani  = (lineMeasures_upper$ENT_vl - lineMeasures_lower$ENT_vl) / (lineMeasures_upper$ENT_vl + lineMeasures_lower$ENT_vl)
+    )
+
+
+  }
+
+  #Output
+  out_global <- data.frame(emRad      = emRad,
+                           RP_max     = recmatsize$rp_size_theiler,
+                           RR         = RR,
+                           SING_N     = SING_N,
+                           SING_rate  = SING_rate)
+
+
+  if(asymmetryUL){
+    out_UL <- data.frame(upper.tri = lineMeasures_upper,
+                         lower.tri = lineMeasures_lower,
+                         ratios.ul = out_ul_ani)
+  } else {
+    out_UL <- NA
+  }
+
+  if(anisotropyHV){
+    out_HL <- rbind(ratios.hl = out_hv_ani)
+  } else {
+    out_HL <- NA
+  }
+
+  out <- as.data.frame(list(out_global, lineMeasures_global, out_UL, out_HL)[c(TRUE, TRUE, asymmetryUL, anisotropyHV)])
+
+  if(matrices){
+    return(list(crqaMeasures = out,
+                crqaMatrices = lineMatrices_global)
+    )
+  } else {
+    return(out)
+  }
+}
+
+
+rp_calc_lineMeasures <- function(RM,
+                                 RP_N,
+                                 DLmin = 2,
+                                 VLmin = 2,
+                                 HLmin = 2,
+                                 DLmax = length(Matrix::diag(RM)),
+                                 VLmax = length(Matrix::diag(RM)),
+                                 HLmax = length(Matrix::diag(RM)),
+                                 d         = NULL,
+                                 theiler   = NULL,
+                                 invert    = FALSE,
+                                 AUTO      = NULL,
+                                 chromatic = FALSE,
+                                 matrices  = FALSE){
 
   #Get line segments
-  if(Matrix::nnzero(RM))
-    lineSegments <- rp_lineDist(RM,
-                                DLmin = DLmin, DLmax = DLmax,
-                                VLmin = VLmin, VLmax = VLmax,
-                                HLmin = HLmin, HLmax = HLmax,
-                                theiler = theiler, AUTO = AUTO)
+  # if(Matrix::nnzero(RM)>0)
+  lineSegments <- rp_lineDist(RM,
+                              DLmin = DLmin, DLmax = DLmax,
+                              VLmin = VLmin, VLmax = VLmax,
+                              HLmin = HLmin, HLmax = HLmax,
+                              d = d, theiler = theiler,
+                              invert = invert, AUTO = AUTO,
+                              chromatic = chromatic,
+                              matrices = matrices)
 
   dlines <- lineSegments$diagonals.dist
   vlines <- lineSegments$verticals.dist
@@ -2651,9 +3103,9 @@ rp_calc <- function(RM,
   freqvec_hl <- as.numeric(names(freq_hl))
 
   # Number of lines
-  N_dl <- sum(freq_dl, na.rm = TRUE)
-  N_vl <- sum(freq_vl, na.rm = TRUE)
-  N_hl <- sum(freq_hl, na.rm = TRUE)
+  N_dl <- sum(freq_dl, na.rm = TRUE)%00%0
+  N_vl <- sum(freq_vl, na.rm = TRUE)%00%0
+  N_hl <- sum(freq_hl, na.rm = TRUE)%00%0
 
   #Number of recurrent points on diagonal, vertical and horizontal lines
   N_dlp <- sum(freqvec_dl*freq_dl, na.rm = TRUE)
@@ -2664,24 +3116,6 @@ rp_calc <- function(RM,
   DET    <- N_dlp/RP_N
   LAM_vl <- N_vlp/RP_N
   LAM_hl <- N_hlp/RP_N
-
-  #anisotropy ratio
-  #ANI    <- ((N_vlp-N_hlp)/N_dlp)%00%NA
-  ANI     <- (N_vlp/N_hlp)%00%NA
-  CPR_U <- sum(RM[upper.tri(RM)])/sum(RM[lower.tri(RM)])
-  CPR_L <- sum(RM[lower.tri(RM)])/sum(RM[upper.tri(RM)])
-
-  # Singularities
-  SING <- rp_lineDist(RM,
-                      DLmin = 1, DLmax = DLmax,
-                      VLmin = 1, VLmax = VLmax,
-                      HLmin = 1, HLmax = HLmax,
-                      theiler = theiler, AUTO = AUTO)
-
-  # table(SING_N$verticals.dist)
-  # table(SING_N$horizontals.dist)
-  SING_N  <-  table(SING$diagonals.dist)[1]
-  SING_rate <- SING_N / RP_N
 
   #Array of probabilities that a certain line length will occur (all >1)
   P_dl <- freq_dl/N_dl
@@ -2699,17 +3133,17 @@ rp_calc <- function(RM,
   ENTrel_hl = ENT_hl/(-1 * log(1/HLmax))
 
   #Meanline
-  MEAN_dl = mean(dlines, na.rm = TRUE)
-  MEAN_vl = mean(vlines, na.rm = TRUE)
-  MEAN_hl = mean(hlines, na.rm = TRUE)
+  MEAN_dl = mean(dlines, na.rm = TRUE)%00%0
+  MEAN_vl = mean(vlines, na.rm = TRUE)%00%0
+  MEAN_hl = mean(hlines, na.rm = TRUE)%00%0
 
   #Maxline
-  MAX_dl = max(freqvec_dl, na.rm = TRUE)
-  MAX_vl = max(freqvec_vl, na.rm = TRUE)
-  MAX_hl = max(freqvec_hl, na.rm = TRUE)
+  MAX_dl = max(freqvec_dl, na.rm = TRUE)%00%0
+  MAX_vl = max(freqvec_vl, na.rm = TRUE)%00%0
+  MAX_hl = max(freqvec_hl, na.rm = TRUE)%00%0
 
   # REPetetiveness
-  REP_av <- ((N_hlp/N_dlp) + (N_vlp/N_dlp))/2
+  REP_av  <- (N_hlp+N_vlp) / N_dlp
   REP_hl  <-  N_hlp/N_dlp
   REP_vl  <-  N_vlp/N_dlp
 
@@ -2723,16 +3157,10 @@ rp_calc <- function(RM,
   DIV_vl = 1/MAX_vl
   DIV_hl = 1/MAX_hl
 
-  #Output
   out <- data.frame(
-    emRad     = emRad,
     RP_N      = RP_N,
-    RR        = RR,
-    SING_N    = SING_N,
-    SING_rate = SING_rate,
     DIV_dl    = DIV_dl,
     REP_av    = REP_av,
-    ANI       = ANI,
     N_dl      = N_dl,
     N_dlp     = N_dlp,
     DET       = DET,
@@ -2750,7 +3178,6 @@ rp_calc <- function(RM,
     ENTrel_vl = ENTrel_vl,
     CoV_vl    = CoV_vl,
     REP_vl    = REP_vl,
-    #    DIV_vl   = DIV_vl,
     N_hlp     = N_hlp,
     N_hl      = N_hl,
     LAM_hl    = LAM_hl,
@@ -2760,7 +3187,6 @@ rp_calc <- function(RM,
     ENTrel_hl = ENTrel_hl,
     CoV_hl    = CoV_hl,
     REP_hl    = REP_hl)
-  #    DIV_hl   = DIV_hl)
 
   if(matrices){
     return(list(
@@ -2777,6 +3203,7 @@ rp_calc <- function(RM,
     return(out)
   }
 }
+
 
 
 #' Prepare matrix
