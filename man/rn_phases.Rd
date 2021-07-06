@@ -25,11 +25,11 @@ rn_phases(
 \arguments{
 \item{RN}{A matrix produced by the function \link{rn}}
 
-\item{maxPhases}{The maximum number of phases to extract. Use \code{NA} to extract all potential phases (default = \code{5})}
+\item{maxPhases}{The maximum number of phases to extract. If \code{NA}, the value will be set to \code{NROW(RN)}  (default = \code{5})}
 
 \item{minStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases do not have a minimum number of \code{minStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{1})}
 
-\item{maxStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases exceeds a maximum number of \code{maxStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{floor(NROW(RN)/maxPhases)})}
+\item{maxStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases exceeds a maximum number of \code{maxStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{NROW(RN)})}
 
 \item{removeSingularities}{Will remove states that recur only once (nodes with \code{degree(g) == 1}) (default = \code{FALSE})}
 

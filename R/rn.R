@@ -543,9 +543,9 @@ rn_recSpec <- function(RN,
 #'
 #' @inheritParams make_spiral_graph
 #' @param RN A matrix produced by the function [rn]
-#' @param maxPhases The maximum number of phases to extract. Use `NA` to extract all potential phases (default = `5`)
+#' @param maxPhases The maximum number of phases to extract. If `NA`, the value will be set to `NROW(RN)`  (default = `5`)
 #' @param minStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases do not have a minimum number of `minStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `1`)
-#' @param maxStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases exceeds a maximum number of `maxStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `floor(NROW(RN)/maxPhases)`)
+#' @param maxStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases exceeds a maximum number of `maxStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `NROW(RN)`)
 #' @param removeSingularities Will remove states that recur only once (nodes with `degree(g) == 1`) (default = `FALSE`)
 #' @param doPhasePlot Produce a plot with the extracted phases (default = `TRUE`)
 #' @param phaseColours Colours for the different phases in the phase plot. If `epochColours` also has a value, `phaseColours` will be used instead (default = `NULL`)
@@ -651,7 +651,7 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
     names(phases)[i] <- paste("Phase",i)
 
     if(i > 1){
-      if(any(i>NROW(RN_nodes), i==maxPhases, NROW(tmp_edges)==0, nodeID[[i]]==nodeID[[i-1]])){
+      if(any(i>=NROW(RN_nodes), i==maxPhases, NROW(tmp_edges)==0, nodeID[[i]]==nodeID[[i-1]])){
         last <- TRUE
         break
       }
@@ -712,7 +712,7 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
 
   # Check if we missed some recurrent states due to the stopping parameters and create an "Other" category
   ltime <- seq(1,igraph::vcount(gRN))[!seq(1,igraph::vcount(gRN))%in%sort(out$states_time)]
-  ltime <- ltime[!ltime%in%Singularities$time]
+  #ltime <- ltime[!ltime%in%Singularities$time]
   # These time points could contain non-recurring points, i.e. distance 0 to all other points
   ltime <- ltime[plyr::laply(ltime, function(p) sum(RN[1:NCOL(RN),p]))>0]
 
@@ -734,7 +734,7 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
 
   # Finally add the nonrecurring states
   norec <- seq(1,igraph::vcount(gRN))[!seq(1,igraph::vcount(gRN))%in%sort(out$states_time)]
-  norec <- norec[!norec%in%Singularities$time]
+  #norec <- norec[!norec%in%Singularities$time]
 
   if(NROW(norec)!=0){
     empty <- data.frame(matrix(NA,nrow=NROW(norec),ncol=NCOL(out),dimnames = list(NULL,colnames(out))))
@@ -911,10 +911,12 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
   mp <- NA
   if(doMatrixPlot){
 
+    df$freq <- signif(df$freq,3)
+    df$labels <- ifelse(is.na(df$freq),"0", df$freq)
     mp <-  ggplot(df, aes_(x = ~to_name,
                           y = ~from_name)) +
       geom_tile(aes_(fill = ~freq),colour = "black",size = 0.4) +
-      geom_text(aes_(label = ifelse(is.na(~freq),"0",signif(~freq,3)))) +
+      geom_text(aes_(label = ~labels)) +
       scale_fill_gradient(low = "#ECE3CD",
                           high = "#A65141",
                           na.value = "grey",
