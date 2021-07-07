@@ -14,7 +14,7 @@ rp(
   includeDiagonal = NA,
   to.ts = NULL,
   order.by = NULL,
-  to.sparse = FALSE,
+  to.sparse = TRUE,
   weighted = FALSE,
   weightedBy = "si",
   method = "Euclidean",

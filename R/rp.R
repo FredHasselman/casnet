@@ -58,7 +58,7 @@ rp <- function(y1, y2 = NULL,
                includeDiagonal = NA,
                to.ts = NULL,
                order.by = NULL,
-               to.sparse = FALSE,
+               to.sparse = TRUE,
                weighted = FALSE,
                weightedBy = "si",
                method = "Euclidean",
@@ -169,7 +169,7 @@ rp <- function(y1, y2 = NULL,
   }
 
   dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
-  dmat <- setTheiler(RM = dmat, theiler = theiler)
+  suppressMessages(dmat <- setTheiler(RM = dmat, theiler = theiler))
 
   if(returnMeasures){
     rpOut <-  rp_measures(RM = dmat, emRad = emRad%00%NA, silent = silent, theiler = theiler, includeDiagonal = includeDiagonal, chromatic = chromatic)
@@ -205,6 +205,8 @@ rp <- function(y1, y2 = NULL,
     attr(dmat,"weightedBy") <- weightedBy
     attr(dmat,"chromatic") <- chromatic
   }
+
+  if(is.null(attributes(dmat))){stop("lost attributes")}
 
   if(doPlot){
 
@@ -1954,7 +1956,7 @@ rp_lineDist <- function(RM,
 #' @param target Target matrix
 #' @param source_remove Remove these attribute fields from the source before copying.
 #'
-#' @return The target matrix with attributes copied deom the source matrix.
+#' @return The target matrix with attributes copied from the source matrix.
 #' @export
 #'
 rp_copy_attributes <- function(source, target, source_remove = c("names", "row.names", "class","dim", "dimnames","x")){
@@ -1993,6 +1995,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 
   if(checkS4){
     yesS4 <- isS4(RM)
+
   }
   if(!yesS4&fixS4){
     RM <- Matrix::Matrix(RM)
@@ -2087,6 +2090,7 @@ rp_plot <- function(RM,
 
   if(is.null(attr(RM,"chromatic"))){
     chromatic <- FALSE
+    attr(RM,"chromatic") <- chromatic
   } else {
     chromatic <- attr(RM,"chromatic")
   }
@@ -2444,6 +2448,7 @@ rp_plot <- function(RM,
 
 
     } else {
+      warning("No atrribute with dimensions!")
       if(unthresholded){
         y1 <- data.frame(Value=diag(RM),x=1:length(diag(RM)), Dimension = rep("LOS",length(diag(RM))))
         y2 <- data.frame(Value=diag(RM),x=1:length(diag(RM)), Dimension = rep("LOS",length(diag(RM))))
@@ -2732,6 +2737,10 @@ rp_plot <- function(RM,
 #' rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
 rp_size <- function(RM, AUTO=NULL, theiler = NULL){
 
+  if(is.null(AUTO)){
+      AUTO <- Matrix::isSymmetric(RM)
+    }
+
   if(is.null(theiler)){
     if(is.null(attributes(RM)$theiler)){
       if(AUTO){
@@ -2748,7 +2757,7 @@ rp_size <- function(RM, AUTO=NULL, theiler = NULL){
   minDiag <- 0
 
   if(is.na(theiler)){
-    if(attributes(RM)$AUTO){
+    if(AUTO){
       theiler <- 1
     } else {
       theiler <- 0

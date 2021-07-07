@@ -277,8 +277,13 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
   #   if(!silent){message(paste0("lower and upper are both 0 (no band, just diagonal)\n using: diag(mat) <- ",round(value,4),"..."))}
   # }
 
+  tmp <- mat
   delta <- col(mat)-row(mat)
-  mat[delta >= lower & delta <= upper] <- value
+  indc  <- delta >= lower & delta <= upper
+  mat[indc] <- value
+  mat <- as(mat, "dgCMatrix")
+  mat <- rp_copy_attributes(source = tmp, target = mat, source_remove = c("names", "row.names", "class","dim", "dimnames","x","i","p"))
+  rm(tmp)
 
   return(mat)
 }

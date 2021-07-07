@@ -18,7 +18,7 @@ rp_copy_attributes(
 \item{source_remove}{Remove these attribute fields from the source before copying.}
 }
 \value{
-The target matrix with attributes copied deom the source matrix.
+The target matrix with attributes copied from the source matrix.
 }
 \description{
 Simple attribute copy used in \code{casnet} to convert between \code{matrix} and \code{Matrix} classes and back.
