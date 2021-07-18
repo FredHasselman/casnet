@@ -155,6 +155,9 @@ as.numeric_character <- function(x, sortUnique = FALSE, keepNA = FALSE){
 #'
 as.numeric_discrete <- function(x, keepNA = FALSE, sortUnique = FALSE){
 
+  idNA <- is.na(x)
+  x <- x[!idNA]
+
   if(is.date(x)){
     x <- as.character(x)
   }
@@ -187,7 +190,16 @@ as.numeric_discrete <- function(x, keepNA = FALSE, sortUnique = FALSE){
       stop("Variable is not a factor, character vector, or, unnamed numeric vector.")
     }
   } # discrete
-  return(y)
+
+  if(keepNA){
+    tmp <- rep(NA,length(idNA))
+    tmp[!idNA] <- y
+    names(tmp)[!idNA] <- names(y)
+    names(tmp)[idNA] <- NA
+    return(tmp)
+  } else {
+    return(y)
+  }
 }
 
 #' It's a Date!

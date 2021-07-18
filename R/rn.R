@@ -542,6 +542,7 @@ rn_recSpec <- function(RN,
 #'
 #'
 #' @inheritParams make_spiral_graph
+#' @inheritParams fd_dfa
 #' @param RN A matrix produced by the function [rn]
 #' @param maxPhases The maximum number of phases to extract. If `NA`, the value will be set to `NROW(RN)`  (default = `5`)
 #' @param minStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases do not have a minimum number of `minStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `1`)
@@ -577,7 +578,6 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
 
   checkPkg("igraph")
   checkPkg("invctr")
-  require(invctr)
 
   if(!attributes(RN)$weighted){
     stop("RN has to be a weighted recurrence network.")
@@ -640,9 +640,9 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
     nodeID[[i]]    <- tmp_nodes$time[which.max(tmp_nodes$strength)]
     strengths[[i]] <- tmp_nodes$strength[which.max(tmp_nodes$strength)]
 
-    tmp_edges      <- RN_edges %>% dplyr::filter(from==nodeID[[i]]|to==nodeID[[i]])
+    tmp_edges      <- RN_edges %>% dplyr::filter(.data$from==nodeID[[i]]|.data$to==nodeID[[i]])
     if(i > 1){
-      tmp_edges   <- tmp_edges %>% dplyr::filter(!((from%in%as.numeric(unlist(phases[1:(i-1)])))|(to%in%as.numeric(unlist(phases[1:(i-1)])))))
+      tmp_edges   <- tmp_edges %>% dplyr::filter(!((.data$from%in%as.numeric(unlist(phases[1:(i-1)])))|(.data$to%in%as.numeric(unlist(phases[1:(i-1)])))))
     }
 
     phases[[i]] <- unique(c(tmp_edges$from,tmp_edges$to))
@@ -759,18 +759,19 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
 
     }
 
-  out <- dplyr::arrange(out,states_time)
+  out <- out %>% dplyr::arrange(.data$states_time)
 
+  gg <- pp <- NA
   # Plots
   if(any(doPhasePlot,doSpiralPlot)){
 
     out_long <- tidyr::pivot_longer(out, cols = (("states_dist2maxState"%ci%out)+1):NCOL(out), names_to = "Dimension", values_to = "Value")
 
     if(excludeOther){
-      out_long <- out_long %>% dplyr::filter(phase_name != "Other")
+      out_long <- out_long %>% dplyr::filter(.data$phase_name != "Other")
     }
     if(excludeNorec){
-      out_long <- out_long %>% dplyr::filter(phase_name != "No recurrence")
+      out_long <- out_long %>% dplyr::filter(.data$phase_name != "No recurrence")
     }
 
     out_long <- dplyr::arrange(out_long, as.numeric(out_long$phase_number))
@@ -779,9 +780,9 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
     out_long$phaseName <- paste(out_long$phase_name,"  |  N =",out_long$phase_size)
     out_long$phaseName <- factor(out_long$phaseName,unique(out_long$phaseName), ordered = TRUE)
     suppressWarnings(out_long <- out_long %>%
-                       dplyr::group_by(phase_name) %>%
-                       dplyr::mutate(alpha = elascer(states_strength, lo = .1, hi = 1, keepNA = TRUE),
-                                     psize = elascer(states_strength, lo = .5, hi = 3, keepNA = TRUE)))
+                       dplyr::group_by(.data$phase_name) %>%
+                       dplyr::mutate(alpha = elascer(.data$states_strength, lo = .1, hi = 1, keepNA = TRUE),
+                                     psize = elascer(.data$states_strength, lo = .5, hi = 3, keepNA = TRUE)))
 
     if(!is.null(phaseColours)){
       epochColours <- phaseColours
@@ -790,11 +791,12 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
       }
     }
     if(is.null(epochColours)){
-      epochColours <- getColours(length(unique(out$phase_name)))
+      epochColours <- getColours(length(sort(unique(out$phase_name))))
     }
     if(is.null(names(epochColours))){
-      names(epochColours) <- unique(out_long$phase_name)
+      names(epochColours) <- sort(unique(out$phase_name))
     }
+
 
     if(doSpiralPlot){
 
@@ -811,14 +813,11 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
                                       epochLabel = "Phase")
 
       print(gg)
-    } else {
-      gg <- NA
     }
 
+
+
     if(doPhasePlot){
-
-
-
       pp <- ggplot(data = out_long,
                    aes_(x = ~Dimension,
                        y = ~Value,
@@ -827,7 +826,7 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
                        group = ~states_time)) +
         scale_size_identity() +
         scale_alpha_identity() +
-        geom_point(aes(size = psize)) +
+        geom_point(aes_(size = ~psize)) +
         geom_line()+
         scale_color_manual(values = epochColours) +
         theme_bw() +
@@ -836,9 +835,6 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
         coord_flip()
 
       print(pp)
-
-    } else {
-      pp <- NA
     }
 
   }
@@ -869,6 +865,10 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
 #'
 #' @examples
 #'
+#' # This will output the transition matrix, a plot of the matrix and a transition network plot.
+#' y <- c("Happy", "Happy", "Sad", "Neutral", "Neutral", "Angry", "Sad", "Sad", "Neutral")
+#' TM <- rn_transition(y)
+#'
 #' @author Fred Hasselman
 #' @author Matti Heino
 #'
@@ -889,12 +889,12 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
   df <- data.frame(from = dplyr::lag(phaseSequence,1), to =  phaseSequence,
                    from_name = dplyr::lag(phase_names,1), to_name = phase_names) %>%
     dplyr::slice(-1) %>%
-    dplyr::group_by(from, to) %>%
-    dplyr::summarise(n = n(),
-                     from_name = dplyr::first(from_name),
-                     to_name = dplyr::first(to_name)) %>%
-    dplyr::mutate(freq = (n / sum(n))) %>%
-    dplyr::select(-n)
+    dplyr::group_by(.data$from, .data$to) %>%
+    dplyr::summarise(N = dplyr::n(),
+                     from_name = dplyr::first(.data$from_name),
+                     to_name = dplyr::first(.data$to_name)) %>%
+    dplyr::mutate(freq = (.data$N / sum(.data$N, na.rm = TRUE))) %>%
+    dplyr::select(-.data$N)
 
   if(!is.na(threshold)){
     df$freq[df$freq<=threshold] <- 0
@@ -957,9 +957,10 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
 
   }
 
+
   if(returnGraph){
     list(TransitionMatrix = TM,
-         MatrixPlot = pp,
+         MatrixPlot = mp,
          TransitionNetwork = gg)[TRUE,doMatrixPlot,doNetworkPlot]
   } else {
     return(TM)

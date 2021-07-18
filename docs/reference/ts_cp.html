@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>casnet: A Toolbox for Studying Complex Adaptive Systems and Networks — casnet-package • casnet</title>
+<title>Change Profile — ts_cp • casnet</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,9 +46,8 @@
 
 
 
-<meta property="og:title" content="casnet: A Toolbox for Studying Complex Adaptive Systems and Networks — casnet-package" />
-<meta property="og:description" content="
-A collection of analytic tools for studying signals recorded from complex adaptive systems or networks: (Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA). Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum). Network based time series analyses and visualisation (Recurrence Networks, spiral graphs). Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks)." />
+<meta property="og:title" content="Change Profile — ts_cp" />
+<meta property="og:description" content="Change Profile" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -138,34 +137,44 @@ A collection of analytic tools for studying signals recorded from complex adapti
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>casnet: A Toolbox for Studying Complex Adaptive Systems and Networks</h1>
-    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/casnet-package.r'><code>R/casnet-package.r</code></a></small>
-    <div class="hidden name"><code>casnet-package.Rd</code></div>
+    <h1>Change Profile</h1>
+    <small class="dont-index">Source: <a href='https://github.com/FredHasselman/casnet/blob/master/R/ts.R'><code>R/ts.R</code></a></small>
+    <div class="hidden name"><code>ts_cp.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><img src='figures/logo.png' align='right' alt='logo' width='120' /></p>
-<p>A collection of analytic tools for studying signals recorded from complex adaptive systems or networks: (Cross) Recurrence Quantification Analyses (Continuous and Categorical (C)RQA, Chromatic RQA, Anisotropic RQA). Fluctuation Analyses (DFA, PSD slope, SDA, Multifractal DFA, Wavelet Singularity Spectrum). Network based time series analyses and visualisation (Recurrence Networks, spiral graphs). Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks).</p>
+    <p>Change Profile</p>
     </div>
 
+    <pre class="usage"><span class='fu'>ts_cp</span><span class='op'>(</span><span class='va'>y</span>, <span class='va'>win</span>, align <span class='op'>=</span> <span class='st'>"right"</span>, keepNA <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>y</th>
+      <td><p>Time series</p></td>
+    </tr>
+    <tr>
+      <th>win</th>
+      <td><p>A window in which</p></td>
+    </tr>
+    <tr>
+      <th>align</th>
+      <td><p>Alignment of the window, see <code><a href='https://rdrr.io/pkg/zoo/man/rollapply.html'>zoo::rollapply()</a></code> (default = <code>"right"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>keepNA</th>
+      <td><p>Remove <code>NA</code> or return <code>y</code> with <code>NA</code> (default = <code>TRUE</code>)</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <div class='dont-index'><p>Useful links:</p><ul>
-<li><p><a href='https://github.com/FredHasselman/casnet'>https://github.com/FredHasselman/casnet</a></p></li>
-<li><p>Report bugs at <a href='https://github.com/FredHasselman/casnet/issues'>https://github.com/FredHasselman/casnet/issues</a></p></li>
-</ul>
+    <p>Transformed time series</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-</div>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p><strong>Maintainer</strong>: Fred Hasselman <a href='mailto:fred.hasselman@ru.nl'>fred.hasselman@ru.nl</a> (<a href='https://orcid.org/0000-0003-1384-8361'>ORCID</a>) [copyright holder]</p>
-<p>Other contributors:</p><ul>
-<li><p>Merlijn Olthof <a href='mailto:m.olthof@pwo.ru.nl'>m.olthof@pwo.ru.nl</a> [contributor]</p></li>
-</ul>
-
-
+    <p>Hasselman, F. and Bosman, A.M.T. (2020). Studying Complex Adaptive Systems With Internal States: A Recurrence Network Approach to the Analysis of Multivariate Time-Series Data Representing Self-Reports of Human Experience. Frontiers of Applied Mathematics and Statistics, 6:9. doi: 10.3389/fams.2020.00009</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

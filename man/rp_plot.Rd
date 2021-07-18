@@ -12,6 +12,7 @@ rp_plot(
   plotRadiusRRbar = TRUE,
   drawGrid = FALSE,
   drawDiagonal = TRUE,
+  drawNA = FALSE,
   markEpochsLOI = NULL,
   radiusValue = NA,
   title = "",
@@ -35,6 +36,8 @@ rp_plot(
 \item{drawGrid}{Draw a grid on the recurrence plot (default = \code{FALSE})}
 
 \item{drawDiagonal}{One usually omits the main diagonal, the Line Of Incidence (LOI) from the calculation of Auto-RQA measures., it is however common to plot it. Set to \code{FALSE} to omit the LOI from an Auto-Recurrence Plot (default = \code{TRUE})}
+
+\item{drawNA}{Draw \code{NA} values in the recurrence plot? If \code{FALSE} then \code{NA} values will be considered non-recurring (default = \code{FALSE})}
 
 \item{markEpochsLOI}{Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (default = \code{NULL})}
 

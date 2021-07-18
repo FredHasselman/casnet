@@ -26,6 +26,3 @@ The matrix with the diagonals indicated in the \code{theiler} argument set to ei
 \description{
 Set theiler window on a distance matrix or recurrence matrix.
 }
-\examples{
-
-}

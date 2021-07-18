@@ -106,10 +106,10 @@
       <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
+      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
-      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -155,13 +155,12 @@
   D <span class='op'>=</span> <span class='cn'>NA</span>,
   fs <span class='op'>=</span> <span class='cn'>NULL</span>,
   transformBefore <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  standardise <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
-  detrend <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  removeTrend <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"no"</span>, <span class='st'>"poly"</span>, <span class='st'>"adaptive"</span>, <span class='st'>"bridge"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
   polyOrder <span class='op'>=</span> <span class='fl'>1</span>,
+  standardise <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
   adjustSumOrder <span class='op'>=</span> <span class='cn'>FALSE</span>,
   scaleMin <span class='op'>=</span> <span class='fl'>1</span>,
   scaleMax <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>10</span><span class='op'>)</span>,
-  scaleDiff <span class='op'>=</span> <span class='fl'>1</span>,
   scaleS <span class='op'>=</span> <span class='cn'>NA</span>,
   overlap <span class='op'>=</span> <span class='fl'>0</span>,
   minData <span class='op'>=</span> <span class='fl'>4</span>,
@@ -211,12 +210,16 @@
       <td><p>Detrend/standardise before coarse graining. If set to <code>FALSE</code>, each coarsegrained series will be detrended/standardised separately (default = <code>TRUE</code>)</p></td>
     </tr>
     <tr>
-      <th>standardise</th>
-      <td><p>Standardise by the series using <code><a href='ts_standardise.html'>ts_standardise()</a></code> with <code>adjustN = FALSE</code> (default = "mean.sd")</p></td>
+      <th>removeTrend</th>
+      <td><p>Method to use for detrending (default = "poly")</p></td>
     </tr>
     <tr>
       <th>polyOrder</th>
       <td><p>Order of polynomial trend to remove if <code>removeTrend = "poly"</code></p></td>
+    </tr>
+    <tr>
+      <th>standardise</th>
+      <td><p>Standardise by the series using <code><a href='ts_standardise.html'>ts_standardise()</a></code> with <code>adjustN = FALSE</code> (default = "mean.sd")</p></td>
     </tr>
     <tr>
       <th>adjustSumOrder</th>
@@ -231,10 +234,6 @@
       <td><p>Maximum scale (as a power of 2) to use</p></td>
     </tr>
     <tr>
-      <th>scaleDiff</th>
-      <td><p>Steps between scaleMin and scaleMax (default = <code>1</code>)</p></td>
-    </tr>
-    <tr>
       <th>scaleS</th>
       <td><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> will be ignored.</p></td>
     </tr>
@@ -245,6 +244,10 @@
     <tr>
       <th>minData</th>
       <td><p>Minimum number of data points in a bin needed to calculate detrended fluctuation</p></td>
+    </tr>
+    <tr>
+      <th>relativeEntropy</th>
+      <td><p>The relative entropy, SampEn / (-1 * log(1/length(y))) will be returned (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>doPlot</th>
@@ -281,7 +284,7 @@
     <p>MSE</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The transformation settings (detrending and/or normalisation) and <code>transformBefore</code> will determine the value of the product r x D if <code>D = NA</code>.</p>
+    <p>The transformation settings (detrending and/or normalisation), <code>transformBefore</code> will determine the value of the product r x D if <code>D = NA</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other Information based complexity measures: 

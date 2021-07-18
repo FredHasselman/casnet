@@ -35,6 +35,7 @@
   for(p in c("grDevices","graphics","ggtable","stats","utils","Matrix","plyr","dplyr","tidyr","ggplot2","invctr","igraph")){
     requireNamespace(p, quietly = TRUE)
   }
+  requireNamespace("invctr")
   invisible()
 }
 

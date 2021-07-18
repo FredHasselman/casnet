@@ -454,7 +454,7 @@ var_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrd
 
   for(column in (1:NCOL(df))){
     for (i in (0:(nrow(df)-win))){
-      df_var[(i+win), column] <- var(df[(i+1):(i+win), column], na.rm = TRUE)
+      df_var[(i+win), column] <- stats::var(df[(i+1):(i+win), column], na.rm = TRUE)
     }
   }
 
@@ -522,8 +522,8 @@ ac_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrde
     for (i in (0:(nrow(df)-win))){
       x <- (df[(i+1):(i+win), column])
 
-      y <- acf(x, lag.max=1, plot=FALSE)
-      y2 <- unique(rapply(y, function(a) head(a,2)))
+      y <- stats::acf(x, lag.max=1, plot=FALSE)
+      y2 <- unique(rapply(y, function(a) utils::head(a,2)))
       y3 <- as.numeric(y2[2])
       if(is.na(y3)){y3<-1}
 

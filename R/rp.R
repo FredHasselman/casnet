@@ -87,9 +87,23 @@ rp <- function(y1, y2 = NULL,
     if(any(is.data.frame(y1),is.data.frame(y2))){
       stop("Multidimensional Chromatic RQA has not been invented (yet)!")
     }
-    uniqueID <- as.numeric_discrete(c(y1,y2))
+    uniqueID <- as.numeric_discrete(x = c(y1,y2), sortUnique = TRUE, keepNA = TRUE)
     y1  <- uniqueID[1:length(y1)]
     y2  <- uniqueID[(length(y2)+1):length(uniqueID)]
+
+    chromaDims <- list(y1 = uniqueID[1:length(y1)],
+                       y2 = uniqueID[(length(y2)+1):length(uniqueID)])
+
+    chromaNames <- unique(uniqueID)
+    nList <- list()
+    for(n in seq_along(chromaNames)){
+      nList[[n]] <- names(uniqueID)[which(uniqueID%in%chromaNames[n])]
+    }
+    names(chromaNames) <- unique(unlist(nList))
+
+  } else {
+    chromaNames <- NA
+    chromaDims  <- NA
   }
 
   if(!is.data.frame(y1)){
@@ -116,8 +130,8 @@ rp <- function(y1, y2 = NULL,
     }
   }
 
-  et1 <- ts_embed(y1, emDim, emLag, silent = silent)
-  et2 <- ts_embed(y2, emDim, emLag, silent = silent)
+  et1 <- ts_embed(y1, emDim=1, emLag=1, silent = silent)
+  et2 <- ts_embed(y2, emDim=1, emLag=1, silent = silent)
 
   dist_method <- return_error(proxy::pr_DB$get_entry(method))
   if("error"%in%class(dist_method$value)){
@@ -168,11 +182,16 @@ rp <- function(y1, y2 = NULL,
     }
   }
 
-  dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE)
+  dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE, checkSPARSE = TRUE, fixSPARSE = TRUE, checkS4 = TRUE, fixS4 = TRUE)
   suppressMessages(dmat <- setTheiler(RM = dmat, theiler = theiler))
 
   if(returnMeasures){
-    rpOut <-  rp_measures(RM = dmat, emRad = emRad%00%NA, silent = silent, theiler = theiler, includeDiagonal = includeDiagonal, chromatic = chromatic)
+    rpOut <-  rp_measures(RM = dmat,
+                          emRad = emRad%00%NA,
+                          silent = silent,
+                          theiler = theiler,
+                          includeDiagonal = includeDiagonal,
+                          chromatic = chromatic)
   } else {
     rpOut <- NA
   }
@@ -190,6 +209,8 @@ rp <- function(y1, y2 = NULL,
     attributes(dmat)$weighted <- weighted
     attributes(dmat)$weightedBy <- weightedBy
     attributes(dmat)$chromatic <- chromatic
+    attributes(dmat)$chromaNames <- chromaNames
+    attributes(dmat)$chromaDims <- chromaDims
   } else {
     attr(dmat,"emDims1") <- et1
     attr(dmat,"emDims2") <- et2
@@ -204,6 +225,8 @@ rp <- function(y1, y2 = NULL,
     attr(dmat,"weighted") <- weighted
     attr(dmat,"weightedBy") <- weightedBy
     attr(dmat,"chromatic") <- chromatic
+    attr(dmat,"chromaNames") <- chromaNames
+    attr(dmat,"chromaDims") <- chromaDims
   }
 
   if(is.null(attributes(dmat))){stop("lost attributes")}
@@ -346,26 +369,36 @@ rp_measures <- function(RM,
     if(chromatic){
 
       # prepare data
-      if(attr(RM,"package")%00%""%in%"Matrix"){
+      if(any(grepl("Matrix",class(RM)))){
         RM     <- rp_checkfix(RM, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
-        meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
+        #meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
+        meltRP <-  mat2ind(Matrix::as.matrix(RM))
       } else {
         meltRP <-  mat2ind(as.matrix(RM))
       }
 
-      chromas <- meltRP %>% dplyr::filter(value!=0)
-      chromas <- as.numeric_discrete(sort(unique(chromas$value)))
-      rm(meltRP)
-
-      if(NROW(chromas)>=(NROW(RM)/2)){
-        warning(paste("Chromatic RQA will have a large number of categories:",NROW(chromas)))
+      if(!is.null(attr(RM,"chromaNames"))){
+        chromaNumbers <- attr(RM,"chromaNames")
+        Cind <- sort(chromaNumbers, index.return = TRUE)
+        chromaNames <- names(chromaNumbers)[Cind$ix]
+        chromaNumbers <- chromaNumbers[Cind$ix]
+      } else {
+        chromas <- meltRP %>% dplyr::filter(.data$value!=0)
+        chromaNumbers <- as.numeric_discrete(sort(unique(chromas$value)))
       }
 
+      chromaNumbers <- stats::na.exclude(chromaNumbers)
+
+      rm(meltRP)
+
+      if(NROW(chromaNumbers)>=(NROW(RM)/2)){
+        warning(paste("Chromatic RQA will have a large number of categories:",NROW(chromaNumbers)))
+      }
 
       chromaList <- list()
       matrixList <- list()
 
-      for(i in seq_along(chromas)){
+      for(i in seq_along(chromaNumbers)){
 
         RMtmp <- RM
         RMtmp[RM!=i] <- 0
@@ -398,9 +431,9 @@ rp_measures <- function(RM,
         rm(RMtmp, tmpOut)
       }
 
-      names(chromaList) <- names(chromas)
+      names(chromaList) <- names(chromaNumbers)
       if(matrices){
-        names(matrixList) <- names(chromas)
+        names(matrixList) <- names(chromaNumbers)
         out <- list(crqaMeasures = plyr::ldply(chromaList, .id = "chroma"),
                     crqaMatrices =  matrixList)
       } else {
@@ -461,6 +494,10 @@ rp_measures <- function(RM,
                                                         `Entropy of lengths` = c(tab$ENT_dl, tab$ENT_vl, tab$ENT_hl),
                                                         `Relative entropy` = c(tab$ENTrel_dl, tab$ENTrel_vl, tab$ENTrel_hl),
                                                         `CoV of lengths`   = c(tab$CoV_dl, tab$CoV_vl, tab$CoV_hl)))
+    if(chromatic){
+    rownames(outTable$`Global Measures`) <- chromaNames
+    rownames(outTable$`Line-based Measures`) <- paste(1:NROW(outTable$`Line-based Measures`), rep(chromaNames, each = 3))
+    }
 
     if(anisotropyHV){
 
@@ -472,6 +509,9 @@ rp_measures <- function(RM,
                                                                     `Mean`    = tab$MEAN_hvl_ani,
                                                                     `Max`     = tab$MAX_hvl_ani,
                                                                     `Entropy of lengths` = tab$ENT_hvl_ani)
+      if(chromatic){
+      rownames(outTable$`Horizontal/Vertical line anisotropy`) <- chromaNames
+      }
     }
 
     if(asymmetryUL){
@@ -499,13 +539,19 @@ rp_measures <- function(RM,
                                    tab$ratios.ul.ENT_vl_ul_ani,
                                    tab$ratios.ul.ENT_hl_ul_ani))
       )
+
+      if(chromatic){
+        id <- which(names(outTable)%in%"Upper/Lower triangle asymmetry")
+        rownames(outTable[[id]]$`Global Measures`) <- chromaNames
+        rownames(outTable[[id]]$`Line-based Measures`) <- paste(1:NROW(outTable[[id]]$`Line-based Measures`), rep(chromaNames, each = 3))
+      }
     }
 
 
     if(!silent){
       cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
       if(chromatic){
-        cat(paste0("Chromatic RQA with categories: ", paste(chromas, collapse = ","),"\n"))
+        cat(paste0("Chromatic RQA with categories: ", paste(chromaNames, collapse = ", "),"\n"))
       }
       cat(paste0("\n",names(outTable)[1],"\n"))
       print(format(outTable$`Global Measures`, digits = 3))
@@ -1373,7 +1419,7 @@ rp_cl            <- function(y1,
     if(wPlot==2){
       if(windowedAnalysis){
         plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1], y2 = df[ind,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE))
-        multi_PLOT(plotList)
+        cowplot::plot_grid(plotList)
       } else {
         rp(y1 = df[,1], y2 = df[,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE)
       }
@@ -1381,7 +1427,7 @@ rp_cl            <- function(y1,
     if(wPlot==3){
       if(windowedAnalysis){
         plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1],y2 = df[ind,2], emDim = emDim, emLag = emLag, doPlot = TRUE))
-        multi_PLOT(plotList)
+        cowplot::plot_grid(plotList)
       } else {
         rp(y1 = df[,1],y2 = df[,2], emDim = emDim, emLag = emLag, doPlot = TRUE)
       }
@@ -1995,10 +2041,10 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 
   if(checkS4){
     yesS4 <- isS4(RM)
-
   }
   if(!yesS4&fixS4){
     RM <- Matrix::Matrix(RM)
+    yesS4 <- isS4(RM)
   }
 
   # check auto-recurrence
@@ -2043,6 +2089,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param plotRadiusRRbar The `Radius-RR-bar` is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of `RR` values one would get if a certain distance threshold were chosen (default = `TRUE`)
 #' @param drawGrid Draw a grid on the recurrence plot (default = `FALSE`)
 #' @param drawDiagonal One usually omits the main diagonal, the Line Of Incidence (LOI) from the calculation of Auto-RQA measures., it is however common to plot it. Set to `FALSE` to omit the LOI from an Auto-Recurrence Plot (default = `TRUE`)
+#' @param drawNA Draw `NA` values in the recurrence plot? If `FALSE` then `NA` values will be considered non-recurring (default = `FALSE`)
 #' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (default = `NULL`)
 #' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `est_radius()` will be called with default settings (find a radius that yields .05 recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
 #' @param title A title for the plot
@@ -2063,9 +2110,12 @@ rp_plot <- function(RM,
                     plotRadiusRRbar = TRUE,
                     drawGrid = FALSE,
                     drawDiagonal = TRUE,
+                    drawNA = FALSE,
                     markEpochsLOI = NULL,
                     radiusValue = NA,
-                    title = "", xlabel = "", ylabel="",
+                    title = "",
+                    xlabel = "",
+                    ylabel="",
                     plotSurrogate = NA,
                     returnOnlyObject = FALSE){
 
@@ -2080,13 +2130,13 @@ rp_plot <- function(RM,
 
   # Make sure we can draw a diagonal if requested
   maxDist <- max(RM, na.rm = TRUE)
-  if(drawDiagonal&AUTO){
-    if(all(as.vector(RM)==0|as.vector(RM)==1)){
-      RM <- bandReplace(RM,0,0,1)
-    } else {
-      RM <- bandReplace(RM,0,0,(maxDist+1))
-    }
-  }
+  # if(drawDiagonal&AUTO){
+  #   if(all(as.vector(RM)==0|as.vector(RM)==1)){
+  #     RM <- bandReplace(RM,0,0,1)
+  #   } else {
+  #     RM <- bandReplace(RM,0,0,(maxDist+1))
+  #   }
+  # }
 
   if(is.null(attr(RM,"chromatic"))){
     chromatic <- FALSE
@@ -2095,19 +2145,57 @@ rp_plot <- function(RM,
     chromatic <- attr(RM,"chromatic")
   }
 
+
   # prepare data
-  if(attr(RM,"package")%00%""%in%"Matrix"){
+  #if(attr(RM,"package")%00%""%in%"Matrix"){
+  if(any(grepl("Matrix",class(RM)))){
     RM     <- rp_checkfix(RM, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
-    meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
+    #meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
+    meltRP <-  mat2ind(Matrix::as.matrix(RM))
   } else {
     meltRP <-  mat2ind(as.matrix(RM))
   }
 
   hasNA <- FALSE
-  if(any(is.na(meltRP$value))){
-    hasNA <- TRUE
-    meltRP$value[is.na(meltRP$value)] <- (maxDist + 1)
+
+  if(chromatic){
+    if(is.null(attr(RM,"chromaNames"))){
+      chromaNumbers <- sort(unique(meltRP$value))[sort(unique(meltRP$value))>0]
+      names(chromaNumbers) <- c("No recurrence", paste("Cat.", chromaNames))
+      attr(RM,"chromaNames") <- chromaNumbers
+      chromaNames <- names(chromaNumbers)
+    } else {
+      chromaNumbers <- attr(RM,"chromaNames")
+      Cind <- sort(chromaNumbers, index.return = TRUE)
+      chromaNames <- names(chromaNumbers)[Cind$ix]
+      chromaNumbers <- chromaNumbers[Cind$ix]
+    }
+    if(NA%in%chromaNames){
+      hasNA <- TRUE
+    }
   }
+
+
+  if(drawNA){
+    if(!is.null(attr(RM,"NAij"))){
+      hasNA <- TRUE
+      NAid <- data.frame(attr(RM,"NAij"))
+      NAid$value <- NA
+      colnames(NAid)[1:2] <- c("Var1","Var2")
+      #meltRP$value[meltRP$Var1==NAid[,2]&meltRP$Var2==NAid[,1]] <- NA
+      meltRP <- rbind(meltRP,NAid)
+    } else {
+      message("Cannot find any NA to draw!")
+      drawNA <- FALSE
+      hasNA <- FALSE
+    }
+  } else {
+    if(any(is.na(meltRP$value))){
+      hasNA <- FALSE
+      meltRP$value[is.na(meltRP$value)] <- (maxDist + 1)
+    }
+  }
+
 
   # Unthresholded START ----
   showL <- FALSE
@@ -2161,11 +2249,77 @@ rp_plot <- function(RM,
 
       if(chromatic){
 
-        colvec <- c("#FFFFFF",getColours(length(unique(meltRP$value))-1))
-        names(colvec) <- sort(unique(meltRP$value))
-        meltRP$value <- factor(meltRP$value, levels = sort(unique(meltRP$value)), labels = names(colvec))
+        if("No recurrence"%in%chromaNames){
+          chromaNames[which("No recurrence"%in%chromaNames)] <- "0"
+        } else {
+          if(!"0"%in%chromaNames){
+          chromaNames <- c("0",chromaNames)
+          }
+        }
 
-        showL <- TRUE
+        if(!0%in%chromaNumbers){
+          chromaNumbers <- c(0,chromaNumbers)
+          names(chromaNumbers)[1] <- "0"
+        }
+
+        colvec <- getColours(length(chromaNames))
+        colvec[which(chromaNames%in%"0")] <- "#FFFFFF"
+
+        if(hasNA){
+          if(NA%in%chromaNames){
+            colvec[which(chromaNames%in%NA)] <-"#FF0000"
+            names(colvec) <- chromaNames
+          } else {
+            colvec <- c(colvec,"#FF0000")
+            names(colvec) <- c(chromaNames,NA)
+            if(!NA%in%chromaNumbers){
+              chromaNumbers <- c(chromaNumbers, NA)
+            }
+          }
+        } else {
+          names(colvec) <- chromaNames
+        }
+
+        if(!drawNA){
+          chromaNames   <- stats::na.exclude(chromaNames)
+          chromaNumbers <- stats::na.exclude(chromaNumbers)
+        }
+
+        # CHECK VECTOR LENGTHS
+        allEqual <- FALSE
+        if(length(unique(meltRP$value))==length(chromaNames)){
+          if(length(unique(meltRP$value))==length(chromaNumbers)){
+            allEqual <- TRUE
+          }
+        }
+
+        if(allEqual){
+          meltRP$value <- factor(meltRP$value, levels = as.numeric(chromaNumbers), labels = chromaNames, exclude = NULL)
+        } else {
+          #message("Check values and chromaNames...")
+
+          excludeVals <- unique(meltRP$value)[!unique(meltRP$value)%in%chromaNumbers]
+          meltRP$value <- factor(meltRP$value,
+                                 levels = c(as.numeric(chromaNumbers), excludeVals),
+                                 labels = c(chromaNames, as.character(excludeVals)),
+                                 exclude = c(as.character(excludeVals),""))
+        }
+
+        showL <- FALSE
+        tmp <- data.frame(x = 1:length(chromaNames), y = 1:length(chromaNames), cols = chromaNames)
+
+        grL <- ggplot(tmp, aes_(x = ~x, y = ~y)) +
+          geom_point(aes_(colour = ~cols, fill = ~cols), pch=22, size =10) +
+          scale_fill_manual(name  = "Phases", breaks = chromaNames,
+                            values = colvec,
+                            na.translate = TRUE,
+                            na.value = "#FF0000") +
+          scale_colour_manual(name  = "Phases", breaks = chromaNames,
+                              values = colvec,
+                              na.translate = TRUE,
+                              na.value = "#FF0000")
+        grLegend <- cowplot::get_legend(grL)
+        rm(grL)
 
       } else {
 
@@ -2209,13 +2363,13 @@ rp_plot <- function(RM,
 
   ## Get CRP Measures END ##
 
-
-
   # Main plot ----
   gRP <-  ggplot2::ggplot(ggplot2::aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
-    ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL) +
-    ggplot2::geom_abline(slope = 1,colour = "grey50", size = 1)
+    ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL)
 
+  if(drawDiagonal){
+    gRP <- gRP + ggplot2::geom_abline(slope = 1,colour = "grey50", size = 1)
+  }
 
   ## Unthresholded START ----
   if(unthresholded){
@@ -2237,7 +2391,7 @@ rp_plot <- function(RM,
 
       gRP <- gRP + ggplot2::scale_fill_gradient(low      = "white",
                                                 high     = "red3",
-                                                na.value = scales::muted("slategray4"),
+                                                na.value = "#FF0000",
                                                 space    = "Lab",
                                                 name     = "")
 
@@ -2249,7 +2403,7 @@ rp_plot <- function(RM,
       gRP <- gRP + ggplot2::scale_fill_gradient2(low      = "red3",
                                                  high     = "steelblue",
                                                  mid      = "white",
-                                                 na.value = scales::muted("slategray4"),
+                                                 na.value = "#FF0000",
                                                  midpoint = barValue*1.1, #mean(meltRP$value, na.rm = TRUE),
                                                  limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                                                  space    = "Lab",
@@ -2296,7 +2450,7 @@ rp_plot <- function(RM,
         ggplot2::scale_fill_gradient2(low      = "red3",
                                       high     = "steelblue",
                                       mid      = "white",
-                                      na.value = scales::muted("slategray4"),
+                                      na.value = "#FF0000",
                                       midpoint =  barValue * 1.1,#mean(meltRP$value, na.rm = TRUE),
                                       #limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
                                       space    = "Lab",
@@ -2578,6 +2732,7 @@ rp_plot <- function(RM,
   }
 
 
+
   # cat(paste("\n\nplotMeasures =", plotMeasures,"\n"))
   # cat(paste("plotDimensions =", plotDimensions,"\n"))
   # cat(paste("plotDimensionLegend =", plotDimensionLegend,"\n"))
@@ -2592,13 +2747,21 @@ rp_plot <- function(RM,
   if(plotDimensionLegend){Lmat[[4]] <- grDimL} else {if(plotDimensions){Lmat[[4]] <- grid::nullGrob()} else {Lmat[[4]] <- NA}}
   Lmat[[5]] <- g
   if(plotDimensions){Lmat[[6]] <- gry1} else {Lmat[[6]] <- NA}
-  if(unthresholded&plotRadiusRRbar){Lmat[[7]] <- grDist} else {Lmat[[7]] <- NA}
-  if(plotDimensions&unthresholded&plotRadiusRRbar){Lmat[[8]] <- grid::nullGrob()} else {Lmat[[8]] <- NA}
+  if((unthresholded&plotRadiusRRbar)|chromatic){
+    if(chromatic){
+      Lmat[[7]] <- grLegend
+    } else {
+      Lmat[[7]] <- grDist
+    }
+  } else {
+    Lmat[[7]] <- NA
+  }
+  if(plotDimensions&(unthresholded&plotRadiusRRbar|chromatic)){Lmat[[8]] <- grid::nullGrob()} else {Lmat[[8]] <- NA}
 
   # Remove unused fields
   Lmat[is.na(Lmat)] <- NULL
 
-  w <- c(.35,.25, 1,.5)[c(plotMeasures,plotDimensions,TRUE,plotRadiusRRbar)]
+  w <- c(.35,.25, 1,.5,.35)[c(plotMeasures,plotDimensions,TRUE,plotRadiusRRbar,chromatic)]
   h <- c(1,.25)[c(TRUE,plotDimensions)]
 
   widths  <- unit(w,"null")  #ifelse(plotMeasures, unit(c(.35,.25, 1,.5),  unit(c(.25, 1), "null")))

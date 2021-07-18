@@ -43,7 +43,9 @@ Find change indices
  breaks$cols <- casnet::getColours(length(breaks$label))
 
  ggplot(tr$pred) +
-   geom_rect(data = breaks, aes(xmin = xmin, xmax=xmax, ymin=ymin, ymax=ymax, colour = label, fill = label), alpha = .3) +
+   geom_rect(data = breaks,
+   aes(xmin = xmin, xmax=xmax, ymin=ymin, ymax=ymax, colour = label, fill = label),
+   alpha = .3) +
    scale_colour_manual(values = breaks$cols) +
    scale_fill_manual(values = breaks$cols) +
    scale_x_continuous("time", expand = c(0,0)) +

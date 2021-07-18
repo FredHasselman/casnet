@@ -62,8 +62,8 @@ est_radius <- function(RM = NULL,
 
 
   if(any(is.na(RM))){
-    NAid <- which(is.na(as.matrix(RM)))
-    RM[NAid] <- max(RM, na.rm = TRUE)+1
+    NAid <- which(is.na(Matrix::as.matrix(RM)))
+    RM[NAid] <- max(Matrix::as.matrix(RM), na.rm = TRUE)+1
   }
 
   # check auto-recurrence
@@ -498,7 +498,7 @@ est_parameters <- function(y,
               Nn.min[D]  <- min(RM, na.rm = TRUE)
               Nn.max[D]  <- max(RM, na.rm = TRUE)
               Nn.sd[D]   <- stats::sd(RM, na.rm = TRUE)
-              Nn.mean[D] <- mean(RM, na.rm = TRUE)
+              Nn.mean[D] <- mean(Matrix::as.matrix(RM), na.rm = TRUE)
               rm(RM)
             }
 

@@ -37,6 +37,10 @@ Create transition network
 }
 \examples{
 
+# This will output the transition matrix, a plot of the matrix and a transition network plot.
+y <- c("Happy", "Happy", "Sad", "Neutral", "Neutral", "Angry", "Sad", "Sad", "Neutral")
+TM <- rn_transition(y)
+
 }
 \author{
 Fred Hasselman

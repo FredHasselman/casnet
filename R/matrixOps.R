@@ -28,6 +28,12 @@ di2bi <- function(distmat, emRad = NA, convMat = FALSE){
   distmat <- rp_checkfix(distmat, checkAUTO = TRUE, fixAUTO = TRUE)
   #attributes(distmat)
 
+  if(any(is.na(distmat))){
+    NAij  <- Matrix::which(is.na(distmat), arr.ind=TRUE)
+  } else {
+    NAij <- NA
+  }
+
   # RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
   # RP[as.matrix(distmat <= emRad)] <- 1
   if(is.na(emRad)){emRad <- est_radius(distmat)$Radius}
@@ -52,6 +58,7 @@ di2bi <- function(distmat, emRad = NA, convMat = FALSE){
 
   suppressMessages(RP <- rp_copy_attributes(source = distmat,  target = RP))
   attributes(RP)$emRad <- emRad
+  attributes(RP)$NAij  <- NAij
 
   return(RP)
 }
@@ -86,6 +93,12 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
   # RP <- distmat #matrix(0,dim(distmat)[1],dim(distmat)[2])
   # RP[distmat <= emRad] <- 0
 
+  if(any(is.na(distmat))){
+    NAij  <- Matrix::which(is.na(distmat), arr.ind=TRUE)
+  } else {
+    NAij <- NA
+  }
+
   ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
 
   if(NROW(ij)>0){
@@ -96,10 +109,7 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
     suppressWarnings(RP <- Matrix::sparseMatrix(x=xij$y,i=xij$row,j=xij$col, dims = dim(distmat)))
 
-
     #  if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
-
-
   } else {
 
     RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
@@ -109,6 +119,7 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
   RP <- rp_copy_attributes(source = distmat,  target = RP)
   attributes(RP)$emRad <- emRad
+  attributes(RP)$NAij <- NAij
 
   return(RP)
 }
@@ -141,6 +152,12 @@ di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
     convMat <- TRUE
   }
 
+  if(any(is.na(distmat))){
+    NAij  <- Matrix::which(is.na(distmat), arr.ind=TRUE)
+  } else {
+    NAij <- NA
+  }
+
   if(emRad==0) emRad <- .Machine$double.eps
 
   ij  <- Matrix::which(distmat <= emRad, arr.ind=TRUE)
@@ -166,6 +183,7 @@ di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
 
   RP <- rp_copy_attributes(source = distmat,  target = RP)
   attributes(RP)$emRad <- emRad
+  attributes(RP)$NAij <- NAij
 
   return(RP)
 }
@@ -280,8 +298,8 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
   tmp <- mat
   delta <- col(mat)-row(mat)
   indc  <- delta >= lower & delta <= upper
-  mat[indc] <- value
-  mat <- as(mat, "dgCMatrix")
+  suppressMessages(mat[indc] <- value)
+  mat <- methods::as(mat, "dgCMatrix")
   mat <- rp_copy_attributes(source = tmp, target = mat, source_remove = c("names", "row.names", "class","dim", "dimnames","x","i","p"))
   rm(tmp)
 
@@ -298,8 +316,6 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 #' @return The matrix with the diagonals indicated in the `theiler` argument set to either `max(RM)+1` (if `RM` is a distance matrix) or `0` (if `RM` is a recurrence matrix).
 #'
 #' @export
-#'
-#' @examples
 #'
 setTheiler <- function(RM, theiler = NA, silent = FALSE){
 
@@ -362,7 +378,7 @@ setTheiler <- function(RM, theiler = NA, silent = FALSE){
     if(all(as.vector(RM)==0|as.vector(RM)==1)){
       value <- 0
     } else {
-      value <- max(RM, na.rm = TRUE)+1
+      value <- max(Matrix::as.matrix(RM), na.rm = TRUE)+1
     }
 
   #LOS <- diag(RM)

@@ -208,7 +208,9 @@ ts_permtest_transmat <- function(y1, y2 = NULL,
 #'  breaks$cols <- casnet::getColours(length(breaks$label))
 #'
 #'  ggplot(tr$pred) +
-#'    geom_rect(data = breaks, aes(xmin = xmin, xmax=xmax, ymin=ymin, ymax=ymax, colour = label, fill = label), alpha = .3) +
+#'    geom_rect(data = breaks,
+#'    aes(xmin = xmin, xmax=xmax, ymin=ymin, ymax=ymax, colour = label, fill = label),
+#'    alpha = .3) +
 #'    scale_colour_manual(values = breaks$cols) +
 #'    scale_fill_manual(values = breaks$cols) +
 #'    scale_x_continuous("time", expand = c(0,0)) +
@@ -1345,17 +1347,17 @@ ts_detrend <- function(y, polyOrder=1){
 
 #' Detect levels in time series
 #'
-#'  Use recursive partitioning function (\link[rpart]{rpart} to perform a 'classification' of relatively stable levels in a timeseries.
+#'  Use recursive partitioning function [rpart::rpart()] to perform a 'classification' of relatively stable levels in a timeseries.
 #'
 #' @param y A time series of numeric vector
 #' @param minDataSplit An integer indicating how many datapoints should be in a segment before it will be analysed for presence of a level change (default = `12`)
 #' @param minLevelDuration Minimum duration (number of datapoint) of a level (default = `round(minDataSplit/3)`)
-#' @param changeSensitivity A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if `method = "anova"`, the overall `R^2` after a level is introduced must increase by the value of `changeSensitivity`, see the `cp` parameter in [rpart::rpart.control].     (default = `0.01`)
+#' @param changeSensitivity A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if `method = "anova"`, the overall `R^2` after a level is introduced must increase by the value of `changeSensitivity`, see the `cp` parameter in [rpart::rpart.control()].     (default = `0.01`)
 #' @param maxLevels Maximum number of levels in one series (default = `30`)
 #' @param method The partitioning method to use, see the manual pages of [rpart] for details.
 #' @param minChange After the call to [rpart], adjust detected level changes to a minimum absolute change in `y`. If a level change is smaller than `minChange`, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end (default  = `sd(y, na.rm = TRUE)`)
 #' @param doLevelPlot Should a plot with the original series and the levels be produced? (default = `FALSE`)
-#' @param doTreePlot Should a plot of the decision tree be produced. This requires package [partykit] (default = `FALSE`)
+#' @param doTreePlot Should a plot of the decision tree be produced. This requires package [partykit](https://cran.r-project.org/web/packages/partykit/index.html) (default = `FALSE`)
 #'
 #' @return A list object with fields `tree` and `pred`. The latter is a data frame with columns `x` (time), `y` (the variable of interest) and `p` the predicted levels in `y`.
 #'
@@ -1400,8 +1402,8 @@ ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/
 
   if(doLevelPlot){
    g <- ggplot2::ggplot(dfs) +
-      geom_line(aes(x=x,y=y)) +
-      geom_step(aes(x=x,y=p), colour = "red3", size=1) +
+      geom_line(aes_(x=~x,y=~y)) +
+      geom_step(aes_(x=~x,y=~p), colour = "red3", size=1) +
       theme_bw() + theme(panel.grid.minor = element_blank())
    print(g)
   }
@@ -1737,7 +1739,7 @@ ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 #' Create a transition matrix from a discrete time series, e.g. to generate Monte Carlo simulations.
 #'
 #' @param yd A discrete numeric vector or time series, e.g. transformed using [ts_discrete()], or, [ts_symbolic()].
-#' @param nbins The number of bins used to transform a continuous time series, or, the number of expected (given `nbins`, or, theoretically possible) values for a discrete series (default = `unique(yd)`)
+#' @param nbins The number of bins used to transform a continuous time series, or, the number of expected (given `nbins`, or, theoretically possible) values for a discrete series (default = `length(unique(yd))`)
 #'
 #' @return A transition probability matrix
 #' @export
@@ -1758,10 +1760,10 @@ ts_rasterize <- function(y, unitSquare = FALSE, toSparse = TRUE, resolution = 2)
 #' # Note: The number of 'observed' bins differs from 'expected' bins
 #' table(yd)
 #'
-#' # Not specifying the expected bins will geberate a different matrix!
+#' # Not specifying the expected bins will generate a different matrix!
 #' ts_transmat(yd = yd, nbins = length(unique(yd)))
 #'
-ts_transmat <- function(yd, nbins = unique(yd)){
+ts_transmat <- function(yd, nbins = length(unique(yd))){
 
   if(!all(is.wholenumber(yd))){
     stop("yd is not a vector of discrete numbers!")
@@ -1782,15 +1784,30 @@ ts_transmat <- function(yd, nbins = unique(yd)){
 }
 
 
-ts_cp <- function(ts, win, align = "right", keepNA = FALSE){
+#' Change Profile
+#'
+#' @param y Time series
+#' @param win A window in which
+#' @param align Alignment of the window, see [zoo::rollapply()] (default = `"right"`)
+#' @param keepNA Remove `NA` or return `y` with `NA` (default = `TRUE`)
+#'
+#' @return Transformed time series
+#'
+#' @export
+#'
+#' @references Hasselman, F. and Bosman, A.M.T. (2020). Studying Complex Adaptive Systems With Internal States: A Recurrence Network Approach to the Analysis of Multivariate Time-Series Data Representing Self-Reports of Human Experience. Frontiers of Applied Mathematics and Statistics, 6:9. doi: 10.3389/fams.2020.00009
+#'
+ts_cp <- function(y, win, align = "right", keepNA = TRUE){
 
-y <-
- idOK     <- !is.na(ts)
- WINmean <- zoo::rollapply(x[idOK], width = win, mean, na.rm=TRUE, fill=NA, align=align)
+ idOK     <- !is.na(y)
 
- y[idOK] <- ts[idOK]-WINmean[1:length(ts[idOK])]
+ x <- y[idOK]
+ WINmean <- zoo::rollapply(x, width = win, mean, na.rm=TRUE, fill=NA, align=align)
 
- df_se[idP,paste(cn,"cp")%ci%df_se] <- ts_integrate(y)
+ y[idOK] <- ts_integrate(x-WINmean[1:length(x)])
+
+ return(y)
+ #df_se[idP,paste(cn,"cp")%ci%df_se] <- ts_integrate(y)
 }
 
 
@@ -1822,7 +1839,8 @@ y <-
 #' lines(y, col = "grey70")
 #' lines(y2, col = "steelblue")
 #' lines(y3, col = "green3")
-#' legend(60, -1.3, legend=c("Original", "Mean", "Mean + Retain Length", "Max + Retain Length"), lty = 1, col=c("grey70", "red3", "steelblue","green3"), cex = 0.7)
+#' legend(60, -1.3, legend=c("Original", "Mean", "Mean + Retain Length", "Max + Retain Length"),
+#' lty = 1, col=c("grey70", "red3", "steelblue","green3"), cex = 0.7)
 #'
 #'
 ts_coarsegrain <- function(y, grain = 2, summaryFunction = c("mean","median","min","max")[1], retainLength = FALSE){

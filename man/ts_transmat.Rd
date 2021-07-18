@@ -4,12 +4,12 @@
 \alias{ts_transmat}
 \title{Transition matrix}
 \usage{
-ts_transmat(yd, nbins = unique(yd))
+ts_transmat(yd, nbins = length(unique(yd)))
 }
 \arguments{
 \item{yd}{A discrete numeric vector or time series, e.g. transformed using \code{\link[=ts_discrete]{ts_discrete()}}, or, \code{\link[=ts_symbolic]{ts_symbolic()}}.}
 
-\item{nbins}{The number of bins used to transform a continuous time series, or, the number of expected (given \code{nbins}, or, theoretically possible) values for a discrete series (default = \code{unique(yd)})}
+\item{nbins}{The number of bins used to transform a continuous time series, or, the number of expected (given \code{nbins}, or, theoretically possible) values for a discrete series (default = \code{length(unique(yd))})}
 }
 \value{
 A transition probability matrix
@@ -33,7 +33,7 @@ ts_transmat(yd = yd, nbins = 10)
 # Note: The number of 'observed' bins differs from 'expected' bins
 table(yd)
 
-# Not specifying the expected bins will geberate a different matrix!
+# Not specifying the expected bins will generate a different matrix!
 ts_transmat(yd = yd, nbins = length(unique(yd)))
 
 }

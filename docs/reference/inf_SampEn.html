@@ -106,10 +106,10 @@
       <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
+      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
-      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -152,9 +152,11 @@
   r <span class='op'>=</span> <span class='fl'>0.2</span>,
   D <span class='op'>=</span> <span class='cn'>NA</span>,
   fs <span class='op'>=</span> <span class='cn'>NULL</span>,
-  standardise <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
-  detrend <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  standardise <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"mean.sd"</span>, <span class='st'>"median.mad"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
+  transformBefore <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  removeTrend <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"no"</span>, <span class='st'>"poly"</span>, <span class='st'>"adaptive"</span>, <span class='st'>"bridge"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
   polyOrder <span class='op'>=</span> <span class='fl'>1</span>,
+  relativeEntropy <span class='op'>=</span> <span class='cn'>FALSE</span>,
   returnInfo <span class='op'>=</span> <span class='cn'>FALSE</span>,
   silent <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
@@ -187,8 +189,20 @@
       <td><p>Standardise by the series using <code><a href='ts_standardise.html'>ts_standardise()</a></code> with <code>adjustN = FALSE</code> (default = "mean.sd")</p></td>
     </tr>
     <tr>
+      <th>transformBefore</th>
+      <td><p>Detrend/standardise before coarse graining. If set to <code>FALSE</code>, each coarsegrained series will be detrended/standardised separately (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>removeTrend</th>
+      <td><p>Method to use for detrending (default = "poly")</p></td>
+    </tr>
+    <tr>
       <th>polyOrder</th>
       <td><p>Order of polynomial trend to remove if <code>removeTrend = "poly"</code></p></td>
+    </tr>
+    <tr>
+      <th>relativeEntropy</th>
+      <td><p>The relative entropy, SampEn / (-1 * log(1/length(y))) will be returned (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>returnInfo</th>
@@ -198,15 +212,11 @@
       <th>silent</th>
       <td><p>Silent-ish mode</p></td>
     </tr>
-    <tr>
-      <th>scaleDiff</th>
-      <td><p>Steps between scaleMin and scaleMax (default = <code>1</code>)</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The sample entropy (SampEn) of the time series y. The relative entropy, SampEn / (-1 * log(1/length(y))) is returned in the attribute <code>Relative Entropy</code></p>
+    <p>The sample entropy (SampEn) of the time series y.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>info_MSE</p>

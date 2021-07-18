@@ -1435,14 +1435,15 @@ monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments
 #' @param m The size of the window in which tho evaluate whether a pattern repeats (default = `2`)
 #' @param r A factor that will determine the threshold for similarity of values, calculated as r x D (default = `0.2`)
 #' @param D Commonly the standard deviation of the time series, the similarity threshold will be calculated as r x D. Note that if the series is detrended and/or standardised and `D = NA` the standard deviation will be calculated after the transformations (default = `NA`)
-#' @param scaleDiff Steps between scaleMin and scaleMax (default = `1`)
+#' @param relativeEntropy The relative entropy, SampEn / (-1 * log(1/length(y))) will be returned (default = `FALSE`)
+#' @param transformBefore Detrend/standardise before coarse graining. If set to `FALSE`, each coarsegrained series will be detrended/standardised separately (default = `TRUE`)
 #'
 #'
-#' @return The sample entropy (SampEn) of the time series y. The relative entropy, SampEn / (-1 * log(1/length(y))) is returned in the attribute `Relative Entropy`
+#' @return The sample entropy (SampEn) of the time series y.
 #'
 #' @export
 #'
-#' @seealso [info_MSE]
+#' @seealso info_MSE
 #'
 #' @family Information based complexity measures
 #'
@@ -1462,9 +1463,11 @@ inf_SampEn <- function(y,
                       r = 0.2,
                       D = NA,
                       fs = NULL,
-                      standardise = c("mean.sd","median.mad")[1],
-                      detrend = FALSE,
+                      standardise = c("none","mean.sd","median.mad")[1],
+                      transformBefore = TRUE,
+                      removeTrend = c("no","poly","adaptive","bridge")[1],
                       polyOrder=1,
+                      relativeEntropy = FALSE,
                       returnInfo = FALSE,
                       silent = FALSE){
 
@@ -1477,7 +1480,7 @@ inf_SampEn <- function(y,
 
   N <- length(y)
   # Simple linear detrending.
-  if(detrend){
+  if(removeTrend%in%"poly"){
     y <- ts_detrend(y, polyOrder = polyOrder)
   }
 
@@ -1511,9 +1514,13 @@ inf_SampEn <- function(y,
   e <- log(B / A)
   }
 
-  attr(e,"Relative Entropy") <- e/(-1 * log(1/N))
-
- return(e)
+  if(!relativeEntropy){
+    attr(e,"Relative Entropy") <- e/(-1 * log(1/N))
+    return(e)
+  } else {
+    attr(e,"Sample Entropy") <- e
+    return(e/(-1 * log(1/N)))
+  }
 }
 
 
@@ -1526,7 +1533,7 @@ inf_SampEn <- function(y,
 #' @inheritParams fd_dfa
 #' @param transformBefore Detrend/standardise before coarse graining. If set to `FALSE`, each coarsegrained series will be detrended/standardised separately (default = `TRUE`)
 #'
-#' @note The transformation settings (detrending and/or normalisation) and `transformBefore` will determine the value of the product r x D if `D = NA`.
+#' @note The transformation settings (detrending and/or normalisation), `transformBefore` will determine the value of the product r x D if `D = NA`.
 #'
 #' @return MSE
 #'
@@ -1549,13 +1556,12 @@ inf_MSE <- function(y,
                     D = NA,
                     fs = NULL,
                     transformBefore = TRUE,
+                    removeTrend = c("no","poly","adaptive","bridge")[1],
+                    polyOrder=1,
                     standardise = c("none","mean.sd","median.mad")[1],
-                    detrend = FALSE,
-                    polyOrder = 1,
                     adjustSumOrder = FALSE,
                     scaleMin = 1,
                     scaleMax = floor(NROW(y)/10),
-                    scaleDiff = 1,
                     scaleS = NA,
                     overlap = 0,
                     minData = 4,
@@ -1572,8 +1578,12 @@ inf_MSE <- function(y,
   if(transformBefore){
 
     # Simple linear detrending.
-    if(detrend){
+    if(removeTrend=="poly"){
       y <- ts_detrend(y, polyOrder = polyOrder)
+    } else {
+      if(removeTrend!="no"){
+        message("Only polynomial detrending implemented, use removeTrend = 'poly' ")
+      }
     }
 
     # Standardise by N
@@ -1603,18 +1613,25 @@ inf_MSE <- function(y,
                           retainLength = retainLength)
 
     ent <- inf_SampEn(y = tmp,
-                               m = m,
-                               r = r,
-                               D = D,
-                               fs = fs,
-                               standardise = standardise,
-                               detrend = detrend,
-                               polyOrder = polyOrder,
-                               returnInfo = returnInfo,
-                               silent = TRUE)
+                      m = m,
+                      r = r,
+                      D = D,
+                      fs = fs,
+                      standardise = "none",
+                      removeTrend = "no",
+                      polyOrder = polyOrder,
+                      relativeEntropy = relativeEntropy,
+                      returnInfo = returnInfo,
+                      transformBefore = FALSE,
+                      silent = TRUE)
 
     out$SampEn[g] <- ent
-    out$SampEn_Relative[g] <- attr(ent,"Relative Entropy")
+
+    if(!relativeEntropy){
+      out$SampEn_Relative[g] <- attr(ent,"Relative Entropy")
+    } else {
+      out$SampEn_Relative[g] <- attr(ent,"Sample Entropy")
+    }
 
     rm(tmp, ent)
   }

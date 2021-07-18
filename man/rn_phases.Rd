@@ -33,6 +33,8 @@ rn_phases(
 
 \item{removeSingularities}{Will remove states that recur only once (nodes with \code{degree(g) == 1}) (default = \code{FALSE})}
 
+\item{standardise}{Standardise by the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
+
 \item{returnGraph}{Return the graph object objects of the plots that have been produced (default = \code{FALSE})}
 
 \item{doPhasePlot}{Produce a plot with the extracted phases (default = \code{TRUE})}

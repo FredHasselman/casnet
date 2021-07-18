@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="Detect levels in time series — ts_levels" />
-<meta property="og:description" content="Use recursive partitioning function (rpart to perform a 'classification' of relatively stable levels in a timeseries." />
+<meta property="og:description" content="Use recursive partitioning function rpart::rpart() to perform a 'classification' of relatively stable levels in a timeseries." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -106,10 +106,10 @@
       <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
+      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
-      <a href="../articles/dynamiccomplexity.html">Applied Synergetics: Dynamic Complexity in a Clinical Case Study</a>
+      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -143,7 +143,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Use recursive partitioning function (<a href='https://rdrr.io/pkg/rpart/man/rpart.html'>rpart</a> to perform a 'classification' of relatively stable levels in a timeseries.</p>
+    <p>Use recursive partitioning function <code><a href='https://rdrr.io/pkg/rpart/man/rpart.html'>rpart::rpart()</a></code> to perform a 'classification' of relatively stable levels in a timeseries.</p>
     </div>
 
     <pre class="usage"><span class='fu'>ts_levels</span><span class='op'>(</span>
@@ -175,7 +175,7 @@
     </tr>
     <tr>
       <th>changeSensitivity</th>
-      <td><p>A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if <code>method = "anova"</code>, the overall <code>R^2</code> after a level is introduced must increase by the value of <code>changeSensitivity</code>, see the <code>cp</code> parameter in <a href='https://rdrr.io/pkg/rpart/man/rpart.control.html'>rpart::rpart.control</a>.     (default = <code>0.01</code>)</p></td>
+      <td><p>A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if <code>method = "anova"</code>, the overall <code>R^2</code> after a level is introduced must increase by the value of <code>changeSensitivity</code>, see the <code>cp</code> parameter in <code><a href='https://rdrr.io/pkg/rpart/man/rpart.control.html'>rpart::rpart.control()</a></code>.     (default = <code>0.01</code>)</p></td>
     </tr>
     <tr>
       <th>maxLevels</th>
@@ -195,7 +195,7 @@
     </tr>
     <tr>
       <th>doTreePlot</th>
-      <td><p>Should a plot of the decision tree be produced. This requires package partykit (default = <code>FALSE</code>)</p></td>
+      <td><p>Should a plot of the decision tree be produced. This requires package <a href='https://cran.r-project.org/web/packages/partykit/index.html'>partykit</a> (default = <code>FALSE</code>)</p></td>
     </tr>
     </table>
 

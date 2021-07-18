@@ -68,7 +68,8 @@ Suggests:
     brainGraph,
     infotheo,
     stabledist,
-    partykit
+    partykit,
+    tidyselect
 Language: en-US
 URL: https://github.com/FredHasselman/casnet
 BugReports: https://github.com/FredHasselman/casnet/issues

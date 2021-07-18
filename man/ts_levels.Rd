@@ -23,7 +23,7 @@ ts_levels(
 
 \item{minLevelDuration}{Minimum duration (number of datapoint) of a level (default = \code{round(minDataSplit/3)})}
 
-\item{changeSensitivity}{A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if \code{method = "anova"}, the overall \code{R^2} after a level is introduced must increase by the value of \code{changeSensitivity}, see the \code{cp} parameter in \link[rpart:rpart.control]{rpart::rpart.control}.     (default = \code{0.01})}
+\item{changeSensitivity}{A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if \code{method = "anova"}, the overall \code{R^2} after a level is introduced must increase by the value of \code{changeSensitivity}, see the \code{cp} parameter in \code{\link[rpart:rpart.control]{rpart::rpart.control()}}.     (default = \code{0.01})}
 
 \item{maxLevels}{Maximum number of levels in one series (default = \code{30})}
 
@@ -33,13 +33,13 @@ ts_levels(
 
 \item{doLevelPlot}{Should a plot with the original series and the levels be produced? (default = \code{FALSE})}
 
-\item{doTreePlot}{Should a plot of the decision tree be produced. This requires package \link{partykit} (default = \code{FALSE})}
+\item{doTreePlot}{Should a plot of the decision tree be produced. This requires package \href{https://cran.r-project.org/web/packages/partykit/index.html}{partykit} (default = \code{FALSE})}
 }
 \value{
 A list object with fields \code{tree} and \code{pred}. The latter is a data frame with columns \code{x} (time), \code{y} (the variable of interest) and \code{p} the predicted levels in \code{y}.
 }
 \description{
-Use recursive partitioning function (\link[rpart]{rpart} to perform a 'classification' of relatively stable levels in a timeseries.
+Use recursive partitioning function \code{\link[rpart:rpart]{rpart::rpart()}} to perform a 'classification' of relatively stable levels in a timeseries.
 }
 \examples{
 

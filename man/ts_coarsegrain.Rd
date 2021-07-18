@@ -40,7 +40,8 @@ plot(t1+1, y1, col = "red3", type = "l", ylim = c(-3,3), xlab = "time", ylab = "
 lines(y, col = "grey70")
 lines(y2, col = "steelblue")
 lines(y3, col = "green3")
-legend(60, -1.3, legend=c("Original", "Mean", "Mean + Retain Length", "Max + Retain Length"), lty = 1, col=c("grey70", "red3", "steelblue","green3"), cex = 0.7)
+legend(60, -1.3, legend=c("Original", "Mean", "Mean + Retain Length", "Max + Retain Length"),
+lty = 1, col=c("grey70", "red3", "steelblue","green3"), cex = 0.7)
 
 
 }

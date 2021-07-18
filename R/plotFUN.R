@@ -44,7 +44,7 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
   }
 
   time <- df[[cname]]
-  df <- df %>% dplyr::select(where(is.numeric))
+  df <- df %>% dplyr::select(tidyselect::vars_select_helpers$where(is.numeric))
   eval(parse(text=paste("df$",cname," <- time")))
 
 
@@ -82,7 +82,7 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
   xOrder <- as.numeric_discrete(time)
 
   tmp$time    <- as.numeric(xOrder)
-  xBreaks <- hist(xOrder, plot = FALSE)$mids
+  xBreaks <- graphics::hist(xOrder, plot = FALSE)$mids
   xLabels <- names(xOrder)[xBreaks]
 
   if(max(nchar(xLabels), na.rm = TRUE)>4){
@@ -525,7 +525,7 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=1, colourE=FALSE
 
   for(c in seq_along(unigroups)){
     Vid <- groups==unigroups[c]
-    if(sum(Vid)>0){
+    if(sum(Vid, na.rm = TRUE)%00%0>0){
 
       igraph::V(g)[Vid]$group      <- unigroups[c]
       igraph::V(g)[Vid]$groupnum   <- c
@@ -1141,7 +1141,7 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   # }
 
   if(is.na(colOrder)&subtitle==""){
-    subtitle <- 'Variables ordered by mean Dynamic Complexity'
+    subtitle <- paste0('Variables ordered by mean ',resVariable)
   } else {
     subtitle <- ifelse(colOrder,
                        'Variables ordered by position in data source',
@@ -2055,18 +2055,18 @@ make_spiral_graph <- function(g,
     }
   }
 
-  gg <- ggplot(gNodes,aes(x=V1,y=V2)) +
-    geom_curve(data=gEdges, aes(x = from.x,
-                                xend = to.x,
-                                y = from.y,
-                                yend = to.y,
-                                colour = colorVar),
+  gg <- ggplot(gNodes,aes_(x=~V1,y=~V2)) +
+    geom_curve(data=gEdges, aes_(x = ~from.x,
+                                xend = ~to.x,
+                                y = ~from.y,
+                                yend = ~to.y,
+                                colour = ~colorVar),
                curvature = curvature,
                arrow = ar,
                angle = angle,
                size = gEdges$width * scaleEdgeSize,
                alpha = alphaE) +
-    geom_point(aes(fill = labels, size = size), pch=21, colour = vBc, alpha = alphaV) +
+    geom_point(aes_(fill = ~labels, size = ~size), pch=21, colour = vBc, alpha = alphaV) +
     ggtitle(label = title, subtitle = subtitle) +
     scale_fill_manual(epochLabel, values = unique(gNodes$colour)) +
     scale_size(sizeLabel, range = scaleVertexSize) +

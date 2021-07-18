@@ -93,6 +93,7 @@ ts_center                                          Center a vector
 ts_changeindex                                     Find change indices
 ts_checkfix                                        Check and/or Fix a vector
 ts_coarsegrain                                     Course grain a time series
+ts_cp                                              Change Profile
 ts_detrend                                         Detrend a time series
 ts_diff                                            Derivative of time series
 ts_discrete                                        Discrete representation
