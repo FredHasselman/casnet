@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>(Cross-) Recurrence Quantification Analysis • casnet</title>
+<title>Recurrence Quantification Analysis • casnet</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="(Cross-) Recurrence Quantification Analysis">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Recurrence Quantification Analysis">
 <meta property="og:description" content="casnet">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -61,7 +61,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/CRQA.html">(Cross-) Recurrence Quantification Analysis</a>
+      <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
       <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
@@ -92,13 +92,13 @@
 
       
 
-      </header><script src="CRQA_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
+      </header><script src="CRQA_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>(Cross-) Recurrence Quantification Analysis</h1>
+      <h1 data-toc-skip>Recurrence Quantification Analysis</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2021-07-18</h4>
+            <h4 class="date">2021-09-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/CRQA.Rmd"><code>vignettes/CRQA.Rmd</code></a></small>
       <div class="hidden name"><code>CRQA.Rmd</code></div>
@@ -107,397 +107,778 @@
 
     
     
-<div id="crqa" class="section level1">
-<h1 class="hasAnchor">
-<a href="#crqa" class="anchor"></a>CRQA</h1>
-<p>There are 2 main ways to run CRQA in <code>casnet</code>:</p>
+<style type="text/css">
+p code {
+  font-size: 70%;
+}
+</style>
+<p>This vignette discusses how to conduct a large variety of recurrence-based time series analyses using R-package <em>casnet</em>. It is not the only <code>R</code> package that can run recurrence analyses, the closest alternative to <code>casnet</code> is probably package <a href="https://cran.r-project.org/web/packages/crqa/index.html"><code>crqa</code></a>. It has a great tutorial paper by <span class="citation">(<a href="#ref-coco2014" role="doc-biblioref">Coco &amp; Dale, 2014</a>)</span>). Several other packages have dedicated functions, e.g. package <code>nonlinearTseries</code> has a function <code>RQA</code>. There are also many options outside of the <code>R</code> framework, see the <a href="http://www.recurrence-plot.tk/programmes.php">Recurrence Plot webpage</a> for a comprehensive list of software.</p>
+<p>There are 2 main ways to run Recurrence Quantification Analyses in <code>casnet</code>:</p>
 <ul>
 <li>Using functions <code>rp</code>, <code>rp_measures</code> and <code>rp_plot</code>
 </li>
 <li>Using function <code>rp_cl</code> which will run Norbert Marwan’s <a href="http://tocsy.pik-potsdam.de/commandline-rp.php">commandline Recurrence Plots</a>
 </li>
 </ul>
-<p>The following example will use the native <code>casnet</code> functions, see the paragraph <strong>An R interface to Marwan’s commandline recurrence plots</strong> to learn about using <code><a href="../reference/rp_cl.html">rp_cl()</a></code>.</p>
+<p>The following examples will use the native <code>casnet</code> functions, see the paragraph <a href="#marwan">An R interface to Marwan’s commandline recurrence plots</a> to learn about using <code><a href="../reference/rp_cl.html">rp_cl()</a></code>.</p>
+<p>The first part of this vignette will demonstrate the basics of recurrence quantification using unordered categorical data. The second part will discuss RQA for <a href="#lvSystem">continuous data</a>. This will be a bit more formal with respect to defining the recurrence matrix and how to calculate the various RQA measures.</p>
+<div id="unordered-categorical-data" class="section level1">
+<h1 class="hasAnchor">
+<a href="#unordered-categorical-data" class="anchor"></a>Unordered Categorical Data</h1>
+<p>The basic principles behind all varieties of Recurrence Quantification Analysis can be explained by looking at simple examples based on unordered categorical data (nominal time series).</p>
+<p>Let’s consider this poem and regard interpret it as a time series (or perhaps better, an event series):</p>
+<pre><code>One little bear
+Wondering what to do
+Along came another
+Then there were two!
+
+Two little bears
+Climbing up a tree
+Along came another
+Then there were three!
+
+Three little bears
+Ate an apple core
+Along came another
+Then there were four!
+
+Four little bears
+Found honey in a hive
+Along came another
+Then there were five!</code></pre>
+<p>We can assign a number to each unique word in the poem. The absolute value of the numbers in the series have no meaning, but what we can say is that whenever a number is repeated, this means a word was repeated. If a specific sequence of numbers is repeated, a larger pattern of words was repeated.</p>
+<p>To change the poem into a time series we can use the function <code><a href="../reference/as.numeric_discrete.html">casnet::as.numeric_discrete()</a></code> on a vector that contains the individual words, in lower case, without any punctuation symbols. It returns a named numeric vector, the names will be the words of the poem.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/casnet">casnet</a></span><span class="op">)</span>
+<span class="va">bear1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"one little bear wondering what to do along came another then there were two two little bears climbing up a tree along came another then there were three three little bears ate an apple core along came another then there were four four little bears found honey in a hive along came another then there were five"</span><span class="op">)</span>
+
+<span class="va">bear_up</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span><span class="op">(</span><span class="va">bear1</span>,<span class="st">" "</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">bear_up</span>, type <span class="op">=</span> <span class="st">"b"</span>, xlab <span class="op">=</span> <span class="st">"Time"</span>, ylab <span class="op">=</span> <span class="st">"Unique Word"</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span></code></pre></div>
+<p><img src="CRQA_files/figure-html/bearstory1-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>Several things can be inferred from the plot of the time series :</p>
+<ul>
+<li>At <code>Time = 15</code> the same word is repeated (horizontal line). This is actually due to the omission of the punctuation symbols, it is the repetition of the word <code>"two"</code> which was at the end of one sentence and at the beginning of the next sentence.<br>
+</li>
+<li>At <code>Time = 16</code> for the first time a non-identical unique word is repeated (<code>"little"</code>).<br>
+</li>
+<li>At several points there are larger patterns that are repeated (<code>"along came another then there were"</code>).<br>
+</li>
+<li>The last word of the poem is in fact a unique word (<code>"five"</code>)</li>
+</ul>
+<p>How can we quantify these features of the poem? How can we quantify these dynamic patterns?</p>
 <div id="categorical-auto-rqa" class="section level2">
 <h2 class="hasAnchor">
-<a href="#categorical-auto-rqa" class="anchor"></a><strong>Categorical Auto RQA</strong>
-</h2>
-<p>We’ll use data from <span class="citation">@oomens2015</span> in which 242 students were asked to generate random sequences of 100 numbers between 1 and 9 (for details see <a href="https://www.frontiersin.org/articles/10.3389/fnhum.2015.00319/full">the article</a>).</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/casnet">casnet</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-
-<span class="co"># Load the random number sequence data from Oomens et al. (2015)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">RNG</span><span class="op">)</span>
-
-<span class="co"># Select a subject</span>
-<span class="va">IDs</span> <span class="op">&lt;-</span> <span class="va">RNG</span><span class="op">$</span><span class="va">ID</span><span class="op">%in%</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">163</span>,<span class="fl">291</span><span class="op">)</span>
-
-<span class="co"># Look at the sequence</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">RNG</span><span class="op">[</span><span class="va">IDs</span>,<span class="op">]</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">time</span>,y<span class="op">=</span><span class="va">number</span>,group<span class="op">=</span><span class="va">ID</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>colour<span class="op">=</span><span class="va">ID</span><span class="op">)</span><span class="op">)</span><span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="op">~</span><span class="va">ID</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">9</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Which of these number sequences is more 'random'?"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="CRQA_files/figure-html/RNG1-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>In order to answer the question in the Figure title, we’ll run a Recurrence Quantification Analysis.</p>
-<p>The data are unordered categorical, that is, the differences between the integers are meaningless in the context of generating random number sequences. This means the RQA parameters can be set to quantify recurrences of the same value:</p>
-<ul>
-<li>Embedding lag = 1</li>
-<li>Embedding dimension = 1</li>
-<li>Radius = 0 (any number <span class="math inline">\(\leq\)</span> 1 will do)</li>
-</ul>
-<p>In the code block below the functions <code><a href="../reference/rp.html">rp()</a></code>, <code><a href="../reference/rp_measures.html">rp_measures()</a></code> and <code><a href="../reference/rp_plot.html">rp_plot()</a></code> are used to perform RQA on 2 participants in the dataset.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Run the RQA analysis</span>
-<span class="va">y_1</span>  <span class="op">&lt;-</span> <span class="va">RNG</span><span class="op">$</span><span class="va">number</span><span class="op">[</span><span class="va">RNG</span><span class="op">$</span><span class="va">ID</span><span class="op">==</span><span class="fl">163</span><span class="op">]</span>
-<span class="va">y_2</span> <span class="op">&lt;-</span>  <span class="va">RNG</span><span class="op">$</span><span class="va">number</span><span class="op">[</span><span class="va">RNG</span><span class="op">$</span><span class="va">ID</span><span class="op">==</span><span class="fl">291</span><span class="op">]</span>
-
-<span class="co">## Plot the recurrence matrix</span>
-<span class="co"># Get the recurrence matrix</span>
-<span class="va">rp_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1<span class="op">=</span><span class="va">y_1</span>, emDim <span class="op">=</span> <span class="fl">1</span>, emLag <span class="op">=</span> <span class="fl">1</span>, emRad <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-<span class="va">rp_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1<span class="op">=</span><span class="va">y_2</span>, emDim <span class="op">=</span> <span class="fl">1</span>, emLag <span class="op">=</span> <span class="fl">1</span>, emRad <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-
-<span class="co"># Get the plots</span>
-<span class="va">g_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">rp_1</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, returnOnlyObject <span class="op">=</span> <span class="cn">TRUE</span>, title <span class="op">=</span> <span class="st">"ID 163"</span><span class="op">)</span>
-<span class="va">g_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">rp_2</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, returnOnlyObject <span class="op">=</span> <span class="cn">TRUE</span>, title <span class="op">=</span> <span class="st">"ID 291"</span><span class="op">)</span>
-
-<span class="co"># Get the RQA measures, using silent = FALSE will produce output in the console.</span>
-<span class="va">crqa_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">rp_1</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Global Measures
-&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix               9900     3104           0.314            1324
-&gt;   Divergence Repetitiveness
-&gt; 1      0.111           2.35
-&gt; 
-&gt; 
-&gt; Line-based Measures
-&gt;   Line.based N.lines N.points.on.lines      Measure  Rate Mean Max
-&gt; 1   Diagonal     668              1780  Determinism 0.573 2.66   9
-&gt; 2   Vertical     959              2090 V Laminarity 0.673 2.18   3
-&gt; 3 Horizontal     959              2090 H Laminarity 0.673 2.18   3
-&gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1               1.11            0.242          0.392
-&gt; 2               0.47            0.102          0.176
-&gt; 3               0.47            0.102          0.176
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<a href="#categorical-auto-rqa" class="anchor"></a>Categorical Auto-RQA</h2>
+<p>The answer is to create a <em>recurrence matrix</em>, or, a <em>recurrence plot</em>. We simply put the time series on both the rows and columns of a matrix and put a black dot (or a <code>1</code>) in every cell in which the same value occurs, that is, we evaluate every possible combination of time points and note whenever we encounter a value that is recurring.</p>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-2-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>You can create a recurrence matrix in <em>casnet</em> using the function <code><a href="../reference/rp.html">rp()</a></code>. Function <code><a href="../reference/rp.html">rp()</a></code> returns a sparse matrix created with package <code>Matrix</code> which has a lot of attributes attached, including the time series it is based on.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">bear_up</span>, emLag <span class="op">=</span> <span class="fl">1</span>, emDim <span class="op">=</span> <span class="fl">1</span>, emRad <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+<p>This is called <em>Auto-Recurrence Quantification Analysis</em>, because we are evaluating the recurrences across all lags of time within 1 time series.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">crqa_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">rp_2</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Global Measures
-&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix               9900     3094           0.313            1456
-&gt;   Divergence Repetitiveness
-&gt; 1      0.143            1.8
-&gt; 
-&gt; 
-&gt; Line-based Measures
-&gt;   Line.based N.lines N.points.on.lines      Measure  Rate Mean Max
-&gt; 1   Diagonal     668              1638  Determinism 0.529 2.45   7
-&gt; 2   Vertical     682              1476 V Laminarity 0.477 2.16   3
-&gt; 3 Horizontal     682              1476 H Laminarity 0.477 2.16   3
-&gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1              0.890            0.193          0.320
-&gt; 2              0.447            0.097          0.171
-&gt; 3              0.447            0.097          0.171
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Using rp_cl() would look very similar:</span>
-<span class="co"># rp_1 &lt;- rp_cl(y1 = y_1, emDim  = 1, emLag = 1, emRad= 1)</span>
-<span class="co"># rp_2 &lt;- rp_cl(y1 = y_2, emDim  = 1, emLag = 1, emRad= 1)</span></code></pre></div>
-<p>The output from <code><a href="../reference/rp_measures.html">rp_measures()</a></code> is structured into <em>Global</em> and <em>Line-based</em> measures. In addition to information about the matrix size and number of points global measures are provided such as the <em>Recurrence Rate</em> (RR), the number of points that do <strong>not</strong> form a line (Singular Points) the <em>Divergence</em> (1 / the longest line structure) the average <em>Repetitiveness</em> (proportion of horizontal and vertical lines on the number of diagonal lines). The idea is to quantify how much of the deterministic structure (line structures) is due to repeating the same values (i.e., the horizontal and vertical lines, Laminarity). Finally the <em>Anisotropy</em> quantifies the symmetry of line structures in the plot by taking the ratio of he number of vertical lines over the numbers of horizontal lines in the plot. This should be 1 for Auto-RQA.</p>
-<p>The <em>Line-based</em> output is a table listing the statistics for diagonal, vertical and horizontal lines (mean length, max length, rate, entropy of the distribution of line lengths and the same entropy but relative to the number of possible recurrent points and the coefficient of variation of line lengths).</p>
-<p>The actual output object is a dataframe (which has more output fields, see the manual pages), the table output to the console is added as attribute <code>measuresTable</code>,</p>
-<p>Below the data and plots are rearranged for ease of comparison.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/">cowplot</a></span><span class="op">)</span>
-<span class="co"># The recurrence plots</span>
-<span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html">plot_grid</a></span><span class="op">(</span><span class="va">g_1</span>, <span class="va">g_2</span><span class="op">)</span></code></pre></div>
-<p><img src="CRQA_files/figure-html/RNG3-1.png" width="504" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># The RQA measures</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span>subj163<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_1</span><span class="op">)</span>, subj291<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt;                      1            1
-&gt; emRad        1.0000000    1.0000000
-&gt; RP_max    9900.0000000 9900.0000000
-&gt; RR           0.3135354    0.3135354
-&gt; SING_N    1324.0000000 1324.0000000
-&gt; SING_rate    0.4265464    0.4265464
-&gt; RP_N      3104.0000000 3104.0000000
-&gt; DIV_dl       0.1111111    0.1111111
-&gt; REP_av       2.3483146    2.3483146
-&gt; N_dl       668.0000000  668.0000000
-&gt; N_dlp     1780.0000000 1780.0000000
-&gt; DET          0.5734536    0.5734536
-&gt; MEAN_dl      2.6646707    2.6646707
-&gt; MAX_dl       9.0000000    9.0000000
-&gt; ENT_dl       1.1141896    1.1141896
-&gt; ENTrel_dl    0.2419432    0.2419432
-&gt; CoV_dl       0.3923046    0.3923046
-&gt; N_vl       959.0000000  959.0000000
-&gt; N_vlp     2090.0000000 2090.0000000
-&gt; LAM_vl       0.6733247    0.6733247
-&gt; TT_vl        2.1793535    2.1793535
-&gt; MAX_vl       3.0000000    3.0000000
-&gt; ENT_vl       0.4704117    0.4704117
-&gt; ENTrel_vl    0.1021486    0.1021486
-&gt; CoV_vl       0.1761294    0.1761294
-&gt; REP_vl       1.1741573    1.1741573
-&gt; N_hlp     2090.0000000 2090.0000000
-&gt; N_hl       959.0000000  959.0000000
-&gt; LAM_hl       0.6733247    0.6733247
-&gt; TT_hl        2.1793535    2.1793535
-&gt; MAX_hl       3.0000000    3.0000000
-&gt; ENT_hl       0.4704117    0.4704117
-&gt; ENTrel_hl    0.1021486    0.1021486
-&gt; CoV_hl       0.1761294    0.1761294
-&gt; REP_hl       1.1741573    1.1741573</code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># The tables are stored in an attribute</span>
-<span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">crqa_1</span>,<span class="st">"measuresTable"</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt; $`Global Measures`
-&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix               9900     3104       0.3135354            1324
-&gt;   Divergence Repetitiveness
-&gt; 1  0.1111111       2.348315
-&gt; 
-&gt; $`Line-based Measures`
-&gt;   Line.based N.lines N.points.on.lines      Measure      Rate     Mean Max
-&gt; 1   Diagonal     668              1780  Determinism 0.5734536 2.664671   9
-&gt; 2   Vertical     959              2090 V Laminarity 0.6733247 2.179353   3
-&gt; 3 Horizontal     959              2090 H Laminarity 0.6733247 2.179353   3
-&gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1          1.1141896        0.2419432      0.3923046
-&gt; 2          0.4704117        0.1021486      0.1761294
-&gt; 3          0.4704117        0.1021486      0.1761294</code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">crqa_2</span>,<span class="st">"measuresTable"</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt; $`Global Measures`
-&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix               9900     3094       0.3125253            1456
-&gt;   Divergence Repetitiveness
-&gt; 1  0.1428571       1.802198
-&gt; 
-&gt; $`Line-based Measures`
-&gt;   Line.based N.lines N.points.on.lines      Measure      Rate     Mean Max
-&gt; 1   Diagonal     668              1638  Determinism 0.5294118 2.452096   7
-&gt; 2   Vertical     682              1476 V Laminarity 0.4770524 2.164223   3
-&gt; 3 Horizontal     682              1476 H Laminarity 0.4770524 2.164223   3
-&gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1          0.8901225       0.19328765      0.3195282
-&gt; 2          0.4466065       0.09697937      0.1713084
-&gt; 3          0.4466065       0.09697937      0.1713084</code></pre>
-<p>The sequence generated by participant 163 has a higher <strong>DET</strong>erminism (<code>DET = .40</code>) than the sequence by particpant 291 (<code>DET = .19</code>). The ratio of points on a diagonal line to the total number of recurrent point also quantifies this difference (<code>DET_RR</code>). Also interesting to note, both participants have a <strong>LAM</strong>inarity score of <code>0</code>. This implies they avoided to produce patterns in which the exact same numbers were repeated in succession. This is a tell-tale sign of the <em>non-random</em> origins of these sequences.</p>
+<code class="sourceCode R"><span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RP</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, drawDiagonal <span class="op">=</span> <span class="cn">TRUE</span>, drawGrid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/bear1RPplot-1.png" alt="Recurrence Plot of the Poem." width="576"><p class="caption">
+Recurrence Plot of the Poem.
+</p>
 </div>
-<div id="hypothesis-testing-using-constrained-data-realisations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#hypothesis-testing-using-constrained-data-realisations" class="anchor"></a><strong>Hypothesis testing using constrained data realisations</strong>
-</h2>
-<p>A simple strategy to get some more certainty about the differences between the two sequences is to randomise the observed series, thus removing any temporal correlations that might give rise to recurring patterns in the sequences and re-run the RQA. If the repeated patterns generated by participant 163 are non-random one would expect the <strong>DET</strong>erminism to drop. If they do not drop this could indicate some random autoregressive process is causing apparent deterministic temporal patterns.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Reproduce the same randomisation</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123456789</span><span class="op">)</span>
-
-<span class="co"># Randomise the number sequences</span>
-<span class="va">y_1rnd</span> <span class="op">&lt;-</span> <span class="va">y_1</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span><span class="op">(</span><span class="va">y_1</span><span class="op">)</span>,size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span><span class="op">(</span><span class="va">y_1</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>
-<span class="va">y_2rnd</span> <span class="op">&lt;-</span> <span class="va">y_2</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span><span class="op">(</span><span class="va">y_2</span><span class="op">)</span>,size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">NROW</a></span><span class="op">(</span><span class="va">y_2</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>
-
-<span class="co"># Create the recurrence matrix</span>
-<span class="va">rp_1rnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1<span class="op">=</span><span class="va">y_1rnd</span>, emDim <span class="op">=</span> <span class="fl">1</span>, emLag <span class="op">=</span> <span class="fl">1</span>,emRad <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-<span class="va">rp_2rnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1<span class="op">=</span><span class="va">y_2rnd</span>, emDim <span class="op">=</span> <span class="fl">1</span>, emLag <span class="op">=</span> <span class="fl">1</span>,emRad <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
-
-<span class="co"># Get the RPs</span>
-<span class="va">g_1rnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">rp_1rnd</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, returnOnlyObject <span class="op">=</span> <span class="cn">TRUE</span>, title <span class="op">=</span> <span class="st">"ID 163 shuffled"</span><span class="op">)</span>
-<span class="va">g_2rnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">rp_2rnd</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, returnOnlyObject <span class="op">=</span> <span class="cn">TRUE</span>, title <span class="op">=</span> <span class="st">"ID 291 shuffled"</span><span class="op">)</span>
-
-<span class="co"># Get CRQA measures</span>
-<span class="va">crqa_1rnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">rp_1rnd</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Global Measures
-&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix               9900     3104           0.314            1474
-&gt;   Divergence Repetitiveness
-&gt; 1      0.167           2.29
-&gt; 
-&gt; 
-&gt; Line-based Measures
-&gt;   Line.based N.lines N.points.on.lines      Measure  Rate Mean Max
-&gt; 1   Diagonal     652              1630  Determinism 0.525 2.50   6
-&gt; 2   Vertical     673              1863 V Laminarity 0.600 2.77   6
-&gt; 3 Horizontal     673              1863 H Laminarity 0.600 2.77   6
-&gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1               0.95            0.206          0.330
-&gt; 2               1.14            0.247          0.383
-&gt; 3               1.14            0.247          0.383
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">crqa_2rnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">rp_2rnd</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~
-&gt; 
-&gt; Global Measures
-&gt;              Global Max.points.theiler N.points Recurrence.Rate Singular.points
-&gt; 1 Recurrence Matrix               9900     3094           0.313            1524
-&gt;   Divergence Repetitiveness
-&gt; 1      0.167           2.02
-&gt; 
-&gt; 
-&gt; Line-based Measures
-&gt;   Line.based N.lines N.points.on.lines      Measure  Rate Mean Max
-&gt; 1   Diagonal     652              1570  Determinism 0.507 2.41   6
-&gt; 2   Vertical     680              1582 V Laminarity 0.511 2.33   4
-&gt; 3 Horizontal     680              1582 H Laminarity 0.511 2.33   4
-&gt;   Entropy.of.lengths Relative.entropy CoV.of.lengths
-&gt; 1              0.838            0.182          0.309
-&gt; 2              0.721            0.157          0.254
-&gt; 3              0.721            0.157          0.254
-&gt; 
-&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Display recurrence plots</span>
-<span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html">plot_grid</a></span><span class="op">(</span><span class="va">g_1rnd</span>, <span class="va">g_2rnd</span>, align <span class="op">=</span> <span class="st">"h"</span><span class="op">)</span></code></pre></div>
-<p><img src="CRQA_files/figure-html/RNG4-1.png" width="504" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Display the RQA measures for ID 163</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span>subj163<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_1</span><span class="op">)</span>, subj163rnd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_1rnd</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt;                      1            1
-&gt; emRad        1.0000000    1.0000000
-&gt; RP_max    9900.0000000 9900.0000000
-&gt; RR           0.3135354    0.3135354
-&gt; SING_N    1324.0000000 1474.0000000
-&gt; SING_rate    0.4265464    0.4748711
-&gt; RP_N      3104.0000000 3104.0000000
-&gt; DIV_dl       0.1111111    0.1666667
-&gt; REP_av       2.3483146    2.2858896
-&gt; N_dl       668.0000000  652.0000000
-&gt; N_dlp     1780.0000000 1630.0000000
-&gt; DET          0.5734536    0.5251289
-&gt; MEAN_dl      2.6646707    2.5000000
-&gt; MAX_dl       9.0000000    6.0000000
-&gt; ENT_dl       1.1141896    0.9496474
-&gt; ENTrel_dl    0.2419432    0.2062133
-&gt; CoV_dl       0.3923046    0.3299676
-&gt; N_vl       959.0000000  673.0000000
-&gt; N_vlp     2090.0000000 1863.0000000
-&gt; LAM_vl       0.6733247    0.6001933
-&gt; TT_vl        2.1793535    2.7682021
-&gt; MAX_vl       3.0000000    6.0000000
-&gt; ENT_vl       0.4704117    1.1353416
-&gt; ENTrel_vl    0.1021486    0.2465363
-&gt; CoV_vl       0.1761294    0.3826106
-&gt; REP_vl       1.1741573    1.1429448
-&gt; N_hlp     2090.0000000 1863.0000000
-&gt; N_hl       959.0000000  673.0000000
-&gt; LAM_hl       0.6733247    0.6001933
-&gt; TT_hl        2.1793535    2.7682021
-&gt; MAX_hl       3.0000000    6.0000000
-&gt; ENT_hl       0.4704117    1.1353416
-&gt; ENTrel_hl    0.1021486    0.2465363
-&gt; CoV_hl       0.1761294    0.3826106
-&gt; REP_hl       1.1741573    1.1429448</code></pre>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Display the RQA measures for ID 291</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind.data.frame</a></span><span class="op">(</span>subj291<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_2</span><span class="op">)</span>,  subj291rnd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">crqa_2rnd</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>&gt;                      1            1
-&gt; emRad     1.000000e+00    1.0000000
-&gt; RP_max    9.900000e+03 9900.0000000
-&gt; RR        3.125253e-01    0.3125253
-&gt; SING_N    1.456000e+03 1524.0000000
-&gt; SING_rate 4.705882e-01    0.4925663
-&gt; RP_N      3.094000e+03 3094.0000000
-&gt; DIV_dl    1.428571e-01    0.1666667
-&gt; REP_av    1.802198e+00    2.0152866
-&gt; N_dl      6.680000e+02  652.0000000
-&gt; N_dlp     1.638000e+03 1570.0000000
-&gt; DET       5.294118e-01    0.5074337
-&gt; MEAN_dl   2.452096e+00    2.4079755
-&gt; MAX_dl    7.000000e+00    6.0000000
-&gt; ENT_dl    8.901225e-01    0.8384475
-&gt; ENTrel_dl 1.932876e-01    0.1820666
-&gt; CoV_dl    3.195282e-01    0.3094559
-&gt; N_vl      6.820000e+02  680.0000000
-&gt; N_vlp     1.476000e+03 1582.0000000
-&gt; LAM_vl    4.770524e-01    0.5113122
-&gt; TT_vl     2.164223e+00    2.3264706
-&gt; MAX_vl    3.000000e+00    4.0000000
-&gt; ENT_vl    4.466065e-01    0.7212808
-&gt; ENTrel_vl 9.697937e-02    0.1566241
-&gt; CoV_vl    1.713084e-01    0.2542265
-&gt; REP_vl    9.010989e-01    1.0076433
-&gt; N_hlp     1.476000e+03 1582.0000000
-&gt; N_hl      6.820000e+02  680.0000000
-&gt; LAM_hl    4.770524e-01    0.5113122
-&gt; TT_hl     2.164223e+00    2.3264706
-&gt; MAX_hl    3.000000e+00    4.0000000
-&gt; ENT_hl    4.466065e-01    0.7212808
-&gt; ENTrel_hl 9.697937e-02    0.1566241
-&gt; CoV_hl    1.713084e-01    0.2542265
-&gt; REP_hl    9.010989e-01    1.0076433</code></pre>
-<p>Note that the number of recurrent points (<code>RR</code>) does not change whe we shuffle the data. What changes is the number of recurrent points that form line structures in the recurrence plot. Randomising the number sequences causes vertical line structures to appear in the recurrence plot (<code>LAM</code>, <code>V_max</code>, <code>V_entr</code>, <code>TT</code>), this is what we would expect if the data generating process were indeed a random process. Having no such structures means there were hardly any sequences consisting of repetitions of the same number. Participants may have adopted a strategy to avoid such sequences because they erroneously believed this to be a feature of non-random sequences.</p>
-<div id="a-permutation-test-with-surrogate-time-series" class="section level3">
+<p>The auto-recurrence plot is symmetrical around the diagonal. The diagonal represents the exact coincidence of the time series with itself, it is often called the <em>Line of Incidence</em> (LOI) or <em>Line of Synchronization</em> (LOS).</p>
+<div id="auto-rqa-measures" class="section level3">
 <h3 class="hasAnchor">
-<a href="#a-permutation-test-with-surrogate-time-series" class="anchor"></a>A permutation test with surrogate time series</h3>
-<p>In order to get an idea about the meaningfulness of these differences, we can construct a surrogate data test for each participant. If we want a one-sided test with <span class="math inline">\(\alpha=.05\)</span>, the formula for the number of constrained realisations <span class="math inline">\(M\)</span> we minimally need is: <span class="math display">\[M = \frac{1}{\alpha}-1 = 19\]</span>. Add the observed value and we have a sample size of <span class="math inline">\(N = 20\)</span>. For a two sided test we would use <span class="math display">\[M = \frac{2}{\alpha}-1 = 39\]</span>.</p>
-<p>Of course, if there are no computational constraints on generating surrogate time series, we can go much higher, If we want <span class="math inline">\(N = 100\)</span>, the test will be an evaluation of <span class="math inline">\(H_{0}\)</span> at <span class="math inline">\(\alpha = .01\)</span>.</p>
-<ol style="list-style-type: decimal">
-<li>Create <code>99</code> realisations that reflect a test of the hypothesis <span class="math inline">\(H_{0}: X_i \sim \mathcal{U(1,9)}\)</span> at <span class="math inline">\(\alpha = .01\)</span>.</li>
-<li>Calculate the measure of interest, e.g. <code>DET</code>
+<a href="#auto-rqa-measures" class="anchor"></a>Auto-RQA Measures</h3>
+<p>The basic measures that are calculated from the auto-recurrence matrix are based on the number of recurring points and whether the points are on a diagonal or vertical (horizontal) line structure. Often, the diagonal is excluded from the calculations, this can be achieved manually by setting the argument <code>theiler = 0</code> when creating the recurrence matrix using function <code><a href="../reference/rp.html">rp()</a></code>. Differences in RQA output between different software packages can often be attributed to inclusion or exclusion of the main diagonal (see the paragraph on the <a href="#theiler">theiler window</a>)</p>
+<p>The points that form line structures represent the repetition of dynamic patterns, in the present example, the repetition of certain patterns of words in the text. In the recurrence plot of the poem, mostly diagonal lines can be seen. Diagonal lines represent the repetition of any type of pattern, like <code>"along came another"</code> and <code>"then there were"</code>. Horizontal (or vertical) lines represent the repetition of exactly the same value, in the time series of the poem, there is only repetition of the counting words (<code>"two"</code>, <code>"three"</code>, “<code>four</code>”). These particular repetitions emerge as blocks on the diagonal.</p>
+<p>The most frequently used measures calculated from the plot are (see section ):</p>
+<ul>
+<li>The <em>Recurrence Rate</em> (<strong>RR</strong>) is simply the amount of recurrent points divided over the number of points that could potentially be recurring, i.e. the size of the matrix. This measure corresponds to the <a href="https://en.wikipedia.org/wiki/Correlation_sum#:~:text=The%20correlation%20sum%20is%20used%20to%20estimate%20the%20correlation%20dimension.">correlation sum</a>.</li>
+<li>
+<em>Determinism</em> (<strong>DET</strong>) is the proportion of points that fall on a diagonal line.</li>
+<li>
+<em>Laminarity</em> (<strong>LAM</strong>) is the proportion of points that fall on a vertical (<em>V Laminarity</em>) or a horizontal line (<em>H Laminarity</em>), or the total (<em>H+V Laminarity</em>)</li>
+</ul>
+<p>Several other measures are often reported based on the line structures in the plot:</p>
+<ul>
+<li>
+<em>Mean line</em> is the mean of line lengths. Commonly used symbols are <strong>L</strong> for diagonal lines and <strong>TT</strong> (trapping time) non-diagonal lines, in <em>casnet</em>:
+<ul>
+<li>Diagonal: <strong>MEAN_dl</strong>
 </li>
-<li>If the observed <code>DET</code> value is at the extremes of the distribution of values representing <span class="math inline">\(H_{0}\)</span>, the observed value was probably not generated by drawing from a discrete uniform distribution with finite elements <code>1</code> through <code>9</code>.</li>
-</ol>
-<p>Use function <code>plorSUR_hist()</code> to get a p-value and plot the distributions. The red dots indicate the observed values.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Get point estimates for p-values based on rank of observation (discrete distribution)</span>
-<span class="co">#   99 = (1 / alpha) - 1</span>
-<span class="co"># 99+1 = (1 / alpha)</span>
-<span class="va">alpha</span> <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">100</span>
+<li>Horizontal: <strong>MEAN_hl</strong>
+</li>
+<li>Vertical: <strong>MEAN_vl</strong>
+</li>
+</ul>
+</li>
+<li>
+<em>Max. line</em> the maximum of observed line lengths. Commonly used symbols <strong>L_max</strong>, <strong>H_max</strong>, <strong>V_max</strong>, in <em>casnet</em>:
+<ul>
+<li>Diagonal: <strong>MAX_dl</strong>
+</li>
+<li>Horizontal: <strong>MAX_hl</strong>
+</li>
+<li>Vertical: <strong>MAX_vl</strong><br>
+</li>
+</ul>
+</li>
+<li>
+<em>Entropy</em> of the distribution of the line lengths. This is not the entropy of the time series (e.g. Sample Entropy), but the Shannon entropy of the histogram of the line lengths. Commonly used symbols are <strong>H</strong>, or <strong>ENTR</strong>, in <em>casnet</em>:
+<ul>
+<li>Diagonal: <strong>ENT_dl</strong>
+</li>
+<li>Horizontal: <strong>ENT_hl</strong>
+</li>
+<li>Vertical: <strong>ENT_vl</strong>
+</li>
+</ul>
+</li>
+</ul>
+<p>To get the basic measures from the recurrence matrix use function <code><a href="../reference/rp_measures.html">rp_measures()</a></code></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bear_up_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">RP</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt;  Global Measures
+&gt;   Global Max.points N.points     RR Singular Divergence Repetitiveness
+&gt; 1 Matrix       3192       98 0.0307       14      0.167              0
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;        Lines N.lines N.points Measure  Rate Mean Max.   ENT ENT_rel   CoV
+&gt; 1   Diagonal      18       84     DET 0.857 4.67    6 0.637   0.157 0.416
+&gt; 2   Vertical       1        0   V LAM 0.000 0.00    0 0.000   0.000    NA
+&gt; 3 Horizontal       1        0   H LAM 0.000 0.00    0 0.000   0.000    NA
+&gt; 4  V+H Total       2        0 V+H LAM 0.000 0.00    0 0.000   0.000   NaN
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<p>The function returns a data frame with all the measures, but can also print a nice summary table. The table is stored in the attribute <code>measureTable</code> of the data frame.</p>
+<p>The table output is grouped into <em>Global Measures</em> and <em>Line-based Measures</em>, some properties of the matrix and line distributions are also provided. There are 98 recurring points in the matrix (excluding the diagonal). Divide this on the size of the matrix (excluding the diagonal) <code>57 * 56 = 3192</code>, gives a recurrence rate of 3.07%. The <code>Singular Points</code> measure indicates there are 14 recurrent points that are not on any line. A measure that is reported in the data frame, but not in the table is the <code>Singularity Rate</code>, which is calculated as the number of singular points on the total number of recurrent points, in the present case 14.3% of recurring points are not part of any larger pattern.</p>
+<p>The global measure <em>Divergence</em> is calculated as the multiplicative inverse of the maximum diagonal line length (1/6 = 0.17), which is thought to be an estimate of the (trend of the) positive maximal <a href="https://en.wikipedia.org/wiki/Lyapunov_exponent">Lyapunov Exponent</a>. This exponent represents the rate of separation between two trajectories in the phase space of a dynamical system with almost identical initial conditions. How fast such trajectories will <em>diverge</em> is an indication of a system’s sensitivity to initial conditions. The largest recurring dynamic pattern represents the maximal stability of the deterministic structure of the system and due to the definition of Divergence in RQA, the maximum diagonal line line length could be considered an estimate of the <a href="https://en.wikipedia.org/wiki/Lyapunov_time">Lyapunov time</a>. However, the relation between Lyapunov exponents and RQA measures is quite complicated and should be interpreted with care. Of course, in the context of a poem about bears, this measure may be difficult to interpret.</p>
+<p>The global measure <em>Repetitiveness</em> is calculated as <code>(N points on horizontal lines + N points on vertical lines) / N points on diagonal lines</code>. This is the proportion of recurrent points that form line structures that are repetitions of the same value.</p>
+<p>There are 18 diagonal lines, made up of a total of 84 recurrent points. The output shows the mean and max line lengths, the entropy of the distribution of line lengths, the relative entropy (standardised on the time series length) and the coefficient of variation of the line lengths. The Laminarity is split between Horizontal and Vertical lines, but also the ‘global’ Laminarity, based on both Horizontal and Vertical lines is reported.</p>
+</div>
+<div id="theiler" class="section level3">
+<h3 class="hasAnchor">
+<a href="#theiler" class="anchor"></a>The theiler window</h3>
+<p>As discussed above, there are no horizontal or vertical lines in the Recurrence Plot of this poem because, by default, the diagonal is removed from the calculations in Auto-RQA. If we include the diagonal there should be horizontal and vertical lines of length 2, representing the repetition of the counting words. This can be achieved by setting the argument <code>theiler = 0</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RP2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">bear_up</span>, emLag <span class="op">=</span> <span class="fl">1</span>, emDim <span class="op">=</span> <span class="fl">1</span>, emRad <span class="op">=</span> <span class="fl">0</span>, theiler <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
 
-<span class="va">p_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotSUR_hist.html">plotSUR_hist</a></span><span class="op">(</span>surrogateValues <span class="op">=</span> <span class="va">crqa_1rnd_sur</span><span class="op">$</span><span class="va">DET</span>, observedValue <span class="op">=</span> <span class="va">crqa_1</span><span class="op">$</span><span class="va">DET</span>, measureName <span class="op">=</span> <span class="st">"DET"</span>, doPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="va">p_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotSUR_hist.html">plotSUR_hist</a></span><span class="op">(</span>surrogateValues <span class="op">=</span> <span class="va">crqa_2rnd_sur</span><span class="op">$</span><span class="va">DET</span>, observedValue <span class="op">=</span> <span class="va">crqa_2</span><span class="op">$</span><span class="va">DET</span>, measureName <span class="op">=</span> <span class="st">"DET"</span>, doPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html">plot_grid</a></span><span class="op">(</span><span class="va">p_1</span><span class="op">$</span><span class="va">surrogates_plot</span>, <span class="va">p_2</span><span class="op">$</span><span class="va">surrogates_plot</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ID 163"</span>,<span class="st">"ID 291"</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<p><img src="CRQA_files/figure-html/RNG5a-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>To get the full picture, let’s look at those missing repetitions of the same numbers.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Get point estimates for p-values based on rank of observation (discrete distribution)</span>
-<span class="co">#   99 = (1 / alpha) - 1</span>
-<span class="co"># 99+1 = (1 / alpha)</span>
-<span class="va">alpha</span> <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">100</span>
-
-<span class="va">p_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotSUR_hist.html">plotSUR_hist</a></span><span class="op">(</span>surrogateValues <span class="op">=</span> <span class="va">crqa_1rnd_sur</span><span class="op">$</span><span class="va">LAM_vl</span>, observedValue <span class="op">=</span> <span class="va">crqa_1</span><span class="op">$</span><span class="va">LAM_vl</span>, measureName <span class="op">=</span> <span class="st">"LAM"</span>, doPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="va">p_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotSUR_hist.html">plotSUR_hist</a></span><span class="op">(</span>surrogateValues <span class="op">=</span> <span class="va">crqa_2rnd_sur</span><span class="op">$</span><span class="va">LAM_vl</span>, observedValue <span class="op">=</span> <span class="va">crqa_2</span><span class="op">$</span><span class="va">LAM_vl</span>, measureName <span class="op">=</span> <span class="st">"LAM"</span>, doPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-
-<span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html">plot_grid</a></span><span class="op">(</span><span class="va">p_1</span><span class="op">$</span><span class="va">surrogates_plot</span>, <span class="va">p_2</span><span class="op">$</span><span class="va">surrogates_plot</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ID 163"</span>,<span class="st">"ID 291"</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<p><img src="CRQA_files/figure-html/RNG6-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>If we were naive to the origin of these number sequences, the results for <strong>LAM</strong>inarity should make us doubt that they represent indendent draws from a discrete uniform distribution of the type <span class="math inline">\(X \sim \mathcal{U}(1,9)\)</span>. If we had to decide which sequence was more, or, less random, then based on the <strong>DET</strong>erminism result, we would conclude that participant 163 produced a sequence that is less random than participant 291, the observed value of the former is at the right extreme of a distribution of <code>DET</code> values calculated from 99 realisations of the data constrained by <span class="math inline">\(H_0\)</span>.</p>
+<span class="va">bear_up_out2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">RP2</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt;  Global Measures
+&gt;   Global Max.points N.points     RR Singular Divergence Repetitiveness
+&gt; 1 Matrix       3249      155 0.0477       14     0.0175           0.17
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;        Lines N.lines N.points Measure   Rate Mean Max.   ENT ENT_rel  CoV
+&gt; 1   Diagonal      19      141     DET 0.9097 7.42   57 0.809     0.2 1.64
+&gt; 2   Vertical       6       12   V LAM 0.0774 2.00    2 0.000     0.0 0.00
+&gt; 3 Horizontal       6       12   H LAM 0.0774 2.00    2 0.000     0.0 0.00
+&gt; 4  V+H Total      12       24 V+H LAM 0.0774 2.00    2 0.000     0.0 0.00
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<p>There are now 6 vertical and horizontal lines of length <code>2</code>, they make up the ‘cubes’ visible on the main diagonal. Obviously, including the diagonal in the calculations <em>will</em> change the values of measures. In addition to measures based on Horizontal and Vertical line structures, the size of the RP will now be <code>57 * 57 = 3249</code> instead of <code>57 * 56 =  3192</code>. The number of recurrent points also changes (by <code>57</code>), which affects the recurrence rate: 4.77%. It is therefore important to always report whether or not the diagonal is included in calculations of Auto-RQA measures.</p>
+<p>The theiler argument represents the number (or range) of diagonals that will be removed, or rather, ‘cleared’ before recurrence measures are calculated. This can be thought of as a kind of filter for signals of which it is know they are autocorrelated on relatively short time scales. The idea is that these autocorrelations (which will pop up as recurrent points around the main diagonal) are less interesting to consider than long-range dependencies.</p>
+<p><strong>Important:</strong> In <em>casnet</em> the value passed to the theiler window argument will affect <strong>all</strong> measures, whereas in other RQA software, you can notice that only the global measures and those based on diagonal lines are affected. That is, in the example above, with <code>theiler = 1</code>, other RQA software will report the same values for Horizontal and Vertical measures as <em>casnet</em> does with <code>theiler = 0</code>. In our opinion it is more consistent to consider line structures of length 2, of which one point lies on the main diagonal, as a single recurrence, because in <strong>Auto</strong>-RQA:</p>
+<ul>
+<li>The main diagonal is simply the Line of Incidence, the <code>lag-0</code> auto-correlation, which is always <code>1</code>.<br>
+</li>
+<li>If a value observed at time <code>t</code> is repeated at time <code>t+1</code>, this is a single repetition of the value, the lag-0 autocorrelation should not be included.</li>
+<li>If a value observed at time <code>t</code> is repeated at time <code>t+1</code> <strong>and</strong> at <code>t+2</code> there are 2 recurrences of the value observed at <code>t</code> and this should be considered a line of length <code>2</code>.</li>
+</ul>
+<p>In <strong>Cross</strong>-RQA, 2 different time series are evaluated. The <code>lag-0</code> auto-correlation is not represented, but rather, the <code>lag-0</code> cross-correlation. This <em>does</em> have a meaningful interpretation, because it represents the recurrence of values in 2 different time series at exactly the same time, which is why it is called the Line of Synchronisation. Therefore, in Cross-RQA the main diagonal should in most cases <strong>not</strong> be excluded and <code>theiler = 0</code> should be used. If <code>theiler = NA</code>, the function will decide the best setting based on the symmetry of recurrence matrix, if it is symmetrical,the context is Auto-RQA and the diagonal will be excluded (<code>theiler = 1</code>). If it is not symmetrical the context is Cross-RQA and the main diagonal will be included (<code>theiler = 0</code>).</p>
 </div>
 </div>
 <div id="categorical-cross-rqa" class="section level2">
 <h2 class="hasAnchor">
 <a href="#categorical-cross-rqa" class="anchor"></a>Categorical Cross-RQA</h2>
+<p>It is possible to evaluate the recurrences between 2 different time series, in which case the analysis is called Cross-Recurrence Analysis. The analysis is used to examine synchronisation and coupling dynamics, but the principle of quantification is exactly the same as for Auto-RQA, for all lags of time, count whether a value is recurring.</p>
+<p>Consider another poem about bears, this time, we count down:</p>
+<pre><code>Five little bears
+Heard a loud roar
+One ran away
+Then there were four!
+
+Four little bears
+Climbing up a tree
+One slid down
+Then there were three!
+
+Three little bears
+Deciding what to do
+One fell asleep
+Then there were two!
+
+Two little bears
+Having lots of fun
+One went home
+Then there was one!</code></pre>
+<p>Let’s examine whether these two poems share similar patterns. The poems are of equal length (57 words), but because they contain different words, the values assigned to the unique words must index the unique words from both poems. This can again be done using the <code>casnet</code> function <code><a href="../reference/as.numeric_discrete.html">as.numeric_discrete()</a></code>. Setting <code>sortUnique = TRUE</code>, will first sort the words (alphabetically) before they are assigned a number.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bear2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"five little bears heard a loud roar one ran away then there were four four little bears climbing up a tree one slid down then there were three three little bears deciding what to do one fell asleep then there were two two little bears having a lot of fun one went home then there was one"</span><span class="op">)</span>
+
+<span class="va">bear_updown</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.numeric_discrete.html">as.numeric_discrete</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span><span class="op">(</span><span class="va">bear1</span>,<span class="st">" "</span><span class="op">)</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span><span class="op">(</span><span class="va">bear2</span>,<span class="st">" "</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, sortUnique <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="va">bear_up</span>  <span class="op">&lt;-</span> <span class="va">bear_updown</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bear_up</span><span class="op">)</span><span class="op">]</span>
+<span class="va">bear_down</span> <span class="op">&lt;-</span> <span class="va">bear_updown</span><span class="op">[</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bear_up</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bear_updown</span><span class="op">)</span><span class="op">]</span>
+  
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">bear_up</span>, type <span class="op">=</span> <span class="st">"b"</span>, xlab <span class="op">=</span> <span class="st">"Time"</span>, ylab <span class="op">=</span> <span class="st">"Unique Word"</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/lines.html">lines</a></span><span class="op">(</span><span class="va">bear_down</span>, type <span class="op">=</span> <span class="st">"b"</span>, col <span class="op">=</span> <span class="st">"red"</span>, lty<span class="op">=</span><span class="fl">2</span>, pch <span class="op">=</span> <span class="fl">16</span><span class="op">)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/bearstory2-1.png" alt="Nominal Time Series." width="576"><p class="caption">
+Nominal Time Series.
+</p>
 </div>
-<div id="continuous-auto-rqa" class="section level2">
+<p>The plot of the two series reveals that at some moments the same words occur at exactly the same time, because the lines overlap. What is less clear to see is whether there are patterns that are repeated with some delay.</p>
+<p><img src="CRQA_files/figure-html/CRP-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>This is a <em>Cross Recurrence Plot</em>, it is no longer symmetrical around the main diagonal, which is now called the <em>Line of Synchronisation</em> (LOS). To get the <em>Cross Recurrence Matrix</em>, simply add the second time series as argument <code>y2</code> to function <code><a href="../reference/rp.html">rp()</a></code>. The function <code><a href="../reference/rp_plot.html">rp_plot()</a></code> will use the attributes attached to the <code>Matrix</code> object generated by <code><a href="../reference/rp.html">rp()</a></code> to determine the context of the analysis (<em>Auto</em> or <em>Cross</em>).</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">CRP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">bear_up</span>, y2 <span class="op">=</span> <span class="va">bear_down</span>, emLag <span class="op">=</span> <span class="fl">1</span>, emDim <span class="op">=</span> <span class="fl">1</span>, emRad <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
+
+<span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">CRP</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, drawDiagonal <span class="op">=</span> <span class="cn">TRUE</span>, drawGrid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="CRQA_files/figure-html/bear2RP-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>This now is a <em>Cross-Recurrence Quantification Analysis</em>, because we are evaluating recurrences across all lags of time between 2 time series. The interpretation of a recurring point and the line structures are now in terms synchronisation or coupling strength: A value or larger pattern observed in one time series may be observed to recur in the other time series. These recurrences can even be used to infer a <em>direction</em> of the coupling in terms of specific patterns of ‘leading’ or ‘following’ the interaction (see the section on <a href="#drp"><strong>Diagonal Recurrence Profiles</strong></a>).</p>
+<p>The main output of the <code><a href="../reference/rp_measures.html">rp_measures()</a></code> function is very similar to that of Auto-RQA.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bear_updown_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">CRP</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt;  Global Measures
+&gt;   Global Max.points N.points     RR Singular Divergence Repetitiveness
+&gt; 1 Matrix       3249      102 0.0314       21      0.143          0.296
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;        Lines N.lines N.points Measure  Rate Mean Max. ENT ENT_rel   CoV
+&gt; 1   Diagonal      26       81     DET 0.794 3.12    7 1.1   0.272 0.532
+&gt; 2   Vertical       6       12   V LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 3 Horizontal       6       12   H LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 4  V+H Total      12       24 V+H LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<p>The output is again grouped into <em>Global Measures</em> and <em>Line-based Measures</em>. There are 102 recurring points in the matrix, now the main diagonal has to be included, points that fall on the main diagonal If we divide this on the size of the matrix (<code>57 * 57 = 3192</code>), we get a recurrence rate of 3.14%. There are 21 recurrent points that are not on any line.</p>
+<div id="anisotropic-and-asymmetric-categorical-rqa-measures" class="section level3">
+<h3 class="hasAnchor">
+<a href="#anisotropic-and-asymmetric-categorical-rqa-measures" class="anchor"></a>Anisotropic and asymmetric categorical RQA measures</h3>
+<p>To see the asymmetry (or <a href="https://en.wikipedia.org/wiki/Anisotropy">anisotropy</a>) in the plot, look at the first few columns and the last few rows of the matrix. There is also a lot of symmetry in the plot. If these were data from 2 systems interacting, one could say their dynamics are probably coupled. In the present case the similarity occurs because the basic structure of the 2 poems is the same.</p>
+<p>There are two sets of measures that quantify the asymmetry in the CRP:</p>
+<ul>
+<li><p><em>Anisotropy ratio based on Horizontal and Vertical line measures</em> <span class="citation">(<a href="#ref-cox2016a" role="doc-biblioref">Cox, Steen, Guevara, Jonge-Hoekstra, &amp; Dijk, 2016</a>)</span>: The ratios are calculated as <code>(horizontal - vertical) / (horizontal + vertical)</code>, for example the anisotropic Laminarity ratio is: <code>(H LAM - V LAM) / (H LAM + V LAM)</code>. A value of <code>0</code> means no anisotropy, negative ratios indicate the measures based on vertical lines had higher values, positive ratios indicate the measures based on horizontal lines had higher values. To get these measures in <code><a href="../reference/rp_measures.html">casnet::rp_measures()</a></code>, set the argument <code>anisotropyHV = TRUE</code>.</p></li>
+<li><p><em>Asymmetry ratio based on Upper and Lower triangles</em>: The ratios are calculated as <code>(upper - lower) / (upper + lower)</code>, for example the asymmetric Determinism ratio is: <code>(DET upper triangle) - (DET lower triangle) / (DET upper triangle) + (DET lower triangle)</code>. A value of <code>0</code> means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values. To get these measures in <code><a href="../reference/rp_measures.html">casnet::rp_measures()</a></code> set the argument <code>asymmetryUL = TRUE</code>.</p></li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bear_updown_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">CRP</span>, anisotropyHV <span class="op">=</span> <span class="cn">TRUE</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt;  Global Measures
+&gt;   Global Max.points N.points     RR Singular Divergence Repetitiveness
+&gt; 1 Matrix       3249      102 0.0314       21      0.143          0.296
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;        Lines N.lines N.points Measure  Rate Mean Max. ENT ENT_rel   CoV
+&gt; 1   Diagonal      26       81     DET 0.794 3.12    7 1.1   0.272 0.532
+&gt; 2   Vertical       6       12   V LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 3 Horizontal       6       12   H LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 4  V+H Total      12       24 V+H LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 
+&gt; 
+&gt; Horizontal/Vertical line anisotropy
+&gt; 
+&gt;               Ratio N.lines N.points Measure Rate Mean Max ENT
+&gt; 1 H/V line measures       0        1     LAM    0    0   0 NaN
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<p>The anisotropic ratios show there are an equal amount of horizontal and vertical lines in the plot, so the Laminarity Rate, Mean, Max and Entropy are also equal and the ratios are all <code>0</code>. In the current context, the equal number of horizontal and vertical lines can be understood from the structure of the 2 poems, they both contain the repetition of the same counting words, for example: <code>then there were three three little bears</code>.</p>
+<p>It is not the case that the two poems are each others mirror opposites, so some asymmetry should be expected, it’s apparently not present in the ratio between horizontal and vertical lines. In the present case we know the upper triangle represents recurrent points (repeated words) that occur at an earlier moment in “time” (position in the poem) in the counting up version which is on on the x-axis. The recurrent points in the lower triangle represent repeated words that occurred at an earlier position in the counting down version of the poem on the y-axis. In a synchronisation study one could use the ratios of RQA measures from the upper and lower triangle to indicate a coupling direction.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">bear_updown_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">CRP</span>, asymmetryUL <span class="op">=</span> <span class="cn">TRUE</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt;  Global Measures
+&gt;   Global Max.points N.points     RR Singular Divergence Repetitiveness
+&gt; 1 Matrix       3249      102 0.0314       21      0.143          0.296
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;        Lines N.lines N.points Measure  Rate Mean Max. ENT ENT_rel   CoV
+&gt; 1   Diagonal      26       81     DET 0.794 3.12    7 1.1   0.272 0.532
+&gt; 2   Vertical       6       12   V LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 3 Horizontal       6       12   H LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 4  V+H Total      12       24 V+H LAM 0.118 2.00    2 0.0   0.000 0.000
+&gt; 
+&gt; 
+&gt; Upper/Lower triangle asymmetry
+&gt; 
+&gt;  Global Measures
+&gt;    Global.Ratio N.points      RR Singular Divergence Repetetiveness
+&gt; 1 U/L of points  -0.0159 -0.0159    0.182          0         0.0577
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;   Line.ratio N.lines N.points Measure    Rate    Mean Max     ENT
+&gt; 1    D lines -0.0577    0.891     DET -0.0577 0.00483   0 0.00944
+&gt; 2    V lines  0.0000    1.000   V LAM  0.0000 0.00000   0     NaN
+&gt; 3    H lines  0.0000    1.000   H LAM  0.0000 0.00000   0     NaN
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<p>The asymmetry ratios based on the upper and lower triangle indeed indicate asymmetry of the Global Measures and Diagonal line-based measures. There are more recurrent points in the lower triangle (64) than in the upper triangle (62). There are more singular points the upper triangle and determinism is higher in the lower triangle.</p>
+</div>
+<div id="drp" class="section level3">
+<h3 class="hasAnchor">
+<a href="#drp" class="anchor"></a>Diagonal (Cross) Recurrence Profiles</h3>
+<p>The diagonal recurrence profile (DRP) or more appropriate, the diagonal cross-recurrence profile (DCRP), is a representation of the distribution of recurrent points in a band around the line of synchronisation The figure below is from <span class="citation">(<a href="#ref-wallot2018" role="doc-biblioref">Wallot &amp; Leonardi, 2018</a>)</span>), it shows how the profile is calculated, the recurrence rate for each of the diagonals in the window is calculated.</p>
+<div class="figure" style="text-align: center">
+<img src="https://www.frontiersin.org/files/Articles/365352/fpsyg-09-02232-HTML/image_m/fpsyg-09-02232-g008.jpg" alt="The Diagonal Recurrence Profile. [Fig. 8 from Wallot &amp; Leonardi(2018)]" width="600"><p class="caption">
+The Diagonal Recurrence Profile. [Fig. 8 from Wallot &amp; Leonardi(2018)]
+</p>
+</div>
+<p>The profile can be used to determine whether one time series is “leading”, or “following” the other series. A more general term would be <strong>coupling direction</strong>. In the current example, there are no real coupling dynamics between the poems, but there is a shared structure between them.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/rp_diagProfile.html">rp_diagProfile</a></span><span class="op">(</span><span class="va">CRP</span>, diagWin <span class="op">=</span> <span class="fl">32</span>, doShuffle <span class="op">=</span> <span class="cn">TRUE</span>, Nshuffle <span class="op">=</span> <span class="fl">19</span>, y1 <span class="op">=</span> <span class="va">bear_up</span>, y2 <span class="op">=</span> <span class="va">bear_down</span>, xname <span class="op">=</span> <span class="st">"counting up"</span>, yname <span class="op">=</span> <span class="st">"counting down"</span><span class="op">)</span></code></pre></div>
+<pre><code>&gt; Calculating diagonal recurrence profiles... 
+&gt; 
+&gt; Profile 1
+&gt; Profile 2
+&gt; Profile 3
+&gt; Profile 4
+&gt; Profile 5
+&gt; Profile 6
+&gt; Profile 7
+&gt; Profile 8
+&gt; Profile 9
+&gt; Profile 10
+&gt; Profile 11
+&gt; Profile 12
+&gt; Profile 13
+&gt; Profile 14
+&gt; Profile 15
+&gt; Profile 16
+&gt; Profile 17
+&gt; Profile 18
+&gt; Profile 19
+&gt; Profile 20</code></pre>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/drp-1.png" alt="Diagonal Recurrence Profile produced by function `rp_diagProfile()`" width="576"><p class="caption">
+Diagonal Recurrence Profile produced by function <code><a href="../reference/rp_diagProfile.html">rp_diagProfile()</a></code>
+</p>
+</div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">#cat("{#fig:drp}")</span></code></pre></div>
+<p>The profile shows there are peaks in recurrent points at the LOS as well as at particular intervals. To be a bit more certain these peaks are real and were not just incidental observations that occurred by chance, one can perform a simple surrogate analysis: One of the time series is randomised, that is, the order in which values appear in the series is shuffled. The CRQA analysis is repeated a number of times and the average of the diagonal recurrence profiles can be used to determine whether a peak is indeed larger than what may be expected based on chance. A one-sided test can be constructed by considering the rank-order of the observed values relative to the shuffled series. If the observed value is the highest among the distribution of <code>20</code> values the p-value is <code>1/20 = .05</code>. A two sided test would require <code>39</code> surrogates, a rank <code>1</code> or <code>40</code> would yield <code>2/40 = .05</code>.</p>
+</div>
+<div id="chromatic-rqa-measures" class="section level3">
+<h3 class="hasAnchor">
+<a href="#chromatic-rqa-measures" class="anchor"></a>Chromatic RQA measures</h3>
+<p>It is often the case that nominal time series data will consist of just a few categories, for example, the series might represent different behavioural categories coded from video recordings. When the data are transformed into a recurrence matrix all category information is lost, as we are only evaluating <em>whether</em> something recurred or not (not <em>what</em> is recurring).</p>
+<p>There maybe situations in which it is interesting to calculate RQA measures for each individual category. This can be done using so-called <strong>Chromatic RQA</strong> <span class="citation">(cf. <a href="#ref-cox2016a" role="doc-biblioref">Cox et al., 2016</a>; <a href="#ref-de-jonge-hoekstra2020" role="doc-biblioref">De Jonge-Hoekstra, Van Der Steen, &amp; Cox, 2020</a>)</span>, which has been implemented in <em>casnet</em> through the argument <code>chromatic</code> in the function <code><a href="../reference/rp.html">rp()</a></code>.</p>
+<p>Below is a simple example of two nominal time series with 3 categories. These data could represent an interpretation of the behaviour of two children interacting with one one another during play. The time series data can be numeric or a character string describing each category which will be assigned a unique number. Note that the recurrence matrix now retains the category numbers, it is no longer a binary matrix.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"positive"</span>, <span class="st">"neutral"</span>,  <span class="st">"neutral"</span>, <span class="st">"hostile"</span>, <span class="st">"hostile"</span>, <span class="cn">NA</span>, <span class="st">"hostile"</span>,  <span class="st">"neutral"</span>, <span class="st">"positive"</span>, <span class="st">"positive"</span>, <span class="st">"positive"</span>, <span class="st">"positive"</span>,  <span class="st">"neutral"</span><span class="op">)</span>
+<span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"neutral"</span>, <span class="st">"hostile"</span>, <span class="st">"neutral"</span>, <span class="st">"hostile"</span>, <span class="st">"hostile"</span>, <span class="st">"positive"</span>, <span class="st">"neutral"</span>, <span class="st">"neutral"</span>, <span class="st">"positive"</span>, <span class="st">"positive"</span>, <span class="st">"positive"</span>, <span class="st">"neutral"</span>, <span class="st">"neutral"</span><span class="op">)</span>
+
+<span class="va">RP_chr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">y1</span>, y2 <span class="op">=</span> <span class="va">y2</span>, chromatic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="co"># Chromatic Recurrence Matrix retains the label information</span>
+<span class="va">RP_chr</span></code></pre></div>
+<pre><code>&gt; 13 x 13 sparse Matrix of class "dgCMatrix"
+&gt;                                
+&gt;  [1,] . . . . . 3 . . 3 3 3 . .
+&gt;  [2,] 2 . 2 . . . 2 2 . . . 2 2
+&gt;  [3,] 2 . 2 . . . 2 2 . . . 2 2
+&gt;  [4,] . 1 . 1 1 . . . . . . . .
+&gt;  [5,] . 1 . 1 1 . . . . . . . .
+&gt;  [6,] . . . . . . . . . . . . .
+&gt;  [7,] . 1 . 1 1 . . . . . . . .
+&gt;  [8,] 2 . 2 . . . 2 2 . . . 2 2
+&gt;  [9,] . . . . . 3 . . 3 3 3 . .
+&gt; [10,] . . . . . 3 . . 3 3 3 . .
+&gt; [11,] . . . . . 3 . . 3 3 3 . .
+&gt; [12,] . . . . . 3 . . 3 3 3 . .
+&gt; [13,] 2 . 2 . . . 2 2 . . . 2 2</code></pre>
+<p>When the matrix is plotted using <code><a href="../reference/rp_plot.html">rp_plot()</a></code> the categories will have different colours in the plot and a legend will be added with the category names.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RP_chr</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, drawGrid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/RPchroma-1.png" alt="Chromatic Recurrence Plot" width="576"><p class="caption">
+Chromatic Recurrence Plot
+</p>
+</div>
+<p>The output of <code>rp_measures())</code> now provides measures for each category label separately.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">RP_chr</span>, anisotropyHV <span class="op">=</span> <span class="cn">TRUE</span>, asymmetryUL <span class="op">=</span> <span class="cn">TRUE</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; Chromatic RQA with categories: hostile, neutral, positive
+&gt;  Global Measures
+&gt;          Global Max.points N.points     RR Singular Divergence Repetitiveness
+&gt; hostile  Matrix        169        9 0.0533        7      0.500            6.0
+&gt; neutral  Matrix        169       24 0.1420       20      0.500            7.0
+&gt; positive Matrix        169       20 0.1183       10      0.333            3.1
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;                  Lines N.lines N.points Measure  Rate Mean Max.   ENT ENT_rel
+&gt; 1 hostile     Diagonal       1        2     DET 0.222 2.00    2 0.000   0.000
+&gt; 2 neutral     Diagonal       2        4     DET 0.167 2.00    2 0.000   0.000
+&gt; 3 positive    Diagonal       4       10     DET 0.500 2.50    3 0.693   0.270
+&gt; 4 hostile     Vertical       3        6   V LAM 0.667 2.00    2 0.000   0.000
+&gt; 5 neutral     Vertical       6       12   V LAM 0.500 2.00    2 0.000   0.000
+&gt; 6 positive    Vertical       4       16   V LAM 0.800 4.00    4 0.000   0.000
+&gt; 7 hostile   Horizontal       3        6   H LAM 0.667 2.00    2 0.000   0.000
+&gt; 8 neutral   Horizontal       8       16   H LAM 0.667 2.00    2 0.000   0.000
+&gt; 9 positive  Horizontal       5       15   H LAM 0.750 4.00    3 0.000   0.000
+&gt; 10 hostile   V+H Total       6       12 V+H LAM 0.667 2.00    2 0.000   0.000
+&gt; 11 neutral   V+H Total      14       28 V+H LAM 0.583 2.00    2 0.000   0.000
+&gt; 12 positive  V+H Total       9       31 V+H LAM 0.775 3.44    4 0.687   0.268
+&gt;               CoV
+&gt; 1 hostile      NA
+&gt; 2 neutral   0.000
+&gt; 3 positive  0.231
+&gt; 4 hostile   0.000
+&gt; 5 neutral   0.000
+&gt; 6 positive  0.000
+&gt; 7 hostile   0.000
+&gt; 8 neutral   0.000
+&gt; 9 positive  0.000
+&gt; 10 hostile  0.000
+&gt; 11 neutral  0.000
+&gt; 12 positive 0.153
+&gt; 
+&gt; 
+&gt; Horizontal/Vertical line anisotropy
+&gt; 
+&gt;                      Ratio N.lines N.points Measure    Rate   Mean    Max ENT
+&gt; hostile  H/V line measures  0.0000    1.000     LAM  0.0000  0.000  0.000 NaN
+&gt; neutral  H/V line measures  0.1429    1.333     LAM  0.1429  0.000  0.000 NaN
+&gt; positive H/V line measures -0.0323    0.938     LAM -0.0323 -0.143 -0.143 NaN
+&gt; 
+&gt; 
+&gt; Upper/Lower triangle asymmetry
+&gt; 
+&gt;  Global Measures
+&gt;           Global.Ratio N.points     RR Singular Divergence Repetetiveness
+&gt; hostile  U/L of points   -0.455 -0.455   -0.714          0       -0.33333
+&gt; neutral  U/L of points    0.037  0.037   -0.130        NaN            NaN
+&gt; positive U/L of points   -0.130 -0.130    0.000          0       -0.00478
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;            Line.ratio N.lines N.points Measure   Rate    Mean    Max     ENT
+&gt; 1 hostile     D lines   0.000    1.000     DET  0.000  0.0000  0.000     NaN
+&gt; 2 neutral     D lines   1.000      Inf     DET  1.000  1.0000  1.000     NaN
+&gt; 3 positive    D lines  -0.231    0.625     DET -0.231 -0.0323  0.000  0.0426
+&gt; 4 hostile     V lines  -0.333    0.500   V LAM -0.333  0.0000  0.000     NaN
+&gt; 5 neutral     V lines   0.667    5.000   V LAM  0.667  0.0000  0.000     NaN
+&gt; 6 positive    V lines  -0.444    0.385   V LAM -0.444 -0.1304 -0.143 -0.2000
+&gt; 7 hostile     H lines  -0.333    0.500   H LAM -0.333  0.0000  0.000     NaN
+&gt; 8 neutral     H lines   0.250    1.667   H LAM  0.250  0.0000  0.000     NaN
+&gt; 9 positive    H lines   0.000    1.000   H LAM  0.000  0.0000  0.000  0.0000
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+</div>
+</div>
+</div>
+<div id="lvSystem" class="section level1">
+<h1 class="hasAnchor">
+<a href="#lvSystem" class="anchor"></a>Continuous Data</h1>
+<p>Recurrence analyses of continuous data are also based on a recurrence matrix which represents recurring values. In terms of (complex) dynamical systems, recurring values represent states of the system that are re-visited at least once during the time it was observed. There are several different ways to construct a recurrence matrix from one or more time series, in this vignette the recurrence matrix based on <a href="#psr">phase space reconstruction</a> will be discussed <span class="citation">(cf. <a href="#ref-marwan2007" role="doc-biblioref">Marwan, Carmen Romano, Thiel, &amp; Kurths, 2007</a>)</span> as well as the so-called <a href="#MdRQA">multidimensional recurrence matrix</a> <span class="citation">(<a href="#ref-wallot2016" role="doc-biblioref">Wallot, Roepstorff, &amp; Mønster, 2016</a>)</span>.</p>
+<p>An important concept in recurrence-based time series analyses of continuous data is the Phase (or State) Space and its reconstruction. The state space is spanned by the dimensions of a system and each coordinate in the space represents a potential state of the system (the degrees of freedom available to the system). A sequence of successive states is referred to as a trajectory, or, a path through phase space. If such a trajectory is re-visited by the system, it will be a relatively stable state, or, orbit of the system.</p>
+<p>In order to explain the steps involved in reconstructing the phase space from a (multivariate) time series, consider the following system of <span class="math inline">\(N=4\)</span> coupled competitive Lotka-Volterra equations previously studied by Vano et al. <span class="citation">(<a href="#ref-vano2006" role="doc-biblioref">2006</a>)</span>:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{dY_{i}}{dt} = r_iY_i\left(1-\frac{\sum_{j=1}^{N}\alpha_{ij}Y_j}{K_i}\right),\ \ \ i=1,\ldots,N\end{equation}\]</span></p>
+<p>with <span class="math inline">\(K_i\)</span> the carrying capacity set to a value of <span class="math inline">\(10\)</span> for all <span class="math inline">\(Y_i\)</span>, and <span class="math inline">\(r_i\)</span> a vector of growth rates and <span class="math inline">\(\alpha_{ij}\)</span> a matrix of coupling parameters:</p>
+<p><span class="math display">\[\begin{equation}
+Y_{i}(t=0) = \begin{bmatrix}8\\2\\2\\2\end{bmatrix},\ \ K = \begin{bmatrix}10\\10\\10\\10\end{bmatrix},\ \ r = \begin{bmatrix}1\\0.72\\1.53\\1.27\end{bmatrix},\ \text{and}\ \ \alpha = \begin{bmatrix} 1 &amp;1.09 &amp;1.52 &amp;0\\  0 &amp;1 &amp;0.44 &amp;1.36\\ 2.33 &amp;0 &amp;1 &amp;0.47\\ 1.21 &amp;0.51 &amp;0.35 &amp;1\end{bmatrix}.
+(\#eq:lvPars)
+\end{equation}\]</span></p>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/lvSeries-1.png" alt="Time series representing the dimensions of the 4D system." width="576"><p class="caption">
+Time series representing the dimensions of the 4D system.
+</p>
+</div>
+<p>The parameters in <span class="math inline">\(r\)</span> and <span class="math inline">\(\alpha\)</span> are taken from Vano et al. <span class="citation">(<a href="#ref-vano2006" role="doc-biblioref">2006</a>)</span>, who describe the dynamics of the resulting attractor as chaotic (bounded, quasi-periodic, sensitive dependence on initial conditions) and found several quantities to display power-law scaling, which is associated with self-organized criticality of multi-stable complex systems <span class="citation">(<a href="#ref-bak1987" role="doc-biblioref">Bak, Tang, &amp; Wiesenfeld, 1987</a>; <a href="#ref-vano2006" role="doc-biblioref">Vano et al., 2006</a>)</span>. Figure @ref(fig:lvSeries) shows <span class="math inline">\(1,000\)</span> iterations of the system (using the 4th order Runge-Kutta method). At <span class="math inline">\(t=\)</span> 700 the coupling strengths in <span class="math inline">\(A\)</span> are gradually increased by 0.01 at each iteration untill <span class="math inline">\(t=\)</span> 800. This means the dynamics of all dimensions become more strongly coupled. These time series could represent a single participant taking part in a study in which bi-daily ratings on a visual analog scale were collected. The dynamics are characterized by initial transient behaviour which settles into a stable, fixed point state, after the coupling strength is changed, a more complex state emerges as a (quasi-)periodic orbit (a trajectory that revisits the same region of phase space, but is not exactly the same as previous visits).</p>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/lvStateSpace-1.png" alt="The 4D state space of the simulated system. The grey squares mark t=700 and t=800 at which the coupling strengths between the 4 dimensions are gradually increased by 0.01 each iteration." width="576"><p class="caption">
+The 4D state space of the simulated system. The grey squares mark t=700 and t=800 at which the coupling strengths between the 4 dimensions are gradually increased by 0.01 each iteration.
+</p>
+</div>
+<p>A (multivariate) time series can be interpreted as a finite representation of the trajectory or state-evolution of a stochastic or deterministic dynamic system: <span class="math inline">\({y_i}_{i=1}^{N}\)</span>, with <span class="math inline">\(y_i = y(t_i)\)</span> <span class="citation">(cf. <a href="#ref-zou2019" role="doc-biblioref">Zou, Donner, Marwan, Donges, &amp; Kurths, 2019</a>)</span>. Figure @ref(fig:lvStateSpace) is a 3D representation of the 4D phase space of the system, with the values of dimension <span class="math inline">\(Y_4\)</span> represented by a colour gradient.</p>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/lvEmbed-1.png" alt="Embedding parameters for attractor reconstruction: The upper panel shows the time-delayed mutual information function with 3 embedding delays, 2 minima and the maximum possible lag for 10 surrogate dimensions given the length of the time series. The bottom panel shows the results of the false nearest neighbor analysis for each of the 3 delays. This plot is the ouput of function `est_parameters()` from package _casnet_." width="576"><p class="caption">
+Embedding parameters for attractor reconstruction: The upper panel shows the time-delayed mutual information function with 3 embedding delays, 2 minima and the maximum possible lag for 10 surrogate dimensions given the length of the time series. The bottom panel shows the results of the false nearest neighbor analysis for each of the 3 delays. This plot is the ouput of function <code><a href="../reference/est_parameters.html">est_parameters()</a></code> from package <em>casnet</em>.
+</p>
+</div>
+<p>The recurrence matrix <span class="math inline">\(\mathbf{R}_{i,j}\)</span> is defined as: <span class="math display">\[\begin{equation}
+\mathbf{R}_{i,j}(\varepsilon)=\Theta\left(\varepsilon-\|\vec{y}_i-\vec{y}_j\|\right),\ \ \ i,j = 1,\ldots, N
+\end{equation}\]</span> where <span class="math inline">\(\|\ \cdot\ \|\)</span> is a distance norm (e.g. Euclidean, Chebyshev, Manhattan), <span class="math inline">\(\varepsilon\)</span> is a threshold value which determines at which distance value a state should be considered to recur, and <span class="math inline">\(\Theta\)</span> is the Heaviside function, which returns <span class="math inline">\(1\)</span> if a distance value falls below <span class="math inline">\(\varepsilon\)</span> and <span class="math inline">\(0\)</span> otherwise. Figure @ref(fig:lvDistOri) displays the unthresholded distance matrix based on the Maximum norm (Chebyshev distance). The distances of each state coordinate (a 4-tuple represented by the values of <span class="math inline">\(y_i\)</span> at each time point) to every other state coordinate are represented by different a colours. The matrix is symmetric around the diagonal, the line of incidence, which is excluded from calculation of recurrence measures. The colour-bar displays several distance values on the right side, which, should they be chosen as the threshold value <span class="math inline">\(\varepsilon\)</span>, would result in the Recurrence Rate (proportion of recurrent points in <span class="math inline">\(\mathbf{R}_{i,j}\)</span>) displayed on the left.</p>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/lvDistOri-1.png" alt="Distance matrix of the simulated 4D phase space." width="576"><p class="caption">
+Distance matrix of the simulated 4D phase space.
+</p>
+</div>
+<div id="psr" class="section level2">
 <h2 class="hasAnchor">
-<a href="#continuous-auto-rqa" class="anchor"></a>Continuous Auto-RQA</h2>
+<a href="#psr" class="anchor"></a>Phase Space Reconstruction</h2>
+<p>A record of all the dimensions that span the phase space of a system will not be available in most cases, so a reconstruction of the attractor and dynamics in phase space will often be conducted. This a common step in many nonlinear time series analyses and can be achieved using the method of delay-embedding <span class="citation">(<a href="#ref-kantz2004" role="doc-biblioref">Kantz &amp; Schreiber, 2004</a>; <a href="#ref-takens1981" role="doc-biblioref">Takens, 1981</a>)</span>. <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> Due to Takens’ theorem <span class="citation">(<a href="#ref-takens1981" role="doc-biblioref">1981</a>)</span> a phase space can be reconstructed that is <em>topologically equivalent</em> to the original space, by creating an <span class="math inline">\(m\)</span>-dimensional time-delay embedding of a single observed dimension of a system: <span class="math inline">\(\vec{y}_i = (y_i, y_{i+\tau}, \ldots, y_{i+\left(m-1\right)\tau})\)</span>, where <span class="math inline">\(\tau\)</span> is the embedding delay. The idea is to exploit the interaction-dominant dynamics that govern the behavior of complex systems. Due to the coupled dynamics of the 4 dimensions of the simulated system, there is information about the dynamics of <span class="math inline">\(Y_2\)</span>, <span class="math inline">\(Y_3\)</span> and <span class="math inline">\(Y_4\)</span> encoded in the dynamics of <span class="math inline">\(Y_1\)</span>. Therefore, any of the dimensions could be used to reconstruct the dynamics of the original phase space. The exact trajectories through phase space will be different, but the dynamical invariants of the original attractor will be retained by the reconstruction and recurrence analyses can be used to quantify (properties of) dynamical invariants. The attractor reconstruction procedure involves two steps, the first is choosing an embedding delay <span class="math inline">\(\tau\)</span>, the second concerns choosing an appropriate number of surrogate dimensions to embed the time series.</p>
+<div id="choosing-an-embedding-lag" class="section level3">
+<h3 class="hasAnchor">
+<a href="#choosing-an-embedding-lag" class="anchor"></a>Choosing an embedding lag</h3>
+<p>The choice for the embedding delay is an optimization step and less crucial than choosing a sufficiently large embedding dimension. Takens’ theorem guarantees topological equivalence if <span class="math inline">\(m\)</span> is twice as large as the fractal dimension of the support (the nonzero elements) of the invariants generated by the dynamics in the original phase space <span class="citation">(<a href="#ref-zou2019" role="doc-biblioref">Zou et al., 2019</a>)</span>. In other words, there should be enough nonzero data to make an embedding with enough surrogate dimensions that fully captures the original dynamics. Embedding a time series in a higher dimension than strictly necessary is unproblematic. Intuitively, <span class="math inline">\(\tau\)</span> should represent a lag of time at which the information about future states of the system as predicted by its history, are at a minimum, for example, the lag at which the autocorrelation function goes to <span class="math inline">\(0\)</span>. However, because time series representing observables of complex systems more often than not violate the stationarity and homogeneity assumptions, a time-delayed mutual information function is commonly used <span class="citation">(cf. <a href="#ref-fraser1986" role="doc-biblioref">Fraser &amp; Swinney, 1986</a>)</span>. As can be seen in the top panel of Figure @ref(fig:lvEmbed) the mutual information function of dimension <span class="math inline">\(Y_1\)</span> has local and global minima that could be used as the embedding delay. A delay of 17.5 was used (the median of the first local minima found for the four series) for all reconstructions. By copying the time series starting at <span class="math inline">\(\tau\)</span> and treating it as the first point of a surrogate dimension, a state vector is created based on a single observed time series. This process is repeated up to <span class="math inline">\(m\)</span>-dimensions, by copying the series at <span class="math inline">\(2\tau, 3\tau,\ldots (m-1)\tau\)</span>. The question is, how to decide on the number of embedding dimensions required to represent the dynamics of the original attractor?</p>
+</div>
+<div id="false-nearest-neighbor-analysis" class="section level3">
+<h3 class="hasAnchor">
+<a href="#false-nearest-neighbor-analysis" class="anchor"></a>False Nearest Neighbor analysis</h3>
+<p>One way to estimate <span class="math inline">\(m\)</span> is by False Nearest Neighbor (FNN) analysis <span class="citation">(<a href="#ref-kennel1992" role="doc-biblioref">Kennel, Brown, &amp; Abarbanel, 1992</a>)</span>, which will consider whether points that are close together in an <span class="math inline">\(m\)</span>-dimensional reconstructed phase space, will still be close together in an <span class="math inline">\(m+1\)</span> embedding. If this is not the case, these points were ‘false neighbors’ of the points in <span class="math inline">\(m\)</span> dimensions. The lower panel of Figure @ref(fig:lvEmbed) shows the results of the FNN analysis for the simulated system. We know the correct number of dimensions should be <span class="math inline">\(m = 4\)</span> and this is indeed the case for <span class="math inline">\(Y_1\)</span> and the local minimum. With real-world data, one would look at the dotted line, where the percentage of false neighbors drops below 10%. The value obtained by FNN provides an estimate of the minimum number of coupled ODE’s required to model the dynamics of the original phase space trajectory. Based on <span class="math inline">\(Y_2\)</span> and <span class="math inline">\(Y_4\)</span> a similar result is found, but <span class="math inline">\(Y_3\)</span> is an exception, here FNN indicates a much higher embedding dimension. The reason is the lack of support that is required by Takens’ theorem, as can be seen in Figure @ref(fig:lvSeries), series <span class="math inline">\(Y3\)</span> contains a lot of zeroes. If this were an observed data set and the aim was to compare analyses based on reconstructions of each of the four series, the largest embedding dimension would be used for all series, for demonstration purposes, we’ll use <span class="math inline">\(m=4\)</span> for all reconstructions. Note that the lack of support in <span class="math inline">\(Y_3\)</span> cannot be resolved by simply adding a constant and proceeding with attractor reconstruction. The lack of support is produced by the coupled dynamics, so there are basically two ways in which <span class="math inline">\(Y_3\)</span> could become a candidate for a successful phase space reconstruction: i) Observe the dynamics for a longer period of time, potentially decreasing the relative frequency of zeros; ii) Change the parameters to change the dynamics of <span class="math inline">\(Y_3\)</span>.</p>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/lvRecon-1.png" alt="The reconstructed phase space based on variable Y1, Y2, Y3 and Y4 respectively. The black diamond indicates t=0; the grey squares at t=700 and t=800 indicate where the coupling strength is increased; the black circle is at t=949." width="576"><p class="caption">
+The reconstructed phase space based on variable Y1, Y2, Y3 and Y4 respectively. The black diamond indicates t=0; the grey squares at t=700 and t=800 indicate where the coupling strength is increased; the black circle is at t=949.
+</p>
+</div>
+<p>The Figure displays reconstructed attractors based on each of the 4 dimensions. The topological equivalence may not be immediately apparent, but considering that for each reconstruction just 1 of the original dimensions was used it is quite remarkable we end up with a trajectory that appears to orbit around a specific region. According to the rules of topology, there exists a continuous deformation for each of these trajectories that will recover the exact same shape as the original attractor. The topological equivalence is visible in the unthresholded distance matrices displayed in Figure @ref(fig:lvDistRec). Here, the transition towards the stable state that persists for some time is clearly visible, as well as several other transitions to states that recur for a shorter duration of time.</p>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/lvDistRec-1.png" alt="Distance matrix of the reconstructed phase spaces based on Y1, Y2, Y3, and Y4, respectively." width="576"><p class="caption">
+Distance matrix of the reconstructed phase spaces based on Y1, Y2, Y3, and Y4, respectively.
+</p>
+</div>
+<p>The next step is to either turn the thresholded recurrence matrix into a Recurrence Plot <span class="citation">(RP, <a href="#ref-eckmann1987" role="doc-biblioref">Eckmann, Kamphorst, &amp; Ruelle, 1987</a>; <a href="#ref-marwan2007" role="doc-biblioref">Marwan et al., 2007</a>; <a href="#ref-webber-jr1994" role="doc-biblioref">Webber Jr &amp; Zbilut, 1994</a>)</span>, or into a Recurrence Network <span class="citation">(RN, <a href="#ref-zou2019" role="doc-biblioref">Zou et al., 2019</a>)</span>.</p>
+</div>
+</div>
+<div id="continous-rqa-measures" class="section level2">
+<h2 class="hasAnchor">
+<a href="#continous-rqa-measures" class="anchor"></a>Continous RQA measures</h2>
+<p>The RQA measures for continuous data are the same as discussed above, except their interpretation can be more explicitly defined in terms of system dynamics. Here, we briefly re-visit some of the most common RQA measures.</p>
+<p>The probability of a cell in the matrix being a recurrent point is expressed by the Recurrence Rate, the measure <span class="math inline">\(RR\)</span>:</p>
+<p><span class="math display">\[\begin{equation}
+RR  = \frac{1}{N^2} \sum_{i,j=1}^N \mathbf{R}(i,j) 
+\end{equation}\]</span></p>
+<p>Time-adjacent recurrent points form diagonal lines <span class="math inline">\(\ell\)</span>, which are considered a recurrent trajectory through (reconstructed) phase space. If the distribution of diagonal line lengths is <span class="math inline">\(P(\ell)\)</span> then the deterministic structure of the reconstructed attractor (<span class="math inline">\(DET\)</span>) is quantified by the proportion of recurrent points that form a diagonal line:</p>
+<p><span class="math display">\[\begin{equation}
+DET = \frac{ \sum_{\ell \geq \ell_{\min}}^{\ell_{\max}} \ell\ P(\ell)}{\sum_{i,j=1} \mathbf{R}(i,j)}
+\end{equation}\]</span></p>
+<p>Based on the distribution of line lengths, measures can be calculated such as the maximum and mean diagonal line length (<span class="math inline">\(DL_{max}\)</span>, <span class="math inline">\(DL_{mean}\)</span>). The entropy of the line length distribution, <span class="math inline">\(H(\ell)\)</span>, is based on the observed frequencies, see equation <span class="citation">(<a href="#ref-eq:pl" role="doc-biblioref"><strong>eq:pl?</strong></a>)</span>:</p>
+<p><span class="math display">\[\begin{equation}
+p(\ell) = \frac{P(\ell)}{\sum_{\ell \geq \ell_{\min}}^{\ell_{\max}} P(\ell)}
+H(\ell) = -\sum_{\ell \geq \ell_{\min}}^{\ell_{\max}} p(\ell) \ln p(\ell)
+(\#eq:pl)
+\end{equation}\]</span></p>
+<p><span class="math inline">\(DET\)</span> together with <span class="math inline">\(H(\ell)\)</span> (<span class="math inline">\(ENT_{dl}\)</span>) quantify different aspects of the (coupled) dynamics <span class="citation">(<a href="#ref-marwan2002" role="doc-biblioref">Marwan &amp; Kurths, 2002</a>; <a href="#ref-shockley2002" role="doc-biblioref">Shockley, Butwill, Zbilut, &amp; Webber Jr, 2002</a>)</span>, a high determinism (<span class="math inline">\(DET\)</span>) and a high entropy of the distribution <span class="math inline">\(P(\ell)\)</span> would represent a meta-, or, multi-stable regime <span class="citation">(<a href="#ref-kelso2012" role="doc-biblioref">Kelso, 2012</a>)</span>, whereas a high determinism coinciding with low entropy of <span class="math inline">\(P(\ell)\)</span> would indicate a relatively stable dynamical regime. Similar measures can be calculated based on the vertical (or horizontal) line structures <span class="math inline">\(P(\nu)\)</span>: Laminarity (<span class="math inline">\(LAM\)</span>) is the proportion of recurrent trajectories that reflect recurrence of the same state, a laminar phase; Focusing on the vertical lines for a moment, Trapping time (<span class="math inline">\(TT\)</span>, or <span class="math inline">\(MEAN_{vl}\)</span>) is the average duration of a laminar phase; <span class="math inline">\(MAX_{vl}\)</span> the maximal vertical line length; and <span class="math inline">\(H(\nu)\)</span> (<span class="math inline">\(ENT_{vl}\)</span>), the entropy of the distribution of vertical lines.</p>
+<!-- The stable state that is observable as a stationary level in each of the 4 time series is a typical laminar phase causing vertical lines structures to appear in the RP in Figure\ \@ref(fig:lvRP). Because the plot is symmetrical, this phase appears as a large black 'square' near the center of the RP. -->
+<p>The absolute values of these measures depend on the choice of the recurrence threshold <span class="math inline">\(\varepsilon\)</span>, but also on the length of the time series. For the purpose of comparing measures calculated from different recurrence plots it can make sense to fix the recurrence rate by choosing a different threshold value for each analysis. It is also possible to pick a fixed threshold and study how the recurrence rate varies between different plots. Several methods exist for the optimization of choosing <span class="math inline">\(\varepsilon\)</span>, some of which will yield different thresholds for different recurrence measures <span class="citation">(e.g. the signal detection method, <a href="#ref-schinkel2008" role="doc-biblioref">Schinkel, Dimigen, &amp; Marwan, 2008</a>)</span>. For these and other considerations when determining the recurrence analysis parameters see <span class="citation">Marwan (<a href="#ref-marwan2011" role="doc-biblioref">2011</a>)</span> and the references therein. It is important to note that <span class="math inline">\(\varepsilon\)</span> is a crucial analysis parameter for recurrence-based methods and its value and selection should always be reported and justified. In general, it is recommended to study the effects of choosing different sets of parameters when comparing the recurrence measures obtained from different (samples of) time series.</p>
+<p>In Table @ref(tab:lvRQA), several common recurrence measures are provided for each of the phase spaces considered so far. The values for Determinism and laminarity are not surprising, after all, this is a completely deterministic system! The point here is to show that the dynamically invariant properties of the original attractor are retained for reconstructions based on <span class="math inline">\(Y_1\)</span>, <span class="math inline">\(Y_2\)</span>, <span class="math inline">\(Y_4\)</span>. The reconstruction based on <span class="math inline">\(Y_3\)</span> was expected to be less accurate due to the lack of support (stationary level at zero for a large period of time). The recurrence threshold <span class="math inline">\(\varepsilon\)</span> has to be extremely small compared to the other values in order to get <span class="math inline">\(RR = 0.045\)</span>. There are techniques that can be used to estimate how well a reconstructed phase space from, say, the first 75% of the time series predicts the remaining 25% (nonlinear prediction skill), or how well it predicts other observed dimensions (convergent cross-mapping) <span class="citation">(<a href="#ref-sugihara2012" role="doc-biblioref">Sugihara et al., 2012</a>)</span>. Convergent cross-mapping can also be used to detect coupling direction and causality in dynamic or delayed interactions <span class="citation">(<a href="#ref-clark2015" role="doc-biblioref">Clark et al., 2015</a>; <a href="#ref-sugihara2012" role="doc-biblioref">Sugihara et al., 2012</a>; see e.g., <a href="#ref-ye2015" role="doc-biblioref">Ye, Deyle, Gilarranz, &amp; Sugihara, 2015</a>)</span>.</p>
+<table class="table">
+<caption>
+Recurrence Measures Based on Different Phase Space Representations.
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Original
+</th>
+<th style="text-align:center;">
+Y1
+</th>
+<th style="text-align:center;">
+Y2
+</th>
+<th style="text-align:center;">
+Y3
+</th>
+<th style="text-align:center;">
+Y4
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Recurrence Threshold <span class="math inline">\(\varepsilon\)</span>
+</td>
+<td style="text-align:left;">
+0.045
+</td>
+<td style="text-align:center;">
+0.049
+</td>
+<td style="text-align:center;">
+0.076
+</td>
+<td style="text-align:center;">
+0.011
+</td>
+<td style="text-align:center;">
+0.052
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Recurrence Rate
+</td>
+<td style="text-align:left;">
+0.050
+</td>
+<td style="text-align:center;">
+0.045
+</td>
+<td style="text-align:center;">
+0.045
+</td>
+<td style="text-align:center;">
+0.045
+</td>
+<td style="text-align:center;">
+0.045
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DETerminism
+</td>
+<td style="text-align:left;">
+0.998
+</td>
+<td style="text-align:center;">
+0.997
+</td>
+<td style="text-align:center;">
+0.998
+</td>
+<td style="text-align:center;">
+0.997
+</td>
+<td style="text-align:center;">
+0.995
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Maximum DL
+</td>
+<td style="text-align:left;">
+860.000
+</td>
+<td style="text-align:center;">
+808.000
+</td>
+<td style="text-align:center;">
+946.000
+</td>
+<td style="text-align:center;">
+244.000
+</td>
+<td style="text-align:center;">
+946.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Entropy DL
+</td>
+<td style="text-align:left;">
+4.500
+</td>
+<td style="text-align:center;">
+3.900
+</td>
+<td style="text-align:center;">
+4.000
+</td>
+<td style="text-align:center;">
+3.700
+</td>
+<td style="text-align:center;">
+4.100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LAMinarity
+</td>
+<td style="text-align:left;">
+0.994
+</td>
+<td style="text-align:center;">
+0.989
+</td>
+<td style="text-align:center;">
+0.994
+</td>
+<td style="text-align:center;">
+0.989
+</td>
+<td style="text-align:center;">
+0.993
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Maximum VL
+</td>
+<td style="text-align:left;">
+131.000
+</td>
+<td style="text-align:center;">
+93.000
+</td>
+<td style="text-align:center;">
+117.000
+</td>
+<td style="text-align:center;">
+170.000
+</td>
+<td style="text-align:center;">
+114.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Entropy VL
+</td>
+<td style="text-align:left;">
+3.700
+</td>
+<td style="text-align:center;">
+3.500
+</td>
+<td style="text-align:center;">
+3.300
+</td>
+<td style="text-align:center;">
+3.800
+</td>
+<td style="text-align:center;">
+3.400
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="MdRQA" class="section level2">
+<h2 class="hasAnchor">
+<a href="#MdRQA" class="anchor"></a>Multidimensional RQA</h2>
+<p>In the present example all relevant dimensions of the system have been ‘observed’ (see figure @ref(fig:lvStateSpace)) and in such a case a multidimensional recurrence matrix can be constructed by considering each time series a state vector <span class="math inline">\(\vec{y_i}\)</span> of the <span class="math inline">\(m\)</span>-dimensional phase space of the system. Multidimensional RQA simply refers to recurrence quantification analysis based on such a multidimensional recurrence matrix. Figure @ref(fig:lvRP) represents the RP based on the multidimensional recurrence matrix, of the 4 coupled differential equations. The threshold <span class="math inline">\(\varepsilon\)</span> was chosen to yield 5% recurrent points.</p>
+<div class="figure" style="text-align: center">
+<img src="CRQA_files/figure-html/lvRP-1.png" alt="A recurrence plot based on the multidimensional recurrence matrix of the coupled 4D system." width="576"><p class="caption">
+A recurrence plot based on the multidimensional recurrence matrix of the coupled 4D system.
+</p>
+</div>
+<p>Calculating the recurrence measures is exactly the same</p>
 </div>
 <div id="continuous-cross-rqa" class="section level2">
 <h2 class="hasAnchor">
 <a href="#continuous-cross-rqa" class="anchor"></a>Continuous Cross-RQA</h2>
-<div id="an-r-interface-to-marwans-commandline-recurrence-plots" class="section level3">
+<div id="anisotropic-and-asymmetric-continuous-rqa-measures" class="section level3">
 <h3 class="hasAnchor">
-<a href="#an-r-interface-to-marwans-commandline-recurrence-plots" class="anchor"></a><strong>An R interface to Marwan’s commandline recurrence plots</strong>
-</h3>
+<a href="#anisotropic-and-asymmetric-continuous-rqa-measures" class="anchor"></a>Anisotropic and asymmetric continuous RQA measures</h3>
+</div>
+</div>
+</div>
+<div id="marwan" class="section level1">
+<h1 class="hasAnchor">
+<a href="#marwan" class="anchor"></a>An R interface to Marwan’s commandline recurrence plots</h1>
 <blockquote>
 <p><strong>IMPORTANT</strong>: Currently <code>rp_cl</code> can only run on an operating system that allows execution of 32-bit applications!</p>
 </blockquote>
@@ -525,12 +906,211 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 </blockquote>
 <p>More information about recurrence quantification analysis can be found on the <a href="http://www.recurrence-plot.tk">Recurrence Plot website</a>.</p>
 </div>
+<div id="computational-load-the-python-solution-pyrqa" class="section level1">
+<h1 class="hasAnchor">
+<a href="#computational-load-the-python-solution-pyrqa" class="anchor"></a>Computational load: The Python solution [PyRQA]</h1>
+<p>When the time series you analyze are very long, the recurrence matrix will become very large and R will become very slow. One solution is to use R to run the Python program <a href="https://pypi.org/project/PyRQA/"><code>PyRQA</code></a> or perhaps <a href="https://github.com/pik-copan/pyunicorn"><code>pyunicorn</code></a>. The options for <code>PyRQA</code> are limited compared to the casnet functions, but the gain in processing speed is remarkable!</p>
+<p>What follows is an example of how you could make <code>PyRQA</code> run in R using the package <code>reticulate</code>.</p>
+<div id="setup-the-environment" class="section level3 unnumbered">
+<h3 class="hasAnchor">
+<a href="#setup-the-environment" class="anchor"></a>Setup the environment</h3>
+<p>Suppose you are on a machine that has both <code>R</code> and <code>Python</code> installed then the steps are:</p>
+<ul>
+<li>Make sure <code>Python</code> and <code>pip</code> are up to date</li>
+<li>Create a virtual (or a coda) environment.</li>
+<li>Install <code>PyRQA</code> into the virtual environment.</li>
+</ul>
+<p>You should only have to create and setup the environment once.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># OS requirements</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Python3.X is installed and updated.</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># On MacOS you'll probably need to run these commands in a Terminal window:</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>python3 pip install <span class="sc">--</span>update pip <span class="co"># Updates the Python module installer</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>python3 pip intall pyrqa <span class="co"># Installs the pyrqa module on your machine</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co"># First make sure you use the latest Python version</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co"># You can check your machine by calling: reticulate::py_discover_config()</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_python</span>(<span class="st">"/usr/local/bin/python3"</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new environment "r-reticulate", the path is stored in vEnv</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co"># On Windows use coda_create() see the reticulate manual.</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>vEnv <span class="ot">&lt;-</span> reticulate<span class="sc">::</span><span class="fu">virtualenv_create</span>(<span class="st">"r-reticulate"</span>)</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Install pyrqa into the virtual environment</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">virtualenv_install</span>(<span class="st">"r-reticulate"</span>,<span class="st">"pyrqa"</span>)</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="co"># If you wish to remove the environment use: reticulate::virtualenv_remove("r-reticulate")</span></span></code></pre></div>
+<p>After the environment is set up:</p>
+<ul>
+<li>Restart your R session and instruct the system to use Python in the virtual environment.</li>
+<li>Import <code>PyRQA</code> into your <code>R</code> session.</li>
+<li>Use the <code>PyRQA</code> functions that are now available as fields (<code><a href="https://rdrr.io/r/base/Extract.html">$</a></code>) of the imported object!</li>
+</ul>
+<p>An important thing to note in the example below is the use of <code><a href="https://rdrr.io/r/base/integer.html">as.integer()</a></code> to pass integer variables to Python.</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Make sure you associate reticulate with your virtual environment.</span>
+<span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/use_python.html">use_virtualenv</a></span><span class="op">(</span><span class="st">"r-reticulate"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="co"># Import pyrqa into your R session</span>
+<span class="va">pyrqa</span> <span class="op">&lt;-</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/import.html">import</a></span><span class="op">(</span><span class="st">"pyrqa"</span><span class="op">)</span>
+
+<span class="co"># Alternatively, you can import from a path in the virtual environment.</span>
+<span class="co"># On MacOS this will be a hidden folder in your home directory:</span>
+<span class="co"># '.virtualenvs/r-reticulate/lib/Python3.X/site-packages'</span>
+<span class="co"># pyrqa &lt;- import_from_path(file.path(vEnv,"/lib/python3.9/site-packages"))</span>
+
+<span class="co"># Now perform RQA on your N = 10,000 time series!</span>
+<span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">10000</span><span class="op">)</span><span class="op">)</span>
+
+<span class="co"># Automated parameter search will still take some time using casnet</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span>
+  <span class="va">emPar</span> <span class="op">&lt;-</span> <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span><span class="op">(</span><span class="va">Y</span>, doPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+  <span class="va">emRad</span> <span class="op">&lt;-</span> <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="../reference/est_radius.html">est_radius</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">Y</span>, emLag <span class="op">=</span> <span class="va">emPar</span><span class="op">$</span><span class="va">optimLag</span>, emDim <span class="op">=</span> <span class="va">emPar</span><span class="op">$</span><span class="va">optimDim</span><span class="op">)</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="co"># user    system  elapsed </span>
+<span class="co"># 299.732 89.094  393.620 </span>
+
+<span class="co"># About 5 minutes to find a delay, embedding dimension and radius yielding 5% recurrent points.</span>
+
+<span class="co"># Now do an RQA on the 10,000 x 10,000 matrix using Python</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span>
+<span class="va">time_series</span> <span class="op">&lt;-</span> <span class="va">pyrqa</span><span class="op">$</span><span class="va">time_series</span><span class="op">$</span><span class="fu">TimeSeries</span><span class="op">(</span><span class="va">Y</span>, 
+                                            embedding_dimension<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">emPar</span><span class="op">$</span><span class="va">optimDim</span><span class="op">)</span>, 
+                                            time_delay<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">emPar</span><span class="op">$</span><span class="va">optimLag</span><span class="op">)</span><span class="op">)</span>
+<span class="va">settings</span>    <span class="op">&lt;-</span> <span class="va">pyrqa</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="fu">Settings</span><span class="op">(</span><span class="va">time_series</span>, 
+                                       analysis_type <span class="op">=</span> <span class="va">pyrqa</span><span class="op">$</span><span class="va">analysis_type</span><span class="op">$</span><span class="va">Classic</span>,
+                                       neighbourhood <span class="op">=</span> <span class="va">pyrqa</span><span class="op">$</span><span class="va">neighbourhood</span><span class="op">$</span><span class="fu">FixedRadius</span><span class="op">(</span><span class="va">emRad</span><span class="op">$</span><span class="va">Radius</span><span class="op">)</span>,
+                                       similarity_measure <span class="op">=</span> <span class="va">pyrqa</span><span class="op">$</span><span class="va">metric</span><span class="op">$</span><span class="va">EuclideanMetric</span>,
+                                       theiler_corrector <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
+<span class="va">computation</span> <span class="op">&lt;-</span> <span class="va">pyrqa</span><span class="op">$</span><span class="va">computation</span><span class="op">$</span><span class="va">RQAComputation</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span><span class="va">settings</span><span class="op">)</span>
+<span class="va">result</span>      <span class="op">&lt;-</span> <span class="va">computation</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span>
+<span class="op">}</span><span class="op">)</span>
+<span class="co"># user   system  elapsed </span>
+<span class="co"># 2.996  0.069   0.365 </span>
+
+<span class="co"># About 3 seconds for the analysis...</span>
+<span class="co"># That's really fast!</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></code></pre></div>
+<pre><code>RQA Result:
+===========
+
+Minimum diagonal line length (L_min): 2
+Minimum vertical line length (V_min): 2
+Minimum white vertical line length (W_min): 2
+
+Recurrence rate (RR): 0.050090
+Determinism (DET): 0.955821
+Average diagonal line length (L): 10.634044
+Longest diagonal line length (L_max): 9866
+Divergence (DIV): 0.000101
+Entropy diagonal lines (L_entr): 3.064460
+Laminarity (LAM): 0.969709
+Trapping time (TT): 14.930102
+Longest vertical line length (V_max): 345
+Entropy vertical lines (V_entr): 3.386939
+Average white vertical line length (W): 265.518914
+Longest white vertical line length (W_max): 9161
+Longest white vertical line length inverse (W_div): 0.000109
+Entropy white vertical lines (W_entr): 4.726210
+
+Ratio determinism / recurrence rate (DET/RR): 19.081989
+Ratio laminarity / determinism (LAM/DET): 1.014530</code></pre>
+<p>You can also save the Recurrence Plot.</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">RPcomputation</span> <span class="op">&lt;-</span> <span class="va">pyrqa</span><span class="op">$</span><span class="va">computation</span><span class="op">$</span><span class="va">RPComputation</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span><span class="va">settings</span><span class="op">)</span>
+<span class="va">RPresult</span> <span class="op">&lt;-</span> <span class="va">RPcomputation</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span>
+<span class="va">pyrqa</span><span class="op">$</span><span class="va">image_generator</span><span class="op">$</span><span class="va">ImageGenerator</span><span class="op">$</span><span class="fu">save_recurrence_plot</span><span class="op">(</span><span class="va">RPresult</span><span class="op">$</span><span class="va">recurrence_matrix_reverse</span>,<span class="st">'recurrence_plot_python.png'</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html">include_graphics</a></span><span class="op">(</span><span class="st">"recurrence_plot_python.png"</span><span class="op">)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="recurrence_plot_python.png" alt="RP produced by PyRQA" width="6577"><p class="caption">
+RP produced by PyRQA
+</p>
 </div>
-<div id="references" class="section level2">
+</div>
+<div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
-<a href="#references" class="anchor"></a><strong>References</strong>
-</h2>
+<a href="#references" class="anchor"></a>References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="ref-bak1987" class="csl-entry">
+Bak, P., Tang, C., &amp; Wiesenfeld, K. (1987). <span class="nocase">Self-Organized Criticality: An Explanation of 1/f Noise</span>. <em>Physical Review Letters</em>, <em>59</em>(4), 381–384.
 </div>
+<div id="ref-clark2015" class="csl-entry">
+Clark, A. T., Ye, H., Isbell, F., Deyle, E. R., Cowles, J., Tilman, G. D., &amp; Sugihara, G. (2015). Spatial convergent cross mapping to detect causal relationships from short time series. <em>Ecology</em>, <em>96</em>(5), 1174–1181. <a href="https://doi.org/10.1890/14-1479.1">https://doi.org/10.1890/14-1479.1</a>
+</div>
+<div id="ref-coco2014" class="csl-entry">
+Coco, M. I., &amp; Dale, R. (2014). Cross-recurrence quantification analysis of categorical and continuous time series: An r package. <em>Frontiers in Psychology</em>, <em>5</em>. <a href="https://doi.org/10.3389/fpsyg.2014.00510">https://doi.org/10.3389/fpsyg.2014.00510</a>
+</div>
+<div id="ref-cox2016a" class="csl-entry">
+Cox, R. F. A., Steen, S. van der, Guevara, M., Jonge-Hoekstra, L. de, &amp; Dijk, M. van. (2016). Chromatic and anisotropic cross-recurrence quantification analysis of interpersonal behavior. In <em>Springer proceedings in physics</em> (pp. 209–225). Springer International Publishing. <a href="https://doi.org/10.1007/978-3-319-29922-8_11">https://doi.org/10.1007/978-3-319-29922-8_11</a>
+</div>
+<div id="ref-de-jonge-hoekstra2020" class="csl-entry">
+De Jonge-Hoekstra, L., Van Der Steen, S., &amp; Cox, R. F. A. (2020). Movers and shakers of cognition: Hand movements, speech, task properties, and variability. <em>Acta Psychologica</em>, <em>211</em>, 103187. https://doi.org/<a href="https://doi.org/10.1016/j.actpsy.2020.103187">https://doi.org/10.1016/j.actpsy.2020.103187</a>
+</div>
+<div id="ref-eckmann1987" class="csl-entry">
+Eckmann, J.-P., Kamphorst, S. O., &amp; Ruelle, D. (1987). Recurrence plots of dynamical systems. <em>EPL (Europhysics Letters)</em>, <em>4</em>(9), 973.
+</div>
+<div id="ref-fraser1986" class="csl-entry">
+Fraser, A. M., &amp; Swinney, H. L. (1986). Independent coordinates for strange attractors from mutual information. <em>Physical Review A</em>, <em>33</em>(2), 1134.
+</div>
+<div id="ref-kantz2004" class="csl-entry">
+Kantz, H., &amp; Schreiber, T. (2004). <em><span class="nocase">Nonlinear time series analysis</span></em> (2nd ed.). Cambridge, UK: Cambridge University Press.
+</div>
+<div id="ref-kelso2012" class="csl-entry">
+Kelso, J. A. S. (2012). <a href="https://www.ncbi.nlm.nih.gov/pubmed/22371613"><span class="nocase">Multistability and metastability: understanding dynamic coordination in the brain.</span></a> <em>Philosophical Transactions of the Royal Society of London. Series B, Biological Sciences</em>, <em>367</em>(1591), 906–18.
+</div>
+<div id="ref-kennel1992" class="csl-entry">
+Kennel, M. B., Brown, R., &amp; Abarbanel, H. D. (1992). Determining embedding dimension for phase-space reconstruction using a geometrical construction. <em>Phys Rev A</em>, <em>45</em>(6), 3403–3411. Journal Article. <a href="https://doi.org/10.1103/physreva.45.3403">https://doi.org/10.1103/physreva.45.3403</a>
+</div>
+<div id="ref-marwan2011" class="csl-entry">
+Marwan, N. (2011). How to avoid potential pitfalls in recurrence plot based data analysis. <em>International Journal of Bifurcation and Chaos</em>, <em>21</em>(4), 1003–1017. Journal Article. <a href="https://doi.org/10.1142/S0218127411029008">https://doi.org/10.1142/S0218127411029008</a>
+</div>
+<div id="ref-marwan2007" class="csl-entry">
+Marwan, N., Carmen Romano, M., Thiel, M., &amp; Kurths, J. (2007). <span class="nocase">Recurrence plots for the analysis of complex systems</span>. <em>Physics Reports</em>, <em>438</em>(5-6), 237–329. <a href="https://doi.org/10.1016/j.physrep.2006.11.001">https://doi.org/10.1016/j.physrep.2006.11.001</a>
+</div>
+<div id="ref-marwan2002" class="csl-entry">
+Marwan, N., &amp; Kurths, J. (2002). Nonlinear analysis of bivariate data with cross recurrence plots. <em>Physics Letters A</em>, <em>302</em>(5-6), 299–307.
+</div>
+<div id="ref-schinkel2008" class="csl-entry">
+Schinkel, S., Dimigen, O., &amp; Marwan, N. (2008). <span class="nocase">Selection of recurrence threshold for signal detection</span>. <em>The European Physical Journal Special Topics</em>, <em>164</em>(1), 45–53. <a href="https://doi.org/10.1140/epjst/e2008-00833-5">https://doi.org/10.1140/epjst/e2008-00833-5</a>
+</div>
+<div id="ref-shockley2002" class="csl-entry">
+Shockley, K., Butwill, M., Zbilut, J. P., &amp; Webber Jr, C. L. (2002). Cross recurrence quantification of coupled oscillators. <em>Physics Letters A</em>, <em>305</em>(1-2), 59–69.
+</div>
+<div id="ref-sugihara2012" class="csl-entry">
+Sugihara, G., May, R., Ye, H., Hsieh, C., Deyle, E., Fogarty, M., &amp; Munch, S. (2012). Detecting causality in complex ecosystems. <em>Science</em>, <em>338</em>(6106), 496–500. <a href="https://doi.org/10.1126/science.1227079">https://doi.org/10.1126/science.1227079</a>
+</div>
+<div id="ref-takens1981" class="csl-entry">
+Takens, F. (1981). <span class="nocase">Detecting strange attractors in turbulence</span>. In D. Rand &amp; L.-S. Young (Eds.), <em>Dynamical systems and turbulence, warwick 1980</em> (Vol. 898, pp. 366–381). Springer Berlin / Heidelberg. Retrieved from <a href="http://www.springerlink.com/index/B254X77553874745.pdf%20http://dx.doi.org/10.1007/BFb0091924">http://www.springerlink.com/index/B254X77553874745.pdf http://dx.doi.org/10.1007/BFb0091924</a>
+</div>
+<div id="ref-vano2006" class="csl-entry">
+Vano, J., Wildenberg, J., Anderson, M., Noel, J., &amp; Sprott, J. (2006). Chaos in low-dimensional lotka–volterra models of competition. <em>Nonlinearity</em>, <em>19</em>(10), 2391.
+</div>
+<div id="ref-wallot2018" class="csl-entry">
+Wallot, S., &amp; Leonardi, G. (2018). Analyzing multivariate dynamics using cross-recurrence quantification analysis (<span>CRQA</span>), diagonal-cross-recurrence profiles (<span>DCRP</span>), and multidimensional recurrence quantification analysis (<span>MdRQA</span>) <span></span> a tutorial in r. <em>Frontiers in Psychology</em>, <em>9</em>. <a href="https://doi.org/10.3389/fpsyg.2018.02232">https://doi.org/10.3389/fpsyg.2018.02232</a>
+</div>
+<div id="ref-wallot2016" class="csl-entry">
+Wallot, S., Roepstorff, A., &amp; Mønster, D. (2016). Multidimensional recurrence quantification analysis (MdRQA) for the analysis of multidimensional time-series: A software implementation in MATLAB and its application to group-level data in joint action. <em>Frontiers in Psychology</em>, <em>7</em>. <a href="https://doi.org/10.3389/fpsyg.2016.01835">https://doi.org/10.3389/fpsyg.2016.01835</a>
+</div>
+<div id="ref-webber-jr1994" class="csl-entry">
+Webber Jr, C. L., &amp; Zbilut, J. P. (1994). Dynamical assessment of physiological systems and states using recurrence plot strategies. <em>Journal of Applied Physiology</em>, <em>76</em>(2), 965–973. Journal Article.
+</div>
+<div id="ref-ye2015" class="csl-entry">
+Ye, H., Deyle, E. R., Gilarranz, L. J., &amp; Sugihara, G. (2015). Distinguishing time-delayed causal interactions using convergent cross mapping. <em>Scientific Reports</em>, <em>5</em>(1). <a href="https://doi.org/10.1038/srep14750">https://doi.org/10.1038/srep14750</a>
+</div>
+<div id="ref-zou2019" class="csl-entry">
+Zou, Y., Donner, R. V., Marwan, N., Donges, J. F., &amp; Kurths, J. (2019). Complex network approaches to nonlinear time series analysis. <em>Physics Reports</em>, <em>787</em>, 1–97. Journal Article. <a href="https://doi.org/10.1016/j.physrep.2018.10.005">https://doi.org/10.1016/j.physrep.2018.10.005</a>
+</div>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Note that phase space reconstruction is not strictly necessary for recurrence quantification analysis and recurrence network analysis. The analyses presented in this paper can also be conducted on the non-embedded ‘raw’ time series, however, here we assume the embedded series to be more informative.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
   </div>
 

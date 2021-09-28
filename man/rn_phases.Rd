@@ -9,12 +9,16 @@ rn_phases(
   maxPhases = 5,
   minStatesinPhase = 1,
   maxStatesinPhase = NROW(RN),
+  cleanUp = TRUE,
   removeSingularities = FALSE,
   standardise = c("none", "mean.sd", "median.mad", "unit")[4],
   returnGraph = FALSE,
   doPhasePlot = FALSE,
+  plotCentroid = c("no", "mean.sd", "median.mad", "centroid")[1],
+  colOrder = FALSE,
   phaseColours = NULL,
   doSpiralPlot = FALSE,
+  doPhaseSeriesPlot = FALSE,
   showEpochLegend = TRUE,
   epochColours = NULL,
   epochLabel = "Phase",
@@ -31,6 +35,8 @@ rn_phases(
 
 \item{maxStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases exceeds a maximum number of \code{maxStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{NROW(RN)})}
 
+\item{cleanUp}{Try to assign states to phases that were not assigned by the algorithm. If \code{FALSE}, these states will be added to category "Other" (default = \code{TRUE})}
+
 \item{removeSingularities}{Will remove states that recur only once (nodes with \code{degree(g) == 1}) (default = \code{FALSE})}
 
 \item{standardise}{Standardise by the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
@@ -39,9 +45,15 @@ rn_phases(
 
 \item{doPhasePlot}{Produce a plot with the extracted phases (default = \code{TRUE})}
 
+\item{plotCentroid}{Currently plots the Mean and SD of the dimensions of the states in each phase over the phase plot (default = \code{FALSE})}
+
+\item{colOrder}{Should the order of the dimensions reflect the order of the columns in the dataset? If \code{FALSE} the order will be based on the values of the dimensions observed in the first extracted phase (default = \code{FALSE})}
+
 \item{phaseColours}{Colours for the different phases in the phase plot. If \code{epochColours} also has a value, \code{phaseColours} will be used instead (default = \code{NULL})}
 
 \item{doSpiralPlot}{Produce a plot of the recurrence network with the nodes coloured by phases (default = \code{FALSE})}
+
+\item{doPhaseSeriesPlot}{Produce a time series of the phases as they occur with a marginal histogram of their frequency (default = \code{FALSE})}
 
 \item{showEpochLegend}{Should a legend be shown for the epoch colours? (default = \code{TRUE})}
 
@@ -73,7 +85,8 @@ The procedure is as follows:
 \item Identify the node with the highest strength
 \item Identify the nodes that connect to this node
 \item Identify the node with highest strength that does not connect to the node identified in step 1.
-\item Repeat.
+\item Repeat until criteria set in \code{maxPhases}, \code{minStatesinPhase} and \code{maxStatesinPhase} are triggered.
+\item Clean up. If \code{cleanUp = TRUE} the remaining states that connect to nodes of one of the identified phases, but not to the node with highest strength identified in step 1 will be added to that phase. Otherwise these nodes will end up in category "Other".
 }
 }
 \examples{

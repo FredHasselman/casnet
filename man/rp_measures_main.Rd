@@ -59,7 +59,7 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{CL}{Confidence limit for bootstrap results (default = \code{.95})}
 
-\item{doParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a seperate process/core for each window in windowed (C)RQA analysis and \code{\link[parallel:detectCores]{parallel::detectCores()}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
+\item{doParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a separate process/core for each window in windowed (C)RQA analysis and \code{\link[parallel:detectCores]{parallel::detectCores()}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
 }
 \description{
 Use \code{rp_measures}

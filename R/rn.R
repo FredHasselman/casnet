@@ -538,7 +538,8 @@ rn_recSpec <- function(RN,
 #'  1. Identify the node with the highest strength
 #'  2. Identify the nodes that connect to this node
 #'  3. Identify the node with highest strength that does not connect to the node identified in step 1.
-#'  4. Repeat.
+#'  4. Repeat until criteria set in `maxPhases`, `minStatesinPhase` and `maxStatesinPhase` are triggered.
+#'  5. Clean up. If `cleanUp = TRUE` the remaining states that connect to nodes of one of the identified phases, but not to the node with highest strength identified in step 1 will be added to that phase. Otherwise these nodes will end up in category "Other".
 #'
 #'
 #' @inheritParams make_spiral_graph
@@ -548,9 +549,13 @@ rn_recSpec <- function(RN,
 #' @param minStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases do not have a minimum number of `minStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `1`)
 #' @param maxStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases exceeds a maximum number of `maxStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `NROW(RN)`)
 #' @param removeSingularities Will remove states that recur only once (nodes with `degree(g) == 1`) (default = `FALSE`)
+#' @param cleanUp Try to assign states to phases that were not assigned by the algorithm. If `FALSE`, these states will be added to category "Other" (default = `TRUE`)
 #' @param doPhasePlot Produce a plot with the extracted phases (default = `TRUE`)
+#' @param plotCentroid Currently plots the Mean and SD of the dimensions of the states in each phase over the phase plot (default = `FALSE`)
+#' @param colOrder Should the order of the dimensions reflect the order of the columns in the dataset? If `FALSE` the order will be based on the values of the dimensions observed in the first extracted phase (default = `FALSE`)
 #' @param phaseColours Colours for the different phases in the phase plot. If `epochColours` also has a value, `phaseColours` will be used instead (default = `NULL`)
 #' @param doSpiralPlot Produce a plot of the recurrence network with the nodes coloured by phases (default = `FALSE`)
+#' @param doPhaseSeriesPlot Produce a time series of the phases as they occur with a marginal histogram of their frequency (default = `FALSE`)
 #' @param excludeOther Should the phase "Other" be excluded from plots? (default = `FALSE`)
 #' @param excludeNorec Should the category "No recurrence" be excluded from plots? (default = `TRUE`)
 #' @param returnGraph Return the graph object objects of the plots that have been produced (default = `FALSE`)
@@ -574,7 +579,7 @@ rn_recSpec <- function(RN,
 #' # Use min. number of states as the extraction criterion
 #' rn_phases(RN, maxPhases = NA, minStatesinPhase = 7, doPhasePlot = TRUE)
 #'
-rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase = NROW(RN), removeSingularities = FALSE, standardise = c("none","mean.sd","median.mad","unit")[4], returnGraph = FALSE, doPhasePlot = FALSE,  phaseColours = NULL, doSpiralPlot = FALSE, showEpochLegend = TRUE, epochColours = NULL, epochLabel = "Phase", excludeOther = FALSE, excludeNorec = TRUE){
+rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase = NROW(RN), cleanUp = TRUE, removeSingularities = FALSE, standardise = c("none","mean.sd","median.mad","unit")[4], returnGraph = FALSE, doPhasePlot = FALSE, plotCentroid = c("no","mean.sd","median.mad","centroid")[1], colOrder = FALSE,  phaseColours = NULL, doSpiralPlot = FALSE, doPhaseSeriesPlot = FALSE, showEpochLegend = TRUE, epochColours = NULL, epochLabel = "Phase", excludeOther = FALSE, excludeNorec = TRUE){
 
   checkPkg("igraph")
   checkPkg("invctr")
@@ -673,33 +678,87 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
   out <- tidyr::unnest(dplyr::tibble(phase_name = names(phases),
                                      phase_number = as.numeric_discrete(names(phases)),
                                      phase_size = lengths(phases),
-                                     phase_singularities = 0,
                                      maxState_time = as.numeric(nodeID),
                                      maxState_strength = as.numeric(strengths),
-                                     states_time = phases),
-                       cols = 7)
+                                     states_time = phases,
+                                     states_singularity = 0),
+                       cols = 6)
+
   out$states_strength <- igraph::strength(gRN)[out$states_time]
 
   tmp     <- plyr::ldply(seq_along(phases), function(p) data.frame(phase_name = names(phases)[[p]],
                                                                    states_time = phases[[p]],
-                                                                   phase_singularities = sum(phases[[p]]%in%Singularities$time, na.rm = TRUE),
                                                                    maxState_time = nodeID[[p]],
-                                                                   states_dist2maxState = RN[phases[[p]], nodeID[[p]]]))
+                                                                   states_dist2maxState = RN[phases[[p]], nodeID[[p]]],
+                                                                   states_singularity = 0))
+
   # Check nodes and phases
   if(identical(out$states_time,tmp$states_time)){
-    out$phase_singularities <- tmp$phase_singularities
+    out$states_singularity <- tmp$states_singularity
     out$states_dist2maxState <- tmp$states_dist2maxState
   } else {
     warning("Wrong order?")
   }
 
+  if(cleanUp){
+
+    remains <- seq(1,igraph::vcount(gRN))[!(seq(1,igraph::vcount(gRN))%in%out$states_time)]
+    remains <- remains[igraph::degree(gRN)[remains]>0]
+
+    remainsList <- list()
+    i <- 0
+
+    for(p in unique(out$phase_name)){
+
+      tmp <- out %>% filter(.data$phase_name == p)
+      tmp <- dplyr::arrange(tmp,dplyr::desc(states_strength))
+
+      dist_remain <- strength_remain <- nodes_remain <- list()
+
+      for(n in 1:NROW(tmp)){
+        nodes_remain[[n]] <- remains[remains%in%unique(c(RN_edges$to[RN_edges$from==tmp$states_time[n]|RN_edges$to==tmp$states_time[n]], RN_edges$from[RN_edges$to==tmp$states_time[n]|RN_edges$from==tmp$states_time[n]]))]
+        strength_remain[[n]] <- igraph::strength(gRN)[nodes_remain[[n]]]
+      }
+      names(nodes_remain) <- tmp$states_time # paste("Node:",tmp$states_time,"| Strength:",tmp$states_strength)
+
+      dist_remain <- plyr::llply(seq_along(nodes_remain), function(d){
+        if(length(nodes_remain[[d]])>0){
+          RN[nodes_remain[[d]], as.numeric(names(nodes_remain)[d])]
+        } else {
+          NA
+        }
+      })
+
+      i <- i+1
+
+      remainsList[[i]] <- tidyr::unnest(dplyr::tibble(phase_name = p,
+                                                      phase_number = tmp$phase_number[tmp$phase_name==p][1],
+                                                      phase_size = NA,
+                                                      maxState_time = as.numeric(names(nodes_remain)),
+                                                      maxState_strength = tmp$states_strength,
+                                                      states_time = nodes_remain,
+                                                      states_strength = strength_remain,
+                                                      states_dist2maxState = dist_remain,
+                                                      states_singularity = 0),
+                                        cols = 6:8)
+
+      rm(tmp)
+    }
+
+    remainsOut <- plyr::ldply(remainsList)
+    remainsOut <- dplyr::arrange(remainsOut, dplyr::desc(.data$maxState_strength))
+    uniIND <- plyr::laply(as.numeric(remains), function(r) which(r==remainsOut$states_time)[1])
+    out <- rbind(out, remainsOut[uniIND[!is.na(uniIND)],])
+    out <- dplyr::arrange(out,.data$phase_name)
+
+    rm(remainsOut, remainsList, uniIND)
+
+  }
+
+
   if(minStatesinPhase>maxStatesinPhase){
     maxStatesinPhase <- minStatesinPhase
   }
-
-  keep <- names(phases)[lengths(phases)%[]%c(minStatesinPhase,maxStatesinPhase)]
-
-  out <- out[out$phase_size%[]%c(minStatesinPhase,maxStatesinPhase),]
 
   if(!is.null(attributes(RN)$emDims1)){
     space_dims <- attributes(RN)$emDims1[out$states_time,]
@@ -717,19 +776,20 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
   ltime <- ltime[plyr::laply(ltime, function(p) sum(RN[1:NCOL(RN),p]))>0]
 
   if(NROW(ltime)!=0){
-  lost_time <- data.frame(matrix(NA,nrow=NROW(ltime),ncol=NCOL(out),dimnames = list(NULL,colnames(out))))
-  lost_time$states_time <- ltime
-  lost_time[,(("states_dist2maxState"%ci%lost_time)+1):NCOL(lost_time)] <- attributes(RN)$emDims1[ltime,]
-  lost_time$phase_name <- "Other"
-  lost_time$phase_number <- max(out$phase_number, na.rm = TRUE)+1
-  lost_time$phase_size <- length(ltime)
-  lost_time$states_strength <- igraph::strength(gRN)[lost_time$states_time]
-  lost_time$maxState_strength <- max(lost_time$states_strength, na.rm = TRUE)
-  lost_time$maxState_time <-  lost_time$states_time[which.max(lost_time$states_strength)]
-  lost_time$phase_singularities <- sum(lost_time$states_time%in%Singularities$time, na.rm = TRUE)
-  lost_time$states_dist2maxState <- NA
 
-  out <- rbind(out,lost_time)
+    lost_time <- data.frame(matrix(NA,nrow=NROW(ltime),ncol=NCOL(out),dimnames = list(NULL,colnames(out))))
+    lost_time$states_time <- ltime
+    lost_time[,(("states_dist2maxState"%ci%lost_time)+1):NCOL(lost_time)] <- attributes(RN)$emDims1[ltime,]
+    lost_time$phase_name <- "Other"
+    lost_time$phase_number <- max(out$phase_number, na.rm = TRUE)+1
+    lost_time$phase_size <- length(ltime)
+    lost_time$states_strength <- igraph::strength(gRN)[lost_time$states_time]
+    lost_time$maxState_strength <- max(lost_time$states_strength, na.rm = TRUE)
+    lost_time$maxState_time <-  lost_time$states_time[which.max(lost_time$states_strength)]
+    lost_time$states_singularity <- 0
+    lost_time$states_dist2maxState <- NA
+
+    out <- rbind(out,lost_time)
   }
 
   # Finally add the nonrecurring states
@@ -748,24 +808,67 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
     out <- rbind(out,empty)
   }
 
-    if(any(standardise%in%c("mean.sd","median.mad","unit"))){
-      if(standardise%in%"unit"){
-        space_dims <- elascer(out[,(("states_dist2maxState"%ci%out)+1):NCOL(out)])
+  if(plotCentroid%in%"centroid"){
+    standardise <- "mean.sd"
+    message("Changed value of standardise to 'mean.sd' because plotCentroid is set to 'centroid'.")
+  }
+
+  if(any(standardise%in%c("mean.sd","median.mad","unit"))){
+
+    if(standardise%in%"unit"){
+      space_dims <- elascer(out[,(("states_dist2maxState"%ci%out)+1):NCOL(out)])
+    } else {
+
+      if(plotCentroid%in%"centroid"){
+        checkPkg("dtwclust")
+        NAind <- which(complete.cases(out))
+        tmp <- t(out[NAind,(("states_dist2maxState"%ci%out)+1):NCOL(out)])
+        tmp_dims <- t(plyr::colwise(dtwclust::zscore)(data.frame(tmp)))
+        space_dims <- matrix(NA, nrow = NROW(out), ncol = length((("states_dist2maxState"%ci%out)+1):NCOL(out)))
+        space_dims[NAind,] <- tmp_dims
+        colnames(space_dims) <- rownames(tmp)
       } else {
         space_dims <- plyr::colwise(ts_standardise,type = standardise,adjustN = FALSE)(data.frame(out[,(("states_dist2maxState"%ci%out)+1):NCOL(out)]))
       }
-      out[,(("states_dist2maxState"%ci%out)+1):NCOL(out)] <- space_dims
-      rm(space_dims)
-
     }
+    out[,(("states_dist2maxState"%ci%out)+1):NCOL(out)] <- space_dims
+    rm(space_dims)
+  }
 
+  out <- out %>% dplyr::group_by(.data$phase_name) %>% dplyr::mutate(phase_size = n())
   out <- out %>% dplyr::arrange(.data$states_time)
+  out$states_singularity[out$states_time %in% Singularities$time] <- 1
+
+  # Check boundaries
+  keep <- names(phases)[lengths(phases)%[]%c(minStatesinPhase,maxStatesinPhase)]
+  out  <- out[out$phase_size%[]%c(minStatesinPhase,maxStatesinPhase),]
+
+
+  #colIND <- which(arr.ind = TRUE, sort(colIND, decreasing = TRUE))
 
   gg <- pp <- NA
   # Plots
   if(any(doPhasePlot,doSpiralPlot)){
 
-    out_long <- tidyr::pivot_longer(out, cols = (("states_dist2maxState"%ci%out)+1):NCOL(out), names_to = "Dimension", values_to = "Value")
+    if(!colOrder){
+
+      colIND <- out %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(.data$phase_number==1) %>%
+        dplyr::summarise(dplyr::across(.cols = (("states_dist2maxState"%ci%out)+1):NCOL(out), mean, na.rm=TRUE)) %>%
+        dplyr::select(., names(sort(.)))
+
+      # cols <- dplyr::select(all_of(colIND),names(sort(colIND, decreasing = TRUE)))
+
+      colsIND <- plyr::laply(names(colIND), function(c) c%ci%out)
+      out <- out %>% dplyr::select(c(1:("states_dist2maxState"%ci%out),colsIND))
+
+      rm(colIND,colsIND)
+    }
+
+    out_long <- tidyr::pivot_longer(out, cols = (("states_dist2maxState"%ci%out)+1):NCOL(out), names_to = "Dimension", values_to = "Value", names_transform = list(Dimension = forcats::fct_inorder))
+
+    # dfp <- tidyr::gather(df_win, key = "variable", value = "value", c(-.data$time), factor_key = colOrder)
 
     if(excludeOther){
       out_long <- out_long %>% dplyr::filter(.data$phase_name != "Other")
@@ -818,18 +921,104 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
 
 
     if(doPhasePlot){
+
+      if(plotCentroid%in%c("mean.sd","median.mad","centroid")){
+
+        if(plotCentroid%in%c("mean.sd","median.mad")){
+
+          outMeans <- plyr::ldply(unique(out$phase_name), function(p){
+            tmp <- out %>% dplyr::ungroup() %>% dplyr::filter(.data$phase_name==p) %>% dplyr::select(starts_with("dim_"))
+            tmp$phase_name <- p
+            if(plotCentroid=="mean.sd"){
+              Mean <- data.frame(phase_name = p, Mean = colMeans(tmp[,-NCOL(tmp)], na.rm = TRUE))
+              SD <- plyr::colwise(sd, na.rm=TRUE)(tmp[,-NCOL(tmp)])
+            }
+            if(plotCentroid=="median.mad"){
+              Mean <- data.frame(phase_name = p, Mean = plyr::colwise(stats::median, na.rm=TRUE)(tmp[,-NCOL(tmp)]))
+              SD <- plyr::colwise(stats::mad, na.rm=TRUE)(tmp[,-NCOL(tmp)])
+            }
+            Mean$SD         <- as.numeric(t(SD))
+            Mean$Dimension  <- rownames(Mean)
+            Mean$phase_size <- unique(out$phase_size[out$phase_name==p])
+            return(Mean)
+          })
+
+        }
+
+        if(plotCentroid%in%"centroid"){
+          #checkPkg("dtwclust")
+
+          NAind <- which(!complete.cases(out))
+          tmpPhases <- out[complete.cases(out),]
+
+          outMeansList <- list()
+          pnames <- unique(tmpPhases$phase_name)
+          for(p in seq_along(pnames)){
+          tmp <- tmpPhases %>%
+            dplyr::ungroup() %>%
+            dplyr::filter(.data$phase_name==pnames[p]) %>%
+            dplyr::select(dplyr::starts_with("dim_"))
+
+            centroid <- dtwclust::shape_extraction(data.frame(tmp), znorm = FALSE)
+            outMeansList[[p]] <- data.frame(phase_name = pnames[p],
+                                            Mean = centroid,
+                                            SD = 0,
+                                            Dimension = colnames(tmp),
+                                            phase_size = unique(tmpPhases$phase_size[tmpPhases$phase_name==pnames[p]]))
+          }
+
+        outMeans <- plyr::ldply(outMeansList)
+        }
+
+
+        if(excludeOther){
+          outMeans <- outMeans %>% dplyr::filter(.data$phase_name != "Other")
+        }
+        if(excludeNorec){
+          outMeans <- outMeans %>% dplyr::filter(.data$phase_name != "No recurrence")
+        }
+
+        outMeans$ymin <- outMeans$Mean - outMeans$SD
+        outMeans$ymax <- outMeans$Mean + outMeans$SD
+        #outMeans$states_time <- outMeans
+        outMeans$Dimension <- forcats::fct_inorder(outMeans$Dimension)
+        outMeans$phaseName <- paste(outMeans$phase_name,"  |  N =",outMeans$phase_size)
+        outMeans$phaseName <- factor(outMeans$phaseName,unique(outMeans$phaseName), ordered = TRUE)
+
+        out_long$alpha <- elascer(out_long$alpha, lo = .2, hi = .5)
+
+      }
+
       pp <- ggplot(data = out_long,
                    aes_(x = ~Dimension,
-                       y = ~Value,
-                       color = ~phase_name,
-                       alpha = ~alpha,
-                       group = ~states_time)) +
+                        y = ~Value,
+                        color = ~phase_name,
+                        alpha = ~alpha,
+                        group = ~states_time)) +
         scale_size_identity() +
         scale_alpha_identity() +
         geom_point(aes_(size = ~psize)) +
         geom_line()+
-        scale_color_manual(values = epochColours) +
-        theme_bw() +
+        scale_color_manual(values = epochColours)
+
+      if(plotCentroid%in%c("mean.sd","median.mad","centroid")){
+        pp <- pp +
+          geom_linerange(data = outMeans,
+                         aes_(x = ~Dimension, y = ~Mean, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+
+        if(plotCentroid%in%"centroid"){
+          pp <- pp + geom_line(data = outMeans,
+                               aes_(x = ~Dimension, y = ~Mean, color = ~phaseName, group = ~phaseName), inherit.aes = FALSE)
+        }
+
+        pp <- pp +
+          geom_point(data = outMeans,
+                     aes_(x = ~Dimension, y = ~Mean, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+          scale_fill_manual(values = epochColours)
+
+      }
+
+      pp <- pp + theme_bw() +
         theme(legend.position = "none") +
         facet_wrap(~ phaseName) +
         coord_flip()
@@ -837,6 +1026,34 @@ rn_phases <- function(RN, maxPhases = 5, minStatesinPhase = 1, maxStatesinPhase 
       print(pp)
     }
 
+    if(doPhaseSeriesPlot){
+
+      out$maxState_strength[is.na(out$maxState_strength)] <- min(out$maxState_strength, na.rm = TRUE)/2
+      p <- ggplot(out, aes_(x = ~states_time, y = ~phase_name, fill = ~phase_name, group = 1)) +
+        geom_line(colour = "grey80") +
+        geom_point(aes(size = maxState_strength+1), pch=21, alpha = .8) +
+        scale_fill_manual(values = epochColours, guide = "none") +
+        scale_x_continuous("Time", expand = c(.05,.2)) +
+        scale_y_discrete("Phase") +
+        scale_size(guide="none", range = c(1,6)) +
+        theme_bw()
+
+    suppressWarnings(
+      h <- ggplot(out, aes_(y = ~phase_name, fill = ~phase_name)) +
+        geom_histogram(stat="count",  colour = "black") +
+        stat_count(geom = "label",
+                   aes(label = paste0(round(..count../NROW(out)*100, digits=1),"%")),
+                   size = 3, hjust=.7,
+                   fill = "white") +
+        scale_fill_manual(values = epochColours, guide = "none") +
+        scale_x_continuous("Count", expand = c(.05,.2)) +
+        theme_bw() +
+        theme(axis.text.y = element_blank(),
+              axis.title.y = element_blank())
+      )
+
+      cowplot::plot_grid(p,h,ncol = 2, rel_widths = c(.75,.25))
+    }
   }
 
   if(returnGraph){
@@ -898,7 +1115,7 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
 
   if(!is.na(threshold)){
     df$freq[df$freq<=threshold] <- 0
-    }
+  }
 
   TM <- Matrix::sparseMatrix(x = df$freq,
                              i = df$from,
@@ -914,7 +1131,7 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
     df$freq <- signif(df$freq,3)
     df$labels <- ifelse(is.na(df$freq),"0", df$freq)
     mp <-  ggplot(df, aes_(x = ~to_name,
-                          y = ~from_name)) +
+                           y = ~from_name)) +
       geom_tile(aes_(fill = ~freq),colour = "black",size = 0.4) +
       geom_text(aes_(label = ~labels)) +
       scale_fill_gradient(low = "#ECE3CD",
@@ -950,7 +1167,7 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
     E(gg)$arrow.size <- .6
 
     if(!is.na(threshold)){
-     gg <-  delete_edges(gg, E(gg)[E(gg)$weight == 0])
+      gg <-  delete_edges(gg, E(gg)[E(gg)$weight == 0])
     }
 
     plot(gg)
@@ -964,6 +1181,6 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
          TransitionNetwork = gg)[TRUE,doMatrixPlot,doNetworkPlot]
   } else {
     return(TM)
-    }
+  }
 }
 

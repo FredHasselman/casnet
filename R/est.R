@@ -60,7 +60,6 @@ est_radius <- function(RM = NULL,
     RM <- rp(y1=y1, y2=y2,emDim=emDim, emLag=emLag, method = method)
   }
 
-
   if(any(is.na(RM))){
     NAid <- which(is.na(Matrix::as.matrix(RM)))
     RM[NAid] <- max(Matrix::as.matrix(RM), na.rm = TRUE)+1
@@ -74,7 +73,11 @@ est_radius <- function(RM = NULL,
 
   if(is.null(startRadius)){
     if(type=="fixed"){
-      startRadius <- as.numeric(stats::quantile(unique(as.vector(RM[lower.tri(RM)])),probs = ifelse(targetValue>=1,.05,targetValue)))
+      if(AUTO){
+        startRadius <- as.numeric(stats::quantile(unique(as.vector(RM[lower.tri(RM)])),probs = ifelse(targetValue>=1,.05,targetValue)))
+      } else {
+        startRadius <- as.numeric(stats::quantile(unique(as.vector(RM)),probs = ifelse(targetValue>=1,.05,targetValue)))
+        }
     } else {
       startRadius <- seq(0,1.5,by=0.001)
     }
@@ -117,9 +120,14 @@ est_radius <- function(RM = NULL,
       iter <- iter+1
       #p$tick()$print()
 
-      RMs <- di2bi(RM, emRad = tryRadius, convMat = TRUE)
-      #Total nr. recurrent points
-      RP_N <- Matrix::nnzero(RMs, na.counted = FALSE)
+      if(!silent){cat(paste("Iteration",iter,"\n"))}
+
+      RP_N <- sum((as.vector(RM)>0)&(as.vector(RM)<tryRadius))
+
+      # RMs <- di2bi(RM, emRad = tryRadius, convMat = TRUE)
+      # #Total nr. recurrent points
+      # RP_N <- Matrix::nnzero(RMs, na.counted = FALSE)
+      # rm(RMs)
 
       #RP_N <- RP_N-minDiag
       #rp.size <- rp_size(RMs) #length(RMs)
@@ -160,6 +168,8 @@ est_radius <- function(RM = NULL,
       } else {
         tryRadius <- tryRadius*(min(c(1.8,1+abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) #1+(tol*2)
       }
+
+
     } # While ....
 
     if(iter>=maxIter){
@@ -171,7 +181,7 @@ est_radius <- function(RM = NULL,
       iterList$Radius[iter] <- dplyr::case_when(
         radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
         radiusOnFail%in%"huge" ~ 1 + max(RM),
-        radiusOnFail%in%"percentile" ~ as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))),probs = ifelse(targetValue>=1,.05,targetValue)))
+        radiusOnFail%in%"percentile" ~ as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))), probs = ifelse(targetValue>=1,.05,targetValue)))
       )
       warning(paste0("\nTarget not found, try increasing tolerance, max. iterations, or, change value of startRadius.\nreturning radius: ",iterList$Radius[iter]))
       iterList$stopRadius[iter] <- tryRadius
@@ -379,7 +389,7 @@ est_radius <- function(RM = NULL,
 #' @examples
 #'
 #' set.seed(4321)
-#' est_parameters(y=rnorm(500))
+#' est_parameters(y=rnorm(100))
 #'
 est_parameters <- function(y,
                            lagMethods = c("first.minimum","global.minimum","max.lag"),

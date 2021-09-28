@@ -130,8 +130,8 @@ rp <- function(y1, y2 = NULL,
     }
   }
 
-  et1 <- ts_embed(y1, emDim=1, emLag=1, silent = silent)
-  et2 <- ts_embed(y2, emDim=1, emLag=1, silent = silent)
+  et1 <- ts_embed(y1, emDim=emDim, emLag=emLag, silent = silent)
+  et2 <- ts_embed(y2, emDim=emDim, emLag=emLag, silent = silent)
 
   dist_method <- return_error(proxy::pr_DB$get_entry(method))
   if("error"%in%class(dist_method$value)){
@@ -282,7 +282,7 @@ rp <- function(y1, y2 = NULL,
 #' @param Nboot How many bootstrap replications? (default = `NULL`)
 #' @param CL Confidence limit for bootstrap results (default = `.95`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR", tol = .2)` if `is.na(emRad)==TRUE`, it will estimate a radius (default = `.05`).
-#' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a seperate process/core for each window in windowed (C)RQA analysis and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
+#' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a separate process/core for each window in windowed (C)RQA analysis and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
 #' @param silent Do not display any messages (default = `TRUE`)
 
 #' @return A list object containing (C)RQA measures (and matrices if requested)
@@ -477,38 +477,45 @@ rp_measures <- function(RM,
       tab <- out
     }
 
-    outTable <- list(`Global Measures` = data.frame(`Global` = "Recurrence Matrix",
-                                                    `Max points-theiler` = tab$RP_max,
+  if(chromatic){
+    Nrows <- length(chromaNames)
+  } else {
+    Nrows <- 1
+  }
+
+    outTable <- list(`Global Measures` = data.frame(Global = "Matrix",
+                                                    `Max points` = tab$RP_max,
                                                     `N points` = tab$RP_N,
-                                                    `Recurrence Rate` = tab$RR,
-                                                    `Singular points` = tab$SING_N%00%NA,
+                                                    RR = tab$RR,
+                                                    Singular = tab$SING_N%00%NA,
                                                     Divergence = tab$DIV_dl,
                                                     Repetitiveness = tab$REP_av),
-                     `Line-based Measures` = data.frame(`Line-based` = c("Diagonal", "Vertical", "Horizontal"),
-                                                        `N lines`   = c(tab$N_dl,tab$N_vl, tab$N_hl),
-                                                        `N points on lines` = c(tab$N_dlp%00%NA,tab$N_vlp%00%NA,tab$N_hlp%00%NA),
-                                                        `Measure` = c("Determinism","V Laminarity","H Laminarity"),
-                                                        `Rate`    = c(tab$DET, tab$LAM_vl, tab$LAM_hl),
-                                                        `Mean`    = c(tab$MEAN_dl, tab$TT_vl, tab$TT_vl),
-                                                        `Max`     = c(tab$MAX_dl, tab$MAX_vl, tab$MAX_hl),
-                                                        `Entropy of lengths` = c(tab$ENT_dl, tab$ENT_vl, tab$ENT_hl),
-                                                        `Relative entropy` = c(tab$ENTrel_dl, tab$ENTrel_vl, tab$ENTrel_hl),
-                                                        `CoV of lengths`   = c(tab$CoV_dl, tab$CoV_vl, tab$CoV_hl)))
+                     `Line-based Measures` = data.frame(`Lines`    = rep(c("Diagonal", "Vertical", "Horizontal", "V+H Total"), each = Nrows),
+                                                        `N lines`  = c(tab$N_dl,tab$N_vl, tab$N_hl, tab$N_hv),
+                                                        `N points` = c(tab$N_dlp%00%NA,tab$N_vlp%00%NA,tab$N_hlp%00%NA, tab$N_hvp%00%NA),
+                                                        `Measure`  = rep(c("DET","V LAM","H LAM", "V+H LAM"), each = Nrows),
+                                                        `Rate`     = c(tab$DET, tab$LAM_vl, tab$LAM_hl, tab$LAM_hv),
+                                                        `Mean`     = c(tab$MEAN_dl, tab$TT_vl, tab$TT_vl, tab$TT_hv),
+                                                        `Max.`     = c(tab$MAX_dl, tab$MAX_vl, tab$MAX_hl, tab$MAX_hv),
+                                                        `ENT`      = c(tab$ENT_dl, tab$ENT_vl, tab$ENT_hl, tab$ENT_hv),
+                                                        `ENT_rel` = c(tab$ENTrel_dl, tab$ENTrel_vl, tab$ENTrel_hl, tab$ENTrel_hv),
+                                                        `CoV`   = c(tab$CoV_dl, tab$CoV_vl, tab$CoV_hl, tab$CoV_hv)))
+
     if(chromatic){
-    rownames(outTable$`Global Measures`) <- chromaNames
-    rownames(outTable$`Line-based Measures`) <- paste(1:NROW(outTable$`Line-based Measures`), rep(chromaNames, each = 3))
+      rownames(outTable$`Global Measures`) <- chromaNames
+      rownames(outTable$`Line-based Measures`) <- paste(1:NROW(outTable$`Line-based Measures`), rep(chromaNames, 4))
     }
 
     if(anisotropyHV){
 
       outTable$`Horizontal/Vertical line anisotropy` <-  data.frame(`Ratio` = "H/V line measures",
-                                                                    `N lines`  =  tab$Nlines_ani,
-                                                                    `N points on lines` = tab$N_hlp%00%NA/tab$N_vlp%00%NA,
-                                                                    `Measure` = "Laminarity",
+                                                                    `N lines`  = tab$Nlines_ani,
+                                                                    `N points` = tab$N_hlp%00%NA/tab$N_vlp%00%NA,
+                                                                    `Measure` = "LAM",
                                                                     `Rate`    = tab$LAM_ani,
                                                                     `Mean`    = tab$MEAN_hvl_ani,
                                                                     `Max`     = tab$MAX_hvl_ani,
-                                                                    `Entropy of lengths` = tab$ENT_hvl_ani)
+                                                                    `ENT`     = tab$ENT_hvl_ani)
       if(chromatic){
       rownames(outTable$`Horizontal/Vertical line anisotropy`) <- chromaNames
       }
@@ -520,22 +527,22 @@ rp_measures <- function(RM,
         `Global Measures` =  data.frame(`Global Ratio` = "U/L of points",
                                         `N points` = tab$ratios.ul.Npoints_ul_ani,
                                         RR = tab$ratios.ul.RR_ul_ani,
-                                        `Singular points` = tab$ratios.ul.SING_N_ul_ani,
+                                        Singular = tab$ratios.ul.SING_N_ul_ani,
                                         Divergence = tab$ratios.ul.DIV_ul_ani,
                                         Repetetiveness = tab$ratios.ul.REP_ul_ani),
         `Line-based Measures` = data.frame(
-          `Line ratio` = c("D lines", "V lines", "H lines"),
+          `Line ratio` = rep(c("D lines", "V lines", "H lines"), each = Nrows),
           `N lines`  = c(tab$ratios.ul.NDlines_ul_ani,
                          tab$ratios.ul.NVlines_ul_ani,
                          tab$ratios.ul.NHlines_ul_ani),
-          `N points on lines` = c(tab$upper.tri.N_dlp/tab$lower.tri.N_dlp,
+          `N points` = c(tab$upper.tri.N_dlp/tab$lower.tri.N_dlp,
                                   tab$upper.tri.N_vlp/tab$lower.tri.N_vlp,
                                   tab$upper.tri.N_hlp/tab$lower.tri.N_hlp),
-          `Measure Ratio` = c("Determinism","V Laminarity", "H Laminarity"),
+          `Measure` = rep(c("DET","V LAM", "H LAM"), each = Nrows),
           `Rate`    = c(tab$ratios.ul.DET_ul_ani, tab$ratios.ul.LAM_vl_ul_ani, tab$ratios.ul.LAM_hl_ul_ani),
           `Mean`    = c(tab$ratios.ul.MEAN_dl_ul_ani, tab$ratios.ul.MEAN_vl_ul_ani, tab$ratios.ul.MEAN_hl_ul_ani),
           `Max`     = c(tab$ratios.ul.MAX_dl_ul_ani, tab$ratios.ul.MAX_vl_ul_ani, tab$ratios.ul.MAX_hl_ul_ani),
-          `Entropy of lengths` = c(tab$ratios.ul.ENT_dl_ul_ani,
+          `ENT`     = c(tab$ratios.ul.ENT_dl_ul_ani,
                                    tab$ratios.ul.ENT_vl_ul_ani,
                                    tab$ratios.ul.ENT_hl_ul_ani))
       )
@@ -543,7 +550,7 @@ rp_measures <- function(RM,
       if(chromatic){
         id <- which(names(outTable)%in%"Upper/Lower triangle asymmetry")
         rownames(outTable[[id]]$`Global Measures`) <- chromaNames
-        rownames(outTable[[id]]$`Line-based Measures`) <- paste(1:NROW(outTable[[id]]$`Line-based Measures`), rep(chromaNames, each = 3))
+        rownames(outTable[[id]]$`Line-based Measures`) <- paste(1:NROW(outTable[[id]]$`Line-based Measures`), rep(chromaNames, 3))
       }
     }
 
@@ -553,22 +560,24 @@ rp_measures <- function(RM,
       if(chromatic){
         cat(paste0("Chromatic RQA with categories: ", paste(chromaNames, collapse = ", "),"\n"))
       }
-      cat(paste0("\n",names(outTable)[1],"\n"))
+      cat(" Global Measures\n")
       print(format(outTable$`Global Measures`, digits = 3))
-      cat(paste0("\n\n",names(outTable)[2],"\n"))
+      cat(paste("\n\n Line-based Measures\n"))
       print(format(outTable$`Line-based Measures`, digits = 3))
 
       if(anisotropyHV){
-        cat(paste0("\n\n",names(outTable)[3],"\n\n"))
+        id <- which(names(outTable)%in%"Horizontal/Vertical line anisotropy")
+        cat(paste0("\n\n",names(outTable)[id],"\n\n"))
         print(format(outTable$`Horizontal/Vertical line anisotropy`, digits = 3))
       }
 
       if(asymmetryUL){
-        cat(paste0("\n\n",names(outTable)[4],"\n\n"))
+        id <- which(names(outTable)%in%"Upper/Lower triangle asymmetry")
+        cat(paste0("\n\n",names(outTable)[id],"\n\n"))
         cat(" Global Measures\n")
-        print(format(outTable[[4]]$`Global Measures`, digits = 3))
+        print(format(outTable[[id]]$`Global Measures`, digits = 3))
         cat(paste("\n\n Line-based Measures\n"))
-        print(format(outTable[[4]]$`Line-based Measures`, digits = 3))
+        print(format(outTable[[id]]$`Line-based Measures`, digits = 3))
       }
       cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
     }
@@ -837,9 +846,9 @@ rp_diagProfile <- function(RM,
                            DLmin = 2,
                            VLmin = 2,
                            HLmin = 2,
-                           DLmax = length(Matrix::diag(RM))-1,
-                           VLmax = length(Matrix::diag(RM))-1,
-                           HLmax = length(Matrix::diag(RM))-1,
+                           DLmax = length(Matrix::diag(RM)),
+                           VLmax = length(Matrix::diag(RM)),
+                           HLmax = length(Matrix::diag(RM)),
                            doShuffle = FALSE,
                            y1        = NA,
                            y2        = NA,
@@ -864,19 +873,21 @@ rp_diagProfile <- function(RM,
     AUTO <- attr(RM,"AUTO")
   }
 
-  if(is.na(theiler%00%NA)){
-    if(!is.null(attributes(RM)$theiler)){
-      if(attributes(RM)$theiler>0){
-        message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
-      }
-    }
-    theiler <- 0
-  } else {
-    if(theiler < 0){
-      theiler <- 0
-    }
-  }
 
+  RM <- setTheiler(RM = RM, theiler = theiler, silent = TRUE)
+
+  # if(is.na(theiler%00%NA)){
+  #   if(!is.null(attributes(RM)$theiler)){
+  #     if(attributes(RM)$theiler>0){
+  #       message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
+  #     }
+  #   }
+  #   theiler <- 0
+  # } else {
+  #   if(theiler < 0){
+  #     theiler <- 0
+  #   }
+  # }
 
   if(is.numeric(diagWin)){
     if(diagWin>0){
@@ -890,7 +901,7 @@ rp_diagProfile <- function(RM,
 
   if(doShuffle){
     if(any(is.na(y1),is.na(y2))){
-      stop("Need series y1 and y2 in order to do the shuffle!!")
+      stop("Need time series (y1 and y2) in order to do the shuffle!!")
     } else {
       cat("Calculating diagonal recurrence profiles... \n")
       TSrnd <- tseries::surrogate(x=y2, ns=Nshuffle, fft=FALSE, amplitude = FALSE)
@@ -917,7 +928,6 @@ rp_diagProfile <- function(RM,
 
     if(r==1){
       RMd <- RM
-      rm(RM)
     } else {
       RMd <- rp(y1 = y1, y2 = TSrnd[,(r-1)],emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
     }
@@ -942,7 +952,7 @@ rp_diagProfile <- function(RM,
     df$group  <- 1
     df$labels <- paste(df$Diagonal)
     # df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
-    df$labels <- factor(df$labels,levels = df$labels,ordered = TRUE)
+    df$labels <- factor(df$labels,levels = df$labels, ordered = TRUE)
 
     out[[r]] <- df
     #rm(df,B,cID,diagID)
@@ -959,38 +969,50 @@ rp_diagProfile <- function(RM,
 
   dy_m <- df_shuf %>%
     dplyr::group_by(.data$Diagonal,.data$labels) %>%
-    dplyr::summarise(meanRRrnd = mean(.data$RR), sdRRrnd = stats::sd(.data$RR))
+    dplyr::summarise(`Mean Shuffled` = mean(.data$RR), sdRRrnd = stats::sd(.data$RR)) %>%
+    dplyr::ungroup()
 
   if(Nshuffle==1){
-    dy_m$sdRRrnd <- dy_m$meanRRrnd
+    dy_m$sdRRrnd <- 0
   }
 
-  dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
-  dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+  dy_m$ciHI <- dy_m$`Mean Shuffled` + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+  dy_m$ciLO <- dy_m$`Mean Shuffled` - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
 
-  obs <- dy$RR[dy$.id=="obs"]
+  obs <- dy[dy$.id=="obs",]
   if(doShuffle){
-    if(length(obs)!=(2*length(y1))){
-      obs <-  ts_trimfill(obs,c(y1,y2),action = 'trim')$y
-    }}
-  dy_m$y_obs <- obs
+    if(!all(obs$Diagonal%in%dy_m$Diagonal)){
+      notInd <- which(!obs$Diagonal%in%dy_m$Diagonal)
+      tmp <- matrix(nrow = NROW(dy_m), ncol = NCOL(dy_m), dimnames = list(NULL,colnames(dy_m)))
+      for(r in 1:NROW(dy_m)){
+        if(!r%in%notInd){
+          tmp[r,] <- obs[r,]
+        }
+      }
+      obs <- tmp
+      rm(tmp)
+    }
+  }
+  dy_m$Observed <- obs$RR
 
   df <- tidyr::gather(dy_m, key = "variable", value = "RR", -c(.data$Diagonal,.data$sdRRrnd, .data$labels, .data$ciLO, .data$ciHI))
   df$Diagonal <- as.numeric(df$Diagonal)
 
   if(doPlot){
 
-    Diags <- as.numeric(levels(df$labels))
-    Diags[is.na(Diags)] <- 0
-    if(length(diagWin)>21){
-      ext <- max(min(abs(Diags),na.rm = TRUE),abs(max(Diags,na.rm = TRUE)))-1
-      breaks <- which(Diags%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
-      labels <- sort(unique(c(Diags[breaks],0)))
-      breaks <- sort(unique(c(breaks,stats::median(breaks))))
-    } else {
-      breaks <- seq_along(Diags)
-      labels <- sort(unique(c(Diags[breaks],0)))
-    }
+    # Diags <- as.numeric(levels(df$labels))
+    # Diags[is.na(Diags)] <- 0
+
+    # if(length(diagWin)>21){
+    #   ext <- max(min(abs(Diags),na.rm = TRUE),abs(max(Diags,na.rm = TRUE)))-1
+    #   breaks <- which(Diags%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
+    #   labels <- sort(unique(c(Diags[breaks],0)))
+    #   breaks <- sort(unique(c(breaks,stats::median(breaks))))
+    # } else {
+    #   breaks <- seq_along(Diags)
+    #   labels <- sort(unique(c(Diags[breaks],0)))
+    # }
+
 
     # if(which.min(c(length(breaks),length(labels)))==1){
     #   labels <- labels[1:length(breaks)]
@@ -998,34 +1020,40 @@ rp_diagProfile <- function(RM,
     #   breaks <- breaks[1:length(labels)]
     # }
 
-    df$Diags <- Diags
+    breaks <- seq_along(as.numeric(levels(df$labels)))
+    labels <- sort(unique(c(as.numeric(levels(df$labels))[breaks],0)))
 
+    x1 <- round((which.min(as.numeric(paste(df$Diagonal))))+(length(diagWin)*.1))
+    x2 <- round((which.max(as.numeric(paste(df$Diagonal))))-(length(diagWin)*.1))
+    yL <- max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
+    # col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
+    if(Nshuffle>0){
+      col <- c("Mean Shuffled" = "grey40","Observed" = "black")
+      leg <- paste0("Diagonal Profile\n(N surrogates = ",Nshuffle,")")
+    } else {
+      col <- c("Observed" = "black")
+      leg <- paste0("Diagonal Profile")
+    }
 
-    x1<-(which.min(as.numeric(paste(df$Diagonal))))+(length(diagWin)*.1)
-    x2<-(which.max(as.numeric(paste(df$Diagonal))))-(length(diagWin)*.1)
-    yL<-max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
-    col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
-    siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
+    #siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
+    #g<- ggplot(df, aes_(x = ~labels, y = ~RR, colour = ~variable))
+    #   geom_line() + theme_bw()
 
-    g <- ggplot(df, aes(x = as.numeric_discrete(~labels), y = ~RR, colour = ~variable)) +
-      geom_line() + theme_bw()
-
-    # g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
-    #   #ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey50")
-    #   if(doShuffle){
-    #     g <- g+ ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3)
-    #   }
-    # g <- g +  ggplot2::geom_line(ggplot2::aes_(y=~RR), size = .5) +
-    #   #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
-    #   ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,yL)) +
-    #   ggplot2::scale_x_continuous("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
-    #   ggplot2::geom_label(x=x1,y=yL,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE) +
-    #   ggplot2::geom_label(x=x2,y=yL,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE) +
-    #   ggplot2::scale_colour_manual(values = col) +
-    #   # ggplot2::scale_size_manual(values = siz) +
-    #   ggplot2::theme_bw() +
-    #   theme(panel.grid.minor = element_blank())
-
+    g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
+      ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey80")
+      if(doShuffle){
+        g <- g + ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3)
+      }
+    g <- g + ggplot2::geom_line(ggplot2::aes_(y=~RR, colour = ~variable), size = .5) +
+      #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
+      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,1)) +
+      ggplot2::scale_x_continuous("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
+      ggplot2::geom_label(x=x1,y=.8,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE, size = 3) +
+      ggplot2::geom_label(x=x2,y=.8,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE, size = 3) +
+      ggplot2::scale_colour_manual(leg, values = col) +
+      ggplot2::theme_bw() +
+      theme(panel.grid.minor = element_blank(),
+            axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5, size = rel(.6)))
     print(g)
 
     if(doShuffle){
@@ -1714,6 +1742,7 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
     if(is.null(d)){
       d <-  c(-1*rev(1:(NCOL(nzdiagsM)-1)),0,1:(NCOL(nzdiagsM)-1))
     }
+    rm(nzdiagsM)
 
     if(removeNZ){
       nd <- unique(nzdiags$ndiag)
@@ -1729,14 +1758,14 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
     n  <- NCOL(RM)
     p  <- length(d)
     if(is.logical(RM)){
-      B <- matrix(FALSE,nrow = min(c(m,n), na.rm = TRUE), ncol = p)
+      B <- matrix(FALSE,nrow = max(c(m,n), na.rm = TRUE), ncol = p)
     } else {
-      B <- matrix(0, nrow = min(c(m,n), na.rm = TRUE), ncol = p)
+      B <- matrix(0, nrow = max(c(m,n), na.rm = TRUE), ncol = p)
     }
     colnames(B) <- paste(d)
 
     for(i in seq_along(d)){
-      B[(nzdiags$row[nzdiags$ndiag==d[i]])+1,i] <- nzdiags$value[nzdiags$ndiag==d[i]]
+      B[(nzdiags$row[nzdiags$ndiag==d[i]]+1), i] <- nzdiags$value[nzdiags$ndiag==d[i]]
     }
 
     zID <- which(Matrix::colSums(Matrix::as.matrix(B))==0)
@@ -2121,7 +2150,7 @@ rp_plot <- function(RM,
 
   useGtable <- TRUE
 
-  colvec <- c("#FFFFFF","#000000")
+  colvec <- c("#FFFFFF00","#000000")
   names(colvec) <- c("0","1")
 
   # check auto-recurrence and make sure Matrix has sparse triplet representation
@@ -2130,13 +2159,13 @@ rp_plot <- function(RM,
 
   # Make sure we can draw a diagonal if requested
   maxDist <- max(RM, na.rm = TRUE)
-  # if(drawDiagonal&AUTO){
-  #   if(all(as.vector(RM)==0|as.vector(RM)==1)){
-  #     RM <- bandReplace(RM,0,0,1)
-  #   } else {
-  #     RM <- bandReplace(RM,0,0,(maxDist+1))
-  #   }
-  # }
+  if(drawDiagonal&AUTO){
+    if(all(as.vector(RM)==0|as.vector(RM)==1)){
+      RM <- bandReplace(RM,0,0,1)
+    } else {
+      RM <- bandReplace(RM,0,0,(maxDist+1))
+    }
+  }
 
   if(is.null(attr(RM,"chromatic"))){
     chromatic <- FALSE
@@ -2229,10 +2258,10 @@ rp_plot <- function(RM,
         #cpal <- paletteer::paletteer_d(package = "ggthemes",palette = "tableau_colorblind10",n = nlevels(markEpochsLOI),direction = 1)
 
         if(hasNA){
-          colvec <- c("#FFFFFF","#000000","#FF0000", cpal)
+          colvec <- c("#FFFFFF00","#000000","#FF0000", cpal)
           names(colvec) <- c("0","1","NA",levels(markEpochsLOI))
         } else {
-          colvec <- c("#FFFFFF","#000000", cpal) #viridis::viridis_pal()(nlevels(markEpochsLOI)))
+          colvec <- c("#FFFFFF00","#000000", cpal) #viridis::viridis_pal()(nlevels(markEpochsLOI)))
           names(colvec) <- c("0","1",levels(markEpochsLOI))
         }
         N <- max(c(NROW(RM),NCOL(RM)))
@@ -2263,7 +2292,7 @@ rp_plot <- function(RM,
         }
 
         colvec <- getColours(length(chromaNames))
-        colvec[which(chromaNames%in%"0")] <- "#FFFFFF"
+        colvec[which(chromaNames%in%"0")] <- "#FFFFFF00"
 
         if(hasNA){
           if(NA%in%chromaNames){
@@ -2323,7 +2352,7 @@ rp_plot <- function(RM,
 
       } else {
 
-      colvec <- c("#FFFFFF","#000000")
+      colvec <- c("#FFFFFF00","#000000")
       names(colvec) <- c("0","1")
       meltRP$value <- factor(meltRP$value, levels = c(0,1), labels = c("0","1"))
       }
@@ -2368,7 +2397,7 @@ rp_plot <- function(RM,
     ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL)
 
   if(drawDiagonal){
-    gRP <- gRP + ggplot2::geom_abline(slope = 1,colour = "grey50", size = 1)
+    gRP <- gRP + ggplot2::geom_abline(slope = 1,colour = "grey30", size = 1)
   }
 
   ## Unthresholded START ----
@@ -2426,13 +2455,18 @@ rp_plot <- function(RM,
       resol <- resol %>% tibble::as_tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
 
       distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){
-        suppressWarnings(est_radius(RM,targetValue = t,silent = TRUE, maxIter = 100, radiusOnFail = "percentile"))
+        suppressMessages(est_radius(RM,targetValue = t, silent = TRUE, maxIter = 100, radiusOnFail = "percentile"))
       })
 
+      if(AUTO){
+      maxD <- suppressMessages(max(RM[lower.tri(RM)], na.rm = TRUE))
+      } else {
+      maxD <- suppressMessages(max(RM, na.rm = TRUE))
+      }
       RecScale <- data.frame(RR=distrange$Measure,epsilon=distrange$Radius)
       RecScale <- RecScale %>%
         dplyr::add_row(epsilon=mean(c(0,distrange$Radius[1])),RR=mean(c(0,distrange$Measure[1])),.before = 1) %>%
-        dplyr::add_row(epsilon=max(RM),RR=1)
+        dplyr::add_row(epsilon=maxD,RR=1)
 
       resol$y <- elascer(x = resol$y,lo = min(log(RecScale$RR),na.rm = TRUE), hi = max(log(RecScale$RR),na.rm = TRUE))
       resol <- resol[-1,]
@@ -2494,10 +2528,12 @@ rp_plot <- function(RM,
                                                   plot.margin = margin(0,0,0,0))
 
   if(drawGrid){
-    rptheme <- rptheme +  theme(panel.grid.major  = element_line("grey70",size = .1),
-                                panel.ontop = TRUE)
+    rptheme <- rptheme +  theme(panel.grid.minor  = element_blank(),
+                                panel.grid.major  = element_line("grey80",size = .1),
+                                panel.ontop = unthresholded)
   } else {
     rptheme <- rptheme +  theme(panel.grid.major  = element_blank(),
+                                panel.grid.minor  = element_blank(),
                                 panel.ontop = FALSE)
   } #drawGrid
 
@@ -3028,7 +3064,7 @@ rp_calc <- function(RM,
 
   if(is.na(theiler)){
     if(is.na(attributes(RM)$theiler)){
-      RM <- setTheiler(RM, )
+      RM <- setTheiler(RM, theiler = theiler)
     }
     theiler <- attributes(RM)$theiler
   }
@@ -3089,7 +3125,7 @@ rp_calc <- function(RM,
 
   # table(SING_N$verticals.dist)
   # table(SING_N$horizontals.dist)
-  SING_N  <-  table(SING$diagonals.dist)[1]
+  SING_N <- table(SING$diagonals.dist)[1]
   SING_rate <- SING_N / RP_N
 
   # H/V Anisotropy ratios
@@ -3262,58 +3298,68 @@ rp_calc_lineMeasures <- function(RM,
                               chromatic = chromatic,
                               matrices = matrices)
 
-  dlines <- lineSegments$diagonals.dist
-  vlines <- lineSegments$verticals.dist
-  hlines <- lineSegments$horizontals.dist
+  dlines <- lineSegments$diagonals.dist%00%0
+  vlines <- lineSegments$verticals.dist%00%0
+  hlines <- lineSegments$horizontals.dist%00%0
 
   #Frequency tables of line lengths
   freq_dl <- table(dlines)
   freq_vl <- table(vlines)
   freq_hl <- table(hlines)
+  freq_hv <- table(c(hlines,vlines))
 
   freqvec_dl <- as.numeric(names(freq_dl))
   freqvec_vl <- as.numeric(names(freq_vl))
   freqvec_hl <- as.numeric(names(freq_hl))
+  freqvec_hv <- as.numeric(names(freq_hv))
 
   # Number of lines
   N_dl <- sum(freq_dl, na.rm = TRUE)%00%0
   N_vl <- sum(freq_vl, na.rm = TRUE)%00%0
   N_hl <- sum(freq_hl, na.rm = TRUE)%00%0
+  N_hv <- sum(freq_hv, na.rm = TRUE)%00%0
 
   #Number of recurrent points on diagonal, vertical and horizontal lines
   N_dlp <- sum(freqvec_dl*freq_dl, na.rm = TRUE)
   N_vlp <- sum(freqvec_vl*freq_vl, na.rm = TRUE)
   N_hlp <- sum(freqvec_hl*freq_hl, na.rm = TRUE)
+  N_hvp <- sum(freqvec_hv*freq_hv, na.rm = TRUE)
 
   #Determinism / Horizontal and Vertical Laminarity
   DET    <- N_dlp/RP_N
   LAM_vl <- N_vlp/RP_N
   LAM_hl <- N_hlp/RP_N
+  LAM_hv <- N_hvp/(RP_N*2)
 
   #Array of probabilities that a certain line length will occur (all >1)
   P_dl <- freq_dl/N_dl
   P_vl <- freq_vl/N_vl
   P_hl <- freq_hl/N_hl
+  P_hv <- freq_hv/N_hv
 
   #Entropy of line length distributions
   ENT_dl <- -1 * sum(P_dl * log(P_dl))
   ENT_vl <- -1 * sum(P_vl * log(P_vl))
   ENT_hl <- -1 * sum(P_hl * log(P_hl))
+  ENT_hv <- -1 * sum(P_hv * log(P_hv))
 
   #Relative Entropy (Entropy / Max entropy)
   ENTrel_dl = ENT_dl/(-1 * log(1/DLmax))
   ENTrel_vl = ENT_vl/(-1 * log(1/VLmax))
   ENTrel_hl = ENT_hl/(-1 * log(1/HLmax))
+  ENTrel_hv = ENT_hv/(-1 * log(1/max(c(HLmax,VLmax), na.rm = TRUE)))
 
   #Meanline
   MEAN_dl = mean(dlines, na.rm = TRUE)%00%0
   MEAN_vl = mean(vlines, na.rm = TRUE)%00%0
   MEAN_hl = mean(hlines, na.rm = TRUE)%00%0
+  MEAN_hv = mean(c(hlines,vlines), na.rm = TRUE)%00%0
 
   #Maxline
   MAX_dl = max(freqvec_dl, na.rm = TRUE)%00%0
   MAX_vl = max(freqvec_vl, na.rm = TRUE)%00%0
   MAX_hl = max(freqvec_hl, na.rm = TRUE)%00%0
+  MAX_hv = max(freqvec_hv, na.rm = TRUE)%00%0
 
   # REPetetiveness
   REP_av  <- (N_hlp+N_vlp) / N_dlp
@@ -3324,11 +3370,13 @@ rp_calc_lineMeasures <- function(RM,
   CoV_dl = stats::sd(dlines)/mean(dlines)
   CoV_vl = stats::sd(vlines)/mean(vlines)
   CoV_hl = stats::sd(hlines)/mean(hlines)
+  CoV_hv = stats::sd(c(hlines,vlines))/mean(c(hlines,vlines))
 
   #Divergence
   DIV_dl = 1/MAX_dl
   DIV_vl = 1/MAX_vl
   DIV_hl = 1/MAX_hl
+  DIV_hv = 1/MAX_hv
 
   out <- data.frame(
     RP_N      = RP_N,
@@ -3359,7 +3407,15 @@ rp_calc_lineMeasures <- function(RM,
     ENT_hl    = ENT_hl,
     ENTrel_hl = ENTrel_hl,
     CoV_hl    = CoV_hl,
-    REP_hl    = REP_hl)
+    REP_hl    = REP_hl,
+    N_hvp     = N_hvp,
+    N_hv      = N_hv,
+    LAM_hv    = LAM_hv,
+    TT_hv     = MEAN_hv,
+    MAX_hv    = MAX_hv,
+    ENT_hv    = ENT_hv,
+    ENTrel_hv = ENTrel_hv,
+    CoV_hv    = CoV_hv)
 
   if(matrices){
     return(list(

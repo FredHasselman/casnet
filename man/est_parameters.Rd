@@ -73,7 +73,7 @@ A number of functions are called to determine optimal parameters for delay embed
 \examples{
 
 set.seed(4321)
-est_parameters(y=rnorm(500))
+est_parameters(y=rnorm(100))
 
 }
 \seealso{
