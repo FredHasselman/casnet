@@ -15,3 +15,5 @@ plyr
 mice
 kableExtra
 igraph
+testthat
+Matrix

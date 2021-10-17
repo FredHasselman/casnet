@@ -29,7 +29,7 @@ rn_plot(
 
 \item{markEpochsLOI}{Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (default = \code{NULL})}
 
-\item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{est_radius()} will be called with default settings (find a radius that yields .05 recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
+\item{radiusValue}{If \code{plotMeasures = TRUE} and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If \code{plotMeasures = TRUE} and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If \code{plotMeasures = TRUE} and \code{radiusValue = NA}, function \code{est_radius()} will be called with default settings (find a radius that yields \code{.05} recurrence rate). If \code{plotMeasures = FALSE} this setting will be ignored.}
 
 \item{title}{A title for the plot}
 
@@ -37,7 +37,7 @@ rn_plot(
 
 \item{ylabel}{An y-axis label}
 
-\item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \code{\link[=rp]{rp()}}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}.}
+\item{plotSurrogate}{Should a 2-panel comparison plot based on surrogate time series be added? If \code{RM} has attributes \code{y1} and \code{y2} containing the time series data (i.e. it was created by a call to \link{rp}), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from \code{y1}. (default = \code{FALSE})}
 
 \item{returnOnlyObject}{Return the ggplot object only, do not draw the plot (default = \code{TRUE})}
 }
@@ -49,9 +49,9 @@ Plot (thresholded) distance matrix as a network
 }
 \seealso{
 Other Distance matrix operations (recurrence network): 
-\code{\link{di2bi}()},
-\code{\link{di2ch}()},
-\code{\link{di2we}()},
+\code{\link{mat_di2bi}()},
+\code{\link{mat_di2ch}()},
+\code{\link{mat_di2we}()},
 \code{\link{rn_phases}()},
 \code{\link{rn_recSpec}()},
 \code{\link{rn}()}

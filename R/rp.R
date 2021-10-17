@@ -79,7 +79,7 @@ rp <- function(y1, y2 = NULL,
 
   atlist <- attributes(y1)
   if(any(names(atlist) %in% c("emDims1","emDims2","emDims1.name","emDims2.name"))){
-    stop("Input is already a recurrence matrix created by 'rp()'. To manually create a binary matrix from a distance matrix use 'di2bi()'. To create a weighted matrix use 'di2we()'")
+    stop("Input is already a recurrence matrix created by 'rp()'. To manually create a binary matrix from a distance matrix use 'mat_di2bi()'. To create a weighted matrix use 'mat_di2we()'")
   }
 
 
@@ -169,21 +169,26 @@ rp <- function(y1, y2 = NULL,
 
   if(!is.null(emRad)){
     if(is.na(emRad)){
-      emRad <- est_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue)$Radius
+      suppressMessages(emRad <- est_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue, silent = TRUE))
+      if(emRad$Converged){
+        emRad <- emRad$Radius
+      } else {
+        emRad <- est_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue, tol = 0.2, silent = TRUE, radiusOnFail = "percentile")$Radius
+      }
     }
     if(chromatic){
-      dmat <- di2ch(dmat, y = et1, emRad = emRad, convMat = to.sparse)
+      dmat <- mat_di2ch(dmat, y = et1, emRad = emRad, convMat = to.sparse)
     } else {
       if(weighted){
-        dmat <- di2we(dmat, emRad = emRad, convMat = to.sparse)
+        dmat <- mat_di2we(dmat, emRad = emRad, convMat = to.sparse)
       } else {
-        dmat <- di2bi(dmat, emRad = emRad, convMat = to.sparse)
+        dmat <- mat_di2bi(dmat, emRad = emRad, convMat = to.sparse)
       }
     }
   }
 
   dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE, checkSPARSE = TRUE, fixSPARSE = TRUE, checkS4 = TRUE, fixS4 = TRUE)
-  suppressMessages(dmat <- setTheiler(RM = dmat, theiler = theiler))
+  suppressMessages(dmat <- setTheiler(RM = dmat, theiler = theiler, chromatic = chromatic))
 
   if(returnMeasures){
     rpOut <-  rp_measures(RM = dmat,
@@ -372,9 +377,9 @@ rp_measures <- function(RM,
       if(any(grepl("Matrix",class(RM)))){
         RM     <- rp_checkfix(RM, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
         #meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
-        meltRP <-  mat2ind(Matrix::as.matrix(RM))
+        meltRP <-  mat_mat2ind(Matrix::as.matrix(RM))
       } else {
-        meltRP <-  mat2ind(as.matrix(RM))
+        meltRP <-  mat_mat2ind(as.matrix(RM))
       }
 
       if(!is.null(attr(RM,"chromaNames"))){
@@ -442,7 +447,7 @@ rp_measures <- function(RM,
 
     } else {
       if(!is.null(emRad)){
-        RM <- di2bi(RM,emRad)
+        RM <- mat_di2bi(RM,emRad)
       } else {
         if(!chromatic){
           stop("Expecting a binary (0,1) matrix.\nUse 'est_radius()', or set 'chromatic = TRUE'")
@@ -2072,7 +2077,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
     yesS4 <- isS4(RM)
   }
   if(!yesS4&fixS4){
-    RM <- Matrix::Matrix(RM)
+    RM <- Matrix::Matrix(RM, sparse = TRUE)
     yesS4 <- isS4(RM)
   }
 
@@ -2096,7 +2101,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
   }
   if(fixTSPARSE&!yesTSPARSE){
     if(!yesS4){
-      RM <- Matrix::Matrix(RM,sparse = TRUE)
+      RM <- Matrix::Matrix(RM, sparse = TRUE)
     }
     Mtype <- gsub("CMatrix","TMatrix",class(RM)[1])
     eval(parse(text=paste0("RM <- as(RM,'",Mtype,"')")))
@@ -2120,11 +2125,13 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param drawDiagonal One usually omits the main diagonal, the Line Of Incidence (LOI) from the calculation of Auto-RQA measures., it is however common to plot it. Set to `FALSE` to omit the LOI from an Auto-Recurrence Plot (default = `TRUE`)
 #' @param drawNA Draw `NA` values in the recurrence plot? If `FALSE` then `NA` values will be considered non-recurring (default = `FALSE`)
 #' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (default = `NULL`)
-#' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `est_radius()` will be called with default settings (find a radius that yields .05 recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
+#' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `est_radius()` will be called with default settings (find a radius that yields `.05` recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
+#' @param courseGrain Reduce the size of the matrix before plotting (greatly improves speed). If `plotMeasures = TRUE` coursegraining takes place after calculation of the CRQA measures. See [mat_coursegrain()] for details (default = `TRUE`)
+#' @param maxSize The maximum size of the matrix (cols x rows) above which the coursegraining function [mat_coursegrain] will be implemented if `courseGrain = TRUE`. This will speed up the plotting process
 #' @param title A title for the plot
 #' @param xlabel An x-axis label
 #' @param ylabel An y-axis label
-#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If `RM` has attributes `y1` and `y2` containing the time series data (i.e. it was created by a call to [rp()]), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from `y1`.
+#' @param plotSurrogate Should a 2-panel comparison plot based on surrogate time series be added? If `RM` has attributes `y1` and `y2` containing the time series data (i.e. it was created by a call to [rp]), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from `y1`. (default = `FALSE`)
 #' @param returnOnlyObject Return the ggplot object only, do not draw the plot (default = `TRUE`)
 #'
 #' @return A nice plot of the recurrence matrix.
@@ -2142,6 +2149,8 @@ rp_plot <- function(RM,
                     drawNA = FALSE,
                     markEpochsLOI = NULL,
                     radiusValue = NA,
+                    courseGrain = TRUE,
+                    maxSize = 500^2,
                     title = "",
                     xlabel = "",
                     ylabel="",
@@ -2150,28 +2159,97 @@ rp_plot <- function(RM,
 
   useGtable <- TRUE
 
-  colvec <- c("#FFFFFF00","#000000")
-  names(colvec) <- c("0","1")
-
-  # check auto-recurrence and make sure Matrix has sparse triplet representation
-  RM   <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkSPARSE = TRUE)
-  AUTO <- attr(RM,"AUTO")
-
-  # Make sure we can draw a diagonal if requested
-  maxDist <- max(RM, na.rm = TRUE)
-  if(drawDiagonal&AUTO){
-    if(all(as.vector(RM)==0|as.vector(RM)==1)){
-      RM <- bandReplace(RM,0,0,1)
-    } else {
-      RM <- bandReplace(RM,0,0,(maxDist+1))
-    }
-  }
-
   if(is.null(attr(RM,"chromatic"))){
     chromatic <- FALSE
     attr(RM,"chromatic") <- chromatic
   } else {
     chromatic <- attr(RM,"chromatic")
+  }
+
+  if(!all(na.exclude(as.vector(RM))%in%c(0,1))&!chromatic){
+    unthresholded <- TRUE
+  } else {
+    unthresholded <- FALSE
+  }
+
+  #  else {
+  #   # This is just to set the attribute in case
+  #   if(unthresholded|plotMeasures){
+  #     radiusValue <- est_radius(RM,silent = TRUE)$Radius
+  #     attr(RM,"emRad") <- radiusValue
+  #   }
+  # }
+
+  # Check if we need to display CRQA measures for the original matrix
+
+  # Get Radius attribute (if present), otherwise set it (if not present)
+  if(is.na(radiusValue%00%NA)){
+    if(!is.na(attr(RM,"emRad")%00%NA)){
+      radiusValue <- attr(RM,"emRad")
+    }
+  } else {
+    if(is.numeric(radiusValue)&radiusValue>=0){
+      if(is.na(attr(RM,"emRad")%00%NA)){
+        attr(RM,"emRad") <- radiusValue
+      }
+    } else {
+      radiusValue <- NA
+    }
+  } # is.na(radiusvalue)
+
+  # check auto-recurrence and make sure Matrix has sparse triplet representation
+  RM   <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkSPARSE = TRUE)
+  AUTO <- attr(RM,"AUTO")
+
+
+  # Get CRQA measures if requested
+  if(plotMeasures){
+      if(!is.na(attr(RM,"emRad")%00%NA)){
+        radiusValue <- attr(RM,"emRad")
+      } else {
+        radiusValue <- est_radius(RM, silent = TRUE)$Radius
+        attr(RM,"emRad") <- radiusValue
+      }
+
+    if(unthresholded){
+      rpOUT   <- rp_measures(RM, emRad = radiusValue, AUTO = AUTO)
+    } else {
+      rpOUT   <- rp_measures(RM, AUTO = AUTO)
+    }
+  } # plotMeasures
+
+
+  # Size check
+  reduced <- FALSE
+  if((rp_size(RM)$rp_size_total>=maxSize)&courseGrain){
+    message("NOTE: To speed up the plotting process, the RP will represent a coursegrained matrix. Set argument 'courseGrain = FALSE' to see the full matrix.")
+    if((rp_size(RM)$rp_size_total/2)>=maxSize){
+      target_height <- round(sqrt(maxSize))
+      target_width  <- round(sqrt(maxSize))
+    } else {
+      target_height <- NROW(RM)/2
+      target_width  <- NCOL(RM)/2
+    }
+
+
+    RM <- mat_coursegrain(RM, target_height = target_height, target_width = target_width, n_core = NA)
+    reduced <- TRUE
+  }
+
+  colvec <- c("#FFFFFF00","#000000")
+  names(colvec) <- c("0","1")
+
+
+  # Make sure we can draw a diagonal if requested
+  maxDist <- max(RM, na.rm = TRUE)
+  if(drawDiagonal&AUTO){
+    if(all(na.exclude(as.vector(RM))%in%c(0,1))){
+      RM <- bandReplace(RM,0,0,1)
+    } else {
+      if(!chromatic){
+        RM <- bandReplace(RM,0,0,(maxDist+1))
+      }
+    }
   }
 
 
@@ -2180,9 +2258,9 @@ rp_plot <- function(RM,
   if(any(grepl("Matrix",class(RM)))){
     RM     <- rp_checkfix(RM, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
     #meltRP <- data.frame(Var1 = (RM@i+1), Var2 = (RM@j+1), value = as.numeric(RM@x))
-    meltRP <-  mat2ind(Matrix::as.matrix(RM))
+    meltRP <-  mat_mat2ind(Matrix::as.matrix(RM))
   } else {
-    meltRP <-  mat2ind(as.matrix(RM))
+    meltRP <-  mat_mat2ind(as.matrix(RM))
   }
 
   hasNA <- FALSE
@@ -2228,13 +2306,13 @@ rp_plot <- function(RM,
 
   # Unthresholded START ----
   showL <- FALSE
-  if(!all(as.vector(meltRP$value[!is.na(meltRP$value)])==0|as.vector(meltRP$value[!is.na(meltRP$value)])==1)&!chromatic){
+  if(unthresholded){
 
-    unthresholded <- TRUE
-
-    if(attr(RM,"weighted")%00%FALSE){
-      warning("Can't show the radius vs. RR bar on a weighted Recurrence Plot!")
-      plotRadiusRRbar <- FALSE
+    if(!is.null(attr(RM,"weighted"))){
+      if(attr(RM,"weighted")%00%FALSE){
+        warning("Can't show the radius vs. RR bar on a weighted Recurrence Plot!")
+        plotRadiusRRbar <- FALSE
+      }
     }
 
     if(!is.null(markEpochsLOI)){
@@ -2247,6 +2325,7 @@ rp_plot <- function(RM,
 
   } else { # unthresholded
 
+    # THRESHOLDED = TRUE
     unthresholded <- FALSE
     plotRadiusRRbar <- FALSE
 
@@ -2357,40 +2436,9 @@ rp_plot <- function(RM,
       meltRP$value <- factor(meltRP$value, levels = c(0,1), labels = c("0","1"))
       }
     }
-  }
+  } # unthresholded = FALSE
+
   ## Unthresholded END ##
-
-  ## Get CRP Measures START----
-
-  ## Get Radius
-  if(is.na(radiusValue)){
-    if(!is.null(attr(RM,"emRad"))|!is.na(attr(RM,"emRad")%00%-1)){
-      radiusValue <- attr(RM,"emRad")%00%NA
-    } else {
-      if(unthresholded|plotMeasures){
-        radiusValue <- est_radius(RM,silent = TRUE)$Radius
-        attr(RM,"emRad") <- radiusValue
-      }
-    }
-  } # is.na(radiusvalue)
-
-  # Get CRQA measures
-  if(plotMeasures){
-    if(is.na(radiusValue)){
-      if(!is.null(attributes(RM)$emRad)){
-        radiusValue <- attr(RM,"emRad")
-      } else {
-        radiusValue <- est_radius(RM, silent = TRUE)$Radius
-      }
-    }
-    if(unthresholded){
-      rpOUT   <- rp_measures(RM, emRad = radiusValue, AUTO = AUTO)
-    } else {
-      rpOUT   <- rp_measures(RM, AUTO = AUTO)
-    }
-  } # plotmeasures
-
-  ## Get CRP Measures END ##
 
   # Main plot ----
   gRP <-  ggplot2::ggplot(ggplot2::aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
@@ -2767,8 +2815,6 @@ rp_plot <- function(RM,
     grA <- ggplot2::ggplotGrob(gA)
   }
 
-
-
   # cat(paste("\n\nplotMeasures =", plotMeasures,"\n"))
   # cat(paste("plotDimensions =", plotDimensions,"\n"))
   # cat(paste("plotDimensionLegend =", plotDimensionLegend,"\n"))
@@ -2797,7 +2843,7 @@ rp_plot <- function(RM,
   # Remove unused fields
   Lmat[is.na(Lmat)] <- NULL
 
-  w <- c(.35,.25, 1,.5,.35)[c(plotMeasures,plotDimensions,TRUE,plotRadiusRRbar,chromatic)]
+  w <- c(.35,.25, 1,.5,.35)[c(plotMeasures,(plotMeasures|plotDimensions),TRUE,plotRadiusRRbar,chromatic)]
   h <- c(1,.25)[c(TRUE,plotDimensions)]
 
   widths  <- unit(w,"null")  #ifelse(plotMeasures, unit(c(.35,.25, 1,.5),  unit(c(.25, 1), "null")))
@@ -2883,6 +2929,10 @@ rp_plot <- function(RM,
   #   mat <- matrix(list(g),nrow = 1)
   #   gt  <- gtable::gtable_matrix("bi_rp", mat, widths = unit(c(1), "null"), heights =  unit(c(1), "null"),respect = TRUE)
   # }
+
+  if(reduced){
+    title <- paste(title,"(coursegrained matrix)")
+  }
 
   if(nchar(title)>0){
     grT <- ggplot2::ggplot(data.frame(x=1,y=1)) +

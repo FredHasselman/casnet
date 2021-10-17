@@ -1818,7 +1818,7 @@ ts_cp <- function(y, win, align = "right", keepNA = TRUE){
 #'
 #' @param y A numeric vector
 #' @param grain The bin size in which to summarise the values (default = `2`)
-#' @param summaryFunction How should the data be summarized in the bins?
+#' @param summaryFunction How should the data be summarized in the bins? Can be `"mean"`, `"median"`, `"min"`, `"max"`, or, `"maxFreq"`. Value `"maxFreq"` is for categorical data and will pick the most frequently occurring category within the bin (default = `"mean"`)
 #' @param retainLength Return only the bin values (`FALSE`), or retain the length of the original series? (default = `TRUE`)
 #'
 #' @return A coarse grained version of `y`.
@@ -1843,7 +1843,7 @@ ts_cp <- function(y, win, align = "right", keepNA = TRUE){
 #' lty = 1, col=c("grey70", "red3", "steelblue","green3"), cex = 0.7)
 #'
 #'
-ts_coarsegrain <- function(y, grain = 2, summaryFunction = c("mean","median","min","max")[1], retainLength = FALSE){
+ts_coarsegrain <- function(y, grain = 2, summaryFunction = c("mean","median","min","max","maxFreq")[1], retainLength = FALSE){
 
   y <- as.numeric(y)
 
@@ -1862,12 +1862,21 @@ ts_coarsegrain <- function(y, grain = 2, summaryFunction = c("mean","median","mi
 
   if(NCOL(yy) != NCOL(y)){
 
+    mostFreq <- function(x){
+      if(all(is.na(x))){
+        return(NA)
+      } else {
+        return(as.numeric(attributes(ftable(x))$col.vars$x[[which.max(ftable(x))]]))
+        }
+    }
+
     yy <-  switch(summaryFunction,
                   min  =  plyr::colwise(min, na.rm = TRUE)(data.frame(yy)),
                   max  =  plyr::colwise(max, na.rm = TRUE)(data.frame(yy)),
                   mean =  plyr::colwise(mean, na.rm = TRUE)(data.frame(yy)),
-                  median = plyr::colwise(median, na.rm = TRUE)(data.frame(yy))
-    )
+                  median = plyr::colwise(median, na.rm = TRUE)(data.frame(yy)),
+                  maxFreq = plyr::colwise(mostFreq)(data.frame(yy))
+                  )
 
     if(retainLength){
       yy <- rep(yy, each = grain)

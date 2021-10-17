@@ -149,7 +149,7 @@
     <pre class="usage"><span class='fu'>ts_coarsegrain</span><span class='op'>(</span>
   <span class='va'>y</span>,
   grain <span class='op'>=</span> <span class='fl'>2</span>,
-  summaryFunction <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mean"</span>, <span class='st'>"median"</span>, <span class='st'>"min"</span>, <span class='st'>"max"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
+  summaryFunction <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"mean"</span>, <span class='st'>"median"</span>, <span class='st'>"min"</span>, <span class='st'>"max"</span>, <span class='st'>"maxFreq"</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span>,
   retainLength <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
@@ -166,7 +166,7 @@
     </tr>
     <tr>
       <th>summaryFunction</th>
-      <td><p>How should the data be summarized in the bins?</p></td>
+      <td><p>How should the data be summarized in the bins? Can be <code>"mean"</code>, <code>"median"</code>, <code>"min"</code>, <code>"max"</code>, or, <code>"maxFreq"</code>. Value <code>"maxFreq"</code> is for categorical data and will pick the most frequently occurring category within the bin (default = <code>"mean"</code>)</p></td>
     </tr>
     <tr>
       <th>retainLength</th>

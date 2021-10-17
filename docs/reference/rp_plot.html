@@ -157,6 +157,8 @@
   drawNA <span class='op'>=</span> <span class='cn'>FALSE</span>,
   markEpochsLOI <span class='op'>=</span> <span class='cn'>NULL</span>,
   radiusValue <span class='op'>=</span> <span class='cn'>NA</span>,
+  courseGrain <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  maxSize <span class='op'>=</span> <span class='fl'>500</span><span class='op'>^</span><span class='fl'>2</span>,
   title <span class='op'>=</span> <span class='st'>""</span>,
   xlabel <span class='op'>=</span> <span class='st'>""</span>,
   ylabel <span class='op'>=</span> <span class='st'>""</span>,
@@ -205,7 +207,15 @@
     </tr>
     <tr>
       <th>radiusValue</th>
-      <td><p>If <code>plotMeasures = TRUE</code> and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If <code>plotMeasures = TRUE</code> and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If <code>plotMeasures = TRUE</code> and <code>radiusValue = NA</code>, function <code><a href='est_radius.html'>est_radius()</a></code> will be called with default settings (find a radius that yields .05 recurrence rate). If <code>plotMeasures = FALSE</code> this setting will be ignored.</p></td>
+      <td><p>If <code>plotMeasures = TRUE</code> and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If <code>plotMeasures = TRUE</code> and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If <code>plotMeasures = TRUE</code> and <code>radiusValue = NA</code>, function <code><a href='est_radius.html'>est_radius()</a></code> will be called with default settings (find a radius that yields <code>.05</code> recurrence rate). If <code>plotMeasures = FALSE</code> this setting will be ignored.</p></td>
+    </tr>
+    <tr>
+      <th>courseGrain</th>
+      <td><p>Reduce the size of the matrix before plotting (greatly improves speed). If <code>plotMeasures = TRUE</code> coursegraining takes place after calculation of the CRQA measures. See <code><a href='mat_coursegrain.html'>mat_coursegrain()</a></code> for details (default = <code>TRUE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>maxSize</th>
+      <td><p>The maximum size of the matrix (cols x rows) above which the coursegraining function <a href='mat_coursegrain.html'>mat_coursegrain</a> will be implemented if <code>courseGrain = TRUE</code>. This will speed up the plotting process</p></td>
     </tr>
     <tr>
       <th>title</th>
@@ -221,7 +231,7 @@
     </tr>
     <tr>
       <th>plotSurrogate</th>
-      <td><p>Should a 2-panel comparison plot based on surrogate time series be added? If <code>RM</code> has attributes <code>y1</code> and <code>y2</code> containing the time series data (i.e. it was created by a call to <code><a href='rp.html'>rp()</a></code>), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from <code>y1</code>.</p></td>
+      <td><p>Should a 2-panel comparison plot based on surrogate time series be added? If <code>RM</code> has attributes <code>y1</code> and <code>y2</code> containing the time series data (i.e. it was created by a call to <a href='rp.html'>rp</a>), the following options are available: "RS" (random shuffle), "RP" (randomised phases), "AAFT" (amplitude adjusted fourier transform). If no timeseries data is included, the columns will be shuffled.  NOTE: This is not a surrogate test, just 1 surrogate is created from <code>y1</code>. (default = <code>FALSE</code>)</p></td>
     </tr>
     <tr>
       <th>returnOnlyObject</th>
@@ -236,10 +246,10 @@
 
     <div class='dont-index'><p>Other Distance matrix operations (recurrence plot): 
 <code><a href='bandReplace.html'>bandReplace</a>()</code>,
-<code><a href='di2bi.html'>di2bi</a>()</code>,
-<code><a href='di2ch.html'>di2ch</a>()</code>,
-<code><a href='di2we.html'>di2we</a>()</code>,
-<code><a href='dist_hamming.html'>dist_hamming</a>()</code>,
+<code><a href='mat_di2bi.html'>mat_di2bi</a>()</code>,
+<code><a href='mat_di2ch.html'>mat_di2ch</a>()</code>,
+<code><a href='mat_di2we.html'>mat_di2we</a>()</code>,
+<code><a href='mat_hamming.html'>mat_hamming</a>()</code>,
 <code><a href='rp_lineDist.html'>rp_lineDist</a>()</code>,
 <code><a href='rp_nzdiags.html'>rp_nzdiags</a>()</code>,
 <code><a href='rp_size.html'>rp_size</a>()</code>,

@@ -4,7 +4,7 @@
 \alias{setTheiler}
 \title{Set theiler window on a distance matrix or recurrence matrix.}
 \usage{
-setTheiler(RM, theiler = NA, silent = FALSE)
+setTheiler(RM, theiler = NA, silent = FALSE, chromatic = FALSE)
 }
 \arguments{
 \item{RM}{A distance matrix (set \code{emRad = NA} to estimate a radius), or a matrix of zeroes and ones}
@@ -19,6 +19,8 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 }}
 
 \item{silent}{Silent-ish mode}
+
+\item{chromatic}{Perform a chromatic RQA. This assumes the recurring values represent the labels of an unordered categorical variable (default = \code{FALSE})}
 }
 \value{
 The matrix with the diagonals indicated in the \code{theiler} argument set to either \code{max(RM)+1} (if \code{RM} is a distance matrix) or \code{0} (if \code{RM} is a recurrence matrix).

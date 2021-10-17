@@ -251,17 +251,17 @@
 <span class='va'>y</span><span class='op'>$</span><span class='va'>s</span> <span class='op'>&lt;-</span> <span class='va'>y2</span><span class='op'>+</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>(</span><span class='fu'>mif</span><span class='op'>(</span><span class='va'>y</span>,lags <span class='op'>=</span> <span class='va'>lags</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 1.840541 1.706329 1.933714 1.863099 1.979608 1.986126 1.938037 2.050960 
+#&gt; 1.800347 1.710428 1.918211 1.846641 1.983497 1.977031 1.911211 2.042716 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 1.825910 1.867963 1.867963 1.867963 1.973578 1.965467 1.952748 1.970644 
+#&gt; 1.807983 1.848667 1.848667 1.848667 2.002605 1.928167 1.970758 1.997869 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 1.993402 1.776707 1.763177 1.722228 2.487123 1.836230 1.859945 1.884310 
+#&gt; 1.992279 1.803695 1.726613 1.723078 2.486868 1.821136 1.876935 1.880658 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 1.934752 1.894090 1.842180 1.864262 1.994258 1.978932 1.944717 2.110575 
+#&gt; 1.899552 1.898142 1.853850 1.828659 1.991210 1.974959 1.934754 2.146847 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 1.943457 1.909392 1.896430 1.866443 1.961917 1.848014 1.949544 1.860142 
+#&gt; 1.953987 1.938371 1.888187 1.916491 1.947780 1.838424 1.949978 1.888774 
 #&gt;       30 
-#&gt; 1.882902 
+#&gt; 1.900061 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y|Z)"
 #&gt; attr(,"lags")
@@ -274,17 +274,17 @@
 <span class='va'>y</span><span class='op'>$</span><span class='va'>y3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>(</span><span class='fu'>mif</span><span class='op'>(</span><span class='va'>y</span>,lags <span class='op'>=</span> <span class='va'>lags</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;      -10       -9       -8       -7       -6       -5       -4       -3 
-#&gt; 4.987693 4.985961 4.982922 4.983091 5.129502 5.127608 5.122598 5.116438 
+#&gt; 4.995877 4.990598 4.991085 4.987716 5.132360 5.130463 5.126112 5.123458 
 #&gt;       -2       -1        0        1        2        3        4        5 
-#&gt; 5.119055 5.120254 5.120254 5.120254 5.119086 5.121703 5.126143 5.131399 
+#&gt; 5.122561 5.125505 5.125505 5.125505 5.122591 5.125212 5.129657 5.130735 
 #&gt;        6        7        8        9       10       11       12       13 
-#&gt; 5.129674 4.981437 4.984830 4.984145 4.991469 4.994547 4.993457 5.000106 
+#&gt; 5.136055 4.991354 4.992993 4.992319 5.004965 5.006287 5.004107 5.006544 
 #&gt;       14       15       16       17       18       19       20       21 
-#&gt; 5.005072 5.137967 5.137147 5.142071 5.143118 5.147530 5.142862 5.146346 
+#&gt; 5.009739 5.141530 5.144283 5.147431 5.144232 5.148645 5.145772 5.142077 
 #&gt;       22       23       24       25       26       27       28       29 
-#&gt; 5.148833 5.151294 5.155561 5.161806 5.006170 5.011306 5.018088 5.018999 
+#&gt; 5.146356 5.143413 5.152398 5.156834 5.002998 5.006321 5.013096 5.017630 
 #&gt;       30 
-#&gt; 5.020685 
+#&gt; 5.017496 
 #&gt; attr(,"miType")
 #&gt; [1] "I(X;Y;Z;...;N)"
 #&gt; attr(,"lags")

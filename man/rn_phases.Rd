@@ -105,9 +105,9 @@ rn_phases(RN, maxPhases = NA, minStatesinPhase = 7, doPhasePlot = TRUE)
 }
 \seealso{
 Other Distance matrix operations (recurrence network): 
-\code{\link{di2bi}()},
-\code{\link{di2ch}()},
-\code{\link{di2we}()},
+\code{\link{mat_di2bi}()},
+\code{\link{mat_di2ch}()},
+\code{\link{mat_di2we}()},
 \code{\link{rn_plot}()},
 \code{\link{rn_recSpec}()},
 \code{\link{rn}()}

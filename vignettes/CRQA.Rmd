@@ -117,7 +117,7 @@ The answer is to create a *recurrence matrix*, or, a *recurrence plot*. We simpl
 
 ```{r echo=FALSE, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, paged.print=FALSE}
 RP <- rp(y1 = bear_up, emLag = 1, emDim = 1, emRad = 0, theiler = 0)
-meltRP <- mat2ind(Matrix::as.matrix(RP))
+meltRP <- mat_mat2ind(Matrix::as.matrix(RP))
 
 colvec <- c("#FFFFFF","#000000")
 names(colvec) <- c("0","1")
@@ -268,7 +268,7 @@ The plot of the two series reveals that at some moments the same words occur at 
 
 ```{r CRP, echo=FALSE, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, paged.print=FALSE}
 RP <- rp(y1 = bear_up, y2 = bear_down, emLag = 1, emDim = 1, emRad = 0, theiler = 0)
-meltRP <- mat2ind(Matrix::as.matrix(RP))
+meltRP <- mat_mat2ind(Matrix::as.matrix(RP))
 
 colvec <- c("#FFFFFF","#000000")
 names(colvec) <- c("0","1")
@@ -682,7 +682,7 @@ emDims <- c(4,4,4,4,4)
 emLags <- c(0,emLag,emLag,emLag,emLag)
 rpList <- list(Y0=rm0,Y1=rm1,Y2=rm2,Y3=rm3,Y4=rm4)
 emRads <- llply(seq_along(rpList), function(r) est_radius(rpList[[r]], emLag = emLags[[r]], emDim = emDims[[r]], targetValue = .05)$Radius)
-RPs    <- llply(seq_along(rpList), function(r) di2bi(rpList[[r]], emRad = emRads[[r]]))
+RPs    <- llply(seq_along(rpList), function(r) mat_di2bi(rpList[[r]], emRad = emRads[[r]]))
 names(RPs) <- names(rpList)
 
 outs             <- ldply(RPs, function(r) rp_measures(r))

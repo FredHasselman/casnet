@@ -98,7 +98,7 @@
       <h1 data-toc-skip>Recurrence Networks</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2021-09-28</h4>
+            <h4 class="date">2021-10-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/RecurrenceNetworks.Rmd"><code>vignettes/RecurrenceNetworks.Rmd</code></a></small>
       <div class="hidden name"><code>RecurrenceNetworks.Rmd</code></div>
@@ -138,7 +138,8 @@
 <span class="fu"><a href="../reference/plotTS_multi.html">plotTS_multi</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span>, subtitle <span class="op">=</span> <span class="st">"Raw data"</span><span class="op">)</span></code></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/imputeNA-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Use the date information in the dataset to create time series objects</span>
+<code class="sourceCode R">
+<span class="co"># Use the date information in the dataset to create time series objects</span>
 <span class="va">dates</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">)</span><span class="op">]</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span>, <span class="st">"%d-%m-%Y\n%H:%M"</span><span class="op">)</span>
 <span class="va">weeknum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">)</span><span class="op">]</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span>,format <span class="op">=</span> <span class="st">"%V"</span><span class="op">)</span><span class="op">)</span>
 
@@ -176,55 +177,58 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">out.cart</span><span class="op">$</span><span class="va">procrast</span><span class="op">)</span></code></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-2.png" width="504" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By passing emRad = NA, a radius will be calculated based on 5% recurrence</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>RN1 <span class="ot">&lt;-</span> casnet<span class="sc">::</span><span class="fu">rn</span>(<span class="at">y1 =</span> out.cart<span class="sc">$</span>restless, <span class="at">emDim =</span> p1<span class="sc">$</span>optimDim, <span class="at">emLag =</span> p1<span class="sc">$</span>optimLag, <span class="at">emRad =</span> <span class="cn">NA</span>, <span class="at">targetValue =</span> <span class="fl">0.05</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> Searching <span class="cf">for</span> a radius that will yield <span class="fl">0.05</span> <span class="cf">for</span> RR </span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> Iteration <span class="dv">1</span> </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> Iteration <span class="dv">2</span> </span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> Iteration <span class="dv">3</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>casnet<span class="sc">::</span><span class="fu">rn_plot</span>(RN1)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="co"># By passing emRad = NA, a radius will be calculated based on 5% recurrence</span>
+<span class="va">RN1</span> <span class="op">&lt;-</span> <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="../reference/rn.html">rn</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">out.cart</span><span class="op">$</span><span class="va">restless</span>, emDim <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">optimDim</span>, emLag <span class="op">=</span> <span class="va">p1</span><span class="op">$</span><span class="va">optimLag</span>, emRad <span class="op">=</span> <span class="cn">NA</span>, targetValue <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
+<span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="../reference/rn_plot.html">rn_plot</a></span><span class="op">(</span><span class="va">RN1</span><span class="op">)</span></code></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-3.png" width="504" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get RQA measures</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rqa1 <span class="ot">&lt;-</span> casnet<span class="sc">::</span><span class="fu">rp_measures</span>(RN1, <span class="at">silent =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>  Global Measures</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   Global Max.points N.points     RR Singular Divergence Repetitiveness</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span> Matrix      <span class="dv">14161</span>      <span class="dv">891</span> <span class="fl">0.0629</span>      <span class="dv">662</span>     <span class="fl">0.0084</span>           <span class="fl">1.87</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> </span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>  Line<span class="sc">-</span>based Measures</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>        Lines N.lines N.points Measure  Rate Mean Max.   ENT ENT_rel   CoV</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   Diagonal      <span class="dv">55</span>      <span class="dv">229</span>     DET <span class="fl">0.257</span> <span class="fl">4.16</span>  <span class="dv">119</span> <span class="fl">0.246</span>  <span class="fl">0.0516</span> <span class="fl">3.788</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">2</span>   Vertical      <span class="dv">99</span>      <span class="dv">214</span>   V LAM <span class="fl">0.240</span> <span class="fl">2.16</span>    <span class="dv">3</span> <span class="fl">0.442</span>  <span class="fl">0.0926</span> <span class="fl">0.171</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">3</span> Horizontal      <span class="dv">99</span>      <span class="dv">214</span>   H LAM <span class="fl">0.240</span> <span class="fl">2.16</span>    <span class="dv">3</span> <span class="fl">0.442</span>  <span class="fl">0.0926</span> <span class="fl">0.171</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">4</span>  V<span class="sc">+</span>H Total     <span class="dv">198</span>      <span class="dv">428</span> V<span class="sc">+</span>H LAM <span class="fl">0.240</span> <span class="fl">2.16</span>    <span class="dv">3</span> <span class="fl">0.442</span>  <span class="fl">0.0926</span> <span class="fl">0.171</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Create RN graph</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>g1  <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">graph_from_adjacency_matrix</span>(RN1, <span class="at">mode=</span><span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(g1)<span class="sc">$</span>size <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">degree</span>(g1)</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>g1r <span class="ot">&lt;-</span> casnet<span class="sc">::</span><span class="fu">make_spiral_graph</span>(g1, </span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">markEpochsBy =</span> weeknum[<span class="dv">1</span><span class="sc">:</span><span class="fu">vcount</span>(g1)], </span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">markTimeBy =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Get RQA measures</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>rqa1 <span class="ot">&lt;-</span> casnet<span class="sc">::</span><span class="fu">rp_measures</span>(RN1, <span class="at">silent =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>  Global Measures</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   Global Max.points N.points     RR Singular Divergence Repetitiveness</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span> Matrix      <span class="dv">14161</span>      <span class="dv">775</span> <span class="fl">0.0547</span>      <span class="dv">596</span>     <span class="fl">0.0084</span>           <span class="fl">1.58</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>  Line<span class="sc">-</span>based Measures</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>        Lines N.lines N.points Measure  Rate Mean Max.   ENT ENT_rel   CoV</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   Diagonal      <span class="dv">31</span>      <span class="dv">179</span>     DET <span class="fl">0.231</span> <span class="fl">5.77</span>  <span class="dv">119</span> <span class="fl">0.143</span>  <span class="fl">0.0298</span> <span class="fl">3.639</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">2</span>   Vertical      <span class="dv">67</span>      <span class="dv">141</span>   V LAM <span class="fl">0.182</span> <span class="fl">2.10</span>    <span class="dv">3</span> <span class="fl">0.335</span>  <span class="fl">0.0701</span> <span class="fl">0.146</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">3</span> Horizontal      <span class="dv">67</span>      <span class="dv">141</span>   H LAM <span class="fl">0.182</span> <span class="fl">2.10</span>    <span class="dv">3</span> <span class="fl">0.335</span>  <span class="fl">0.0701</span> <span class="fl">0.146</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">4</span>  V<span class="sc">+</span>H Total     <span class="dv">134</span>      <span class="dv">282</span> V<span class="sc">+</span>H LAM <span class="fl">0.182</span> <span class="fl">2.10</span>    <span class="dv">3</span> <span class="fl">0.335</span>  <span class="fl">0.0701</span> <span class="fl">0.146</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Create RN graph</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>g1  <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">graph_from_adjacency_matrix</span>(RN1, <span class="at">mode=</span><span class="st">"undirected"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(g1)<span class="sc">$</span>size <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">degree</span>(g1)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>g1r <span class="ot">&lt;-</span> casnet<span class="sc">::</span><span class="fu">make_spiral_graph</span>(g1, </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">markEpochsBy =</span> weeknum[<span class="dv">1</span><span class="sc">:</span><span class="fu">vcount</span>(g1)], </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">markTimeBy =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-4.png" width="504" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get RN measures</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>rn1 <span class="ot">&lt;-</span> <span class="fu">rn_measures</span>(g1, <span class="at">silent =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> </span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> Global Network Measures</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>   EdgeDensity MeanStrengthDensity GlobalClustering NetworkTransitivity</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>  <span class="fl">0.05497792</span>                  <span class="cn">NA</span>        <span class="fl">0.5050313</span>           <span class="fl">0.6251053</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   AveragePathLength GlobalEfficiency</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>           <span class="fl">71.9003</span>         <span class="fl">6.598311</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Should be the same</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>rqa1<span class="sc">$</span>RR<span class="sc">==</span>rn1<span class="sc">$</span>graph_measures<span class="sc">$</span>EdgeDensity</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> [<span class="dv">1</span>] <span class="cn">FALSE</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get RN measures</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>rn1 <span class="ot">&lt;-</span> <span class="fu">rn_measures</span>(g1, <span class="at">silent =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> Global Network Measures</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>   EdgeDensity MeanStrengthDensity GlobalClustering NetworkTransitivity</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>  <span class="fl">0.04671699</span>                  <span class="cn">NA</span>        <span class="fl">0.5041799</span>           <span class="fl">0.6169951</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   AveragePathLength GlobalEfficiency</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>          <span class="fl">69.95058</span>         <span class="fl">7.149131</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Should be the same</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>rqa1<span class="sc">$</span>RR<span class="sc">==</span>rn1<span class="sc">$</span>graph_measures<span class="sc">$</span>EdgeDensity</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> [<span class="dv">1</span>] <span class="cn">FALSE</span></span></code></pre></div>
 <div id="ts-2" class="section level3 unnumbered">
 <h3 class="hasAnchor">
 <a href="#ts-2" class="anchor"></a>TS 2</h3>
@@ -299,7 +303,8 @@
 <span class="fu"><a href="../reference/mrn.html">mrn</a></span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span><span class="op">)</span></code></pre></div>
 <p>A variety of plots can be created using <code><a href="../reference/mrn_plot.html">casnet::mrn_plot()</a></code></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Simple</span>
+<code class="sourceCode R">
+<span class="co"># Simple</span>
 <span class="fu"><a href="../reference/mrn_plot.html">mrn_plot</a></span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span>, showEdgeColourLegend <span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/mrn_plot.html">mrn_plot</a></span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span>, MRNweightedBy <span class="op">=</span> <span class="st">"EdgeOverlap"</span>, showEdgeColourLegend <span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
 
@@ -313,7 +318,8 @@
 <a href="#time-varying-multiplex-recurrence-networks" class="anchor"></a>Time-varying Multiplex Recurrence Networks</h2>
 <p>The MRN can be calculated in a sliding window, by setting the arguments <code>win</code> and <code>step</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># This will generate 26 windows</span>
+<code class="sourceCode R">
+<span class="co"># This will generate 26 windows</span>
 <span class="va">MRN_win</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mrn.html">mrn</a></span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span>, win <span class="op">=</span> <span class="fl">250</span>, step <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
 
 <span class="co"># The MRN are returned as a list</span>

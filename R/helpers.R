@@ -618,3 +618,5 @@ aggregate_bins <- function(x, by, FUN, moving=FALSE, ...){
   return(z)
 }
 
+
+

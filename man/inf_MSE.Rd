@@ -35,7 +35,7 @@ inf_MSE(
 \arguments{
 \item{y}{A numeric vector}
 
-\item{summaryFunction}{How should the data be summarized in the bins?}
+\item{summaryFunction}{How should the data be summarized in the bins? Can be \code{"mean"}, \code{"median"}, \code{"min"}, \code{"max"}, or, \code{"maxFreq"}. Value \code{"maxFreq"} is for categorical data and will pick the most frequently occurring category within the bin (default = \code{"mean"})}
 
 \item{retainLength}{Return only the bin values (\code{FALSE}), or retain the length of the original series? (default = \code{TRUE})}
 

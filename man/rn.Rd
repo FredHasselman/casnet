@@ -89,9 +89,9 @@ This function serves as a wrapper for function \code{rp()}, it will add some att
 }
 \seealso{
 Other Distance matrix operations (recurrence network): 
-\code{\link{di2bi}()},
-\code{\link{di2ch}()},
-\code{\link{di2we}()},
+\code{\link{mat_di2bi}()},
+\code{\link{mat_di2ch}()},
+\code{\link{mat_di2we}()},
 \code{\link{rn_phases}()},
 \code{\link{rn_plot}()},
 \code{\link{rn_recSpec}()}

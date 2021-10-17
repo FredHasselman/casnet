@@ -124,7 +124,7 @@ est_radius <- function(RM = NULL,
 
       RP_N <- sum((as.vector(RM)>0)&(as.vector(RM)<tryRadius))
 
-      # RMs <- di2bi(RM, emRad = tryRadius, convMat = TRUE)
+      # RMs <- mat_di2bi(RM, emRad = tryRadius, convMat = TRUE)
       # #Total nr. recurrent points
       # RP_N <- Matrix::nnzero(RMs, na.counted = FALSE)
       # rm(RMs)

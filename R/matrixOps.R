@@ -16,7 +16,7 @@
 #' @family Distance matrix operations (recurrence plot)
 #' @family Distance matrix operations (recurrence network)
 #'
-di2bi <- function(distmat, emRad = NA, convMat = FALSE){
+mat_di2bi <- function(distmat, emRad = NA, convMat = FALSE){
 
   matPack <- FALSE
   # if already Matrix do not convert to matrix
@@ -47,7 +47,7 @@ di2bi <- function(distmat, emRad = NA, convMat = FALSE){
     suppressMessages(RP <- Matrix::sparseMatrix(x=rep(1,length(xij$y)),i=xij$row,j=xij$col, dims = dim(distmat)))
 
     # Simple check
-    if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
+    if(!all(na.exclude(as.vector(RP))%in%c(0,1))){warning("Matrix did not convert to a binary (0,1) matrix!!")}
 
   } else {
 
@@ -80,7 +80,7 @@ di2bi <- function(distmat, emRad = NA, convMat = FALSE){
 #' @family Distance matrix operations (recurrence plot)
 #' @family Distance matrix operations (recurrence network)
 #'
-di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
+mat_di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
   matPack <- FALSE
   if(any(grepl("Matrix",class(distmat)))){
@@ -144,7 +144,7 @@ di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 #' @family Distance matrix operations (recurrence plot)
 #' @family Distance matrix operations (recurrence network)
 #'
-di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
+mat_di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
 
   matPack <- FALSE
   if(any(grepl("Matrix",class(distmat)))){
@@ -203,9 +203,9 @@ di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
 #'
 #' @examples
 #'
-#' mat2ind(as.matrix(1:100,ncol=10))
+#' mat_mat2ind(as.matrix(1:100,ncol=10))
 #'
-mat2ind <- function(mat){
+mat_mat2ind <- function(mat){
   if(all(!is.matrix(mat),!attr(class(mat),"package")%in%"Matrix")){stop("Input has to be a matrix.")}
   ind <- which(!is.na(mat), arr.ind = TRUE)
   out <- cbind.data.frame(ind, mat[!is.na(mat)])
@@ -227,7 +227,7 @@ mat2ind <- function(mat){
 #' @family Distance matrix operations (recurrence plot)
 #' @author Fred Hasselman
 #'
-dist_hamming <- function(X, Y=NULL, embedded=TRUE) {
+mat_hamming <- function(X, Y=NULL, embedded=TRUE) {
   if ( missing(Y) ) {
     if(embedded){
       # X and Y represent delay-embeddings of a timeseries
@@ -317,7 +317,7 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
 #'
 #' @export
 #'
-setTheiler <- function(RM, theiler = NA, silent = FALSE){
+setTheiler <- function(RM, theiler = NA, silent = FALSE, chromatic = FALSE){
 
   checkPkg("Matrix")
   # Check auto-recurrence
@@ -375,7 +375,7 @@ setTheiler <- function(RM, theiler = NA, silent = FALSE){
 
   if(!skip){
 
-    if(all(as.vector(RM)==0|as.vector(RM)==1)){
+    if(all(as.vector(RM)==0|as.vector(RM)==1)|chromatic){
       value <- 0
     } else {
       value <- max(Matrix::as.matrix(RM), na.rm = TRUE)+1
@@ -411,3 +411,156 @@ setTheiler <- function(RM, theiler = NA, silent = FALSE){
 
   return(RM)
 }
+
+
+
+
+#' Course grain a matrix for plotting
+#'
+#'
+#' @param RM A (recurrence) matrix
+#' @param target_height How many rows? (default = `NROW(RM)/2`)
+#' @param target_width How many columns? (default = `NCOL(RM)/2`)
+#' @param summary_func How to summarise the values in subset `X` of `RM`. If set to `NA`, the function will try to pick a summary function based on the cell values: If `RM` is a distance matrix,  `mean(X, na.rm = TRUE)` will be used; If it is a binary matrix `ifelse(mean(X, na.rm = TRUE)>recurrence_threshold,1,0)`, a categorical matrix (`categorical = TRUE`, or, matrix attribute `chromatic = TRUE`) will pick the most frequent category in the subset `attributes(ftable(X))$col.vars$x[[which.max(ftable(X))]]`. (default = `NA`)
+#' @param recurrence_threshold For a binary matrix the mean of the cells to be summarised will vary between `0` and `1`, which essentially represents the recurrence rate for that subset of the matrix. If `NA` the threshold will be set to a value that in most cases should return a plot with a similar `RR` as the original plot. (default = `NA`)
+#' @param categorical If set to `TRUE`, will force `summary_func` to select the most frequent value. If `NA` the matrix attribute `chromatic` will be used. If `chromatic` is not present, all values in the matrix have to be whole numbers as determined by `plyr::is.discrete()`. (default = `NA`)
+#' @param output_type The output format for `plyr::vapply()`. (default = `0.0`)
+#' @param n_core Number of cores for parallel processing. Set to `NA` to automatically choose cores. (default = `1`)
+#' @param silent Silt-ish mode (default = `FALSE`)
+#'
+#' @note This code was inspired by code published in a blog post by Guillaume Devailly on 29-04-2020 (https://gdevailly.netlify.app/post/plotting-big-matrices-in-r/)
+#'
+#' @return A coursegrained matrix of size `target_width` by `target_height`.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' # Continuous
+#' RMc1 <- rp(cumsum(rnorm(200)))
+#' rp_plot(RMc1)
+#' RMc2 <- mat_coursegrain(RMc1)
+#' rp_plot(RMc2)
+#'
+#' # Binary
+#' RMb1 <- rp(cumsum(rnorm(200)), emRad = NA)
+#' rp_plot(RMb1, plotMeasures = TRUE)
+#' # Reported RQA measures in rp_plot will be based on the full matrix
+#' rp_plot(RMb1, maxSize = 100^2, plotMeasures = TRUE)
+#' # Plotting the coursegrained matrix itself will yield different values
+#' RMb2 <- mat_coursegrain(RMb1)
+#' rp_plot(RMb2, plotMeasures = TRUE)
+#'
+#' # Categorical
+#' RMl1 <- rp(y1 = round(runif(100, min = 1, max = 3)), chromatic = TRUE)
+#' rp_plot(RMl1)
+#' RMl2 <- mat_coursegrain(RMl1, categorical = TRUE)
+#' rp_plot(RMl2)
+#'
+mat_coursegrain <- function(RM,
+                               target_height = round(NROW(RM)/2),
+                               target_width = round(NCOL(RM)/2),
+                               summary_func = NA,
+                               recurrence_threshold = NA,
+                               categorical = NA,
+                               output_type = 0.0, #vapply style
+                               n_core = 1, # parallel processing
+                               silent = FALSE){
+
+  # square?
+  if(NROW(RM)==NCOL(RM)){
+    if(target_height!=target_width){
+      stop("Original matrix is square, but target dimensions are not!")
+    }
+  }
+
+  if(target_height > NROW(RM) | target_width > NCOL(RM)){
+    stop("Input matrix must be bigger than target width and height.")
+  }
+
+  if(is.na(recurrence_threshold)){
+    if(all(na.exclude(as.vector(RM))%in%c(0,1))){
+      RR <- rp_measures(RM)
+      recurrence_threshold <- mean(c(RR$RR,RR$SING_rate,RR$DET,RR$LAM_hv), na.rm = TRUE)
+      rm(RR)
+      #((NROW(RM)*NCOL(RM))/(target_height*target_width))
+    }
+  } else {
+    if(recurrence_threshold%)(%c(0,1)){
+      recurrence_threshold <- mean(RM, na.rm = TRUE)
+    }
+  }
+
+  if(is.na(categorical)){
+    if(attributes(RM)$chromatic|all(plyr::is.discrete(RM))){
+      categorical <- TRUE
+    } else {
+      categorical <- FALSE
+    }
+  }
+
+  if(is.na(n_core)){
+    n_core <- parallel::detectCores()
+  }
+  if(n_core>1){
+    available_core <- parallel::detectCores()
+    if(!n_core%[]%c(2,available_core)){
+      n_core <- (available_core-1)
+    }
+  }
+
+  if(is.na(summary_func)){
+    if(all(na.exclude(as.vector(RM))%in%c(0,1))){
+      summary_func <- function(x){ifelse(mean(x, na.rm = TRUE)>recurrence_threshold,1,0)}
+      if(!silent){message("Binary matrix... using summary function 'ifelse(mean(x, na.rm = TRUE)>recurrence_threshold,1,0)' for coursegraining.")}
+    } else {
+      if(categorical){
+        summary_func <- function(x){as.numeric(attributes(ftable(x))$col.vars$x[[which.max(ftable(x))]])}
+        if(!silent){message("Categorical matrix... using summary function 'attributes(ftable(x))$col.vars[[which.max(ftable(x))]]' for coursegraining.")}
+      } else {
+        if(!all(plyr::is.discrete(RM))){
+          summary_func <- function(x){mean(x, na.rm = TRUE)}
+          if(!silent){message("Continuous matrix... using summary function 'mean(x, na.rm = TRUE)' for coursegraining.")}
+        }
+      }
+    }
+  }
+  tmpMat <- as.matrix(RM)
+
+  seq_height <- round(seq(1, NROW(RM), length.out = target_height + 1))
+  seq_width  <- round(seq(1, NCOL(RM), length.out = target_width  + 1))
+
+  # subMat <- list()
+  # m <- 0
+  # for(i in seq_len(target_height)){
+  #   for(j in seq_len(target_width)){
+  #     m <- m + 1
+  #     subMat[[m]] <- list(x = seq(seq_height[i], seq_height[i + 1]),
+  #                         y = seq(seq_width[j], seq_width[j + 1]))
+  #   }
+  #  }
+  #
+  # tmpMat <- matrix(plyr::laply(subMat, function(f) summary_func(as.numeric(RM[f$x,f$y]))),nrow = target_height, ncol = target_width)
+
+#  rp_plot(tmpMat, courseGrain = FALSE)
+
+  # complicated way to write a double for loop
+  tmpMat <- do.call(rbind, parallel::mclapply(seq_len(target_height), function(i) { # i is row
+    vapply(seq_len(target_width), function(j) { # j is column
+      summary_func(as.numeric(RM[seq(seq_height[i], seq_height[i + 1]), seq(seq_width[j] , seq_width[j + 1])]))
+    }, output_type)
+  }, mc.cores = n_core))
+
+
+  # tmpMat <- purrr::map(seq_len(target_height), ~ purrr::map(seq_len(target_width), ~ summary_func(as.numeric(RM[seq(seq_height[.x], seq_height[.x + 1]), seq(seq_width[.y] , seq_width[.y + 1])])), .y=.x))
+  #
+
+  tmpMat <- Matrix::as.matrix(tmpMat)
+  tmpMat <- rp_copy_attributes(source = RM, target = tmpMat)
+  tmpMat <- rp_checkfix(tmpMat, checkS4 = TRUE, fixS4 = TRUE, checkAUTO = TRUE, fixAUTO = TRUE)
+  rm(RM)
+
+  return(tmpMat)
+}
+
+

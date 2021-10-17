@@ -146,7 +146,7 @@
     <p>Set theiler window on a distance matrix or recurrence matrix.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>setTheiler</span><span class='op'>(</span><span class='va'>RM</span>, theiler <span class='op'>=</span> <span class='cn'>NA</span>, silent <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>setTheiler</span><span class='op'>(</span><span class='va'>RM</span>, theiler <span class='op'>=</span> <span class='cn'>NA</span>, silent <span class='op'>=</span> <span class='cn'>FALSE</span>, chromatic <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -168,6 +168,10 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
     <tr>
       <th>silent</th>
       <td><p>Silent-ish mode</p></td>
+    </tr>
+    <tr>
+      <th>chromatic</th>
+      <td><p>Perform a chromatic RQA. This assumes the recurring values represent the labels of an unordered categorical variable (default = <code>FALSE</code>)</p></td>
     </tr>
     </table>
 

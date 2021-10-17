@@ -98,10 +98,10 @@ The calculation of the (C)RQA measures in \link{casnet} can be different from ot
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
-\code{\link{di2bi}()},
-\code{\link{di2ch}()},
-\code{\link{di2we}()},
-\code{\link{dist_hamming}()},
+\code{\link{mat_di2bi}()},
+\code{\link{mat_di2ch}()},
+\code{\link{mat_di2we}()},
+\code{\link{mat_hamming}()},
 \code{\link{rp_lineDist}()},
 \code{\link{rp_nzdiags}()},
 \code{\link{rp_plot}()},

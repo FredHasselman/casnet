@@ -98,7 +98,7 @@
       <h1 data-toc-skip>Recurrence Quantification Analysis</h1>
                         <h4 class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2021-09-28</h4>
+            <h4 class="date">2021-10-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/CRQA.Rmd"><code>vignettes/CRQA.Rmd</code></a></small>
       <div class="hidden name"><code>CRQA.Rmd</code></div>
@@ -670,188 +670,80 @@ H(\ell) = -\sum_{\ell \geq \ell_{\min}}^{\ell_{\max}} p(\ell) \ln p(\ell)
 <p>The absolute values of these measures depend on the choice of the recurrence threshold <span class="math inline">\(\varepsilon\)</span>, but also on the length of the time series. For the purpose of comparing measures calculated from different recurrence plots it can make sense to fix the recurrence rate by choosing a different threshold value for each analysis. It is also possible to pick a fixed threshold and study how the recurrence rate varies between different plots. Several methods exist for the optimization of choosing <span class="math inline">\(\varepsilon\)</span>, some of which will yield different thresholds for different recurrence measures <span class="citation">(e.g. the signal detection method, <a href="#ref-schinkel2008" role="doc-biblioref">Schinkel, Dimigen, &amp; Marwan, 2008</a>)</span>. For these and other considerations when determining the recurrence analysis parameters see <span class="citation">Marwan (<a href="#ref-marwan2011" role="doc-biblioref">2011</a>)</span> and the references therein. It is important to note that <span class="math inline">\(\varepsilon\)</span> is a crucial analysis parameter for recurrence-based methods and its value and selection should always be reported and justified. In general, it is recommended to study the effects of choosing different sets of parameters when comparing the recurrence measures obtained from different (samples of) time series.</p>
 <p>In Table @ref(tab:lvRQA), several common recurrence measures are provided for each of the phase spaces considered so far. The values for Determinism and laminarity are not surprising, after all, this is a completely deterministic system! The point here is to show that the dynamically invariant properties of the original attractor are retained for reconstructions based on <span class="math inline">\(Y_1\)</span>, <span class="math inline">\(Y_2\)</span>, <span class="math inline">\(Y_4\)</span>. The reconstruction based on <span class="math inline">\(Y_3\)</span> was expected to be less accurate due to the lack of support (stationary level at zero for a large period of time). The recurrence threshold <span class="math inline">\(\varepsilon\)</span> has to be extremely small compared to the other values in order to get <span class="math inline">\(RR = 0.045\)</span>. There are techniques that can be used to estimate how well a reconstructed phase space from, say, the first 75% of the time series predicts the remaining 25% (nonlinear prediction skill), or how well it predicts other observed dimensions (convergent cross-mapping) <span class="citation">(<a href="#ref-sugihara2012" role="doc-biblioref">Sugihara et al., 2012</a>)</span>. Convergent cross-mapping can also be used to detect coupling direction and causality in dynamic or delayed interactions <span class="citation">(<a href="#ref-clark2015" role="doc-biblioref">Clark et al., 2015</a>; <a href="#ref-sugihara2012" role="doc-biblioref">Sugihara et al., 2012</a>; see e.g., <a href="#ref-ye2015" role="doc-biblioref">Ye, Deyle, Gilarranz, &amp; Sugihara, 2015</a>)</span>.</p>
 <table class="table">
-<caption>
-Recurrence Measures Based on Different Phase Space Representations.
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:left;">
-Original
-</th>
-<th style="text-align:center;">
-Y1
-</th>
-<th style="text-align:center;">
-Y2
-</th>
-<th style="text-align:center;">
-Y3
-</th>
-<th style="text-align:center;">
-Y4
-</th>
+<caption>Recurrence Measures Based on Different Phase Space Representations.</caption>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">Original</th>
+<th align="center">Y1</th>
+<th align="center">Y2</th>
+<th align="center">Y3</th>
+<th align="center">Y4</th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-Recurrence Threshold <span class="math inline">\(\varepsilon\)</span>
+<tr class="odd">
+<td align="left">Recurrence Threshold <span class="math inline">\(\varepsilon\)</span>
 </td>
-<td style="text-align:left;">
-0.045
-</td>
-<td style="text-align:center;">
-0.049
-</td>
-<td style="text-align:center;">
-0.076
-</td>
-<td style="text-align:center;">
-0.011
-</td>
-<td style="text-align:center;">
-0.052
-</td>
+<td align="left">0.045</td>
+<td align="center">0.049</td>
+<td align="center">0.076</td>
+<td align="center">0.011</td>
+<td align="center">0.052</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Recurrence Rate
-</td>
-<td style="text-align:left;">
-0.050
-</td>
-<td style="text-align:center;">
-0.045
-</td>
-<td style="text-align:center;">
-0.045
-</td>
-<td style="text-align:center;">
-0.045
-</td>
-<td style="text-align:center;">
-0.045
-</td>
+<tr class="even">
+<td align="left">Recurrence Rate</td>
+<td align="left">0.050</td>
+<td align="center">0.045</td>
+<td align="center">0.045</td>
+<td align="center">0.045</td>
+<td align="center">0.045</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-DETerminism
-</td>
-<td style="text-align:left;">
-0.998
-</td>
-<td style="text-align:center;">
-0.997
-</td>
-<td style="text-align:center;">
-0.998
-</td>
-<td style="text-align:center;">
-0.997
-</td>
-<td style="text-align:center;">
-0.995
-</td>
+<tr class="odd">
+<td align="left">DETerminism</td>
+<td align="left">0.998</td>
+<td align="center">0.997</td>
+<td align="center">0.998</td>
+<td align="center">0.997</td>
+<td align="center">0.995</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Maximum DL
-</td>
-<td style="text-align:left;">
-860.000
-</td>
-<td style="text-align:center;">
-808.000
-</td>
-<td style="text-align:center;">
-946.000
-</td>
-<td style="text-align:center;">
-244.000
-</td>
-<td style="text-align:center;">
-946.000
-</td>
+<tr class="even">
+<td align="left">Maximum DL</td>
+<td align="left">860.000</td>
+<td align="center">808.000</td>
+<td align="center">946.000</td>
+<td align="center">244.000</td>
+<td align="center">946.000</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Entropy DL
-</td>
-<td style="text-align:left;">
-4.500
-</td>
-<td style="text-align:center;">
-3.900
-</td>
-<td style="text-align:center;">
-4.000
-</td>
-<td style="text-align:center;">
-3.700
-</td>
-<td style="text-align:center;">
-4.100
-</td>
+<tr class="odd">
+<td align="left">Entropy DL</td>
+<td align="left">4.500</td>
+<td align="center">3.900</td>
+<td align="center">4.000</td>
+<td align="center">3.700</td>
+<td align="center">4.100</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-LAMinarity
-</td>
-<td style="text-align:left;">
-0.994
-</td>
-<td style="text-align:center;">
-0.989
-</td>
-<td style="text-align:center;">
-0.994
-</td>
-<td style="text-align:center;">
-0.989
-</td>
-<td style="text-align:center;">
-0.993
-</td>
+<tr class="even">
+<td align="left">LAMinarity</td>
+<td align="left">0.994</td>
+<td align="center">0.989</td>
+<td align="center">0.994</td>
+<td align="center">0.989</td>
+<td align="center">0.993</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Maximum VL
-</td>
-<td style="text-align:left;">
-131.000
-</td>
-<td style="text-align:center;">
-93.000
-</td>
-<td style="text-align:center;">
-117.000
-</td>
-<td style="text-align:center;">
-170.000
-</td>
-<td style="text-align:center;">
-114.000
-</td>
+<tr class="odd">
+<td align="left">Maximum VL</td>
+<td align="left">131.000</td>
+<td align="center">93.000</td>
+<td align="center">117.000</td>
+<td align="center">170.000</td>
+<td align="center">114.000</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Entropy VL
-</td>
-<td style="text-align:left;">
-3.700
-</td>
-<td style="text-align:center;">
-3.500
-</td>
-<td style="text-align:center;">
-3.300
-</td>
-<td style="text-align:center;">
-3.800
-</td>
-<td style="text-align:center;">
-3.400
-</td>
+<tr class="even">
+<td align="left">Entropy VL</td>
+<td align="left">3.700</td>
+<td align="center">3.500</td>
+<td align="center">3.300</td>
+<td align="center">3.800</td>
+<td align="center">3.400</td>
 </tr>
 </tbody>
 </table>
