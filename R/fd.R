@@ -172,18 +172,20 @@ fd_psd <- function(y,
                      removeTrend = removeTrend,
                      polyOrder = polyOrder,
                      standardise = standardise,
-                     adjustSumOrder = NA,
+                     adjustSumOrder = FALSE,
                      scaleMin = NA,
                      scaleMax = NA,
                      scaleResolution = NA,
                      dataMin = NA,
-                     scaleS = NA,
+                     scaleS = NULL,
                      overlap = NA,
                      silent = silent
   )
 
   scaleS  <- attr(y, "scaleS")
   dataMin <- attr(y, "dataMin")
+
+  N <- NROW(y)
 
   # Number of frequencies estimated cannot be set! (defaults to Nyquist)
   # Use Tukey window: cosine taper with r = 0.5
@@ -347,15 +349,22 @@ fd_prepSeries <- function(y,
   if(any(is.na(scaleS))){
     exponents <- seq(log2(scaleMin),log2(scaleMax), length.out = scaleResolution)
     scaleS    <- round(2^exponents) #unique(round(seq(scaleMin,scaleMax, length.out= (scaleMax-scaleMin)/(scaleResolution-1))))
+  } else {
+    if(is.null(scaleS)){
+      scaleS <- NA
+    }
   }
 
-  # Nyquist-ish
-  if(max(scaleS)>floor(NROW(y)/2)){
-    warning("The maximum bin should be smaller than floor(NROW(y)/2) data points")
-  }
+  if(!is.na(scaleS)){
+    # Nyquist-ish
+    if(max(scaleS)>floor(NROW(y)/2)){
+      warning("The maximum bin should be smaller than floor(NROW(y)/2) data points")
+    }
+
 
   if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
     stop("Something wrong with vector passed to scaleS.... \nUsing defaults: (scaleMax-scaleMin)/scaleResolution")
+  }
   }
 
   if(!removeTrend%in%"no"){
