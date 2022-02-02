@@ -499,14 +499,14 @@ ts_discrete <- function(y, nbins=ceiling(2*NROW(y)^(1/3)), keepNA = TRUE){
 
 #' Symbolic representation
 #'
-#'  Return a discrete representation of `y` by binning the observed values and returning the transfer probabilities.
+#'  Return a discrete representation of `y` by transforming it into an unordered categorical variable which indicates whether a value went up, down, or remained the same relative to the previous value.
 #'
-#' @param y Numeric vector or time series to be discretised.
-#' @param keepNA If `TRUE`, any `NA` values will first be removed and later re-inserted into the discretised time series.
-#' @param usePlateaus Treat consequative "same" values after "peak" or "trough" as a "peak"/"trough".
-#' @param doPlot Create a plot of the symbolized series.
+#' @param y Numeric vector or matrix to be discretised. Will return attributes with labels for each column in the matrix.
+#' @param keepNA If `TRUE`, any `NA` values will first be removed and later re-inserted into the discretised time series. (default = `TRUE`)
+#' @param usePlateaus Give consecutive `"same"` values after `"peak"` or `"trough"` a `"peak"` or `"trough"` label instrad of `"same"`. (default = `FALSE`)
+#' @param doPlot Create a plot of the symbolized series. (default = `FALSE)`)
 #'
-#' @return A discretised version of `y`
+#' @return A symbolic version of `y`
 #'
 #' @family Time series operations
 #'
@@ -593,15 +593,14 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
   # yc<-paste0(y,collapse=" ")
   # substr(yc,9,9+18-1)
 
-  if(cl%in%c("matrix","numeric")){
-    out <- sym_num
-    colnames(out)  <- paste0(cnames,"_sym_num")
+  if(any(cl%in%c("matrix","data.frame","numeric","tbl","tbl_df"))){
+    out    <- sym_num
     anames <- paste0(cnames,"_sym_label")
+
     for(c in 1:NCOL(out)){
-      attr(out,anames[c]) <- factor(sym_label[,c],exclude=NULL)
+        attr(out,anames[c]) <- factor(sym_label[,c],exclude=NULL)
     }
-    if(cl%in%"numeric"){dim(out) <- NULL}
-  } else {
+  } else { # Possibly a 1D vector
     if(!is.null(ncol(y))){
       for(c in 1:NCOL(sym_label)){
         sym_label[,c]  <- factor(sym_label[,c],exclude=NULL)
@@ -609,12 +608,11 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
       colnames(sym_num) <- paste0(cnames,"_sym_num")
       colnames(sym_label) <- paste0(cnames,"_sym_label")
       out <- cbind(sym_num,sym_label) #,stringsAsFactors = FALSE)
-    } else {
+    } else { # in case of single vector
       out <- factor(sym_label, exclude=NULL)
       attr(out,"sym_numeric") <- sym_num
     }
   }
-
 
   if(doPlot){
 
@@ -622,21 +620,45 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
     col <- c("trough"="darkkhaki","decrease"="orange","same"="grey60","increase"="steelblue","peak"="olivedrab","missing"="red")
     labs <- c("0" = "missing","1"="trough","2"="decrease","3"="same","4"="increase","5"="peak")
 
+    tmpOut <- data.frame(time = 1:NROW(out), out)
+
     if(!is.null(ncol(sym_num))){
-      out$time <- 1:NROW(out)
-      df_p1 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_label"),"time") %>% tidyr::gather(key="lab_var", value="sym_label", -"time")
+
+      # All this code is because we had to store the results in attributes to keep dims of the input same as output
+      if(NCOL(dplyr::select(tmpOut,dplyr::ends_with("_sym_label")))==0){
+        cname <- which(grepl(pattern = "_sym_label",x = names(attributes(out))))
+        #which(names(attributes(tmpOut))[grepl(pattern = "_sym_label",x = names(attributes(tmpOut)))])
+        for(c in cname){
+          tmpOut[,NCOL(tmpOut)+1] <- attributes(out)[[c]]
+          colnames(tmpOut)[NCOL(tmpOut)] <- names(attributes(out)[c])
+        }
+        #colnames(tmpOut)["label"%ci%tmpOut] <- names(attributes(out)[cname])
+      }
+      if(NCOL(dplyr::select(tmpOut,dplyr::ends_with("_sym_num")))==0){
+        cname <- which(grepl(pattern = "_sym_num",x = names(attributes(tmpOut))))
+        tmpOut$num <-  attributes(tmpOut)[[cname]]
+        colnames(tmpOut)["num"%ci%tmpOut] <- cname
+      }
+
+      df_p1 <- tmpOut %>% dplyr::as_tibble() %>%
+        dplyr::select(dplyr::ends_with("_sym_label"),"time") %>%
+        tidyr::gather(key="lab_var", value="sym_label", -"time")
+
       #df_p1$sym_label[is.na(df_p1$sym_label)] <- "missing"
-      df_p2 <- out %>% dplyr::as_tibble() %>% dplyr::select(dplyr::ends_with("_sym_num")) %>% tidyr::gather(key="num_var", value="sym_num")
+      df_p2 <- tmpOut %>% dplyr::as_tibble() %>%
+        dplyr::select(dplyr::ends_with("_sym_num")) %>%
+        tidyr::gather(key="num_var", value="sym_num")
+
       df_p2[is.na(df_p2)] <- 0
       df_plot <- cbind(df_p1,df_p2)
       df_plot$num_var <- gsub("_sym_num","",df_plot$num_var)
     } else {
-      df_plot <- data.frame(time = 1:NROW(out), sym_num= attr(out,"sym_numeric"), sym_label = out)
+      df_plot <- data.frame(time = 1:NROW(tmpOut), sym_num= attr(tmpOut,"sym_numeric"), sym_label = tmpOut)
       df_plot$sym_num[is.na(df_plot$sym_num)] <- 0
       #levels(df_plot$sym_label)[is.na(df_plot$sym_num)] <- "missing"
     }
 
-
+    # Generate plot
     g <- ggplot(df_plot,aes_(x=~time,y=~sym_num)) +
       geom_line(color="grey80") +
       geom_point(aes_(shape=~sym_label, color=~sym_label, fill=~sym_label),size=2)
@@ -659,6 +681,7 @@ ts_symbolic <- function(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE){
 
     return(list(data=out,plot=invisible(g)))
   } else {
+    if(cl%in%"numeric"&NCOL(y)==1){dim(out) <- NULL}
     return(out)
   }
 
@@ -1230,6 +1253,7 @@ ts_trimfill <- function(x,y,action=c("fill","trim.cut","trim.NA")[1],type=c("end
 #' @param overlap A value between `[0 .. 1]`. If overlap is not `NA` (default), the value of `step` is ignored and set to `floor(overlap*win)`. This produces indices in which the size of `step` is always smaller than `win`, e.g. for fluctuation analyses that use binning procedures to represent time scales.
 #' @param adjustY If not `NA`, or, `FALSE` a list object with fields that match one or more arguments of \link[casnet]{ts_trimfill} (except for `x,y`), e.g. `list(action="trim.NA",type="end",padding=NA,silent=TRUE)`. See `Return value` below for details.
 #' @param alignment Whether to right (`"r"`), center (`"c"`), or left (`"l"`) align the window.
+#' @param silent Silent mode.
 #'
 #' @return If `adjustY = FALSE`, or, a list object with fields that represent arguments of \link[casnet]{ts_trimfill}, then the (adjusted) vector `y` is returned with an attribute `"windower"`. This is a list object with fields that contain the indices for each window that fits on `y`, given `win`, `step` or `overlap` and the settings of `adjustY`. If `adjustY = NA`, only the list object is returned.
 #' @export
@@ -1237,7 +1261,7 @@ ts_trimfill <- function(x,y,action=c("fill","trim.cut","trim.NA")[1],type=c("end
 #' @family Time series operations
 #' @family Tools for windowed analyses
 #'
-ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, alignment = c("r","c","l")[1]){
+ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, alignment = c("r","c","l")[1], silent = TRUE){
 
   adjustOK <- FALSE
   if(is.list(adjustY)){
@@ -1253,20 +1277,22 @@ ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, align
     }
   }
 
-  if(!is.na(win)&is.na(step)&is.na(overlap)){
-    step <- win
-    warning("step = NA! Stepsize was set to window size.")
-  }
-
-  if(!is.na(overlap)){
+  if(!is.na(overlap)&!is.na(win)){
     if(overlap%[]%c(0,1)){
       if(!is.na(step)){
-        warning("Step will be ignored, because overlap has a value.")
+        if(!silent){
+          message("Step will be ignored, because overlap has a value.")
+        }
       }
       step <- floor(overlap*win)
     } else {
       stop("Overlap must be in [0,1]")
     }
+  }
+
+  if(!is.na(win)&is.na(step)&is.na(overlap)){
+    step <- win
+    if(!silent){message("Stepsize was set to window size.")}
   }
 
   wIndices <- list()
@@ -1301,11 +1327,15 @@ ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, align
     if(iDiff<0|any(lengths(wIndices)>win)){
       wIndices[[length(wIndices)]] <- c(wIndices[[length(wIndices)]],(dplyr::last(wIndices[[length(wIndices)]])+1):NROW(y))
       #warning("Last window was enlarged to include all data")
-      warning(paste0("Window ",seq_along(wIndices)[lengths(wIndices)>win])," is larger than window size ",win,".\n")
+      if(!silent){
+        warning(paste0("Window ",seq_along(wIndices)[lengths(wIndices)>win])," is larger than window size ",win,".\n")
+        }
     }
     if(iDiff>0|any(lengths(wIndices)<win)){
       wIndices[[length(wIndices)]] <- c(dplyr::first(wIndices[[length(wIndices)]]):NROW(y))
+      if(!silent){
       warning(paste0("Window ",seq_along(wIndices)[lengths(wIndices)<win])," is smaller than window size ",win,".\n")
+      }
       #warning("Last window was shrunk to fit data")
     }
     names(wIndices)[length(wIndices)] <- paste0("window: ",max(seq_along(wIndices))," | start: ",max(wIndex)," | stop: ",max(wIndices[[length(wIndices)]]))
@@ -1327,7 +1357,7 @@ ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, align
 
 #' Detrend a time series
 #'
-#' @param y A time series ot numeric vector
+#' @param y A time series of numeric vector
 #' @param polyOrder order Order of polynomial trend to remove
 #'
 #' @return Residuals after detrending polynomial of order `order`
@@ -1339,8 +1369,18 @@ ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, align
 #' @author Fred Hasselman
 #'
 #'
-ts_detrend <- function(y, polyOrder=1){
-  detR <- stats::lm(y~stats::poly(1:length(y), degree=polyOrder))$residuals
+ts_detrend <- function(y, polyOrder=1, adaptive = FALSE){
+
+  if(adaptive){
+     pOrders <- 1:polyOrder
+     Rsq <- laply(pOrders, function(pO){
+       fit <- stats::lm(formula = y~stats::poly(1:length(y), degree = pO, raw=TRUE))
+       return(summary(fit)$adj.r.squared)
+       })
+     polyOrder <- which.max(Rsq)
+  }
+
+  detR <- stats::lm(formula = y~stats::poly(1:length(y), polyOrder, raw = TRUE))$residual
   return(detR)
 }
 
@@ -1359,7 +1399,7 @@ ts_detrend <- function(y, polyOrder=1){
 #' @param doLevelPlot Should a plot with the original series and the levels be produced? (default = `FALSE`)
 #' @param doTreePlot Should a plot of the decision tree be produced. This requires package [partykit](https://cran.r-project.org/web/packages/partykit/index.html) (default = `FALSE`)
 #'
-#' @return A list object with fields `tree` and `pred`. The latter is a data frame with columns `x` (time), `y` (the variable of interest) and `p` the predicted levels in `y`.
+#' @return A list object with fields `tree` and `pred`. The latter is a data frame with columns `x` (time), `y` (the variable of interest) and `p` the predicted levels in `y` and `p_adj`, the levels in `p` but adjusted for the value passed to `minChange`.
 #'
 #' @export
 #'
@@ -1387,6 +1427,12 @@ ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/
 
   checkPkg("rpart")
 
+  if(any(is.na(y))){
+    NAind <- which(is.na(y))
+  } else {
+    NAind <- NA
+  }
+
   x <- seq_along(y)
   dfs  <- data.frame(x=x, y=y)
   tree <- rpart::rpart(y ~ x,
@@ -1398,7 +1444,32 @@ ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/
                          cp = changeSensitivity),
                        data=dfs)
 
-  dfs$p <- stats::predict(tree, data.frame(x=x))
+  dfs$p     <- stats::predict(tree, data.frame(x=x))
+  dfs$p_adj <- dfs$p
+
+  if(minChange>=max(abs(diff(dfs$p)), na.rm = TRUE)){
+    warning("The largest level difference is smaller than the value of argument minChange. Setting minChange to NA")
+  minChange <- NA
+  }
+
+  if(!is.na(minChange%00%NA)&is.numeric(minChange)){
+    if(minChange>0){
+      checkPkg("imputeTS")
+      ind <- which(abs(diff(c(dfs$p[1],dfs$p)))%()%c(0,minChange))
+      for(i in ind){
+        if(all(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)){
+          dfs$p_adj[i:last(which(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)+i)] <- NA
+        } else {
+          dfs$p_adj[i:(which(diff(dfs$p_adj[i:length(dfs$p_adj)])!=0)[1]+i-1)] <- NA
+        }
+      }
+      dfs$p_adj <- imputeTS::na_locf(dfs$p_adj)
+      if(!is.na(NAind)){
+        dfs$p_adj[NAind] <- NA
+      }
+    }
+  }
+
 
   if(doLevelPlot){
    g <- ggplot2::ggplot(dfs) +
@@ -1602,6 +1673,7 @@ ts_sd <- function(y, na.rm = TRUE, type = c("Bessel","unadjusted")[1], silent=TR
 #'
 #' @param y A matrix with timeseries as columns
 #' @param epochSz Epoch size
+#' @param removeUnequal Do not return bins whose length is not equal to `epochSz` (default = `FALSE`)
 #'
 #' @return A list with epochs
 #'
@@ -1611,7 +1683,10 @@ ts_sd <- function(y, na.rm = TRUE, type = c("Bessel","unadjusted")[1], silent=TR
 #'
 #' @author Fred Hasselman
 #'
-ts_slice <- function(y , epochSz=4){
+ts_slice <- function(y , epochSz=4, overlap = NA, removeUnequal = FALSE){
+
+  bins <- ts_windower(y, win = epochSz, step = epochSz, overlap = overlap, adjustY = FALSE, alignment = "c", silent = TRUE)
+
   if(!is.matrix(y)){
     yy <- as.matrix(y)
   } else {
@@ -1619,11 +1694,25 @@ ts_slice <- function(y , epochSz=4){
   }
 
   N <- dim(yy)
-  wIndex <- plyr::llply(seq(1,N[1],epochSz),function(i) yy[i:min(i+epochSz-1,N[1]),1:N[2]])
+  #wIndex <- plyr::llply(seq(1,N[1],epochSz),function(i) yy[i:min(i+epochSz-1,N[1]),1:N[2]])
+  wIndex <- plyr::llply(bins, function(i) yy[i, 1:N[2]])
   delID <- which(lengths(wIndex)!=epochSz)%00%NA
+  for(s in delID){
+    if(length(wIndex[[s]])>epochSz){
+      #wIndex[[s]][(epochSz+1):length(wIndex[[s]])] <- NA
+      rest <- wIndex[[s]][(epochSz+1):length(wIndex[[s]])]
+      wIndex[[s]]   <- wIndex[[s]][1:epochSz]
+      wIndex[[s+1]] <- rest
+    }
+  }
+
+  if(removeUnequal){
+    delID <- which(lengths(wIndex)!=epochSz)%00%NA
   for(del in delID){
     if(!any(is.na(delID))){wIndex <- wIndex[-del]}
+    }
   }
+
   names(wIndex) <- paste("epoch",1:length(wIndex),"| size",lengths(wIndex))
   return(wIndex)
 }
@@ -1634,7 +1723,7 @@ ts_slice <- function(y , epochSz=4){
 #'
 #' @param y A 1D timeseries
 #'
-#' @return The profile
+#' @return The profile calculated as `cumsum(y[-length(y)]*diff(t))`, with `t` as `stats::time(y)`
 #' @export
 #'
 #' @family Time series operations
@@ -1652,7 +1741,8 @@ ts_integrate <-function(y){
     y <- as.numeric(as.vector(y))
   }
   idOK <- !is.na(y)
-  t    <- zoo::index(y)
+  #t    <- zoo::index(y)
+  t    <- stats::time(y)
   t[!idOK] <- NA
   yy  <- c(y[idOK][1],y[idOK])
   tt  <- c(t[idOK][1],t[idOK])
@@ -1866,7 +1956,7 @@ ts_coarsegrain <- function(y, grain = 2, summaryFunction = c("mean","median","mi
       if(all(is.na(x))){
         return(NA)
       } else {
-        return(as.numeric(attributes(ftable(x))$col.vars$x[[which.max(ftable(x))]]))
+        return(as.numeric(attributes(stats::ftable(x))$col.vars$x[[which.max(stats::ftable(x))]]))
         }
     }
 

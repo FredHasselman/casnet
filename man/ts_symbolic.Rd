@@ -7,19 +7,19 @@
 ts_symbolic(y, keepNA = TRUE, usePlateaus = FALSE, doPlot = FALSE)
 }
 \arguments{
-\item{y}{Numeric vector or time series to be discretised.}
+\item{y}{Numeric vector or matrix to be discretised. Will return attributes with labels for each column in the matrix.}
 
-\item{keepNA}{If \code{TRUE}, any \code{NA} values will first be removed and later re-inserted into the discretised time series.}
+\item{keepNA}{If \code{TRUE}, any \code{NA} values will first be removed and later re-inserted into the discretised time series. (default = \code{TRUE})}
 
-\item{usePlateaus}{Treat consequative "same" values after "peak" or "trough" as a "peak"/"trough".}
+\item{usePlateaus}{Give consecutive \code{"same"} values after \code{"peak"} or \code{"trough"} a \code{"peak"} or \code{"trough"} label instrad of \code{"same"}. (default = \code{FALSE})}
 
-\item{doPlot}{Create a plot of the symbolized series.}
+\item{doPlot}{Create a plot of the symbolized series. (default = \verb{FALSE)})}
 }
 \value{
-A discretised version of \code{y}
+A symbolic version of \code{y}
 }
 \description{
-Return a discrete representation of \code{y} by binning the observed values and returning the transfer probabilities.
+Return a discrete representation of \code{y} by transforming it into an unordered categorical variable which indicates whether a value went up, down, or remained the same relative to the previous value.
 }
 \seealso{
 Other Time series operations: 

@@ -7,8 +7,9 @@
 fd_psd(
   y,
   fs = NULL,
-  standardise = TRUE,
-  detrend = TRUE,
+  removeTrend = c("no", "poly", "adaptive", "bridge")[2],
+  polyOrder = 1,
+  standardise = c("none", "mean.sd", "median.mad")[2],
   fitMethod = c("lowest25", "Wijnants", "Hurvich-Deo")[3],
   doPlot = FALSE,
   returnPlot = FALSE,
@@ -26,8 +27,6 @@ fd_psd(
 
 \item{standardise}{standardise the series (default = \code{TRUE}).}
 
-\item{detrend}{Subtract linear trend from the series (default = \code{TRUE}).}
-
 \item{fitMethod}{Method to decide on a frequency range for log-log fit. Can be one of: "lowest25","Wijnants","Hurvich-Deo" (default). See details for more info.}
 
 \item{doPlot}{Return the log-log spectrum with linear fit (default = \code{TRUE}).}
@@ -43,6 +42,8 @@ fd_psd(
 \item{noTitle}{Do not generate a title (only the subtitle)}
 
 \item{tsName}{Name of y added as a subtitle to the plot}
+
+\item{detrend}{Subtract linear trend from the series (default = \code{TRUE}).}
 }
 \value{
 A list object containing:

@@ -2166,7 +2166,7 @@ rp_plot <- function(RM,
     chromatic <- attr(RM,"chromatic")
   }
 
-  if(!all(na.exclude(as.vector(RM))%in%c(0,1))&!chromatic){
+  if(!all(stats::na.exclude(as.vector(RM))%in%c(0,1))&!chromatic){
     unthresholded <- TRUE
   } else {
     unthresholded <- FALSE
@@ -2232,7 +2232,7 @@ rp_plot <- function(RM,
     }
 
 
-    RM <- mat_coursegrain(RM, target_height = target_height, target_width = target_width, n_core = NA)
+    RM <- mat_coursegrain(RM, target_height = target_height, target_width = target_width)
     reduced <- TRUE
   }
 
@@ -2243,7 +2243,7 @@ rp_plot <- function(RM,
   # Make sure we can draw a diagonal if requested
   maxDist <- max(RM, na.rm = TRUE)
   if(drawDiagonal&AUTO){
-    if(all(na.exclude(as.vector(RM))%in%c(0,1))){
+    if(all(stats::na.exclude(as.vector(RM))%in%c(0,1))){
       RM <- bandReplace(RM,0,0,1)
     } else {
       if(!chromatic){

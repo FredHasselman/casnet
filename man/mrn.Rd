@@ -6,7 +6,8 @@
 \usage{
 mrn(
   layers,
-  MRNweightedBy = c("InterlayerMI", "InterlayerCor", "Edgeoverlap")[1],
+  MRNweightedBy = c("InterLayerMI", "InterLayerCor", "EdgeOverlap", "JRP")[1],
+  jrp_measure = "RR",
   win = NA,
   step = NA,
   overlap = NA,
@@ -19,7 +20,9 @@ mrn(
 \arguments{
 \item{layers}{A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.}
 
-\item{MRNweightedBy}{The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: \code{"InterLayerMI"} (Mutual information based on similarity of the vertex degree across layers), \code{"EdgeOverlap"} (proportion of vertices sharing the same edges across layers). Choosing \code{"InterLayerMI"}, \code{"InterlayerCor"}, or \code{"EdgeOverlap"} will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.}
+\item{MRNweightedBy}{The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: \code{"InterLayerMI"} (Mutual information based on similarity of the vertex degree across layers), \code{"InterLayerCor"} (pearson correlation between vertex degree or strength of each layer pair),  \code{"EdgeOverlap"} (proportion of vertices sharing the same edges across layers), or \code{"JRP"} which will calculate a joint recurrence plot for each layer pair and add the value passed to \code{jrp_measure} as the measure of association (default = \code{InterLayerMI})}
+
+\item{jrp_measure}{Which JRP measure should be used to asses layer similarity. Use a column name of the data frame output by \link{rp_measures} (default = \code{"RR"})}
 
 \item{win}{The window size passed to \code{\link[=ts_windower]{ts_windower()}} in which to evaluate \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}. (default = \code{NA}).}
 
@@ -36,12 +39,13 @@ mrn(
 \item{silent}{Silent-ish mode. (default = FALSE).}
 }
 \value{
-A list object with fields:
+A list object with a (windowed) Multiplex Recurrence Matrix based on \code{MRNweightedBy}:
 \itemize{
 \item \emph{interlayerMI} - One or more matrices with edge weights between layers that represent the interlayer Mutual Information.
-\item \emph{interlayerCor} - One or more matrices with edge weights between layers that represent the Pearson correlation between vertex degrees of layers.
+\item \emph{interlayerCor} - One or more matrices with edge weights between layers that represent the Pearson correlation between vertex degrees (or strength if layers are weighted graphs) of layers.
 \item \emph{edgeOverlap} - One or more matrices with edge weights between layers that represent the overlapping edges between layers.
-\item \emph{meanValues} - One or more matrices that represent the means and SDs of the interlayer Mutual Information, absolute interlayer correlation and edge overlap. Ther measure \code{eo_joint} refers to the number of edges shared among \emph{all} layers of the MRN.
+\item \emph{jointRP} -  One or more matrices with edge weights between layers that represent the value of the joint RP passed in \code{jrp_measure}. The default is the \code{"RR"} of joint Recurrence Plot of the two layers.
+\item The field \emph{meanValues} contains one or more matrices that represent the means and SDs of the weights requested in\code{MRNweightedBy}. The measure \code{eo_joint} (returned with \code{"edgeOverlap"}) refers to the number of edges shared among \emph{all} layers of the MRN.
 }
 }
 \description{

@@ -10,7 +10,8 @@ ts_windower(
   step = NA,
   overlap = NA,
   adjustY = NA,
-  alignment = c("r", "c", "l")[1]
+  alignment = c("r", "c", "l")[1],
+  silent = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ ts_windower(
 \item{adjustY}{If not \code{NA}, or, \code{FALSE} a list object with fields that match one or more arguments of \link[casnet]{ts_trimfill} (except for \verb{x,y}), e.g. \code{list(action="trim.NA",type="end",padding=NA,silent=TRUE)}. See \verb{Return value} below for details.}
 
 \item{alignment}{Whether to right (\code{"r"}), center (\code{"c"}), or left (\code{"l"}) align the window.}
+
+\item{silent}{Silent mode.}
 }
 \value{
 If \code{adjustY = FALSE}, or, a list object with fields that represent arguments of \link[casnet]{ts_trimfill}, then the (adjusted) vector \code{y} is returned with an attribute \code{"windower"}. This is a list object with fields that contain the indices for each window that fits on \code{y}, given \code{win}, \code{step} or \code{overlap} and the settings of \code{adjustY}. If \code{adjustY = NA}, only the list object is returned.

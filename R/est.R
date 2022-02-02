@@ -96,13 +96,15 @@ est_radius <- function(RM = NULL,
     seqIter   <- 1:maxIter
     stopRadius <- NA
     RP_N <- NA
+    tollo <- targetValue-tol #(1-tol),
+    tolhi <- targetValue+tol #(tol+1),
 
     iterList <- data.frame(iter        = seqIter,
                            Measure     = Measure,
                            Radius      = tryRadius,
                            targetValue = targetValue,
-                           tollo       = targetValue*(1-tol),
-                           tolhi       = targetValue*(tol+1),
+                           tollo       = tollo, #(1-tol),
+                           tolhi       = tolhi, #(tol+1),
                            startRadius = startRadius,
                            stopRadius  = stopRadius,
                            rp.size     = rp.size,
@@ -111,7 +113,7 @@ est_radius <- function(RM = NULL,
                            Converged   = Converged, check.names = FALSE)
 
     exitIter <- FALSE
-    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue, "for", targetMeasure,"\n"))}
+    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"±",tol,"for", targetMeasure,"\n"))}
 
     # p <- dplyr::progress_estimated(maxIter)
     while(!exitIter){
@@ -143,8 +145,8 @@ est_radius <- function(RM = NULL,
                                              Measure     = Measure,
                                              Radius      = tryRadius,
                                              targetValue = targetValue,
-                                             tollo       = targetValue*(1-tol),
-                                             tolhi       = targetValue*(tol+1),
+                                             tollo       = tollo, #(1-tol),
+                                             tolhi       = tolhi, #(tol+1),
                                              startRadius = startRadius,
                                              stopRadius  = stopRadius,
                                              rp.size     = rp.size,
@@ -152,8 +154,8 @@ est_radius <- function(RM = NULL,
                                              AUTO        = AUTO,
                                              Converged   = Converged)
 
-      if(any(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1)),(iter>=maxIter))){
-        if(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1))){
+      if(any(Measure%[]%c(tollo,tolhi),(iter>=maxIter))){
+        if(Measure%[]%c(tollo,tolhi)){
           Converged <- TRUE
           if(!silent){
             message("\nConverged! Found an appropriate radius...")
@@ -177,7 +179,7 @@ est_radius <- function(RM = NULL,
       iterList$stopRadius[iter] <- tryRadius
       #iterlist$Measure[iter] <- Measure
     }
-    if(Measure %][% c(targetValue*(1-tol),targetValue*(tol+1))){
+    if(Measure %][% c(tollo,tolhi)){
       iterList$Radius[iter] <- dplyr::case_when(
         radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
         radiusOnFail%in%"huge" ~ 1 + max(RM),
@@ -454,7 +456,7 @@ est_parameters <- function(y,
     for(m in seq_along(emLags$selection.methods)){
       if(emLags$selection.methods[m]%in%"first.minimum"){
         if(length(doLags)>2){
-          emLags$lag[m] <- which(ts_symbolic(data.frame(mi))%in%"trough")[1]%00%NA
+          emLags$lag[m] <- which(attributes(ts_symbolic(data.frame(mi)))$mi_sym_label%in%"trough")[1]%00%NA
         } else {
           warning("Only 2 lags to evaluate, setting 'first.minimum' to 1.")
           emLags$lag[m] <- 1
@@ -529,6 +531,8 @@ est_parameters <- function(y,
             #                           atol = nnSize,
             #                           olag = 1
             # )
+          } else {
+
           }
 
           #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSize*sd(y))

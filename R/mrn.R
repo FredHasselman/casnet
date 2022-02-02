@@ -12,18 +12,20 @@
 #' @inheritParams ts_windower
 #' @inheritParams rn
 #' @param layers A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.
-#' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers). Choosing `"InterLayerMI"`, `"InterlayerCor"`, or `"EdgeOverlap"` will decide which measure is displayed in the plot of the Multiplex RN, all measures will always be returned in the numerical output.
+#' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"InterLayerCor"` (pearson correlation between vertex degree or strength of each layer pair),  `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers), or `"JRP"` which will calculate a joint recurrence plot for each layer pair and add the value passed to `jrp_measure` as the measure of association (default = `InterLayerMI`)
+#' @param jrp_measure Which JRP measure should be used to asses layer similarity. Use a column name of the data frame output by [rp_measures] (default = `"RR"`)
 #' @param win The window size passed to [casnet::ts_windower()] in which to evaluate `"InterLayerMI"`, `"InterLayerCor"`, or `"EdgeOvelap"`. (default = `NA`).
 #' @param step The stepsize for the sliding window (default = `NA`).
 #' @param overlap The window overlap passed to [casnet::ts_windower()] if `MRNweightedBy` is `"InterLayerMI"` or `"EdgeOvelap"`. The value of `step` will be ignored if `overlap` is not `NA`. (default = `NA`).
 #' @param doPlot Plot the multiplex recurrence network (default = `FALSE`).
 #' @param silent Silent-ish mode. (default = FALSE).
 #'
-#' @return A list object with fields:
+#' @return A list object with a (windowed) Multiplex Recurrence Matrix based on `MRNweightedBy`:
 #' * _interlayerMI_ - One or more matrices with edge weights between layers that represent the interlayer Mutual Information.
-#' * _interlayerCor_ - One or more matrices with edge weights between layers that represent the Pearson correlation between vertex degrees of layers.
+#' * _interlayerCor_ - One or more matrices with edge weights between layers that represent the Pearson correlation between vertex degrees (or strength if layers are weighted graphs) of layers.
 #' * _edgeOverlap_ - One or more matrices with edge weights between layers that represent the overlapping edges between layers.
-#' * _meanValues_ - One or more matrices that represent the means and SDs of the interlayer Mutual Information, absolute interlayer correlation and edge overlap. Ther measure `eo_joint` refers to the number of edges shared among _all_ layers of the MRN.
+#' * _jointRP_ -  One or more matrices with edge weights between layers that represent the value of the joint RP passed in `jrp_measure`. The default is the `"RR"` of joint Recurrence Plot of the two layers.
+#' * The field _meanValues_ contains one or more matrices that represent the means and SDs of the weights requested in`MRNweightedBy`. The measure `eo_joint` (returned with `"edgeOverlap"`) refers to the number of edges shared among _all_ layers of the MRN.
 #'
 #' @export
 #'
@@ -40,7 +42,8 @@
 #'
 #'
 mrn <- function(layers,
-                MRNweightedBy = c("InterlayerMI", "InterlayerCor", "Edgeoverlap")[1],
+                MRNweightedBy = c("InterLayerMI", "InterLayerCor", "EdgeOverlap", "JRP")[1],
+                jrp_measure = "RR",
                 win = NA,
                 step = NA,
                 overlap = NA,
@@ -49,17 +52,19 @@ mrn <- function(layers,
                 doPlot = FALSE,
                 silent = TRUE){
 
+  rr_col <- c("emRad", "RP_max", "RR", "SING_N", "SING_rate", "RP_N", "DIV_dl", "REP_av", "N_dl", "N_dlp", "DET", "MEAN_dl", "MAX_dl", "ENT_dl", "ENTrel_dl", "CoV_dl","N_vl","N_vlp","LAM_vl","TT_vl","MAX_vl","ENT_vl","ENTrel_vl","CoV_vl","REP_vl","N_hlp","N_hl", "LAM_hl", "TT_hl", "MAX_hl", "ENT_hl", "ENTrel_hl", "CoV_hl", "REP_hl", "N_hvp", "N_hv", "LAM_hv", "TT_hv", "MAX_hv", "ENT_hv", "ENTrel_hv", "CoV_hv")
+
   cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
 
-  if(!all(plyr::laply(layers,function(g) igraph::is.igraph(g)))){
-    stop("All elements of the layers list have to be an igraph object!")
-  }
+  # if(!all(plyr::laply(layers,function(g) igraph::is.igraph(g)))){
+  #   stop("All elements of the layers list have to be an igraph object!")
+  # }
 
   if(!all(plyr::laply(layers, function(g) igraph::vcount(g))==igraph::vcount(layers[[1]]))){
     stop("In a Multiplex Recurrence Network, the layer networks must all have the same number of vertices!")
   }
 
-  Nsize <- igraph::vcount(layers[[1]])
+   Nsize <- igraph::vcount(layers[[1]])
 
   if(is.null(names(layers))){
     names(layers) <- paste0("layer",1:length(layers))
@@ -78,7 +83,6 @@ mrn <- function(layers,
 
   wIndexList <- ts_windower(y = 1:Nsize, win = win, step = step, overlap = overlap, adjustY = NA)
 
-  func <- "mi_interlayer"
   weighted <- igraph::is.weighted(layers[[1]])
   directed <- igraph::is.directed(layers[[1]])
 
@@ -88,78 +92,194 @@ mrn <- function(layers,
     layers <- plyr::llply(layers, function(g) igraph::as.undirected(g))
     combis <- getPairs(seq_along(layers),seq_along(layers))
     mode <- "directed"
-    if(cumulative){
-      mode <- "upper"
+    if(is.na(cumulative%00%NA)){
+      stop("The graphs in the list are directed, please set cumulative to TRUE or FALSE.")
     }
+    if(cumulative){
+        mode <- "upper"
+      } else {
+        if(!silent){
+          warning("NOTE: Graphs in the list are directed, should cumulative bet set to TRUE?")
+      }
+    } # Cumulative
   } else {
     combis <- getPairs(seq_along(layers))
     mode <- "upper"
   }
 
-  if(func%in%"mi_interlayer"){
+
+  if(any(MRNweightedBy%in%c("InterLayerMI", "InterLayerCor", "EdgeOverlap", "JRP"))){
 
     cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
 
-    out_mi <- out_eo <- out_means <- list()
+    out_mi <- out_eo <- out_cr <- out_jrp <- out_means <- list()
 
     pb <- progress::progress_bar$new(total = length(wIndexList), force = TRUE)
 
     for(w in seq_along(wIndexList)){
 
       pb$tick()
-      mp <- eo <- matrix(nrow=length(layers), ncol=length(layers), dimnames = list(names(layers),names(layers)))
 
-      for(i in seq_along(combis$X1)){
+      mp <- eo <- cr <- rr <- matrix(nrow=length(layers), ncol=length(layers), dimnames = list(names(layers),names(layers)))
 
-        edgeFrame1 <- igraph::as_data_frame(layers[[combis$X1[i]]],"edges")
-        edgeFrame1 <- edgeFrame1 %>% filter(edgeFrame1$from%[]%range(wIndexList[[w]])&edgeFrame1$to%[]%range(wIndexList[[w]]))
-        ga  <- graph_from_data_frame(edgeFrame1, directed = directed)
+      for(i in seq_along(combis[[1]])){
 
-        edgeFrame2 <- igraph::as_data_frame(layers[[combis$X2[i]]],"edges")
-        edgeFrame2 <- edgeFrame2 %>% filter(edgeFrame2$from%[]%range(wIndexList[[w]])&edgeFrame2$to%[]%range(wIndexList[[w]]))
-        gb  <- graph_from_data_frame(edgeFrame2, directed = directed)
+        if(combis[i,1]!=combis[i,2]){
+
+        i1 <-  which(!(1:igraph::vcount(layers[[combis[i,1]]])%in%(min(wIndexList[[w]]):max(wIndexList[[w]]))))
+        i2 <-  which(!(1:igraph::vcount(layers[[combis[i,2]]])%in%(min(wIndexList[[w]]):max(wIndexList[[w]]))))
+
+        ga <- igraph::delete.vertices(layers[[combis[i,1]]], i1)
+        gb <- igraph::delete.vertices(layers[[combis[i,2]]], i2)
+
+        # edgeFrame1 <- igraph::as_data_frame(layers[[combis[i,1]]],"edges")
+        # edgeFrame1 <- edgeFrame1 %>% filter(edgeFrame1$from%[]%range(wIndexList[[w]])&edgeFrame1$to%[]%range(wIndexList[[w]]))
+        # ga  <- graph_from_data_frame(edgeFrame1, directed = directed)
+
+        # edgeFrame2 <- igraph::as_data_frame(layers[[combis[i,2]]],"edges")
+        # edgeFrame2 <- edgeFrame2 %>% filter(edgeFrame2$from%[]%range(wIndexList[[w]])&edgeFrame2$to%[]%range(wIndexList[[w]]))
+        # gb  <- graph_from_data_frame(edgeFrame2, directed = directed)
 
         if(any(igraph::ecount(ga)==0,igraph::ecount(gb)==0)){
-          mp[combis$X1[i],combis$X2[i]] <- NA
-          eo[combis$X1[i],combis$X2[i]] <- NA
+
+          mp[combis[i,1],combis[i,2]] <- 0
+          eo[combis[i,1],combis[i,2]] <- 0
+          cr[combis[i,1],combis[i,2]] <- 0
+
         } else {
-        mp[combis$X1[i],combis$X2[i]] <- mi_interlayer(ga,gb)
-        eo[combis$X1[i],combis$X2[i]] <- igraph::ecount(ga %s% gb) / (igraph::ecount(ga) + igraph::ecount(gb))
+
+          mp[combis[i,1],combis[i,2]] <- mi_interlayer(ga,gb)
+          eo[combis[i,1],combis[i,2]] <- igraph::ecount(ga %s% gb) / (igraph::ecount(ga) + igraph::ecount(gb))
+
+          if(weighted){
+            # barrat
+            cr[combis[i,1],combis[i,2]] <- as.numeric(stats::cor(data.frame(igraph::strength(ga, loops = FALSE, mode = "total")/(igraph::vcount(ga)-1)),
+                                                                 data.frame(igraph::strength(gb, loops = FALSE, mode = "total")/(igraph::vcount(ga)-1))))
+          } else {
+            cr[combis[i,1],combis[i,2]] <- as.numeric(stats::cor(data.frame(igraph::degree(ga, loops = FALSE)/(igraph::vcount(ga)-1)),
+                                                                 data.frame(igraph::degree(gb, loops = FALSE)/(igraph::vcount(ga)-1))))
+          }
+
         }
 
         #igraph::ecount(layers[[combis$X1[i]]] %s% layers[[combis$X2[i]]]) / (igraph::ecount(layers[[combis$X1[i]]]) + igraph::ecount(layers[[combis$X2[i]]]))
-      }
 
-      mi_ave   <- mean(mp[upper.tri(mp)&mp>0], na.rm = TRUE)
-      mi_sd    <- stats::sd(mp[upper.tri(mp)&mp>0], na.rm = TRUE)
-      eo_ave   <- mean(eo[upper.tri(eo)&eo>0], na.rm = TRUE)
-      eo_sd    <- stats::sd(eo[upper.tri(eo)&eo>0], na.rm = TRUE)
-      eo_sum   <- sum(plyr::laply(layers, function(g) length(igraph::E(g))),na.rm = TRUE)
-      eo_all   <- eval(parse(text = paste0("igraph::ecount(intersection(",paste0("layers[[",1:NROW(layers),"]]",collapse=","),"))")))
-      eo_joint <- eo_all / eo_sum
+        if(MRNweightedBy%in%"JRP"){
+            jrp1 <- igraph::as_adjacency_matrix(ga, type = "both", sparse = TRUE)
+            jrp2 <- igraph::as_adjacency_matrix(gb, type = "both", sparse = TRUE)
+
+            # jrp1[jrp1>0] <- 1
+            # jrp2[jrp2>0] <- 1
+            # jrp <- sqrt(jrp1^2 + jrp2^2)
+
+            jrp <- Matrix::Matrix(Matrix::t(Matrix::t(jrp1) * jrp2))
+            rm(jrp1,jrp2)
+
+            if(Matrix::nnzero(jrp)==0){
+
+              rr[combis[i,1],combis[i,2]] <- 0
+              rm(jrp)
+
+            } else {
+
+            jrp_out <- suppressMessages(rp_measures(jrp, theiler = 1))
+            rm(jrp)
+
+            if(jrp_measure %in% rr_col){
+              rr[combis[i,1],combis[i,2]] <- jrp_out[1,jrp_measure%ci%jrp_out]
+            } else {
+              stop("Argument 'jrp_measure' has to be a column name of the data frame returned by 'rp_measures()'")
+            }
+          }
+        } # JRP
+        rm(ga,gb)
+
+        } else {
+
+          mp[combis[i,1],combis[i,2]] <- NA
+          cr[combis[i,1],combis[i,2]] <- NA
+          eo[combis[i,1],combis[i,2]] <- NA
+
+          if(MRNweightedBy%in%"JRP"){
+            rr[combis[i,1],combis[i,2]] <- NA
+          }
+        }
+
+      } # combis
+
+      mi_ave   <- mean(mp[mp>=0], na.rm = TRUE)
+      mi_sd    <- stats::sd(mp[mp>=0], na.rm = TRUE)
+      eo_ave   <- mean(eo[eo>=0], na.rm = TRUE)
+      eo_sd    <- stats::sd(eo[eo>=0], na.rm = TRUE)
+
+      cr_ave   <- mean(cr[cr!=0], na.rm = TRUE)
+      cr_sd    <- stats::sd(cr[cr!=0], na.rm = TRUE)
 
       out_mi[[w]] <- mp
       out_eo[[w]] <- eo
+      out_cr[[w]] <- cr
+
       out_means[[w]] <- data.frame(mi_mean = mi_ave, mi_sd = mi_sd,
                                    eo_mean = eo_ave, eo_sd = eo_sd,
-                                   eo_sum  = eo_sum, eo_all = eo_all, eo_joint = eo_joint)
+                                   eo_sum  = NA, eo_all = NA, eo_joint = NA,
+                                   cr_mean = cr_ave, cr_sd = cr_sd,
+                                   jrp_mean = NA, jrp_sd = NA)
+
+      if(MRNweightedBy%in%"JRP"){
+
+        jrp_ave <- mean(rr[rr>=0], na.rm = TRUE)
+        jrp_sd  <- stats::sd(rr[rr>=0], na.rm = TRUE)
+
+        out_jrp[[w]] <- rr
+        out_means[[w]]$jrp_mean <- jrp_ave
+        out_means[[w]]$jrp_sd <- jrp_sd
+      }
+
+      ind <-  which(!(1:igraph::vcount(layers[[combis[i,1]]])%in%(min(wIndexList[[w]]):max(wIndexList[[w]]))))
+
+      windowLayer <- plyr::llply(layers, function(l){
+        igraph::delete.vertices(l, ind)
+      })
+
+      eo_sum   <- sum(plyr::laply(windowLayer, function(g) length(igraph::E(g))),na.rm = TRUE)
+      eo_all   <- eval(parse(text = paste0("igraph::ecount(intersection(",paste0("windowLayer[[",1:NROW(windowLayer),"]]",collapse=","),"))")))
+      eo_joint <- eo_all / eo_sum
+
+      out_means[[w]]$eo_sum   <- eo_sum
+      out_means[[w]]$eo_all   <- eo_all
+      out_means[[w]]$eo_joint <- eo_joint
 
     } # wIndex
 
     names(out_mi)    <- names(wIndexList)
     names(out_eo)    <- names(wIndexList)
+    names(out_cr)    <- names(wIndexList)
     names(out_means) <- names(wIndexList)
 
+    if(MRNweightedBy%in%"JRP"){
+      names(out_jrp)   <- names(wIndexList)
+    }
+
   } else {
-    stop("Not implemented yet!")
+      stop("Not implemented yet!")
   }
+
+  out <- list(interlayerMI  = out_mi,
+       edgeOverlap   = out_eo,
+       interlayerCor = out_cr,
+       jointRP       = out_jrp,
+       meanValues    = out_means,
+       Nsize         = Nsize)[c(MRNweightedBy%in%"InterLayerMI",MRNweightedBy%in%"InterLayerCor",MRNweightedBy%in%"EdgeOverlap",MRNweightedBy%in%"JRP",TRUE,TRUE)]
+
+
+  if(doPlot){
+    mrn_plot(MRN = out)
+  }
+
 
   cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
 
-  return(list(interlayerMI  = out_mi,
-              edgeOverlap   = out_eo,
-              meanValues    = out_means,
-              Nsize         = Nsize))
+  return(out)
 }
 
 

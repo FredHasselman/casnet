@@ -10,11 +10,12 @@ rn_phases(
   minStatesinPhase = 1,
   maxStatesinPhase = NROW(RN),
   cleanUp = TRUE,
+  returnCentroid = c("no", "mean.sd", "median.mad", "centroid")[1],
   removeSingularities = FALSE,
   standardise = c("none", "mean.sd", "median.mad", "unit")[4],
   returnGraph = FALSE,
-  doPhasePlot = FALSE,
-  plotCentroid = c("no", "mean.sd", "median.mad", "centroid")[1],
+  doPhaseProfilePlot = FALSE,
+  plotCentroid = FALSE,
   colOrder = FALSE,
   phaseColours = NULL,
   doSpiralPlot = FALSE,
@@ -37,15 +38,17 @@ rn_phases(
 
 \item{cleanUp}{Try to assign states to phases that were not assigned by the algorithm. If \code{FALSE}, these states will be added to category "Other" (default = \code{TRUE})}
 
+\item{returnCentroid}{Values can be \code{"no"}, \code{"mean.sd"}, \code{"median.mad"}, \code{"centroid"}. Any other value than \code{"no"} will return a data frame with the central tendency and deviation measures for each phase (default = \code{"no"})}
+
 \item{removeSingularities}{Will remove states that recur only once (nodes with \code{degree(g) == 1}) (default = \code{FALSE})}
 
-\item{standardise}{Standardise by the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
+\item{standardise}{Standardise the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
-\item{returnGraph}{Return the graph object objects of the plots that have been produced (default = \code{FALSE})}
+\item{returnGraph}{Returns all the graph object objects of the plots that have been produced (default = \code{FALSE})}
 
-\item{doPhasePlot}{Produce a plot with the extracted phases (default = \code{TRUE})}
+\item{doPhaseProfilePlot}{Produce a profile plot of the extracted phases (default = \code{TRUE})}
 
-\item{plotCentroid}{Currently plots the Mean and SD of the dimensions of the states in each phase over the phase plot (default = \code{FALSE})}
+\item{plotCentroid}{Plot the centroid requested in \code{returnCentroid}? (default = \code{FALSE})}
 
 \item{colOrder}{Should the order of the dimensions reflect the order of the columns in the dataset? If \code{FALSE} the order will be based on the values of the dimensions observed in the first extracted phase (default = \code{FALSE})}
 
@@ -66,7 +69,7 @@ rn_phases(
 \item{excludeNorec}{Should the category "No recurrence" be excluded from plots? (default = \code{TRUE})}
 }
 \value{
-A data frame with information about the phases.
+A data frame with information about the phases or a list object with data and graph objects (if requested).
 }
 \description{
 This function will extract phases (regions of attraction in phase space) based on a weighted \code{RN} object created with function \link{rn}.
@@ -97,10 +100,10 @@ df <- manyAnalystsESM[4:10]
 RN <- rn(y1 = df, doEmbed = FALSE, weighted = TRUE, weightedBy = "si", emRad = NA)
 
 # This returns 6 phases which have minimally 1 state
-rn_phases(RN, maxPhases = 10, doPhasePlot = TRUE)
+rn_phases(RN, maxPhases = 10, doPhaseProfilePlot = TRUE)
 
 # Use min. number of states as the extraction criterion
-rn_phases(RN, maxPhases = NA, minStatesinPhase = 7, doPhasePlot = TRUE)
+rn_phases(RN, maxPhases = NA, minStatesinPhase = 7, doPhaseProfilePlot = TRUE)
 
 }
 \seealso{

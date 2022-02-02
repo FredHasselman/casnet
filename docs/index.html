@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -77,7 +73,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/FredHasselman/casnet/">
+  <a href="https://github.com/FredHasselman/casnet/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -95,15 +91,15 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="disclaimer" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#disclaimer" class="anchor"></a>Disclaimer:</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="disclaimer">Disclaimer:<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
+</h1></div>
 <p><strong>Still EXPERIMENTAL after all these years…</strong></p>
-<p><a href="https://travis-ci.org/FredHasselman/casnet"><img src="https://travis-ci.org/FredHasselman/casnet.svg?branch=master" alt="Travis-CI Build Status"></a> <a href="https://ci.appveyor.com/project/FredHasselman/casnet"><img src="https://ci.appveyor.com/api/projects/status/github/FredHasselman/casnet?branch=master&amp;svg=true" alt="AppVeyor build status"></a> <a href="https://cran.r-project.org/package=casnet"><img src="https://www.r-pkg.org/badges/version/casnet" alt="CRAN status"></a> <a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="lifecycle"></a></p>
+<p><a href="https://travis-ci.org/FredHasselman/casnet" class="external-link"><img src="https://travis-ci.org/FredHasselman/casnet.svg?branch=master" alt="Travis-CI Build Status"></a> <a href="https://ci.appveyor.com/project/FredHasselman/casnet" class="external-link"><img src="https://ci.appveyor.com/api/projects/status/github/FredHasselman/casnet?branch=master&amp;svg=true" alt="AppVeyor build status"></a> <a href="https://cran.r-project.org/package=casnet" class="external-link"><img src="https://www.r-pkg.org/badges/version/casnet" alt="CRAN status"></a> <a href="https://www.tidyverse.org/lifecycle/#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="lifecycle"></a></p>
 </div>
-<div id="casnet-an-r-toolbox-for-studying-complex-adaptive-systems-and-networks-" class="section level1">
-<h1 class="hasAnchor">
-<a href="#casnet-an-r-toolbox-for-studying-complex-adaptive-systems-and-networks-" class="anchor"></a><strong>casnet</strong>: An R toolbox for studying Complex Adaptive Systems and NETworks <img src="reference/figures/logo.png" align="right" alt="" width="120">
+<div class="section level1">
+<h1 id="casnet-an-r-toolbox-for-studying-complex-adaptive-systems-and-networks-">
+<strong>casnet</strong>: An R toolbox for studying Complex Adaptive Systems and NETworks <img src="reference/figures/logo.png" align="right" alt="" width="120"><a class="anchor" aria-label="anchor" href="#casnet-an-r-toolbox-for-studying-complex-adaptive-systems-and-networks-"></a>
 </h1>
 <p>A collection of analytic tools for studying signals recorded from complex adaptive systems or networks:</p>
 <ul>
@@ -112,25 +108,25 @@
 <li>Network based time series analyses and visualisation (Recurrence Networks, spiral graphs)</li>
 <li>Multivariate (network based) time series analyses (Dynamic Complexity, Multiplex Recurrence Networks)</li>
 </ul>
-<div id="installing-casnet" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installing-casnet" class="anchor"></a>Installing <strong>casnet</strong>
+<div class="section level2">
+<h2 id="installing-casnet">Installing <strong>casnet</strong>
+<a class="anchor" aria-label="anchor" href="#installing-casnet"></a>
 </h2>
-<p>As soon as it is published on CRAN, install the latest stable release of casnet using <code><a href="https://rdrr.io/r/utils/install.packages.html">utils::install.packages(casnet, dependencies = TRUE)</a></code>.</p>
+<p>As soon as it is published on CRAN, install the latest stable release of casnet using <code>utils::install.packages(casnet, dependencies = TRUE)</code>.</p>
 </div>
-<div id="development-version" class="section level2">
-<h2 class="hasAnchor">
-<a href="#development-version" class="anchor"></a>Development version</h2>
-<p>Either use <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github</a></code> or <code><a href="https://remotes.r-lib.org/reference/install_github.html">remotes::install_github</a></code></p>
-<pre><code><a href="https://devtools.r-lib.org/">library(devtools)
-install_github("FredHasselman/casnet")
+<div class="section level2">
+<h2 id="development-version">Development version<a class="anchor" aria-label="anchor" href="#development-version"></a>
+</h2>
+<p>Either use <code><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">devtools::install_github</a></code> or <code><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">remotes::install_github</a></code></p>
+<pre><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span>
+<span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"FredHasselman/casnet"</span><span class="op">)</span>
 
-library(remotes)
-install_github("FredHasselman/casnet")</a></code></pre>
-<div id="vignette-build-failing" class="section level3">
-<h3 class="hasAnchor">
-<a href="#vignette-build-failing" class="anchor"></a>Vignette build failing?</h3>
-<p>If building the vignettes fails on installation (using <code>build_vignettes = TRUE</code>), just omit the argument and find them at online as <a href="https://fredhasselman.com/casnet/">Articles</a> or locate the vignettes in the <code>inst/docs/</code> folder of the repository.</p>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span>
+<span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"FredHasselman/casnet"</span><span class="op">)</span></code></pre>
+<div class="section level3">
+<h3 id="vignette-build-failing">Vignette build failing?<a class="anchor" aria-label="anchor" href="#vignette-build-failing"></a>
+</h3>
+<p>If building the vignettes fails on installation (using <code>build_vignettes = TRUE</code>), just omit the argument and find them at online as <a href="https://fredhasselman.com/casnet/" class="external-link">Articles</a> or locate the vignettes in the <code>inst/docs/</code> folder of the repository.</p>
 </div>
 </div>
 </div>
@@ -139,46 +135,52 @@ install_github("FredHasselman/casnet")</a></code></pre>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/FredHasselman/casnet/">https://​github.com/​FredHasselman/​casnet/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/FredHasselman/casnet/issues">https://​github.com/​FredHasselman/​casnet/​issues</a>
-</li>
+<li><a href="https://github.com/FredHasselman/casnet/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/FredHasselman/casnet/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a> + file <a href="LICENSE-text.html">LICENSE</a>
+<a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a> + file <a href="LICENSE-text.html">LICENSE</a>
 </li>
 </ul>
 </div>
+
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html">Citing casnet</a></li>
+<li><a href="authors.html#citation">Citing casnet</a></li>
 </ul>
 </div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Fred Hasselman <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0003-1384-8361" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li><a href="authors.html">All authors...</a></li>
+<li>Fred Hasselman <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0003-1384-8361" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Fred Hasselman.</p>
+  <p></p>
+<p>Developed by Fred Hasselman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -186,6 +188,8 @@ install_github("FredHasselman/casnet")</a></code></pre>
 
   
 
+
+  
 
   </body>
 </html>

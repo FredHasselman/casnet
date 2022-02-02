@@ -7,7 +7,7 @@
 rn_measures(g, cumulative = TRUE, silent = TRUE)
 }
 \arguments{
-\item{g}{An igraph object.}
+\item{g}{An igraph object. If V(g)$name is set the labels will be returned in a column.}
 
 \item{cumulative}{Only consider out-degree.}
 
