@@ -331,9 +331,10 @@ rn_measures <- function(g, cumulative = TRUE, silent = TRUE){
     } else {
       vertex_prop$LocalClustering  <- DirectedClustering::ClustBCG(igraph::as_adjacency_matrix(g, edges = TRUE, sparse = FALSE), "directed", isolates = "zero")$totalCC
     }
+  } else {
+    vertex_prop$LocalClustering  <- igraph::transitivity(g, type = clType, isolates = "zero")
   }
 
-  vertex_prop$LocalClustering  <- igraph::transitivity(g, type = clType, isolates = "zero")
   vertex_prop$DegreeDensity    <- igraph::degree(g, loops = FALSE)/(igraph::vcount(g)-1)
   vertex_prop$LocalCloseness   <- igraph::closeness(g, normalized = TRUE, mode = degType)
   vertex_prop$LocalEfficiency  <- brainGraph::efficiency(g,type = efType, use.parallel = FALSE, A = igraph::as_adjacency_matrix(g,edges = TRUE, sparse = FALSE))
@@ -564,6 +565,7 @@ rn_recSpec <- function(RN,
 #' @param returnCentroid Values can be `"no"`, `"mean.sd"`, `"median.mad"`, `"centroid"`. Any other value than `"no"` will return a data frame with the central tendency and deviation measures for each phase (default = `"no"`)
 #' @param doPhaseProfilePlot Produce a profile plot of the extracted phases (default = `TRUE`)
 #' @param plotCentroid Plot the centroid requested in `returnCentroid`? (default = `FALSE`)
+#' @param space_dims A vector of titles to use for the dimensions. If `NULL` the values will be read from the attribute of `RN`.
 #' @param colOrder Should the order of the dimensions reflect the order of the columns in the dataset? If `FALSE` the order will be based on the values of the dimensions observed in the first extracted phase (default = `FALSE`)
 #' @param phaseColours Colours for the different phases in the phase plot. If `epochColours` also has a value, `phaseColours` will be used instead (default = `NULL`)
 #' @param doSpiralPlot Produce a plot of the recurrence network with the nodes coloured by phases (default = `FALSE`)
@@ -602,6 +604,7 @@ rn_phases <- function(RN,
                       returnGraph = FALSE,
                       doPhaseProfilePlot = FALSE,
                       plotCentroid = FALSE,
+                      space_dims = NULL,
                       colOrder = FALSE,
                       phaseColours = NULL,
                       doSpiralPlot = FALSE,
@@ -789,14 +792,23 @@ rn_phases <- function(RN,
     maxStatesinPhase <- minStatesinPhase
   }
 
-  if(!is.null(attributes(RN)$emDims1)){
-    space_dims <- attributes(RN)$emDims1[out$states_time, , drop = FALSE]
-    colnames(space_dims) <- paste0("dim_", plyr::laply(strsplit(colnames(space_dims),split = "[.]"), function(s) s[[2]]))
-    out <- cbind(out,space_dims)
-    rm(space_dims)
+  if(!is.null(space_dims)){
+    if(length(space_dims)!=NCOL(attributes(RN)$emDims1)){
+      warning("Argument space_dims is not equal to number of phase space dimensions.")
+    }
+    tmp <- attributes(RN)$emDims1[out$states_time, ,drop = FALSE]
+    colnames(tmp) <- space_dims
+    space_dims <- tmp
   } else {
-    stop("Could not find the attribute 'emDims1' on the Recurrence Matrix.")
-  }
+  if(!is.null(attributes(RN)$emDims1)){
+      space_dims <- attributes(RN)$emDims1[out$states_time, ,drop = FALSE]
+      colnames(space_dims) <- paste0("dim_", plyr::laply(strsplit(colnames(space_dims),split = "[.]"), function(s) s[[2]]))
+      } else {
+        stop("Could not find the attribute 'emDims1' on the Recurrence Matrix.")
+      }
+    }
+  out <- cbind(out,space_dims)
+  rm(space_dims)
 
   # Check if we missed some recurrent states due to the stopping parameters and create an "Other" category
   ltime <- seq(1,igraph::vcount(gRN))[!seq(1,igraph::vcount(gRN))%in%sort(out$states_time)]
@@ -996,7 +1008,7 @@ rn_phases <- function(RN,
 
 
   if(returnGraph){
-    listOut <- list(phases = list(phaseSeries = out, phaseCentroids = outMeans)[TRUE, bCentroid],
+    listOut <- list(phases = list(phaseSeries = out, phaseCentroids = outMeans)[TRUE, Centroid],
                     plots  = list(phaseProfile = pp, phaseSeries = ps, spiralPlot = gg)[c(doPhaseProfilePlot, doPhaseSeriesPlot, doSpiralPlot)])
   }
 

@@ -81,7 +81,7 @@
   scaleMin <span class="op">=</span> <span class="fl">0</span>,
   scaleMax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">*</span> <span class="va">resolution</span><span class="op">)</span><span class="op">)</span>,
   scaleS <span class="op">=</span> <span class="cn">NA</span>,
-  minData <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="op">(</span><span class="va">scaleMin</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>,
+  dataMin <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="op">(</span><span class="va">scaleMin</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>,
   maxData <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="op">(</span><span class="va">scaleMax</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,
   doPlot <span class="op">=</span> <span class="cn">FALSE</span>,
   returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -118,7 +118,7 @@
 <dd><p>Maximum scale value (as <code>2^scale</code>) to use (default = <code>max</code> of <code>log2(nrows)</code> and <code>log2(ncols)</code>)</p></dd>
 <dt>scaleS</dt>
 <dd><p>If not <code>NA</code>, pass a numeric vector listing the scales (as a power of <code>2</code>) on which to evaluate the boxcount. Arguments <code>scaleMax</code>, <code>scaleMin</code>, and <code>scaleResolution</code> will be ignored (default = <code>NA</code>)</p></dd>
-<dt>minData</dt>
+<dt>dataMin</dt>
 <dd><p>Minimum number of time/data points inside a box for it to be included in the slope estimation (default = <code>2^scaleMin</code>)</p></dd>
 <dt>maxData</dt>
 <dd><p>Maximum number of time/data points inside a box for it to be included in the slope estimation (default = <code>2^scaleMax</code>)</p></dd>

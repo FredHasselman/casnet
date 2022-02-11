@@ -85,6 +85,7 @@ or with high-frequency, are regions of attraction for the system.</p>
   returnGraph <span class="op">=</span> <span class="cn">FALSE</span>,
   doPhaseProfilePlot <span class="op">=</span> <span class="cn">FALSE</span>,
   plotCentroid <span class="op">=</span> <span class="cn">FALSE</span>,
+  space_dims <span class="op">=</span> <span class="cn">NULL</span>,
   colOrder <span class="op">=</span> <span class="cn">FALSE</span>,
   phaseColours <span class="op">=</span> <span class="cn">NULL</span>,
   doSpiralPlot <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -121,6 +122,8 @@ or with high-frequency, are regions of attraction for the system.</p>
 <dd><p>Produce a profile plot of the extracted phases (default = <code>TRUE</code>)</p></dd>
 <dt>plotCentroid</dt>
 <dd><p>Plot the centroid requested in <code>returnCentroid</code>? (default = <code>FALSE</code>)</p></dd>
+<dt>space_dims</dt>
+<dd><p>A vector of titles to use for the dimensions. If <code>NULL</code> the values will be read from the attribute of <code>RN</code>.</p></dd>
 <dt>colOrder</dt>
 <dd><p>Should the order of the dimensions reflect the order of the columns in the dataset? If <code>FALSE</code> the order will be based on the values of the dimensions observed in the first extracted phase (default = <code>FALSE</code>)</p></dd>
 <dt>phaseColours</dt>

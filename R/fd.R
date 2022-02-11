@@ -383,7 +383,7 @@ fd_prepSeries <- function(y,
 
 
   # if(adjustSumOrder){
-  #   y       <- ts_sumorder(y_ori, scaleS = scaleS, polyOrder = polyOrder, minData = minData)
+  #   y       <- ts_sumorder(y_ori, scaleS = scaleS, polyOrder = polyOrder, dataMin = dataMin)
   #   Hadj    <- attr(y,"Hadj")
   #   Hglobal <- attr(y,"Hglobal.excl")
   # } else {
@@ -510,7 +510,7 @@ fd_sda <- function(y,
   # }
   #
   # if(adjustSumOrder){
-  #   y       <- ts_sumorder(y, scaleS = scaleS, polyOrder = polyOrder, minData = minData)
+  #   y       <- ts_sumorder(y, scaleS = scaleS, polyOrder = polyOrder, dataMin = dataMin)
   #   Hadj    <- attr(y,"Hadj")
   #   Hglobal <- attr(y,"Hglobal.excl")
   # } else {
@@ -520,7 +520,7 @@ fd_sda <- function(y,
 
   out <- SDA(y, front = FALSE)
 
-  fitRange <- which(lengths(lapply(out$scale, function(s){ts_slice(y,s)}))>=minData)
+  fitRange <- which(lengths(lapply(out$scale, function(s){ts_slice(y,s)}))>=dataMin)
 
   lmfit1        <- stats::lm(log(out$sd) ~ log(out$scale))
   lmfit2        <- stats::lm(log(out$sd[fitRange]) ~ log(out$scale[fitRange]))
@@ -782,7 +782,7 @@ fd_dfa <- function(y,
 #' @param scaleMax Maximum scale value (as `2^scale`) to use (default = `max` of `log2(nrows)` and `log2(ncols)`)
 #' @param scaleMin Minimium scale value (as `2^scale`) to use (default = `0`)
 #' @param scaleS If not `NA`, pass a numeric vector listing the scales (as a power of `2`) on which to evaluate the boxcount. Arguments `scaleMax`, `scaleMin`, and `scaleResolution` will be ignored (default = `NA`)
-#' @param minData Minimum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMin`)
+#' @param dataMin Minimum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMin`)
 #' @param maxData Maximum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMax`)
 #' @param doPlot Return the log-log scale versus bulk plot with linear fit (default = `TRUE`).
 #' @param returnPlot Return ggplot2 object (default = `FALSE`)
@@ -815,7 +815,7 @@ fd_boxcount2D <- function(y = NA,
                           scaleMin = 0,
                           scaleMax = floor(log2(NROW(y)*resolution)),
                           scaleS = NA,
-                          minData = 2^(scaleMin+1),
+                          dataMin = 2^(scaleMin+1),
                           maxData = 2^(scaleMax-1),
                           doPlot = FALSE,
                           returnPlot = FALSE,
@@ -842,7 +842,7 @@ fd_boxcount2D <- function(y = NA,
     }
 
     if(adjustSumOrder){
-      y       <- ts_sumorder(y, scaleS = 2^(4:floor(log2(NROW(y)/2))), polyOrder = polyOrder, minData = 4)
+      y       <- ts_sumorder(y, scaleS = 2^(4:floor(log2(NROW(y)/2))), polyOrder = polyOrder, dataMin = 4)
       Hadj    <- attr(y,"Hadj")
       Hglobal <- attr(y,"Hglobal.excl")
     } else {
@@ -943,7 +943,7 @@ fd_boxcount2D <- function(y = NA,
 
   lmfit1 <- stats::lm(-log(n)~log(r)) #lmfit1 <- mean(-diff(log(n))/diff(log(r)))
 
-  fitRange <- which(r%[]%c(minData,maxData))
+  fitRange <- which(r%[]%c(dataMin,maxData))
   lmfit2   <- stats::lm(-log(n[fitRange])~log(r[fitRange])) #mean(-diff(log(n[fitRange]))/diff(log(r[fitRange])))
 
   localFit <- -pracma::gradient(log(n))/pracma::gradient(log(r))
@@ -1861,7 +1861,7 @@ inf_MSE <- function(y,
                     scaleMax = floor(NROW(y)/10),
                     scaleS = NA,
                     overlap = 0,
-                    minData = 4,
+                    dataMin = 4,
                     relativeEntropy = FALSE,
                     doPlot = FALSE,
                     returnPlot = FALSE,

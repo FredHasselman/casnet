@@ -7,14 +7,14 @@
 
 #' Multiplex Recurrence Network
 #'
-#' @description This function will create a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: *Layer similarity* (`MRNweightedBy` is set to `"InterLayerMI"`, `"InterLayerCor"`, or `"EdgeOvelap"`) and *Layer importance* (not implemented yet). The former generates weighted MRN based on _Interlayer Mutual Information_, _Interlayer Correlation_, or _Edge Overlap_.
+#' @description This function will create a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: *Layer similarity* (`MRNweightedBy` is set to `"InterLayerMI"`, `"InterLayerCor"`, `"EdgeOvelap"`, or "`JRP`") and *Layer importance* (not implemented yet). The former generates weighted MRN based on _Interlayer Mutual Information_, _Interlayer Correlation_, _Edge Overlap_, _Joint Recurrence Rate_.
 #'
 #' @inheritParams ts_windower
 #' @inheritParams rn
 #' @param layers A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.
 #' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"InterLayerCor"` (pearson correlation between vertex degree or strength of each layer pair),  `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers), or `"JRP"` which will calculate a joint recurrence plot for each layer pair and add the value passed to `jrp_measure` as the measure of association (default = `InterLayerMI`)
 #' @param jrp_measure Which JRP measure should be used to asses layer similarity. Use a column name of the data frame output by [rp_measures] (default = `"RR"`)
-#' @param win The window size passed to [casnet::ts_windower()] in which to evaluate `"InterLayerMI"`, `"InterLayerCor"`, or `"EdgeOvelap"`. (default = `NA`).
+#' @param win The window size passed to [casnet::ts_windower()] in which to evaluate `"InterLayerMI"`, `"InterLayerCor"`, `"EdgeOvelap"`, or "`JRP`". (default = `NA`).
 #' @param step The stepsize for the sliding window (default = `NA`).
 #' @param overlap The window overlap passed to [casnet::ts_windower()] if `MRNweightedBy` is `"InterLayerMI"` or `"EdgeOvelap"`. The value of `step` will be ignored if `overlap` is not `NA`. (default = `NA`).
 #' @param doPlot Plot the multiplex recurrence network (default = `FALSE`).
@@ -54,8 +54,9 @@ mrn <- function(layers,
 
   rr_col <- c("emRad", "RP_max", "RR", "SING_N", "SING_rate", "RP_N", "DIV_dl", "REP_av", "N_dl", "N_dlp", "DET", "MEAN_dl", "MAX_dl", "ENT_dl", "ENTrel_dl", "CoV_dl","N_vl","N_vlp","LAM_vl","TT_vl","MAX_vl","ENT_vl","ENTrel_vl","CoV_vl","REP_vl","N_hlp","N_hl", "LAM_hl", "TT_hl", "MAX_hl", "ENT_hl", "ENTrel_hl", "CoV_hl", "REP_hl", "N_hvp", "N_hv", "LAM_hv", "TT_hv", "MAX_hv", "ENT_hv", "ENTrel_hv", "CoV_hv")
 
-  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
-
+  if(!silent){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+  }
   # if(!all(plyr::laply(layers,function(g) igraph::is.igraph(g)))){
   #   stop("All elements of the layers list have to be an igraph object!")
   # }
@@ -64,7 +65,7 @@ mrn <- function(layers,
     stop("In a Multiplex Recurrence Network, the layer networks must all have the same number of vertices!")
   }
 
-   Nsize <- igraph::vcount(layers[[1]])
+  Nsize <- igraph::vcount(layers[[1]])
 
   if(is.null(names(layers))){
     names(layers) <- paste0("layer",1:length(layers))
@@ -96,10 +97,10 @@ mrn <- function(layers,
       stop("The graphs in the list are directed, please set cumulative to TRUE or FALSE.")
     }
     if(cumulative){
-        mode <- "upper"
-      } else {
-        if(!silent){
-          warning("NOTE: Graphs in the list are directed, should cumulative bet set to TRUE?")
+      mode <- "upper"
+    } else {
+      if(!silent){
+        warning("NOTE: Graphs in the list are directed, should cumulative bet set to TRUE?")
       }
     } # Cumulative
   } else {
@@ -110,7 +111,9 @@ mrn <- function(layers,
 
   if(any(MRNweightedBy%in%c("InterLayerMI", "InterLayerCor", "EdgeOverlap", "JRP"))){
 
-    cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
+    if(!silent){
+      cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
+    }
 
     out_mi <- out_eo <- out_cr <- out_jrp <- out_means <- list()
 
@@ -126,45 +129,45 @@ mrn <- function(layers,
 
         if(combis[i,1]!=combis[i,2]){
 
-        i1 <-  which(!(1:igraph::vcount(layers[[combis[i,1]]])%in%(min(wIndexList[[w]]):max(wIndexList[[w]]))))
-        i2 <-  which(!(1:igraph::vcount(layers[[combis[i,2]]])%in%(min(wIndexList[[w]]):max(wIndexList[[w]]))))
+          i1 <-  which(!(1:igraph::vcount(layers[[combis[i,1]]])%in%(min(wIndexList[[w]]):max(wIndexList[[w]]))))
+          i2 <-  which(!(1:igraph::vcount(layers[[combis[i,2]]])%in%(min(wIndexList[[w]]):max(wIndexList[[w]]))))
 
-        ga <- igraph::delete.vertices(layers[[combis[i,1]]], i1)
-        gb <- igraph::delete.vertices(layers[[combis[i,2]]], i2)
+          ga <- igraph::delete.vertices(layers[[combis[i,1]]], i1)
+          gb <- igraph::delete.vertices(layers[[combis[i,2]]], i2)
 
-        # edgeFrame1 <- igraph::as_data_frame(layers[[combis[i,1]]],"edges")
-        # edgeFrame1 <- edgeFrame1 %>% filter(edgeFrame1$from%[]%range(wIndexList[[w]])&edgeFrame1$to%[]%range(wIndexList[[w]]))
-        # ga  <- graph_from_data_frame(edgeFrame1, directed = directed)
+          # edgeFrame1 <- igraph::as_data_frame(layers[[combis[i,1]]],"edges")
+          # edgeFrame1 <- edgeFrame1 %>% filter(edgeFrame1$from%[]%range(wIndexList[[w]])&edgeFrame1$to%[]%range(wIndexList[[w]]))
+          # ga  <- graph_from_data_frame(edgeFrame1, directed = directed)
 
-        # edgeFrame2 <- igraph::as_data_frame(layers[[combis[i,2]]],"edges")
-        # edgeFrame2 <- edgeFrame2 %>% filter(edgeFrame2$from%[]%range(wIndexList[[w]])&edgeFrame2$to%[]%range(wIndexList[[w]]))
-        # gb  <- graph_from_data_frame(edgeFrame2, directed = directed)
+          # edgeFrame2 <- igraph::as_data_frame(layers[[combis[i,2]]],"edges")
+          # edgeFrame2 <- edgeFrame2 %>% filter(edgeFrame2$from%[]%range(wIndexList[[w]])&edgeFrame2$to%[]%range(wIndexList[[w]]))
+          # gb  <- graph_from_data_frame(edgeFrame2, directed = directed)
 
-        if(any(igraph::ecount(ga)==0,igraph::ecount(gb)==0)){
+          if(any(igraph::ecount(ga)==0,igraph::ecount(gb)==0)){
 
-          mp[combis[i,1],combis[i,2]] <- 0
-          eo[combis[i,1],combis[i,2]] <- 0
-          cr[combis[i,1],combis[i,2]] <- 0
+            mp[combis[i,1],combis[i,2]] <- 0
+            eo[combis[i,1],combis[i,2]] <- 0
+            cr[combis[i,1],combis[i,2]] <- 0
 
-        } else {
-
-          mp[combis[i,1],combis[i,2]] <- mi_interlayer(ga,gb)
-          eo[combis[i,1],combis[i,2]] <- igraph::ecount(ga %s% gb) / (igraph::ecount(ga) + igraph::ecount(gb))
-
-          if(weighted){
-            # barrat
-            cr[combis[i,1],combis[i,2]] <- as.numeric(stats::cor(data.frame(igraph::strength(ga, loops = FALSE, mode = "total")/(igraph::vcount(ga)-1)),
-                                                                 data.frame(igraph::strength(gb, loops = FALSE, mode = "total")/(igraph::vcount(ga)-1))))
           } else {
-            cr[combis[i,1],combis[i,2]] <- as.numeric(stats::cor(data.frame(igraph::degree(ga, loops = FALSE)/(igraph::vcount(ga)-1)),
-                                                                 data.frame(igraph::degree(gb, loops = FALSE)/(igraph::vcount(ga)-1))))
+
+            mp[combis[i,1],combis[i,2]] <- mi_interlayer(ga,gb)
+            eo[combis[i,1],combis[i,2]] <- igraph::ecount(ga %s% gb) / (igraph::ecount(ga) + igraph::ecount(gb))
+
+            if(weighted){
+              # barrat
+              cr[combis[i,1],combis[i,2]] <- as.numeric(stats::cor(data.frame(igraph::strength(ga, loops = FALSE, mode = "total")/(igraph::vcount(ga)-1)),
+                                                                   data.frame(igraph::strength(gb, loops = FALSE, mode = "total")/(igraph::vcount(ga)-1))))
+            } else {
+              cr[combis[i,1],combis[i,2]] <- as.numeric(stats::cor(data.frame(igraph::degree(ga, loops = FALSE)/(igraph::vcount(ga)-1)),
+                                                                   data.frame(igraph::degree(gb, loops = FALSE)/(igraph::vcount(ga)-1))))
+            }
+
           }
 
-        }
+          #igraph::ecount(layers[[combis$X1[i]]] %s% layers[[combis$X2[i]]]) / (igraph::ecount(layers[[combis$X1[i]]]) + igraph::ecount(layers[[combis$X2[i]]]))
 
-        #igraph::ecount(layers[[combis$X1[i]]] %s% layers[[combis$X2[i]]]) / (igraph::ecount(layers[[combis$X1[i]]]) + igraph::ecount(layers[[combis$X2[i]]]))
-
-        if(MRNweightedBy%in%"JRP"){
+          if(MRNweightedBy%in%"JRP"){
             jrp1 <- igraph::as_adjacency_matrix(ga, type = "both", sparse = TRUE)
             jrp2 <- igraph::as_adjacency_matrix(gb, type = "both", sparse = TRUE)
 
@@ -182,17 +185,17 @@ mrn <- function(layers,
 
             } else {
 
-            jrp_out <- suppressMessages(rp_measures(jrp, theiler = 1))
-            rm(jrp)
+              jrp_out <- suppressMessages(rp_measures(jrp, theiler = 1))
+              rm(jrp)
 
-            if(jrp_measure %in% rr_col){
-              rr[combis[i,1],combis[i,2]] <- jrp_out[1,jrp_measure%ci%jrp_out]
-            } else {
-              stop("Argument 'jrp_measure' has to be a column name of the data frame returned by 'rp_measures()'")
+              if(jrp_measure %in% rr_col){
+                rr[combis[i,1],combis[i,2]] <- jrp_out[1,jrp_measure%ci%jrp_out]
+              } else {
+                stop("Argument 'jrp_measure' has to be a column name of the data frame returned by 'rp_measures()'")
+              }
             }
-          }
-        } # JRP
-        rm(ga,gb)
+          } # JRP
+          rm(ga,gb)
 
         } else {
 
@@ -204,7 +207,6 @@ mrn <- function(layers,
             rr[combis[i,1],combis[i,2]] <- NA
           }
         }
-
       } # combis
 
       mi_ave   <- mean(mp[mp>=0], na.rm = TRUE)
@@ -261,30 +263,38 @@ mrn <- function(layers,
     }
 
   } else {
-      stop("Not implemented yet!")
+    stop("Not implemented yet!")
   }
 
   out <- list(interlayerMI  = out_mi,
-       edgeOverlap   = out_eo,
-       interlayerCor = out_cr,
-       jointRP       = out_jrp,
-       meanValues    = out_means,
-       Nsize         = Nsize)[c(MRNweightedBy%in%"InterLayerMI",MRNweightedBy%in%"InterLayerCor",MRNweightedBy%in%"EdgeOverlap",MRNweightedBy%in%"JRP",TRUE,TRUE)]
+              interlayerCor = out_cr,
+              edgeOverlap   = out_eo,
+              jointRP       = out_jrp,
+              meanValues    = out_means,
+              Nsize         = Nsize)[c(MRNweightedBy%in%"InterLayerMI",
+                                       MRNweightedBy%in%"InterLayerCor",
+                                       MRNweightedBy%in%"EdgeOverlap",
+                                       MRNweightedBy%in%"JRP",
+                                       TRUE,
+                                       TRUE)]
 
+  attr(out,"time") <- attr(wIndexList,"time")
+  attr(out, "MRNweightedBy") <- MRNweightedBy
 
   if(doPlot){
-    mrn_plot(MRN = out)
+    mrn_plot(layers = layers, MRN = out)
   }
 
-
-  cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+  if(!silent){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+  }
 
   return(out)
 }
 
 
 
-#' Mutliplex Recurrence Network Plot
+#' Multiplex Recurrence Network Plot
 #'
 #' @description This function will plot a Multiplex Recurrence Network from a list of [igraph] objects that can be considered the layers of a network. or based on the output of function [mrn()]. The layers must have the same number of nodes.
 #'
@@ -295,7 +305,7 @@ mrn <- function(layers,
 #' @param MRNweightedBy The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: `"InterLayerMI"` (Mutual information based on similarity of the vertex degree across layers), `"EdgeOverlap"` (proportion of vertices sharing the same edges across layers). Choosing `"InterLayerMI"` or `"EdgeOverlap"` will decide which measure is displayed in the plot of the Multiplex RN, both measures will always be returned in the numerical output.
 #' @param doPlot Plot the multiplex recurrence network (default = `TRUE`).
 #' @param doSave Save the plots.
-#' @param coords A data frame with layout coordinastes generated by calling any of the [igraph] layout functions. If `NA` a circle layout will; be generated (default = `NA`)
+#' @param coords A data frame with layout coordinates generated by calling any of the [igraph] layout functions. If `NA` a circle layout will; be generated (default = `NA`)
 #' @param RNnodes Should the vertices of the MRN represent a plot of the RN of the layers? This is recommended only for a small numbers of vertices. (default = `FALSE``)
 #' @param vertexSizeBy A valid [igraph] function that calculates node based measures, or a numeric constant. (default = `"degree"`)
 #' @param vertexColour A vector of colours for the vertices. If this is a named list, names will be displayed in the legend.
@@ -349,6 +359,7 @@ mrn_plot     <- function(layers = NA,
                          alphaE = .5,
                          showEdgeColourLegend = FALSE,
                          curvature = -0.2,
+                         title = "",
                          createAnimation = FALSE,
                          useImageMagick = FALSE,
                          loopAnimation = TRUE,
@@ -391,8 +402,10 @@ mrn_plot     <- function(layers = NA,
 
   } else {
     if(all(names(MRN)%in%c("interlayerMI","edgeOverlap","meanValues","Nsize"))){
-      cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
-      cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
+      if(!silent){
+       cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+       cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
+      }
     } else {
       stop("MRN is not an object output by function mrn()")
     }
@@ -594,11 +607,15 @@ mrn_plot     <- function(layers = NA,
           gg <- gg +
             scale_size_binned(range = scaleVertexSize) +
             scale_colour_manual(paste("Weighted by",MRNweightedBy), values = edgeCols) +
-            labs(title = names(MRNlist)[w]) +
             coord_cartesian(clip="off") +
             theme_void() + theme(plot.margin = margin(50,50,50,50, unit = "pt"),
                                  legend.margin = margin(l = 20, unit = "pt"),
                                  plot.title = element_text(margin = margin(b=20)))
+          if(nchar(title)>0){
+            gg <- gg + labs(title = title)
+          } else {
+           gg <- gg + labs(title = names(MRNlist)[w])
+          }
 
           if(showVertexLegend){
             if(RNnodes){
@@ -723,25 +740,27 @@ mrn_plot     <- function(layers = NA,
                                  animation = gg, path = file.path(imageDir))
           }
 
-          return(list(MRN              = MRNlist,
+          return(invisible(list(MRN              = MRNlist,
                       MRNanimationData = gList,
                       MRNanimationGG   = invisible(gg),
                       interlayerMI  =  MRN$interlayerMI,
                       edgeOverlap   =  MRN$edgeOverlap,
-                      meanValues    =  MRN$out_means))
+                      meanValues    =  MRN$out_means)))
         }
       }
 
     } else { #doPlot
-      return(MRN)
+      return(invisible(MRN))
     }
 
   } else {    # NOT mi_interlayer
-
+    if(!silent){
     cat(paste("\nWelcome to the multiplex... in layer importance mode!\n\n"))
     cat(paste("\n\nNOT IMPLEMENTED\n\n"))
-  } # rankDC
+   # rankDC
   cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+    }
+  }
 }
 
 

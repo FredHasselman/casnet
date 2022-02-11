@@ -4,7 +4,7 @@
 \alias{ts_sumorder}
 \title{Adjust time series by summation order}
 \usage{
-ts_sumorder(y, scaleS = NULL, polyOrder = 1, minData = 4)
+ts_sumorder(y, scaleS = NULL, polyOrder = 1, dataMin = 4)
 }
 \arguments{
 \item{y}{A time series of numeric vector}
@@ -13,7 +13,7 @@ ts_sumorder(y, scaleS = NULL, polyOrder = 1, minData = 4)
 
 \item{polyOrder}{Order of polynomial for detrending in DFA (default = \code{1})}
 
-\item{minData}{Minimum number of data points in a bin needed to calculate detrended fluctuation}
+\item{dataMin}{Minimum number of data points in a bin needed to calculate detrended fluctuation}
 }
 \value{
 The input vector, possibly adjusted based on \code{H} with an attribute \code{"Hadj"} containing an integer by which a Hurst exponent calculated from the series should be adjusted.

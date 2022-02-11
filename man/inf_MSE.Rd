@@ -21,7 +21,7 @@ inf_MSE(
   scaleMax = floor(NROW(y)/10),
   scaleS = NA,
   overlap = 0,
-  minData = 4,
+  dataMin = 4,
   relativeEntropy = FALSE,
   doPlot = FALSE,
   returnPlot = FALSE,

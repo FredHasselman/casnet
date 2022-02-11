@@ -953,7 +953,7 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
 #' @param y A time series of numeric vector
 #' @param scaleS The scales to consider for `DFA1`
 #' @param polyOrder Order of polynomial for detrending in DFA (default = `1`)
-#' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
+#' @param dataMin Minimum number of data points in a bin needed to calculate detrended fluctuation
 #'
 #' @return The input vector, possibly adjusted based on `H` with an attribute `"Hadj"` containing an integer by which a Hurst exponent calculated from the series should be adjusted.
 #'
@@ -971,7 +971,7 @@ ts_diff <- function(y, order= 1, addColumns = TRUE, keepDerivatives = FALSE, mas
 #'
 #' @export
 #'
-ts_sumorder <- function(y, scaleS = NULL, polyOrder = 1, minData = 4){
+ts_sumorder <- function(y, scaleS = NULL, polyOrder = 1, dataMin = 4){
 
   if(is.null(scaleS)){
     scaleS <- unique(round(2^(seq(2, floor(log2(NROW(y)/2)), by=((floor(log2(NROW(y)/2))-2)/30)))))
@@ -982,7 +982,7 @@ ts_sumorder <- function(y, scaleS = NULL, polyOrder = 1, minData = 4){
   Hglobal  <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder, returnPLAW = TRUE, returnSegments = TRUE)
   rm(TSm)
 
-  fitRange <- which(lapply(Hglobal$segments,NROW)>=minData)
+  fitRange <- which(lapply(Hglobal$segments,NROW)>=dataMin)
 
   lmfit1        <- stats::lm(Hglobal$PLAW$bulk ~ Hglobal$PLAW$size.log2, na.action=stats::na.omit)
   H1  <- lmfit1$coefficients[2]

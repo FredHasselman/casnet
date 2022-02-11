@@ -59,7 +59,11 @@ The following examples will use the native `casnet` functions, see the paragraph
 The first part of this vignette will demonstrate the basics of recurrence quantification using unordered categorical data. The second part will discuss RQA for [continuous data](#lvSystem). This will be a bit more formal with respect to defining the recurrence matrix and how to calculate the various RQA measures.
 
 
-Please see the chapters on RQA the Complex Systems Approach book for more details: https://complexity-methods.github.io 
+Please see the chapters on RQA the Complex Systems Approach book for more details: 
+
+[RQA on unordered categorical data](https://complexity-methods.github.io/book/auto-rqa-categorical-data.html)
+
+[RQA on continuous data](https://complexity-methods.github.io/book/auto-rqa-continuous-data.html)
 
 
 # An R interface to Marwan's commandline recurrence plots {#marwan}

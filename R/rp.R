@@ -962,7 +962,7 @@ rp_diagProfile <- function(RM,
     out[[r]] <- df
     #rm(df,B,cID,diagID)
 
-    cat(paste("\nProfile"),r)
+    cat(paste("Profile"),r,"\n")
   }
 
   dy      <- plyr::ldply(out)
@@ -1935,7 +1935,7 @@ rp_lineDist <- function(RM,
                         VLmax = length(Matrix::diag(RM))-1,
                         HLmax = length(Matrix::diag(RM))-1,
                         d         = NULL,
-                        theiler   = NULL,
+                        theiler   = NA,
                         invert    = FALSE,
                         AUTO      = NULL,
                         chromatic = FALSE,
@@ -1972,6 +1972,17 @@ rp_lineDist <- function(RM,
   H <- Matrix::as.matrix(RPt)[,colSums(Matrix::as.matrix(RPt))>0]
   rm(RPt)
 
+  if(NCOL(B)==0|is.null(dim(B))){
+
+    B <- matrix(0)
+  }
+  if(NCOL(V)==0|is.null(dim(V))){
+    V <- matrix(0)
+  }
+  if(NCOL(H)==0|is.null(dim(H))){
+    H <- matrix(0)
+  }
+
   # Get diagonal lines & pad with zeros
   diagonals   <- rbind.data.frame(rep(0,dim(B)[2]),
                                   B,
@@ -1979,18 +1990,16 @@ rp_lineDist <- function(RM,
   )
 
   # get nonzero vertical Lines & pad with zeros
-  verticals <- rbind.data.frame(rep(0,dim(V)[2]),
+  verticals <- rbind.data.frame(rep(x = 0, times = dim(V)[2]),
                                 V,
-                                rep(0,dim(V)[2])
+                                rep(x= 0, times = dim(V)[2])
   )
-  colnames(verticals) <- paste(1:ncol(verticals))
 
   # get nonzero horizontal Lines & pad with zeros
   horizontals <- rbind.data.frame(rep(0,dim(H)[2]),
                                   H,
                                   rep(0,dim(H)[2])
   )
-  colnames(horizontals) <- paste(1:ncol(horizontals))
 
   # Get indices of line lengths
   diagonals.ind   <- tidyr::gather(diagonals,   key = "diagonal",   value = "segment")
@@ -3331,7 +3340,7 @@ rp_calc_lineMeasures <- function(RM,
                                  VLmax = length(Matrix::diag(RM)),
                                  HLmax = length(Matrix::diag(RM)),
                                  d         = NULL,
-                                 theiler   = NULL,
+                                 theiler   = NA,
                                  invert    = FALSE,
                                  AUTO      = NULL,
                                  chromatic = FALSE,
@@ -3362,6 +3371,7 @@ rp_calc_lineMeasures <- function(RM,
   freqvec_vl <- as.numeric(names(freq_vl))
   freqvec_hl <- as.numeric(names(freq_hl))
   freqvec_hv <- as.numeric(names(freq_hv))
+
 
   # Number of lines
   N_dl <- sum(freq_dl, na.rm = TRUE)%00%0
@@ -3419,6 +3429,7 @@ rp_calc_lineMeasures <- function(RM,
   #Coefficient of determination
   CoV_dl = stats::sd(dlines)/mean(dlines)
   CoV_vl = stats::sd(vlines)/mean(vlines)
+
   CoV_hl = stats::sd(hlines)/mean(hlines)
   CoV_hv = stats::sd(c(hlines,vlines))/mean(c(hlines,vlines))
 

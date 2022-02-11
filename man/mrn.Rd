@@ -24,7 +24,7 @@ mrn(
 
 \item{jrp_measure}{Which JRP measure should be used to asses layer similarity. Use a column name of the data frame output by \link{rp_measures} (default = \code{"RR"})}
 
-\item{win}{The window size passed to \code{\link[=ts_windower]{ts_windower()}} in which to evaluate \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}. (default = \code{NA}).}
+\item{win}{The window size passed to \code{\link[=ts_windower]{ts_windower()}} in which to evaluate \code{"InterLayerMI"}, \code{"InterLayerCor"}, \code{"EdgeOvelap"}, or "\code{JRP}". (default = \code{NA}).}
 
 \item{step}{The stepsize for the sliding window (default = \code{NA}).}
 
@@ -49,7 +49,7 @@ A list object with a (windowed) Multiplex Recurrence Matrix based on \code{MRNwe
 }
 }
 \description{
-This function will create a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{MRNweightedBy} is set to \code{"InterLayerMI"}, \code{"InterLayerCor"}, or \code{"EdgeOvelap"}) and \emph{Layer importance} (not implemented yet). The former generates weighted MRN based on \emph{Interlayer Mutual Information}, \emph{Interlayer Correlation}, or \emph{Edge Overlap}.
+This function will create a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{MRNweightedBy} is set to \code{"InterLayerMI"}, \code{"InterLayerCor"}, \code{"EdgeOvelap"}, or "\code{JRP}") and \emph{Layer importance} (not implemented yet). The former generates weighted MRN based on \emph{Interlayer Mutual Information}, \emph{Interlayer Correlation}, \emph{Edge Overlap}, \emph{Joint Recurrence Rate}.
 }
 \examples{
 

@@ -16,6 +16,7 @@ rn_phases(
   returnGraph = FALSE,
   doPhaseProfilePlot = FALSE,
   plotCentroid = FALSE,
+  space_dims = NULL,
   colOrder = FALSE,
   phaseColours = NULL,
   doSpiralPlot = FALSE,
@@ -49,6 +50,8 @@ rn_phases(
 \item{doPhaseProfilePlot}{Produce a profile plot of the extracted phases (default = \code{TRUE})}
 
 \item{plotCentroid}{Plot the centroid requested in \code{returnCentroid}? (default = \code{FALSE})}
+
+\item{space_dims}{A vector of titles to use for the dimensions. If \code{NULL} the values will be read from the attribute of \code{RN}.}
 
 \item{colOrder}{Should the order of the dimensions reflect the order of the columns in the dataset? If \code{FALSE} the order will be based on the values of the dimensions observed in the first extracted phase (default = \code{FALSE})}
 
