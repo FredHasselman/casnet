@@ -373,24 +373,10 @@ dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVar
     for (i in (1:(length(tsy)-(win-1)))){
       x <- tsy[i:(i+win-1)]
       x <- sort(x)
-      r=0
-      g=0
-      for (e in (1:(win-1))){
-        for (d in ((e+1):win)){
-          for (a in (e:(d-1))){
-            for (b in (((a+1):d))){
-              h <- Heaviside((y[b]-y[a])-(x[b]-x[a]))
-              if(h==1){
-                r <- r + (((y[b]-y[a]) - (x[b]-x[a])))
-                g <- g + (y[b]-y[a])
-              } else {
-                r <- r
-                g <- g + (y[b]-y[a])
-              }
-            }
-          }
-        }
-      }
+
+      v_temp <- edab(win, x, y)
+      r <- v_temp["r"]
+      g <- v_temp["g"]
       ew_data_D[(i+win-1),(column)] <- 1-(r/g)
     }
   }
