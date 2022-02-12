@@ -34,7 +34,8 @@ Imports:
     tseries,
     rlang (>= 0.1.2),
     methods,
-    splus2R
+    splus2R,
+    Rcpp
 Suggests: 
     xts,
     zoo,
@@ -73,3 +74,5 @@ Suggests:
 Language: en-US
 URL: https://github.com/FredHasselman/casnet
 BugReports: https://github.com/FredHasselman/casnet/issues
+LinkingTo: 
+    Rcpp
