@@ -13,7 +13,7 @@ rp_lineDist(
   VLmax = length(Matrix::diag(RM)) - 1,
   HLmax = length(Matrix::diag(RM)) - 1,
   d = NULL,
-  theiler = NULL,
+  theiler = NA,
   invert = FALSE,
   AUTO = NULL,
   chromatic = FALSE,

@@ -36,7 +36,7 @@ ts_levels(
 \item{doTreePlot}{Should a plot of the decision tree be produced. This requires package \href{https://cran.r-project.org/web/packages/partykit/index.html}{partykit} (default = \code{FALSE})}
 }
 \value{
-A list object with fields \code{tree} and \code{pred}. The latter is a data frame with columns \code{x} (time), \code{y} (the variable of interest) and \code{p} the predicted levels in \code{y}.
+A list object with fields \code{tree} and \code{pred}. The latter is a data frame with columns \code{x} (time), \code{y} (the variable of interest) and \code{p} the predicted levels in \code{y} and \code{p_adj}, the levels in \code{p} but adjusted for the value passed to \code{minChange}.
 }
 \description{
 Use recursive partitioning function \code{\link[rpart:rpart]{rpart::rpart()}} to perform a 'classification' of relatively stable levels in a timeseries.

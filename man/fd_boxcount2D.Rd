@@ -16,7 +16,7 @@ fd_boxcount2D(
   scaleMin = 0,
   scaleMax = floor(log2(NROW(y) * resolution)),
   scaleS = NA,
-  minData = 2^(scaleMin + 1),
+  dataMin = 2^(scaleMin + 1),
   maxData = 2^(scaleMax - 1),
   doPlot = FALSE,
   returnPlot = FALSE,
@@ -51,7 +51,7 @@ fd_boxcount2D(
 
 \item{scaleS}{If not \code{NA}, pass a numeric vector listing the scales (as a power of \code{2}) on which to evaluate the boxcount. Arguments \code{scaleMax}, \code{scaleMin}, and \code{scaleResolution} will be ignored (default = \code{NA})}
 
-\item{minData}{Minimum number of time/data points inside a box for it to be included in the slope estimation (default = \code{2^scaleMin})}
+\item{dataMin}{Minimum number of time/data points inside a box for it to be included in the slope estimation (default = \code{2^scaleMin})}
 
 \item{maxData}{Maximum number of time/data points inside a box for it to be included in the slope estimation (default = \code{2^scaleMax})}
 

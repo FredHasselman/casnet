@@ -4,12 +4,14 @@
 \alias{ts_slice}
 \title{Slice a Matrix}
 \usage{
-ts_slice(y, epochSz = 4)
+ts_slice(y, epochSz = 4, overlap = NA, removeUnequal = FALSE)
 }
 \arguments{
 \item{y}{A matrix with timeseries as columns}
 
 \item{epochSz}{Epoch size}
+
+\item{removeUnequal}{Do not return bins whose length is not equal to \code{epochSz} (default = \code{FALSE})}
 }
 \value{
 A list with epochs

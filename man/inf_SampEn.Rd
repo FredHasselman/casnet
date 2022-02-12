@@ -30,19 +30,19 @@ inf_SampEn(
 
 \item{fs}{Sample rate}
 
-\item{standardise}{Standardise by the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
+\item{standardise}{Standardise the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
 \item{transformBefore}{Detrend/standardise before coarse graining. If set to \code{FALSE}, each coarsegrained series will be detrended/standardised separately (default = \code{TRUE})}
 
-\item{removeTrend}{Method to use for detrending (default = "poly")}
+\item{removeTrend}{Method to use for global detrending (default = \code{"poly"})}
 
-\item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
+\item{polyOrder}{Order of global polynomial trend to remove if \code{removeTrend = "poly"}. If \code{removeTrend = "adaptive"} polynomials \code{1} to \code{polyOrder} will be evaluated and the best fitting curve (R squared) will be removed (default = \code{1})}
 
 \item{relativeEntropy}{The relative entropy, SampEn / (-1 * log(1/length(y))) will be returned (default = \code{FALSE})}
 
-\item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
+\item{returnInfo}{Return all the data used in SDA (default = \code{FALSE})}
 
-\item{silent}{Silent-ish mode}
+\item{silent}{Silent-ish mode (default = \code{FALSE})}
 }
 \value{
 The sample entropy (SampEn) of the time series y.

@@ -6,40 +6,63 @@
 \usage{
 fd_mfdfa(
   y,
-  qq = c(-10, -5:5, 10),
   fs = NULL,
   removeTrend = c("no", "poly", "adaptive", "bridge")[2],
   polyOrder = 1,
-  standardise = c("none", "mean.sd", "median.mad")[2],
+  standardise = c("none", "mean.sd", "median.mad")[1],
   adjustSumOrder = FALSE,
-  scaleMin = 2,
-  scaleMax = floor(log2(NROW(y)/2)),
-  scaleResolution = (scaleMax - scaleMin),
-  m = 1
+  removeTrendSegment = c("no", "poly", "adaptive", "bridge")[2],
+  polyOrderSegment = 1,
+  scaleMin = 16,
+  scaleMax = stats::nextn(floor(NROW(y)/4), factors = 2),
+  scaleResolution = round(log2(scaleMax - scaleMin)),
+  dataMin = NA,
+  scaleS = NA,
+  overlap = NA,
+  qq = seq(-5, 5, length.out = 101),
+  doPlot = FALSE,
+  returnPlot = FALSE,
+  returnInfo = FALSE,
+  silent = FALSE
 )
 }
 \arguments{
-\item{y}{An input signal.}
-
-\item{qq}{A vector containing a range of values for the order of fluctuation \code{q}.}
+\item{y}{A numeric vector or time series object.}
 
 \item{fs}{Sample rate}
 
-\item{removeTrend}{Method to use for detrending (default = "poly")}
+\item{removeTrend}{Method to use for global detrending (default = \code{"poly"})}
 
-\item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
+\item{polyOrder}{Order of global polynomial trend to remove if \code{removeTrend = "poly"}. If \code{removeTrend = "adaptive"} polynomials \code{1} to \code{polyOrder} will be evaluated and the best fitting curve (R squared) will be removed (default = \code{1})}
 
-\item{standardise}{Standardise by the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
+\item{standardise}{Standardise the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
-\item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
+\item{adjustSumOrder}{Adjust the time series (summation or difference), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
 
-\item{scaleMin}{Minimium scale (as a power of 2) to use}
+\item{removeTrendSegment}{Method to use for detrending in the bins (default = \code{"poly"})}
 
-\item{scaleMax}{Maximum scale (as a power of 2) to use}
+\item{polyOrderSegment}{The DFA order, the order of polynomial trend to remove from the bin if \code{removeTrendSegment = "poly"}. If \code{removeTrendSegment = "adaptive"} polynomials \code{1} to \code{polyOrder} will be evaluated and the best fitting polynomial (R squared) will be removed (default = \code{1})}
 
-\item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculatd as: \code{(scaleMax-scaleMin)/scaleResolution}. The default value yields no resolution of scales: \code{(scaleMax-scaleMin)}. Common values}
+\item{scaleMin}{Minimum scale (in data points) to use for log-log regression (default = \code{4})}
 
-\item{m}{m}
+\item{scaleMax}{Maximum scale (in data points) to use for log-log regression. This value will be ignored if \code{dataMin} is not \code{NA} (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
+
+\item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculated as: \code{seq(scaleMin, scaleMax, length.out = scaleResolution)} (default =  \code{round(log2(scaleMax-scaleMin))}).
+#' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if \code{length(y) = 1024} and \code{dataMin = 4}, the maximum scale used to calculate the slope will be \code{1024 / 4 = 256}. This value will take precedence over the \code{scaleMax} (default = \code{NA})}
+
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
+
+\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
+
+\item{qq}{A vector containing a range of values for the order of fluctuation \code{q} (default = \code{seq(-5, 5,length.out=101)})}
+
+\item{doPlot}{Output the log-log scale versus fluctuation plot with linear fit by calling function \code{plotFD_loglog()} (default = \code{TRUE})}
+
+\item{returnPlot}{Return ggplot2 object (default = \code{FALSE})}
+
+\item{returnInfo}{Return all the data used in SDA (default = \code{FALSE})}
+
+\item{silent}{Silent-ish mode (default = \code{FALSE})}
 }
 \value{
 A dataframe with values of \code{q},\code{H(q)}, \code{t(q)}, \code{h(q)}, `D(q)``
@@ -50,14 +73,17 @@ Multi-fractal Detrended Fluctuation Analysis
 \examples{
 
 set.seed(33)
-df <- fd_mfdfa(rnorm(4096))
 
-op <- par(mfrow=c(2,2))
-plot(df$q, df$Hq, type="l")
-plot(df$q, df$tq, type="l")
-plot(df$q, df$Dq, type="l")
-plot(df$hq,df$Dq, type="l")
-par(op)
+# White noise
+fd_mfdfa(rnorm(4096), doPlot = TRUE)
+
+# Pink noise
+fd_mfdfa(noise_powerlaw(N=4096), doPlot = TRUE)
+
+# 'multi' fractal
+N <- 2048
+y <- rowSums(data.frame(elascer(noise_powerlaw(N=N, alpha = -2)), elascer(noise_powerlaw(N=N, alpha = -.5))*c(rep(.2,512),rep(.5,512),rep(.7,512),rep(1,512))))
+fd_mfdfa(y=y, doPlot = TRUE)
 
 }
 \seealso{

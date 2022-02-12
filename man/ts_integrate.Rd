@@ -10,7 +10,7 @@ ts_integrate(y)
 \item{y}{A 1D timeseries}
 }
 \value{
-The profile
+The profile calculated as \code{cumsum(y[-length(y)]*diff(t))}, with \code{t} as \code{stats::time(y)}
 }
 \description{
 Create a timeseries profile

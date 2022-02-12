@@ -96,13 +96,15 @@ est_radius <- function(RM = NULL,
     seqIter   <- 1:maxIter
     stopRadius <- NA
     RP_N <- NA
+    tollo <- targetValue-tol #(1-tol),
+    tolhi <- targetValue+tol #(tol+1),
 
     iterList <- data.frame(iter        = seqIter,
                            Measure     = Measure,
                            Radius      = tryRadius,
                            targetValue = targetValue,
-                           tollo       = targetValue*(1-tol),
-                           tolhi       = targetValue*(tol+1),
+                           tollo       = tollo, #(1-tol),
+                           tolhi       = tolhi, #(tol+1),
                            startRadius = startRadius,
                            stopRadius  = stopRadius,
                            rp.size     = rp.size,
@@ -111,7 +113,7 @@ est_radius <- function(RM = NULL,
                            Converged   = Converged, check.names = FALSE)
 
     exitIter <- FALSE
-    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue, "for", targetMeasure,"\n"))}
+    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"±",tol,"for", targetMeasure,"\n"))}
 
     # p <- dplyr::progress_estimated(maxIter)
     while(!exitIter){
@@ -143,8 +145,8 @@ est_radius <- function(RM = NULL,
                                              Measure     = Measure,
                                              Radius      = tryRadius,
                                              targetValue = targetValue,
-                                             tollo       = targetValue*(1-tol),
-                                             tolhi       = targetValue*(tol+1),
+                                             tollo       = tollo, #(1-tol),
+                                             tolhi       = tolhi, #(tol+1),
                                              startRadius = startRadius,
                                              stopRadius  = stopRadius,
                                              rp.size     = rp.size,
@@ -152,8 +154,8 @@ est_radius <- function(RM = NULL,
                                              AUTO        = AUTO,
                                              Converged   = Converged)
 
-      if(any(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1)),(iter>=maxIter))){
-        if(Measure%[]%c(targetValue*(1-tol),targetValue*(tol+1))){
+      if(any(Measure%[]%c(tollo,tolhi),(iter>=maxIter))){
+        if(Measure%[]%c(tollo,tolhi)){
           Converged <- TRUE
           if(!silent){
             message("\nConverged! Found an appropriate radius...")
@@ -177,7 +179,7 @@ est_radius <- function(RM = NULL,
       iterList$stopRadius[iter] <- tryRadius
       #iterlist$Measure[iter] <- Measure
     }
-    if(Measure %][% c(targetValue*(1-tol),targetValue*(tol+1))){
+    if(Measure %][% c(tollo,tolhi)){
       iterList$Radius[iter] <- dplyr::case_when(
         radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
         radiusOnFail%in%"huge" ~ 1 + max(RM),
@@ -430,7 +432,7 @@ est_parameters <- function(y,
   if(!is.na(maxDim%00%NA)&!is.na(maxLag%00%NA)){
     if((NROW(y)-(maxDim*maxLag))<minVecLength){
       maxDim <- (1:maxDim)[max(which(NROW(y)-(1:maxDim*maxLag)>=minVecLength), na.rm = TRUE)]
-      message(paste("Changed value of maxDim to",maxDim))
+      message(paste("Changed value of maxDim to",maxDim,"\n"))
     }
   }
 
@@ -454,7 +456,10 @@ est_parameters <- function(y,
     for(m in seq_along(emLags$selection.methods)){
       if(emLags$selection.methods[m]%in%"first.minimum"){
         if(length(doLags)>2){
-          emLags$lag[m] <- which(ts_symbolic(data.frame(mi))%in%"trough")[1]%00%NA
+          emLags$lag[m] <- which(attributes(ts_symbolic(data.frame(mi)))$mi_sym_label%in%"trough")[1]%00%NA
+          if(is.na(emLags$lag[m])){
+            emLags$lag[m] <- as.numeric(which.min(mi))
+          }
         } else {
           warning("Only 2 lags to evaluate, setting 'first.minimum' to 1.")
           emLags$lag[m] <- 1
@@ -497,9 +502,9 @@ est_parameters <- function(y,
     #for(N in seq_along(nnSize)){
       for(R in seq_along(nnRadius)){
         for(L in seq_along(emLags$selection.method)){
-
+          cnt = cnt+1
           if(!is.na(emLags$lag[L])){
-            cnt = cnt+1
+            #cnt = cnt+1
 
             Nn.max <- Nn.mean <- Nn.sd <- Nn.min <- numeric(maxDim)
             for(D in seq_along(emDims)){
@@ -522,29 +527,39 @@ est_parameters <- function(y,
                              radius = nnRadius[R],
                              number.boxes = number.boxes)
 
-            # fnnSeries <- fractal::FNN(x = as.numeric(y),
-            #                           dimension = maxDim,
-            #                           tlag = emLags$lag[L],
-            #                           rtol = nnRadius[R],
-            #                           atol = nnSize,
-            #                           olag = 1
-            # )
+            lagList[[cnt]] <- data.frame(Nn.pct = fnnSeries[,1]/fnnSeries[1,1]*100,
+                                         Nsize = nnSize,
+                                         Nradius = nnRadius[R],
+                                         emLag.method = emLags$selection.method[[L]],
+                                         emLag = emLags$lag[L],
+                                         emDim = emDims,
+                                         Nn.mean = Nn.mean,
+                                         Nn.sd  = Nn.sd,
+                                         Nn.min = Nn.min,
+                                         Nn.max = Nn.max)
+
+
+
+          } else {
+
+            lagList[[cnt]] <- data.frame(Nn.pct = NA,
+                                         Nsize = nnSize,
+                                         Nradius = nnRadius[R],
+                                         emLag.method = emLags$selection.method[[L]],
+                                         emLag = emLags$lag[L],
+                                         emDim = emDims,
+                                         Nn.mean = NA,
+                                         Nn.sd  = NA,
+                                         Nn.min = NA,
+                                         Nn.max = NA)
+
           }
 
           #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSize*sd(y))
           #Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
           #   if(D==1){Nn.max <- Nn}
 
-          lagList[[cnt]] <- data.frame(Nn.pct = fnnSeries[,1]/fnnSeries[1,1]*100,
-                                       Nsize = nnSize,
-                                       Nradius = nnRadius[R],
-                                       emLag.method = emLags$selection.method[[L]],
-                                       emLag = emLags$lag[L],
-                                       emDim = emDims,
-                                       Nn.mean = Nn.mean,
-                                       Nn.sd  = Nn.sd,
-                                       Nn.min = Nn.min,
-                                       Nn.max = Nn.max)
+
         } #R
       } #L
    # } #N

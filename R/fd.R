@@ -154,8 +154,9 @@ fd_RR <- function(y){
 #'
 fd_psd <- function(y,
                    fs = NULL,
-                   standardise = TRUE,
-                   detrend = TRUE,
+                   removeTrend = c("no","poly","adaptive","bridge")[2],
+                   polyOrder=1,
+                   standardise = c("none","mean.sd","median.mad")[2],
                    fitMethod = c("lowest25","Wijnants","Hurvich-Deo")[3],
                    doPlot = FALSE,
                    returnPlot = FALSE,
@@ -165,21 +166,26 @@ fd_psd <- function(y,
                    noTitle = FALSE,
                    tsName="y"){
 
-  if(!stats::is.ts(y)){
-    if(is.null(fs)){fs <- 1}
-    y <- stats::ts(y, frequency = fs)
-    if(!silent){cat("\n\nfd_psd:\tSample rate was set to 1.\n\n")}
-  }
 
-  N <- length(y)
-  # Simple linear detrending.
-  if(detrend){
-    y <- stats::ts(ts_detrend(as.vector(y)), frequency = fs)
-  }
-  # standardise using N instead of N-1.
-  if(standardise){
-    y <- stats::ts(ts_standardise(y,adjustN=FALSE), frequency = fs)
-  }
+  y <- fd_prepSeries(y = y,
+                     fs = fs,
+                     removeTrend = removeTrend,
+                     polyOrder = polyOrder,
+                     standardise = standardise,
+                     adjustSumOrder = FALSE,
+                     scaleMin = NA,
+                     scaleMax = NA,
+                     scaleResolution = NA,
+                     dataMin = NA,
+                     scaleS = NULL,
+                     overlap = NA,
+                     silent = silent
+  )
+
+  scaleS  <- attr(y, "scaleS")
+  dataMin <- attr(y, "dataMin")
+
+  N <- NROW(y)
 
   # Number of frequencies estimated cannot be set! (defaults to Nyquist)
   # Use Tukey window: cosine taper with r = 0.5
@@ -288,29 +294,136 @@ fd_psd <- function(y,
 }
 
 
+#' Prepare time series for fluctuation analysis
+#'
+#' @param y y
+#' @param fs fs
+#' @param removeTrend rt
+#' @param polyOrder po
+#' @param standardise st
+#' @param adjustSumOrder ao
+#' @param scaleMin sm
+#' @param scaleMax smm
+#' @param scaleResolution sr
+#' @param dataMin dm
+#' @param scaleS sc
+#' @param overlap ov
+#' @param silent si
+#'
+#' @keywords internal
+#'
+#' @return transformed series
+#'
+#' @export
+#'
+fd_prepSeries <- function(y,
+                          fs = NULL,
+                          removeTrend = c("no","poly","adaptive","bridge")[2],
+                          polyOrder=1,
+                          standardise = c("none","mean.sd","median.mad")[2],
+                          adjustSumOrder = FALSE,
+                          scaleMin = 4,
+                          scaleMax = log2(floor(NROW(y)/2)),
+                          scaleResolution = (scaleMax-scaleMin),
+                          dataMin = NA,
+                          scaleS = NA,
+                          overlap = NA,
+                          silent = TRUE){
+
+  y_ori <- y
+
+  if(!stats::is.ts(y)){
+    if(is.null(fs)){
+      fs <- 1
+      if(!silent){cat("\n\n(mf)dfa:\tSample rate was set to 1.\n\n")}
+    }
+    y <- stats::ts(y, frequency = fs)
+  }
+
+  if(!is.na(dataMin)){
+    scaleMax <- floor(log2(NROW(y)/dataMin))
+  } else {
+    dataMin <- floor(NROW(y)/(scaleMax))
+  }
+
+  if(any(is.na(scaleS))){
+    exponents <- seq(log2(scaleMin),log2(scaleMax), length.out = scaleResolution)
+    scaleS    <- round(2^exponents) #unique(round(seq(scaleMin,scaleMax, length.out= (scaleMax-scaleMin)/(scaleResolution-1))))
+  } else {
+    if(is.null(scaleS)){
+      scaleS <- NA
+    }
+  }
+
+  if(!is.na(scaleS)){
+    # Nyquist-ish
+    if(max(scaleS)>floor(NROW(y)/2)){
+      warning("The maximum bin should be smaller than floor(NROW(y)/2) data points")
+    }
+
+
+  if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
+    stop("Something wrong with vector passed to scaleS.... \nUsing defaults: (scaleMax-scaleMin)/scaleResolution")
+  }
+  }
+
+  if(!removeTrend%in%"no"){
+    if(removeTrend%in%"adaptive"){
+      adaptive <- TRUE
+    } else {
+      adaptive <- FALSE
+    }
+    y <- ts_detrend(y, polyOrder = polyOrder, adaptive = adaptive)
+  }
+
+  # Standardise by N
+  if(any(standardise%in%c("mean.sd","median.mad"))){
+    y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
+  }
+
+
+  # if(adjustSumOrder){
+  #   y       <- ts_sumorder(y_ori, scaleS = scaleS, polyOrder = polyOrder, dataMin = dataMin)
+  #   Hadj    <- attr(y,"Hadj")
+  #   Hglobal <- attr(y,"Hglobal.excl")
+  # } else {
+  #   Hadj    <- 0
+  #   Hglobal <- NA
+  # }
+
+  attr(y,"Original time series") <- y_ori
+
+  attr(y,"removeTrend") <- removeTrend
+  attr(y,"polyOrder")   <- polyOrder
+  attr(y,"standardise") <- standardise
+  attr(y,"scaleMin")    <- scaleMin
+  attr(y,"scaleMax")    <- scaleMax
+  attr(y,"scaleResolution") <- scaleResolution
+  attr(y,"dataMin")     <- dataMin
+  attr(y,"scaleS")      <- scaleS
+  attr(y,"overlap")     <- overlap
+
+  attr(y,"adjustSumOrder") <- adjustSumOrder
+  if(adjustSumOrder){
+    y <- ts_sumorder(y, scaleS = scaleS, polyOrder = polyOrder)
+    Hglobal.full <- attr(y,"Hglobal.full")
+    Hglobal.excl <- attr(y,"Hglobal.excl")
+    Hadj <- attr(y,"Hadj")
+  } else {
+    Hglobal.full <- attr(y,"Hglobal.full") <- NA
+    Hglobal.excl <- attr(y,"Hglobal.excl") <- NA
+    Hadj <- attr(y,"Hadj") <- 0
+  }
+
+  return(y)
+}
+
+
 #' fd_sda
 #'
 #' @title Standardised Dispersion Analysis (SDA).
 #'
-#' @param y    A numeric vector or time series object.
-#' @param fs Sample rate (default = NULL)
-#' @param standardise standardise the series (default = "mean.sd")
-#' @param detrend Subtract linear trend from the series (default = FALSE)
-#' @param polyOrder Order of detrending polynomial
-#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `FALSE`)
-#' @param scaleMax   Maximum scale to use
-#' @param scaleMin   Minimium scale to use
-#' @param scaleResolution  The scales at which the standardised fluctuations are calculated as: `(scaleMax-scaleMin)/scaleResolution`
-#' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` will be ignored.
-#' @param overlap Turn SDA into a sliding window analysis. A number in `[0 ... 1]` representing the amount of 'bin overlap'. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with stepsize `floor(.5 * 4) = 2` (default = `0`)
-#' @param minData Minimum number of data points in a bin needed to calculate standardised dispersion
-#' @param doPlot   Output the log-log scale versus fluctuation plot with linear fit by calling function `plotFD_loglog()` (default = `TRUE`)
-#' @param returnPlot Return ggplot2 object (default = `FALSE`)
-#' @param returnPLAW Return the power law data (default = `FALSE`)
-#' @param returnInfo Return all the data used in SDA (default = `FALSE`)
-#' @param silent Silent-ish mode
-#' @param noTitle Do not generate a title (only the subtitle)
-#' @param tsName Name of y added as a subtitle to the plot
+#' @inheritParams fd_dfa
 #'
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
@@ -331,16 +444,16 @@ fd_psd <- function(y,
 #'
 fd_sda <- function(y,
                    fs = NULL,
-                   standardise = c("mean.sd","median.mad")[1],
-                   detrend = FALSE,
+                   removeTrend = c("no","poly","adaptive","bridge")[2],
                    polyOrder=1,
+                   standardise = c("none","mean.sd","median.mad")[2],
                    adjustSumOrder = FALSE,
-                   scaleMin = 2,
-                   scaleMax = floor(log2(NROW(y)/2)),
-                   scaleResolution = 30,
+                   scaleMin = 4,
+                   scaleMax = log2(floor(NROW(y)/2)),
+                   scaleResolution = (scaleMax-scaleMin),
+                   dataMin = NA,
                    scaleS = NA,
                    overlap = 0,
-                   minData = 4,
                    doPlot = FALSE,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
@@ -350,48 +463,64 @@ fd_sda <- function(y,
                    tsName="y"){
 
 
-  if(!stats::is.ts(y)){
-    if(is.null(fs)){fs <- 1}
-    y <- stats::ts(y, frequency = fs)
-    if(!silent){cat("\n\nfd_sda:\tSample rate was set to 1.\n\n")}
-  }
+  y <- fd_prepSeries(y = y,
+                     fs = fs,
+                     removeTrend = removeTrend,
+                     polyOrder = polyOrder,
+                     standardise = standardise,
+                     adjustSumOrder = adjustSumOrder,
+                     scaleMin = scaleMin,
+                     scaleMax = scaleMax,
+                     scaleResolution = scaleResolution,
+                     dataMin = dataMin,
+                     scaleS = scaleS,
+                     overlap = overlap,
+                     silent = silent
+  )
 
-  N             <- length(y)
-  # Simple linear detrending.
-  if(detrend){
-    y <- ts_detrend(y,polyOrder = polyOrder)
-    }
-  # y <- stats::ts(pracma::detrend(as.vector(y), tt = 'linear'), frequency = fs)
-  # standardise using N instead of N-1.
-  if(is.na(scaleS)){
-    scaleS <- unique(round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution)))))
-  }
+
+  scaleS  <- attr(y, "scaleS")
+  dataMin <- attr(y, "dataMin")
+
+
+  # if(!stats::is.ts(y)){
+  #   if(is.null(fs)){fs <- 1}
+  #   y <- stats::ts(y, frequency = fs)
+  #   if(!silent){cat("\n\nfd_sda:\tSample rate was set to 1.\n\n")}
+  # }
+  #
+  #
+  # N             <- length(y)
+  #
+  # if(is.na(scaleS)){
+  #   scaleS <- unique(round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution)))))
+  # }
 
   if(max(scaleS)>(NROW(y)/2)){
     scaleS <- scaleS[scaleS<=(NROW(y)/2)]
   }
 
-  if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
-    message("Something wrong with vector passed to scaleS.... \nUsing default: (scaleMax-scaleMin)/scaleResolution")
-  }
-
-  # Standardise by N
-  if(any(standardise%in%c("mean.sd","median.mad"))){
-    y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
-  }
-
-  if(adjustSumOrder){
-    y       <- ts_sumorder(y, scaleS = scaleS, polyOrder = polyOrder, minData = minData)
-    Hadj    <- attr(y,"Hadj")
-    Hglobal <- attr(y,"Hglobal.excl")
-  } else {
-    Hadj    <- 0
-    Hglobal <- NA
-  }
+  # if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
+  #   message("Something wrong with vector passed to scaleS.... \nUsing default: (scaleMax-scaleMin)/scaleResolution")
+  # }
+  #
+  # # Standardise by N
+  # if(any(standardise%in%c("mean.sd","median.mad"))){
+  #   y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
+  # }
+  #
+  # if(adjustSumOrder){
+  #   y       <- ts_sumorder(y, scaleS = scaleS, polyOrder = polyOrder, dataMin = dataMin)
+  #   Hadj    <- attr(y,"Hadj")
+  #   Hglobal <- attr(y,"Hglobal.excl")
+  # } else {
+  #   Hadj    <- 0
+  #   Hglobal <- NA
+  # }
 
   out <- SDA(y, front = FALSE)
 
-  fitRange <- which(lengths(lapply(out$scale, function(s){ts_slice(y,s)}))>=minData)
+  fitRange <- which(lengths(lapply(out$scale, function(s){ts_slice(y,s)}))>=dataMin)
 
   lmfit1        <- stats::lm(log(out$sd) ~ log(out$scale))
   lmfit2        <- stats::lm(log(out$sd[fitRange]) ~ log(out$scale[fitRange]))
@@ -453,24 +582,26 @@ fd_sda <- function(y,
 #'
 #' @param y    A numeric vector or time series object.
 #' @param fs   Sample rate
-#' @param removeTrend Method to use for detrending (default = "poly")
-#' @param polyOrder Order of polynomial trend to remove if `removeTrend = "poly"`
-#' @param standardise Standardise by the series using [casnet::ts_standardise()] with `adjustN = FALSE` (default = "mean.sd")
-#' @param adjustSumOrder  Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `FALSE`)
-#' @param scaleMax   Maximum scale (as a power of 2) to use
-#' @param scaleMin   Minimium scale (as a power of 2) to use
-#' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculatd as: `(scaleMax-scaleMin)/scaleResolution`. The default value yields no resolution of scales: `(scaleMax-scaleMin)`. Common values
-#' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` will be ignored.
-#' @param overlap Turn DFA into a sliding window analysis. A number in `[0 ... 1]` representing the amount of 'bin overlap'. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with stepsize `floor(.5 * 4) = 2`. The detrended fluctuation in   For scale `128` this will be  (default = `0`)
-#' @param minData Minimum number of data points in a bin needed to calculate detrended fluctuation
-#' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = `TRUE`).
+#' @param removeTrend Method to use for global detrending (default = `"poly"`)
+#' @param polyOrder Order of global polynomial trend to remove if `removeTrend = "poly"`. If `removeTrend = "adaptive"` polynomials `1` to `polyOrder` will be evaluated and the best fitting curve (R squared) will be removed (default = `1`)
+#' @param standardise Standardise the series using [casnet::ts_standardise()] with `adjustN = FALSE` (default = "mean.sd")
+#' @param adjustSumOrder  Adjust the time series (summation or difference), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `FALSE`)
+#' @param removeTrendSegment Method to use for detrending in the bins (default = `"poly"`)
+#' @param polyOrderSegment The DFA order, the order of polynomial trend to remove from the bin if `removeTrendSegment = "poly"`. If `removeTrendSegment = "adaptive"` polynomials `1` to `polyOrder` will be evaluated and the best fitting polynomial (R squared) will be removed (default = `1`)
+#' @param scaleMin   Minimum scale (in data points) to use for log-log regression (default = `4`)
+#' @param scaleMax   Maximum scale (in data points) to use for log-log regression. This value will be ignored if `dataMin` is not `NA` (default = `stats::nextn(floor(NROW(y)/4), factors = 2)`)
+#' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculated as: `seq(scaleMin, scaleMax, length.out = scaleResolution)` (default =  `round(log2(scaleMax-scaleMin))`).
+#' #' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if `length(y) = 1024` and `dataMin = 4`, the maximum scale used to calculate the slope will be `1024 / 4 = 256`. This value will take precedence over the `scaleMax` (default = `NA`)
+#' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` and `dataMin` will be ignored (default = `NA`)
+#' @param overlap Turn DFA into a sliding window analysis. A number in `[0 ... 1]` representing the amount of 'bin overlap'. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with step-size `floor(.5 * 4) = 2`, so for scale `128` step-size will be `64` (default = `NA`)
+#' @param y    A numeric vector or time series object.
+#' @param doPlot   Output the log-log scale versus fluctuation plot with linear fit by calling function `plotFD_loglog()` (default = `TRUE`)
 #' @param returnPlot Return ggplot2 object (default = `FALSE`)
 #' @param returnPLAW Return the power law data (default = `FALSE`)
-#' @param returnInfo Return all the data used in DFA (default = `FALSE`)
-#' @param silent Silent-ish mode
-#' @param noTitle Do not generate a title (only the subtitle)
-#' @param tsName Name of y added as a subtitle to the plot
-#'
+#' @param returnInfo Return all the data used in SDA (default = `FALSE`)
+#' @param silent Silent-ish mode (default = `FALSE`)
+#' @param noTitle Do not generate a title (only the subtitle) (default = `FALSE`)
+#' @param tsName Name of y added as a subtitle to the plot (default = `"y"`)
 #'
 #' @return Estimate of Hurst exponent (slope of `log(bin)` vs. `log(RMSE))` and an FD estimate based on Hasselman (2013)
 #' A list object containing:
@@ -495,12 +626,14 @@ fd_dfa <- function(y,
                    polyOrder=1,
                    standardise = c("none","mean.sd","median.mad")[2],
                    adjustSumOrder = FALSE,
-                   scaleMin = 2,
-                   scaleMax = floor(log2(NROW(y)/2)),
-                   scaleResolution = (scaleMax-scaleMin),
+                   removeTrendSegment = c("no","poly","adaptive","bridge")[2],
+                   polyOrderSegment=1,
+                   scaleMin = 16,
+                   scaleMax = stats::nextn(floor(NROW(y)/4), factors = 2),
+                   scaleResolution = round(log2(scaleMax-scaleMin)),
+                   dataMin = NA,
                    scaleS = NA,
-                   overlap = 0,
-                   minData = 4,
+                   overlap = NA,
                    doPlot = FALSE,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
@@ -509,40 +642,21 @@ fd_dfa <- function(y,
                    noTitle = FALSE,
                    tsName="y"){
 
-  y_ori <- y
 
-  if(!stats::is.ts(y)){
-    if(is.null(fs)){fs <- 1}
-    y <- stats::ts(y, frequency = fs)
-    if(!silent){cat("\n\nfd_dfa:\tSample rate was set to 1.\n\n")}
-  }
-
-  if(is.na(scaleS)){
-    scaleS <- unique(round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution)))))
-  }
-
-  if(max(scaleS)>(NROW(y)/2)){
-    scaleS <- scaleS[scaleS<=(NROW(y)/2)]
-  }
-
-  if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
-    message("Something wrong with vector passed to scaleS.... \nUsing defaults: (scaleMax-scaleMin)/scaleResolution")
-  }
-
-  # Standardise by N
-  if(any(standardise%in%c("mean.sd","median.mad"))){
-    y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
-  }
-
-
-  if(adjustSumOrder){
-    y       <- ts_sumorder(y_ori, scaleS = scaleS, polyOrder = polyOrder, minData = minData)
-    Hadj    <- attr(y,"Hadj")
-    Hglobal <- attr(y,"Hglobal.excl")
-  } else {
-    Hadj    <- 0
-    Hglobal <- NA
-  }
+   y <- fd_prepSeries(y = y,
+                 fs = fs,
+                 removeTrend = "no",
+                 polyOrder = polyOrder,
+                 standardise = standardise,
+                 adjustSumOrder = adjustSumOrder,
+                 scaleMin = scaleMin,
+                 scaleMax = scaleMax,
+                 scaleResolution = scaleResolution,
+                 dataMin = dataMin,
+                 scaleS = scaleS,
+                 overlap = overlap,
+                 silent = silent
+                 )
 
   # Integrate the series
   if(standardise%in%"none"){
@@ -551,32 +665,41 @@ fd_dfa <- function(y,
     y <- ts_integrate(y)
   }
 
-  TSm    <- as.matrix(cbind(t=1:NROW(y),y=y))
-  DFAout <- monoH(TSm = TSm, scaleS = scaleS, polyOrder = polyOrder, returnPLAW = TRUE, returnSegments = TRUE)
+  scaleS  <- attr(y, "scaleS")
+  dataMin <- attr(y, "dataMin")
 
-  fitRange <- which(lapply(DFAout$segments,NROW)>=minData)
+  if(removeTrendSegment%in%"adaptive"){
+    adaptive <- TRUE
+  } else {
+    adaptive <- FALSE
+  }
+
+  TSm    <- as.matrix(cbind(t=1:NROW(y),y=y))
+  DFAout <- monoH(TSm = TSm, scaleS = scaleS, removeTrend = removeTrendSegment, polyOrder = polyOrderSegment, overlap = overlap, returnPLAW = TRUE, returnSegments = TRUE)
+
+  fitRange <- which(lapply(DFAout$segments,NROW)>=dataMin)
 
   lmfit1 <- stats::lm(DFAout$PLAW$bulk.log2 ~ DFAout$PLAW$size.log2, na.action=stats::na.omit)
-  H1     <- lmfit1$coefficients[2] + Hadj
+  H1     <- lmfit1$coefficients[2] + attr(y,"Hadj")
   lmfit2 <- stats::lm(DFAout$PLAW$bulk.log2[fitRange] ~ DFAout$PLAW$size.log2[fitRange], na.action=stats::na.omit)
-  H2     <- lmfit2$coefficients[2] + Hadj
+  H2     <- lmfit2$coefficients[2] + attr(y,"Hadj")
 
   outList <- list(
     PLAW  =  DFAout$PLAW,
     fullRange = list(y = y,
                      sap = lmfit1$coefficients[2],
-                     Hadj = Hadj,
+                     Hadj = attr(y,"Hglobal.full"),
                      H = H1,
                      FD = sa2fd_dfa(lmfit1$coefficients[2]),
                      fitlm1 = lmfit1,
-                     method = paste0("Full range (n = ",NROW(DFAout$PLAW$size),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit1)[2]))),
+                     method = paste0("Full range (n = ",NROW(DFAout$PLAW$size),")\nSlope = ", round(stats::coef(lmfit1)[2],2)," | FD = ", sa2fd_dfa(stats::coef(lmfit1)[2]))),
     fitRange  = list(y = y,
                      sap = lmfit2$coefficients[2],
                      H = H2,
-                     Hadj = Hadj,
+                     Hadj = attr(y,"Hglobal.excl"),
                      FD = sa2fd_dfa(lmfit2$coefficients[2]),
                      fitlm2 = lmfit2,
-                     method = paste0("Exclude large bin sizes (n = ",NROW(fitRange),")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",sa2fd_dfa(stats::coef(lmfit2)[2]))),
+                     method = paste0("Exclude large bin sizes (n = ",NROW(fitRange),")\nSlope = ", round(stats::coef(lmfit2)[2],2)," | FD = ", sa2fd_dfa(stats::coef(lmfit2)[2]))),
     info = list(fullRange=lmfit1,fitRange=lmfit2,segments=DFAout$segments),
     plot = NA,
     analysis = list(
@@ -584,7 +707,6 @@ fd_dfa <- function(y,
       logBaseFit = "log2",
       logBasePlot = "2")
   )
-
 
   if(doPlot|returnPlot){
     if(noTitle){
@@ -601,17 +723,15 @@ fd_dfa <- function(y,
       }
     }
 
-
   if(returnInfo){returnPLAW<-TRUE}
 
   if(!silent){
     cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
-    cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method,"\n\n",outList$fitRange$method))
+    cat(paste("\n",outList$analysis$name,"\n\n",outList$fullRange$method,"\n\n",outList$fitRange$method,"\n\n Detrending:",removeTrendSegment))
     cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
   }
 
   return(invisible(outList[c(returnPLAW,TRUE,TRUE,returnInfo,returnPlot,TRUE)]))
-
 }
 
 
@@ -662,7 +782,7 @@ fd_dfa <- function(y,
 #' @param scaleMax Maximum scale value (as `2^scale`) to use (default = `max` of `log2(nrows)` and `log2(ncols)`)
 #' @param scaleMin Minimium scale value (as `2^scale`) to use (default = `0`)
 #' @param scaleS If not `NA`, pass a numeric vector listing the scales (as a power of `2`) on which to evaluate the boxcount. Arguments `scaleMax`, `scaleMin`, and `scaleResolution` will be ignored (default = `NA`)
-#' @param minData Minimum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMin`)
+#' @param dataMin Minimum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMin`)
 #' @param maxData Maximum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMax`)
 #' @param doPlot Return the log-log scale versus bulk plot with linear fit (default = `TRUE`).
 #' @param returnPlot Return ggplot2 object (default = `FALSE`)
@@ -695,7 +815,7 @@ fd_boxcount2D <- function(y = NA,
                           scaleMin = 0,
                           scaleMax = floor(log2(NROW(y)*resolution)),
                           scaleS = NA,
-                          minData = 2^(scaleMin+1),
+                          dataMin = 2^(scaleMin+1),
                           maxData = 2^(scaleMax-1),
                           doPlot = FALSE,
                           returnPlot = FALSE,
@@ -722,7 +842,7 @@ fd_boxcount2D <- function(y = NA,
     }
 
     if(adjustSumOrder){
-      y       <- ts_sumorder(y, scaleS = 2^(4:floor(log2(NROW(y)/2))), polyOrder = polyOrder, minData = 4)
+      y       <- ts_sumorder(y, scaleS = 2^(4:floor(log2(NROW(y)/2))), polyOrder = polyOrder, dataMin = 4)
       Hadj    <- attr(y,"Hadj")
       Hglobal <- attr(y,"Hglobal.excl")
     } else {
@@ -823,7 +943,7 @@ fd_boxcount2D <- function(y = NA,
 
   lmfit1 <- stats::lm(-log(n)~log(r)) #lmfit1 <- mean(-diff(log(n))/diff(log(r)))
 
-  fitRange <- which(r%[]%c(minData,maxData))
+  fitRange <- which(r%[]%c(dataMin,maxData))
   lmfit2   <- stats::lm(-log(n[fitRange])~log(r[fitRange])) #mean(-diff(log(n[fitRange]))/diff(log(r[fitRange])))
 
   localFit <- -pracma::gradient(log(n))/pracma::gradient(log(r))
@@ -1260,9 +1380,7 @@ fd_allan <- function(y,
 #' Multi-fractal Detrended Fluctuation Analysis
 #'
 #' @inheritParams fd_dfa
-#' @param y An input signal.
-#' @param qq A vector containing a range of values for the order of fluctuation `q`.
-#' @param m m
+#' @param qq A vector containing a range of values for the order of fluctuation `q` (default = `seq(-5, 5,length.out=101)`)
 #'
 #' @return A dataframe with values of `q`,`H(q)`, `t(q)`, `h(q)`, `D(q)``
 #' @export
@@ -1272,102 +1390,281 @@ fd_allan <- function(y,
 #' @examples
 #'
 #' set.seed(33)
-#' df <- fd_mfdfa(rnorm(4096))
 #'
-#' op <- par(mfrow=c(2,2))
-#' plot(df$q, df$Hq, type="l")
-#' plot(df$q, df$tq, type="l")
-#' plot(df$q, df$Dq, type="l")
-#' plot(df$hq,df$Dq, type="l")
-#' par(op)
+#' # White noise
+#' fd_mfdfa(rnorm(4096), doPlot = TRUE)
+#'
+#' # Pink noise
+#' fd_mfdfa(noise_powerlaw(N=4096), doPlot = TRUE)
+#'
+#' # 'multi' fractal
+#' N <- 2048
+#' y <- rowSums(data.frame(elascer(noise_powerlaw(N=N, alpha = -2)), elascer(noise_powerlaw(N=N, alpha = -.5))*c(rep(.2,512),rep(.5,512),rep(.7,512),rep(1,512))))
+#' fd_mfdfa(y=y, doPlot = TRUE)
 #'
 fd_mfdfa <- function(y,
-                     qq = c(-10,-5:5,10),
                      fs = NULL,
                      removeTrend = c("no","poly","adaptive","bridge")[2],
                      polyOrder=1,
-                     standardise = c("none","mean.sd","median.mad")[2],
+                     standardise = c("none","mean.sd","median.mad")[1],
                      adjustSumOrder = FALSE,
-                     scaleMin = 2,
-                     scaleMax = floor(log2(NROW(y)/2)),
-                     scaleResolution = (scaleMax-scaleMin),
-                     m = 1){
+                     removeTrendSegment = c("no","poly","adaptive","bridge")[2],
+                     polyOrderSegment=1,
+                     scaleMin = 16,
+                     scaleMax = stats::nextn(floor(NROW(y)/4), factors = 2),
+                     scaleResolution = round(log2(scaleMax-scaleMin)),
+                     dataMin = NA,
+                     scaleS = NA,
+                     overlap = NA,
+                     qq = seq(-5, 5,length.out=101),
+                     doPlot = FALSE,
+                     returnPlot = FALSE,
+                     returnInfo = FALSE,
+                     silent = FALSE){
 
-  #   reload <- FALSE
-  #   if("signal" %in% .packages()){
-  #     warning("signal:poly is loaded and stats:poly is needed... will unload package:signal, compute slope, and reload...")
-  #     reload <- TRUE
-  #     detach("package:signal", unload=TRUE)
-  #   }
+  yy <- fd_prepSeries(y = y,
+                      fs = fs,
+                      removeTrend = "no",
+                      polyOrder = polyOrder,
+                      standardise = standardise,
+                      adjustSumOrder = adjustSumOrder,
+                      scaleMin = scaleMin,
+                      scaleMax = scaleMax,
+                      scaleResolution = scaleResolution,
+                      dataMin = dataMin,
+                      scaleS = scaleS,
+                      overlap = overlap,
+                      silent = silent)
 
-  if(scaleMin<2){scaleMin<-2}
-  if((NROW(y)-scaleMax)<0){
-    y <- y%+]%abs(NROW(y)-scaleMax)
+  # Integrate the series
+  if(standardise%in%"none"){
+    y <- cumsum(ts_center(yy)) # need negative values in profile
+  } else {
+    y <- cumsum(yy)
   }
-  scale     <- round(2^(seq(scaleMin,scaleMax,by=((scaleMax-scaleMin)/scaleResolution))))
+  y <- rp_copy_attributes(source = yy, target = y)
+
+  scaleS  <- attr(y, "scaleS")
+  dataMin <- attr(y, "dataMin")
+
+  qq <- c(qq,(qq[length(qq)]+.1))
+
+  scale     <- scaleS #round(2^(seq(scaleMin,scaleMax,by=((scaleMax-scaleMin)/scaleResolution))))
   segv      <- numeric(length(scale))
   RMS_scale <- vector("list",length(scale))
-  qRMS      <- vector("list",length(qq))
-  Fq        <- vector("list",length(qq))
+  qRMSns    <- vector("list",length(scaleS))
+  Fq        <- matrix(nrow = length(qq), ncol = length(scaleS))
   qRegLine  <- vector("list",length(qq))
   Hq        <- numeric(length(qq))
 
-  if(adjustSumOrder){
-    Y        <- ts_sumorder(y)
-    Hglobal.full <- attr(Y,"Hglobal.full")
-    Hglobal.excl <- attr(Y,"Hglobal.excl")
-    Hadj <- attr(Y,"Hadj")
+  TSm      <- as.matrix(cbind(t=1:NROW(y),y=y))
+
+  if(removeTrendSegment%in%"adaptive"){
+    adaptive <- TRUE
   } else {
-    Y <- y
-    Hglobal.full <- attr(Y,"Hglobal.full") <- NA
-    Hglobal.excl <- attr(Y,"Hglobal.excl") <- NA
-    Hadj <- attr(Y,"Hadj") <- 0
+    adaptive <- FALSE
   }
-  TSm      <- as.matrix(cbind(t=1:length(Y),y=Y))
-
   for(ns in seq_along(scale)){
-    RMS_scale[[ns]] <- plyr::ldply(ts_slice(y = TSm, epochSz = scale[ns]),function(sv){return(sqrt(mean(ts_detrend(sv[,2]))^2))})
+    RMS_scale[[ns]] <- plyr::ldply(ts_slice(y = TSm[,2], epochSz = scale[ns], overlap = overlap, removeUnequal = TRUE), function(sv){return(sqrt(mean(ts_detrend(sv,polyOrder = polyOrder, adaptive = adaptive)^2, na.rm = TRUE)))})
+    qRMS      <- vector("list",length(qq))
     for(nq in seq_along(qq)){
-      qRMS[[nq]][1:length(RMS_scale[[ns]]$V1)] <- RMS_scale[[ns]]$V1^qq[nq]
-      Fq[[nq]][ns] <- mean(qRMS[[nq]][1:length(RMS_scale[[ns]]$V1)])^(1/qq[nq])
-      if(is.infinite(log2(Fq[[nq]][ns]))){Fq[[nq]][ns]<-NA}
+      qRMS[[nq]] <- RMS_scale[[ns]]$V1^qq[nq]
+      Fq[nq,ns] <- mean(qRMS[[nq]])^(1/qq[nq])
+      #if(is.infinite(log2(Fq[nq,ns]))){Fq[nq,ns]<-NA
     }
-    Fq[[which(qq==0)]][ns] <- exp(0.5*mean(log(RMS_scale[[ns]][,2]^2)))
-    if(is.infinite(log2(Fq[[which(qq==0)]][ns]))){Fq[[which(qq==0)]][ns]<-NA}
+    qRMSns[[ns]] <- qRMS[[nq]]
+    rm(qRMS)
+    Fq[which(qq==0),ns] <- exp(0.5*mean(log(RMS_scale[[ns]]$V1^2)))%00%NA
+    #if(is.infinite(log2(Fq[[which(qq==0)]][ns]))){Fq[[which(qq==0)]][ns]<-NA}
   }
 
-  fmin<-1
-  fmax<-which(scale==max(scale))
+  # fmin<-1
+  # fmax<-which(scale==max(scale))
   #for(nq in seq_along(qq)){Hq[nq] <- stats::lm(log2(Fq[[nq]])~log2(scale))$coefficients[2]}
-  Hq <- plyr::ldply(Fq,function(Fqs){stats::lm(log2(Fqs[fmin:fmax])~log2(scale[fmin:fmax]),na.action=stats::na.omit)$coefficients[2]})
+  Hq <- plyr::ldply(seq_along(qq), function(nq){stats::lm(log2(Fq[nq,])~log2(scale),na.action=stats::na.omit)$coefficients[2]})
 
-  tq <- (Hq[,1]*qq)-1
-  hq <- ts_diff(tq, addColumns = FALSE, maskEdges = 0)/ts_diff(qq, addColumns = FALSE, maskEdges = 0) #[-c(1,length(tq))]
-  Dq <- (ts_diff(qq, addColumns = FALSE, maskEdges = NA)*hq)-tq #(qq[1:(length(qq)-1)]*hq) - (tq[1:(length(qq)-1)])
+  tq <- Hq[,1]*qq-1
+  hq <- diff(c(tq,tq[length(tq)]))/diff(c(qq,qq[length(qq)])) #[-c(1,length(tq))]
+  Dq <- (qq*hq) - tq
 
+  tq <- tq[1:(length(qq)-1)]
+  hq <- hq[1:(length(qq)-1)]
+  Dq <- Dq[1:(length(qq)-1)]
+  Hq <- Hq[1:(length(qq)-1),1]
+  qq <- qq[1:(length(qq)-1)]
+
+  # Dq <- (qq[1:(length(qq)-1)]*hq) - tq[1:(length(qq)-1)]
+  # Dh=(qq*hq)-tq
   #if(reload==TRUE){library(y,verbose=FALSE,quietly=TRUE)}
 
-  out <- data.frame(q=qq,Hq=Hq[,1],tq=tq,hq=hq,Dq=Dq)
+  # qRegLine <- as.data.frame(Reduce("cbind", qRegLine))
+  # tq <- Hq * q - 1
+  # hq <- diff(tq)/(q[2] - q[1])
+  # Dq <- (q[1:(length(q) - 1)] * hq) - tq[1:(length(tq) - 1)]
 
-  attr(out,"y") <- y
-  attr(out,"Hglobal.full") <- Hglobal.full
-  attr(out,"Hglobal.excl") <- Hglobal.excl
-  attr(out,"Hadj") <- Hadj
+  # tau=(q.*Hq)-1;
+  #
+  # hh=diff(tau)./(q(2)-q(1));
+  # Dh=(q(1:(end-1)).*hh)-tau(1:(end-1));
+  # h=hh-1;
+  #plot(hq,Dq, type="l")
 
-  return(out)
+  out <- data.frame(q=qq,Hq=Hq,tq=tq,hq=hq,Dq=Dq)
+
+  id <- order(out$hq)
+  Spec_AUC <- sum(diff(out$hq[id])*zoo::rollmean(out$Dq[id],2), na.rm = TRUE)
+
+  Spec_Width  <- max(out$hq, na.rm = TRUE) - min(out$hq, na.rm = TRUE)
+  Spec_CVplus <- sd(out$Dq[which(out$q==0):which.max(out$q)], na.rm = TRUE)/mean(out$Dq[which(out$q==0):which.max(out$q)], na.rm = TRUE)
+  Spec_CVmin  <- sd(out$Dq[which.min(out$q):which(out$q==0)], na.rm = TRUE)/mean(out$Dq[which.min(out$q):which(out$q==0)], na.rm = TRUE)
+  Spec_CVtot  <- sd(out$Dq, na.rm = TRUE)/mean(out$Dq, na.rm = TRUE)
+  Spec_CVasymm <- (Spec_CVplus-Spec_CVmin)/(Spec_CVplus+Spec_CVmin)
+
+
+  outList <- list(MFDFA = out,
+                  MFSpectrum = data.frame(Spec_AUC = Spec_AUC,
+                                          Spec_Width = Spec_Width,
+                                          Spec_CVplus = Spec_CVplus,
+                                          Spec_CVmin = Spec_CVmin,
+                                          Spec_CVtot = Spec_CVtot,
+                                          Spec_CVasymm = Spec_CVasymm),
+                  ScalingFunction = Fq
+                  )
+
+  # if(doPlot|returnPlot){
+  #   if(noTitle){
+  #     title <- " "
+  #   } else {
+  #     title <- "log-log regression (DFA)"
+  #   }
+  #   g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation", doPlot = doPlot)
+  #   if(doPlot){
+  #     print(g)
+  #   }
+  #   if(returnPlot){
+  #     outList$plot <- g
+  #   }
+  # }
+
+  if(doPlot|returnPlot){
+
+    qmin  <- which(out$q==min(out$q,na.rm = TRUE))
+    qzero <- which(out$q==0)
+    qmax  <- which(out$q==max(out$q,na.rm = TRUE))
+
+    df_q <- data.frame(q = out$q[c(qmin, qzero,qmax)],
+                       label = paste0("q=",out$q[c(qmin, qzero,qmax)]),
+                       labelH = paste0("H(q=",out$q[c(qmin, qzero,qmax)],") = ",round(out$Hq[c(qmin, qzero,qmax)],2)),
+                       hq = out$hq[c(qmin, qzero,qmax)],
+                       Hq = out$Hq[c(qmin, qzero,qmax)],
+                       tq = out$tq[c(qmin, qzero,qmax)],
+                       Dq = out$Dq[c(qmin, qzero,qmax)])
+
+    df_lines <- data.frame(Scale_label = paste(c(scale,scale,scale)),
+                           Scale = c(scale,scale,scale),
+                           labelH = rep(df_q$labelH,each = length(scale)),
+                           Fq    = log2(c(Fq[qmin,],Fq[qzero,],Fq[qmax,])),
+                           q     = rep(out$q[c(qmin, qzero,qmax)], each = length(scale)))
+    df_lines$label <- factor(paste0("q=",df_lines$q))
+
+    cols <- getColours(3)
+    names(cols) <- levels(df_lines$labelH)
+
+    g1 <-  ggplot(data = df_lines, aes(x=Scale,y= Fq, group = q)) +
+      geom_smooth(aes(colour = labelH), method = "lm", se = FALSE) +
+      geom_point(aes(fill = labelH), pch=21,colour="black") +
+      scale_x_continuous("Scale", limits = c(min(df_lines$Scale, na.rm = TRUE),
+                                             max(df_lines$Scale, na.rm = TRUE)), trans = "log2") +
+      scale_y_continuous(expression(log[2](F[q])), limits = c(min(df_lines$Fq, na.rm = TRUE)-2,
+                                                              max(df_lines$Fq, na.rm = TRUE)+2), expand = c(0,0)) +
+      scale_color_manual("Slope", values = cols) +
+      scale_fill_manual("Slope", values = cols) +
+      ggtitle("Scaling function (Slope = Hurst exponent)") +
+      theme_bw()  +
+      theme(legend.position = c(.85,.25),
+            legend.text = element_text(size=rel(.6)),
+            legend.title = element_text(size=rel(.6)),
+            legend.key.size = unit(.8,"lines"),
+            legend.background = element_rect(colour = "black"))
+
+    g2 <- ggplot(out,aes(x=q,y=Hq)) + geom_line() +
+      geom_point(data = df_q, aes(x=q,y=Hq, fill = labelH), pch=21,colour="black", show.legend = FALSE, size = 2) +
+      scale_x_continuous("q", limits = c(min(out$q, na.rm = TRUE)-.2,
+                                         max(out$q, na.rm = TRUE)+.2), expand = c(0,0)) +
+      scale_y_continuous(expression(H[q]), limits = c(min(out$Hq, na.rm = TRUE)-.1,
+                                                      max(out$Hq, na.rm = TRUE)+.1), expand = c(0,0)) +
+      #scale_color_discrete("q-order") +
+      scale_fill_manual("Slope", values = cols) +
+      theme_bw()  + ggtitle("q-order Hurst exponent")
+
+
+    g3 <- ggplot(out,aes(x=q,y=tq)) +
+      geom_line() +
+      #      geom_point(data = df_q, aes(x=q,y=tq, colour = label),show.legend = FALSE) +
+      geom_point(data = df_q, aes(x=q,y=tq, fill = label), pch=21,colour="black", show.legend = FALSE, size = 2) +
+      scale_x_continuous("q", limits = c(min(out$q, na.rm = TRUE)-.2,
+                                         max(out$q, na.rm = TRUE)+.2), expand = c(0,0)) +
+      scale_y_continuous(expression(t[q]), limits = c(min(out$tq, na.rm = TRUE)-.2,
+                                                      max(out$tq, na.rm = TRUE)+.2), expand = c(0,0)) +
+      scale_fill_manual("Slope", values = cols) +
+      theme_bw()  + ggtitle("q-order Mass exponent")
+
+
+    g4 <- ggplot(out,aes(x=hq,y=Dq)) + geom_line() +
+      geom_point(data = df_q, aes(x=hq,y=Dq, fill = label), pch=21, colour="black", show.legend = TRUE, size = 2) +
+      scale_x_continuous(expression(h[q]), limits = c(min(out$hq, na.rm = TRUE)-.1,
+                                                      max(out$hq, na.rm = TRUE)+.1), expand = c(0,0)) +
+      scale_y_continuous(expression(D[q]), limits = c(min(c(out$Dq,0), na.rm = TRUE)-.05,
+                                                      max(c(out$Dq,1), na.rm = TRUE)+.05), expand = c(0,0)) +
+      scale_color_discrete("q-order") +
+      scale_fill_manual("q-order", values = cols) +
+      ggtitle("Multifractal spectrum") +
+      theme_bw()  +
+      theme(legend.position = c(.4,.5),
+            legend.text = element_text(size=rel(.6)),
+            legend.title = element_text(size=rel(.6)),
+            legend.key.size = unit(.8,"lines"),
+            legend.background = element_rect(colour = "black"))
+
+    g <- cowplot::plot_grid(g1,g2,g3,g4, ncol = 2)
+
+    if(doPlot){
+      print(g)
+    }
+
+    if(returnPlot){
+      outList$plot <- g
+    } else {
+      outList$plot <- NA
+    }
+  }
+
+  outList$analysis = list(
+      name = "Multifractal Detrended FLuctuation Analysis",
+      logBaseFit = "log2",
+      logBasePlot = "2")
+
+  if(!silent){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+    cat(paste("\n",outList$analysis$name,"\n\n"))
+    print(outList$MFSpectrum, digits = 3)
+    cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+  }
+
+  return(invisible(outList[c(TRUE,TRUE,returnInfo,returnPlot,TRUE)]))
+
 }
 
 
 #' mono Hurst
 #'
+#' @inheritParams fd_dfa
 #' @param TSm TS matrix with 2 columns `t` (1st) and `y` (second)
-#' @param scaleS scales to evaluate
-#' @param polyOrder If numeric: order to use for polynomial detrendiing, if "adaptive" will use the best fitting polynomial.
 #'
 #' @export
 #' @keywords internal
 #'
-monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments = FALSE, removeRMSbelow = .Machine$double.eps){
+monoH <- function(TSm, scaleS, removeTrend = c("no","poly","adaptive","bridge")[2], polyOrder = 1, overlap = overlap, returnPLAW = FALSE, returnSegments = FALSE, removeRMSbelow = .Machine$double.eps){
 
   dfaRMS_scale <- vector("list",length(scaleS))
 
@@ -1378,7 +1675,7 @@ monoH <- function(TSm, scaleS, polyOrder = 1, returnPLAW = FALSE, returnSegments
   F2 <- numeric(length(scaleS))
 
   for(ns in seq_along(scaleS)){
-    dfaRMS <- plyr::ldply(ts_slice(TSm[,2],scaleS[ns]), function(sv){return(sqrt(mean(ts_detrend(sv,polyOrder=polyOrder)^2,na.rm = TRUE)))})
+    dfaRMS <- plyr::ldply(ts_slice(y = TSm[,2], epochSz = scaleS[ns], overlap = overlap), function(sv){return(sqrt(mean(ts_detrend(sv,polyOrder=polyOrder)^2,na.rm = TRUE)))})
     dfaRMS$V1[dfaRMS$V1 <= removeRMSbelow^2] <- NA
     dfaRMS_scale[[ns]] <- dfaRMS$V1
     F2[ns] <- mean(dfaRMS_scale[[ns]]^2,na.rm = TRUE)^(1/2)
@@ -1564,7 +1861,7 @@ inf_MSE <- function(y,
                     scaleMax = floor(NROW(y)/10),
                     scaleS = NA,
                     overlap = 0,
-                    minData = 4,
+                    dataMin = 4,
                     relativeEntropy = FALSE,
                     doPlot = FALSE,
                     returnPlot = FALSE,

@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,18 +40,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -77,7 +73,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/FredHasselman/casnet/">
+  <a href="https://github.com/FredHasselman/casnet/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -92,85 +88,85 @@
 
       
 
-      </header><script src="RecurrenceNetworks_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Recurrence Networks</h1>
-                        <h4 class="author">Fred Hasselman</h4>
+                        <h4 data-toc-skip class="author">Fred Hasselman</h4>
             
-            <h4 class="date">2021-10-17</h4>
+            <h4 data-toc-skip class="date">2022-02-11</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/master/vignettes/RecurrenceNetworks.Rmd"><code>vignettes/RecurrenceNetworks.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/RecurrenceNetworks.Rmd" class="external-link"><code>vignettes/RecurrenceNetworks.Rmd</code></a></small>
       <div class="hidden name"><code>RecurrenceNetworks.Rmd</code></div>
 
     </div>
 
     
     
-<div id="recurrence-networks" class="section level1">
-<h1 class="hasAnchor">
-<a href="#recurrence-networks" class="anchor"></a><em>Recurrence Networks</em>
-</h1>
+<div class="section level2">
+<h2 id="recurrence-networks">
+<em>Recurrence Networks</em><a class="anchor" aria-label="anchor" href="#recurrence-networks"></a>
+</h2>
 <p>Recurrence networks are graphs created from a recurrence matrix. This means the nodes (vertices) of the graph represent values observed at specific time points and the connections (edges) between nodes represent a recurrence relation between the values observed at those time points. In a reconstructed or multidimensional (coarse grained) state space, the values represent some measure of distance between the observed states (coordinates in state space).</p>
 <p>We can turn the recurrence matrix into an adjacency matrix, e.g. an <code>igraph</code> object in <code>R</code>. This means we can use all the <code>igraph</code> functions to calculate network measures. The main differences between the recurrence matrix as used for (C)RQA and the adjacency matrix is that the latter can represent weighted, as well as directed recurrence networks. The interpretation of the network measures calculated from a recurrence network is somewhat different from when the nodes do not represent time. The ultimate reference for learning about recurrence networks is:</p>
 <blockquote>
-<p><a href="https://www.sciencedirect.com/science/article/abs/pii/S037015731830276X?via%3Dihub">Zou, Y., Donner, R. V., Marwan, N., Donges, J. F., &amp; Kurths, J. (2018). Complex network approaches to nonlinear time series analysis. Physics Reports</a></p>
+<p><a href="https://www.sciencedirect.com/science/article/abs/pii/S037015731830276X?via%3Dihub" class="external-link">Zou, Y., Donner, R. V., Marwan, N., Donges, J. F., &amp; Kurths, J. (2018). Complex network approaches to nonlinear time series analysis. Physics Reports</a></p>
 </blockquote>
 <p>Package <code>casnet</code> has some functions to create recurrence networks, they are similar to the functions used for CRQA: * <code><a href="../reference/rn.html">rn()</a></code> is very similar to <code><a href="../reference/rp.html">rp()</a></code>, it will create a matrix based on embedding parameters, or on a multivariate dataset. One difference is the option to create a weighted and/or directed matrix. This is a matrix in which non-recurring values are set to 0, but the recurring values are not replaced by a 1, the distance value (or recurrence time) is retained and acts as an edge-weight * <code><a href="../reference/rn_plot.html">rn_plot()</a></code> will produce similar plots as <code><a href="../reference/rp_plot.html">rp_plot()</a></code>, with some differences for weighted and directed networks * <code><a href="../reference/rn_measures.html">rn_measures()</a></code> produces several common network measures used with recurrence networks.</p>
-<div id="esm-data" class="section level3 unnumbered">
-<h3 class="hasAnchor">
-<a href="#esm-data" class="anchor"></a>ESM data</h3>
-<p>We’ll use the same dataset as in the vignette <a href="https://fredhasselman.com/casnet/articles/dynamiccomplexity.html"><em>Dynamic Complexity</em></a> by Bastiaansen et al. (2019). Load it from the Open Science Framework, or use the internal data.</p>
+<div class="section level4">
+<h4 class="unnumbered" id="esm-data">ESM data<a class="anchor" aria-label="anchor" href="#esm-data"></a>
+</h4>
+<p>We’ll use the same dataset as in the vignette <a href="https://fredhasselman.com/casnet/articles/dynamiccomplexity.html" class="external-link"><em>Dynamic Complexity</em></a> by Bastiaansen et al. (2019). Load it from the Open Science Framework, or use the internal data.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/casnet">casnet</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/invctr">invctr</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/casnet" class="external-link">casnet</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/invctr" class="external-link">invctr</a></span><span class="op">)</span>
 <span class="co"># # Load data from OSF https://osf.io/tcnpd/</span>
 <span class="co"># require(osfr)</span>
 <span class="co"># manyAnalystsESM &lt;- rio::import(osfr::osf_download(osfr::osf_retrieve_file("tcnpd") , overwrite = TRUE)$local_path)</span>
 
 <span class="co"># Or use the internal data</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">)</span></code></pre></div>
-<p>A visual inspection of the data reveals some variables can be omitted and cases with missing values need to be imputed or removed. We’ll use the same strategy as explained in the <a href="https://fredhasselman.com/casnet/articles/dynamiccomplexity.html"><em>Dynamic Complexity</em></a> vignette.</p>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">)</span></code></pre></div>
+<p>A visual inspection of the data reveals some variables can be omitted and cases with missing values need to be imputed or removed. We’ll use the same strategy as explained in the <a href="https://fredhasselman.com/casnet/articles/dynamiccomplexity.html" class="external-link"><em>Dynamic Complexity</em></a> vignette.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org">igraph</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org" class="external-link">igraph</a></span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/plotTS_multi.html">plotTS_multi</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span>, subtitle <span class="op">=</span> <span class="st">"Raw data"</span><span class="op">)</span></code></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/imputeNA-1.png" width="504" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># Use the date information in the dataset to create time series objects</span>
-<span class="va">dates</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">)</span><span class="op">]</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span>, <span class="st">"%d-%m-%Y\n%H:%M"</span><span class="op">)</span>
-<span class="va">weeknum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html">strptime</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">)</span><span class="op">]</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span>,format <span class="op">=</span> <span class="st">"%V"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">dates</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html" class="external-link">strptime</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">)</span><span class="op">]</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span>, <span class="st">"%d-%m-%Y\n%H:%M"</span><span class="op">)</span>
+<span class="va">weeknum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html" class="external-link">strptime</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span><span class="op">)</span><span class="op">]</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span>,format <span class="op">=</span> <span class="st">"%V"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># days       &lt;- format(strptime(dates, "%m/%d/%Y %H:%M"), "%d-%m-%Y")</span>
 <span class="co"># time       &lt;- format(strptime(dates, "%m/%d/%Y %H:%M"), "%H:%M")</span>
 
 <span class="co"># Don't use columns 1, 26-28, 30-35</span>
-<span class="va">df</span> <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fl">26</span><span class="op">:</span><span class="fl">28</span>, <span class="fl">30</span><span class="op">:</span><span class="fl">35</span><span class="op">)</span><span class="op">]</span>
+<span class="va">df</span> <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fl">26</span><span class="op">:</span><span class="fl">28</span>, <span class="fl">30</span><span class="op">:</span><span class="fl">35</span><span class="op">)</span><span class="op">]</span>
 
 <span class="co"># 1. Remove NA </span>
-<span class="va">out.NA</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html">complete.cases</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>,<span class="op">]</span>
+<span class="va">out.NA</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/complete.cases.html" class="external-link">complete.cases</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>,<span class="op">]</span>
 
 <span class="co"># 2. Classification And Regression Trees / Random Forests</span>
-<span class="va">imp.cart</span>  <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/mice.html">mice</a></span><span class="op">(</span><span class="va">df</span>, method <span class="op">=</span> <span class="st">'cart'</span>, printFlag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="va">out.cart</span>  <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/complete.mids.html">complete</a></span><span class="op">(</span><span class="va">imp.cart</span><span class="op">)</span>
+<span class="va">imp.cart</span>  <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/mice.html" class="external-link">mice</a></span><span class="op">(</span><span class="va">df</span>, method <span class="op">=</span> <span class="st">'cart'</span>, printFlag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">out.cart</span>  <span class="op">&lt;-</span> <span class="fu">mice</span><span class="fu">::</span><span class="fu"><a href="https://amices.org/mice/reference/complete.mids.html" class="external-link">complete</a></span><span class="op">(</span><span class="va">imp.cart</span><span class="op">)</span>
 
 <span class="va">out.cart</span><span class="op">$</span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="va">dates</span>
-<span class="fu"><a href="../reference/plotTS_multi.html">plotTS_multi</a></span><span class="op">(</span><span class="va">out.cart</span>, subtitle <span class="op">=</span> <span class="st">"Imputed data"</span>, timeVec <span class="op">=</span> <span class="st">"dates"</span><span class="op">%ci%</span><span class="va">out.cart</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/plotTS_multi.html">plotTS_multi</a></span><span class="op">(</span><span class="va">out.cart</span>, subtitle <span class="op">=</span> <span class="st">"Imputed data"</span>, timeVec <span class="op">=</span> <span class="st">"dates"</span><span class="op"><a href="https://rdrr.io/pkg/invctr/man/fINDexers.html" class="external-link">%ci%</a></span><span class="va">out.cart</span><span class="op">)</span></code></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/imputeNA-2.png" width="504" style="display: block; margin: auto;"></p>
 <p>The first step is to create a recurrence matrix and consider it an adjacency matrix. This matrix can be created based on the reconstructed state space using the method of delay embedding, or, on a multidimensional state space in which the dimensions are a (subset) of the multivariate time series.</p>
 </div>
-<div id="reconstructed-state-space" class="section level2 unnumbered">
-<h2 class="hasAnchor">
-<a href="#reconstructed-state-space" class="anchor"></a><strong>Reconstructed State Space</strong>
-</h2>
+<div class="section level3">
+<h3 class="unnumbered" id="reconstructed-state-space">
+<strong>Reconstructed State Space</strong><a class="anchor" aria-label="anchor" href="#reconstructed-state-space"></a>
+</h3>
 <p>Below is an example of how to create a recurrence network based on a reconstructed state space. We’ll examine the variables <code>restless</code> and <code>procrast</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix </span>
 <span class="co">#----------------------</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/casnet">casnet</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/casnet" class="external-link">casnet</a></span><span class="op">)</span>
 
 <span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">out.cart</span><span class="op">$</span><span class="va">restless</span><span class="op">)</span></code></pre></div>
 <p><img src="RecurrenceNetworks_files/figure-html/unnamed-chunk-3-1.png" width="504" style="display: block; margin: auto;"></p>
@@ -189,16 +185,16 @@
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>  Global Measures</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   Global Max.points N.points     RR Singular Divergence Repetitiveness</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span> Matrix      <span class="dv">14161</span>      <span class="dv">775</span> <span class="fl">0.0547</span>      <span class="dv">596</span>     <span class="fl">0.0084</span>           <span class="fl">1.58</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   Global Max.points N.points    RR Singular Divergence Repetitiveness</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span> Matrix      <span class="dv">14161</span>     <span class="dv">1813</span> <span class="fl">0.128</span>     <span class="dv">1256</span>     <span class="fl">0.0084</span>           <span class="fl">2.43</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> </span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>  Line<span class="sc">-</span>based Measures</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>        Lines N.lines N.points Measure  Rate Mean Max.   ENT ENT_rel   CoV</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   Diagonal      <span class="dv">31</span>      <span class="dv">179</span>     DET <span class="fl">0.231</span> <span class="fl">5.77</span>  <span class="dv">119</span> <span class="fl">0.143</span>  <span class="fl">0.0298</span> <span class="fl">3.639</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">2</span>   Vertical      <span class="dv">67</span>      <span class="dv">141</span>   V LAM <span class="fl">0.182</span> <span class="fl">2.10</span>    <span class="dv">3</span> <span class="fl">0.335</span>  <span class="fl">0.0701</span> <span class="fl">0.146</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">3</span> Horizontal      <span class="dv">67</span>      <span class="dv">141</span>   H LAM <span class="fl">0.182</span> <span class="fl">2.10</span>    <span class="dv">3</span> <span class="fl">0.335</span>  <span class="fl">0.0701</span> <span class="fl">0.146</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">4</span>  V<span class="sc">+</span>H Total     <span class="dv">134</span>      <span class="dv">282</span> V<span class="sc">+</span>H LAM <span class="fl">0.182</span> <span class="fl">2.10</span>    <span class="dv">3</span> <span class="fl">0.335</span>  <span class="fl">0.0701</span> <span class="fl">0.146</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   Diagonal     <span class="dv">195</span>      <span class="dv">557</span>     DET <span class="fl">0.307</span> <span class="fl">2.86</span>  <span class="dv">119</span> <span class="fl">0.524</span>   <span class="fl">0.110</span> <span class="fl">2.947</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">2</span>   Vertical     <span class="dv">303</span>      <span class="dv">676</span>   V LAM <span class="fl">0.373</span> <span class="fl">2.23</span>    <span class="dv">6</span> <span class="fl">0.592</span>   <span class="fl">0.124</span> <span class="fl">0.247</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">3</span> Horizontal     <span class="dv">303</span>      <span class="dv">676</span>   H LAM <span class="fl">0.373</span> <span class="fl">2.23</span>    <span class="dv">6</span> <span class="fl">0.592</span>   <span class="fl">0.124</span> <span class="fl">0.247</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">4</span>  V<span class="sc">+</span>H Total     <span class="dv">606</span>     <span class="dv">1352</span> V<span class="sc">+</span>H LAM <span class="fl">0.373</span> <span class="fl">2.23</span>    <span class="dv">6</span> <span class="fl">0.592</span>   <span class="fl">0.124</span> <span class="fl">0.247</span></span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
 <span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
@@ -220,23 +216,23 @@
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> Global Network Measures</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>   EdgeDensity MeanStrengthDensity GlobalClustering NetworkTransitivity</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>  <span class="fl">0.04671699</span>                  <span class="cn">NA</span>        <span class="fl">0.5041799</span>           <span class="fl">0.6169951</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   <span class="fl">0.1206381</span>                  <span class="cn">NA</span>        <span class="fl">0.6928903</span>           <span class="fl">0.6698159</span></span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   AveragePathLength GlobalEfficiency</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>          <span class="fl">69.95058</span>         <span class="fl">7.149131</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>          <span class="fl">6.367042</span>         <span class="fl">2.912073</span></span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Should be the same</span></span>
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>rqa1<span class="sc">$</span>RR<span class="sc">==</span>rn1<span class="sc">$</span>graph_measures<span class="sc">$</span>EdgeDensity</span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> [<span class="dv">1</span>] <span class="cn">FALSE</span></span></code></pre></div>
-<div id="ts-2" class="section level3 unnumbered">
-<h3 class="hasAnchor">
-<a href="#ts-2" class="anchor"></a>TS 2</h3>
+<div class="section level4">
+<h4 class="unnumbered" id="ts-2">TS 2<a class="anchor" aria-label="anchor" href="#ts-2"></a>
+</h4>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix TS_2</span>
 <span class="co">#----------------------</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">series</span><span class="op">$</span><span class="va">TS_2</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html" class="external-link">ts</a></span><span class="op">(</span><span class="va">series</span><span class="op">$</span><span class="va">TS_2</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Because these are generated signals, look for a drop in FNN below 1%.</span>
 <span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">series</span><span class="op">$</span><span class="va">TS_2</span>, nnThres <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
@@ -248,8 +244,8 @@
 <span class="va">rqa2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">RN2</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="co"># Create RN graph</span>
-<span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">RN2</span>, mode<span class="op">=</span><span class="st">"undirected"</span>, diag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span><span class="op">(</span><span class="va">g2</span><span class="op">)</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span><span class="op">(</span><span class="va">g2</span><span class="op">)</span>
+<span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">RN2</span>, mode<span class="op">=</span><span class="st">"undirected"</span>, diag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">g2</span><span class="op">)</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html" class="external-link">degree</a></span><span class="op">(</span><span class="va">g2</span><span class="op">)</span>
 <span class="va">g2r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_spiral_graph.html">make_spiral_graph</a></span><span class="op">(</span><span class="va">g2</span>, arcs <span class="op">=</span> <span class="va">arcs</span>, epochColours <span class="op">=</span> <span class="fu"><a href="../reference/getColours.html">getColours</a></span><span class="op">(</span><span class="va">arcs</span><span class="op">)</span>, markTimeBy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># Get RN measures</span>
@@ -258,14 +254,14 @@
 <span class="co"># Should be the same</span>
 <span class="va">rqa2</span><span class="op">$</span><span class="va">RR</span><span class="op">==</span><span class="va">rn2</span><span class="op">$</span><span class="va">graph_measures</span><span class="op">$</span><span class="va">EdgeDensity</span></code></pre></div>
 </div>
-<div id="ts-3" class="section level3 unnumbered">
-<h3 class="hasAnchor">
-<a href="#ts-3" class="anchor"></a>TS 3</h3>
+<div class="section level4">
+<h4 class="unnumbered" id="ts-3">TS 3<a class="anchor" aria-label="anchor" href="#ts-3"></a>
+</h4>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#----------------------</span>
 <span class="co"># Adjacency matrix TS_3</span>
 <span class="co">#----------------------</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">series</span><span class="op">$</span><span class="va">TS_3</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html" class="external-link">ts</a></span><span class="op">(</span><span class="va">series</span><span class="op">$</span><span class="va">TS_3</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Because these are generated signals, look for a drop in FNN below 1%.</span>
 <span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/est_parameters.html">est_parameters</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">series</span><span class="op">$</span><span class="va">TS_3</span>, nnThres <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
@@ -277,8 +273,8 @@
 <span class="va">rqa3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">RN3</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="co"># Create RN graph</span>
-<span class="va">g3</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">RN3</span>, mode<span class="op">=</span><span class="st">"undirected"</span>, diag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html">V</a></span><span class="op">(</span><span class="va">g3</span><span class="op">)</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html">degree</a></span><span class="op">(</span><span class="va">g3</span><span class="op">)</span>
+<span class="va">g3</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">RN3</span>, mode<span class="op">=</span><span class="st">"undirected"</span>, diag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">g3</span><span class="op">)</span><span class="op">$</span><span class="va">size</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/degree.html" class="external-link">degree</a></span><span class="op">(</span><span class="va">g3</span><span class="op">)</span>
 <span class="va">g3r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_spiral_graph.html">make_spiral_graph</a></span><span class="op">(</span><span class="va">g3</span>,arcs <span class="op">=</span> <span class="va">arcs</span> ,epochColours <span class="op">=</span> <span class="fu"><a href="../reference/getColours.html">getColours</a></span><span class="op">(</span><span class="va">arcs</span><span class="op">)</span>, markTimeBy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># Get RN measures</span>
@@ -288,17 +284,17 @@
 <span class="va">rqa3</span><span class="op">$</span><span class="va">RR</span><span class="op">==</span><span class="va">rn3</span><span class="op">$</span><span class="va">graph_measures</span><span class="op">$</span><span class="va">EdgeDensity</span></code></pre></div>
 </div>
 </div>
-<div id="multiplex-recurrence-networks" class="section level2">
-<h2 class="hasAnchor">
-<a href="#multiplex-recurrence-networks" class="anchor"></a>Multiplex Recurrence Networks</h2>
+<div class="section level3">
+<h3 id="multiplex-recurrence-networks">Multiplex Recurrence Networks<a class="anchor" aria-label="anchor" href="#multiplex-recurrence-networks"></a>
+</h3>
 <p>Consider the three time series to be part of a multi-layer recurrence network. Common properties of the multiplex network are <em>inter-layer mutual information</em> and <em>edge overlap</em> can be calculated using function <code><a href="../reference/mrn.html">casnet::mrn()</a></code>. One problem, the networks have to be all of the same size (same number of nodes, a multivariate time series), but here we have reconstructed the phase space using different embedding parameters… let’s choose one set of parameters for all time series.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">emDim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">p1</span><span class="op">$</span><span class="va">optimDim</span>,<span class="va">p2</span><span class="op">$</span><span class="va">optimDim</span>,<span class="va">p3</span><span class="op">$</span><span class="va">optimDim</span><span class="op">)</span><span class="op">)</span>
-<span class="va">emLag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">p1</span><span class="op">$</span><span class="va">optimLag</span>,<span class="va">p2</span><span class="op">$</span><span class="va">optimLag</span>,<span class="va">p3</span><span class="op">$</span><span class="va">optimLag</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">emDim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p1</span><span class="op">$</span><span class="va">optimDim</span>,<span class="va">p2</span><span class="op">$</span><span class="va">optimDim</span>,<span class="va">p3</span><span class="op">$</span><span class="va">optimDim</span><span class="op">)</span><span class="op">)</span>
+<span class="va">emLag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p1</span><span class="op">$</span><span class="va">optimLag</span>,<span class="va">p2</span><span class="op">$</span><span class="va">optimLag</span>,<span class="va">p3</span><span class="op">$</span><span class="va">optimLag</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">RNs</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/llply.html">llply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="fu"><a href="../reference/rn.html">rn</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">series</span><span class="op">[</span>,<span class="va">r</span><span class="op">]</span>, emDim <span class="op">=</span> <span class="va">emDim</span>, emLag <span class="op">=</span> <span class="va">emLag</span>, emRad <span class="op">=</span> <span class="cn">NA</span>, targetValue <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span>
-<span class="va">layers</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/llply.html">llply</a></span><span class="op">(</span><span class="va">RNs</span>, <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">r</span>, mode<span class="op">=</span><span class="st">"undirected"</span>, diag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">layers</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"g1"</span>,<span class="st">"g2"</span>,<span class="st">"g3"</span><span class="op">)</span>
+<span class="va">RNs</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/llply.html" class="external-link">llply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="fu"><a href="../reference/rn.html">rn</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">series</span><span class="op">[</span>,<span class="va">r</span><span class="op">]</span>, emDim <span class="op">=</span> <span class="va">emDim</span>, emLag <span class="op">=</span> <span class="va">emLag</span>, emRad <span class="op">=</span> <span class="cn">NA</span>, targetValue <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span>
+<span class="va">layers</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/llply.html" class="external-link">llply</a></span><span class="op">(</span><span class="va">RNs</span>, <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">r</span>, mode<span class="op">=</span><span class="st">"undirected"</span>, diag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">layers</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>,<span class="st">"g2"</span>,<span class="st">"g3"</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/mrn.html">mrn</a></span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span><span class="op">)</span></code></pre></div>
 <p>A variety of plots can be created using <code><a href="../reference/mrn_plot.html">casnet::mrn_plot()</a></code></p>
@@ -313,9 +309,9 @@
 <span class="fu"><a href="../reference/mrn_plot.html">mrn_plot</a></span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span>, RNnodes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/mrn_plot.html">mrn_plot</a></span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span>, RNnodes <span class="op">=</span> <span class="cn">TRUE</span>,MRNweightedBy <span class="op">=</span> <span class="st">"EdgeOverlap"</span>, showEdgeColourLegend <span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="time-varying-multiplex-recurrence-networks" class="section level2">
-<h2 class="hasAnchor">
-<a href="#time-varying-multiplex-recurrence-networks" class="anchor"></a>Time-varying Multiplex Recurrence Networks</h2>
+<div class="section level3">
+<h3 id="time-varying-multiplex-recurrence-networks">Time-varying Multiplex Recurrence Networks<a class="anchor" aria-label="anchor" href="#time-varying-multiplex-recurrence-networks"></a>
+</h3>
 <p>The MRN can be calculated in a sliding window, by setting the arguments <code>win</code> and <code>step</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -345,11 +341,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Fred Hasselman.</p>
+  <p></p>
+<p>Developed by Fred Hasselman.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -357,6 +355,8 @@
 
   
 
+
+  
 
   </body>
 </html>

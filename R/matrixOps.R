@@ -47,7 +47,7 @@ mat_di2bi <- function(distmat, emRad = NA, convMat = FALSE){
     suppressMessages(RP <- Matrix::sparseMatrix(x=rep(1,length(xij$y)),i=xij$row,j=xij$col, dims = dim(distmat)))
 
     # Simple check
-    if(!all(na.exclude(as.vector(RP))%in%c(0,1))){warning("Matrix did not convert to a binary (0,1) matrix!!")}
+    if(!all(stats::na.exclude(as.vector(RP))%in%c(0,1))){warning("Matrix did not convert to a binary (0,1) matrix!!")}
 
   } else {
 
@@ -479,7 +479,7 @@ mat_coursegrain <- function(RM,
   }
 
   if(is.na(recurrence_threshold)){
-    if(all(na.exclude(as.vector(RM))%in%c(0,1))){
+    if(all(stats::na.exclude(as.vector(RM))%in%c(0,1))){
       RR <- rp_measures(RM)
       recurrence_threshold <- mean(c(RR$RR,RR$SING_rate,RR$DET,RR$LAM_hv), na.rm = TRUE)
       rm(RR)
@@ -500,7 +500,7 @@ mat_coursegrain <- function(RM,
   }
 
   if(is.na(n_core)){
-    n_core <- parallel::detectCores()
+    n_core <- parallel::detectCores()-1
   }
   if(n_core>1){
     available_core <- parallel::detectCores()
@@ -510,12 +510,12 @@ mat_coursegrain <- function(RM,
   }
 
   if(is.na(summary_func)){
-    if(all(na.exclude(as.vector(RM))%in%c(0,1))){
+    if(all(stats::na.exclude(as.vector(RM))%in%c(0,1))){
       summary_func <- function(x){ifelse(mean(x, na.rm = TRUE)>recurrence_threshold,1,0)}
       if(!silent){message("Binary matrix... using summary function 'ifelse(mean(x, na.rm = TRUE)>recurrence_threshold,1,0)' for coursegraining.")}
     } else {
       if(categorical){
-        summary_func <- function(x){as.numeric(attributes(ftable(x))$col.vars$x[[which.max(ftable(x))]])}
+        summary_func <- function(x){as.numeric(attributes(stats::ftable(x))$col.vars$x[[which.max(stats::ftable(x))]])}
         if(!silent){message("Categorical matrix... using summary function 'attributes(ftable(x))$col.vars[[which.max(ftable(x))]]' for coursegraining.")}
       } else {
         if(!all(plyr::is.discrete(RM))){

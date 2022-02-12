@@ -21,7 +21,7 @@ inf_MSE(
   scaleMax = floor(NROW(y)/10),
   scaleS = NA,
   overlap = 0,
-  minData = 4,
+  dataMin = 4,
   relativeEntropy = FALSE,
   doPlot = FALSE,
   returnPlot = FALSE,
@@ -49,39 +49,37 @@ inf_MSE(
 
 \item{transformBefore}{Detrend/standardise before coarse graining. If set to \code{FALSE}, each coarsegrained series will be detrended/standardised separately (default = \code{TRUE})}
 
-\item{removeTrend}{Method to use for detrending (default = "poly")}
+\item{removeTrend}{Method to use for global detrending (default = \code{"poly"})}
 
-\item{polyOrder}{Order of polynomial trend to remove if \code{removeTrend = "poly"}}
+\item{polyOrder}{Order of global polynomial trend to remove if \code{removeTrend = "poly"}. If \code{removeTrend = "adaptive"} polynomials \code{1} to \code{polyOrder} will be evaluated and the best fitting curve (R squared) will be removed (default = \code{1})}
 
-\item{standardise}{Standardise by the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
+\item{standardise}{Standardise the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
-\item{adjustSumOrder}{Adjust the time series (summation or differencing), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
+\item{adjustSumOrder}{Adjust the time series (summation or difference), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
 
-\item{scaleMin}{Minimium scale (as a power of 2) to use}
+\item{scaleMin}{Minimum scale (in data points) to use for log-log regression (default = \code{4})}
 
-\item{scaleMax}{Maximum scale (as a power of 2) to use}
+\item{scaleMax}{Maximum scale (in data points) to use for log-log regression. This value will be ignored if \code{dataMin} is not \code{NA} (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
 
-\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} will be ignored.}
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
 
-\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with stepsize \code{floor(.5 * 4) = 2}. The detrended fluctuation in   For scale \code{128} this will be  (default = \code{0})}
-
-\item{minData}{Minimum number of data points in a bin needed to calculate detrended fluctuation}
+\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
 
 \item{relativeEntropy}{The relative entropy, SampEn / (-1 * log(1/length(y))) will be returned (default = \code{FALSE})}
 
-\item{doPlot}{Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).}
+\item{doPlot}{Output the log-log scale versus fluctuation plot with linear fit by calling function \code{plotFD_loglog()} (default = \code{TRUE})}
 
 \item{returnPlot}{Return ggplot2 object (default = \code{FALSE})}
 
 \item{returnPLAW}{Return the power law data (default = \code{FALSE})}
 
-\item{returnInfo}{Return all the data used in DFA (default = \code{FALSE})}
+\item{returnInfo}{Return all the data used in SDA (default = \code{FALSE})}
 
-\item{silent}{Silent-ish mode}
+\item{silent}{Silent-ish mode (default = \code{FALSE})}
 
-\item{noTitle}{Do not generate a title (only the subtitle)}
+\item{noTitle}{Do not generate a title (only the subtitle) (default = \code{FALSE})}
 
-\item{tsName}{Name of y added as a subtitle to the plot}
+\item{tsName}{Name of y added as a subtitle to the plot (default = \code{"y"})}
 }
 \value{
 MSE

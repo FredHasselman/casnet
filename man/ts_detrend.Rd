@@ -4,10 +4,10 @@
 \alias{ts_detrend}
 \title{Detrend a time series}
 \usage{
-ts_detrend(y, polyOrder = 1)
+ts_detrend(y, polyOrder = 1, adaptive = FALSE)
 }
 \arguments{
-\item{y}{A time series ot numeric vector}
+\item{y}{A time series of numeric vector}
 
 \item{polyOrder}{order Order of polynomial trend to remove}
 }

@@ -7,7 +7,9 @@
 monoH(
   TSm,
   scaleS,
+  removeTrend = c("no", "poly", "adaptive", "bridge")[2],
   polyOrder = 1,
+  overlap = overlap,
   returnPLAW = FALSE,
   returnSegments = FALSE,
   removeRMSbelow = .Machine$double.eps
@@ -16,9 +18,15 @@ monoH(
 \arguments{
 \item{TSm}{TS matrix with 2 columns \code{t} (1st) and \code{y} (second)}
 
-\item{scaleS}{scales to evaluate}
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
 
-\item{polyOrder}{If numeric: order to use for polynomial detrendiing, if "adaptive" will use the best fitting polynomial.}
+\item{removeTrend}{Method to use for global detrending (default = \code{"poly"})}
+
+\item{polyOrder}{Order of global polynomial trend to remove if \code{removeTrend = "poly"}. If \code{removeTrend = "adaptive"} polynomials \code{1} to \code{polyOrder} will be evaluated and the best fitting curve (R squared) will be removed (default = \code{1})}
+
+\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
+
+\item{returnPLAW}{Return the power law data (default = \code{FALSE})}
 }
 \description{
 mono Hurst
