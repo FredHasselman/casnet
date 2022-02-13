@@ -36,6 +36,13 @@
 #'
 #' @family Dynamic Complexity functions
 #'
+#' @examples
+#'
+#'  # Dynamic Complexity analysis on part of the coloured noise dataset:
+#'  data(ColouredNoise)
+#'  # Make unit scale
+#'  df <- data.frame(Brownianish = elascer(rowSums(ColouredNoise[,1:6])), pinkish = elascer(rowSums(ColouredNoise[,7:12])), whiteish = elascer(rowSums(ColouredNoise[,12:17])))
+#'  dc_win(df = df, win = 56, scale_min = 0, scale_max = 1, doPlot = TRUE)
 #'
 dc_win <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, doPlotF = FALSE, doPlotD = FALSE, returnFandD = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
@@ -187,6 +194,9 @@ dc_ccp = function(df_win , alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE,
 #'
 #' @export
 #'
+#' @author Merlijn Olthof
+#' @author Fred Hasselman
+#'
 #' @seealso Use [dc_win()] to get the dynamic complexity measure.
 #'
 #' @references Haken H, & Schiepek G. (2006). *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
@@ -330,6 +340,10 @@ get_fluct <- function(y_win,s){
 #' @return a dataframe
 #' @export
 #'
+#' @author Merlijn Olthof
+#' @author Fred Hasselman
+#' @author Jingmeng Cui
+#'
 #' @seealso Use [dc_win()] to get the Dynamic Complexity measure.
 #'
 #' @references Haken H, & Schiepek G. (2006). *Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten*. Hogrefe, Göttingen.
@@ -374,6 +388,7 @@ dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVar
       x <- tsy[i:(i+win-1)]
       x <- sort(x)
 
+      # Faster C code
       v_temp <- edab(win, x, y)
       r <- v_temp["r"]
       g <- v_temp["g"]
@@ -406,6 +421,9 @@ dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVar
 #' @inheritParams dc_win
 #'
 #' @return Data frame with variance in requested window size.
+#'
+#' @author Merlijn Olthof
+#' @author Fred Hasselman
 #'
 #' @export
 #'
@@ -469,6 +487,9 @@ var_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrd
 #' @note For different step-sizes or window alignments see [ts_windower()].
 #'
 #' @inheritParams dc_win
+#'
+#' @author Merlijn Olthof
+#' @author Fred Hasselman
 #'
 #' @return Data frame with autocorrelations in requested window size.
 #'

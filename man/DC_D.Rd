@@ -63,4 +63,11 @@ Other Dynamic Complexity functions:
 \code{\link{plotDC_lvl}()},
 \code{\link{plotDC_res}()}
 }
+\author{
+Merlijn Olthof
+
+Fred Hasselman
+
+Jingmeng Cui
+}
 \concept{Dynamic Complexity functions}

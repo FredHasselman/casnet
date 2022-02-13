@@ -50,6 +50,15 @@ If \code{doPlot = TRUE}, a list object containing a data frame of Dynamic Comple
 \description{
 Calculates Dynamic Complexity, a complexity index for short and coarse grained time series.
 }
+\examples{
+
+ # Dynamic Complexity analysis on part of the coloured noise dataset:
+ data(ColouredNoise)
+ # Make unit scale
+ df <- data.frame(Brownianish = elascer(rowSums(ColouredNoise[,1:6])), pinkish = elascer(rowSums(ColouredNoise[,7:12])), whiteish = elascer(rowSums(ColouredNoise[,12:17])))
+ dc_win(df = df, win = 56, scale_min = 0, scale_max = 1, doPlot = TRUE)
+
+}
 \references{
 Haken H, & Schiepek G. (2006). \emph{Synergetik in der Psychologie. Selbstorganisation verstehen und gestalten}. Hogrefe, Göttingen.
 

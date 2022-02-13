@@ -355,7 +355,7 @@ fd_prepSeries <- function(y,
     }
   }
 
-  if(!is.na(scaleS)){
+  if(!all(is.na(scaleS))){
     # Nyquist-ish
     if(max(scaleS)>floor(NROW(y)/2)){
       warning("The maximum bin should be smaller than floor(NROW(y)/2) data points")
@@ -482,6 +482,8 @@ fd_sda <- function(y,
   scaleS  <- attr(y, "scaleS")
   dataMin <- attr(y, "dataMin")
 
+  Hadj    <- attr(y,"Hadj")
+  Hglobal <- attr(y,"Hglobal.excl")
 
   # if(!stats::is.ts(y)){
   #   if(is.null(fs)){fs <- 1}

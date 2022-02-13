@@ -45,3 +45,8 @@ data(ColouredNoise)
 ac_win(elascer(ColouredNoise[,c(1,11,21,31,41)],groupwise = TRUE), win = 128, doPlot = TRUE)
 
 }
+\author{
+Merlijn Olthof
+
+Fred Hasselman
+}

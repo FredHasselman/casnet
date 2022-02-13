@@ -23,7 +23,8 @@ Useful links:
 
 Other contributors:
 \itemize{
-  \item Merlijn Olthof \email{m.olthof@pwo.ru.nl} [contributor]
+  \item Merlijn Olthof \email{merlijn.olthof@ru.nl} [contributor]
+  \item Jingmeng Cui \email{jingmeng.cui@rug.nl} [contributor]
 }
 
 }
