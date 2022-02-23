@@ -411,7 +411,7 @@ rn_recSpec <- function(RN,
   weighted <- NULL
   if(attributes(RN)$weighted){weighted <- TRUE}
 
-  g1 <- igraph::graph_from_adjacency_matrix(RN, mode="upper", diag = FALSE, weighted = weighted)
+  g1 <- igraph::graph_from_adjacency_matrix(RN, mode="directed", diag = FALSE, weighted = weighted)
 
   edgeFrame <- igraph::as_data_frame(g1,"edges")
   edgeFrame$rectime <- edgeFrame$to-edgeFrame$from
@@ -632,7 +632,7 @@ rn_phases <- function(RN,
 
   gRN <- igraph::graph_from_adjacency_matrix(RN,
                                              weighted = TRUE,
-                                             mode = "upper",
+                                             mode = "directed",
                                              diag = FALSE)
 
   igraph::E(gRN)$weight <- (1/igraph::E(gRN)$weight)%00%0

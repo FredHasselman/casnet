@@ -289,7 +289,7 @@ mrn <- function(layers,
     cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
   }
 
-  return(out)
+  return(invisible(out))
 }
 
 
@@ -403,8 +403,8 @@ mrn_plot     <- function(layers = NA,
   } else {
     if(all(names(MRN)%in%c("interlayerMI","edgeOverlap","meanValues","Nsize"))){
       if(!silent){
-       cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
-       cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
+        cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+        cat(paste("\nWelcome to the multiplex... in layer similarity mode!\n\n"))
       }
     } else {
       stop("MRN is not an object output by function mrn()")
@@ -472,13 +472,13 @@ mrn_plot     <- function(layers = NA,
 
             gg <- gg + ggimage::theme_transparent() +
               theme(
-              panel.background      = element_rect(fill = "transparent"),
-              plot.background       = element_rect(fill = "transparent", color = NA),
-              panel.grid.major      = element_blank(),
-              panel.grid.minor      = element_blank(),
-              legend.background     = element_rect(fill = "transparent"),
-              legend.box.background = element_rect(fill = "transparent")
-            )
+                panel.background      = element_rect(fill = "transparent"),
+                plot.background       = element_rect(fill = "transparent", color = NA),
+                panel.grid.major      = element_blank(),
+                panel.grid.minor      = element_blank(),
+                legend.background     = element_rect(fill = "transparent"),
+                legend.box.background = element_rect(fill = "transparent")
+              )
           })
 
           g_rast <- list()
@@ -588,11 +588,11 @@ mrn_plot     <- function(layers = NA,
 
           gg <- ggplot(gNodes,aes_(x=~V1, y=~V2)) +
             geom_curve(data=gEdges, aes_(x = ~from.x,
-                                        xend = ~to.x,
-                                        y = ~from.y,
-                                        yend = ~to.y,
-                                        colour = ~weight,
-                                        size = ~size),
+                                         xend = ~to.x,
+                                         y = ~from.y,
+                                         yend = ~to.y,
+                                         colour = ~weight,
+                                         size = ~size),
                        alpha = alphaE,
                        curvature = curvature)
 
@@ -614,7 +614,7 @@ mrn_plot     <- function(layers = NA,
           if(nchar(title)>0){
             gg <- gg + labs(title = title)
           } else {
-           gg <- gg + labs(title = names(MRNlist)[w])
+            gg <- gg + labs(title = names(MRNlist)[w])
           }
 
           if(showVertexLegend){
@@ -622,11 +622,11 @@ mrn_plot     <- function(layers = NA,
 
               gg <- gg + geom_text(aes_(label=~name))
 
-             } else {
-               gg <- gg + guides(fill = guide_legend(title.position = "top",
-                                                     byrow = TRUE,
-                                                     nrow=2,
-                                                     override.aes = list(size=5,order = 0)))
+            } else {
+              gg <- gg + guides(fill = guide_legend(title.position = "top",
+                                                    byrow = TRUE,
+                                                    nrow=2,
+                                                    override.aes = list(size=5,order = 0)))
             }
           } else {
             gg <- gg + guides(fill = "none")
@@ -691,10 +691,10 @@ mrn_plot     <- function(layers = NA,
             }
           }
 
-          return(list(MRN           = MRNlist,
+          return(invisible(list(MRN           = MRNlist,
                       interlayerMI  = MRN$interlayerMI,
                       edgeOverlap   =  MRN$edgeOverlap,
-                      meanValues    =  MRN$out_means))
+                      meanValues    =  MRN$out_means)))
 
         } else {
 
@@ -707,11 +707,11 @@ mrn_plot     <- function(layers = NA,
 
           gg <- ggplot(gNodes, aes_(x = ~V1, y = ~V2)) +
             geom_curve(data = gEdges, aes_(x = ~from.x,
-                                    xend = ~to.x,
-                                    y = ~from.y,
-                                    yend = ~to.y,
-                                    size = ~weight,
-                                    colour = ~weight), curvature = 0)
+                                           xend = ~to.x,
+                                           y = ~from.y,
+                                           yend = ~to.y,
+                                           size = ~weight,
+                                           colour = ~weight), curvature = 0)
           if(RNnodes){
             gg <- gg + ggimage::geom_image(aes(image=image), size = .2)
           }
@@ -741,11 +741,11 @@ mrn_plot     <- function(layers = NA,
           }
 
           return(invisible(list(MRN              = MRNlist,
-                      MRNanimationData = gList,
-                      MRNanimationGG   = invisible(gg),
-                      interlayerMI  =  MRN$interlayerMI,
-                      edgeOverlap   =  MRN$edgeOverlap,
-                      meanValues    =  MRN$out_means)))
+                                MRNanimationData = gList,
+                                MRNanimationGG   = invisible(gg),
+                                interlayerMI  =  MRN$interlayerMI,
+                                edgeOverlap   =  MRN$edgeOverlap,
+                                meanValues    =  MRN$out_means)))
         }
       }
 
@@ -755,10 +755,10 @@ mrn_plot     <- function(layers = NA,
 
   } else {    # NOT mi_interlayer
     if(!silent){
-    cat(paste("\nWelcome to the multiplex... in layer importance mode!\n\n"))
-    cat(paste("\n\nNOT IMPLEMENTED\n\n"))
-   # rankDC
-  cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
+      cat(paste("\nWelcome to the multiplex... in layer importance mode!\n\n"))
+      cat(paste("\n\nNOT IMPLEMENTED\n\n"))
+      # rankDC
+      cat("\n\n~~~o~~o~~casnet~~o~~o~~~\n")
     }
   }
 }
