@@ -16,7 +16,7 @@ rp_plot(
   markEpochsLOI = NULL,
   radiusValue = NA,
   courseGrain = TRUE,
-  maxSize = 500^2,
+  maxSize = 1000^2,
   title = "",
   xlabel = "",
   ylabel = "",

@@ -10,6 +10,7 @@ dc_d                                            Distribution Uniformity Distribu
                                                 the Dynamic Complexity measure.
 dc_f                                            Fluctuation Intensity
 dc_win                                          Dynamic Complexity
+eig_win                                         Windowed Eigenvalue (PCA)
 elascer                                         Elastic Scaler - A Flexible Rescale Function
 est_emDim                                       Estimate number of embedding dimensions
 est_emLag                                       Estimate embedding lag (tau)

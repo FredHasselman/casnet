@@ -239,7 +239,7 @@ rp <- function(y1, y2 = NULL,
   if(doPlot){
 
     if(rp_size(dmat)$rp_size_total>1024){
-      warning("Plotting will take a long time. Consider running rp_plot(..., courseGrain = TRUE)")
+      warning("Plotting will take a long time. Consider running rp_plot(..., courseGrain = TRUE)", immediate. = TRUE)
     }
     rp_plot(RM = dmat, courseGrain = FALSE)
 
@@ -2166,7 +2166,7 @@ rp_plot <- function(RM,
                     markEpochsLOI = NULL,
                     radiusValue = NA,
                     courseGrain = TRUE,
-                    maxSize = 500^2,
+                    maxSize = 1000^2,
                     title = "",
                     xlabel = "",
                     ylabel="",
