@@ -50,7 +50,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -94,7 +94,7 @@
       <h1 data-toc-skip>Recurrence Networks</h1>
                         <h4 data-toc-skip class="author">Fred Hasselman</h4>
             
-            <h4 data-toc-skip class="date">2022-02-23</h4>
+            <h4 data-toc-skip class="date">2022-03-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/RecurrenceNetworks.Rmd" class="external-link"><code>vignettes/RecurrenceNetworks.Rmd</code></a></small>
       <div class="hidden name"><code>RecurrenceNetworks.Rmd</code></div>
@@ -186,15 +186,15 @@
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>  Global Measures</span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   Global Max.points N.points    RR Singular Divergence Repetitiveness</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span> Matrix      <span class="dv">14161</span>     <span class="dv">1863</span> <span class="fl">0.132</span>     <span class="dv">1286</span>     <span class="fl">0.0084</span>           <span class="fl">2.49</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span> Matrix      <span class="dv">14161</span>     <span class="dv">1815</span> <span class="fl">0.128</span>     <span class="dv">1224</span>     <span class="fl">0.0084</span>           <span class="fl">2.23</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> </span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>  Line<span class="sc">-</span>based Measures</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>        Lines N.lines N.points Measure  Rate Mean Max.   ENT ENT_rel   CoV</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   Diagonal     <span class="dv">201</span>      <span class="dv">577</span>     DET <span class="fl">0.310</span> <span class="fl">2.87</span>  <span class="dv">119</span> <span class="fl">0.561</span>   <span class="fl">0.117</span> <span class="fl">2.889</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">2</span>   Vertical     <span class="dv">316</span>      <span class="dv">717</span>   V LAM <span class="fl">0.385</span> <span class="fl">2.27</span>    <span class="dv">6</span> <span class="fl">0.642</span>   <span class="fl">0.134</span> <span class="fl">0.288</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">3</span> Horizontal     <span class="dv">316</span>      <span class="dv">717</span>   H LAM <span class="fl">0.385</span> <span class="fl">2.27</span>    <span class="dv">6</span> <span class="fl">0.642</span>   <span class="fl">0.134</span> <span class="fl">0.288</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">4</span>  V<span class="sc">+</span>H Total     <span class="dv">632</span>     <span class="dv">1434</span> V<span class="sc">+</span>H LAM <span class="fl">0.385</span> <span class="fl">2.27</span>    <span class="dv">6</span> <span class="fl">0.642</span>   <span class="fl">0.134</span> <span class="fl">0.287</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   Diagonal     <span class="dv">211</span>      <span class="dv">591</span>     DET <span class="fl">0.326</span> <span class="fl">2.80</span>  <span class="dv">119</span> <span class="fl">0.512</span>   <span class="fl">0.107</span> <span class="fl">2.890</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">2</span>   Vertical     <span class="dv">292</span>      <span class="dv">660</span>   V LAM <span class="fl">0.364</span> <span class="fl">2.26</span>    <span class="dv">6</span> <span class="fl">0.631</span>   <span class="fl">0.132</span> <span class="fl">0.280</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">3</span> Horizontal     <span class="dv">292</span>      <span class="dv">660</span>   H LAM <span class="fl">0.364</span> <span class="fl">2.26</span>    <span class="dv">6</span> <span class="fl">0.631</span>   <span class="fl">0.132</span> <span class="fl">0.280</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">4</span>  V<span class="sc">+</span>H Total     <span class="dv">584</span>     <span class="dv">1320</span> V<span class="sc">+</span>H LAM <span class="fl">0.364</span> <span class="fl">2.26</span>    <span class="dv">6</span> <span class="fl">0.631</span>   <span class="fl">0.132</span> <span class="fl">0.279</span></span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
 <span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
@@ -216,9 +216,9 @@
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> Global Network Measures</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span>   EdgeDensity MeanStrengthDensity GlobalClustering NetworkTransitivity</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   <span class="fl">0.1241988</span>                  <span class="cn">NA</span>        <span class="fl">0.7004116</span>           <span class="fl">0.6891234</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>   <span class="fl">0.1207805</span>                  <span class="cn">NA</span>        <span class="fl">0.6870866</span>           <span class="fl">0.6780764</span></span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span>   AveragePathLength GlobalEfficiency</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>           <span class="fl">6.48298</span>         <span class="fl">2.924907</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="dv">1</span>          <span class="fl">5.977211</span>         <span class="fl">2.840714</span></span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> </span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="er">~~~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>casnet<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~</span>o<span class="sc">~</span><span class="er">~~</span></span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
