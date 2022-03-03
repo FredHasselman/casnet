@@ -880,7 +880,7 @@ rn_phases <- function(RN,
     rm(space_dims)
   }
 
-  out <- out %>% dplyr::group_by(.data$phase_name) %>% dplyr::mutate(phase_size = dplyr::n())
+  out <- out %>% dplyr::group_by(.data$phase_name) %>% dplyr::mutate(phase_size = dplyr::n()) %>% dplyr::ungroup()
   out <- out %>% dplyr::arrange(.data$states_time)
   out$states_singularity[out$states_time %in% Singularities$time] <- 1
 
@@ -1060,7 +1060,8 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
                      from_name = dplyr::first(.data$from_name),
                      to_name = dplyr::first(.data$to_name)) %>%
     dplyr::mutate(freq = (.data$N / sum(.data$N, na.rm = TRUE))) %>%
-    dplyr::select(-.data$N)
+    dplyr::select(-.data$N) %>%
+    dplyr::ungroup()
 
   if(!is.na(threshold)){
     df$freq[df$freq<=threshold] <- 0

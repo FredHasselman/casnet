@@ -238,7 +238,10 @@ rp <- function(y1, y2 = NULL,
 
   if(doPlot){
 
-    rp_plot(RM = dmat)
+    if(rp_size(dmat)$rp_size_total>1024){
+      warning("Plotting will take a long time. Consider running rp_plot(..., courseGrain = TRUE)")
+    }
+    rp_plot(RM = dmat, courseGrain = FALSE)
 
     # if(...length()>0){
     #   dotArgs <- list(...)
@@ -837,7 +840,8 @@ rp_measures_main <- function(RM,
 #' @param AUTO Auto-recurrence? (default = `FALSE`)
 #' @param chromatic Force chromatic RQA? (default = `FALSE`)
 #' @param matrices Return matrices? (default = `FALSE`)
-#' @param doPlot Plot
+#' @param doPlot Plot (default = `TRUE`)
+#' @param returnOnlyPlot Don't plot to graphics device, but do return the plot (default = `FALSE`)
 #'
 #' @return A plot and/or the data for the plot
 #'
@@ -861,7 +865,8 @@ rp_diagProfile <- function(RM,
                            AUTO      = NULL,
                            chromatic = FALSE,
                            matrices  = FALSE,
-                           doPlot    = TRUE){
+                           doPlot    = TRUE,
+                           returnOnlyPlot = FALSE){
 
 
   # crqa_results_xy <– crqa(ts1 = lorData$x, ts2 = lorData$y, delay = 9, embed = 4, rescale = 2, radius = 20, normalize = 2, mindiagline = 2, minvertline = 2, tw = 0, whiteline = FALSE, recpt = FALSE, side = “both”) # compute cross-recurrence plot
@@ -1059,8 +1064,10 @@ rp_diagProfile <- function(RM,
       ggplot2::theme_bw() +
       theme(panel.grid.minor = element_blank(),
             axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5, size = rel(.6)))
-    print(g)
 
+    if(!returnOnlyPlot){
+      print(g)
+    }
     if(doShuffle){
       df <- tidyr::spread(df,key = .data$variable, value = .data$RR)
     }

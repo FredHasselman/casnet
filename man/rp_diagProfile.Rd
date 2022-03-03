@@ -24,7 +24,8 @@ rp_diagProfile(
   AUTO = NULL,
   chromatic = FALSE,
   matrices = FALSE,
-  doPlot = TRUE
+  doPlot = TRUE,
+  returnOnlyPlot = FALSE
 )
 }
 \arguments{
@@ -71,7 +72,9 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{matrices}{Return matrices? (default = \code{FALSE})}
 
-\item{doPlot}{Plot}
+\item{doPlot}{Plot (default = \code{TRUE})}
+
+\item{returnOnlyPlot}{Don't plot to graphics device, but do return the plot (default = \code{FALSE})}
 }
 \value{
 A plot and/or the data for the plot

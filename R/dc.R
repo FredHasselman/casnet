@@ -497,8 +497,6 @@ var_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrd
 #'
 #' @examples
 #'
-#' @examples
-#'
 #' data(ColouredNoise)
 #' ac_win(elascer(ColouredNoise[,c(1,11,21,31,41)],groupwise = TRUE), win = 128, doPlot = TRUE)
 #'
@@ -553,3 +551,63 @@ ac_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrde
     return(df_ac)
   }
 }
+
+
+
+#' Windowed Eigenvalue (PCA)
+#'
+#' Calculate the eigenvalue of the first PCA component in a right-aligned sliding window on (multivariate) time series data.
+#'
+#' @note For different step-sizes or window alignments see [ts_windower()].
+#'
+#' @inheritParams dc_win
+#'
+#' @author Merlijn Olthof
+#' @author Fred Hasselman
+#'
+#' @return Data frame with the eigenvalues in requested window size.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' data(ColouredNoise)
+#' eig_win(df = elascer(ColouredNoise[,c(1,11,21,31,41)],groupwise = TRUE), win = 128, doPlot = TRUE)
+#'
+eig_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
+
+  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+    time_vec <- stats::time(df)
+  } else {
+    time_vec <- NA
+  }
+
+  if(is.null(dim(df))){
+    if(is.numeric(df)){
+      df <- data.frame(df)
+    } else {
+      df <- data.frame(as.numeric_discrete(df))
+    }
+  }
+
+  if(win<=0){stop("Need a window > 0")}
+
+  tsNames <- colnames(df)
+
+  df_eig <- matrix(NA, nrow=nrow(df), ncol=ncol(df))
+  df_eig <- data.frame(df_eig)
+
+  for(i in (win:nrow(df))){
+    res.pca <- stats::prcomp(df[(i-win+1):i,])
+    df_eig[win+i-1,] <- factoextra::get_eigenvalue(res.pca)$eigenvalue[1]
+  }
+
+  g <- NULL
+  if(doPlot){
+    g <- plotDC_res(df_win = df_eig, win = win, useVarNames = useVarNames, colOrder = colOrder, timeStamp = timeStamp, doPlot = doPlot, title = "Eigenvalue Resonance Diagram", resVariable = "Eigenvalue of 1st Principle Component")
+    return(invisible(list(data = df_eig, graph = g)))
+  } else {
+    return(df_eig)
+  }
+}
+
