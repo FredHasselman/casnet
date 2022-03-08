@@ -27,7 +27,7 @@ growth_ac(
 A timeseries object of length N.
 }
 \description{
-Autocatlytic Growth: Iterating differential equations (maps)
+Autocatalytic Growth: Iterating differential equations (maps)
 }
 \examples{
 # The logistic map in the chaotic regime

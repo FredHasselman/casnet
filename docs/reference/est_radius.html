@@ -81,7 +81,7 @@
   eachRadius <span class="op">=</span> <span class="fl">1</span>,
   targetMeasure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RR"</span>, <span class="st">"DET"</span>, <span class="st">"LAM"</span>, <span class="st">"T1"</span>, <span class="st">"all"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
   targetValue <span class="op">=</span> <span class="fl">0.05</span>,
-  tol <span class="op">=</span> <span class="fl">0.1</span>,
+  tol <span class="op">=</span> <span class="fl">0.01</span>,
   maxIter <span class="op">=</span> <span class="fl">100</span>,
   theiler <span class="op">=</span> <span class="cn">NA</span>,
   histIter <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -119,7 +119,7 @@
 <dt>targetValue</dt>
 <dd><p>When argument <code>type</code> is set to "fixed", the value represents the target value for the measure in <code>targetMeasure</code> (default = <code>RR = .05</code>).</p></dd>
 <dt>tol</dt>
-<dd><p>Tolerance for achieving <code>targetValue</code> for <code>targetMeasure</code> (default = <code>0.1</code>)</p></dd>
+<dd><p>Tolerance for achieving <code>targetValue</code> for <code>targetMeasure</code> (default = <code>0.01</code>)</p></dd>
 <dt>maxIter</dt>
 <dd><p>If <code>type = "fixed"</code>: Maximum number of iterations to reach targetValue.</p></dd>
 <dt>theiler</dt>

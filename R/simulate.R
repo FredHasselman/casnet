@@ -4,7 +4,7 @@
 
 #' Examples of dynamical growth models (maps)
 #'
-#' Autocatlytic Growth: Iterating differential equations (maps)
+#' Autocatalytic Growth: Iterating differential equations (maps)
 #'
 #' @param Y0    Initial value.
 #' @param r    Growth rate parameter.

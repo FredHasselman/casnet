@@ -17,7 +17,7 @@ est_radius(
   eachRadius = 1,
   targetMeasure = c("RR", "DET", "LAM", "T1", "all")[1],
   targetValue = 0.05,
-  tol = 0.1,
+  tol = 0.01,
   maxIter = 100,
   theiler = NA,
   histIter = FALSE,
@@ -52,7 +52,7 @@ est_radius(
 
 \item{targetValue}{When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).}
 
-\item{tol}{Tolerance for achieving \code{targetValue} for \code{targetMeasure} (default = \code{0.1})}
+\item{tol}{Tolerance for achieving \code{targetValue} for \code{targetMeasure} (default = \code{0.01})}
 
 \item{maxIter}{If \code{type = "fixed"}: Maximum number of iterations to reach targetValue.}
 
