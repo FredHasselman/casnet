@@ -91,8 +91,10 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Dynamic Complexity as an Early-Warning Indicator for Clinical Change</h1>
-                        <h4 data-toc-skip class="author">Merlijn Olthof &amp; Fred Hasselman</h4>
+      <h1 data-toc-skip>Dynamic Complexity as an Early-Warning Indicator
+for Clinical Change</h1>
+                        <h4 data-toc-skip class="author">Merlijn Olthof
+&amp; Fred Hasselman</h4>
             
             <h4 data-toc-skip class="date">2022-03-08</h4>
       
@@ -106,14 +108,41 @@
 <div class="section level2">
 <h2 id="early-warning-signals-for-clinical-change">Early-warning signals for clinical change<a class="anchor" aria-label="anchor" href="#early-warning-signals-for-clinical-change"></a>
 </h2>
-<p>Critical transitions between stable states in a complex system are preceded by <em>critical fluctuations</em> that can be identified as increased variability and complexity in the system’s behaviour over time (Haken, 1983). Critical fluctuations thus serve as an <em>early-warning signal</em> (Scheffer et al., 2009) for such transitions (Olthof et al., 2020a). Although often used, variance is a sub-optimal measure for critical fluctuations as it is highly sensitive to non-stationarity and noise. Therefore, the measure <a href="https://doi.org/10.1007/s00422-009-0362-1" class="external-link"><em>dynamic complexity</em></a> has been proposed as a potentially more suitable indicator of critical fluctuations in short and coarse-grained time series (Schiepek &amp; Strunk, 2010; Schiepek, 2003).</p>
-<p>The main purpose of the vignette is to showcase the <em>Dynamic Complexity functions</em> family in <code>casnet</code>. For comparison, we also introduce similar functions based on <em>variance</em> and <em>autocorrelation</em> which have been both proposed as indicators of early-warning signals. In addition, we introduce the function <em>ts_levels()</em> as a method to identify possible transitions.</p>
-<p>We analyze publicly available ecological momentary assesment (EMA) data from 1 patient that was drawn from a personalized psychotherapy study (Fisher &amp; Boswell, 2016) and was analysed by several different teams in a ‘Many Analysists’ study: <a href="https://doi.org/10.1016/j.jpsychores.2020.110211" class="external-link"><em>Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology</em></a> by Bastiaansen et al. (2020). In this vignette, we focus on EMA data but note that dynamic complexity may also be used for different data sources (e.g. see Wiltshire et al., 2020).</p>
+<p>Critical transitions between stable states in a complex system are
+preceded by <em>critical fluctuations</em> that can be identified as
+increased variability and complexity in the system’s behaviour over time
+(Haken, 1983). Critical fluctuations thus serve as an <em>early-warning
+signal</em> (Scheffer et al., 2009) for such transitions (Olthof et al.,
+2020a). Although often used, variance is a sub-optimal measure for
+critical fluctuations as it is highly sensitive to non-stationarity and
+noise. Therefore, the measure <a href="https://doi.org/10.1007/s00422-009-0362-1" class="external-link"><em>dynamic
+complexity</em></a> has been proposed as a potentially more suitable
+indicator of critical fluctuations in short and coarse-grained time
+series (Schiepek &amp; Strunk, 2010; Schiepek, 2003).</p>
+<p>The main purpose of the vignette is to showcase the <em>Dynamic
+Complexity functions</em> family in <code>casnet</code>. For comparison,
+we also introduce similar functions based on <em>variance</em> and
+<em>autocorrelation</em> which have been both proposed as indicators of
+early-warning signals. In addition, we introduce the function
+<em>ts_levels()</em> as a method to identify possible transitions.</p>
+<p>We analyze publicly available ecological momentary assesment (EMA)
+data from 1 patient that was drawn from a personalized psychotherapy
+study (Fisher &amp; Boswell, 2016) and was analysed by several different
+teams in a ‘Many Analysists’ study: <a href="https://doi.org/10.1016/j.jpsychores.2020.110211" class="external-link"><em>Time to get
+personal? The impact of researchers’ choices on the selection of
+treatment targets using the experience sampling methodology</em></a> by
+Bastiaansen et al. (2020). In this vignette, we focus on EMA data but
+note that dynamic complexity may also be used for different data sources
+(e.g. see Wiltshire et al., 2020).</p>
 </div>
 <div class="section level2">
 <h2 id="load-and-prepare-data">Load and prepare data<a class="anchor" aria-label="anchor" href="#load-and-prepare-data"></a>
 </h2>
-<p>We select the self-ratings that were collected four times per day and impute missing values using the <a href="https://cran.r-project.org/package=mice" class="external-link"><em>mice</em></a> function. The choice for the imputation method is explained in the vignette <em>Dealing with missing values in time series</em> (ADD LINK?).</p>
+<p>We select the self-ratings that were collected four times per day and
+impute missing values using the <a href="https://cran.r-project.org/package=mice" class="external-link"><em>mice</em></a>
+function. The choice for the imputation method is explained in the
+vignette <em>Dealing with missing values in time series</em> (ADD
+LINK?).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/amices/mice" class="external-link">mice</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">manyAnalystsESM</span><span class="op">)</span>
@@ -130,13 +159,33 @@
 <div class="section level2">
 <h2 id="state-variable">State variable<a class="anchor" aria-label="anchor" href="#state-variable"></a>
 </h2>
-<p>Critical transitions can be detected as regime shifts in the state variable of a system in a given context. For example, the onset of an epileptic seizure involves a regime shift in the EEG signal, which serves as state variable for this particular transition. The identification of state variables for clinical change is not straightforward and an important avenue for future research. Here, we simply use the item ‘Felt down or depressed’ as state variable as it seems an important variable for patients with depression. Also, ‘feeling down’ has been used as a state variable in previous research (Wichers, Smit &amp; Snippe, 2020)</p>
+<p>Critical transitions can be detected as regime shifts in the state
+variable of a system in a given context. For example, the onset of an
+epileptic seizure involves a regime shift in the EEG signal, which
+serves as state variable for this particular transition. The
+identification of state variables for clinical change is not
+straightforward and an important avenue for future research. Here, we
+simply use the item ‘Felt down or depressed’ as state variable as it
+seems an important variable for patients with depression. Also, ‘feeling
+down’ has been used as a state variable in previous research (Wichers,
+Smit &amp; Snippe, 2020)</p>
 <div class="section level3">
 <h3 id="detecting-transitions-with-ts_levels">Detecting transitions with <code>ts_levels()</code><a class="anchor" aria-label="anchor" href="#detecting-transitions-with-ts_levels"></a>
 </h3>
-<p>We can use the function <code><a href="../reference/ts_levels.html">ts_levels()</a></code> to evaluate whether there are regime shifts in the data. The method uses function <code><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart()</a></code> and has several arguments that control when a level should be considered, that is, how many datapoints should a level last minimally; how much must the signal change before a new level is considered, etc. Check the manual pages for more details. `</p>
-<p>The value of <code>minDataSplit</code> tells the algorithm how many data points need to be in a segment before a change of level is considered. Here we choose <code>minDataSplit = 12</code>, which is 3 days. The value of <code>minLevelDuration</code> tells the algorithm how long a segment should be at least. We choose 28 time points, which corresponds to 1 week.</p>
-<p>One can see that there appears to be a transitions in feeling down around 3/4 of the measurement period.</p>
+<p>We can use the function <code><a href="../reference/ts_levels.html">ts_levels()</a></code> to evaluate whether
+there are regime shifts in the data. The method uses function
+<code><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart()</a></code> and has several arguments that control when
+a level should be considered, that is, how many datapoints should a
+level last minimally; how much must the signal change before a new level
+is considered, etc. Check the manual pages for more details. `</p>
+<p>The value of <code>minDataSplit</code> tells the algorithm how many
+data points need to be in a segment before a change of level is
+considered. Here we choose <code>minDataSplit = 12</code>, which is 3
+days. The value of <code>minLevelDuration</code> tells the algorithm how
+long a segment should be at least. We choose 28 time points, which
+corresponds to 1 week.</p>
+<p>One can see that there appears to be a transitions in feeling down
+around 3/4 of the measurement period.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dates</span>      <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">$</span><span class="va">start</span>
 <span class="va">dateTimesS</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html" class="external-link">strptime</a></span><span class="op">(</span><span class="va">dates</span>, <span class="st">"%m/%d/%Y %H:%M"</span><span class="op">)</span><span class="op">)</span>
@@ -177,25 +226,58 @@
 <div class="section level3">
 <h3 id="using-dc_win">Using <code>dc_win()</code><a class="anchor" aria-label="anchor" href="#using-dc_win"></a>
 </h3>
-<p><code><a href="../reference/dc_win.html">dc_win()</a></code> is used to calculate Dynamic Complexity. The function can also call <code><a href="../reference/plotDC_res.html">plotDC_res()</a></code> to produce a <em>Complexity Resonance Diagram</em> by setting <code>doPlot = TRUE</code>. The input for the function is a dataframe consisting of time series, the output is a list, featuring a new dataframe consisting of a ‘dynamic complexity time series’ for each original time series.</p>
-<p>Dynamic complexity is calculated as a product of <em>fluctuation intensity</em>, given by function <code><a href="../reference/dc_f.html">dc_f()</a></code> and <em>distribution uniformity</em>, given by function <code><a href="../reference/dc_d.html">dc_d()</a></code>. These functions can be called separately, or, you can set the argument <code>returnFandD = TRUE</code> in function <code><a href="../reference/dc_win.html">dc_win()</a></code>. Also, the resonance diagrams for only measure D or F can simply be obtained by adding <code>doPlotF = TRUE</code> and <code>doPlotD = TRUE</code>.</p>
-<p>All variables should be on the same scale for the function to work properly. The arguments <code>scale_min</code> and <code>scale_max</code> have to be given manually as they refer to the theoretical limits of the scale. If the data contain a mix of known scale ranges, transformation should be done manually.</p>
-<p>The analysis uses a backwards overlapping moving window of size N. Here, we set <code>win = 12</code>, corresponding to 12 measurement points and thus 3 days. The first dynamic complexity value in the output is placed at the time point that corresponds to the window length. The output time series thus start with a serie of <code>NA</code> values, whose length is equal to the window size -1.</p>
-<p>Note that while <code><a href="../reference/dc_win.html">dc_win()</a></code> is optimized for multivariate computation and visualization, the analysis itself is univariate. We can use the function thus for one variable. Here, we calculate dynamic complexity values for the item ‘rumination’ and then create a simple plot. The vertical line indicates the moment of the transition in ‘down’ as identified above. It appears that this transition is preceded by increased dynamic complexity in ‘rumination’: an early-warning signal.</p>
+<p><code><a href="../reference/dc_win.html">dc_win()</a></code> is used to calculate Dynamic Complexity. The
+function can also call <code><a href="../reference/plotDC_res.html">plotDC_res()</a></code> to produce a
+<em>Complexity Resonance Diagram</em> by setting
+<code>doPlot = TRUE</code>. The input for the function is a dataframe
+consisting of time series, the output is a list, featuring a new
+dataframe consisting of a ‘dynamic complexity time series’ for each
+original time series.</p>
+<p>Dynamic complexity is calculated as a product of <em>fluctuation
+intensity</em>, given by function <code><a href="../reference/dc_f.html">dc_f()</a></code> and
+<em>distribution uniformity</em>, given by function <code><a href="../reference/dc_d.html">dc_d()</a></code>.
+These functions can be called separately, or, you can set the argument
+<code>returnFandD = TRUE</code> in function <code><a href="../reference/dc_win.html">dc_win()</a></code>. Also,
+the resonance diagrams for only measure D or F can simply be obtained by
+adding <code>doPlotF = TRUE</code> and <code>doPlotD = TRUE</code>.</p>
+<p>All variables should be on the same scale for the function to work
+properly. The arguments <code>scale_min</code> and
+<code>scale_max</code> have to be given manually as they refer to the
+theoretical limits of the scale. If the data contain a mix of known
+scale ranges, transformation should be done manually.</p>
+<p>The analysis uses a backwards overlapping moving window of size N.
+Here, we set <code>win = 12</code>, corresponding to 12 measurement
+points and thus 3 days. The first dynamic complexity value in the output
+is placed at the time point that corresponds to the window length. The
+output time series thus start with a serie of <code>NA</code> values,
+whose length is equal to the window size -1.</p>
+<p>Note that while <code><a href="../reference/dc_win.html">dc_win()</a></code> is optimized for multivariate
+computation and visualization, the analysis itself is univariate. We can
+use the function thus for one variable. Here, we calculate dynamic
+complexity values for the item ‘rumination’ and then create a simple
+plot. The vertical line indicates the moment of the transition in ‘down’
+as identified above. It appears that this transition is preceded by
+increased dynamic complexity in ‘rumination’: an early-warning
+signal.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dc.ruminate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">ruminate</span>, win<span class="op">=</span><span class="fl">12</span>, scale_min<span class="op">=</span><span class="fl">0</span>, scale_max<span class="op">=</span><span class="fl">100</span>, doPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dc.ruminate</span><span class="op">$</span><span class="va">df</span>, type<span class="op">=</span><span class="st">'l'</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v<span class="op">=</span><span class="fl">93</span><span class="op">)</span> </code></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>And for multiple variables, in which case we can produce a nice looking complexity resonance diagram”:</p>
+<p>And for multiple variables, in which case we can produce a nice
+looking complexity resonance diagram”:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dc.case</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span><span class="op">(</span><span class="va">df</span>, win<span class="op">=</span><span class="fl">12</span>, scale_min<span class="op">=</span><span class="fl">0</span>, scale_max<span class="op">=</span><span class="fl">100</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>By setting <code>colOrder = NA</code>, we can order the output columns based on mean dynamic complexity, resulting in a more comprehensive diagram:</p>
+<p>By setting <code>colOrder = NA</code>, we can order the output
+columns based on mean dynamic complexity, resulting in a more
+comprehensive diagram:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dc.case</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span><span class="op">(</span><span class="va">df</span>, win<span class="op">=</span><span class="fl">12</span>, scale_min<span class="op">=</span><span class="fl">0</span>, scale_max<span class="op">=</span><span class="fl">100</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span>, colOrder <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></code></pre></div>
 <p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>One may aggregate the dynamic complexity values of multiple items, for example by averaging (other options would be clustering, either data-driven or theory-driven).</p>
+<p>One may aggregate the dynamic complexity values of multiple items,
+for example by averaging (other options would be clustering, either
+data-driven or theory-driven).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mean_DC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">dc.case</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mean_DC</span>, type<span class="op">=</span><span class="st">'line'</span><span class="op">)</span>
@@ -205,7 +287,22 @@
 <div class="section level3">
 <h3 id="using-dc_ccp">Using <code>dc_ccp()</code><a class="anchor" aria-label="anchor" href="#using-dc_ccp"></a>
 </h3>
-<p>One approach to identify critical fluctuations is to identify peaks in dynamic complexity using a statistical test, decision rule or control chart. The function <code><a href="../reference/dc_ccp.html">dc_ccp()</a></code> identifies ‘cumulative complexity peaks’, i.e. timepoints where a significant number of items showed significant peaks in dynamic complexity. Significance is here determined using one-tailed Z-tests. First, a Z-test is used to identify peaks in each time series, which are visualized as grey squares in the diagram below. Then, another Z-test is used to identify a significant number of peaks on a particular day, which is visualized as black squares in the upper row of the diagram. The method is introduced in Schiepek (2003). It should be noted that this is just one approach to peak detection and other techniques should be considered as well when using this in research or practice. An important limitation for interpretation of cumulative complexity peaks is that peaks are identified based on all observations that are used as an input. Results can thus differ when more or less observations are used as input.</p>
+<p>One approach to identify critical fluctuations is to identify peaks
+in dynamic complexity using a statistical test, decision rule or control
+chart. The function <code><a href="../reference/dc_ccp.html">dc_ccp()</a></code> identifies ‘cumulative
+complexity peaks’, i.e. timepoints where a significant number of items
+showed significant peaks in dynamic complexity. Significance is here
+determined using one-tailed Z-tests. First, a Z-test is used to identify
+peaks in each time series, which are visualized as grey squares in the
+diagram below. Then, another Z-test is used to identify a significant
+number of peaks on a particular day, which is visualized as black
+squares in the upper row of the diagram. The method is introduced in
+Schiepek (2003). It should be noted that this is just one approach to
+peak detection and other techniques should be considered as well when
+using this in research or practice. An important limitation for
+interpretation of cumulative complexity peaks is that peaks are
+identified based on all observations that are used as an input. Results
+can thus differ when more or less observations are used as input.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ccp.case</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_ccp.html">dc_ccp</a></span><span class="op">(</span>df_win <span class="op">=</span> <span class="va">dc.case</span><span class="op">)</span>
 <span class="fu"><a href="../reference/plotDC_ccp.html">plotDC_ccp</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.case</span>, win <span class="op">=</span> <span class="fl">12</span>, colOrder <span class="op">=</span> <span class="cn">NA</span>, title <span class="op">=</span> <span class="st">"Cumulative Complexity Peak Plot"</span><span class="op">)</span></code></pre></div>
@@ -215,9 +312,20 @@
 <div class="section level2">
 <h2 id="comparison-with-variance-and-autocorrelation">Comparison with variance and autocorrelation<a class="anchor" aria-label="anchor" href="#comparison-with-variance-and-autocorrelation"></a>
 </h2>
-<p>Variance and autocorrelation are the most well-known indicators for early-warning signals, as introduced by Scheffer et al., (2009). Here we provide the functions <code><a href="../reference/var_win.html">var_win()</a></code> and <code><a href="../reference/ac_win.html">ac_win()</a></code> to calculate them in a similar functionality as <code><a href="../reference/dc_win.html">dc_win()</a></code> and we visualize the results in resonance diagrams.</p>
-<p>The results for variance are somewhat similar to those of dynamic complexity, as could be expected since both are sensitive to critical fluctuations (for a comparison of both measures see Schiepek &amp; Strunk, 2010; Olthof et al., 2020b).</p>
-<p>Autocorrelation is believed to tap into the early-warning signal of <em>critical slowing down</em>, instead of critical fluctuations and gives a rather different resonance diagram. For a paper illustrating the difference between critical slowing down and critical fluctuations, we recommend Kelso et al., (1987).</p>
+<p>Variance and autocorrelation are the most well-known indicators for
+early-warning signals, as introduced by Scheffer et al., (2009). Here we
+provide the functions <code><a href="../reference/var_win.html">var_win()</a></code> and <code><a href="../reference/ac_win.html">ac_win()</a></code>
+to calculate them in a similar functionality as <code><a href="../reference/dc_win.html">dc_win()</a></code>
+and we visualize the results in resonance diagrams.</p>
+<p>The results for variance are somewhat similar to those of dynamic
+complexity, as could be expected since both are sensitive to critical
+fluctuations (for a comparison of both measures see Schiepek &amp;
+Strunk, 2010; Olthof et al., 2020b).</p>
+<p>Autocorrelation is believed to tap into the early-warning signal of
+<em>critical slowing down</em>, instead of critical fluctuations and
+gives a rather different resonance diagram. For a paper illustrating the
+difference between critical slowing down and critical fluctuations, we
+recommend Kelso et al., (1987).</p>
 <div class="section level3">
 <h3 id="using-var_win">Using <code>var_win()</code><a class="anchor" aria-label="anchor" href="#using-var_win"></a>
 </h3>
@@ -241,7 +349,8 @@
 <div class="section level3">
 <h3 id="using-ac_win">Using <code>ac_win()</code><a class="anchor" aria-label="anchor" href="#using-ac_win"></a>
 </h3>
-<p>Autocorrelation is calculated with win=28, corresponding to 7 days, as 12 data points is very little for autocorrelation.</p>
+<p>Autocorrelation is calculated with win=28, corresponding to 7 days,
+as 12 data points is very little for autocorrelation.</p>
 <p>We use the function for the item ‘ruminate’…</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ac.ruminate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ac_win.html">ac_win</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">ruminate</span>, win<span class="op">=</span><span class="fl">12</span><span class="op">)</span>
@@ -263,15 +372,42 @@
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F., Boker, S. M., Ceulemans, E., Chen, M., … Bringmann, L. F. (2020). Time to get personal? The impact of researchers’ choices on the selection of treatment targets using the experience sampling methodology. <em>Journal of Psychosomatic Research, 137,</em> 110211. <a href="https://doi.org/10.1016/j.jpsychores.2020.110211" class="external-link uri">https://doi.org/10.1016/j.jpsychores.2020.110211</a></p>
-<p>Fisher, A. J., &amp; Boswell, J. F. (2016). Enhancing the personalization of psychotherapy with dynamic assessment and modeling. <em>Assessment, 23</em>, 496–506. <a href="https://doi.org/10.1177/1073191116638735-Fisher" class="external-link uri">https://doi.org/10.1177/1073191116638735-Fisher</a></p>
-<p>Kelso, J. S., Schoner, G., Scholz, J. P., &amp; Haken, H. (1987). Phase-Locked Modes, Phase Transitions and Component Oscillators in Biological Motion. <em>Physica Scripta, 35</em>, 79-87. <a href="https://doi.org/10.1088/0031-8949/35/1/020" class="external-link uri">https://doi.org/10.1088/0031-8949/35/1/020</a></p>
-<p>Olthof, M., Hasselman, F., Strunk, G., van Rooij, M., Aas, B., Helmich, M. A., Schiepek, G., &amp; Lichtwarck-Aschoff, A. (2020a). Critical fluctuations as an early-warning signal for sudden gains and losses in patients receiving psychotherapy for mood disorders. <em>Clinical Psychological Science, 8</em>, 25-35. <a href="https://doi.org/10.1177%2F2167702619865969" class="external-link uri">https://doi.org/10.1177%2F2167702619865969</a></p>
-<p>Olthof, M., Hasselman, F., Wijnants, M., &amp; Lichtwarck-Aschoff, A. (2020b). Psychological dynamics are complex: a comparison of scaling, variance, and dynamic complexity in simulated and observed data. In Selbstorganisation–ein Paradigma für die Humanwissenschaften (pp. 303-316). Springer, Wiesbaden. <a href="https://hdl.handle.net/2066/217470" class="external-link uri">https://hdl.handle.net/2066/217470</a></p>
-<p>Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. <em>European Journal of Psychological Assessment, 19</em>, 175-184. <a href="https://doi.org/10.1027//1015-5759.19.3.175" class="external-link uri">https://doi.org/10.1027//1015-5759.19.3.175</a></p>
-<p>Schiepek, G., &amp; Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. <em>Biological cybernetics, 102(3)</em>, 197-207. <a href="https://doi.org/10.1007/s00422-009-0362-1" class="external-link uri">https://doi.org/10.1007/s00422-009-0362-1</a></p>
-<p>Wichers, M., Smit, A. C., &amp; Snippe, E. (2020). Early warning signals based on momentary affect dynamics can expose nearby transitions in depression: a confirmatory single-subject time-series study. <em>Journal for Person-Oriented Research, 6(1)</em>, 1-15. <a href="https://doi.org/10.17505/jpor.2020.22042" class="external-link uri">https://doi.org/10.17505/jpor.2020.22042</a></p>
-<p>Wiltshire, T. J., Hudson, D., Lijdsman, P., Wever, S., &amp; Atzmueller, M. (2020). Social Analytics of Team Interaction using Dynamic Complexity Heat Maps and Network Visualizations. <em>arXiv preprint arXiv:2009.04445.</em> <a href="https://arxiv.org/abs/2009.04445v1" class="external-link uri">https://arxiv.org/abs/2009.04445v1</a></p>
+<p>Bastiaansen, J. A., Kunkels, Y. K., Blaauw, F., Boker, S. M.,
+Ceulemans, E., Chen, M., … Bringmann, L. F. (2020). Time to get
+personal? The impact of researchers’ choices on the selection of
+treatment targets using the experience sampling methodology. <em>Journal
+of Psychosomatic Research, 137,</em> 110211. <a href="https://doi.org/10.1016/j.jpsychores.2020.110211" class="external-link uri">https://doi.org/10.1016/j.jpsychores.2020.110211</a></p>
+<p>Fisher, A. J., &amp; Boswell, J. F. (2016). Enhancing the
+personalization of psychotherapy with dynamic assessment and modeling.
+<em>Assessment, 23</em>, 496–506. <a href="https://doi.org/10.1177/1073191116638735-Fisher" class="external-link uri">https://doi.org/10.1177/1073191116638735-Fisher</a></p>
+<p>Kelso, J. S., Schoner, G., Scholz, J. P., &amp; Haken, H. (1987).
+Phase-Locked Modes, Phase Transitions and Component Oscillators in
+Biological Motion. <em>Physica Scripta, 35</em>, 79-87. <a href="https://doi.org/10.1088/0031-8949/35/1/020" class="external-link uri">https://doi.org/10.1088/0031-8949/35/1/020</a></p>
+<p>Olthof, M., Hasselman, F., Strunk, G., van Rooij, M., Aas, B.,
+Helmich, M. A., Schiepek, G., &amp; Lichtwarck-Aschoff, A. (2020a).
+Critical fluctuations as an early-warning signal for sudden gains and
+losses in patients receiving psychotherapy for mood disorders.
+<em>Clinical Psychological Science, 8</em>, 25-35. <a href="https://doi.org/10.1177%2F2167702619865969" class="external-link uri">https://doi.org/10.1177%2F2167702619865969</a></p>
+<p>Olthof, M., Hasselman, F., Wijnants, M., &amp; Lichtwarck-Aschoff, A.
+(2020b). Psychological dynamics are complex: a comparison of scaling,
+variance, and dynamic complexity in simulated and observed data. In
+Selbstorganisation–ein Paradigma für die Humanwissenschaften
+(pp. 303-316). Springer, Wiesbaden. <a href="https://hdl.handle.net/2066/217470" class="external-link uri">https://hdl.handle.net/2066/217470</a></p>
+<p>Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case
+Formulation. <em>European Journal of Psychological Assessment, 19</em>,
+175-184. <a href="https://doi.org/10.1027//1015-5759.19.3.175" class="external-link uri">https://doi.org/10.1027//1015-5759.19.3.175</a></p>
+<p>Schiepek, G., &amp; Strunk, G. (2010). The identification of critical
+fluctuations and phase transitions in short term and coarse-grained time
+series-a method for the real-time monitoring of human change processes.
+<em>Biological cybernetics, 102(3)</em>, 197-207. <a href="https://doi.org/10.1007/s00422-009-0362-1" class="external-link uri">https://doi.org/10.1007/s00422-009-0362-1</a></p>
+<p>Wichers, M., Smit, A. C., &amp; Snippe, E. (2020). Early warning
+signals based on momentary affect dynamics can expose nearby transitions
+in depression: a confirmatory single-subject time-series study.
+<em>Journal for Person-Oriented Research, 6(1)</em>, 1-15. <a href="https://doi.org/10.17505/jpor.2020.22042" class="external-link uri">https://doi.org/10.17505/jpor.2020.22042</a></p>
+<p>Wiltshire, T. J., Hudson, D., Lijdsman, P., Wever, S., &amp;
+Atzmueller, M. (2020). Social Analytics of Team Interaction using
+Dynamic Complexity Heat Maps and Network Visualizations. <em>arXiv
+preprint arXiv:2009.04445.</em> <a href="https://arxiv.org/abs/2009.04445v1" class="external-link uri">https://arxiv.org/abs/2009.04445v1</a></p>
 </div>
   </div>
 
@@ -292,7 +428,8 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>

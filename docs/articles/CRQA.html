@@ -92,7 +92,8 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Recurrence Quantification Analysis</h1>
-                        <h4 data-toc-skip class="author">Fred Hasselman</h4>
+                        <h4 data-toc-skip class="author">Fred
+Hasselman</h4>
             
             <h4 data-toc-skip class="date">2022-03-08</h4>
       
@@ -108,60 +109,112 @@ p code {
   font-size: 70%;
 }
 </style>
-<p>This vignette discusses how to conduct a large variety of recurrence-based time series analyses using R-package <em>casnet</em>. It is not the only <code>R</code> package that can run recurrence analyses, the closest alternative to <code>casnet</code> is probably package <a href="https://cran.r-project.org/web/packages/crqa/index.html" class="external-link"><code>crqa</code></a>. It has a great tutorial paper by <span class="citation">(<a href="#ref-coco2014" role="doc-biblioref">Coco &amp; Dale, 2014</a>)</span>). Several other packages have dedicated functions, e.g. package <code>nonlinearTseries</code> has a function <code>RQA</code>. There are also many options outside of the <code>R</code> framework, see the <a href="http://www.recurrence-plot.tk/programmes.php" class="external-link">Recurrence Plot webpage</a> for a comprehensive list of software.</p>
-<p>There are 2 main ways to run Recurrence Quantification Analyses in <code>casnet</code>:</p>
+<p>This vignette discusses how to conduct a large variety of
+recurrence-based time series analyses using R-package <em>casnet</em>.
+It is not the only <code>R</code> package that can run recurrence
+analyses, the closest alternative to <code>casnet</code> is probably
+package <a href="https://cran.r-project.org/web/packages/crqa/index.html" class="external-link"><code>crqa</code></a>.
+It has a great tutorial paper by <span class="citation">(<a href="#ref-coco2014" role="doc-biblioref">Coco &amp; Dale,
+2014</a>)</span>). Several other packages have dedicated functions,
+e.g. package <code>nonlinearTseries</code> has a function
+<code>RQA</code>. There are also many options outside of the
+<code>R</code> framework, see the <a href="http://www.recurrence-plot.tk/programmes.php" class="external-link">Recurrence Plot
+webpage</a> for a comprehensive list of software.</p>
+<p>There are 2 main ways to run Recurrence Quantification Analyses in
+<code>casnet</code>:</p>
 <ul>
-<li>Using functions <code>rp</code>, <code>rp_measures</code> and <code>rp_plot</code>
+<li>Using functions <code>rp</code>, <code>rp_measures</code> and
+<code>rp_plot</code>
 </li>
-<li>Using function <code>rp_cl</code> which will run Norbert Marwan’s <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline Recurrence Plots</a>
+<li>Using function <code>rp_cl</code> which will run Norbert Marwan’s <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
+Recurrence Plots</a>
 </li>
 </ul>
-<p>The following examples will use the native <code>casnet</code> functions, see the paragraph <a href="#marwan">An R interface to Marwan’s commandline recurrence plots</a> to learn about using <code><a href="../reference/rp_cl.html">rp_cl()</a></code>.</p>
-<p>The first part of this vignette will demonstrate the basics of recurrence quantification using unordered categorical data. The second part will discuss RQA for <a href="#lvSystem">continuous data</a>. This will be a bit more formal with respect to defining the recurrence matrix and how to calculate the various RQA measures.</p>
-<p>Please see the chapters on RQA the Complex Systems Approach book for more details:</p>
-<p><a href="https://complexity-methods.github.io/book/auto-rqa-categorical-data.html" class="external-link">RQA on unordered categorical data</a></p>
-<p><a href="https://complexity-methods.github.io/book/auto-rqa-continuous-data.html" class="external-link">RQA on continuous data</a></p>
+<p>The following examples will use the native <code>casnet</code>
+functions, see the paragraph <a href="#marwan">An R interface to
+Marwan’s commandline recurrence plots</a> to learn about using
+<code><a href="../reference/rp_cl.html">rp_cl()</a></code>.</p>
+<p>The first part of this vignette will demonstrate the basics of
+recurrence quantification using unordered categorical data. The second
+part will discuss RQA for <a href="#lvSystem">continuous data</a>. This
+will be a bit more formal with respect to defining the recurrence matrix
+and how to calculate the various RQA measures.</p>
+<p>Please see the chapters on RQA the Complex Systems Approach book for
+more details:</p>
+<p><a href="https://complexity-methods.github.io/book/auto-rqa-categorical-data.html" class="external-link">RQA
+on unordered categorical data</a></p>
+<p><a href="https://complexity-methods.github.io/book/auto-rqa-continuous-data.html" class="external-link">RQA
+on continuous data</a></p>
 <div class="section level2">
 <h2 id="marwan">An R interface to Marwan’s commandline recurrence plots<a class="anchor" aria-label="anchor" href="#marwan"></a>
 </h2>
 <blockquote>
-<p><strong>IMPORTANT</strong>: Currently <code>rp_cl</code> can only run on an operating system that allows execution of 32-bit applications!</p>
+<p><strong>IMPORTANT</strong>: Currently <code>rp_cl</code> can only run
+on an operating system that allows execution of 32-bit applications!</p>
 </blockquote>
-<p>The <code><a href="../reference/rp_cl.html">rp_cl()</a></code> function is a wrapper for the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline Recurrence Plots</a> executable provided by Norbert Marwan.</p>
-<p>The <code>rp</code> executable is installed on your machine when the function <code><a href="../reference/rp_cl.html">rp_cl()</a></code> is called for the first time:</p>
+<p>The <code><a href="../reference/rp_cl.html">rp_cl()</a></code> function is a wrapper for the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
+Recurrence Plots</a> executable provided by Norbert Marwan.</p>
+<p>The <code>rp</code> executable is installed on your machine when the
+function <code><a href="../reference/rp_cl.html">rp_cl()</a></code> is called for the first time:</p>
 <ul>
-<li>It is renamed to <code>rp</code> from a platform specific file downloaded from the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline Recurrence Plots</a> site.</li>
+<li>It is renamed to <code>rp</code> from a platform specific file
+downloaded from the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
+Recurrence Plots</a> site.</li>
 <li>The file is copied to the directory: [path to casnet]/exec/
 <ul>
-<li>Make sure that you have rights to execute programs in this directory!</li>
+<li>Make sure that you have rights to execute programs in this
+directory!</li>
 </ul>
 </li>
-<li>The latter location is stored as an option and can be read by calling <code>getOption("casnet.path_to_rp")</code>
+<li>The latter location is stored as an option and can be read by
+calling <code>getOption("casnet.path_to_rp")</code>
 </li>
 </ul>
-<p>If you cannot change the permissions on the folder where <code>rp</code> was downloaded, consider downloading the appropriate executable from the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline Recurrence Plots</a> site to a directory in which you have such permissions. Then change the <code>path_to_rp</code> option using <code>options(casnet.path_to_rp="YOUR_PATH_TO_RP")</code>. See the manual entry for <code><a href="../reference/rp_cl.html">rp_cl()</a></code> for more details.</p>
+<p>If you cannot change the permissions on the folder where
+<code>rp</code> was downloaded, consider downloading the appropriate
+executable from the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
+Recurrence Plots</a> site to a directory in which you have such
+permissions. Then change the <code>path_to_rp</code> option using
+<code>options(casnet.path_to_rp="YOUR_PATH_TO_RP")</code>. See the
+manual entry for <code><a href="../reference/rp_cl.html">rp_cl()</a></code> for more details.</p>
 <hr>
-<p>The platform specific <code>rp</code> command line executable files were created by Norbert Marwan and obtained under a Creative Commons License from the website of the Potsdam Institute for Climate Impact Research at: <a href="http://tocsy.pik-potsdam.de/" class="external-link uri">http://tocsy.pik-potsdam.de/</a></p>
+<p>The platform specific <code>rp</code> command line executable files
+were created by Norbert Marwan and obtained under a Creative Commons
+License from the website of the Potsdam Institute for Climate Impact
+Research at: <a href="http://tocsy.pik-potsdam.de/" class="external-link uri">http://tocsy.pik-potsdam.de/</a></p>
 <p>The full copyright statement on the website is as follows:</p>
 <blockquote>
 <p>© 2004-2017 SOME RIGHTS RESERVED<br>
-University of Potsdam, Interdisciplinary Center for Dynamics of Complex Systems, Germany<br>
-Potsdam Institute for Climate Impact Research, Transdisciplinary Concepts and Methods, Germany<br>
-This work is licensed under a <a href="https://creativecommons.org/licenses/by-nc-nd/2.0/de/" class="external-link">Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Germany License</a>.</p>
+University of Potsdam, Interdisciplinary Center for Dynamics of Complex
+Systems, Germany<br>
+Potsdam Institute for Climate Impact Research, Transdisciplinary
+Concepts and Methods, Germany<br>
+This work is licensed under a <a href="https://creativecommons.org/licenses/by-nc-nd/2.0/de/" class="external-link">Creative
+Commons Attribution-NonCommercial-NoDerivs 2.0 Germany License</a>.</p>
 </blockquote>
-<p>More information about recurrence quantification analysis can be found on the <a href="http://www.recurrence-plot.tk" class="external-link">Recurrence Plot website</a>.</p>
+<p>More information about recurrence quantification analysis can be
+found on the <a href="http://www.recurrence-plot.tk" class="external-link">Recurrence Plot
+website</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="computational-load-the-python-solution-pyrqa">Computational load: The Python solution [PyRQA]<a class="anchor" aria-label="anchor" href="#computational-load-the-python-solution-pyrqa"></a>
 </h2>
-<p>When the time series you analyze are very long, the recurrence matrix will become very large and R will become very slow. One solution is to use R to run the Python program <a href="https://pypi.org/project/PyRQA/" class="external-link"><code>PyRQA</code></a> or perhaps <a href="https://github.com/pik-copan/pyunicorn" class="external-link"><code>pyunicorn</code></a>. The options for <code>PyRQA</code> are limited compared to the casnet functions, but the gain in processing speed is remarkable!</p>
-<p>What follows is an example of how you could make <code>PyRQA</code> run in R using the package <code>reticulate</code>.</p>
+<p>When the time series you analyze are very long, the recurrence matrix
+will become very large and R will become very slow. One solution is to
+use R to run the Python program <a href="https://pypi.org/project/PyRQA/" class="external-link"><code>PyRQA</code></a> or perhaps
+<a href="https://github.com/pik-copan/pyunicorn" class="external-link"><code>pyunicorn</code></a>.
+The options for <code>PyRQA</code> are limited compared to the casnet
+functions, but the gain in processing speed is remarkable!</p>
+<p>What follows is an example of how you could make <code>PyRQA</code>
+run in R using the package <code>reticulate</code>.</p>
 <div class="section level4">
 <h4 class="unnumbered" id="setup-the-environment">Setup the environment<a class="anchor" aria-label="anchor" href="#setup-the-environment"></a>
 </h4>
-<p>Suppose you are on a machine that has both <code>R</code> and <code>Python</code> installed then the steps are:</p>
+<p>Suppose you are on a machine that has both <code>R</code> and
+<code>Python</code> installed then the steps are:</p>
 <ul>
-<li>Make sure <code>Python</code> and <code>pip</code> are up to date</li>
+<li>Make sure <code>Python</code> and <code>pip</code> are up to
+date</li>
 <li>Create a virtual (or a coda) environment.</li>
 <li>Install <code>PyRQA</code> into the virtual environment.</li>
 </ul>
@@ -188,11 +241,14 @@ This work is licensed under a <a href="https://creativecommons.org/licenses/by-n
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># If you wish to remove the environment use: reticulate::virtualenv_remove("r-reticulate")</span></span></code></pre></div>
 <p>After the environment is set up:</p>
 <ul>
-<li>Restart your R session and instruct the system to use Python in the virtual environment.</li>
+<li>Restart your R session and instruct the system to use Python in the
+virtual environment.</li>
 <li>Import <code>PyRQA</code> into your <code>R</code> session.</li>
-<li>Use the <code>PyRQA</code> functions that are now available as fields (<code>$</code>) of the imported object!</li>
+<li>Use the <code>PyRQA</code> functions that are now available as
+fields (<code>$</code>) of the imported object!</li>
 </ul>
-<p>An important thing to note in the example below is the use of <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> to pass integer variables to Python.</p>
+<p>An important thing to note in the example below is the use of
+<code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> to pass integer variables to Python.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Make sure you associate reticulate with your virtual environment.</span>
 <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"r-reticulate"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
@@ -280,7 +336,9 @@ RP produced by PyRQA
 </h3>
 <div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
 <div id="ref-coco2014" class="csl-entry">
-Coco, M. I., &amp; Dale, R. (2014). Cross-recurrence quantification analysis of categorical and continuous time series: An r package. <em>Frontiers in Psychology</em>, <em>5</em>. <a href="https://doi.org/10.3389/fpsyg.2014.00510" class="external-link">https://doi.org/10.3389/fpsyg.2014.00510</a>
+Coco, M. I., &amp; Dale, R. (2014). Cross-recurrence quantification
+analysis of categorical and continuous time series: An r package.
+<em>Frontiers in Psychology</em>, <em>5</em>. <a href="https://doi.org/10.3389/fpsyg.2014.00510" class="external-link">https://doi.org/10.3389/fpsyg.2014.00510</a>
 </div>
 </div>
 </div>
@@ -304,7 +362,8 @@ Coco, M. I., &amp; Dale, R. (2014). Cross-recurrence quantification analysis of 
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>

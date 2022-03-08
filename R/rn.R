@@ -123,6 +123,8 @@ rn <- function(y1, y2 = NULL,
       if(rescaleWeights==TRUE){
         dmat <- dmat/max(dmat, na.rm = TRUE)
       }
+    } else {
+      weighted <- NULL
     }
   } #if is.null(emRad)
 
@@ -170,8 +172,8 @@ rn <- function(y1, y2 = NULL,
 
   if(returnGraph){
     g  <- igraph::graph_from_adjacency_matrix(dmat, weighted = weighted, mode = mode) #, diag = includeDiagonal)
-    V(g)$y1 <- y1[1:igraph::vcount(g)]
-    V(g)$y2 <- y2[1:igraph::vcount(g)]
+    # V(g)$y1 <- y1[1:igraph::vcount(g)]
+    # V(g)$y2 <- y2[1:igraph::vcount(g)]
 
     return(list(RN = dmat,
                 g  = g)
