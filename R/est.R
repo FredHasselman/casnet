@@ -16,7 +16,7 @@
 #' @param eachRadius If `type = "optimal"` this is the number of signal and noise series that will be generated for each level in `startRadius` (default = `1`)
 #' @param targetMeasure If `type = "optimal"`, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option `targetMeasure = "all"` will report all the optimal values obtained from one realisation of `startRadius * eachRadius` signal and noise series.
 #' @param targetValue When argument `type` is set to "fixed", the value represents the target value for the measure in `targetMeasure` (default = `RR = .05`).
-#' @param tol Tolerance for achieving `targetValue` for `targetMeasure` (default = `0.1`)
+#' @param tol Tolerance for achieving `targetValue` for `targetMeasure` (default = `0.01`)
 #' @param maxIter If `type = "fixed"`: Maximum number of iterations to reach targetValue.
 #' @param theiler Size of theiler window (default `0`)
 #' @param histIter Return iteration history? (default = `FALSE`)
@@ -43,7 +43,7 @@ est_radius <- function(RM = NULL,
                        eachRadius     = 1,
                        targetMeasure  = c("RR","DET","LAM","T1","all")[1],
                        targetValue    = 0.05,
-                       tol            = 0.1,
+                       tol            = 0.01,
                        maxIter        = 100,
                        theiler        = NA,
                        histIter       = FALSE,
