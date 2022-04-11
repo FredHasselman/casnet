@@ -1116,7 +1116,6 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
     labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
     majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
   } else {
-    #minorBreaks <- NULL
     majorBreaks <- NULL
   }
 
@@ -1153,7 +1152,7 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
     colOrder <- TRUE
   }
 
-  df_win$time <- 1:NROW(df_win)
+ # df_win$time <- 1:NROW(df_win)
   dfp <- tidyr::gather(df_win, key = "variable", value = "value", c(-.data$time), factor_key = colOrder)
   dfp$time <- as.numeric(dfp$time)
 
@@ -1165,25 +1164,34 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
     ggplot2::geom_raster(interpolate = FALSE) +
     ggplot2::scale_fill_gradient2(resVariable,low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
-
-    #   if(is.null(majorBreaks)){
-    #   g <- g +
-    #       ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
-    #       ggplot2::scale_x_continuous(xlabel, expand = c(0,0), limits = c((win+1)-.5, NROW(dfp)+.5))
-    #
-    #   } else {
-    # g <- g +
     ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, size=.1) +
     ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="steelblue", alpha=.9, size=.1) +
-    ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
-    ggplot2::scale_x_continuous(xlabel,
+    ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
+
+  #   if(is.null(majorBreaks)){
+  #   g <- g +
+  #       ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
+  #       ggplot2::scale_x_continuous(xlabel, expand = c(0,0), limits = c((win+1)-.5, NROW(dfp)+.5))
+  #
+  #   } else {
+  # g <- g +
+
+
+  if(!is.null(majorBreaks)){
+   g <- g + ggplot2::scale_x_continuous(xlabel,
                                 breaks = majorBreaks,
                                 minor_breaks = minorBreaks-.5,
                                 labels = labels,
-                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5)) +
+                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5))
+  } else {
+     g <- g + ggplot2::scale_x_continuous(xlabel, expand = c(0,0),
+                                          breaks = minorBreaks,
+                                          limits = c((win+1)-.5, max(minorBreaks)+.5))
+   }
+
     # ggplot2::scale_x_continuous(xlabel, breaks = breaks, labels = labels, expand = c(0,0), limits = c((win+1)-.5, max(breaks)+.5)) +
 
-    ggplot2::labs(title = title, subtitle = subtitle) +
+   g <- g + ggplot2::labs(title = title, subtitle = subtitle) +
     ggplot2::theme_bw() +
     ggplot2::theme(#axis.text.x = element_text(vjust = 0, hjust = 1, angle = 90),
       #axis.text.y = element_text(vjust = 1),
@@ -1257,6 +1265,8 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
     labels <- labels[minorBreaks]
     labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
     majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+  } else {
+
   }
 
   if(!colOrder){
@@ -1274,13 +1284,19 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
     ggplot2::geom_raster(interpolate = FALSE) +
     ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, size=.1) +
     ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="grey90", alpha=1, size=.1) +
-    ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
-    ggplot2::scale_x_continuous(xlabel,
-                                breaks = majorBreaks,
-                                minor_breaks = minorBreaks-.5,
-                                labels = labels,
-                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5)) +
-    ggplot2::scale_fill_manual("Critical Insability", breaks = c("Sig. DC level","Sig. CCP"), values = c("0"="white","Sig. DC level"="grey","5"="whitesmoke","Sig. CCP"="black")) +
+    ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
+    if(!is.null(majorBreaks)){
+      g <- g + ggplot2::scale_x_continuous(xlabel,
+                                           breaks = majorBreaks,
+                                           minor_breaks = minorBreaks-.5,
+                                           labels = labels,
+                                           expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5))
+    } else {
+      g <- g + ggplot2::scale_x_continuous(xlabel, expand = c(0,0),
+                                           breaks = minorBreaks,
+                                           limits = c((win+1)-.5, max(minorBreaks)+.5))
+    }
+   g <- g + ggplot2::scale_fill_manual("Critical Insability", breaks = c("Sig. DC level","Sig. CCP"), values = c("0"="white","Sig. DC level"="grey","5"="whitesmoke","Sig. CCP"="black")) +
     ggplot2::labs(title = title, subtitle = subtitle) +
     ggplot2::theme_bw() +
     ggplot2::theme(
@@ -1800,7 +1816,7 @@ plotRN_phaseProfile <- function(phaseOutput,
   #   }
   # }
 
-  if(is.na(plotCentroid)|(!returnCentroid%in%"no")){
+  if(is.na(plotCentroid)){ #|(!returnCentroid%in%"no")){
     plotCentroid <- TRUE
   }
 
@@ -1833,7 +1849,7 @@ plotRN_phaseProfile <- function(phaseOutput,
     dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
     dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
     dplyr::select(!(dplyr::contains(excludeVars))) %>%
-    dplyr::select(phase_name, states_time, alpha, psize, dplyr::starts_with("dim_")) %>%
+    dplyr::select(phaseName, phase_name, states_time, alpha, psize, dplyr::starts_with("dim_")) %>%
     tidyr::pivot_longer(cols = dplyr::starts_with("dim_"), names_to = "Dimension", values_to = "Value")
 
 
@@ -1851,28 +1867,48 @@ plotRN_phaseProfile <- function(phaseOutput,
     scale_alpha_identity() +
     geom_point(aes_(size = ~psize)) +
     geom_line()+
+    facet_wrap(~ phaseName) +
     scale_color_manual(values = epochColours)
 
-  if(plotCentroid){
-    if(returnCentroid%in%c("mean.sd","median.mad","centroid")){
-      pp <- pp +
-        geom_linerange(data = outMeans,
-                       aes_(x = ~Dimension, y = ~Mean, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
 
-      if(returnCentroid%in%"centroid"){
-        pp <- pp + geom_line(data = outMeans,
-                             aes_(x = ~Dimension, y = ~Mean, color = ~phaseName, group = ~phaseName), inherit.aes = FALSE)
+  if(plotCentroid){
+    if(returnCentroid%in%c("mean.sd","centroid")){
+
+      pp <- pp + geom_line(data = outMeans, aes_(x = ~Dimension, y = ~Mean, group = ~phaseName), inherit.aes = FALSE)
+
+      if(returnCentroid%in%c("mean.sd")){
+
+      # if(returnCentroid%in%"centroid"){
+      #   pp <- pp +
+      #     geom_line(data = outMeans,
+      #                        aes_(x = ~Dimension, y = ~Mean, color = ~phaseName, group = ~phaseName), inherit.aes = FALSE)
+      # } else {
+
+        pp <- pp +
+          geom_linerange(data = outMeans,
+                         aes_(x = ~Dimension, y = ~Mean, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+      }
+
+      pp <- pp +
+        geom_point(data = outMeans,
+                   aes_(x = ~Dimension, y = ~Mean, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+        scale_fill_manual(values = epochColours)
+
+      } else {
+
+        pp <- pp +
+          geom_linerange(data = outMeans,
+                         aes_(x = ~Dimension, y = ~Median, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+
+        pp <- pp +
+          geom_point(data = outMeans,
+                     aes_(x = ~Dimension, y = ~Median, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+          scale_fill_manual(values = epochColours)
       }
     }
-    pp <- pp +
-      geom_point(data = outMeans,
-                 aes_(x = ~Dimension, y = ~Mean, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
-      scale_fill_manual(values = epochColours)
-  }
 
   pp <- pp + theme_bw() +
     theme(legend.position = "none") +
-    facet_wrap(~ phase_name) +
     coord_flip()
 
   print(pp)
@@ -1992,15 +2028,6 @@ plotRN_phaseSeries <- function(phaseOutput,
     stop("The output is not from function 'casnet::rn_phases()'!")
   }
 
-
-  # Phases_long <- Phases %>% ungroup() %>%
-  #   dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
-  #   dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
-  #   dplyr::select(!(dplyr::contains(excludeVars))) %>%
-  #   select(phase_name, starts_with("dim_")) %>%
-  #   pivot_longer(cols = starts_with("dim_"), names_to = "Dimension", values_to = "Value")
-  #
-
   epochColours <- getColours(Ncols = length(unique(out$phase_name)))
 
   out$maxState_strength[is.na(out$maxState_strength)] <- min(out$maxState_strength, na.rm = TRUE)/2
@@ -2042,6 +2069,86 @@ plotRN_phaseSeries <- function(phaseOutput,
     invisible(return(pd))
   }
 }
+
+
+#
+# phases <- casnet::rn_phases(RN$RN,
+#                             standardise = "unit",
+#                             maxPhases = 100,
+#                             minStatesinPhase = 1,
+#                             returnGraph = FALSE,
+#                             doPhaseProfilePlot = FALSE,
+#                             doSpiralPlot = FALSE,
+#                             # returnCentroid = "centroid",
+#                             cleanUp = TRUE,
+#                             excludeNorec = FALSE,
+#                             excludeOther = FALSE)
+
+
+### Create a variable which is based on the mean of each dimension; this
+# goes to the phase colour
+
+# phases <- phases %>%
+#   dplyr::mutate(phase_stringency = select(starts_with("dim_"), colMeans, na.rm=TRUE),
+#                 phase_name_ordered = factor(phase_name)) %>%
+#   dplyr::ungroup() %>%
+#   dplyr::mutate(phase_colour_stringency = forcats::fct_reorder(.x = phase_stringency,
+#                                                                .f = phase_name_ordered,
+#                                                                .fun = median))
+# phases$
+#
+# phases$
+#
+#     ### Prepare data
+#
+#     phases_viz <- phases %>%
+#       # dplyr::filter(phase_name != "No recurrence" &
+#       #                 phase_name != "Other") %>%
+#       tidyr::pivot_longer(cols = contains("dim_"),
+#                           names_to = "Dimension",
+#                           values_to = "Value") %>%
+#       dplyr::mutate(Dimension = stringr::str_replace(string = Dimension,
+#                                                      pattern = "dim_",
+#                                                      replacement = ""))
+#
+#     total_number_of_phases <- length(unique(phases_viz$phase_name_ordered))
+#
+#     ### Draw plot
+#     phases_viz %>%
+#       ggplot(aes(fill = phase_colour_stringency,
+#                  x = Value,
+#                  y = Dimension)) +
+#       ggridges::geom_density_ridges(
+#         aes(point_colour = phase_colour_stringency),
+#         jittered_points = TRUE,
+#         position = "raincloud",
+#         scale = 0.9,
+#         alpha = 0.7,
+#         point_alpha = 0.9,
+#         point_size = 0.5) +
+#       scale_discrete_manual("point_colour",
+#                             values = viridis::inferno(n =
+#                                                         total_number_of_phases,
+#                                                       end = 0.9,
+#                                                       direction = -1),
+#                             name = "Phase name") +
+#       scale_fill_viridis_d(option = "inferno",
+#                            name = "Phase name",
+#                            end = 0.9,
+#                            direction = -1) +
+#       labs(title = paste0("All phases: ", figure_identifier)) +
+#       theme_bw()
+#
+# Phases_long <- Phases %>% ungroup() %>%
+#   dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
+#   dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
+#   dplyr::select(!(dplyr::contains(excludeVars))) %>%
+#   select(phase_name, starts_with("dim_")) %>%
+#   pivot_longer(cols = starts_with("dim_"), names_to = "Dimension", values_to = "Value")
+#
+#
+#
+
 
 
 # Complex Networks# graph2svg <- function(TDM,pname){

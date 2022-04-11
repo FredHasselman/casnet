@@ -4,7 +4,6 @@ pkgdown_sha: ~
 articles:
   CRQA: CRQA.html
   DynamicComplexity: DynamicComplexity.html
-  RecurrenceNetworks: RecurrenceNetworks.html
   scalingphenomena: scalingphenomena.html
-last_built: 2022-03-08T16:17Z
+last_built: 2022-04-11T09:01Z
 

@@ -9,6 +9,7 @@ rn_phases(
   maxPhases = 5,
   minStatesinPhase = 1,
   maxStatesinPhase = NROW(RN),
+  inverseWeight = TRUE,
   cleanUp = TRUE,
   returnCentroid = c("no", "mean.sd", "median.mad", "centroid")[1],
   removeSingularities = FALSE,
@@ -36,6 +37,8 @@ rn_phases(
 \item{minStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases do not have a minimum number of \code{minStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{1})}
 
 \item{maxStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases exceeds a maximum number of \code{maxStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{NROW(RN)})}
+
+\item{inverseWeight}{Whether to perform the operation \code{1/weight} on the edge weights. The default is \code{TRUE}, if the matrix was weighted by a distance metric (\code{weightedBy = "si"}) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on the node strength calculation used to select the phases. If the matrix was weighted by recurrence time (\code{weightedBy = "rt"}) and \code{inverseWeight = TRUE}, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If \code{weightedBy = "rf"}, lower frequencies will end up having more impact. (default = \code{TRUE})}
 
 \item{cleanUp}{Try to assign states to phases that were not assigned by the algorithm. If \code{FALSE}, these states will be added to category "Other" (default = \code{TRUE})}
 

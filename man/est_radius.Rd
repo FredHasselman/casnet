@@ -73,7 +73,7 @@ est_radius(
 \item{silent}{Silent-ish}
 }
 \value{
-A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
+A dataframe listing settings used to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 }
 \description{
 Find a fixed or optimal radius.

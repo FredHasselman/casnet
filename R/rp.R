@@ -2325,7 +2325,7 @@ rp_plot <- function(RM,
   if(unthresholded){
 
     if(!is.null(attr(RM,"weighted"))){
-      if(attr(RM,"weighted")%00%FALSE){
+      if((attr(RM,"weighted")%00%FALSE)&plotRadiusRRbar){
         warning("Can't show the radius vs. RR bar on a weighted Recurrence Plot!")
         plotRadiusRRbar <- FALSE
       }
@@ -2519,7 +2519,7 @@ rp_plot <- function(RM,
       resol <- resol %>% tibble::as_tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
 
       distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){
-        suppressMessages(est_radius(RM,targetValue = t, silent = TRUE, maxIter = 100, radiusOnFail = "percentile"))
+        suppressWarnings(suppressMessages(est_radius(RM,targetValue = t, silent = TRUE, maxIter = 100, radiusOnFail = "percentile")))
       })
 
       if(AUTO){

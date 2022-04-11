@@ -19,7 +19,7 @@ or with high-frequency, are regions of attraction for the system."><meta propert
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
       </span>
     </div>
 
@@ -38,9 +38,6 @@ or with high-frequency, are regions of attraction for the system."><meta propert
     </li>
     <li>
       <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
-    </li>
-    <li>
-      <a href="../articles/RecurrenceNetworks.html">Recurrence Networks</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -78,6 +75,7 @@ or with high-frequency, are regions of attraction for the system.</p>
   maxPhases <span class="op">=</span> <span class="fl">5</span>,
   minStatesinPhase <span class="op">=</span> <span class="fl">1</span>,
   maxStatesinPhase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">RN</span><span class="op">)</span>,
+  inverseWeight <span class="op">=</span> <span class="cn">TRUE</span>,
   cleanUp <span class="op">=</span> <span class="cn">TRUE</span>,
   returnCentroid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"centroid"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
   removeSingularities <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -108,6 +106,8 @@ or with high-frequency, are regions of attraction for the system.</p>
 <dd><p>A parameter applied after the extraction of phases (limited by <code>maxPhases</code>). If any extracted phases do not have a minimum number of <code>minStatesinPhase</code> + <code>1</code> (= the state that was selected based on node strength), the phase will be removed from the result (default = <code>1</code>)</p></dd>
 <dt>maxStatesinPhase</dt>
 <dd><p>A parameter applied after the extraction of phases (limited by <code>maxPhases</code>). If any extracted phases exceeds a maximum number of <code>maxStatesinPhase</code> + <code>1</code> (= the state that was selected based on node strength), the phase will be removed from the result (default = <code>NROW(RN)</code>)</p></dd>
+<dt>inverseWeight</dt>
+<dd><p>Whether to perform the operation <code>1/weight</code> on the edge weights. The default is <code>TRUE</code>, if the matrix was weighted by a distance metric (<code>weightedBy = "si"</code>) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on the node strength calculation used to select the phases. If the matrix was weighted by recurrence time (<code>weightedBy = "rt"</code>) and <code>inverseWeight = TRUE</code>, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If <code>weightedBy = "rf"</code>, lower frequencies will end up having more impact. (default = <code>TRUE</code>)</p></dd>
 <dt>cleanUp</dt>
 <dd><p>Try to assign states to phases that were not assigned by the algorithm. If <code>FALSE</code>, these states will be added to category "Other" (default = <code>TRUE</code>)</p></dd>
 <dt>returnCentroid</dt>

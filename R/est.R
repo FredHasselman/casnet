@@ -29,7 +29,7 @@
 #'
 #' @family Estimate Recurrence Parameters
 #'
-#' @return A dataframe listing settings ussed to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
+#' @return A dataframe listing settings used to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
 #' @export
 #'
 est_radius <- function(RM = NULL,
@@ -833,3 +833,17 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
                                                                            do.plot = doPlot)
   )
 }
+
+#
+#
+# est_RRvsRad <- function(y, RM = NA, emLag = NA, emDim = NA){
+#   if(is.na(RM)){
+#     RM <- rp(y1 = y, emLag = emLag, emDim = emDim)
+#   }
+#   df_RR <- plyr::ldply(seq(0,1, by = .05), function(t){
+#     suppressMessages(out <- est_radius(RM = RM, targetValue = t, silent = TRUE, maxIter = 500, radiusOnFail = NA))
+#     return(data.frame(target = t, RR = out$Measure, emRad = out$Radius))
+#   })
+#
+# }
+#
