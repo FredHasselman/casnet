@@ -14,7 +14,7 @@ rn(
   directed = FALSE,
   cumulative = TRUE,
   weighted = FALSE,
-  weightedBy = c("si", "rt", "rf")[1],
+  weightedBy = c("none", "si", "rt", "rf")[1],
   rescaleWeights = FALSE,
   fs = NA,
   to.ts = NULL,

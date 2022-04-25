@@ -83,7 +83,6 @@ est_radius <- function(RM = NULL,
     }
   }
 
-  rp.size <- rp_size(RM,AUTO,theiler)$rp_size_theiler
 
   if(type%in%"fixed"){
 
@@ -93,11 +92,15 @@ est_radius <- function(RM = NULL,
     Measure   <- 0
     iter      <- 0
     Converged <- FALSE
-    seqIter   <- 1:maxIter
+    minRRfound <- FALSE
+    seqIter    <- 1:maxIter
     stopRadius <- NA
-    RP_N <- NA
+    RP_N  <- NA
     tollo <- targetValue-tol #(1-tol),
     tolhi <- targetValue+tol #(tol+1),
+    rp.size <- rp_size(RM,AUTO,theiler)$rp_size_theiler
+    minDist <- suppressMessages(min(RM[RM>0], na.rm = TRUE))
+    minRR   <- (sum((as.vector(RM)>0)&(as.vector(RM)==minDist)))/rp.size
 
     iterList <- data.frame(iter        = seqIter,
                            Measure     = Measure,
@@ -115,9 +118,15 @@ est_radius <- function(RM = NULL,
     exitIter <- FALSE
     if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"±",tol,"for", targetMeasure,"\n"))}
 
+    if(tryRadius<=minDist){
+      warning(paste("The minimum RR possible for this matrix is", round(Measure,3),
+                    "because the minimum distance is:", round(minDist,3)))
+      minRRfound <- TRUE
+      exitIter   <- TRUE
+    }
+
     # p <- dplyr::progress_estimated(maxIter)
     while(!exitIter){
-
 
       iter <- iter+1
       #p$tick()$print()
@@ -154,6 +163,12 @@ est_radius <- function(RM = NULL,
                                              AUTO        = AUTO,
                                              Converged   = Converged)
 
+      if(tryRadius<=minDist){
+        warning(paste("The minimum RR possible for this matrix is",round(minRR,3), "because the minimum distance is:",round(minDist,3)))
+        minRRfound <- TRUE
+        exitIter <- TRUE
+      }
+
       if(any(Measure%[]%c(tollo,tolhi),(iter>=maxIter))){
         if(Measure%[]%c(tollo,tolhi)){
           Converged <- TRUE
@@ -179,6 +194,7 @@ est_radius <- function(RM = NULL,
       iterList$stopRadius[iter] <- tryRadius
       #iterlist$Measure[iter] <- Measure
     }
+    if(!minRRfound){
     if(Measure %][% c(tollo,tolhi)){
       iterList$Radius[iter] <- dplyr::case_when(
         radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
@@ -189,6 +205,9 @@ est_radius <- function(RM = NULL,
       iterList$stopRadius[iter] <- tryRadius
       #iterlist$Measure[iter] <- Measure
     }
+    } else {
+      iterList$Radius[iter] <- minDist
+      }
 
     ifelse(histIter,id<-c(1:iter),id<-iter)
     return(iterList[id,])

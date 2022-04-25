@@ -34,7 +34,7 @@ rn <- function(y1, y2 = NULL,
                directed = FALSE,
                cumulative = TRUE,
                weighted = FALSE,
-               weightedBy = c("si","rt","rf")[1],
+               weightedBy = c("none","si","rt","rf")[1],
                rescaleWeights = FALSE,
                fs = NA,
                to.ts = NULL,
@@ -62,6 +62,10 @@ rn <- function(y1, y2 = NULL,
       if(!silent){
         message("`emRad` was set to NA due to the value of `weighted`")
       }
+    }
+    if(!weightedBy %in% c("si","rt","rf")){
+      weightedBy <- "si"
+      message("Set `weightedBy` to 'si' due to the value of `weighted`")
     }
   }
 
@@ -1162,7 +1166,7 @@ rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, do
     gg <- igraph::graph_from_adjacency_matrix(TM, mode = "directed", weighted = TRUE, diag = TRUE)
     gg$layout <- igraph::layout_as_tree(gg,mode = "all", circular = TRUE)
 
-    gg <- plotNET_prep(gg, nodeSize = "strength", rescaleSize = c(10,20), edgeColour = TRUE, doPlot = FALSE)
+    gg <- plotNET_prep(gg, nodeSize = "strength", rescaleSize = c(10,20), edgeColour = TRUE, doPlot = FALSE, removeSelfLoops = FALSE)
 
     E(gg)$curved <- .3
     E(gg)$loop.angle <- pi/12
