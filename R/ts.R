@@ -1452,19 +1452,20 @@ ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/
   minChange <- NA
   }
 
+  minChange <- abs(minChange)
   if(!is.na(minChange%00%NA)&is.numeric(minChange)){
     if(minChange>0){
       checkPkg("imputeTS")
       ind <- which(abs(diff(c(dfs$p[1],dfs$p)))%()%c(0,minChange))
       for(i in ind){
         if(all(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)){
-          dfs$p_adj[i:last(which(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)+i)] <- NA
+          dfs$p_adj[i:dplyr::last(which(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)+i)] <- NA
         } else {
           dfs$p_adj[i:(which(diff(dfs$p_adj[i:length(dfs$p_adj)])!=0)[1]+i-1)] <- NA
         }
       }
       dfs$p_adj <- imputeTS::na_locf(dfs$p_adj)
-      if(!is.na(NAind)){
+      if(any(is.na(NAind))){
         dfs$p_adj[NAind] <- NA
       }
     }
@@ -1981,3 +1982,111 @@ ts_coarsegrain <- function(y, grain = 2, summaryFunction = c("mean","median","mi
 
   return(as.numeric(yy))
 }
+
+
+
+
+
+#' Calculate Kendall's tau in sliding window or around change point.
+#'
+#'  Kendall's tau at different lags or change point ranges
+#'
+#' @param y A numeric vector
+#' @param changepoint If not `NA`, it has to be an index of `y`. If `win` is `NA` Kendall's tau will be calculated in `1:changepoint`, otherwise the values of `win` will be used to create a window. If both `changepoint` and `win` are `NA` Kendall's tau will be calculated on all of `y`.
+#' @param win Numeric vector with 1 or 2 values. If `changepoint != NA`, Kendall's tau will be calculated in a window around the change point. If one value is provided a symmetric window, otherwise `changepoint - win[1]` and `changepoint + win[2]`. If `changepoint == NA` Kendall's tau will be calculated in a sliding  window.
+#' @param doPlot provide a plot
+#'
+#' @return A data frame
+#' @export
+#'
+#' @examples
+#'
+#' ts_slope(y=rnorm(100), doPlot = TRUE)
+#'
+ts_slope <- function(y, win = NA, changepoint = NA, doPlot = FALSE){
+
+
+  cnt <- 0
+
+  ms_out <- list()
+
+  slWindow  <- FALSE
+  cpWindow  <- FALSE
+
+  if(!all(is.na(win))&!is.na(changepoint)){
+    if(changepoint%[]%c(1,NROW(y))){
+
+      if(length(win)==1){
+        N <- changepoint + (abs(c(win,win)) * c(-1,1))
+      } else {
+        N <- changepoint + abs(win) * c(-1,1)
+      }
+
+      N <- N[1]:N[2]
+
+      if(all(N %[]% c(1,NROW(y)))){
+        cpWindow <- TRUE
+        xl <- "Changepoint ± win"
+        X  <- c(changepoint,changepoint)
+      } else {
+        stop("Invalid combination of win and changepoint.")
+      }
+    }
+  }
+
+  if(all(is.na(win))&!is.na(changepoint)){
+    N <- 1:changepoint
+    if(all(N %[]% c(1,NROW(y)))){
+      cpWindow <- TRUE
+      doPlot   <- FALSE
+    } else {
+      stop("Invalid combination of changepoint and length of y.")
+    }
+  }
+
+  if(!all(is.na(win))&is.na(changepoint)){
+    if(length(win)>=2){
+      N <- abs(win[1])
+      message("Using first value in argument win")
+    }
+
+    if(N%[]%c(1,NROW(y))){
+      slWindow <- TRUE
+      xl <- "Sliding window"
+      X  <- c(0,0)
+    } else {
+      stop("Invalid combination of win and changepoint.")
+    }
+  }
+
+  if(cpWindow){
+    ms_out <- data.frame(winID = paste("window: 001 | start:",N[1],"| stop:", max(N)),
+                         win = length(N), ktau = stats::cor(x = seq_along(N), y = y[N], method = "kendall"),
+                         sig = stats::cor.test(x = seq_along(N), y = y[N], method = "kendall")$p.value)
+  }
+
+  if(slWindow){
+    winList <- ts_windower(y = y, win=win, step = 1)
+    ms_out <- plyr::ldply(winList, function(w){
+      print(w)
+      if(sum(!is.na(y[w]))<2){
+        return(data.frame(win = win,
+                          ktau = NA,
+                          sig  = NA))
+      } else {
+        return(data.frame(win = win,
+                          ktau = stats::cor(x = seq_along(w), y = y[w], method = "kendall"),
+                          sig  = stats::cor.test(x = seq_along(w), y = y[w], method = "kendall")$p.value))
+      }
+    },
+    .id = "winID")
+  }
+
+  if(doPlot){
+    plot(x=X, y = c(-1,1), type = "l", xlab = xl, ylab = "Kendall's tau", xlim = c(1,NROW(ms_out)) )
+    lines(1:NROW(ms_out) , ms_out$ktau, lwd=2)
+  }
+
+  return(ms_out)
+}
+

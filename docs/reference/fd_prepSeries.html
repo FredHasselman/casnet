@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,55 +66,82 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fd_prepSeries</span><span class="op">(</span>
-  <span class="va">y</span>,
-  fs <span class="op">=</span> <span class="cn">NULL</span>,
-  removeTrend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
-  polyOrder <span class="op">=</span> <span class="fl">1</span>,
-  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
-  adjustSumOrder <span class="op">=</span> <span class="cn">FALSE</span>,
-  scaleMin <span class="op">=</span> <span class="fl">4</span>,
-  scaleMax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,
-  scaleResolution <span class="op">=</span> <span class="op">(</span><span class="va">scaleMax</span> <span class="op">-</span> <span class="va">scaleMin</span><span class="op">)</span>,
-  dataMin <span class="op">=</span> <span class="cn">NA</span>,
-  scaleS <span class="op">=</span> <span class="cn">NA</span>,
-  overlap <span class="op">=</span> <span class="cn">NA</span>,
-  silent <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fd_prepSeries</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  fs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  removeTrend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
+<span>  polyOrder <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
+<span>  adjustSumOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  scaleMin <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  scaleMax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  scaleResolution <span class="op">=</span> <span class="op">(</span><span class="va">scaleMax</span> <span class="op">-</span> <span class="va">scaleMin</span><span class="op">)</span>,</span>
+<span>  dataMin <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  scaleS <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  overlap <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>y</p></dd>
+
+
 <dt>fs</dt>
 <dd><p>fs</p></dd>
+
+
 <dt>removeTrend</dt>
 <dd><p>rt</p></dd>
+
+
 <dt>polyOrder</dt>
 <dd><p>po</p></dd>
+
+
 <dt>standardise</dt>
 <dd><p>st</p></dd>
+
+
 <dt>adjustSumOrder</dt>
 <dd><p>ao</p></dd>
+
+
 <dt>scaleMin</dt>
 <dd><p>sm</p></dd>
+
+
 <dt>scaleMax</dt>
 <dd><p>smm</p></dd>
+
+
 <dt>scaleResolution</dt>
 <dd><p>sr</p></dd>
+
+
 <dt>dataMin</dt>
 <dd><p>dm</p></dd>
+
+
 <dt>scaleS</dt>
 <dd><p>sc</p></dd>
+
+
 <dt>overlap</dt>
 <dd><p>ov</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>si</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>transformed series</p>
+    
+
+<p>transformed series</p>
     </div>
 
   </div>
@@ -129,8 +156,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

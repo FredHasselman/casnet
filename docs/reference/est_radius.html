@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,79 +66,122 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">est_radius</span><span class="op">(</span>
-  RM <span class="op">=</span> <span class="cn">NULL</span>,
-  y1 <span class="op">=</span> <span class="cn">NULL</span>,
-  y2 <span class="op">=</span> <span class="cn">NULL</span>,
-  emLag <span class="op">=</span> <span class="fl">1</span>,
-  emDim <span class="op">=</span> <span class="fl">1</span>,
-  method <span class="op">=</span> <span class="st">"Euclidean"</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed"</span>, <span class="st">"optimal"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  startRadius <span class="op">=</span> <span class="cn">NULL</span>,
-  eachRadius <span class="op">=</span> <span class="fl">1</span>,
-  targetMeasure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RR"</span>, <span class="st">"DET"</span>, <span class="st">"LAM"</span>, <span class="st">"T1"</span>, <span class="st">"all"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  targetValue <span class="op">=</span> <span class="fl">0.05</span>,
-  tol <span class="op">=</span> <span class="fl">0.01</span>,
-  maxIter <span class="op">=</span> <span class="fl">100</span>,
-  theiler <span class="op">=</span> <span class="cn">NA</span>,
-  histIter <span class="op">=</span> <span class="cn">FALSE</span>,
-  noiseLevel <span class="op">=</span> <span class="fl">0.75</span>,
-  noiseType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"normal"</span>, <span class="st">"uniform"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  plotROC <span class="op">=</span> <span class="cn">FALSE</span>,
-  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"none"</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,
-  radiusOnFail <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tiny"</span>, <span class="st">"huge"</span>, <span class="st">"percentile"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  silent <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">est_radius</span><span class="op">(</span></span>
+<span>  RM <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  emLag <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  emDim <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"Euclidean"</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed"</span>, <span class="st">"optimal"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  startRadius <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  eachRadius <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  targetMeasure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RR"</span>, <span class="st">"DET"</span>, <span class="st">"LAM"</span>, <span class="st">"T1"</span>, <span class="st">"all"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  targetValue <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  tol <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  maxIter <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  theiler <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  histIter <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  noiseLevel <span class="op">=</span> <span class="fl">0.75</span>,</span>
+<span>  noiseType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"normal"</span>, <span class="st">"uniform"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  plotROC <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"none"</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,</span>
+<span>  radiusOnFail <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tiny"</span>, <span class="st">"huge"</span>, <span class="st">"percentile"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>RM</dt>
 <dd><p>Unthresholded Recurrence Matrix</p></dd>
+
+
 <dt>y1</dt>
 <dd><p>A numeric vector or time series</p></dd>
+
+
 <dt>y2</dt>
 <dd><p>A numeric vector or time series for cross recurrence</p></dd>
+
+
 <dt>emLag</dt>
 <dd><p>The embedding lag</p></dd>
+
+
 <dt>emDim</dt>
 <dd><p>The embedding dimensions</p></dd>
+
+
 <dt>method</dt>
-<dd><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href="https://rdrr.io/pkg/proxy/man/dist.html" class="external-link">proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></dd>
+<dd><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code>proxy::dist()</code>. Type <code>proxy::pr_DB$get_entries()</code> to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Either <code>"fixed"</code> (default) or <code>"optimal"</code>, <code>"fixed"</code> will search for a radius that is close to the value for the <code>targetMeasure</code> in <code>targetValue</code>, <code>"optimal"</code> will optimise the radius for the <code>targetMeasure</code>, <code>targetValue</code> is ignored.</p></dd>
+
+
 <dt>startRadius</dt>
 <dd><p>If <code>type = "fixed"</code> this is the starting value for the radius (default = percentile of unique distances in RM given by <code>targetValue</code>). If <code>type = "optimal"</code> this will be a range of radius values (in normalised SD units) that will be considered (default = <code>seq(0,2,by=.01)</code>)</p></dd>
+
+
 <dt>eachRadius</dt>
 <dd><p>If <code>type = "optimal"</code> this is the number of signal and noise series that will be generated for each level in <code>startRadius</code> (default = <code>1</code>)</p></dd>
+
+
 <dt>targetMeasure</dt>
 <dd><p>If <code>type = "optimal"</code>, it must be a character vector indicating which recurrence measure to optimise the radius for, options are "RR" (default), "DET", "LAM", "T1", and "all". The option <code>targetMeasure = "all"</code> will report all the optimal values obtained from one realisation of <code>startRadius * eachRadius</code> signal and noise series.</p></dd>
+
+
 <dt>targetValue</dt>
 <dd><p>When argument <code>type</code> is set to "fixed", the value represents the target value for the measure in <code>targetMeasure</code> (default = <code>RR = .05</code>).</p></dd>
+
+
 <dt>tol</dt>
 <dd><p>Tolerance for achieving <code>targetValue</code> for <code>targetMeasure</code> (default = <code>0.01</code>)</p></dd>
+
+
 <dt>maxIter</dt>
 <dd><p>If <code>type = "fixed"</code>: Maximum number of iterations to reach targetValue.</p></dd>
+
+
 <dt>theiler</dt>
 <dd><p>Size of theiler window (default <code>0</code>)</p></dd>
+
+
 <dt>histIter</dt>
 <dd><p>Return iteration history? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>noiseLevel</dt>
 <dd><p>Noise level to construct the <code>signal + noiseLevel *</code> \(N(\mu=0,\sigma=1)\) (default = <code>0.75</code>)</p></dd>
+
+
 <dt>noiseType</dt>
 <dd><p>Type</p></dd>
+
+
 <dt>plotROC</dt>
 <dd><p>Generates an ROC plot if <code>type = "optimal"</code></p></dd>
+
+
 <dt>standardise</dt>
 <dd><p>Standardise <code>y</code> if <code>type == "optimal"</code></p></dd>
+
+
 <dt>radiusOnFail</dt>
 <dd><p>Radius to return when search fails <code>"tiny" = 0 + ,Machine.double.eps</code>, this will likely cause a matrix full of zeros. <code>"huge" = 1 + max. distance in RM</code>, which will give a matrix full of ones, <code>"percentile" = quantile(RM, prob = targetValue) of distances greater than 0</code>.</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silent-ish</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A dataframe listing settings used to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)</p>
+    
+
+<p>A dataframe listing settings used to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -161,8 +204,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

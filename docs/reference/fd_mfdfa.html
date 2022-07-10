@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,72 +66,109 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fd_mfdfa</span><span class="op">(</span>
-  <span class="va">y</span>,
-  fs <span class="op">=</span> <span class="cn">NULL</span>,
-  removeTrend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
-  polyOrder <span class="op">=</span> <span class="fl">1</span>,
-  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  adjustSumOrder <span class="op">=</span> <span class="cn">FALSE</span>,
-  removeTrendSegment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
-  polyOrderSegment <span class="op">=</span> <span class="fl">1</span>,
-  scaleMin <span class="op">=</span> <span class="fl">16</span>,
-  scaleMax <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/nextn.html" class="external-link">nextn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">4</span><span class="op">)</span>, factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,
-  scaleResolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMax</span> <span class="op">-</span> <span class="va">scaleMin</span><span class="op">)</span><span class="op">)</span>,
-  dataMin <span class="op">=</span> <span class="cn">NA</span>,
-  scaleS <span class="op">=</span> <span class="cn">NA</span>,
-  overlap <span class="op">=</span> <span class="cn">NA</span>,
-  qq <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>, length.out <span class="op">=</span> <span class="fl">101</span><span class="op">)</span>,
-  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnInfo <span class="op">=</span> <span class="cn">FALSE</span>,
-  silent <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fd_mfdfa</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  fs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  removeTrend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
+<span>  polyOrder <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  adjustSumOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  removeTrendSegment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
+<span>  polyOrderSegment <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  scaleMin <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>  scaleMax <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/nextn.html" class="external-link">nextn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">4</span><span class="op">)</span>, factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  scaleResolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMax</span> <span class="op">-</span> <span class="va">scaleMin</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  dataMin <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  scaleS <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  overlap <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  qq <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>, length.out <span class="op">=</span> <span class="fl">101</span><span class="op">)</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnInfo <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A numeric vector or time series object.</p></dd>
+
+
 <dt>fs</dt>
 <dd><p>Sample rate</p></dd>
+
+
 <dt>removeTrend</dt>
 <dd><p>Method to use for global detrending (default = <code>"poly"</code>)</p></dd>
+
+
 <dt>polyOrder</dt>
 <dd><p>Order of global polynomial trend to remove if <code>removeTrend = "poly"</code>. If <code>removeTrend = "adaptive"</code> polynomials <code>1</code> to <code>polyOrder</code> will be evaluated and the best fitting curve (R squared) will be removed (default = <code>1</code>)</p></dd>
+
+
 <dt>standardise</dt>
 <dd><p>Standardise the series using <code><a href="ts_standardise.html">ts_standardise()</a></code> with <code>adjustN = FALSE</code> (default = "mean.sd")</p></dd>
+
+
 <dt>adjustSumOrder</dt>
 <dd><p>Adjust the time series (summation or difference), based on the global scaling exponent, see e.g. <a href="https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg" class="external-link">https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg</a>Ihlen (2012) (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>removeTrendSegment</dt>
 <dd><p>Method to use for detrending in the bins (default = <code>"poly"</code>)</p></dd>
+
+
 <dt>polyOrderSegment</dt>
 <dd><p>The DFA order, the order of polynomial trend to remove from the bin if <code>removeTrendSegment = "poly"</code>. If <code>removeTrendSegment = "adaptive"</code> polynomials <code>1</code> to <code>polyOrder</code> will be evaluated and the best fitting polynomial (R squared) will be removed (default = <code>1</code>)</p></dd>
+
+
 <dt>scaleMin</dt>
 <dd><p>Minimum scale (in data points) to use for log-log regression (default = <code>4</code>)</p></dd>
+
+
 <dt>scaleMax</dt>
 <dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code> (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
+
+
 <dt>scaleResolution</dt>
 <dd><p>The scales at which detrended fluctuation will be evaluated are calculated as: <code>seq(scaleMin, scaleMax, length.out = scaleResolution)</code> (default =  <code>round(log2(scaleMax-scaleMin))</code>).
 #' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if <code>length(y) = 1024</code> and <code>dataMin = 4</code>, the maximum scale used to calculate the slope will be <code>1024 / 4 = 256</code>. This value will take precedence over the <code>scaleMax</code> (default = <code>NA</code>)</p></dd>
+
+
 <dt>scaleS</dt>
 <dd><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> and <code>dataMin</code> will be ignored (default = <code>NA</code>)</p></dd>
+
+
 <dt>overlap</dt>
 <dd><p>Turn DFA into a sliding window analysis. A number in <code>[0 ... 1]</code> representing the amount of 'bin overlap'. If <code>length(y) = 1024</code> and overlap is <code>.5</code>, a scale of <code>4</code> will be considered a sliding window of size <code>4</code> with step-size <code>floor(.5 * 4) = 2</code>, so for scale <code>128</code> step-size will be <code>64</code> (default = <code>NA</code>)</p></dd>
+
+
 <dt>qq</dt>
 <dd><p>A vector containing a range of values for the order of fluctuation <code>q</code> (default = <code>seq(-5, 5,length.out=101)</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Output the log-log scale versus fluctuation plot with linear fit by calling function <code><a href="plotFD_loglog.html">plotFD_loglog()</a></code> (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>returnPlot</dt>
 <dd><p>Return ggplot2 object (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>returnInfo</dt>
 <dd><p>Return all the data used in SDA (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silent-ish mode (default = <code>FALSE</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A dataframe with values of <code>q</code>,<code>H(q)</code>, <code>t(q)</code>, <code>h(q)</code>, `D(q)``</p>
+    
+
+<p>A dataframe with values of <code>q</code>,<code>H(q)</code>, <code>t(q)</code>, <code>h(q)</code>, `D(q)``</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -146,11 +183,11 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">33</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># White noise</span></span>
-<span class="r-in"><span class="fu">fd_mfdfa</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4096</span><span class="op">)</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">33</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># White noise</span></span></span>
+<span class="r-in"><span><span class="fu">fd_mfdfa</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4096</span><span class="op">)</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (mf)dfa:	Sample rate was set to 1.</span>
@@ -167,9 +204,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Pink noise</span></span>
-<span class="r-in"><span class="fu">fd_mfdfa</span><span class="op">(</span><span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="fl">4096</span><span class="op">)</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Pink noise</span></span></span>
+<span class="r-in"><span><span class="fu">fd_mfdfa</span><span class="op">(</span><span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="fl">4096</span><span class="op">)</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (mf)dfa:	Sample rate was set to 1.</span>
@@ -186,11 +223,11 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># 'multi' fractal</span></span>
-<span class="r-in"><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">2048</span></span>
-<span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.2</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.5</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.7</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">512</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">fd_mfdfa</span><span class="op">(</span>y<span class="op">=</span><span class="va">y</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 'multi' fractal</span></span></span>
+<span class="r-in"><span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">2048</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.2</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.5</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.7</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">512</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">fd_mfdfa</span><span class="op">(</span>y<span class="op">=</span><span class="va">y</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (mf)dfa:	Sample rate was set to 1.</span>
@@ -207,7 +244,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -222,8 +259,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

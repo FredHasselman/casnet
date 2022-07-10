@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,49 +66,72 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotNET_prep</span><span class="op">(</span>
-  <span class="va">g</span>,
-  labels <span class="op">=</span> <span class="cn">NA</span>,
-  nodeSize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"degree"</span>, <span class="st">"hubscore"</span>, <span class="st">"strength"</span>, <span class="st">"eccentricity"</span>, <span class="st">"coreness"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  rescaleSize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">10</span><span class="op">)</span>,
-  nodeColour <span class="op">=</span> <span class="cn">TRUE</span>,
-  labelSize <span class="op">=</span> <span class="st">"asnodesize"</span>,
-  edgeWeight <span class="op">=</span> <span class="st">"weight"</span>,
-  edgeColour <span class="op">=</span> <span class="cn">FALSE</span>,
-  removeZeroDegree <span class="op">=</span> <span class="cn">TRUE</span>,
-  removeSelfLoops <span class="op">=</span> <span class="cn">TRUE</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotNET_prep</span><span class="op">(</span></span>
+<span>  <span class="va">g</span>,</span>
+<span>  labels <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  nodeSize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"degree"</span>, <span class="st">"hubscore"</span>, <span class="st">"strength"</span>, <span class="st">"eccentricity"</span>, <span class="st">"coreness"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  rescaleSize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  nodeColour <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  labelSize <span class="op">=</span> <span class="st">"asnodesize"</span>,</span>
+<span>  edgeWeight <span class="op">=</span> <span class="st">"weight"</span>,</span>
+<span>  edgeColour <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  removeZeroDegree <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  removeSelfLoops <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>g</dt>
 <dd><p>An igraph object</p></dd>
+
+
 <dt>labels</dt>
 <dd><p>Vertex labels. If <code>NA</code> is passed then first <code>V(g)$name</code> will be checked, for node labels. To create a plot without labels pass <code>NULL</code> (default = <code>NA</code>)</p></dd>
+
+
 <dt>nodeSize</dt>
 <dd><p>Set node sizes by <code>degree(g, normalised = TRUE)</code> (default), <code>hubscore(g)$vector</code>, or, <code>strength(g)</code>, <code>eccentricity(g)</code>, <code>coreness(g)</code>. If a numeric value is passed all vertex sizes will be set to that value.</p></dd>
+
+
 <dt>rescaleSize</dt>
 <dd><p>Use to rescale the measure indicated under <code>nodeSize</code> to <code>c(min,max)</code> for better node visibility. Pass <code>c(1,1)</code> for no rescaling (default = <code>c(3,10)</code>)</p></dd>
+
+
 <dt>nodeColour</dt>
 <dd><p>Set to <code>TRUE</code> to colour nodes using the size of the node (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>labelSize</dt>
 <dd><p>Set labelsize: <code>"asnodesize"</code> sets the <code>cex</code> for the labels to coincide with nodesize (with min of .4 and max of 1.1). A single numeric value sets the <code>cex</code> of all labels to that value. A numeric vector of length two, <code>c(min,max)</code> will scale the label sizes to <code>min</code> and <code>max</code></p></dd>
+
+
 <dt>edgeWeight</dt>
 <dd><p>Set size of edges to <code>"E(g)$weight"</code> by passing "weight". If a single numeric value is provided all edges will be set to that value.</p></dd>
+
+
 <dt>edgeColour</dt>
 <dd><p>Set to <code>TRUE</code> to colour edges using the weight of the edge (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>removeZeroDegree</dt>
 <dd><p>Remove vertices with <code>degree(g) == 0</code> (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>removeSelfLoops</dt>
 <dd><p>Calls <code>simplify(g)</code> (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Plot the igraph object.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>an igraph object</p>
+    
+
+<p>an <a href="https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html" class="external-link">igraph</a> object</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -131,8 +154,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

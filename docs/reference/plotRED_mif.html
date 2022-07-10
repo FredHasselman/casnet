@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,37 +66,52 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotRED_mif</span><span class="op">(</span>
-  mif.OUT <span class="op">=</span> <span class="cn">NULL</span>,
-  lags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">mif.OUT</span>, <span class="st">"lags"</span><span class="op">)</span>,
-  nbins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">mif.OUT</span>, <span class="st">"nbins"</span><span class="op">)</span>,
-  surTest <span class="op">=</span> <span class="cn">FALSE</span>,
-  alpha <span class="op">=</span> <span class="fl">0.05</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,
-  returnMIFun <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotRED_mif</span><span class="op">(</span></span>
+<span>  mif.OUT <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">mif.OUT</span>, <span class="st">"lags"</span><span class="op">)</span>,</span>
+<span>  nbins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">mif.OUT</span>, <span class="st">"nbins"</span><span class="op">)</span>,</span>
+<span>  surTest <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  returnMIFun <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>mif.OUT</dt>
 <dd><p>Output from function <code><a href="mif.html">mif()</a></code></p></dd>
+
+
 <dt>lags</dt>
 <dd><p>The lags to evaluate mutual information.</p></dd>
+
+
 <dt>nbins</dt>
 <dd><p>The number of bins passed to <code><a href="https://rdrr.io/pkg/infotheo/man/discretize.html" class="external-link">infotheo::discretize()</a></code> if y is a matrix or <code><a href="ts_discrete.html">ts_discrete()</a></code></p></dd>
+
+
 <dt>surTest</dt>
 <dd><p>If <code>TRUE</code>, a surrogate will be conducted using simple surrogates. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin <code>j</code> when the current value is in bin <code>j</code>. The number of surrogates needed will be computed based on the value of the <code>alpha</code> parameter, conceived as a one-sided test: <code>mi &gt; 0</code>.</p></dd>
+
+
 <dt>alpha</dt>
 <dd><p>The alpha level for the surrogate test (default = <code>0.05</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Produce a plot of the symbolic time series by calling <code>plotRED_mif()</code> (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>returnMIFun</dt>
 <dd><p>Return the data</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Either an invisible ggplot2 object r a list containing the plot and the data</p>
+    
+
+<p>Either an invisible ggplot2 object r a list containing the plot and the data</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -116,8 +131,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,41 +66,58 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotMRN_win</span><span class="op">(</span>
-  <span class="va">df_mrn</span>,
-  layerMeasures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"InterLayerMI"</span>, <span class="st">"InterLayerCor"</span>, <span class="st">"EdgeOverlap"</span>, <span class="st">"JRP"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  vertexMeasures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"degree"</span>, <span class="st">"strength"</span>, <span class="st">"transitivity"</span>, <span class="st">"closeness"</span>,
-    <span class="st">"betweenness"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  weighted <span class="op">=</span> <span class="cn">FALSE</span>,
-  directed <span class="op">=</span> <span class="cn">FALSE</span>,
-  cumulative <span class="op">=</span> <span class="cn">FALSE</span>,
-  plotSD <span class="op">=</span> <span class="cn">FALSE</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotMRN_win</span><span class="op">(</span></span>
+<span>  <span class="va">df_mrn</span>,</span>
+<span>  layerMeasures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"InterLayerMI"</span>, <span class="st">"InterLayerCor"</span>, <span class="st">"EdgeOverlap"</span>, <span class="st">"JRP"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  vertexMeasures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"degree"</span>, <span class="st">"strength"</span>, <span class="st">"transitivity"</span>, <span class="st">"closeness"</span>,</span>
+<span>    <span class="st">"betweenness"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  weighted <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  directed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cumulative <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  plotSD <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>df_mrn</dt>
 <dd><p>Output from function <code><a href="mrn.html">mrn()</a></code> with arguments set for a windowed analysis.</p></dd>
+
+
 <dt>layerMeasures</dt>
 <dd><p>Character vector indicating which layer similarity measure(s) should be plotted. Valid elements in the vector are: <code>"InterLayerMI"</code>, <code>"InterLayerCor"</code>, <code>"EdgeOverlap"</code>, <code>"JRP"</code>.</p></dd>
+
+
 <dt>vertexMeasures</dt>
 <dd><p>Character vector indicating which vertex measure(s) should be plotted.  Valid elements in the vector are: <code>"none"</code>, <code>"degree"</code>,<code>"strength"</code>,<code>"transitivity"</code> (= clustering),<code>"closeness"</code>,<code>"betweenness"</code>. See the <a href="https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html" class="external-link">igraph</a> The calculations  depend on the value of <code>MRNweightedBy</code> that was used with function <code><a href="mrn.html">mrn()</a></code>.</p></dd>
+
+
 <dt>weighted</dt>
 <dd><p>If <code>vertexMeasures</code> is not equal to <code>"none"</code>, should the graph be considered weighted? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>directed</dt>
 <dd><p>If <code>vertexMeasures</code> is not equal to <code>"none"</code>, should the graph be considered directed? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>cumulative</dt>
 <dd><p>If <code>vertexMeasures</code> is not equal to <code>"none"</code>, should the graph be considered cumulative? This will set the mode to <code>"upper"</code> (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>plotSD</dt>
 <dd><p>If <code>TRUE</code>, a ribbon with range mean ± SD will be plotted (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Plot the igraph object. If <code>FALSE</code>, a just the graph object will be returned invisible.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a ggplot object</p>
+    
+
+<p>a ggplot object</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -120,8 +137,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

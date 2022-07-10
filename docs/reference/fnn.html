@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,25 +66,36 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fnn</span><span class="op">(</span><span class="va">y</span>, emLag <span class="op">=</span> <span class="fl">1</span>, maxDim <span class="op">=</span> <span class="fl">10</span>, radius <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span>, number.boxes <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fnn</span><span class="op">(</span><span class="va">y</span>, emLag <span class="op">=</span> <span class="fl">1</span>, maxDim <span class="op">=</span> <span class="fl">10</span>, radius <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span>, number.boxes <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A numeric vector or time series</p></dd>
+
+
 <dt>emLag</dt>
 <dd><p>Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If <code>NULL</code> the lags based on the mutual information in <code>lagMethods</code> will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = <code>NULL</code>)</p></dd>
+
+
 <dt>maxDim</dt>
 <dd><p>Maximum number of embedding dimensions to consider (default = <code>10</code>)</p></dd>
+
+
 <dt>radius</dt>
 <dd><p>Size of the neighbourhood: Every point smaller than the radius will be considered a near neighbour, see <code><a href="https://rdrr.io/pkg/nonlinearTseries/man/findAllNeighbours.html" class="external-link">nonlinearTseries::findAllNeighbours()</a></code> (default = <code>sd(y)/10</code>).</p></dd>
+
+
 <dt>number.boxes</dt>
 <dd><p>Integer representing number of boxes to to speed up neighbour search, if <code>NULL</code> an optimal number will be chosen <code><a href="https://rdrr.io/pkg/nonlinearTseries/man/findAllNeighbours.html" class="external-link">nonlinearTseries::findAllNeighbours()</a></code> (default = <code>NULL</code>).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>FNN curve</p>
+    
+
+<p>FNN curve</p>
     </div>
 
   </div>
@@ -99,8 +110,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

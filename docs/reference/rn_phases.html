@@ -19,7 +19,7 @@ or with high-frequency, are regions of attraction for the system."><meta propert
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -37,7 +37,7 @@ or with high-frequency, are regions of attraction for the system."><meta propert
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -70,82 +70,127 @@ or with high-frequency, are regions of attraction for the system.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rn_phases</span><span class="op">(</span>
-  <span class="va">RN</span>,
-  maxPhases <span class="op">=</span> <span class="fl">5</span>,
-  minStatesinPhase <span class="op">=</span> <span class="fl">1</span>,
-  maxStatesinPhase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">RN</span><span class="op">)</span>,
-  inverseWeight <span class="op">=</span> <span class="cn">TRUE</span>,
-  cleanUp <span class="op">=</span> <span class="cn">TRUE</span>,
-  returnCentroid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"centroid"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  removeSingularities <span class="op">=</span> <span class="cn">FALSE</span>,
-  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"unit"</span><span class="op">)</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span>,
-  returnGraph <span class="op">=</span> <span class="cn">FALSE</span>,
-  doPhaseProfilePlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  plotCentroid <span class="op">=</span> <span class="cn">FALSE</span>,
-  space_dims <span class="op">=</span> <span class="cn">NULL</span>,
-  colOrder <span class="op">=</span> <span class="cn">FALSE</span>,
-  phaseColours <span class="op">=</span> <span class="cn">NULL</span>,
-  doSpiralPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  doPhaseSeriesPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  showEpochLegend <span class="op">=</span> <span class="cn">TRUE</span>,
-  epochColours <span class="op">=</span> <span class="cn">NULL</span>,
-  epochLabel <span class="op">=</span> <span class="st">"Phase"</span>,
-  excludeOther <span class="op">=</span> <span class="cn">FALSE</span>,
-  excludeNorec <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rn_phases</span><span class="op">(</span></span>
+<span>  <span class="va">RN</span>,</span>
+<span>  maxPhases <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  minStatesinPhase <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  maxStatesinPhase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">RN</span><span class="op">)</span>,</span>
+<span>  inverseWeight <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cleanUp <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  returnCentroid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"centroid"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  removeSingularities <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"unit"</span><span class="op">)</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span>,</span>
+<span>  returnGraph <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doPhaseProfilePlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  plotCentroid <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  space_dims <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  phaseColours <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  doSpiralPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doPhaseSeriesPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  showEpochLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  epochColours <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  epochLabel <span class="op">=</span> <span class="st">"Phase"</span>,</span>
+<span>  excludeOther <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  excludeNorec <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>RN</dt>
 <dd><p>A matrix produced by the function <a href="rn.html">rn</a></p></dd>
+
+
 <dt>maxPhases</dt>
 <dd><p>The maximum number of phases to extract. If <code>NA</code>, the value will be set to <code>NROW(RN)</code>  (default = <code>5</code>)</p></dd>
+
+
 <dt>minStatesinPhase</dt>
 <dd><p>A parameter applied after the extraction of phases (limited by <code>maxPhases</code>). If any extracted phases do not have a minimum number of <code>minStatesinPhase</code> + <code>1</code> (= the state that was selected based on node strength), the phase will be removed from the result (default = <code>1</code>)</p></dd>
+
+
 <dt>maxStatesinPhase</dt>
 <dd><p>A parameter applied after the extraction of phases (limited by <code>maxPhases</code>). If any extracted phases exceeds a maximum number of <code>maxStatesinPhase</code> + <code>1</code> (= the state that was selected based on node strength), the phase will be removed from the result (default = <code>NROW(RN)</code>)</p></dd>
+
+
 <dt>inverseWeight</dt>
 <dd><p>Whether to perform the operation <code>1/weight</code> on the edge weights. The default is <code>TRUE</code>, if the matrix was weighted by a distance metric (<code>weightedBy = "si"</code>) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on the node strength calculation used to select the phases. If the matrix was weighted by recurrence time (<code>weightedBy = "rt"</code>) and <code>inverseWeight = TRUE</code>, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If <code>weightedBy = "rf"</code>, lower frequencies will end up having more impact. (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>cleanUp</dt>
 <dd><p>Try to assign states to phases that were not assigned by the algorithm. If <code>FALSE</code>, these states will be added to category "Other" (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>returnCentroid</dt>
 <dd><p>Values can be <code>"no"</code>, <code>"mean.sd"</code>, <code>"median.mad"</code>, <code>"centroid"</code>. Any other value than <code>"no"</code> will return a data frame with the central tendency and deviation measures for each phase (default = <code>"no"</code>)</p></dd>
+
+
 <dt>removeSingularities</dt>
 <dd><p>Will remove states that recur only once (nodes with <code>degree(g) == 1</code>) (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>standardise</dt>
 <dd><p>Standardise the series using <code><a href="ts_standardise.html">ts_standardise()</a></code> with <code>adjustN = FALSE</code> (default = "mean.sd")</p></dd>
+
+
 <dt>returnGraph</dt>
 <dd><p>Returns all the graph object objects of the plots that have been produced (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>doPhaseProfilePlot</dt>
 <dd><p>Produce a profile plot of the extracted phases (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>plotCentroid</dt>
 <dd><p>Plot the centroid requested in <code>returnCentroid</code>? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>space_dims</dt>
 <dd><p>A vector of titles to use for the dimensions. If <code>NULL</code> the values will be read from the attribute of <code>RN</code>.</p></dd>
+
+
 <dt>colOrder</dt>
 <dd><p>Should the order of the dimensions reflect the order of the columns in the dataset? If <code>FALSE</code> the order will be based on the values of the dimensions observed in the first extracted phase (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>phaseColours</dt>
 <dd><p>Colours for the different phases in the phase plot. If <code>epochColours</code> also has a value, <code>phaseColours</code> will be used instead (default = <code>NULL</code>)</p></dd>
+
+
 <dt>doSpiralPlot</dt>
 <dd><p>Produce a plot of the recurrence network with the nodes coloured by phases (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>doPhaseSeriesPlot</dt>
 <dd><p>Produce a time series of the phases as they occur with a marginal histogram of their frequency (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>showEpochLegend</dt>
 <dd><p>Should a legend be shown for the epoch colours? (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>epochColours</dt>
 <dd><p>A vector of length <code>vcount(g)</code> with colour codes (default = <code>NULL</code>)</p></dd>
+
+
 <dt>epochLabel</dt>
 <dd><p>A title for the epoch legend (default = <code>"Epoch"</code>)</p></dd>
+
+
 <dt>excludeOther</dt>
 <dd><p>Should the phase "Other" be excluded from plots? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>excludeNorec</dt>
 <dd><p>Should the category "No recurrence" be excluded from plots? (default = <code>TRUE</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame with information about the phases or a list object with data and graph objects (if requested).</p>
+    
+
+<p>A data frame with information about the phases or a list object with data and graph objects (if requested).</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -170,20 +215,20 @@ or with high-frequency, are regions of attraction for the system.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co"># Use the ManyAnalysts dataset to create a phase plot with default settings</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"manyAnalystsESM"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">[</span><span class="fl">4</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
-<span class="r-in"><span class="va">RN</span> <span class="op">&lt;-</span> <span class="fu"><a href="rn.html">rn</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">df</span>, doEmbed <span class="op">=</span> <span class="cn">FALSE</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span>, weightedBy <span class="op">=</span> <span class="st">"si"</span>, emRad <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># This returns 6 phases which have minimally 1 state</span></span>
-<span class="r-in"><span class="fu">rn_phases</span><span class="op">(</span><span class="va">RN</span>, maxPhases <span class="op">=</span> <span class="fl">10</span>, doPhaseProfilePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use the ManyAnalysts dataset to create a phase plot with default settings</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"manyAnalystsESM"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">[</span><span class="fl">4</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">RN</span> <span class="op">&lt;-</span> <span class="fu"><a href="rn.html">rn</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">df</span>, doEmbed <span class="op">=</span> <span class="cn">FALSE</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span>, weightedBy <span class="op">=</span> <span class="st">"si"</span>, emRad <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># This returns 6 phases which have minimally 1 state</span></span></span>
+<span class="r-in"><span><span class="fu">rn_phases</span><span class="op">(</span><span class="va">RN</span>, maxPhases <span class="op">=</span> <span class="fl">10</span>, doPhaseProfilePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="rn_phases-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Use min. number of states as the extraction criterion</span></span>
-<span class="r-in"><span class="fu">rn_phases</span><span class="op">(</span><span class="va">RN</span>, maxPhases <span class="op">=</span> <span class="cn">NA</span>, minStatesinPhase <span class="op">=</span> <span class="fl">7</span>, doPhaseProfilePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use min. number of states as the extraction criterion</span></span></span>
+<span class="r-in"><span><span class="fu">rn_phases</span><span class="op">(</span><span class="va">RN</span>, maxPhases <span class="op">=</span> <span class="cn">NA</span>, minStatesinPhase <span class="op">=</span> <span class="fl">7</span>, doPhaseProfilePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="rn_phases-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -198,8 +243,7 @@ or with high-frequency, are regions of attraction for the system.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

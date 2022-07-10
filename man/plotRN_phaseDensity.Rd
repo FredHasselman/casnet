@@ -26,7 +26,7 @@ plotRN_phaseDensity(
 \item{excludePhases}{Exclude Phases by their name (variable \code{phase_name}). Leave empty to include all Phases (after \code{excludeOther} and \code{excludeNorec}) (default = \code{""})}
 }
 \value{
-
+data frame with phase series.
 }
 \description{
 Create a ridge plot (requires package \link{ggridges})

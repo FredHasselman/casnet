@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,32 +66,43 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">monoH</span><span class="op">(</span>
-  <span class="va">TSm</span>,
-  <span class="va">scaleS</span>,
-  removeTrend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
-  polyOrder <span class="op">=</span> <span class="fl">1</span>,
-  overlap <span class="op">=</span> <span class="va">overlap</span>,
-  returnPLAW <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnSegments <span class="op">=</span> <span class="cn">FALSE</span>,
-  removeRMSbelow <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">monoH</span><span class="op">(</span></span>
+<span>  <span class="va">TSm</span>,</span>
+<span>  <span class="va">scaleS</span>,</span>
+<span>  removeTrend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
+<span>  polyOrder <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  overlap <span class="op">=</span> <span class="va">overlap</span>,</span>
+<span>  returnPLAW <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnSegments <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  removeRMSbelow <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>TSm</dt>
 <dd><p>TS matrix with 2 columns <code>t</code> (1st) and <code>y</code> (second)</p></dd>
+
+
 <dt>scaleS</dt>
 <dd><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> and <code>dataMin</code> will be ignored (default = <code>NA</code>)</p></dd>
+
+
 <dt>removeTrend</dt>
 <dd><p>Method to use for global detrending (default = <code>"poly"</code>)</p></dd>
+
+
 <dt>polyOrder</dt>
 <dd><p>Order of global polynomial trend to remove if <code>removeTrend = "poly"</code>. If <code>removeTrend = "adaptive"</code> polynomials <code>1</code> to <code>polyOrder</code> will be evaluated and the best fitting curve (R squared) will be removed (default = <code>1</code>)</p></dd>
+
+
 <dt>overlap</dt>
 <dd><p>Turn DFA into a sliding window analysis. A number in <code>[0 ... 1]</code> representing the amount of 'bin overlap'. If <code>length(y) = 1024</code> and overlap is <code>.5</code>, a scale of <code>4</code> will be considered a sliding window of size <code>4</code> with step-size <code>floor(.5 * 4) = 2</code>, so for scale <code>128</code> step-size will be <code>64</code> (default = <code>NA</code>)</p></dd>
+
+
 <dt>returnPLAW</dt>
 <dd><p>Return the power law data (default = <code>FALSE</code>)</p></dd>
+
 </dl></div>
 
   </div>
@@ -106,8 +117,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,52 +66,77 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rp_prep</span><span class="op">(</span>
-  <span class="va">RP</span>,
-  emRad <span class="op">=</span> <span class="cn">NULL</span>,
-  DLmin <span class="op">=</span> <span class="fl">2</span>,
-  VLmin <span class="op">=</span> <span class="fl">2</span>,
-  HLmin <span class="op">=</span> <span class="fl">2</span>,
-  DLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RP</span><span class="op">)</span><span class="op">)</span>,
-  VLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RP</span><span class="op">)</span><span class="op">)</span>,
-  HLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RP</span><span class="op">)</span><span class="op">)</span>,
-  AUTO <span class="op">=</span> <span class="cn">FALSE</span>,
-  chromatic <span class="op">=</span> <span class="cn">FALSE</span>,
-  matrices <span class="op">=</span> <span class="cn">FALSE</span>,
-  doHalf <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rp_prep</span><span class="op">(</span></span>
+<span>  <span class="va">RP</span>,</span>
+<span>  emRad <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  DLmin <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  VLmin <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  HLmin <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  DLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RP</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  VLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RP</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  HLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RP</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  AUTO <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  chromatic <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  matrices <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doHalf <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>RP</dt>
 <dd><p>Recurrence plot</p></dd>
+
+
 <dt>emRad</dt>
 <dd><p>Radiuc</p></dd>
+
+
 <dt>DLmin</dt>
 <dd><p>Minimal diagonal line length</p></dd>
+
+
 <dt>VLmin</dt>
 <dd><p>Minimal vertical line length</p></dd>
+
+
 <dt>HLmin</dt>
 <dd><p>Minimal horizontal line length</p></dd>
+
+
 <dt>DLmax</dt>
 <dd><p>Maximal diagonal line length</p></dd>
+
+
 <dt>VLmax</dt>
 <dd><p>Maximal vertical line length</p></dd>
+
+
 <dt>HLmax</dt>
 <dd><p>Maximal horizontal line length</p></dd>
+
+
 <dt>AUTO</dt>
 <dd><p>Is this an AUTO RQA?</p></dd>
+
+
 <dt>chromatic</dt>
 <dd><p>Chromatic RQA?</p></dd>
+
+
 <dt>matrices</dt>
 <dd><p>Return Matrices?</p></dd>
+
+
 <dt>doHalf</dt>
 <dd><p>Analyse half of the matrix?</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A prepped matrix</p>
+    
+
+<p>A prepped matrix</p>
     </div>
 
   </div>
@@ -126,8 +151,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

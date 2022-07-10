@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,43 +66,62 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">mat_coursegrain</span><span class="op">(</span>
-  <span class="va">RM</span>,
-  target_height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,
-  target_width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NCOL</a></span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,
-  summary_func <span class="op">=</span> <span class="cn">NA</span>,
-  recurrence_threshold <span class="op">=</span> <span class="cn">NA</span>,
-  categorical <span class="op">=</span> <span class="cn">NA</span>,
-  output_type <span class="op">=</span> <span class="fl">0</span>,
-  n_core <span class="op">=</span> <span class="fl">1</span>,
-  silent <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mat_coursegrain</span><span class="op">(</span></span>
+<span>  <span class="va">RM</span>,</span>
+<span>  target_height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,</span>
+<span>  target_width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NCOL</a></span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,</span>
+<span>  summary_func <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  recurrence_threshold <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  categorical <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  output_type <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  n_core <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>RM</dt>
 <dd><p>A (recurrence) matrix</p></dd>
+
+
 <dt>target_height</dt>
 <dd><p>How many rows? (default = <code>NROW(RM)/2</code>)</p></dd>
+
+
 <dt>target_width</dt>
 <dd><p>How many columns? (default = <code>NCOL(RM)/2</code>)</p></dd>
+
+
 <dt>summary_func</dt>
 <dd><p>How to summarise the values in subset <code>X</code> of <code>RM</code>. If set to <code>NA</code>, the function will try to pick a summary function based on the cell values: If <code>RM</code> is a distance matrix,  <code>mean(X, na.rm = TRUE)</code> will be used; If it is a binary matrix <code>ifelse(mean(X, na.rm = TRUE)&gt;recurrence_threshold,1,0)</code>, a categorical matrix (<code>categorical = TRUE</code>, or, matrix attribute <code>chromatic = TRUE</code>) will pick the most frequent category in the subset <code>attributes(ftable(X))$col.vars$x[[which.max(ftable(X))]]</code>. (default = <code>NA</code>)</p></dd>
+
+
 <dt>recurrence_threshold</dt>
 <dd><p>For a binary matrix the mean of the cells to be summarised will vary between <code>0</code> and <code>1</code>, which essentially represents the recurrence rate for that subset of the matrix. If <code>NA</code> the threshold will be set to a value that in most cases should return a plot with a similar <code>RR</code> as the original plot. (default = <code>NA</code>)</p></dd>
+
+
 <dt>categorical</dt>
 <dd><p>If set to <code>TRUE</code>, will force <code>summary_func</code> to select the most frequent value. If <code>NA</code> the matrix attribute <code>chromatic</code> will be used. If <code>chromatic</code> is not present, all values in the matrix have to be whole numbers as determined by <code><a href="https://rdrr.io/pkg/plyr/man/is.discrete.html" class="external-link">plyr::is.discrete()</a></code>. (default = <code>NA</code>)</p></dd>
+
+
 <dt>output_type</dt>
 <dd><p>The output format for <code>plyr::vapply()</code>. (default = <code>0.0</code>)</p></dd>
+
+
 <dt>n_core</dt>
 <dd><p>Number of cores for parallel processing. Set to <code>NA</code> to automatically choose cores. (default = <code>1</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silt-ish mode (default = <code>FALSE</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A coursegrained matrix of size <code>target_width</code> by <code>target_height</code>.</p>
+    
+
+<p>A coursegrained matrix of size <code>target_width</code> by <code>target_height</code>.</p>
     </div>
     <div id="note">
     <h2>Note</h2>
@@ -111,40 +130,40 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co"># Continuous</span></span>
-<span class="r-in"><span class="va">RMc1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMc1</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Continuous</span></span></span>
+<span class="r-in"><span><span class="va">RMc1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMc1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="mat_coursegrain-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="va">RMc2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMc1</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="va">RMc2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMc1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Continuous matrix... using summary function 'mean(x, na.rm = TRUE)' for coursegraining.</span>
-<span class="r-in"><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMc2</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMc2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="mat_coursegrain-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Binary</span></span>
-<span class="r-in"><span class="va">RMb1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span>, emRad <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb1</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Binary</span></span></span>
+<span class="r-in"><span><span class="va">RMb1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span>, emRad <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb1</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="mat_coursegrain-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co"># Reported RQA measures in rp_plot will be based on the full matrix</span></span>
-<span class="r-in"><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb1</span>, maxSize <span class="op">=</span> <span class="fl">100</span><span class="op">^</span><span class="fl">2</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="co"># Reported RQA measures in rp_plot will be based on the full matrix</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb1</span>, maxSize <span class="op">=</span> <span class="fl">100</span><span class="op">^</span><span class="fl">2</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> NOTE: To speed up the plotting process, the RP will represent a coursegrained matrix. Set argument 'courseGrain = FALSE' to see the full matrix.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Binary matrix... using summary function 'ifelse(mean(x, na.rm = TRUE)&gt;recurrence_threshold,1,0)' for coursegraining.</span>
 <span class="r-plt img"><img src="mat_coursegrain-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co"># Plotting the coursegrained matrix itself will yield different values</span></span>
-<span class="r-in"><span class="va">RMb2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMb1</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="co"># Plotting the coursegrained matrix itself will yield different values</span></span></span>
+<span class="r-in"><span><span class="va">RMb2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMb1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Binary matrix... using summary function 'ifelse(mean(x, na.rm = TRUE)&gt;recurrence_threshold,1,0)' for coursegraining.</span>
-<span class="r-in"><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb2</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb2</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="mat_coursegrain-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Categorical</span></span>
-<span class="r-in"><span class="va">RMl1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span>, min <span class="op">=</span> <span class="fl">1</span>, max <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>, chromatic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMl1</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Categorical</span></span></span>
+<span class="r-in"><span><span class="va">RMl1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span>, min <span class="op">=</span> <span class="fl">1</span>, max <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>, chromatic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMl1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="mat_coursegrain-6.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="va">RMl2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMl1</span>, categorical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="va">RMl2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMl1</span>, categorical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Categorical matrix... using summary function 'attributes(ftable(x))$col.vars[[which.max(ftable(x))]]' for coursegraining.</span>
-<span class="r-in"><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMl2</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMl2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="mat_coursegrain-7.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -159,8 +178,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

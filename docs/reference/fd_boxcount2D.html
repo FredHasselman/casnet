@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,79 +66,122 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fd_boxcount2D</span><span class="op">(</span>
-  y <span class="op">=</span> <span class="cn">NA</span>,
-  unitSquare <span class="op">=</span> <span class="cn">TRUE</span>,
-  image2D <span class="op">=</span> <span class="cn">NA</span>,
-  resolution <span class="op">=</span> <span class="fl">1</span>,
-  removeTrend <span class="op">=</span> <span class="cn">FALSE</span>,
-  polyOrder <span class="op">=</span> <span class="fl">1</span>,
-  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  adjustSumOrder <span class="op">=</span> <span class="cn">FALSE</span>,
-  scaleMin <span class="op">=</span> <span class="fl">0</span>,
-  scaleMax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">*</span> <span class="va">resolution</span><span class="op">)</span><span class="op">)</span>,
-  scaleS <span class="op">=</span> <span class="cn">NA</span>,
-  dataMin <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="op">(</span><span class="va">scaleMin</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>,
-  maxData <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="op">(</span><span class="va">scaleMax</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,
-  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnPLAW <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnInfo <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnLocalScaling <span class="op">=</span> <span class="cn">FALSE</span>,
-  silent <span class="op">=</span> <span class="cn">FALSE</span>,
-  noTitle <span class="op">=</span> <span class="cn">FALSE</span>,
-  tsName <span class="op">=</span> <span class="st">"y"</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fd_boxcount2D</span><span class="op">(</span></span>
+<span>  y <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  unitSquare <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  image2D <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  resolution <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  removeTrend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  polyOrder <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  adjustSumOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  scaleMin <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  scaleMax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">*</span> <span class="va">resolution</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  scaleS <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  dataMin <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="op">(</span><span class="va">scaleMin</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  maxData <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="op">(</span><span class="va">scaleMax</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnPLAW <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnInfo <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnLocalScaling <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  noTitle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tsName <span class="op">=</span> <span class="st">"y"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A numeric vector or time series object.</p></dd>
+
+
 <dt>unitSquare</dt>
 <dd><p>Create unit square image of <code>y</code>? This is required for estimating FD of time series (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>image2D</dt>
 <dd><p>A matrix representing a 2D image, argument <code>y</code> and <code>unitSquare</code> will be ignored (default = <code>NA</code>)</p></dd>
+
+
 <dt>resolution</dt>
 <dd><p>The resolution used to embed the timeseries in 2D, a factor by which the dimensions the matrix will be multiplied (default = <code>1</code>)</p></dd>
+
+
 <dt>removeTrend</dt>
 <dd><p>If <code>TRUE</code>, will call <a href="ts_detrend.html">ts_detrend</a> on <code>y</code> (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>polyOrder</dt>
 <dd><p>Order of polynomial trend to remove if <code>removeTrend = </code>TRUE``</p></dd>
+
+
 <dt>standardise</dt>
 <dd><p>Standardise <code>y</code> using <code><a href="ts_standardise.html">ts_standardise()</a></code> with <code>adjustN = FALSE</code> (default = <code>none</code>)</p></dd>
+
+
 <dt>adjustSumOrder</dt>
 <dd><p>Adjust the order of the time series (by summation or differencing), based on the global scaling exponent, see e.g. <a href="https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg" class="external-link">https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg</a>Ihlen (2012) (default = `FALSE``)</p></dd>
+
+
 <dt>scaleMin</dt>
 <dd><p>Minimium scale value (as <code>2^scale</code>) to use (default = <code>0</code>)</p></dd>
+
+
 <dt>scaleMax</dt>
 <dd><p>Maximum scale value (as <code>2^scale</code>) to use (default = <code>max</code> of <code>log2(nrows)</code> and <code>log2(ncols)</code>)</p></dd>
+
+
 <dt>scaleS</dt>
 <dd><p>If not <code>NA</code>, pass a numeric vector listing the scales (as a power of <code>2</code>) on which to evaluate the boxcount. Arguments <code>scaleMax</code>, <code>scaleMin</code>, and <code>scaleResolution</code> will be ignored (default = <code>NA</code>)</p></dd>
+
+
 <dt>dataMin</dt>
 <dd><p>Minimum number of time/data points inside a box for it to be included in the slope estimation (default = <code>2^scaleMin</code>)</p></dd>
+
+
 <dt>maxData</dt>
 <dd><p>Maximum number of time/data points inside a box for it to be included in the slope estimation (default = <code>2^scaleMax</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Return the log-log scale versus bulk plot with linear fit (default = <code>TRUE</code>).</p></dd>
+
+
 <dt>returnPlot</dt>
 <dd><p>Return ggplot2 object (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>returnPLAW</dt>
 <dd><p>Return the power law data (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>returnInfo</dt>
 <dd><p>Return all the data used in DFA (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>returnLocalScaling</dt>
 <dd><p>Return estimates of FD for each scale</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silent-ish mode (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>noTitle</dt>
 <dd><p>Do not generate a title (only the subtitle)</p></dd>
+
+
 <dt>tsName</dt>
 <dd><p>Name of y added as a subtitle to the plot (default = <code>y</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The boxcount fractal dimension and the 'local' boxcount fractal dimension</p>
+    
+
+<p>The boxcount fractal dimension and the 'local' boxcount fractal dimension</p>
     </div>
     <div id="note">
     <h2>Note</h2>
@@ -147,8 +190,8 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="fu">fd_boxcount2D</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">fd_boxcount2D</span><span class="op">(</span>y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Raterizing time series... Done!</span>
@@ -165,8 +208,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> FD = 1.52</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
-<span class="r-in"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -181,8 +224,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

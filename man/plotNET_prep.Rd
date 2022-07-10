@@ -42,7 +42,7 @@ plotNET_prep(
 \item{doPlot}{Plot the igraph object.}
 }
 \value{
-an igraph object
+an \link{igraph} object
 }
 \description{
 Plot Network Based on RQA

@@ -1748,7 +1748,7 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
     nzdiags  <- data.frame(row   = nzdiagsM@i,
                            col   = nzdiagsM@j,
                            value = nzdiagsM@x,
-                           ndiag = (nzdiagsM@j)-(nzdiagsM@i))
+                           ndiag = (nzdiagsM@i)-(nzdiagsM@j)) #(nzdiagsM@j)-(nzdiagsM@i))
     nzdiags <- dplyr::arrange(nzdiags,nzdiags$ndiag)
 
     if(is.null(d)){
@@ -2355,16 +2355,26 @@ rp_plot <- function(RM,
         if(hasNA){
           colvec <- c("#FFFFFF00","#000000","#FF0000", cpal)
           names(colvec) <- c("0","1","NA",levels(markEpochsLOI))
+          vals <- 1:3
         } else {
           colvec <- c("#FFFFFF00","#000000", cpal) #viridis::viridis_pal()(nlevels(markEpochsLOI)))
           names(colvec) <- c("0","1",levels(markEpochsLOI))
+          vals <- 1:2
         }
         N <- max(c(NROW(RM),NCOL(RM)))
+        LOIvals <- as.numeric_discrete(markEpochsLOI, sortUnique = TRUE)
         for(i in 1:N){
           j <- i
-          meltRP$value[meltRP$Var1==i&meltRP$Var2==j] <- start + as.numeric_character(markEpochsLOI)[i]
+          meltRP$value[meltRP$Var1==i&meltRP$Var2==j] <- start + LOIvals[i]
         }
-        meltRP$value <- factor(meltRP$value, levels = sort(unique(meltRP$value)), labels = names(colvec))
+
+        # uni <- sort(unique(meltRP$value))
+        # LOIvals <- as.numeric_discrete()
+        # if(length(uni)==length(names(colvec))){
+        #   which()
+        #
+        # }
+        meltRP$value <- factor(meltRP$value, labels = names(colvec)) #as.character(c(as.numeric(colvec)[vals],(LOIvals+start)))
         showL <- TRUE
       } else {
         warning("Variable passed to 'markEpochsLOI' is not a factor or doesn't have correct length.")
@@ -2603,7 +2613,7 @@ rp_plot <- function(RM,
 
 
   if(showL){
-    rptheme <- rptheme +  theme(legend.position = c(1.1,1),
+    rptheme <- rptheme +  theme(legend.position = c(1.2,1),
                                 legend.direction = "vertical",
                                 legend.background = element_rect(fill="grey90"),
                                 legend.justification = "top")

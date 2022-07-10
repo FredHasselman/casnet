@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,31 +66,42 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ts_peaks</span><span class="op">(</span>
-  <span class="va">y</span>,
-  window <span class="op">=</span> <span class="fl">3</span>,
-  includeWells <span class="op">=</span> <span class="cn">FALSE</span>,
-  minPeakDist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">window</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,
-  minPeakHeight <span class="op">=</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">y</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_peaks</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  window <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  includeWells <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  minPeakDist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">window</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,</span>
+<span>  minPeakHeight <span class="op">=</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">y</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A time series or numeric vector</p></dd>
+
+
 <dt>window</dt>
 <dd><p>Window in which to look for peaks or wells</p></dd>
+
+
 <dt>includeWells</dt>
 <dd><p>Find wells?</p></dd>
+
+
 <dt>minPeakDist</dt>
 <dd><p>Minimum distance between peaks or wells</p></dd>
+
+
 <dt>minPeakHeight</dt>
 <dd><p>Minimum height / depth for a peak / well</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Index with peak or well coordinates</p>
+    
+
+<p>Index with peak or well coordinates</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -133,8 +144,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

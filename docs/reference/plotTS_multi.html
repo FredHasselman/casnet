@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,65 +66,92 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotTS_multi</span><span class="op">(</span>
-  <span class="va">df</span>,
-  timeVec <span class="op">=</span> <span class="cn">NA</span>,
-  groupVec <span class="op">=</span> <span class="cn">NA</span>,
-  useVarNames <span class="op">=</span> <span class="cn">TRUE</span>,
-  colOrder <span class="op">=</span> <span class="cn">TRUE</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,
-  title <span class="op">=</span> <span class="st">""</span>,
-  subtitle <span class="op">=</span> <span class="st">""</span>,
-  xlabel <span class="op">=</span> <span class="st">"Time"</span>,
-  ylabel <span class="op">=</span> <span class="st">""</span>,
-  returnPlotData <span class="op">=</span> <span class="cn">FALSE</span>,
-  useRibbon <span class="op">=</span> <span class="cn">FALSE</span>,
-  overlap <span class="op">=</span> <span class="fl">1</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotTS_multi</span><span class="op">(</span></span>
+<span>  <span class="va">df</span>,</span>
+<span>  timeVec <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  groupVec <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  useVarNames <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  colOrder <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  xlabel <span class="op">=</span> <span class="st">"Time"</span>,</span>
+<span>  ylabel <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  returnPlotData <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  useRibbon <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overlap <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>df</dt>
 <dd><p>A data frame with time series in columns.</p></dd>
+
+
 <dt>timeVec</dt>
 <dd><p>If numeric, the number of the column in <code>df</code> which contains a time keeping variable. If <code>NA</code>, the time vector will be <code>1:NROW(df)</code> (default = <code>NA</code>)</p></dd>
+
+
 <dt>groupVec</dt>
 <dd><p>A vector indicating the names of the time series in the columns of <code>df</code>. If <code>NA</code>, the column names of <code>df</code> will be used, excluding the <code>timeVec</code>, if present (default = <code>NA</code>)</p></dd>
+
+
 <dt>useVarNames</dt>
 <dd><p>Use the column names of <code>df</code> as variable names in the Complexity Resonance Diagram (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>colOrder</dt>
 <dd><p>If <code>TRUE</code>, the order of the columns in <code>df</code> determines the of variables on the y-axis. Use <code>FALSE</code> for alphabetic/numeric order. Use <code>NA</code> to sort by by mean value of Dynamic Complexity (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>If <code>TRUE</code> shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>title</dt>
 <dd><p>A title for the plot.</p></dd>
+
+
 <dt>subtitle</dt>
 <dd><p>A subtitle for the plot.</p></dd>
+
+
 <dt>xlabel</dt>
 <dd><p>A label for the x-axis.</p></dd>
+
+
 <dt>ylabel</dt>
 <dd><p>A label for the y-axis.</p></dd>
+
+
 <dt>returnPlotData</dt>
 <dd><p>Return the restructured data frame used to create the plot (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>useRibbon</dt>
 <dd><p>Neat for distributions</p></dd>
+
+
 <dt>overlap</dt>
 <dd><p>Multiplier for scaling the series around the y-offset. Default is <code>offset + elascer(y, lo = -.45*overlap, hi = .45*overlap)</code> and if <code>useRibbon = TRUE</code> it is <code>offset + elascer(y, lo = 0*overlap, hi = .95*overlap)</code>. (default = <code>1</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a> object.</p>
+    
+
+<p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a> object.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co"># Use the coloured noise data set.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ColouredNoise</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plotTS_multi</span><span class="op">(</span><span class="va">ColouredNoise</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use the coloured noise data set.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ColouredNoise</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plotTS_multi</span><span class="op">(</span><span class="va">ColouredNoise</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotTS_multi-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -139,8 +166,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

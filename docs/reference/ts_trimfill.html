@@ -18,7 +18,7 @@ Fill the shortest vector with padding."><meta property="og:image" content="/logo
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -36,7 +36,7 @@ Fill the shortest vector with padding."><meta property="og:image" content="/logo
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -68,34 +68,47 @@ Fill the shortest vector with padding.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ts_trimfill</span><span class="op">(</span>
-  <span class="va">x</span>,
-  <span class="va">y</span>,
-  action <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fill"</span>, <span class="st">"trim.cut"</span>, <span class="st">"trim.NA"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"end"</span>, <span class="st">"center"</span>, <span class="st">"front"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  padding <span class="op">=</span> <span class="fl">0</span>,
-  silent <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_trimfill</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  action <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fill"</span>, <span class="st">"trim.cut"</span>, <span class="st">"trim.NA"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"end"</span>, <span class="st">"center"</span>, <span class="st">"front"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  padding <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>A numeric vector</p></dd>
+
+
 <dt>y</dt>
 <dd><p>A numeric vector</p></dd>
+
+
 <dt>action</dt>
 <dd><p>Use <code>"fill"</code> to fill the shortest vector with <code>padding</code> (default); <code>"trim.cut"</code> to trim the longest vector to the length of the shortest; <code>"trim.NA"</code> to fill the longest vector with <code>NA</code>. This is a shortcut for running <code>action = "trim.cut"</code> with <code>padding=NA</code>, which can be useful if one wants to match the shortest series, but preserve the original length of largest vector.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Should trimming or filling take place at the <code>"end"</code> (default), or <code>"front"</code> of the vector? The option <code>"center"</code> will try to distribute trimming by <code>NA</code> or filling by <code>padding</code> evenly across the front and end of the vector.</p></dd>
+
+
 <dt>padding</dt>
 <dd><p>A value to use for padding (default = <code>0</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Run silent-ish</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list with two vectors of equal length.</p>
+    
+
+<p>A list with two vectors of equal length.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -160,8 +173,7 @@ Fill the shortest vector with padding.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

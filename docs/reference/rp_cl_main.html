@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,80 +66,123 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rp_cl_main</span><span class="op">(</span>
-  <span class="va">data</span>,
-  emDim <span class="op">=</span> <span class="fl">1</span>,
-  emLag <span class="op">=</span> <span class="fl">1</span>,
-  emRad <span class="op">=</span> <span class="cn">NA</span>,
-  DLmin <span class="op">=</span> <span class="fl">2</span>,
-  VLmin <span class="op">=</span> <span class="fl">2</span>,
-  theiler <span class="op">=</span> <span class="fl">0</span>,
-  win <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span>, <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y1</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span>, na.rm <span class="op">=</span>
-    <span class="cn">TRUE</span><span class="op">)</span>,
-  step <span class="op">=</span> <span class="va">step</span>,
-  JRP <span class="op">=</span> <span class="cn">FALSE</span>,
-  distNorm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"EUCLIDEAN"</span>, <span class="st">"MAX"</span>, <span class="st">"MIN"</span>, <span class="st">"OP"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,
-  returnMeasures <span class="op">=</span> <span class="cn">TRUE</span>,
-  returnRPvector <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnLineDist <span class="op">=</span> <span class="cn">FALSE</span>,
-  doPlot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"noplot"</span>, <span class="st">"rp"</span>, <span class="st">"distmat"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,
-  path_to_rp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"casnet.path_to_rp"</span><span class="op">)</span>,
-  saveOut <span class="op">=</span> <span class="cn">FALSE</span>,
-  path_out <span class="op">=</span> <span class="cn">NULL</span>,
-  file_ID <span class="op">=</span> <span class="cn">NULL</span>,
-  silent <span class="op">=</span> <span class="cn">TRUE</span>,
-  targetValue <span class="op">=</span> <span class="fl">0.05</span>,
-  useParallel <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rp_cl_main</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  emDim <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  emLag <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  emRad <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  DLmin <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  VLmin <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  theiler <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  win <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span>, <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y1</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span>, na.rm <span class="op">=</span></span>
+<span>    <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  step <span class="op">=</span> <span class="va">step</span>,</span>
+<span>  JRP <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  distNorm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"EUCLIDEAN"</span>, <span class="st">"MAX"</span>, <span class="st">"MIN"</span>, <span class="st">"OP"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  returnMeasures <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  returnRPvector <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnLineDist <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"noplot"</span>, <span class="st">"rp"</span>, <span class="st">"distmat"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>  path_to_rp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"casnet.path_to_rp"</span><span class="op">)</span>,</span>
+<span>  saveOut <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  path_out <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  file_ID <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  targetValue <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  useParallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>emDim</dt>
 <dd><p>Embedding dimensions (default = <code>1</code>)</p></dd>
+
+
 <dt>emLag</dt>
 <dd><p>Embedding lag (default = <code>1</code>)</p></dd>
+
+
 <dt>emRad</dt>
 <dd><p>Radius on distance matrix (default = <code>1</code>)</p></dd>
+
+
 <dt>DLmin</dt>
 <dd><p>Minimum length of diagonal structure to be considered a line (default = <code>2</code>)</p></dd>
+
+
 <dt>VLmin</dt>
 <dd><p>Minimum length of vertical structure to be considered a line (default = <code>2</code>)</p></dd>
+
+
 <dt>theiler</dt>
 <dd><p>Theiler window (default = <code>0</code>)</p></dd>
+
+
 <dt>win</dt>
 <dd><p>Window to calculate the (C)RQA (default = minimum of length of <code>y1</code> or <code>y2</code>)</p></dd>
+
+
 <dt>step</dt>
 <dd><p>Stepsize for sliding windows (default = size of <code>win</code>, so no sliding window)</p></dd>
+
+
 <dt>JRP</dt>
 <dd><p>Wether to calculate a Joint Recurrence Plot (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>distNorm</dt>
 <dd><p>One of "EUCLIDEAN" (default), <code>"MAX", "MIN"</code>, or <code>"OP"</code> for an Order Pattern recurrence matrix</p></dd>
+
+
 <dt>returnMeasures</dt>
 <dd><p>Return the (C)RQA measures? (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>returnRPvector</dt>
 <dd><p>Return the recurrent points in a dataframe? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>returnLineDist</dt>
 <dd><p>Return the distribution of diagonal and horizontal line length distances (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Produce a plot of the recurrence matrix by calling <code><a href="rp_plot.html">rp_plot()</a></code>, values can be <code>"rp"</code> (the thresholded recurrence matrix),<code>"distmat"</code> (the unthresholded recurrence matrix) or <code>"noplot"</code> (default = <code>"noplot"</code>)</p></dd>
+
+
 <dt>path_to_rp</dt>
 <dd><p>Path to the command line executable (default = path set during installation, use <code>getOption("casnet.path_to_rp")</code> to see)</p></dd>
+
+
 <dt>saveOut</dt>
 <dd><p>Save the output to files? If <code>TRUE</code> and <code>path_out = NA</code>, the current working directory will be used (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>path_out</dt>
 <dd><p>Path to save output if <code>saveOut = TRUE</code> (default = <code>NULL</code>)</p></dd>
+
+
 <dt>file_ID</dt>
 <dd><p>A file ID which will be a prefix to to the filename if <code>saveOut = TRUE</code> (default = <code>NULL</code>, an integer will be added tot the file name to ensure unique files)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Do not display any messages (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>targetValue</dt>
 <dd><p>A value passed to <code>est_radius(...,type="fixed", targetMeasure="RR")</code> if <code>is.na(emRad)==TRUE</code>. This is useful for windowed analysis, it will estimate a new radius for each window.</p></dd>
+
+
 <dt>useParallel</dt>
 <dd><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a seperate process/core for each window in windowed (C)RQA analysis and <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> with<code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional parameters (currently not used)</p></dd>
+
 </dl></div>
 
   </div>
@@ -154,8 +197,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

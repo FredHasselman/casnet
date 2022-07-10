@@ -2,9 +2,7 @@
 % Please edit documentation in R/dc.R
 \name{dc_d}
 \alias{dc_d}
-\title{Distribution Uniformity
-
-Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.}
+\title{Distribution Uniformity}
 \usage{
 dc_d(
   df,
@@ -41,8 +39,6 @@ dc_d(
 a dataframe
 }
 \description{
-Distribution Uniformity
-
 Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.
 }
 \references{

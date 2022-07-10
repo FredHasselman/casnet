@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,37 +66,52 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotFD_loglog</span><span class="op">(</span>
-  <span class="va">fd.OUT</span>,
-  title <span class="op">=</span> <span class="st">""</span>,
-  subtitle <span class="op">=</span> <span class="st">""</span>,
-  xlabel <span class="op">=</span> <span class="st">"Bin size"</span>,
-  ylabel <span class="op">=</span> <span class="st">"Fluctuation"</span>,
-  logBase <span class="op">=</span> <span class="cn">NA</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotFD_loglog</span><span class="op">(</span></span>
+<span>  <span class="va">fd.OUT</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  subtitle <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  xlabel <span class="op">=</span> <span class="st">"Bin size"</span>,</span>
+<span>  ylabel <span class="op">=</span> <span class="st">"Fluctuation"</span>,</span>
+<span>  logBase <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>fd.OUT</dt>
 <dd><p>Output from one of the <code>fd_</code> functions that use log-log regression to get scaling exponents.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>Plot title</p></dd>
+
+
 <dt>subtitle</dt>
 <dd><p>Plot subtitle</p></dd>
+
+
 <dt>xlabel</dt>
 <dd><p>x label</p></dd>
+
+
 <dt>ylabel</dt>
 <dd><p>y label</p></dd>
+
+
 <dt>logBase</dt>
 <dd><p>base of the log used</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Display the plot (A plot object is always returned invisibly)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A ggplot object</p>
+    
+
+<p>A ggplot object</p>
     </div>
 
   </div>
@@ -111,8 +126,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

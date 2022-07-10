@@ -28,12 +28,8 @@ plotRN_phaseSeries(
 \item{excludePhases}{Exclude Phases by their name (variable \code{phase_name}). Leave empty to include all Phases (after \code{excludeOther} and \code{excludeNorec}) (default = \code{""})}
 }
 \value{
-
+phase density plot
 }
 \description{
 Plot the sequence of phases as a time series.
-}
-\examples{
-
-
 }

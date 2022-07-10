@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,131 +66,200 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">mrn_plot</span><span class="op">(</span>
-  layers <span class="op">=</span> <span class="cn">NA</span>,
-  MRN <span class="op">=</span> <span class="cn">NA</span>,
-  MRNweightedBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"InterLayerMI"</span>, <span class="st">"EdgeOverlap"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  win <span class="op">=</span> <span class="cn">NA</span>,
-  step <span class="op">=</span> <span class="cn">NA</span>,
-  overlap <span class="op">=</span> <span class="cn">NA</span>,
-  alignment <span class="op">=</span> <span class="st">"r"</span>,
-  cumulative <span class="op">=</span> <span class="cn">FALSE</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,
-  doSave <span class="op">=</span> <span class="cn">FALSE</span>,
-  coords <span class="op">=</span> <span class="cn">NA</span>,
-  RNnodes <span class="op">=</span> <span class="cn">FALSE</span>,
-  vertexSizeBy <span class="op">=</span> <span class="st">"degree"</span>,
-  scaleVertexSize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">5</span><span class="op">)</span>,
-  vertexColour <span class="op">=</span> <span class="cn">NA</span>,
-  vertexBorderColour <span class="op">=</span> <span class="st">"black"</span>,
-  showVertexLegend <span class="op">=</span> <span class="cn">TRUE</span>,
-  showSizeLegend <span class="op">=</span> <span class="cn">FALSE</span>,
-  alphaV <span class="op">=</span> <span class="fl">0.7</span>,
-  scaleEdgeSize <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">5</span>,
-  alphaE <span class="op">=</span> <span class="fl">0.5</span>,
-  showEdgeColourLegend <span class="op">=</span> <span class="cn">FALSE</span>,
-  curvature <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>,
-  title <span class="op">=</span> <span class="st">""</span>,
-  createAnimation <span class="op">=</span> <span class="cn">FALSE</span>,
-  useImageMagick <span class="op">=</span> <span class="cn">FALSE</span>,
-  loopAnimation <span class="op">=</span> <span class="cn">TRUE</span>,
-  transitionLength <span class="op">=</span> <span class="fl">3</span>,
-  stateLength <span class="op">=</span> <span class="fl">1</span>,
-  gifWidth <span class="op">=</span> <span class="fl">600</span>,
-  gifRes <span class="op">=</span> <span class="fl">150</span>,
-  noParts <span class="op">=</span> <span class="cn">TRUE</span>,
-  imageDir <span class="op">=</span> <span class="cn">NA</span>,
-  silent <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mrn_plot</span><span class="op">(</span></span>
+<span>  layers <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  MRN <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  MRNweightedBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"InterLayerMI"</span>, <span class="st">"EdgeOverlap"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  win <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  step <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  overlap <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  alignment <span class="op">=</span> <span class="st">"r"</span>,</span>
+<span>  cumulative <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  doSave <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  coords <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  RNnodes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  vertexSizeBy <span class="op">=</span> <span class="st">"degree"</span>,</span>
+<span>  scaleVertexSize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  vertexColour <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  vertexBorderColour <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>  showVertexLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  showSizeLegend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  alphaV <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  scaleEdgeSize <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">5</span>,</span>
+<span>  alphaE <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  showEdgeColourLegend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  curvature <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  createAnimation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  useImageMagick <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  loopAnimation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  transitionLength <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  stateLength <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  gifWidth <span class="op">=</span> <span class="fl">600</span>,</span>
+<span>  gifRes <span class="op">=</span> <span class="fl">150</span>,</span>
+<span>  noParts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  imageDir <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>layers</dt>
 <dd><p>A list of igraph objects representing the layers of the multiplex network. The layer networks must all have the same number of vertices.</p></dd>
+
+
 <dt>MRN</dt>
 <dd><p>The output from function <code><a href="mrn.html">mrn()</a></code></p></dd>
+
+
 <dt>MRNweightedBy</dt>
 <dd><p>The measure to be used to evaluate the average structural similarities between the layers of the network. Valid options are: <code>"InterLayerMI"</code> (Mutual information based on similarity of the vertex degree across layers), <code>"EdgeOverlap"</code> (proportion of vertices sharing the same edges across layers). Choosing <code>"InterLayerMI"</code> or <code>"EdgeOverlap"</code> will decide which measure is displayed in the plot of the Multiplex RN, both measures will always be returned in the numerical output.</p></dd>
+
+
 <dt>win</dt>
 <dd><p>The window size passed to <code><a href="ts_windower.html">ts_windower()</a></code> in which to evaluate <code>"InterLayerMI"</code>, <code>"InterLayerCor"</code>, <code>"EdgeOvelap"</code>, or "<code>JRP</code>". (default = <code>NA</code>).</p></dd>
+
+
 <dt>step</dt>
 <dd><p>The stepsize for the sliding window (default = <code>NA</code>).</p></dd>
+
+
 <dt>overlap</dt>
 <dd><p>The window overlap passed to <code><a href="ts_windower.html">ts_windower()</a></code> if <code>MRNweightedBy</code> is <code>"InterLayerMI"</code> or <code>"EdgeOvelap"</code>. The value of <code>step</code> will be ignored if <code>overlap</code> is not <code>NA</code>. (default = <code>NA</code>).</p></dd>
+
+
 <dt>alignment</dt>
 <dd><p>Whether to right (<code>"r"</code>), center (<code>"c"</code>), or left (<code>"l"</code>) align the window.</p></dd>
+
+
 <dt>cumulative</dt>
 <dd><p>To make the network represent cumulative time, set <code>directed = TRUE</code> and <code>cumulative = TRUE</code>. This will set the upper triangle of the recurrence matrix to <code>0</code> and ensures that the network edges represent recurrent values that have occurred in the <code>past</code> relative to the current observed value (node). If <code>directed = FALSE</code> the argument is ignored (default = <code>TRUE</code>).</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Plot the multiplex recurrence network (default = <code>TRUE</code>).</p></dd>
+
+
 <dt>doSave</dt>
 <dd><p>Save the plots.</p></dd>
+
+
 <dt>coords</dt>
 <dd><p>A data frame with layout coordinates generated by calling any of the <a href="https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html" class="external-link">igraph</a> layout functions. If <code>NA</code> a circle layout will; be generated (default = <code>NA</code>)</p></dd>
+
+
 <dt>RNnodes</dt>
 <dd><p>Should the vertices of the MRN represent a plot of the RN of the layers? This is recommended only for a small numbers of vertices. (default = `FALSE``)</p></dd>
+
+
 <dt>vertexSizeBy</dt>
 <dd><p>A valid <a href="https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html" class="external-link">igraph</a> function that calculates node based measures, or a numeric constant. (default = <code>"degree"</code>)</p></dd>
+
+
 <dt>scaleVertexSize</dt>
 <dd><p>Scale the size of the vertices by setting a range for <code><a href="https://ggplot2.tidyverse.org/reference/scale_size.html" class="external-link">ggplot2::scale_size()</a></code>. This will not affect the numbers on the size legend (default = <code>c(1,6)</code>)</p></dd>
+
+
 <dt>vertexColour</dt>
 <dd><p>A vector of colours for the vertices. If this is a named list, names will be displayed in the legend.</p></dd>
+
+
 <dt>vertexBorderColour</dt>
 <dd><p>Draw a border around the vertices. Pass <code>NULL</code> to use the same colour as the fill colour (default = <code>"black"</code>)</p></dd>
+
+
 <dt>showVertexLegend</dt>
 <dd><p>Show the vertex colour legend?</p></dd>
+
+
 <dt>showSizeLegend</dt>
 <dd><p>Should a legend be shown for the size of the nodes? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>alphaV</dt>
 <dd><p>Set transparency for Vertices (default = <code>1</code>)</p></dd>
+
+
 <dt>scaleEdgeSize</dt>
 <dd><p>Scale the size of the edges by a constant: <code>E(g)$width * scaleEdgeSize</code> (default = <code>1/5</code>)</p></dd>
+
+
 <dt>alphaE</dt>
 <dd><p>Set transparency for Edges. A single numeric, or a vector of length <code>ecount(g)</code> (default = <code>0.8</code>)</p></dd>
+
+
 <dt>showEdgeColourLegend</dt>
 <dd><p>Should a legend be shown for the colour of the edges? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>curvature</dt>
 <dd><p>The <code>curvature</code> parameter for edges see <code><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html" class="external-link">geom_curve()</a></code> (default = <code>-0.7</code>)</p></dd>
+
+
 <dt>title</dt>
 <dd><p>A title for the plot</p></dd>
+
+
 <dt>createAnimation</dt>
 <dd><p>If <code>createAnimation = TRUE</code> <em>and</em> <code>doPlot = TRUE</code> <em>and</em> a windowed analysis is conducted, an animation will be produced using either package <code>gganimate</code> (if <code>useImageMagick = FALSE</code>) or <code>animation</code> (if <code>useImageMagick = TRUE</code>). The main difference is that <code>gganimate</code> has nice animation transition features, but plots the MRN using <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a>, which does not have great options for displaying the nodes as images. With package <code>animation</code> a sequence of <a href="https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html" class="external-link">igraph</a> plots will be converted to an animation. If <code>doSave = TRUE</code> the animation will be saved in <code>imageDir</code> as an animated gif by calling either <code><a href="https://gganimate.com/reference/anim_save.html" class="external-link">gganimate::anim_save()</a></code>, or <code><a href="https://rdrr.io/pkg/animation/man/saveGIF.html" class="external-link">animation::saveGIF()</a></code> (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>useImageMagick</dt>
 <dd><p>Should <a href="https://imagemagick.org/index.php" class="external-link">ImageMagick</a> be used to create the animation. <strong>NOTE:</strong> ImageMagick has to be installed on your system, see <code><a href="https://rdrr.io/pkg/animation/man/saveGIF.html" class="external-link">animation::saveGIF()</a></code> (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>loopAnimation</dt>
 <dd><p>Should the animation loop? (default = <code>TRUE</code>)`</p></dd>
+
+
 <dt>transitionLength</dt>
 <dd><p>Length of each transition in the animation, ignored if <code>useImageMagick = TRUE</code> (default = <code>3</code>)</p></dd>
+
+
 <dt>stateLength</dt>
 <dd><p>Value of <code>state_length</code> if <code>gganimate</code> is used, or the  <code>interval</code> in seconds for <code><a href="https://rdrr.io/pkg/animation/man/ani.pause.html" class="external-link">animation::ani.pause()</a></code> (default = <code>1</code>)</p></dd>
+
+
 <dt>gifWidth</dt>
 <dd><p>Width of the animated <code>gif</code> in pixels. The default width will be <code>600/150 = 4 in</code> or <code>10.16 cm</code> (default = <code>600</code>)</p></dd>
+
+
 <dt>gifRes</dt>
 <dd><p>Resolution of the animated <code>gif</code> in <code>ppi</code> (default =<code>150</code>)</p></dd>
+
+
 <dt>noParts</dt>
 <dd><p>Do not plot the individual graphs that make up the animation to the current <code>dev</code> (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>imageDir</dt>
 <dd><p>Directory to save the layer images and windowed MRN plots. If <code>NA</code>, the value returned by <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code> will be used, if <code>NULL</code> no windowed images will be saved (default = <code>NA</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silent-ish mode</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A matrix with edge weights between layers that represent the measure <code>MRNweightedBy</code>.</p>
+    
+
+<p>A matrix with edge weights between layers that represent the measure <code>MRNweightedBy</code>.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co">#' # Create some layers</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org" class="external-link">igraph</a></span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>g1 <span class="op">=</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/sample_smallworld.html" class="external-link">sample_smallworld</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span>, <span class="fl">5</span>, <span class="fl">0.05</span><span class="op">)</span>,</span>
-<span class="r-in">g2 <span class="op">=</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/sample_smallworld.html" class="external-link">sample_smallworld</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span>, <span class="fl">5</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
-<span class="r-in">g3 <span class="op">=</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/sample_smallworld.html" class="external-link">sample_smallworld</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">mrn_plot</span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span>,showEdgeColourLegend<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#' # Create some layers</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org" class="external-link">igraph</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>g1 <span class="op">=</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/sample_smallworld.html" class="external-link">sample_smallworld</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span>, <span class="fl">5</span>, <span class="fl">0.05</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>g2 <span class="op">=</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/sample_smallworld.html" class="external-link">sample_smallworld</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span>, <span class="fl">5</span>, <span class="fl">0.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>g3 <span class="op">=</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/sample_smallworld.html" class="external-link">sample_smallworld</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">mrn_plot</span><span class="op">(</span>layers <span class="op">=</span> <span class="va">layers</span>,showEdgeColourLegend<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $MRN</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $MRN$`window: 1 | start: 1 | stop: 100`</span>
 <span class="r-plt img"><img src="mrn_plot-1.png" alt="" width="700" height="433"></span>
@@ -210,7 +279,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> $meanValues</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -225,8 +294,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

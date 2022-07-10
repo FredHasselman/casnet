@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,40 +66,57 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotNET_groupWeight</span><span class="op">(</span>
-  <span class="va">g</span>,
-  <span class="va">groups</span>,
-  weigth.within <span class="op">=</span> <span class="fl">100</span>,
-  weight.between <span class="op">=</span> <span class="fl">1</span>,
-  preserve.weight.within <span class="op">=</span> <span class="cn">FALSE</span>,
-  preserve.weight.between <span class="op">=</span> <span class="cn">FALSE</span>,
-  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnOnlyWeights <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotNET_groupWeight</span><span class="op">(</span></span>
+<span>  <span class="va">g</span>,</span>
+<span>  <span class="va">groups</span>,</span>
+<span>  weigth.within <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  weight.between <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  preserve.weight.within <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  preserve.weight.between <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnOnlyWeights <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>g</dt>
 <dd><p>An igraph object whose edges (<code>get.edgelist(g)</code>) will be re-weighted according to the <code>membership</code> argument.</p></dd>
+
+
 <dt>groups</dt>
 <dd><p>A named numeric vector with <code>length(V(g))</code> integers representing each group, or, a named character vector describing each group. If <code>names(groups)==NULL</code> then the names of the vector will be set as <code>names(groups) == V(g)$name</code>. If <code>V(g)$name==NULL</code>, the names of the vector will be set by the Vertex index</p></dd>
+
+
 <dt>weigth.within</dt>
 <dd><p>The weight within a group (<code>default = 100</code>)</p></dd>
+
+
 <dt>weight.between</dt>
 <dd><p>The weight within a group (<code>default = 1</code>)</p></dd>
+
+
 <dt>preserve.weight.within</dt>
 <dd><p>If <code>E(g)$weights</code> is not <code>NULL</code>, try to preserve edge weigths within a group</p></dd>
+
+
 <dt>preserve.weight.between</dt>
 <dd><p>If <code>E(g)$weights</code> is not <code>NULL</code>, try to preserve edge weigths between a groups</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Plot the igraph object</p></dd>
+
+
 <dt>returnOnlyWeights</dt>
 <dd><p>Do not return the graph, just the weights. If <code>FALSE</code> this will return the graph object, otherwis it returns <code>E(g)$weights</code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A numeric vector with <code>length(get.edgelist(g))</code> edge weights that will cluster groups defined in <code>membership</code> if a layout is used that can handle edge weights as a parameter (see examples).</p>
+    
+
+<p>A numeric vector with <code>length(get.edgelist(g))</code> edge weights that will cluster groups defined in <code>membership</code> if a layout is used that can handle edge weights as a parameter (see examples).</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -112,31 +129,31 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># Make a star graph and let the odd numbers cluster together</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org" class="external-link">igraph</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="va">g</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/make_full_graph.html" class="external-link">make_full_graph</a></span><span class="op">(</span><span class="fl">10</span>, directed<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">width</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">membership</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,<span class="fl">5</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">membership</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">name</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span> <span class="op">&lt;-</span> <span class="fu">plotNET_groupWeight</span><span class="op">(</span><span class="va">g</span>,<span class="va">membership</span>,<span class="fl">1000</span>,<span class="fl">10</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">g</span><span class="op">$</span><span class="va">layout</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/layout.deprecated.html" class="external-link">layout.fruchterman.reingold</a></span><span class="op">(</span><span class="va">g</span>,weights<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Make a star graph and let the odd numbers cluster together</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org" class="external-link">igraph</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">g</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/make_full_graph.html" class="external-link">make_full_graph</a></span><span class="op">(</span><span class="fl">10</span>, directed<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">width</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">membership</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>,<span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">membership</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">name</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span> <span class="op">&lt;-</span> <span class="fu">plotNET_groupWeight</span><span class="op">(</span><span class="va">g</span>,<span class="va">membership</span>,<span class="fl">1000</span>,<span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">g</span><span class="op">$</span><span class="va">layout</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/layout.deprecated.html" class="external-link">layout.fruchterman.reingold</a></span><span class="op">(</span><span class="va">g</span>,weights<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotNET_groupWeight-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Make 3 groups by changing the 'membership' vector</span></span>
-<span class="r-in"><span class="va">membership</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">membership</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">name</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span> <span class="op">&lt;-</span> <span class="fu">plotNET_groupWeight</span><span class="op">(</span><span class="va">g</span>,<span class="va">membership</span>,<span class="fl">1000</span>,<span class="fl">10</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">g</span><span class="op">$</span><span class="va">layout</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/layout.deprecated.html" class="external-link">layout.fruchterman.reingold</a></span><span class="op">(</span><span class="va">g</span>,weights<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Make 3 groups by changing the 'membership' vector</span></span></span>
+<span class="r-in"><span><span class="va">membership</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">membership</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/igraph/man/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">name</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span> <span class="op">&lt;-</span> <span class="fu">plotNET_groupWeight</span><span class="op">(</span><span class="va">g</span>,<span class="va">membership</span>,<span class="fl">1000</span>,<span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">g</span><span class="op">$</span><span class="va">layout</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/layout.deprecated.html" class="external-link">layout.fruchterman.reingold</a></span><span class="op">(</span><span class="va">g</span>,weights<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotNET_groupWeight-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Use plotNET_groupColour for Vertex and Edge group colours</span></span>
-<span class="r-in"><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="plotNET_groupColour.html">plotNET_groupColour</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">membership</span>, colourE<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use plotNET_groupColour for Vertex and Edge group colours</span></span></span>
+<span class="r-in"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu"><a href="plotNET_groupColour.html">plotNET_groupColour</a></span><span class="op">(</span><span class="va">g</span>, <span class="va">membership</span>, colourE<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotNET_groupWeight-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -151,8 +168,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

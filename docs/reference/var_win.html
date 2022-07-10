@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,37 +66,52 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">var_win</span><span class="op">(</span>
-  <span class="va">df</span>,
-  win <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>,
-  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  useVarNames <span class="op">=</span> <span class="cn">TRUE</span>,
-  colOrder <span class="op">=</span> <span class="cn">TRUE</span>,
-  useTimeVector <span class="op">=</span> <span class="cn">NA</span>,
-  timeStamp <span class="op">=</span> <span class="st">"01-01-1999"</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">var_win</span><span class="op">(</span></span>
+<span>  <span class="va">df</span>,</span>
+<span>  win <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  useVarNames <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  colOrder <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  useTimeVector <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  timeStamp <span class="op">=</span> <span class="st">"01-01-1999"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>df</dt>
 <dd><p>A data frame containing multivariate time series data from 1 person. Rows should indicate time, columns should indicate the time series variables. All time series in <code>df</code> should be on the same scale, an error will be thrown if the range of the time series in<code>df</code> is not <code>[scale_min,scale_max]</code>.</p></dd>
+
+
 <dt>win</dt>
 <dd><p>Size of window in which to calculate Dynamic Complexity. If <code>win &lt; NROW(df)</code> the window will move along the time series with a stepsize of <code>1</code> (default = <code>NROW(df)</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>If <code>TRUE</code> shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>useVarNames</dt>
 <dd><p>Use the column names of <code>df</code> as variable names in the Complexity Resonance Diagram (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>colOrder</dt>
 <dd><p>If <code>TRUE</code>, the order of the columns in <code>df</code> determines the of variables on the y-axis. Use <code>FALSE</code> for alphabetic/numeric order. Use <code>NA</code> to sort by by mean value of Dynamic Complexity (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>useTimeVector</dt>
 <dd><p>Parameter used for plotting. A vector of length <code>NROW(df)</code>, containing date/time information (default = <code>NA</code>)</p></dd>
+
+
 <dt>timeStamp</dt>
 <dd><p>If <code>useTimeVector</code> is not <code>NA</code>, a character string that can be passed to <code><a href="https://lubridate.tidyverse.org/reference/stamp.html" class="external-link">lubridate::stamp()</a></code> to format the the dates/times passed in <code>useTimeVector</code> (default = <code>"01-01-1999"</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Data frame with variance in requested window size.</p>
+    
+
+<p>Data frame with variance in requested window size.</p>
     </div>
     <div id="note">
     <h2>Note</h2>
@@ -110,10 +125,10 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co"># Use ColouredNoise data, first scale each series to 0-1.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ColouredNoise</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">var_win</span><span class="op">(</span><span class="fu"><a href="elascer.html">elascer</a></span><span class="op">(</span><span class="va">ColouredNoise</span>,groupwise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, win <span class="op">=</span> <span class="fl">128</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use ColouredNoise data, first scale each series to 0-1.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">ColouredNoise</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">var_win</span><span class="op">(</span><span class="fu"><a href="elascer.html">elascer</a></span><span class="op">(</span><span class="va">ColouredNoise</span>,groupwise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, win <span class="op">=</span> <span class="fl">128</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 6519 rows containing missing values (geom_raster).</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 31 rows containing missing values (geom_vline).</span>
 <span class="r-plt img"><img src="var_win-1.png" alt="" width="700" height="433"></span>
@@ -7299,7 +7314,7 @@
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 31 rows containing missing values (geom_vline).</span>
 <span class="r-plt img"><img src="var_win-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -7314,8 +7329,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

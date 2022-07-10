@@ -228,7 +228,7 @@ plotNET_groupWeight <- function(g, groups, weigth.within=100, weight.between=1, 
 #' @param removeSelfLoops Calls `simplify(g)` (default = `TRUE`)
 #' @param doPlot Plot the igraph object.
 #'
-#' @return an igraph object
+#' @return an [igraph] object
 #' @export
 #'
 #' @family tools for plotting networks
@@ -1266,7 +1266,7 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
     labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
     majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
   } else {
-
+    majorBreaks <- NULL
   }
 
   if(!colOrder){
@@ -1651,7 +1651,7 @@ plotMRN_win <- function(df_mrn,
 #' @param excludeVars Exclude specific dimension variables by name. Leave empty to include all variables (default = `""`)
 #' @param excludePhases Exclude Phases by their name (variable `phase_name`). Leave empty to include all Phases (after `excludeOther` and `excludeNorec`) (default = `""`)
 #'
-#' @return
+#' @return data frame with phase series.
 #'
 #' @export
 #'
@@ -1766,11 +1766,15 @@ plotRN_phaseDensity <- function(phaseOutput,
 #'
 #' @inheritParams plotRN_phaseDensity
 #'
-#' @return
+#' @return plot
 #'
 #' @export
 #'
 #' @examples
+#'
+#' RN <- rn(y1 = rnorm(100), weighted = TRUE)
+#' phase_out <- rn_phases(RN)
+#' plotRN_phaseProfile(phase_out)
 #'
 #'
 plotRN_phaseProfile <- function(phaseOutput,
@@ -1782,7 +1786,8 @@ plotRN_phaseProfile <- function(phaseOutput,
                                 excludeNorec = TRUE,
                                 excludeVars = "",
                                 excludePhases = "",
-                                returnGraph = FALSE){
+                                returnGraph = FALSE,
+                                colOrder = NA){
 
   if(!is.null(attr(phaseOutput,"rn_phases"))){
 
@@ -1843,6 +1848,11 @@ plotRN_phaseProfile <- function(phaseOutput,
   }
   if(!nchar(excludeVars)>0){
     excludeVars <- "___"
+  }
+
+  if(is.na(colOrder)&plotCentroid){
+    dim_order <-
+    out <- dplyr::select(out,names(sort(colMeans(out, na.rm = TRUE))))
   }
 
   Phases_long <- out %>% dplyr::ungroup() %>%
@@ -1993,7 +2003,7 @@ plotRN_phaseProfile <- function(phaseOutput,
 #'
 #' @inheritParams plotRN_phaseDensity
 #'
-#' @return
+#' @return phase density plot
 #' @export
 #'
 #' @examples
@@ -2028,7 +2038,41 @@ plotRN_phaseSeries <- function(phaseOutput,
     stop("The output is not from function 'casnet::rn_phases()'!")
   }
 
-  epochColours <- getColours(Ncols = length(unique(out$phase_name)))
+  # if(length(phaseOutput)>1){
+  #   phaseCentroid <- phaseOutput$phaseCentroids
+  #   phaseOutput <- phaseOutput$phaseSeries
+  # }
+  #
+  # epochColours <- getColours(Ncols = length(unique(phaseOutput$phase_name)))
+
+  # if(is.na(plotCentroid)){ #|(!returnCentroid%in%"no")){
+  #   plotCentroid <- TRUE
+  # }
+
+  if(!is.data.frame(phaseOutput)){
+    out <- phaseOutput$phaseSeries
+    if(plotCentroid){
+      if("phaseCentroids"%in%names(phaseOutput)){
+        outMeans <- phaseOutput$phaseCentroids
+      }
+    }
+  } else {
+    out <- phaseOutput
+  }
+
+  if(is.null(epochColours)){
+    epochColours <- getColours(Ncols = length(unique(out$phase_name))+5)
+  }
+
+  out$alpha <- .9
+  out$psize <- out$phase_size
+
+  if(!nchar(excludePhases)>0){
+    excludePhases <- "___"
+  }
+  if(!nchar(excludeVars)>0){
+    excludeVars <- "___"
+  }
 
   out$maxState_strength[is.na(out$maxState_strength)] <- min(out$maxState_strength, na.rm = TRUE)/2
 
@@ -2042,10 +2086,9 @@ plotRN_phaseSeries <- function(phaseOutput,
     theme_bw() +
     theme(panel.grid.minor = element_blank())
 
-
   tmp <- out %>%
-    count(phase_name) %>%
-    mutate(pct = n/NROW(out))
+    dplyr::count(phase_name) %>%
+    dplyr::mutate(pct = n/NROW(out))
 
   h <- ggplot(tmp, aes_(y = ~phase_name, fill = ~phase_name, x = ~pct, label = scales::percent(tmp$pct))) +
     geom_col(position= "dodge") +
@@ -2066,7 +2109,7 @@ plotRN_phaseSeries <- function(phaseOutput,
   print(ps)
 
   if(returnGraph){
-    invisible(return(pd))
+    invisible(return(ps))
   }
 }
 

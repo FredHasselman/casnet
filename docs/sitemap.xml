@@ -574,6 +574,9 @@
     <loc>/reference/ts_levels.html</loc>
   </url>
   <url>
+    <loc>/reference/ts_maxslope.html</loc>
+  </url>
+  <url>
     <loc>/reference/ts_peaks.html</loc>
   </url>
   <url>
@@ -593,6 +596,9 @@
   </url>
   <url>
     <loc>/reference/ts_slice.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ts_slope.html</loc>
   </url>
   <url>
     <loc>/reference/ts_standardise.html</loc>

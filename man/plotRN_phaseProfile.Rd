@@ -14,7 +14,8 @@ plotRN_phaseProfile(
   excludeNorec = TRUE,
   excludeVars = "",
   excludePhases = "",
-  returnGraph = FALSE
+  returnGraph = FALSE,
+  colOrder = NA
 )
 }
 \arguments{
@@ -29,12 +30,16 @@ plotRN_phaseProfile(
 \item{excludePhases}{Exclude Phases by their name (variable \code{phase_name}). Leave empty to include all Phases (after \code{excludeOther} and \code{excludeNorec}) (default = \code{""})}
 }
 \value{
-
+plot
 }
 \description{
 Plot a profile (values of the dimensions) for each phase.
 }
 \examples{
+
+RN <- rn(y1 = rnorm(100), weighted = TRUE)
+phase_out <- rn_phases(RN)
+plotRN_phaseProfile(phase_out)
 
 
 }

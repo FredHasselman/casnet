@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,44 +66,54 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rn</span><span class="op">(</span>
-  <span class="va">y1</span>,
-  y2 <span class="op">=</span> <span class="cn">NULL</span>,
-  emDim <span class="op">=</span> <span class="fl">1</span>,
-  emLag <span class="op">=</span> <span class="fl">1</span>,
-  emRad <span class="op">=</span> <span class="cn">NULL</span>,
-  theiler <span class="op">=</span> <span class="fl">0</span>,
-  directed <span class="op">=</span> <span class="cn">FALSE</span>,
-  cumulative <span class="op">=</span> <span class="cn">TRUE</span>,
-  weighted <span class="op">=</span> <span class="cn">FALSE</span>,
-  weightedBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"si"</span>, <span class="st">"rt"</span>, <span class="st">"rf"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  rescaleWeights <span class="op">=</span> <span class="cn">FALSE</span>,
-  fs <span class="op">=</span> <span class="cn">NA</span>,
-  to.ts <span class="op">=</span> <span class="cn">NULL</span>,
-  order.by <span class="op">=</span> <span class="cn">NULL</span>,
-  to.sparse <span class="op">=</span> <span class="cn">FALSE</span>,
-  method <span class="op">=</span> <span class="st">"Euclidean"</span>,
-  targetValue <span class="op">=</span> <span class="fl">0.05</span>,
-  returnGraph <span class="op">=</span> <span class="cn">FALSE</span>,
-  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  doEmbed <span class="op">=</span> <span class="cn">TRUE</span>,
-  silent <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rn</span><span class="op">(</span></span>
+<span>  <span class="va">y1</span>,</span>
+<span>  y2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  emDim <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  emLag <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  emRad <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  theiler <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  directed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cumulative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  weighted <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  weightedBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"si"</span>, <span class="st">"rt"</span>, <span class="st">"rf"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  rescaleWeights <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fs <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  to.ts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  order.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  to.sparse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"Euclidean"</span>,</span>
+<span>  targetValue <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  returnGraph <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doEmbed <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y1</dt>
 <dd><p>A numeric vector or time series</p></dd>
+
+
 <dt>y2</dt>
 <dd><p>A numeric vector or time series for cross recurrence</p></dd>
+
+
 <dt>emDim</dt>
 <dd><p>The embedding dimensions</p></dd>
+
+
 <dt>emLag</dt>
 <dd><p>The embedding lag</p></dd>
+
+
 <dt>emRad</dt>
 <dd><p>The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If <code>NULL</code>, an unthresholded matrix will be created (default = <code>NULL</code>)</p></dd>
+
+
 <dt>theiler</dt>
 <dd><p>Use a <code>theiler</code> window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:</p><ul><li><p><code>0</code> will include the main diagonal in all RQA measure calculations.</p></li>
 <li><p><code>1</code> will remove the main diagonal from all RQA measure calculations.</p></li>
@@ -111,42 +121,77 @@
 <li><p>A value greater than <code>1</code> will remove that many diagonals around and including the diagonal from all RQA measure calculations. So <code>theiler = 2</code> means exclude <code>2</code> diagonals around the main diagonal, including the main diagonal itself: <code>[-1,0,1]</code>.
 If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code> it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. <code>theiler = c(-1,5)</code> will exclude <code>[-1,0,1,2,3,4,5]</code>. If <code>length(theiler) &gt; 2</code>, the values will be considered individual diagonal ID's, e.g. <code>theiler = c(-3,-1,0,2,5)</code>, will exclude only those specific ID's. Also see the note.</p></li>
 </ul></dd>
+
+
 <dt>directed</dt>
 <dd><p>Should the matrix be considered to represent a directed network? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>cumulative</dt>
 <dd><p>To make the network represent cumulative time, set <code>directed = TRUE</code> and <code>cumulative = TRUE</code>. This will set the upper triangle of the recurrence matrix to <code>0</code> and ensures that the network edges represent recurrent values that have occurred in the <code>past</code> relative to the current observed value (node). If <code>directed = FALSE</code> the argument is ignored (default = <code>TRUE</code>).</p></dd>
+
+
 <dt>weighted</dt>
 <dd><p>Should the matrix be considered to represent a weighted network? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>weightedBy</dt>
 <dd><p>After setting values smaller than <code>emRad</code> to <code>0</code>, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (<code>"si"</code>). Other option are <code>"rt"</code> for <em>recurrence time</em> and <code>"rf"</code> for <em>recurrence time frequency</em>, Because vertices represent time points in \(\epsilon\)-thresholded recurrence networks, a difference of two vertex-indices represents duration. If an edge <code>e1</code> connects <code>v1</code> and <code>v10</code> then the <em>recurrence time</em> will be the difference of the vertex indices, <code>9</code>, and the <em>recurrence time frequency</em> will be <code>1/9</code>.</p></dd>
+
+
 <dt>rescaleWeights</dt>
 <dd><p>If set to <code>TRUE</code> and <code>weighted = TRUE</code>, all weight values will be rescaled to <code>[0,1]</code>, where <code>0</code> means no recurrence relation and <code>1</code> the maximum weight value.</p></dd>
+
+
 <dt>fs</dt>
 <dd><p>Sample frequency: A numeric value interpreted as the <code>number of observed samples per unit of time</code>. If the weights represent recurrence times (<code>"rt"</code>), they will be divided by the value in <code>fs</code>. If the weights represent recurrence time frequencies (<code>"rf"</code>), they will be multiplied by the value of <code>fs</code> (default = <code>NA</code>)</p></dd>
+
+
 <dt>to.ts</dt>
 <dd><p>Should <code>y1</code> and <code>y2</code> be converted to time series objects?</p></dd>
+
+
 <dt>order.by</dt>
 <dd><p>If <code>to.ts = TRUE</code>, pass a vector of the same length as <code>y1</code> and <code>y2</code>. It will be used as the time index, if <code>NA</code> the vector indices will be used to represent time.</p></dd>
+
+
 <dt>to.sparse</dt>
 <dd><p>Should sparse matrices be used?</p></dd>
+
+
 <dt>method</dt>
-<dd><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code><a href="https://rdrr.io/pkg/proxy/man/dist.html" class="external-link">proxy::dist()</a></code>. Type <code>proxy::pr_DB$get_entries()</code> to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></dd>
+<dd><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code>proxy::dist()</code>. Type <code>proxy::pr_DB$get_entries()</code> to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></dd>
+
+
 <dt>targetValue</dt>
 <dd><p>A value passed to <code>est_radius(...,type="fixed", targetMeasure="RR")</code> if <code>is.na(emRad)==TRUE</code>.</p></dd>
+
+
 <dt>returnGraph</dt>
 <dd><p>Return an <code><a href="https://rdrr.io/pkg/igraph/man/aaa-igraph-package.html" class="external-link">igraph::igraph()</a></code> object (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Plot the matrix by calling <code><a href="rp_plot.html">rp_plot()</a></code> with default settings</p></dd>
+
+
 <dt>doEmbed</dt>
 <dd><p>If <code>FALSE</code>, a distance matrix will be returned that is not embedded by <code>emDim</code> and <code>emLag</code> (Multidimensional RQA). If <code>y1</code> and/or <code>y2</code> are data frames, the columns will be used as the state space dimensions (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silent-ish mode</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Any paramters to pass to <code><a href="rn_plot.html">rn_plot()</a></code> if <code>doPlot = TRUE</code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidence) matrix.</p>
+    
+
+<p>A (Coss-) Recurrence matrix that can be interpreted as an adjacency (or incidence) matrix.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -171,8 +216,7 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

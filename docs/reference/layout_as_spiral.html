@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,40 +66,53 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">layout_as_spiral</span><span class="op">(</span>
-  <span class="va">g</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Archimedean"</span>, <span class="st">"Bernoulli"</span>, <span class="st">"Fermat"</span>, <span class="st">"Euler"</span><span class="op">)</span>,
-  arcs <span class="op">=</span> <span class="fl">6</span>,
-  a <span class="op">=</span> <span class="fl">1</span>,
-  b <span class="op">=</span> <span class="cn">NULL</span>,
-  rev <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">layout_as_spiral</span><span class="op">(</span></span>
+<span>  <span class="va">g</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Archimedean"</span>, <span class="st">"Bernoulli"</span>, <span class="st">"Fermat"</span>, <span class="st">"Euler"</span><span class="op">)</span>,</span>
+<span>  arcs <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>  a <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  b <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rev <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>g</dt>
 <dd><p>An igraph object. If (<code>rev = FALSE</code>) the vertex with the lowest index will be placed in the centre of the spiral, the highest index will be most outer vertex,</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Spiral type, one of <code>"Archimedean"</code>,<code>"Bernoulli"</code>,<code>"Fermat"</code>, or, <code>"Euler"</code> (default = <code>"Archimedean"</code>)</p></dd>
+
+
 <dt>arcs</dt>
 <dd><p>The number of arcs (half circles/ovals) that make up the spiral (default = <code>10</code>)</p></dd>
+
+
 <dt>a</dt>
 <dd><p>Parameter controlling the distance between spiral arms, however, the effect will vary for different spiral types (default = <code>0.5</code>)</p></dd>
+
+
 <dt>b</dt>
 <dd><p>Parameter controlling where the spiral originates. A value of 1 will generally place the origin in the center. The default <code>NULL</code> will choose a value based on the different spiral types (default = <code>NULL</code>)</p></dd>
+
+
 <dt>rev</dt>
 <dd><p>If <code>TRUE</code> the vertex with the highest index will be placed in the centre of the spiral (default = <code>FALSE</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An igraph layout</p>
+    
+
+<p>An igraph layout</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org" class="external-link">igraph</a></span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org" class="external-link">igraph</a></span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘igraph’</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:stats’:</span>
@@ -108,21 +121,21 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following object is masked from ‘package:base’:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     union</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">g</span>  <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/sample_gnp.html" class="external-link">sample_gnp</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">1</span><span class="op">/</span><span class="fl">100</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Equiangular spiral: Any line from the origin cuts at the same angle.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, layout <span class="op">=</span> <span class="fu">layout_as_spiral</span><span class="op">(</span><span class="va">g</span>, type <span class="op">=</span> <span class="st">"Bernoulli"</span>, arcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">g</span>  <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/sample_gnp.html" class="external-link">sample_gnp</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">1</span><span class="op">/</span><span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Equiangular spiral: Any line from the origin cuts at the same angle.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, layout <span class="op">=</span> <span class="fu">layout_as_spiral</span><span class="op">(</span><span class="va">g</span>, type <span class="op">=</span> <span class="st">"Bernoulli"</span>, arcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="layout_as_spiral-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># The arms of Fermat's spiral diverge quadratically.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, layout <span class="op">=</span> <span class="fu">layout_as_spiral</span><span class="op">(</span><span class="va">g</span>, type <span class="op">=</span> <span class="st">"Fermat"</span>, arcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The arms of Fermat's spiral diverge quadratically.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, layout <span class="op">=</span> <span class="fu">layout_as_spiral</span><span class="op">(</span><span class="va">g</span>, type <span class="op">=</span> <span class="st">"Fermat"</span>, arcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="layout_as_spiral-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Equidistance of intersection points along a line through the origin.</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, layout <span class="op">=</span> <span class="fu">layout_as_spiral</span><span class="op">(</span><span class="va">g</span>, type <span class="op">=</span> <span class="st">"Archimedean"</span>, arcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Equidistance of intersection points along a line through the origin.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, layout <span class="op">=</span> <span class="fu">layout_as_spiral</span><span class="op">(</span><span class="va">g</span>, type <span class="op">=</span> <span class="st">"Archimedean"</span>, arcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="layout_as_spiral-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -137,8 +150,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

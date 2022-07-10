@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,34 +66,47 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">mif</span><span class="op">(</span>
-  <span class="va">y</span>,
-  lags <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">10</span>,
-  nbins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">^</span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
-  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  surTest <span class="op">=</span> <span class="cn">FALSE</span>,
-  alpha <span class="op">=</span> <span class="fl">0.05</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mif</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  lags <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">10</span>,</span>
+<span>  nbins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">^</span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  surTest <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.05</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A <code>Nx1</code> matrix for auto-mif, a <code>Nx2</code> matrix or data frame for cross-mif, a <code>Nx3</code> matrix or data frame for mif between col 1 and 2 conditional on col 3; or a <code>NxM</code> matrix or data frame for the multi-information function. Mutual information for each lag will be calculated using functions in package <code><a href="https://rdrr.io/pkg/infotheo/man/infotheo.html" class="external-link">infotheo::infotheo()</a></code> for <code>lags</code> lagged versions of the time series.</p></dd>
+
+
 <dt>lags</dt>
 <dd><p>The lags to evaluate mutual information.</p></dd>
+
+
 <dt>nbins</dt>
 <dd><p>The number of bins passed to <code><a href="https://rdrr.io/pkg/infotheo/man/discretize.html" class="external-link">infotheo::discretize()</a></code> if y is a matrix or <code><a href="ts_discrete.html">ts_discrete()</a></code></p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Produce a plot of the symbolic time series by calling <code><a href="plotRED_mif.html">plotRED_mif()</a></code> (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>surTest</dt>
 <dd><p>If <code>TRUE</code>, a surrogate will be conducted using simple surrogates. The surrogates will be created from the transition probabilities of the discretised time series, i.e. the probability of observing bin <code>j</code> when the current value is in bin <code>j</code>. The number of surrogates needed will be computed based on the value of the <code>alpha</code> parameter, conceived as a one-sided test: <code>mi &gt; 0</code>.</p></dd>
+
+
 <dt>alpha</dt>
 <dd><p>The alpha level for the surrogate test (default = <code>0.05</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The auto- or cross-mi function</p>
+    
+
+<p>The auto- or cross-mi function</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -104,14 +117,14 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co"># Lags to evaluate mututal information</span></span>
-<span class="r-in"><span class="va">lags</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">30</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Auto-mutual information</span></span>
-<span class="r-in"><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">8</span><span class="op">)</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">y1</span><span class="op">)</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Lags to evaluate mututal information</span></span></span>
+<span class="r-in"><span><span class="va">lags</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">30</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Auto-mutual information</span></span></span>
+<span class="r-in"><span><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">8</span><span class="op">)</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">y1</span><span class="op">)</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      -10       -9       -8       -7       -6       -5       -4       -3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1.656295 1.929039 1.645481 1.571829 1.567038 1.680948 1.460478 1.497499 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       -2       -1        0        1        2        3        4        5 </span>
@@ -132,12 +145,12 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [39]  28  29  30</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"nbins")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 19</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Cross-mututal information, y2 is a lagged version y1</span></span>
-<span class="r-in"><span class="va">y2</span> <span class="op">&lt;-</span> <span class="va">y1</span><span class="op">[</span><span class="fl">10</span><span class="op">:</span><span class="fl">801</span><span class="op">]</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="ts_trimfill.html">ts_trimfill</a></span><span class="op">(</span><span class="va">y1</span>, <span class="va">y2</span>, action <span class="op">=</span> <span class="st">"trim.cut"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="va">y</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Cross-mututal information, y2 is a lagged version y1</span></span></span>
+<span class="r-in"><span><span class="va">y2</span> <span class="op">&lt;-</span> <span class="va">y1</span><span class="op">[</span><span class="fl">10</span><span class="op">:</span><span class="fl">801</span><span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="ts_trimfill.html">ts_trimfill</a></span><span class="op">(</span><span class="va">y1</span>, <span class="va">y2</span>, action <span class="op">=</span> <span class="st">"trim.cut"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="va">y</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      -10       -9       -8       -7       -6       -5       -4       -3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1.626296 1.474408 1.859941 1.560486 1.621651 1.607910 1.563809 1.924130 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       -2       -1        0        1        2        3        4        5 </span>
@@ -158,10 +171,10 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [39]  28  29  30</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"nbins")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 19</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span></span>
-<span class="r-in"><span class="va">y</span><span class="op">$</span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">y2</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="va">y</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Conditional mutual information, add some noise to y2 and add it as a 3rd column</span></span></span>
+<span class="r-in"><span><span class="va">y</span><span class="op">$</span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">y2</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="va">y</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      -10       -9       -8       -7       -6       -5       -4       -3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1.834929 1.736090 1.970503 1.833393 1.955936 1.964817 1.937624 2.039731 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       -2       -1        0        1        2        3        4        5 </span>
@@ -182,10 +195,10 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [39]  28  29  30</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"nbins")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 19</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Multi-information, the information of the entire multivariate series at each lag</span></span>
-<span class="r-in"><span class="va">y</span><span class="op">$</span><span class="va">y3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="va">y</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Multi-information, the information of the entire multivariate series at each lag</span></span></span>
+<span class="r-in"><span><span class="va">y</span><span class="op">$</span><span class="va">y3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="va">y</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      -10       -9       -8       -7       -6       -5       -4       -3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4.993314 4.988131 4.985059 4.985194 5.130505 5.133889 5.125356 5.120978 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       -2       -1        0        1        2        3        4        5 </span>
@@ -206,8 +219,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [39]  28  29  30</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"nbins")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 19</span>
-<span class="r-in"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -222,8 +235,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

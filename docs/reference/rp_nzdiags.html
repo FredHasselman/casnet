@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,34 +66,47 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">rp_nzdiags</span><span class="op">(</span>
-  RM <span class="op">=</span> <span class="cn">NULL</span>,
-  d <span class="op">=</span> <span class="cn">NULL</span>,
-  returnVectorList <span class="op">=</span> <span class="cn">TRUE</span>,
-  returnNZtriplets <span class="op">=</span> <span class="cn">FALSE</span>,
-  removeNZ <span class="op">=</span> <span class="cn">TRUE</span>,
-  silent <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rp_nzdiags</span><span class="op">(</span></span>
+<span>  RM <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  d <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  returnVectorList <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  returnNZtriplets <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  removeNZ <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>RM</dt>
 <dd><p>A binary (0,1) matrix.</p></dd>
+
+
 <dt>d</dt>
 <dd><p>An optional vector of diagonals to extract.</p></dd>
+
+
 <dt>returnVectorList</dt>
 <dd><p>Return list</p></dd>
+
+
 <dt>returnNZtriplets</dt>
 <dd><p>Return a dataframe with coordinates of only nonzero elements in diagonals (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>removeNZ</dt>
 <dd><p>Remove nonzero diagonals if <code>TRUE</code>. If <code>FALSE</code> returns the full diagonals matrix. Use e.g. to plot diagonal recurrence profiles (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silent-ish mode</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A matrix object with nonzero diagonals as columns and/or a dataframe with coordinates of nonzero diagonal elements</p>
+    
+
+<p>A matrix object with nonzero diagonals as columns and/or a dataframe with coordinates of nonzero diagonal elements</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -125,8 +138,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,53 +66,78 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fd_psd</span><span class="op">(</span>
-  <span class="va">y</span>,
-  fs <span class="op">=</span> <span class="cn">NULL</span>,
-  removeTrend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
-  polyOrder <span class="op">=</span> <span class="fl">1</span>,
-  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
-  fitMethod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lowest25"</span>, <span class="st">"Wijnants"</span>, <span class="st">"Hurvich-Deo"</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,
-  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnPLAW <span class="op">=</span> <span class="cn">FALSE</span>,
-  returnInfo <span class="op">=</span> <span class="cn">FALSE</span>,
-  silent <span class="op">=</span> <span class="cn">FALSE</span>,
-  noTitle <span class="op">=</span> <span class="cn">FALSE</span>,
-  tsName <span class="op">=</span> <span class="st">"y"</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fd_psd</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  fs <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  removeTrend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
+<span>  polyOrder <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
+<span>  fitMethod <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lowest25"</span>, <span class="st">"Wijnants"</span>, <span class="st">"Hurvich-Deo"</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnPLAW <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnInfo <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  noTitle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tsName <span class="op">=</span> <span class="st">"y"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A numeric vector or time series object.</p></dd>
+
+
 <dt>fs</dt>
 <dd><p>Sample rate (default = <code>NULL</code>)</p></dd>
+
+
 <dt>standardise</dt>
 <dd><p>standardise the series (default = <code>TRUE</code>).</p></dd>
+
+
 <dt>fitMethod</dt>
 <dd><p>Method to decide on a frequency range for log-log fit. Can be one of: "lowest25","Wijnants","Hurvich-Deo" (default). See details for more info.</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Return the log-log spectrum with linear fit (default = <code>TRUE</code>).</p></dd>
+
+
 <dt>returnPlot</dt>
 <dd><p>Return ggplot2 object (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>returnPLAW</dt>
 <dd><p>Return the power law data (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>returnInfo</dt>
 <dd><p>Return all the data used in SDA (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Run in silent-ish mode (default = <code>TRUE)</code></p></dd>
+
+
 <dt>noTitle</dt>
 <dd><p>Do not generate a title (only the subtitle)</p></dd>
+
+
 <dt>tsName</dt>
 <dd><p>Name of y added as a subtitle to the plot</p></dd>
+
+
 <dt>detrend</dt>
 <dd><p>Subtract linear trend from the series (default = <code>TRUE</code>).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list object containing:</p><ul><li><p>A data matrix <code>PLAW</code> with columns <code>freq.norm</code>, <code>size</code> and <code>bulk</code>.</p></li>
+    
+
+<p>A list object containing:</p><ul><li><p>A data matrix <code>PLAW</code> with columns <code>freq.norm</code>, <code>size</code> and <code>bulk</code>.</p></li>
 <li><p>Estimate of scaling exponent <code>alpha</code> based on a fit over the lowest 25\<!-- % frequencies (\code{low25}), or using the HD estimate \code{HD}. --></p></li>
 <li><p>Estimate of the the Fractal Dimension (<code>FD</code>) using conversion formula's reported in Hasselman(2013).</p></li>
 <li><p>Information output by various functions.</p></li>
@@ -156,8 +181,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

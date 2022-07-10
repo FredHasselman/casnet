@@ -1,10 +1,3 @@
-# package casnet ----
-#
-# Dynamic Complexity ----
-#
-# dc functions
-
-
 #' Dynamic Complexity
 #'
 #' Calculates Dynamic Complexity, a complexity index for short and coarse grained time series.
@@ -46,10 +39,10 @@
 #'
 dc_win <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, doPlotF = FALSE, doPlotD = FALSE, returnFandD = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
-  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
-    time_vec <- stats::time(df)
-  } else {
-    time_vec <- NA
+  if(all(is.na(useTimeVector))){
+    if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+      useTimeVector <- stats::time(df)
+    }
   }
 
   if(is.null(dim(df))){
@@ -59,7 +52,6 @@ dc_win <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, doPlo
       df <- data.frame(as.numeric_discrete(df))
     }
   }
-
 
   if(any(df<scale_min,df>scale_max)){
     stop("Range of values in df is outside [scale_min,scale_max]!")
@@ -207,10 +199,10 @@ dc_ccp = function(df_win , alpha_item = 0.05, alpha_time = 0.05, doPlot = FALSE,
 #'
 dc_f <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
-  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
-    time_vec <- stats::time(df)
-  } else {
-    time_vec <- NA
+  if(all(is.na(useTimeVector))){
+    if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+      useTimeVector <- stats::time(df)
+    }
   }
 
   if(is.null(dim(df))){
@@ -293,7 +285,7 @@ dc_f <- function(df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarN
     }
   }
   ew_data_F <- ew_data_F[1:nrow(df),]
-  attr(ew_data_F,"time") <- time_vec
+  attr(ew_data_F,"time") <- useTimeVector
   if(is.null(dim(ew_data_F))){
     ew_data_F <- data.frame(ew_data_F)
   }
@@ -331,7 +323,7 @@ get_fluct <- function(y_win,s){
 }
 
 
-#' @title Distribution Uniformity
+#' Distribution Uniformity
 #'
 #' Distribution Uniformity is one of two components of which the product is the Dynamic Complexity measure.
 #'
@@ -353,10 +345,10 @@ get_fluct <- function(y_win,s){
 #'
 dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
-  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
-    time_vec <- stats::time(df)
-  } else {
-    time_vec <- NA
+  if(all(is.na(useTimeVector))){
+    if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+      useTimeVector <- stats::time(df)
+    }
   }
 
   if(is.null(dim(df))){
@@ -396,7 +388,7 @@ dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVar
     }
   }
   ew_data_D <- ew_data_D[(1:nrow(df)),]
-  attr(ew_data_D,"time") <- time_vec
+  attr(ew_data_D,"time") <- useTimeVector
   if(is.null(dim(ew_data_D))){
     ew_data_D <- data.frame(ew_data_D)
   }
@@ -435,10 +427,10 @@ dc_d <- function (df, win=NROW(df), scale_min, scale_max, doPlot = FALSE, useVar
 #'
 var_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
-  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
-    time_vec <- stats::time(df)
-  } else {
-    time_vec <- NA
+  if(all(is.na(useTimeVector))){
+    if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+      useTimeVector <- stats::time(df)
+    }
   }
 
   if(is.null(dim(df))){
@@ -463,7 +455,7 @@ var_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrd
   }
 
   #df_var <- df_var[1:nrow(df),]
-  attr(df_var,"time") <- time_vec
+  attr(df_var,"time") <- useTimeVector
   if(is.null(dim(df_var))){
     df_var <- data.frame(df_var)
   }
@@ -502,10 +494,10 @@ var_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrd
 #'
 ac_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
-  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
-    time_vec <- stats::time(df)
-  } else {
-    time_vec <- NA
+  if(all(is.na(useTimeVector))){
+    if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+      useTimeVector <- stats::time(df)
+    }
   }
 
   if(is.null(dim(df))){
@@ -536,7 +528,7 @@ ac_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrde
     }
   }
 
-  attr(df_ac,"time") <- time_vec
+  attr(df_ac,"time") <- useTimeVector
   if(is.null(dim(df_ac))){
     df_ac <- data.frame(df_ac)
   }
@@ -576,10 +568,10 @@ ac_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrde
 #'
 eig_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999"){
 
-  if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
-    time_vec <- stats::time(df)
-  } else {
-    time_vec <- NA
+  if(all(is.na(useTimeVector))){
+    if(any(stats::is.ts(df),xts::is.xts(df),zoo::is.zoo(df))){
+      useTimeVector <- stats::time(df)
+    }
   }
 
   if(is.null(dim(df))){
@@ -610,4 +602,5 @@ eig_win <- function(df, win=NROW(df), doPlot = FALSE, useVarNames = TRUE, colOrd
     return(df_eig)
   }
 }
+
 

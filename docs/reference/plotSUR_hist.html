@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,41 +66,58 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotSUR_hist</span><span class="op">(</span>
-  <span class="va">surrogateValues</span>,
-  <span class="va">observedValue</span>,
-  sides <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"two.sided"</span>, <span class="st">"greater"</span>, <span class="st">"less"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  binWidth <span class="op">=</span> <span class="cn">NULL</span>,
-  measureName <span class="op">=</span> <span class="st">""</span>,
-  title <span class="op">=</span> <span class="st">""</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,
-  returnOnlyPvalue <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotSUR_hist</span><span class="op">(</span></span>
+<span>  <span class="va">surrogateValues</span>,</span>
+<span>  <span class="va">observedValue</span>,</span>
+<span>  sides <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"two.sided"</span>, <span class="st">"greater"</span>, <span class="st">"less"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  binWidth <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  measureName <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  returnOnlyPvalue <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>surrogateValues</dt>
 <dd><p>Vector of measures based on surrogate time series</p></dd>
+
+
 <dt>observedValue</dt>
 <dd><p>The measure obtained from the observed value</p></dd>
+
+
 <dt>sides</dt>
 <dd><p>Is this a 1 or 2-sided test (default = <code>1</code>)</p></dd>
+
+
 <dt>binWidth</dt>
 <dd><p>The size of the histogram bins. The default is to look for the max. number of digits and set the width to <code>1/10^(Ndigits-1)</code>. If integers are detectec width will be set to 1.</p></dd>
+
+
 <dt>measureName</dt>
 <dd><p>Label for x-axis</p></dd>
+
+
 <dt>title</dt>
 <dd><p>A title for the plot</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Plot a histogram of the distribution (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>returnOnlyPvalue</dt>
 <dd><p>Do not return the graph, just the point p-value (default = <code>FALSE</code>)</p>
 <p>alpha Significance threshold for the test. This value is currently calculated from the data as \(\frac{1}{rank}*Nsides\), setting it will not have an effect.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A point p-value for the observed value, and/or a histogram of the distribution (<code>ggplot2</code> object).</p>
+    
+
+<p>A point p-value for the observed value, and/or a histogram of the distribution (<code>ggplot2</code> object).</p>
     </div>
 
   </div>
@@ -115,8 +132,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

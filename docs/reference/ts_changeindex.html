@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,34 +66,49 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ts_changeindex</span><span class="op">(</span>
-  <span class="va">y</span>,
-  returnRectdata <span class="op">=</span> <span class="cn">FALSE</span>,
-  groupVar <span class="op">=</span> <span class="cn">NULL</span>,
-  labelVar <span class="op">=</span> <span class="cn">NULL</span>,
-  discretize <span class="op">=</span> <span class="cn">FALSE</span>,
-  nbins <span class="op">=</span> <span class="fl">5</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_changeindex</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  returnRectdata <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  groupVar <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  labelVar <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  discretize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nbins <span class="op">=</span> <span class="fl">5</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>An indicator variable representing different levels of a variable or factor</p></dd>
+
+
 <dt>returnRectdata</dt>
 <dd><p>Return a dataframe suitable for shading a <code>ggplot2</code> graph with <code><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">ggplot2::geom_rect()</a></code></p></dd>
+
+
 <dt>groupVar</dt>
 <dd><p>Pass a value (length 1) or variable (length of y) that can be used as a variable to join the indices by if <code>returnRectdata = TRUE</code></p></dd>
+
+
 <dt>labelVar</dt>
 <dd><p>If <code>y</code> is not a character vector, provide a vector of labels equal to <code>length(y)</code></p></dd>
+
+
 <dt>discretize</dt>
 <dd><p>If <code>y</code> is a continuous variable, setting <code>discretize = TRUE</code> will partition the values of <code>y</code> into <code>nbins</code> number of bins, each value of <code>y</code> will be replaced by its bin number.</p></dd>
+
+
 <dt>nbins</dt>
 <dd><p>Number of bins to use to change a continuous <code>y</code> (if <code>discretize = TRUE</code>) into a variable with <code>nbins</code> levels</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Either a vector with the indices of change in <code>y</code>, or, a data frame with variables <code>xmin,xmax,ymin,ymax,label</code></p>
+    
+
+<p>Either a vector with the indices of change in <code>y</code>, or, a data frame with variables <code>xmin,xmax,ymin,ymax,label</code></p>
+
+
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -122,28 +137,28 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"> <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
-<span class="r-in"> <span class="va">yy</span>     <span class="op">&lt;-</span> <span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>standardise <span class="op">=</span> <span class="cn">TRUE</span>, N<span class="op">=</span><span class="fl">50</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
-<span class="r-in"> <span class="va">tr</span>     <span class="op">&lt;-</span> <span class="fu"><a href="ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">yy</span>, doTreePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">yy</span>     <span class="op">&lt;-</span> <span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>standardise <span class="op">=</span> <span class="cn">TRUE</span>, N<span class="op">=</span><span class="fl">50</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">tr</span>     <span class="op">&lt;-</span> <span class="fu"><a href="ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">yy</span>, doTreePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="ts_changeindex-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"> <span class="va">breaks</span> <span class="op">&lt;-</span> <span class="fu">ts_changeindex</span><span class="op">(</span><span class="va">tr</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">p</span>, returnRectdata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"> <span class="va">breaks</span><span class="op">$</span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="getColours.html">getColours</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">breaks</span><span class="op">$</span><span class="va">label</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">tr</span><span class="op">$</span><span class="va">pred</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_rect</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">breaks</span>,</span>
-<span class="r-in">   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="va">xmin</span>, xmax<span class="op">=</span><span class="va">xmax</span>, ymin<span class="op">=</span><span class="va">ymin</span>, ymax<span class="op">=</span><span class="va">ymax</span>, colour <span class="op">=</span> <span class="va">label</span>, fill <span class="op">=</span> <span class="va">label</span><span class="op">)</span>,</span>
-<span class="r-in">   alpha <span class="op">=</span> <span class="fl">.3</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">breaks</span><span class="op">$</span><span class="va">cols</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">breaks</span><span class="op">$</span><span class="va">cols</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span><span class="st">"time"</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_step</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">p</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"red3"</span>, size<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid.minor <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span> <span class="va">breaks</span> <span class="op">&lt;-</span> <span class="fu">ts_changeindex</span><span class="op">(</span><span class="va">tr</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">p</span>, returnRectdata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">breaks</span><span class="op">$</span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="getColours.html">getColours</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">breaks</span><span class="op">$</span><span class="va">label</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">tr</span><span class="op">$</span><span class="va">pred</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_rect</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">breaks</span>,</span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="va">xmin</span>, xmax<span class="op">=</span><span class="va">xmax</span>, ymin<span class="op">=</span><span class="va">ymin</span>, ymax<span class="op">=</span><span class="va">ymax</span>, colour <span class="op">=</span> <span class="va">label</span>, fill <span class="op">=</span> <span class="va">label</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>   alpha <span class="op">=</span> <span class="fl">.3</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">breaks</span><span class="op">$</span><span class="va">cols</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">breaks</span><span class="op">$</span><span class="va">cols</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span><span class="st">"time"</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_step</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">x</span>,y<span class="op">=</span><span class="va">p</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"red3"</span>, size<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid.minor <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="ts_changeindex-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -158,8 +173,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

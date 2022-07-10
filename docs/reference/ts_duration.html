@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,28 +66,37 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ts_duration</span><span class="op">(</span>
-  <span class="va">y</span>,
-  timeVec <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>,
-  fs <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">frequency</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>,
-  tolerance <span class="op">=</span> <span class="fl">0</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_duration</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  timeVec <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>,</span>
+<span>  fs <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">frequency</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>,</span>
+<span>  tolerance <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A time series, numeric vector, or categorical variable.</p></dd>
+
+
 <dt>timeVec</dt>
 <dd><p>A vector, same length as <code>y</code> containing timestamps, or, sample indices.</p></dd>
+
+
 <dt>fs</dt>
 <dd><p>Optional sampling frequency if timeVec represents sample indices. An extra column <code>duration.fs</code> will be added which represents <code>1/fs * duration in samples</code></p></dd>
+
+
 <dt>tolerance</dt>
 <dd><p>A number <code>tol</code> indicating a range <code>[y-tol,y+tol]</code> to consider the same value. Useful when <code>y</code> is continuous (<code>default = 0</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame</p>
+    
+
+<p>A data frame</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -116,17 +125,17 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/invctr" class="external-link">invctr</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># Create data with events and their timecodes</span></span>
-<span class="r-in"><span class="va">coder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>beh<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stare"</span>,<span class="st">"stare"</span>,<span class="st">"coffee"</span>,<span class="st">"type"</span>,<span class="st">"type"</span>,<span class="st">"stare"</span><span class="op">)</span>,t<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">10</span>,<span class="fl">15</span>,<span class="fl">20</span>,<span class="fl">25</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">ts_duration</span><span class="op">(</span>y <span class="op">=</span> <span class="va">coder</span><span class="op">$</span><span class="va">beh</span>, timeVec <span class="op">=</span> <span class="va">coder</span><span class="op">$</span><span class="va">t</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/invctr" class="external-link">invctr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Create data with events and their timecodes</span></span></span>
+<span class="r-in"><span><span class="va">coder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>beh<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stare"</span>,<span class="st">"stare"</span>,<span class="st">"coffee"</span>,<span class="st">"type"</span>,<span class="st">"type"</span>,<span class="st">"stare"</span><span class="op">)</span>,t<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">5</span>,<span class="fl">10</span>,<span class="fl">15</span>,<span class="fl">20</span>,<span class="fl">25</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">ts_duration</span><span class="op">(</span>y <span class="op">=</span> <span class="va">coder</span><span class="op">$</span><span class="va">beh</span>, timeVec <span class="op">=</span> <span class="va">coder</span><span class="op">$</span><span class="va">t</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   y y.name t.start t.end duration.time duration.samples duration.fs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 1  stare       0    10            10                2           2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 2 coffee      10    15             5                1           1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 3   type      15    25            10                2           2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 1  stare      25    25             0                1           1</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -141,8 +150,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

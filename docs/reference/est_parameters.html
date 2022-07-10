@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,30 +66,34 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">est_parameters</span><span class="op">(</span>
-  <span class="va">y</span>,
-  lagMethods <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first.minimum"</span>, <span class="st">"global.minimum"</span>, <span class="st">"max.lag"</span><span class="op">)</span>,
-  estimateDimensions <span class="op">=</span> <span class="st">"preferSmallestInLargestHood"</span>,
-  maxDim <span class="op">=</span> <span class="fl">10</span>,
-  emLag <span class="op">=</span> <span class="cn">NULL</span>,
-  maxLag <span class="op">=</span> <span class="cn">NA</span>,
-  minVecLength <span class="op">=</span> <span class="fl">20</span>,
-  nnSize <span class="op">=</span> <span class="cn">NA</span>,
-  nnRadius <span class="op">=</span> <span class="cn">NA</span>,
-  nnThres <span class="op">=</span> <span class="fl">10</span>,
-  theiler <span class="op">=</span> <span class="fl">0</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,
-  silent <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">est_parameters</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  lagMethods <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first.minimum"</span>, <span class="st">"global.minimum"</span>, <span class="st">"max.lag"</span><span class="op">)</span>,</span>
+<span>  estimateDimensions <span class="op">=</span> <span class="st">"preferSmallestInLargestHood"</span>,</span>
+<span>  maxDim <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  emLag <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxLag <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  minVecLength <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>  nnSize <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  nnRadius <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  nnThres <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  theiler <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A numeric vector or time series</p></dd>
+
+
 <dt>lagMethods</dt>
 <dd><p>A character vector with one or more of the following strings: <code>"first.minimum","global.minimum","max.lag"</code>. If <code>emLag</code> represents a valid lag this value will be reported as <code>"user.lag"</code> (default = <code>c("first.minimum","global.minimum","max.lag")</code>)</p></dd>
+
+
 <dt>estimateDimensions</dt>
 <dd><p>Decide on an optimal embedding dimension relative to the values in <code>maxDim</code> and <code>lagMethods</code>, according to a number of preferences passed as a character vector. The order in which the preferences appear in the vector affects the selection procedure, with index <code>1</code> being most important preference. The following options are available:</p><ul><li><p><code>preferNone</code> - No optimal number will be picked all other preferences will be ignored</p></li>
 <li><p><code>preferSmallestDim</code> - Pick smallest number of dimensions associated with a percentage NN below <code>nnThres</code></p></li>
@@ -97,32 +101,57 @@
 <li><p><code>preferSmallestLag</code> - If the value of <code>nnThres</code> does not lead to a unique preference for a pair of dimension and lag values, use the pair with the smallest lag</p></li>
 <li><p><code>preferSmallestInLargestHood</code> - The default option: If no unique pair can be found, prefer pairs with smallest values for lag, dimensions, percentage NN for the largest NN size</p></li>
 </ul></dd>
+
+
 <dt>maxDim</dt>
 <dd><p>Maximum number of embedding dimensions to consider (default = <code>10</code>)</p></dd>
+
+
 <dt>emLag</dt>
 <dd><p>Optimal embedding lag (delay), e.g., provided by an optimising algorithm. If <code>NULL</code> the lags based on the mutual information in <code>lagMethods</code> will be reported. If a numeric value representing a valid lag is passed, this value will be used to estimate the number of dimensions (default = <code>NULL</code>)</p></dd>
+
+
 <dt>maxLag</dt>
 <dd><p>Maximum embedding lag to consider. If <code>NA</code> then the value is caclulated as <code>floor(length(y)/(maxDim+1))</code> (default = <code>NA</code>)</p></dd>
+
+
 <dt>minVecLength</dt>
 <dd><p>The minimum length of state space vectors after delay-embedding. For short time series, this will affect the possible values of <code>maxDim</code> that can be used to evaluate the drop in nearest neighbours. In general it is not recommended to evaluate high dimensional state spaces, based on a small number of state soace coordinates, the default is an absolute minimum and possibly even lower than that. (default = <code>20</code>)</p></dd>
+
+
 <dt>nnSize</dt>
 <dd><p>Neighbourhood diameter (integer, the <code>number.boxes</code> parameter of <code><a href="https://rdrr.io/pkg/tseriesChaos/man/false.nearest.html" class="external-link">tseriesChaos::false.nearest()</a></code>) used to speed up neighbour search. (default = <code>NA</code>)</p></dd>
+
+
 <dt>nnRadius</dt>
 <dd><p>Points smaller than the radius are considered neighbours. If <code>NA</code> the value will be <code>sd(y)/10</code>  (default = <code>NA</code>)</p></dd>
+
+
 <dt>nnThres</dt>
 <dd><p>Threshold value (in percentage 0-100) representing the percentage of Nearest Neighbours that would be acceptable when using N surrogate dimensions. The smallest number of surrogate dimensions that yield a value below the threshold will be considered optimal (default = <code>10</code>)</p></dd>
+
+
 <dt>theiler</dt>
 <dd><p>Theiler window on distance matrix (default = <code>0</code>)</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Produce a diagnostic plot the results (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silent-ish mode</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other parameters passed to <code><a href="https://rdrr.io/pkg/nonlinearTseries/man/timeLag.html" class="external-link">nonlinearTseries::timeLag()</a></code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list object containing the optimal values (as indicated by the user) and iteration history.</p>
+    
+
+<p>A list object containing the optimal values (as indicated by the user) and iteration history.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -140,15 +169,12 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4321</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">est_parameters</span><span class="op">(</span>y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4321</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">est_parameters</span><span class="op">(</span>y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Changed value of maxDim to 8 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Registered S3 method overwritten by 'quantmod':</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   method            from</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   as.zoo.data.frame zoo </span>
 <span class="r-plt img"><img src="est_parameters-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -163,8 +189,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

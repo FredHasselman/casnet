@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,70 +66,107 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ts_checkfix</span><span class="op">(</span>
-  <span class="va">y</span>,
-  checkNumericVector <span class="op">=</span> <span class="cn">TRUE</span>,
-  checkWholeNumbers <span class="op">=</span> <span class="cn">FALSE</span>,
-  checkTimeVector <span class="op">=</span> <span class="cn">FALSE</span>,
-  checkPow2 <span class="op">=</span> <span class="cn">FALSE</span>,
-  checkScale <span class="op">=</span> <span class="cn">FALSE</span>,
-  checkSummationOrder <span class="op">=</span> <span class="cn">FALSE</span>,
-  checkNonStationarity <span class="op">=</span> <span class="cn">FALSE</span>,
-  checkNonHomogeneity <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixNumericVector <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixWholeNumbers <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixTimeVector <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixPow2 <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixNA <span class="op">=</span> <span class="cn">TRUE</span>,
-  fixScale <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixSummationOrder <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixNonStationarity <span class="op">=</span> <span class="cn">FALSE</span>,
-  fixNonHomogeneity <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_checkfix</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  checkNumericVector <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  checkWholeNumbers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  checkTimeVector <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  checkPow2 <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  checkScale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  checkSummationOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  checkNonStationarity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  checkNonHomogeneity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixNumericVector <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixWholeNumbers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixTimeVector <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixPow2 <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixNA <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  fixScale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixSummationOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixNonStationarity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fixNonHomogeneity <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A time series object or numeric vector</p></dd>
+
+
 <dt>checkNumericVector</dt>
 <dd><p>is 1D numeric vector?</p></dd>
+
+
 <dt>checkWholeNumbers</dt>
 <dd><p>contains only wholenumbers?</p></dd>
+
+
 <dt>checkTimeVector</dt>
 <dd><p>has time vector?</p></dd>
+
+
 <dt>checkPow2</dt>
 <dd><p>length is power of 2?</p></dd>
+
+
 <dt>checkScale</dt>
 <dd><p>checkScale</p></dd>
+
+
 <dt>checkSummationOrder</dt>
 <dd><p>checkSummationOrder</p></dd>
+
+
 <dt>checkNonStationarity</dt>
 <dd><p>checkNonStationarity</p></dd>
+
+
 <dt>checkNonHomogeneity</dt>
 <dd><p>checkNonHomogeneity</p></dd>
+
+
 <dt>fixNumericVector</dt>
 <dd><p>return a 1D numeric vector (WARNING: Data frames and Matrices with NCOL &gt; 1 wil be converted to long form)</p></dd>
+
+
 <dt>fixWholeNumbers</dt>
 <dd><p>fixWholeNumber</p></dd>
+
+
 <dt>fixTimeVector</dt>
 <dd><p>fixTimeVector</p></dd>
+
+
 <dt>fixPow2</dt>
 <dd><p>foxPow2</p></dd>
+
+
 <dt>fixNA</dt>
 <dd><p>fixNA</p></dd>
+
+
 <dt>fixScale</dt>
 <dd><p>fixScale</p></dd>
+
+
 <dt>fixSummationOrder</dt>
 <dd><p>fixSummationOrder</p></dd>
+
+
 <dt>fixNonStationarity</dt>
 <dd><p>fixNonStationarity</p></dd>
+
+
 <dt>fixNonHomogeneity</dt>
 <dd><p>fixNonHomogeneity</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A 'check' report and/or a 'fixed' vector y.</p>
+    
+
+<p>A 'check' report and/or a 'fixed' vector y.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -168,8 +205,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

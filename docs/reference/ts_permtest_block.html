@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,43 +66,62 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ts_permtest_block</span><span class="op">(</span>
-  <span class="va">y1</span>,
-  y2 <span class="op">=</span> <span class="cn">NULL</span>,
-  targetValue <span class="op">=</span> <span class="fl">0</span>,
-  Nperms <span class="op">=</span> <span class="fl">19</span>,
-  sim <span class="op">=</span> <span class="st">"geom"</span>,
-  l <span class="op">=</span> <span class="fl">3</span>,
-  alpha <span class="op">=</span> <span class="fl">0.05</span>,
-  returnBootObject <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_permtest_block</span><span class="op">(</span></span>
+<span>  <span class="va">y1</span>,</span>
+<span>  y2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  targetValue <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  Nperms <span class="op">=</span> <span class="fl">19</span>,</span>
+<span>  sim <span class="op">=</span> <span class="st">"geom"</span>,</span>
+<span>  l <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  returnBootObject <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y1</dt>
 <dd><p>Time series 1. The goal of the permutation test will be to decide whether the difference <code>y1-targetValue != 0</code> for each time point, given <code>alpha</code>.</p></dd>
+
+
 <dt>y2</dt>
 <dd><p>An optional second time series. If this timeseries is provided then the goal of the permutation test will be the to decide wether the difference <code>y2-y1 != targetValue</code> for each time point, given <code>alpha</code>.</p></dd>
+
+
 <dt>targetValue</dt>
 <dd><p>The target value for the permutation test. If <code>NULL</code>, the function will return a data frame with the block randomised surrogates  columns (default = <code>0</code>)</p></dd>
+
+
 <dt>Nperms</dt>
 <dd><p>Number of permutations (default = <code>19</code>)</p></dd>
+
+
 <dt>sim</dt>
 <dd><p>Value passed to the <code>sim</code> argument of <code><a href="https://rdrr.io/pkg/boot/man/tsboot.html" class="external-link">boot::tsboot()</a></code> valid options are: <code>"model","fixed","geom","scramble"</code> (default = <code>"geom"</code>)</p></dd>
+
+
 <dt>l</dt>
 <dd><p>Block sizes to use, see <code><a href="https://rdrr.io/pkg/boot/man/tsboot.html" class="external-link">boot::tsboot()</a></code> for details (default = <code>3</code>)</p></dd>
+
+
 <dt>alpha</dt>
 <dd><p>Alpha level for deciding significance  (default = <code>0.05</code>)</p></dd>
+
+
 <dt>returnBootObject</dt>
 <dd><p>Return the <code>boot</code> object (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments passed to function <code><a href="https://rdrr.io/pkg/boot/man/tsboot.html" class="external-link">boot::tsboot()</a></code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame with the difference time series and variables indicating N and significance.</p>
+    
+
+<p>A data frame with the difference time series and variables indicating N and significance.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -131,12 +150,12 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4321</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">5000</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y2</span> <span class="op">&lt;-</span> <span class="va">y1</span><span class="op">-</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y1</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">ts_permtest_block</span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">y1</span>, y2 <span class="op">=</span> <span class="va">y2</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4321</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">5000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y2</span> <span class="op">&lt;-</span> <span class="va">y1</span><span class="op">-</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y1</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">ts_permtest_block</span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">y1</span>, y2 <span class="op">=</span> <span class="va">y2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      time        Ori targetValue Nperms Ori.Diff Ori.Rank Ori.Rank.p alpha</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       1 -0.2563779           0     19   lesser       11       0.55  0.05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2       2 -0.2563779           0     19   lesser       11       0.55  0.05</span>
@@ -10139,7 +10158,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4998 FALSE -3.257635e-01 1.2909384 0.018254801</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4999 FALSE -3.496315e-01 1.0940317 0.015470398</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5000 FALSE -2.008464e-01 1.0912281 0.015430753</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -10154,8 +10173,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

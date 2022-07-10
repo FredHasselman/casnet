@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,31 +66,42 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ts_standardise</span><span class="op">(</span>
-  <span class="va">y</span>,
-  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,
-  keepNAvalues <span class="op">=</span> <span class="cn">TRUE</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-  adjustN <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_standardise</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  keepNAvalues <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  adjustN <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p>A time series or numeric vector</p></dd>
+
+
 <dt>na.rm</dt>
 <dd><p>Set the <code>na.rm</code> field</p></dd>
+
+
 <dt>keepNAvalues</dt>
 <dd><p>If <code>na.rm = TRUE</code> and <code>keepNAvalues = TRUE</code>, any <code>NA</code> values in <code>y</code> will be re-inserted after transformation.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>Center on the <code>"mean"</code> and divide by <code>sd</code> (default), or center on <code>"median"</code> and divide by <code>mad</code></p></dd>
+
+
 <dt>adjustN</dt>
 <dd><p>If <code>TRUE</code>, apply Bessel's correction (divide by <code>N-1</code>) or return the unadjusted <code>SD</code> (divide by <code>N</code>) (default = <code>TRUE</code>)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A standardised vector</p>
+    
+
+<p>A standardised vector</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -133,8 +144,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

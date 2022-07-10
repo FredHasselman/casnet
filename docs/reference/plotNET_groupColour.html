@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -35,7 +35,7 @@
       <a href="../articles/CRQA.html">Recurrence Quantification Analysis</a>
     </li>
     <li>
-      <a href="../articles/DynamicComplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
+      <a href="../articles/dynamiccomplexity.html">Dynamic Complexity as an Early-Warning Indicator for Clinical Change</a>
     </li>
     <li>
       <a href="../articles/scalingphenomena.html">Quantifying Scaling Phenomena in Time Series</a>
@@ -66,43 +66,64 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotNET_groupColour</span><span class="op">(</span>
-  <span class="va">g</span>,
-  <span class="va">groups</span>,
-  colourV <span class="op">=</span> <span class="cn">TRUE</span>,
-  alphaV <span class="op">=</span> <span class="fl">1</span>,
-  colourE <span class="op">=</span> <span class="cn">FALSE</span>,
-  alphaE <span class="op">=</span> <span class="fl">0.8</span>,
-  groupColours <span class="op">=</span> <span class="cn">NULL</span>,
-  defaultEdgeColour <span class="op">=</span> <span class="st">"grey70"</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotNET_groupColour</span><span class="op">(</span></span>
+<span>  <span class="va">g</span>,</span>
+<span>  <span class="va">groups</span>,</span>
+<span>  colourV <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  alphaV <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  colourE <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  alphaE <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  groupColours <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  defaultEdgeColour <span class="op">=</span> <span class="st">"grey70"</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>g</dt>
 <dd><p>An igraph object</p></dd>
+
+
 <dt>groups</dt>
 <dd><p>A named numeric vector with <code>length(V(g))</code> integers representing each group, or, a named character vector describing each group. If <code>names(groups)==NULL</code> then the names of the vector will be set as <code>names(groups) == V(g)$name</code>. If <code>V(g)$name==NULL</code>, the names of the vector will be set by the Vertex index</p></dd>
+
+
 <dt>colourV</dt>
 <dd><p>Colour Vertices based on <code>groups</code> (default = <code>TRUE</code>)</p></dd>
+
+
 <dt>alphaV</dt>
 <dd><p>Set transparency for Vertices (default = <code>1</code>)</p></dd>
+
+
 <dt>colourE</dt>
 <dd><p>Colour Edges based on <code>groups</code>. Edges connecting to vertices of the same group will be coloured as the group (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>alphaE</dt>
 <dd><p>Set transparency for Edges. A single numeric, or a vector of length <code>ecount(g)</code> (default = <code>0.8</code>)</p></dd>
+
+
 <dt>groupColours</dt>
 <dd><p>A list of length <code>groups</code> with valid colour codes</p></dd>
+
+
 <dt>defaultEdgeColour</dt>
 <dd><p>Default edge colour</p></dd>
+
+
 <dt>doPlot</dt>
 <dd><p>Plot the igraph object</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An igraph object with vertices and/or edges coloured by groups listed in <code>groups</code></p>
+    
+
+<p>An igraph object with vertices and/or edges coloured by groups listed in <code>groups</code></p>
+
+
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -125,8 +146,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>
