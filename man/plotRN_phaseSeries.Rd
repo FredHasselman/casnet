@@ -33,3 +33,11 @@ phase density plot
 \description{
 Plot the sequence of phases as a time series.
 }
+\examples{
+
+RN <- rn(y1 = rnorm(100), weighted = TRUE)
+phase_out <- rn_phases(RN)
+plotRN_phaseDensity(phase_out)
+
+
+}

@@ -108,6 +108,18 @@
 <p>phase density plot</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">RN</span> <span class="op">&lt;-</span> <span class="fu"><a href="rn.html">rn</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Set `weightedBy` to 'si' due to the value of `weighted`</span>
+<span class="r-in"><span><span class="va">phase_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="rn_phases.html">rn_phases</a></span><span class="op">(</span><span class="va">RN</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plotRN_phaseDensity.html">plotRN_phaseDensity</a></span><span class="op">(</span><span class="va">phase_out</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in pivot_longer(., cols = starts_with("dim_"), names_to = "Dimension",     values_to = "Value"):</span> could not find function "pivot_longer"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

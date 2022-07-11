@@ -2008,8 +2008,11 @@ plotRN_phaseProfile <- function(phaseOutput,
 #'
 #' @examples
 #'
+#' RN <- rn(y1 = rnorm(100), weighted = TRUE)
+#' phase_out <- rn_phases(RN)
+#' plotRN_phaseDensity(phase_out)
 #'
-
+#'
 plotRN_phaseSeries <- function(phaseOutput,
                                showEpochLegend = TRUE,
                                epochColours = NULL,
