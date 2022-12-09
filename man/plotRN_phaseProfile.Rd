@@ -37,9 +37,9 @@ Plot a profile (values of the dimensions) for each phase.
 }
 \examples{
 
-RN <- rn(y1 = rnorm(100), weighted = TRUE)
-phase_out <- rn_phases(RN)
-plotRN_phaseProfile(phase_out)
+RN <- rn(y1 = data.frame(x = rnorm(100), y= rnorm(100)), weighted = TRUE)
+phase_out <- rn_phases(RN, returnCentroid = "mean.sd")
+plotRN_phaseProfile(phaseOutput = phase_out)
 
 
 }

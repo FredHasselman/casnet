@@ -887,7 +887,7 @@ rn_phases <- function(RN,
   }
 
 
-  if(plotCentroid&returnCentroid=="no"){
+  if(plotCentroid&(returnCentroid=="no")){
     message("Specify which centroid type to return in argument 'returnCentroid'")
     plotCentroid <- FALSE
   }

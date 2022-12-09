@@ -20,6 +20,7 @@ rp_measures(
   chromatic = NA,
   anisotropyHV = FALSE,
   asymmetryUL = FALSE,
+  returnUL = FALSE,
   recurrenceTimes = FALSE,
   matrices = FALSE,
   Nboot = NULL,
@@ -64,6 +65,8 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 \item{anisotropyHV}{Return anisotropy ratio measures based on Horizontal and Vertical lines. The ratios are calculated as \code{(horizontal - vertical) / (horizontal + vertical)}. So a value of 0 means no anisotropy, negative ratios indicate the measures based on vertical lines had  higher values, positive ratios indicate the measures based on horizontal lines had higher values  (default = \code{FALSE})}
 
 \item{asymmetryUL}{Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as \code{(upper - lower) / (upper + lower)}. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = \code{FALSE})}
+
+\item{returnUL}{Return the (C)RQA values for the upper and lower triangle on which asymmetry ratio calculations are based? (default = \code{FALSE})}
 
 \item{recurrenceTimes}{Return measures based on 'white lines', the recurrence times (default = \code{FALSE})}
 

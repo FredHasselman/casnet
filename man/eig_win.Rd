@@ -11,7 +11,7 @@ eig_win(
   useVarNames = TRUE,
   colOrder = TRUE,
   useTimeVector = NA,
-  timeStamp = "01-01-1999"
+  timeStamp = "31-01-1999"
 )
 }
 \arguments{

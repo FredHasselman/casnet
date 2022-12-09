@@ -6,7 +6,7 @@
 \usage{
 dc_win(
   df,
-  win = NROW(df),
+  win = 0,
   scale_min,
   scale_max,
   doPlot = FALSE,
@@ -16,7 +16,10 @@ dc_win(
   useVarNames = TRUE,
   colOrder = TRUE,
   useTimeVector = NA,
-  timeStamp = "01-01-1999"
+  timeStamp = "31-01-1999",
+  markID = NA,
+  NAdates = 1:(win - 1),
+  trimFirstWin = TRUE
 )
 }
 \arguments{
@@ -43,6 +46,14 @@ dc_win(
 \item{useTimeVector}{Parameter used for plotting. A vector of length \code{NROW(df)}, containing date/time information (default = \code{NA})}
 
 \item{timeStamp}{If \code{useTimeVector} is not \code{NA}, a character string that can be passed to \code{\link[lubridate:stamp]{lubridate::stamp()}} to format the the dates/times passed in \code{useTimeVector} (default = \code{"01-01-1999"})}
+
+\item{markID}{Numeric vector of integers in the range \verb{[length of window, length of timeseries]}. Vertical lines will be drawn at these indices (default = \code{NA})}
+
+\item{NAdates}{Should some dates be considered \code{NA}? Provide a numerical vector with indices, the default is to set \code{1:(win-1)} to NA.  (default = \code{1:(win-1)})}
+
+\item{trimFirstWin}{Display the first empty window (\code{1:win-1})? (default = \code{TRUE})}
+
+\item{plotMeanCD}{Plot the mean Dynamic Complexity at the top row of the resonance diagram? (default = \code{TRUE})}
 }
 \value{
 If \code{doPlot = TRUE}, a list object containing a data frame of Dynamic Complexity values and a \code{ggplot2} object of the dynamic complexity resonance diagram. If \code{doPlot = FALSE} the data frame with Dynamic Complexity series is returned.

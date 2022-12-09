@@ -96,6 +96,94 @@ growth_ac_cond <- function(Y0 = 0.01, r = 0.1, k = 2, cond = cbind.data.frame(Y 
   return(stats::ts(Y))
 }
 
+# \frac{dY_{i}}{dt} = r_iY_i\left(1-\frac{\sum_{j=1}^{N}\alpha_{ij}Y_j}{K_i}\right),\ \ \ i=1,\ldots,N}
+# $K_i$ is the carrying capacity set to a value of `1` for all $Y_i$, and $r_i$ a vector of growth rates and $\alpha_{ij}$ a matrix of coupling parameters:
+# $$Y_{i}(t=0) = \begin{bmatrix}8\\2\\2\\2\end{bmatrix}$$
+# $$K = \begin{bmatrix}10\\10\\10\\10\end{bmatrix}$$
+# $$r = \begin{bmatrix}1\\0.72\\1.53\\1#' .27\end{bmatrix}$$
+# $$alpha = \begin{bmatrix} 1 &1.09 &1.52 &0\\  0 &1 &0.44 &1.36\\ 2.33 &0 &1 &0.47\\ 1.21 &0.51 &0.35 &1\end{bmatrix}$$
+
+
+# The N-dimensional LV model
+
+#' Lotka-Volterra model for N species
+#'
+#' The default simulates a system of `Ndim = 4` coupled competitive Lotka-Volterra equations studied by Vano et al. (2006) using RK4 numerical integration. Vano et al. describe the dynamics of the resulting attractor as chaotic (bounded, quasi-periodic, sensitive dependence on initial conditions), also see [this Wiki page](https://en.wikipedia.org/wiki/Competitive_Lotka%E2%80%93Volterra_equations#4-dimensional_example).
+#'
+#' @param Nsim How many data points to simulate (default = `1000`)
+#' @param Ndim How many dimensions (coupled L-V equations) to use (default = `4`)
+#' @param Y0 A vector with `Ndim` elements representing the initial value (default = `rep(.1, Ndim)`)
+#' @param r A vector with `Ndim` elements representing the growth rates for each dimension. The default settings are taken from  Vano et al. (2006)  (default = `c(1, 0.72, 1.53, 1.27)`)
+#' @param A The interaction matrix of `Ndim X Ndim` representing the nature of the coupling between each dimension. `A[1,2]` will appear as a parameter in the  equation for `Y1` setting the magnitude of the interaction with `Y2`. Conversely `A[2,1]` will appear in the equation for `Y2` setting the magnitude of the interaction with `Y1`. The diagonal elements have to be `1`. The default settings are taken from  Vano et al. (2006)
+#' @param K A vector with `Ndim` elements representing the carrying capacity  for each dimension. (default = `rep(1, Ndim)`)
+#' @param h The Euler parameter for RK4 integration.
+#' @param returnLongData Return the data in long format for easy plotting (default = `FALSE`)
+#'
+#' @return A matrix of `Ndim X Nsim` with simulated values.
+#' @export
+#'
+#' @references Vano, J. A., Wildenberg, J. C., Anderson, M. B., Noel, J. K., & Sprott, J. C. (2006). Chaos in low-dimensional Lotka–Volterra models of competition. *Nonlinearity, 19*(10), 2391.
+#'
+#' @examples
+#'
+#' library(plot3D)
+#'
+#' Y <- lv_Ndim()
+#' df <- as.data.frame(apply(t(Y), 2, ts_standardise))
+#' lines3D(df$Y1, df$Y2, df$Y3, colvar = df$Y4, clab = "Y4", xlab= "Y1", ylab = "Y2", zlab ="Y3", ticktype = "detailed")
+#'
+lv_Ndim <- function(Nsim = 1000,
+                    Ndim = 4,
+                    Y0 = rep(.1,Ndim),
+                    r  = c(1, 0.72, 1.53, 1.27),
+                    A = matrix(c(1,1.09,1.52,0,
+                                 0,1,0.44,1.36,
+                                 2.33,0,1,0.47,
+                                 1.21,0.51,0.35,1), nrow=4, byrow = TRUE),
+                    K = rep(1, Ndim),
+                    h = .5){
+
+  if(NROW(Y0)!=Ndim){
+    stop("Initial values vector needs exactly Ndim elements.")
+  }
+
+  if(NROW(r)!=Ndim){
+    stop("Growth rate vector needs exactly Ndim elements.")
+  }
+
+  if(NCOL(A)!=Ndim|NROW(A)!=Ndim){
+    stop("Interacion matrix has to have dimensions Ndim X Ndim.")
+  }
+
+  if(NROW(K)!=Ndim){
+    stop("Carrying capacity vector needs exactly Ndim elements.")
+  }
+
+  if(h > 1){
+    warning("Euler value larger than 1!")
+  }
+
+  Y <- matrix(laply(1:Ndim, function(i){matrix(c(Y0[i],rep(NA,Nsim-1)), nrow = 1)}),
+              nrow=Ndim,  dimnames = list(paste0("Y",1:Ndim), paste0("t",1:Nsim)))
+
+  # Runge-Kuta 4 implemented in a for loop for clarity of presentation
+  for(t in 1:(Nsim-1)){
+    for(i in seq_along(r)){
+      RK1 <- (r[i]*Y[i,t]*(1-((A[i,1]*Y[1,t]+A[i,2]*Y[2,t]+A[i,3]*Y[3,t]+A[i,4]*Y[4,t])/K[i])))
+
+      RK2 <- ((r[i]*Y[i,t]+h*RK1/2)*(1-((A[i,1]*Y[1,t]+RK1/2*h+A[i,2]*Y[2,t]+RK1/2*h+A[i,3]*Y[3,t]+RK1/2*h+A[i,4]*Y[4,t]+RK1/2*h)/K[i])))
+
+      RK3 <- ((r[i]*Y[i,t]+h*RK2/2)*(1-((A[i,1]*Y[1,t]+RK2/2*h+A[i,2]*Y[2,t]+RK2/2*h+A[i,3]*Y[3,t]+RK2/2*h+A[i,4]*Y[4,t]+RK2/2*h)/K[i])))
+
+      RK4 <- ((r[i]*Y[i,t]+h*RK3)*(1-((A[i,1]*Y[1,t]+h*RK3+A[i,2]*Y[2,t]+h*RK3+A[i,3]*Y[3,t]+h*RK3+A[i,4]*Y[4,t]+h*RK3)/K[i])))
+
+      Y[i,t+1] <- Y[i,t] + (1/6) * h * (RK1 + 2*RK2 + 2*RK3 + RK4)
+    }
+  }
+
+  return(Y)
+}
+
 
 # Generate noise ----
 

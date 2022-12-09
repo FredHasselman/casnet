@@ -10,13 +10,17 @@ plotDC_res(
   useVarNames = TRUE,
   colOrder = TRUE,
   useTimeVector = NA,
-  timeStamp = "01-01-1999",
+  timeStamp = "31-01-1999",
+  markID = NA,
   doPlot = TRUE,
+  PlotMeanDC = TRUE,
   title = "Complexity Resonance Diagram",
   resVariable = "Dynamic Complexity",
   subtitle = "",
   xlabel = "Time",
-  ylabel = ""
+  ylabel = "",
+  NAdates = 1:win,
+  trimFirstWin = TRUE
 )
 }
 \arguments{
@@ -32,6 +36,8 @@ plotDC_res(
 
 \item{timeStamp}{If \code{useTimeVector} is not \code{NA}, a character string that can be passed to \code{\link[lubridate:stamp]{lubridate::stamp()}} to format the the dates/times passed in \code{useTimeVector} (default = \code{"01-01-1999"})}
 
+\item{markID}{Numeric vector of integers in the range \verb{[length of window, length of timeseries]}. Vertical lines will be drawn at these indices (default = \code{NA})}
+
 \item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
 
 \item{title}{A title for the plot.}
@@ -43,6 +49,10 @@ plotDC_res(
 \item{xlabel}{A label for the x-axis.}
 
 \item{ylabel}{A label for the y-axis.}
+
+\item{NAdates}{Should some dates be considered \code{NA}? Provide a numerical vector with indices, the default is to set \code{1:(win-1)} to NA.  (default = \code{1:(win-1)})}
+
+\item{trimFirstWin}{Display the first empty window (\code{1:win-1})? (default = \code{TRUE})}
 }
 \value{
 An invisible ggplot2 object.

@@ -125,14 +125,14 @@ plot(dc.ruminate$df, type='l')
 abline(v=93) 
 ```
 
-And for multiple variables, in which case we can produce a nice looking complexity resonance diagram":
+And for multiple variables, in which case we can produce a nice looking complexity resonance diagram:
 ```{r}
-dc.case <- dc_win(df, win=12, scale_min=0, scale_max=100, doPlot = TRUE)
+dc.case <- dc_win(df, win=12, scale_min=0, scale_max=100, useTimeVector = as.Date(dateTimesS),  timeStamp = "1999-01-31", doPlot = TRUE)
 ```
 
-By setting `colOrder = NA`, we can order the output columns based on mean dynamic complexity, resulting in a more comprehensive diagram:
+If you do not have any date/time information, the x-axis will display integers. By setting `colOrder = NA`, we can order the output columns based on mean dynamic complexity, resulting in a more comprehensive diagram:
 ```{r}
-dc.case <- dc_win(df, win=12, scale_min=0, scale_max=100, doPlot = TRUE, colOrder = NA)
+dc.case <- dc_win(df, win=12, scale_min=0, scale_max=100, useTimeVector = as.Date(dateTimesS),  timeStamp = "1999-01-31", doPlot = TRUE, colOrder = NA)
 ```
 
 One may aggregate the dynamic complexity values of multiple items, for example by averaging (other options would be clustering, either data-driven or theory-driven).
@@ -142,13 +142,16 @@ plot(mean_DC, type='line')
 abline(v=93)
 ```
 
+Check the help pages for many more options for plotting, for example, marking specific time points with argument `markID`, setting certain time periods to `NA` with `NAdates` or displaying the first window on the x-axis by setting `trimFirstWin = FALSE`.
+
+
 ### Using `dc_ccp()`
 
 One approach to identify critical fluctuations is to identify peaks in dynamic complexity using a statistical test, decision rule or control chart. 
 The function `dc_ccp()` identifies 'cumulative complexity peaks', i.e. timepoints where a significant number of items showed significant peaks in dynamic complexity. Significance is here determined using one-tailed Z-tests. First, a Z-test is used to identify peaks in each time series, which are visualized as grey squares in the diagram below. Then, another Z-test is used to identify a significant number of peaks on a particular day, which is visualized as black squares in the upper row of the diagram. The method is introduced in Schiepek (2003). It should be noted that this is just one approach to peak detection and other techniques should be considered as well when using this in research or practice. An important limitation for interpretation of cumulative complexity peaks is that peaks are identified based on all observations that are used as an input. Results can thus differ when more or less observations are used as input.
 ```{r}
 ccp.case <- dc_ccp(df_win = dc.case)
-plotDC_ccp(df_ccp = ccp.case, win = 12, colOrder = NA, title = "Cumulative Complexity Peak Plot")
+plotDC_ccp(df_ccp = ccp.case, win = 12, useTimeVector = as.Date(dateTimesS),  timeStamp = "1999-01-31", colOrder = NA, title = "Cumulative Complexity Peak Plot")
 ```
 
 
@@ -171,7 +174,7 @@ abline(v=93)
 
 ...and for the full dataset:
 ```{r}
-var.case <- var_win(df, win=12, doPlot = TRUE, colOrder = NA)
+var.case <- var_win(df, win=12, useTimeVector = as.Date(dateTimesS),  timeStamp = "1999-01-31", doPlot = TRUE, colOrder = NA)
 ```
 
 One may aggregate the variance time series:
@@ -195,7 +198,7 @@ abline(v=93)
 
 ...and for the full dataset:
 ```{r}
-ac.case <- ac_win(df, win=28, doPlot = TRUE, colOrder = NA)
+ac.case <- ac_win(df, win=28, useTimeVector = as.Date(dateTimesS),  timeStamp = "1999-01-31", doPlot = TRUE, colOrder = NA)
 ```
 
 One may aggregate the autocorrelation time series:

@@ -35,6 +35,6 @@ Create a ridge plot (requires package \link{ggridges})
 
 RN <- rn(cumsum(rnorm(100)), emDim = 1, emLag = 1, emRad = NA, weighted = TRUE)
 outPhases <- rn_phases(RN)
-
+plotRN_phaseDensity(outPhases)
 
 }

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.7</span>
       </span>
     </div>
 
@@ -74,10 +74,14 @@
 <span>  useTimeVector <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  timeStamp <span class="op">=</span> <span class="st">"31-01-1999"</span>,</span>
 <span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  markID <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  NAdates <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">win</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Critical Instability Plot"</span>,</span>
+<span>  resVariable <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  xlabel <span class="op">=</span> <span class="st">"Time"</span>,</span>
-<span>  ylabel <span class="op">=</span> <span class="st">""</span></span>
+<span>  ylabel <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  trimFirstWin <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -111,8 +115,20 @@
 <dd><p>If <code>TRUE</code> shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code> object. (default = <code>FALSE</code>)</p></dd>
 
 
+<dt>markID</dt>
+<dd><p>Numeric vector of integers in the range <code>[length of window, length of timeseries]</code>. Vertical lines will be drawn at these indices (default = <code>NA</code>)</p></dd>
+
+
+<dt>NAdates</dt>
+<dd><p>Should some dates be considered <code>NA</code>? Provide a numerical vector with indices, the default is to set <code>1:(win-1)</code> to NA.  (default = <code>1:(win-1)</code>)</p></dd>
+
+
 <dt>title</dt>
 <dd><p>A title for the plot.</p></dd>
+
+
+<dt>resVariable</dt>
+<dd><p>Variable displayed in the plot.</p></dd>
 
 
 <dt>subtitle</dt>
@@ -125,6 +141,10 @@
 
 <dt>ylabel</dt>
 <dd><p>A label for the y-axis.</p></dd>
+
+
+<dt>trimFirstWin</dt>
+<dd><p>Display the first empty window (<code>1:win-1</code>)? (default = <code>TRUE</code>)</p></dd>
 
 </dl></div>
     <div id="value">
@@ -156,7 +176,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

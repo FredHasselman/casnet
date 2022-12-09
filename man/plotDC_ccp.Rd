@@ -12,10 +12,14 @@ plotDC_ccp(
   useTimeVector = NA,
   timeStamp = "31-01-1999",
   doPlot = TRUE,
+  markID = NA,
+  NAdates = 1:(win - 1),
   title = "Critical Instability Plot",
+  resVariable = "",
   subtitle = "",
   xlabel = "Time",
-  ylabel = ""
+  ylabel = "",
+  trimFirstWin = TRUE
 )
 }
 \arguments{
@@ -33,13 +37,21 @@ plotDC_ccp(
 
 \item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
 
+\item{markID}{Numeric vector of integers in the range \verb{[length of window, length of timeseries]}. Vertical lines will be drawn at these indices (default = \code{NA})}
+
+\item{NAdates}{Should some dates be considered \code{NA}? Provide a numerical vector with indices, the default is to set \code{1:(win-1)} to NA.  (default = \code{1:(win-1)})}
+
 \item{title}{A title for the plot.}
+
+\item{resVariable}{Variable displayed in the plot.}
 
 \item{subtitle}{A subtitle for the plot.}
 
 \item{xlabel}{A label for the x-axis.}
 
 \item{ylabel}{A label for the y-axis.}
+
+\item{trimFirstWin}{Display the first empty window (\code{1:win-1})? (default = \code{TRUE})}
 }
 \value{
 An invisible ggplot2 object.

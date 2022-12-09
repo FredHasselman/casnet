@@ -619,4 +619,17 @@ aggregate_bins <- function(x, by, FUN, moving=FALSE, ...){
 }
 
 
+# getFundefaults <- function(FUN){
+#   arglist <- formals(FUN)
+#
+#   for(i in seq_along(arglist)){
+#     if(!is.symbol(arglist[[i]])){
+#     if(!is.na(arglist[[i]]%00%NA)){
+#       eval(parse(text = paste(names(arglist)[i],"<-",arglist[[i]])))
+#     }
+#     }
+#   }
+#
+# }
+
 

@@ -289,6 +289,9 @@
     <loc>/reference/logScale.html</loc>
   </url>
   <url>
+    <loc>/reference/lv_Ndim.html</loc>
+  </url>
+  <url>
     <loc>/reference/make_spiral_focus.html</loc>
   </url>
   <url>
@@ -368,6 +371,9 @@
   </url>
   <url>
     <loc>/reference/plotDC_crit.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plotDC_helper.html</loc>
   </url>
   <url>
     <loc>/reference/plotDC_lvl.html</loc>

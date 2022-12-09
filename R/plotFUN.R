@@ -1068,6 +1068,68 @@ plotRED_mif <- function(mif.OUT = NULL,
 }
 
 
+#' Create breaks for Resonance plots
+#'
+#' @param useTimeVector useTimeVector
+#' @param df_DC df_DC
+#'
+#' @return breaks
+#'
+#' @export
+#'
+#' @keywords internal
+#'
+plotDC_helper <- function(useTimeVector, timeStamp, win, df_DC, trimFirstWin = TRUE){
+  TimeIndex <- NA
+  if(!all(is.na(useTimeVector))){
+    TimeIndex <- NA
+    if(length(useTimeVector)==1){
+      if(is.character(useTimeVector)){
+        TimeIndex <- useTimeVector%ci%df_DC %00% NA
+      }
+      if(is.numeric(useTimeVector)&useTimeVector%[]%c(1:NCOL(df_DC))){
+        TimeIndex <- useTimeVector
+      }
+      if(!is.na(TimeIndex)){
+        labels <- lubridate::stamp(timeStamp)(df_DC[,TimeIndex])
+      }
+    } else {
+      if(length(as.character(useTimeVector))==NROW(df_DC)){
+        labels <- suppressMessages(lubridate::stamp(timeStamp)(as.character(useTimeVector)))
+      } else {
+        labels <- 1:NROW(df_DC)
+      }
+    }
+  } else {
+    labels <- paste(1:NROW(df_DC))
+  }
+
+  if(trimFirstWin){
+    start <- win
+  } else {
+    start <- 1
+  }
+
+  minorBreaks <- df_DC$time[seq(start, NROW(df_DC))]
+  labels <- labels[minorBreaks]
+  if(NROW(df_DC)>40){
+     step <- round(length(minorBreaks)/25)
+    if(step%%2>0){
+      step <- step - 1
+      }
+    labels <- labels[seq(1,length(minorBreaks), by = step)]
+    majorBreaks <- minorBreaks[c(seq(1,length(minorBreaks), by = step))]
+  } else {
+    majorBreaks <- NULL
+  }
+
+  return(list(minorBreaks = minorBreaks,
+              majorBreaks = majorBreaks,
+              labels = labels,
+              TimeIndex = TimeIndex)
+         )
+}
+
 
 #' Plot Complexity Resonance Diagram
 #'
@@ -1084,60 +1146,35 @@ plotRED_mif <- function(mif.OUT = NULL,
 #'
 #' @family Dynamic Complexity functions
 #'
-plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "01-01-1999", doPlot = TRUE, title = 'Complexity Resonance Diagram', resVariable = "Dynamic Complexity", subtitle = "", xlabel = "Time", ylabel = ""){
+plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", markID = NA, doPlot = TRUE, PlotMeanDC = TRUE, title = 'Complexity Resonance Diagram', resVariable = "Dynamic Complexity", subtitle = "", xlabel = "Time", ylabel = "", NAdates = 1:win, trimFirstWin = TRUE){
 
   if(!useVarNames){
     df_win <- data.matrix(df_win)
-    colnames(df_win) <- c(1:ncol(df_win))
+    colnames(df_win) <- c(1:NCOL(df_win))
   }
 
   if(win>=NROW(df_win)){
     stop("Only one value to display.")
   }
 
-  if(!all(is.na(useTimeVector))){
-    if(length(useTimeVector)==1){
-      if(useTimeVector%in%colnames(df_win)){
-        labels <- lubridate::stamp(timeStamp)(df_win[,useTimeVector%ci%df_win])
-      }
-    } else {
-      if(length(useTimeVector)==NROW(df_win)){
-        labels <- lubridate::stamp(timeStamp)(useTimeVector)
-      }
+  df_win$time <- 1:NROW(df_win)
+  if(win>NROW(df_win)){
+    warning("Window is larger than length of time series.")
+    win <- 1
+  }
+
+  breaks <- plotDC_helper(useTimeVector = useTimeVector, timeStamp = timeStamp, win = win, df_DC = df_win, trimFirstWin = trimFirstWin)
+  majorBreaks <- breaks$majorBreaks
+  minorBreaks <- breaks$minorBreaks
+  labels      <- breaks$labels
+
+  if(!all(is.na(markID))){
+    if(!is.numeric(markID)){
+      markID <- markID%ci%df_win %00% NA
     }
   } else {
-    labels <- paste(1:NROW(df_win))
+    markID <- NA
   }
-
-  df_win$time <- 1:NROW(df_win)
-  minorBreaks <- df_win$time[seq(win, NROW(df_win))]
-  if(NROW(df_win)>50){
-    labels <- labels[minorBreaks]
-    labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
-    majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
-  } else {
-    majorBreaks <- NULL
-  }
-
-  #
-  #   if(NROW(df_win)>50){
-  #     labels <- labels[minorBreaks]
-  #     #  by = round(length(breaks)/25))]
-  #     #labels[!labels%in%labels[seq(2,length(minorBreaks), by = round(length(minorBreaks)/25))]] <- ""
-  #     labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
-  #     majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
-  #   } else {
-  #     minorBreaks <- NULL
-  #     majorBreaks <- NULL
-  #   }
-
-  # breaks <- seq(win, NROW(df_win))
-  # if(NROW(df_win)>50){
-  #   labels <- paste(breaks)
-  #   labels[!labels%in%labels[seq(2,length(breaks), by = round(length(breaks)/25))]]<- ""
-  #   labels[1] <- ""
-  #   labels[2] <- paste(win+1)
-  # }
 
   if(is.na(colOrder)&subtitle==""){
     subtitle <- paste0('Variables ordered by mean ',resVariable)
@@ -1152,62 +1189,72 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
     colOrder <- TRUE
   }
 
- # df_win$time <- 1:NROW(df_win)
+  if(PlotMeanDC){
+    df_win$meanDC <- rowMeans(as.matrix(df_win[-c("time"%ci%df_win)]), na.rm = TRUE)
+    colnames(df_win)[colnames(df_win)%in%"meanDC"]<-"Mean DC"
+  }
+
+
+  if(!is.null(NAdates)){
+    if(is.numeric(NAdates)&length(NAdates)<=NROW(df_win)){
+      #NAinds <- NAvalue%ai%df_win
+      df_win[NAdates,] <- NA
+    }
+  }
+
   dfp <- tidyr::gather(df_win, key = "variable", value = "value", c(-.data$time), factor_key = colOrder)
   dfp$time <- as.numeric(dfp$time)
 
-
-  # if(subtitle=="Variables ordered by ..."){
-  #   subt <- paste0("Variables ordered by ",corder)
-  # }
-  #max(dfp$value, na.rm=TRUE)/2
   g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
-    ggplot2::geom_raster(interpolate = FALSE) +
-    ggplot2::scale_fill_gradient2(resVariable,low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
-    ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, size=.1) +
-    ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="steelblue", alpha=.9, size=.1) +
-    ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
+       ggplot2::geom_raster(interpolate = FALSE) +
+       ggplot2::scale_fill_gradient2(resVariable,low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
+       ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, size=.1) +
+       ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="steelblue", alpha=.9, size=.1) +
+       ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
 
-  #   if(is.null(majorBreaks)){
-  #   g <- g +
-  #       ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
-  #       ggplot2::scale_x_continuous(xlabel, expand = c(0,0), limits = c((win+1)-.5, NROW(dfp)+.5))
-  #
-  #   } else {
-  # g <- g +
-
+  if(trimFirstWin){
+    start <- win
+  } else {
+    start <- 1
+  }
 
   if(!is.null(majorBreaks)){
-   g <- g + ggplot2::scale_x_continuous(xlabel,
-                                breaks = majorBreaks,
-                                minor_breaks = minorBreaks-.5,
-                                labels = labels,
-                                expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5))
+    g <- g + ggplot2::scale_x_continuous(xlabel,
+                                         breaks = majorBreaks,
+                                         minor_breaks = minorBreaks,
+                                         labels = labels,
+                                         expand = c(0,0), limits = c((start-.5), max(majorBreaks)+.5))
+    if(!all(is.na(markID))){
+      markID <- markID[markID%in%unique(sort(c(minorBreaks,majorBreaks)))]
+      g <- g + geom_vline(xintercept = markID)
+    }
   } else {
-     g <- g + ggplot2::scale_x_continuous(xlabel, expand = c(0,0),
-                                          breaks = minorBreaks,
-                                          limits = c((win+1)-.5, max(minorBreaks)+.5))
-   }
+    g <- g + ggplot2::scale_x_continuous(xlabel, expand = c(0,0),
+                                         breaks = minorBreaks,
+                                         labels = labels,
+                                         limits = c((start-.5), max(minorBreaks)+.5))
+    if(!all(is.na(markID))){
+      markID <- markID[markID%in%unique(sort(c(minorBreaks)))]
+      g <- g + geom_vline(xintercept = markID)
+    }
+  }
 
-    # ggplot2::scale_x_continuous(xlabel, breaks = breaks, labels = labels, expand = c(0,0), limits = c((win+1)-.5, max(breaks)+.5)) +
-
-   g <- g + ggplot2::labs(title = title, subtitle = subtitle) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(#axis.text.x = element_text(vjust = 0, hjust = 1, angle = 90),
-      #axis.text.y = element_text(vjust = 1),
-      legend.position = "bottom",
-      legend.key.size = unit(.05,"npc"),
-      axis.text.x = element_text(size=8, angle = 90, vjust =0.5),
-      axis.text.y = element_text(size=8),
-      axis.line.x.top = element_line(),
-      axis.ticks.x.top = element_line(),
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor.x = element_line(),
-      panel.grid.minor.y = element_line(),
-      panel.grid.major.y = element_blank(),
-      plot.subtitle = element_text(size=10),
-      plot.title = element_text(face = "bold"),
-      legend.title = element_text(vjust=.75,size = 10))
+  g <- g + ggplot2::labs(title = title, subtitle = subtitle) +
+           ggplot2::theme_bw() +
+           ggplot2::theme(
+             legend.position = "bottom",
+             legend.key.size = unit(.05,"npc"),
+             axis.text.x = element_text(size=8, angle = 90, vjust =0.5),
+             axis.text.y = element_text(size=8),
+             axis.line.x.top = element_line(),
+             axis.ticks.x.top = element_line(),
+             panel.grid.major.x = element_blank(),
+             panel.grid.minor.x = element_line(),
+             panel.grid.minor.y = element_line(),
+             panel.grid.major.y = element_blank(),
+             plot.subtitle = element_text(size=10),
+             plot.title = element_text(face = "bold"),
+             legend.title = element_text(vjust=.75,size = 10))
 
 
   if(doPlot){
@@ -1229,11 +1276,49 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
 #'
 #' @family Dynamic Complexity functions
 #'
-plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", doPlot = TRUE, title = 'Critical Instability Plot', subtitle = "", xlabel = "Time", ylabel = ""){
+plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", doPlot = TRUE, markID = NA, NAdates = 1:(win-1), title = 'Critical Instability Plot', resVariable = "", subtitle = "", xlabel = "Time", ylabel = "", trimFirstWin = TRUE){
 
   if(!useVarNames){
     df_ccp <- data.matrix(df_ccp)
     colnames(df_ccp) <- c(1:ncol(df_ccp))
+  }
+
+  df_ccp$time <- 1:NROW(df_ccp)
+  if(win>NROW(df_ccp)){
+    warning("Window is larger than length of time series.")
+    win <- 1
+  }
+
+  breaks <- plotDC_helper(useTimeVector = useTimeVector, timeStamp = timeStamp, win = win, df_DC = df_ccp)
+  majorBreaks <- breaks$majorBreaks
+  minorBreaks <- breaks$minorBreaks
+  labels      <- breaks$labels
+
+  if(!all(is.na(markID))){
+    if(!is.numeric(markID)){
+      markID <- markID%ci%df_ccp %00% NA
+    }
+  } else {
+    markID <- NA
+  }
+
+
+
+  if(is.na(colOrder)){
+    df_ccp <- dplyr::select(df_ccp,names(sort(colMeans(df_ccp, na.rm = TRUE))))
+    colOrder <- TRUE
+  }
+
+  if(!colOrder){
+    df_ccp <- df_ccp[,sort(colnames(df_ccp))]
+  }
+
+  if(is.na(colOrder)&subtitle==""){
+    subtitle <- paste0('Variables ordered by mean ',resVariable)
+  } else {
+    subtitle <- ifelse(colOrder,
+                       'Variables ordered by position in data source',
+                       'Variables ordered by variable name')
   }
 
   lcol  <- df_ccp$sig.peaks
@@ -1244,59 +1329,56 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
     colOrder <- TRUE
   }
 
-  if(!all(is.na(useTimeVector))){
-    if(length(useTimeVector)==1){
-      if(useTimeVector%in%colnames(df_ccp)){
-        labels <- lubridate::stamp(timeStamp)(df_ccp[,useTimeVector%ci%df_ccp])
-      }
-    } else {
-      if(length(useTimeVector)==NROW(df_ccp)){
-        labels <- lubridate::stamp(timeStamp)(useTimeVector)
-      }
-    }
-  } else {
-    labels <- paste(1:NROW(df_ccp))
-  }
-
-  df_ccp$time <- 1:NROW(df_ccp)
-
-  minorBreaks <- df_ccp$time[seq(win, NROW(df_ccp))]
-  if(NROW(df_ccp)>50){
-    labels <- labels[minorBreaks]
-    labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
-    majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
-  } else {
-    majorBreaks <- NULL
-  }
-
-  if(!colOrder){
-    df_ccp <- df_ccp[,sort(colnames(df_ccp))]
-  }
-
   df_ccp$sig.peaks <- lcol
   colnames(df_ccp)[colnames(df_ccp)%in%"sig.peaks"]<-"Sig. CCP"
   dfp <- tidyr::gather(df_ccp, key = "variable", value = "value", -c(.data$time), factor_key = TRUE)
   dfp$value <- factor(dfp$value,levels = c(0,1,5,10),
                       labels = c("0","Sig. DC level","5","Sig. CCP"))
 
+  if(!all(is.na(markID))){
+    if(!is.numeric(markID)){
+      markID <- markID%ci%df_ccp %00% NA
+    }
+  } else {
+    markID <- NA
+  }
 
-  g <- ggplot2::ggplot(dfp[stats::complete.cases(dfp),], ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
+
+  g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
     ggplot2::geom_raster(interpolate = FALSE) +
     ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, size=.1) +
     ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="grey90", alpha=1, size=.1) +
     ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
+
+
+  if(trimFirstWin){
+    start <- win
+  } else {
+    start <- 1
+  }
+
     if(!is.null(majorBreaks)){
       g <- g + ggplot2::scale_x_continuous(xlabel,
                                            breaks = majorBreaks,
-                                           minor_breaks = minorBreaks-.5,
+                                           minor_breaks = minorBreaks,
                                            labels = labels,
-                                           expand = c(0,0), limits = c((win+1)-.5, max(majorBreaks)+.5))
+                                           expand = c(0,0), limits = c((start-.5), max(majorBreaks)+.5))
+      if(!all(is.na(markID))){
+        markID <- markID[markID%in%unique(sort(c(minorBreaks,majorBreaks)))]
+        g <- g + geom_vline(xintercept = markID)
+      }
+
     } else {
       g <- g + ggplot2::scale_x_continuous(xlabel, expand = c(0,0),
                                            breaks = minorBreaks,
-                                           limits = c((win+1)-.5, max(minorBreaks)+.5))
+                                           labels = labels,
+                                           limits = c((start-.5), max(minorBreaks)+.5))
+      if(!all(is.na(markID))){
+        markID <- markID[markID%in%unique(sort(c(minorBreaks)))]
+        g <- g + geom_vline(xintercept = markID)
+      }
     }
-   g <- g + ggplot2::scale_fill_manual("Critical Insability", breaks = c("Sig. DC level","Sig. CCP"), values = c("0"="white","Sig. DC level"="grey","5"="whitesmoke","Sig. CCP"="black")) +
+   g <- g + ggplot2::scale_fill_manual("Critical Insability", breaks = c("Sig. DC level","Sig. CCP"), values = c("0"="white","Sig. DC level"="grey","5"="whitesmoke","Sig. CCP"="black"), na.value = "white") +
     ggplot2::labs(title = title, subtitle = subtitle) +
     ggplot2::theme_bw() +
     ggplot2::theme(
@@ -1379,13 +1461,22 @@ plotDC_lvl <-  function(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE, co
   }
 
   if(!all(is.na(useTimeVector))){
+    TimeIndex <- NA
     if(length(useTimeVector)==1){
-      if(useTimeVector%in%colnames(df_ccp)){
-        labels <- lubridate::stamp(timeStamp)(df_ccp[,useTimeVector%ci%df_ccp])
+      if(is.character(useTimeVector)){
+        TimeIndex <- useTimeVector%ci%df_ccp %00% NA
+      }
+      if(is.numeric(useTimeVector)&useTimeVector%[]%c(1:NCOL(df_ccp))){
+        TimeIndex <- useTimeVector
+      }
+      if(!is.na(TimeIndex)){
+        labels <- lubridate::stamp(timeStamp)(df_ccp[,TimeIndex])
       }
     } else {
-      if(length(useTimeVector)==NROW(df_ccp)){
-        labels <- lubridate::stamp(timeStamp)(useTimeVector)
+      if(length(as.character(useTimeVector))==NROW(df_ccp)){
+        labels <- suppressMessages(lubridate::stamp(timeStamp)(as.character(useTimeVector)))
+      } else {
+        labels <- 1:NROW(df_win)
       }
     }
   } else {
@@ -1394,11 +1485,15 @@ plotDC_lvl <-  function(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE, co
 
   df_ccp$time <- 1:NROW(df_ccp)
 
+  if(win>NROW(df_ccp)){
+    warning("Window is larger than length of time series.")
+    win <- 1
+  }
   minorBreaks <- df_ccp$time[seq(win, NROW(df_ccp))]
+  labels <- labels[minorBreaks]
   if(NROW(df_ccp)>50){
-    labels <- labels[minorBreaks]
-    labels <- labels[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
-    majorBreaks <- minorBreaks[c(seq(2,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+    labels <- labels[c(seq(1,length(minorBreaks), by = round(length(minorBreaks)/25)))]
+    majorBreaks <- minorBreaks[c(seq(1,length(minorBreaks), by = round(length(minorBreaks)/25)))]
   }
 
   if(!colOrder){
@@ -1659,7 +1754,7 @@ plotMRN_win <- function(df_mrn,
 #'
 #' RN <- rn(cumsum(rnorm(100)), emDim = 1, emLag = 1, emRad = NA, weighted = TRUE)
 #' outPhases <- rn_phases(RN)
-#'
+#' plotRN_phaseDensity(outPhases)
 #'
 plotRN_phaseDensity <- function(phaseOutput,
                                 plotCentroid = NA,
@@ -1713,8 +1808,8 @@ plotRN_phaseDensity <- function(phaseOutput,
     dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
     dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
     dplyr::select(!(dplyr::contains(excludeVars))) %>%
-    select(phase_name, starts_with("dim_")) %>%
-    pivot_longer(cols = starts_with("dim_"), names_to = "Dimension", values_to = "Value")
+    dplyr::select(phase_name, dplyr::starts_with("dim_")) %>%
+    tidyr::pivot_longer(cols = dplyr::starts_with("dim_"), names_to = "Dimension", values_to = "Value")
 
   # maxPhases
   # unique(Phases_long$phase_name)
@@ -1772,9 +1867,9 @@ plotRN_phaseDensity <- function(phaseOutput,
 #'
 #' @examples
 #'
-#' RN <- rn(y1 = rnorm(100), weighted = TRUE)
-#' phase_out <- rn_phases(RN)
-#' plotRN_phaseProfile(phase_out)
+#' RN <- rn(y1 = data.frame(x = rnorm(100), y= rnorm(100)), weighted = TRUE)
+#' phase_out <- rn_phases(RN, returnCentroid = "mean.sd")
+#' plotRN_phaseProfile(phaseOutput = phase_out)
 #'
 #'
 plotRN_phaseProfile <- function(phaseOutput,
@@ -1798,7 +1893,6 @@ plotRN_phaseProfile <- function(phaseOutput,
     minStatesinPhase <- outArg$minStatesinPhase
     maxStatesinPhase <- outArg$maxStatesinPhase
     cleanUp <- outArg$cleanUp
-    returnCentroid <- outArg$returnCentroid
     removeSingularities <- outArg$removeSingularities
     standardise <- outArg$standardise
 
@@ -1821,15 +1915,18 @@ plotRN_phaseProfile <- function(phaseOutput,
   #   }
   # }
 
-  if(is.na(plotCentroid)){ #|(!returnCentroid%in%"no")){
+  plotCentroid <- FALSE
+
+  if(is.na(plotCentroid)&(!returnCentroid%in%"no")){
     plotCentroid <- TRUE
   }
 
   if(!is.data.frame(phaseOutput)){
     out <- phaseOutput$phaseSeries
-    if(plotCentroid){
+    if(!returnCentroid%in%"no"){
       if("phaseCentroids"%in%names(phaseOutput)){
         outMeans <- phaseOutput$phaseCentroids
+        plotCentroid <- TRUE
       }
     }
   } else {
@@ -1851,8 +1948,10 @@ plotRN_phaseProfile <- function(phaseOutput,
   }
 
   if(is.na(colOrder)&plotCentroid){
-    dim_order <-
-    out <- dplyr::select(out,names(sort(colMeans(out, na.rm = TRUE))))
+   # tmp <-  out %>% dplyr::group_by(phase_name) %>% dplyr::select(dplyr::starts_with("dim_"))
+   #  dplyr::select(out,names(sort(colMeans(tmp[,-1], na.rm = TRUE), decreasing = TRUE)))
+   #
+   #  out <- dplyr::select(out,names(sort(colMeans(out, na.rm = TRUE))))
   }
 
   Phases_long <- out %>% dplyr::ungroup() %>%

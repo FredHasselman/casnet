@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.7</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@
                         <h4 data-toc-skip class="author">Fred
 Hasselman</h4>
             
-            <h4 data-toc-skip class="date">2022-07-11</h4>
+            <h4 data-toc-skip class="date">2022-12-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/CRQA.Rmd" class="external-link"><code>vignettes/CRQA.Rmd</code></a></small>
       <div class="hidden name"><code>CRQA.Rmd</code></div>
@@ -111,10 +111,9 @@ recurrence-based time series analyses using R-package <em>casnet</em>.
 It is not the only <code>R</code> package that can run recurrence
 analyses, the closest alternative to <code>casnet</code> is probably
 package <a href="https://cran.r-project.org/web/packages/crqa/index.html" class="external-link"><code>crqa</code></a>.
-It has a great tutorial paper by <span class="citation">(<a href="#ref-coco2014" role="doc-biblioref">Coco &amp; Dale,
-2014</a>)</span>). Several other packages have dedicated functions,
-e.g. package <code>nonlinearTseries</code> has a function
-<code>RQA</code>. There are also many options outside of the
+It has a great tutorial paper by <span class="citation">[@coco2014]</span>). Several other packages have
+dedicated functions, e.g. package <code>nonlinearTseries</code> has a
+function <code>RQA</code>. There are also many options outside of the
 <code>R</code> framework, see the <a href="http://www.recurrence-plot.tk/programmes.php" class="external-link">Recurrence Plot
 webpage</a> for a comprehensive list of software.</p>
 <p>There are 2 main ways to run Recurrence Quantification Analyses in
@@ -138,10 +137,12 @@ will be a bit more formal with respect to defining the recurrence matrix
 and how to calculate the various RQA measures.</p>
 <p>Please see the chapters on RQA the Complex Systems Approach book for
 more details:</p>
-<p><a href="https://complexity-methods.github.io/book/auto-rqa-categorical-data.html" class="external-link">RQA
-on unordered categorical data</a></p>
-<p><a href="https://complexity-methods.github.io/book/auto-rqa-continuous-data.html" class="external-link">RQA
-on continuous data</a></p>
+<ul>
+<li><p><a href="https://complexity-methods.github.io/book/unordered-categorical-data.html" class="external-link">RQA
+on unordered categorical data</a></p></li>
+<li><p><a href="https://complexity-methods.github.io/book/lvSystem.html" class="external-link">RQA on
+continuous data</a></p></li>
+</ul>
 <div class="section level2">
 <h2 id="marwan">An R interface to Marwan’s commandline recurrence plots<a class="anchor" aria-label="anchor" href="#marwan"></a>
 </h2>
@@ -248,10 +249,10 @@ fields (<code>$</code>) of the imported object!</li>
 <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> to pass integer variables to Python.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Make sure you associate reticulate with your virtual environment.</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"r-reticulate"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu">use_virtualenv</span><span class="op">(</span><span class="st">"r-reticulate"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Import pyrqa into your R session</span></span>
-<span><span class="va">pyrqa</span> <span class="op">&lt;-</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"pyrqa"</span><span class="op">)</span></span>
+<span><span class="va">pyrqa</span> <span class="op">&lt;-</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu">import</span><span class="op">(</span><span class="st">"pyrqa"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Alternatively, you can import from a path in the virtual environment.</span></span>
 <span><span class="co"># On MacOS this will be a hidden folder in your home directory:</span></span>
@@ -329,15 +330,8 @@ RP produced by PyRQA
 </div>
 </div>
 <div class="section level3">
-<h3 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h3>
-<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
-<div id="ref-coco2014" class="csl-entry">
-Coco, M. I., &amp; Dale, R. (2014). Cross-recurrence quantification
-analysis of categorical and continuous time series: An r package.
-<em>Frontiers in Psychology</em>, <em>5</em>. <a href="https://doi.org/10.3389/fpsyg.2014.00510" class="external-link">https://doi.org/10.3389/fpsyg.2014.00510</a>
-</div>
-</div>
 </div>
 </div>
   </div>
@@ -359,7 +353,7 @@ analysis of categorical and continuous time series: An r package.
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

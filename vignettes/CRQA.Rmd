@@ -3,19 +3,13 @@ title: "Recurrence Quantification Analysis"
 author: "Fred Hasselman"
 date: "`r Sys.Date()`"
 output: 
-  bookdown::html_document2:
+  html_vignette:
     toc: true
-    toc_depth: 3
-    number_sections: true
-    fig_caption: true
-bibliography: [CMBSCN.bib]
-biblio-style: apalike
-csl: apa.csl
-link-citations: true
 vignette: >
-  %\VignetteIndexEntry{Recurrence Quantification Analysis}
   %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown} 
+  \usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{Recurrence Quantification Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
 ---
@@ -61,9 +55,9 @@ The first part of this vignette will demonstrate the basics of recurrence quanti
 
 Please see the chapters on RQA the Complex Systems Approach book for more details: 
 
-[RQA on unordered categorical data](https://complexity-methods.github.io/book/auto-rqa-categorical-data.html)
+* [RQA on unordered categorical data](https://complexity-methods.github.io/book/unordered-categorical-data.html)
 
-[RQA on continuous data](https://complexity-methods.github.io/book/auto-rqa-continuous-data.html)
+* [RQA on continuous data](https://complexity-methods.github.io/book/lvSystem.html)
 
 
 # An R interface to Marwan's commandline recurrence plots {#marwan}

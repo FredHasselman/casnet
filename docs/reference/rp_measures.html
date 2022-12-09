@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.7</span>
       </span>
     </div>
 
@@ -81,6 +81,7 @@
 <span>  chromatic <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  anisotropyHV <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  asymmetryUL <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnUL <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  recurrenceTimes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  matrices <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  Nboot <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -154,6 +155,10 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 <dd><p>Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as <code>(upper - lower) / (upper + lower)</code>. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = <code>FALSE</code>)</p></dd>
 
 
+<dt>returnUL</dt>
+<dd><p>Return the (C)RQA values for the upper and lower triangle on which asymmetry ratio calculations are based? (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>recurrenceTimes</dt>
 <dd><p>Return measures based on 'white lines', the recurrence times (default = <code>FALSE</code>)</p></dd>
 
@@ -207,7 +212,7 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

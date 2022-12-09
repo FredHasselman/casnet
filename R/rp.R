@@ -285,6 +285,7 @@ rp <- function(y1, y2 = NULL,
 #' @param chromatic Force chromatic RQA? If `NA` the value of the `RM` attribute `"chromatic"` will be used, if present (default = `NA`)
 #' @param anisotropyHV Return anisotropy ratio measures based on Horizontal and Vertical lines. The ratios are calculated as `(horizontal - vertical) / (horizontal + vertical)`. So a value of 0 means no anisotropy, negative ratios indicate the measures based on vertical lines had  higher values, positive ratios indicate the measures based on horizontal lines had higher values  (default = `FALSE`)
 #' @param asymmetryUL Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as `(upper - lower) / (upper + lower)`. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = `FALSE`)
+#' @param returnUL Return the (C)RQA values for the upper and lower triangle on which asymmetry ratio calculations are based? (default = `FALSE`)
 #' @param recurrenceTimes Return measures based on 'white lines', the recurrence times (default = `FALSE`)
 #' @param matrices Return matrices? (default = `FALSE`)
 #' @param Nboot How many bootstrap replications? (default = `NULL`)
@@ -292,7 +293,7 @@ rp <- function(y1, y2 = NULL,
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR", tol = .2)` if `is.na(emRad)==TRUE`, it will estimate a radius (default = `.05`).
 #' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a separate process/core for each window in windowed (C)RQA analysis and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
 #' @param silent Do not display any messages (default = `TRUE`)
-
+#'
 #' @return A list object containing (C)RQA measures (and matrices if requested)
 #'
 #' @export
@@ -314,6 +315,7 @@ rp_measures <- function(RM,
                         chromatic = NA,
                         anisotropyHV = FALSE,
                         asymmetryUL = FALSE,
+                        returnUL = FALSE,
                         recurrenceTimes = FALSE,
                         matrices  = FALSE,
                         Nboot     = NULL,
@@ -448,7 +450,7 @@ rp_measures <- function(RM,
         out <- plyr::ldply(chromaList, .id = "chroma")
       }
 
-    } else {
+    } else { #IF CHROMATIC
       if(!is.null(emRad)){
         RM <- mat_di2bi(RM,emRad)
       } else {
@@ -517,13 +519,13 @@ rp_measures <- function(RM,
     if(anisotropyHV){
 
       outTable$`Horizontal/Vertical line anisotropy` <-  data.frame(`Ratio` = "H/V line measures",
-                                                                    `N lines`  = tab$Nlines_ani,
-                                                                    `N points` = tab$N_hlp%00%NA/tab$N_vlp%00%NA,
+                                                                    `N lines`  = tab$ratios.hv.Nlines_ani,
+                                                                    `N points` = tab$ratios.hv.N_hlp%00%NA/tab$ratios.hv.N_vlp%00%NA,
                                                                     `Measure` = "LAM",
-                                                                    `Rate`    = tab$LAM_ani,
-                                                                    `Mean`    = tab$MEAN_hvl_ani,
-                                                                    `Max`     = tab$MAX_hvl_ani,
-                                                                    `ENT`     = tab$ENT_hvl_ani)
+                                                                    `Rate`    = tab$ratios.hv.LAM_ani,
+                                                                    `Mean`    = tab$ratios.hv.MEAN_ani,
+                                                                    `Max`     = tab$ratios.hv.MAX_ani,
+                                                                    `ENT`     = tab$ratios.hv.ENT_ani)
       if(chromatic){
       rownames(outTable$`Horizontal/Vertical line anisotropy`) <- chromaNames
       }
@@ -533,26 +535,24 @@ rp_measures <- function(RM,
 
       outTable$`Upper/Lower triangle asymmetry` <- list(
         `Global Measures` =  data.frame(`Global Ratio` = "U/L of points",
-                                        `N points` = tab$ratios.ul.Npoints_ul_ani,
-                                        RR = tab$ratios.ul.RR_ul_ani,
-                                        Singular = tab$ratios.ul.SING_N_ul_ani,
-                                        Divergence = tab$ratios.ul.DIV_ul_ani,
-                                        Repetetiveness = tab$ratios.ul.REP_ul_ani),
+                                        `N points` = tab$ratios.ul.Npoints_asym,
+                                        RR = tab$ratios.ul.RR_asym,
+                                        Singular = tab$ratios.ul.SING_N_asym,
+                                        Divergence = tab$ratios.ul.DIV_asym,
+                                        Repetetiveness = tab$ratios.ul.REP_asym),
         `Line-based Measures` = data.frame(
           `Line ratio` = rep(c("D lines", "V lines", "H lines"), each = Nrows),
-          `N lines`  = c(tab$ratios.ul.NDlines_ul_ani,
-                         tab$ratios.ul.NVlines_ul_ani,
-                         tab$ratios.ul.NHlines_ul_ani),
-          `N points` = c(tab$upper.tri.N_dlp/tab$lower.tri.N_dlp,
-                                  tab$upper.tri.N_vlp/tab$lower.tri.N_vlp,
-                                  tab$upper.tri.N_hlp/tab$lower.tri.N_hlp),
+          `N lines`  = c(tab$ratios.ul.NDlines_asym,
+                         tab$ratios.ul.NVlines_asym,
+                         tab$ratios.ul.NHlines_asym),
+          `N points` = c(tab$ratios.ul.NDpoints_asym,
+                         tab$ratios.ul.NVpoints_asym,
+                         tab$ratios.ul.NHpoints_asym),
           `Measure` = rep(c("DET","V LAM", "H LAM"), each = Nrows),
-          `Rate`    = c(tab$ratios.ul.DET_ul_ani, tab$ratios.ul.LAM_vl_ul_ani, tab$ratios.ul.LAM_hl_ul_ani),
-          `Mean`    = c(tab$ratios.ul.MEAN_dl_ul_ani, tab$ratios.ul.MEAN_vl_ul_ani, tab$ratios.ul.MEAN_hl_ul_ani),
-          `Max`     = c(tab$ratios.ul.MAX_dl_ul_ani, tab$ratios.ul.MAX_vl_ul_ani, tab$ratios.ul.MAX_hl_ul_ani),
-          `ENT`     = c(tab$ratios.ul.ENT_dl_ul_ani,
-                                   tab$ratios.ul.ENT_vl_ul_ani,
-                                   tab$ratios.ul.ENT_hl_ul_ani))
+          `Rate`    = c(tab$ratios.ul.DET_asym, tab$ratios.ul.LAM_vl_asym, tab$ratios.ul.LAM_hl_asym),
+          `Mean`    = c(tab$ratios.ul.MEAN_dl_asym, tab$ratios.ul.MEAN_vl_asym, tab$ratios.ul.MEAN_hl_asym),
+          `Max`     = c(tab$ratios.ul.MAX_dl_asym, tab$ratios.ul.MAX_vl_asym, tab$ratios.ul.MAX_hl_asym),
+          `ENT`     = c(tab$ratios.ul.ENT_dl_asym, tab$ratios.ul.ENT_vl_asym, tab$ratios.ul.ENT_hl_asym))
       )
 
       if(chromatic){
@@ -1032,6 +1032,17 @@ rp_diagProfile <- function(RM,
 
     breaks <- seq_along(as.numeric(levels(df$labels)))
     labels <- sort(unique(c(as.numeric(levels(df$labels))[breaks],0)))
+
+    if(length(breaks)>21){
+      ID <- round(seq(1,length(breaks),length.out = 21))
+      if(any(labels[ID]==0)){
+        labels <- labels[ID]
+        breaks <- ID
+      } else {
+        breaks <- sort(c(which(labels==0),ID))
+        labels <- labels[breaks]
+      }
+    }
 
     x1 <- round((which.min(as.numeric(paste(df$Diagonal))))+(length(diagWin)*.1))
     x2 <- round((which.max(as.numeric(paste(df$Diagonal))))-(length(diagWin)*.1))
@@ -3127,6 +3138,7 @@ rp_calc <- function(RM,
                     chromatic = FALSE,
                     anisotropyHV = FALSE,
                     asymmetryUL = FALSE,
+                    returnUL = FALSE,
                     recurrenceTimes = FALSE,
                     matrices  = FALSE){
 
@@ -3183,6 +3195,7 @@ rp_calc <- function(RM,
                                               VLmin = VLmin, VLmax = VLmax,
                                               HLmin = HLmin, HLmax = HLmax,
                                               theiler = theiler,
+                                              invert = recurrenceTimes,
                                               AUTO = AUTO,
                                               chromatic = chromatic,
                                               matrices = matrices)
@@ -3209,9 +3222,9 @@ rp_calc <- function(RM,
     out_hv_ani <- data.frame(
       Nlines_ani   = ((lineMeasures_global$N_hlp - lineMeasures_global$N_vlp)  / (lineMeasures_global$N_hlp  + lineMeasures_global$N_vlp))%00%NA,
       LAM_ani      = (lineMeasures_global$LAM_hl - lineMeasures_global$LAM_vl) / (lineMeasures_global$LAM_hl + lineMeasures_global$LAM_vl),
-      MEAN_hvl_ani = (lineMeasures_global$TT_hl  - lineMeasures_global$TT_vl)  / (lineMeasures_global$TT_hl  + lineMeasures_global$TT_vl),
-      MAX_hvl_ani  = (lineMeasures_global$MAX_hl - lineMeasures_global$MAX_vl) / (lineMeasures_global$MAX_hl + lineMeasures_global$MAX_vl),
-      ENT_hvl_ani  = (lineMeasures_global$ENT_hl - lineMeasures_global$ENT_vl) / (lineMeasures_global$ENT_hl + lineMeasures_global$ENT_vl)
+      MEAN_ani = (lineMeasures_global$TT_hl  - lineMeasures_global$TT_vl)  / (lineMeasures_global$TT_hl  + lineMeasures_global$TT_vl),
+      MAX_ani  = (lineMeasures_global$MAX_hl - lineMeasures_global$MAX_vl) / (lineMeasures_global$MAX_hl + lineMeasures_global$MAX_vl),
+      ENT_ani  = (lineMeasures_global$ENT_hl - lineMeasures_global$ENT_vl) / (lineMeasures_global$ENT_hl + lineMeasures_global$ENT_vl)
     )
   } else {
     out_hv_ani <- NA
@@ -3231,6 +3244,7 @@ rp_calc <- function(RM,
                                                VLmin = VLmin, VLmax = VLmax,
                                                HLmin = HLmin, HLmax = HLmax,
                                                theiler = theiler,
+                                               invert = recurrenceTimes,
                                                AUTO = AUTO,
                                                chromatic = chromatic,
                                                matrices = FALSE)
@@ -3266,6 +3280,7 @@ rp_calc <- function(RM,
                                                HLmin = HLmin, HLmax = HLmax,
                                                theiler = theiler,
                                                AUTO = AUTO,
+                                               invert = recurrenceTimes,
                                                chromatic = chromatic,
                                                matrices = FALSE)
 
@@ -3288,27 +3303,30 @@ rp_calc <- function(RM,
     rm(RMl,SING_l)
 
     # RATIOs
-    out_ul_ani <- data.frame(
-      Npoints_ul_ani = (lineMeasures_upper$RP_N   - lineMeasures_lower$RP_N)   / (lineMeasures_upper$RP_N   + lineMeasures_lower$RP_N),
-      NDlines_ul_ani = ((lineMeasures_upper$N_dlp - lineMeasures_lower$N_dlp)  / (lineMeasures_upper$N_dlp  + lineMeasures_lower$N_dlp))%00%NA,
-      NHlines_ul_ani = ((lineMeasures_upper$N_hlp - lineMeasures_lower$N_hlp)  / (lineMeasures_upper$N_hlp  + lineMeasures_lower$N_hlp))%00%NA,
-      NVlines_ul_ani = ((lineMeasures_upper$N_vlp - lineMeasures_lower$N_vlp)  / (lineMeasures_upper$N_vlp  + lineMeasures_lower$N_vlp))%00%NA,
-      RR_ul_ani      = ((lineMeasures_upper$RR    - lineMeasures_lower$RR)     / (lineMeasures_upper$RR     + lineMeasures_lower$RR))%00%NA,
-      SING_N_ul_ani  = (lineMeasures_upper$SING_N - lineMeasures_lower$SING_N) / (lineMeasures_upper$SING_N + lineMeasures_lower$SING_N),
-      DIV_ul_ani     = (lineMeasures_upper$DIV_dl - lineMeasures_lower$DIV_dl) / (lineMeasures_upper$DIV_dl + lineMeasures_lower$DIV_dl),
-      REP_ul_ani     = (lineMeasures_upper$REP_av - lineMeasures_lower$REP_av) / (lineMeasures_upper$REP_av + lineMeasures_lower$REP_av),
-      DET_ul_ani     = (lineMeasures_upper$DET    - lineMeasures_lower$DET)    / (lineMeasures_upper$DET    + lineMeasures_lower$DET),
-      LAM_hl_ul_ani  = (lineMeasures_upper$LAM_hl - lineMeasures_lower$LAM_hl) / (lineMeasures_upper$LAM_hl + lineMeasures_lower$LAM_hl),
-      LAM_vl_ul_ani  = (lineMeasures_upper$LAM_vl - lineMeasures_lower$LAM_vl) / (lineMeasures_upper$LAM_vl + lineMeasures_lower$LAM_vl),
-      MEAN_dl_ul_ani = (lineMeasures_upper$MEAN_dl- lineMeasures_lower$MEAN_dl)/ (lineMeasures_upper$MEAN_dl+ lineMeasures_lower$MEAN_dl),
-      MEAN_hl_ul_ani = (lineMeasures_upper$TT_hl  - lineMeasures_lower$TT_hl)  / (lineMeasures_upper$TT_hl  + lineMeasures_lower$TT_hl),
-      MEAN_vl_ul_ani = (lineMeasures_upper$TT_vl  - lineMeasures_lower$TT_vl)  / (lineMeasures_upper$TT_vl  + lineMeasures_lower$TT_vl),
-      MAX_dl_ul_ani  = (lineMeasures_upper$MAX_dl - lineMeasures_lower$MAX_dl) / (lineMeasures_upper$MAX_dl + lineMeasures_lower$MAX_dl),
-      MAX_hl_ul_ani  = (lineMeasures_upper$MAX_hl - lineMeasures_lower$MAX_hl) / (lineMeasures_upper$MAX_hl + lineMeasures_lower$MAX_hl),
-      MAX_vl_ul_ani  = (lineMeasures_upper$MAX_vl - lineMeasures_lower$MAX_vl) / (lineMeasures_upper$MAX_vl + lineMeasures_lower$MAX_vl),
-      ENT_dl_ul_ani  = (lineMeasures_upper$ENT_dl - lineMeasures_lower$ENT_dl) / (lineMeasures_upper$ENT_dl + lineMeasures_lower$ENT_dl),
-      ENT_hl_ul_ani  = (lineMeasures_upper$ENT_hl - lineMeasures_lower$ENT_hl) / (lineMeasures_upper$ENT_hl + lineMeasures_lower$ENT_hl),
-      ENT_vl_ul_ani  = (lineMeasures_upper$ENT_vl - lineMeasures_lower$ENT_vl) / (lineMeasures_upper$ENT_vl + lineMeasures_lower$ENT_vl)
+    out_ul_asym <- data.frame(
+      Npoints_asym = (lineMeasures_upper$RP_N   - lineMeasures_lower$RP_N)/ (lineMeasures_upper$RP_N  + lineMeasures_lower$RP_N),
+      NDlines_asym = ((lineMeasures_upper$N_dl - lineMeasures_lower$N_dl) / (lineMeasures_upper$N_dl  + lineMeasures_lower$N_dl))%00%NA,
+      NHlines_asym = ((lineMeasures_upper$N_hl - lineMeasures_lower$N_hl) / (lineMeasures_upper$N_hl  + lineMeasures_lower$N_hl))%00%NA,
+      NVlines_asym = ((lineMeasures_upper$N_vl - lineMeasures_lower$N_vl) / (lineMeasures_upper$N_vl  + lineMeasures_lower$N_vl))%00%NA,
+      NDpoints_asym = ((lineMeasures_upper$N_dlp - lineMeasures_lower$N_dlp)/ (lineMeasures_upper$N_dlp  + lineMeasures_lower$N_dlp))%00%NA,
+      NHpoints_asym = ((lineMeasures_upper$N_hlp - lineMeasures_lower$N_hlp)/ (lineMeasures_upper$N_hlp  + lineMeasures_lower$N_hlp))%00%NA,
+      NVpoints_asym = ((lineMeasures_upper$N_vlp - lineMeasures_lower$N_vlp)/ (lineMeasures_upper$N_vlp  + lineMeasures_lower$N_vlp))%00%NA,
+      RR_asym      = ((lineMeasures_upper$RR    - lineMeasures_lower$RR)    / (lineMeasures_upper$RR     + lineMeasures_lower$RR))%00%NA,
+      SING_N_asym  = (lineMeasures_upper$SING_N - lineMeasures_lower$SING_N)/ (lineMeasures_upper$SING_N + lineMeasures_lower$SING_N),
+      DIV_asym     = (lineMeasures_upper$DIV_dl - lineMeasures_lower$DIV_dl)/ (lineMeasures_upper$DIV_dl + lineMeasures_lower$DIV_dl),
+      REP_asym     = (lineMeasures_upper$REP_av - lineMeasures_lower$REP_av)/ (lineMeasures_upper$REP_av + lineMeasures_lower$REP_av),
+      DET_asym     = (lineMeasures_upper$DET    - lineMeasures_lower$DET)   / (lineMeasures_upper$DET    + lineMeasures_lower$DET),
+      LAM_hl_asym  = (lineMeasures_upper$LAM_hl - lineMeasures_lower$LAM_hl)/ (lineMeasures_upper$LAM_hl + lineMeasures_lower$LAM_hl),
+      LAM_vl_asym  = (lineMeasures_upper$LAM_vl - lineMeasures_lower$LAM_vl)/ (lineMeasures_upper$LAM_vl + lineMeasures_lower$LAM_vl),
+      MEAN_dl_asym = (lineMeasures_upper$MEAN_dl- lineMeasures_lower$MEAN_dl)/ (lineMeasures_upper$MEAN_dl+ lineMeasures_lower$MEAN_dl),
+      MEAN_hl_asym = (lineMeasures_upper$TT_hl  - lineMeasures_lower$TT_hl) / (lineMeasures_upper$TT_hl  + lineMeasures_lower$TT_hl),
+      MEAN_vl_asym = (lineMeasures_upper$TT_vl  - lineMeasures_lower$TT_vl) / (lineMeasures_upper$TT_vl  + lineMeasures_lower$TT_vl),
+      MAX_dl_asym  = (lineMeasures_upper$MAX_dl - lineMeasures_lower$MAX_dl)/ (lineMeasures_upper$MAX_dl + lineMeasures_lower$MAX_dl),
+      MAX_hl_asym  = (lineMeasures_upper$MAX_hl - lineMeasures_lower$MAX_hl)/ (lineMeasures_upper$MAX_hl + lineMeasures_lower$MAX_hl),
+      MAX_vl_asym  = (lineMeasures_upper$MAX_vl - lineMeasures_lower$MAX_vl)/ (lineMeasures_upper$MAX_vl + lineMeasures_lower$MAX_vl),
+      ENT_dl_asym  = (lineMeasures_upper$ENT_dl - lineMeasures_lower$ENT_dl)/ (lineMeasures_upper$ENT_dl + lineMeasures_lower$ENT_dl),
+      ENT_hl_asym  = (lineMeasures_upper$ENT_hl - lineMeasures_lower$ENT_hl)/ (lineMeasures_upper$ENT_hl + lineMeasures_lower$ENT_hl),
+      ENT_vl_asym  = (lineMeasures_upper$ENT_vl - lineMeasures_lower$ENT_vl)/ (lineMeasures_upper$ENT_vl + lineMeasures_lower$ENT_vl)
     )
 
 
@@ -3323,15 +3341,19 @@ rp_calc <- function(RM,
 
 
   if(asymmetryUL){
+    if(returnUL){
     out_UL <- data.frame(upper.tri = lineMeasures_upper,
                          lower.tri = lineMeasures_lower,
-                         ratios.ul = out_ul_ani)
+                         ratios.ul = out_ul_asym)
+    } else {
+    out_UL <- data.frame(ratios.ul = out_ul_asym)
+    }
   } else {
     out_UL <- NA
   }
 
   if(anisotropyHV){
-    out_HL <- rbind(ratios.hl = out_hv_ani)
+    out_HL <- data.frame(ratios.hv = out_hv_ani)
   } else {
     out_HL <- NA
   }

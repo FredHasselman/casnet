@@ -603,9 +603,9 @@ est_parameters <- function(y,
 
     opt <- switch(estimateDimensions,
                   preferNone = opt[!duplicated(opt),],
-                  preferSmallestDim = opt[min(opt$emDim, na.rm=TRUE),],
-                  preferSmallestNN = opt[min(opt$NN.pct, na.rm=TRUE),],
-                  preferSmallestLag = opt[min(opt$emLag, na.rm=TRUE),],
+                  preferSmallestDim = opt[which.min(opt$emDim),],
+                  preferSmallestNN = opt[which.min(opt$NN.pct),],
+                  preferSmallestLag = opt[which.min(opt$emLag),],
                   preferSmallestInLargestHood = opt[which(min(opt$emLag, na.rm=TRUE)&min(opt$emDim, na.rm=TRUE)&max(opt$Nradius, na.rm = TRUE)),]
     )
 
