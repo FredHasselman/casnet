@@ -346,7 +346,7 @@ rp_measures <- function(RM,
   }
 
   if(chromatic){
-    if(length(range(RM))<=2){
+    if(abs(diff(range(RM)))==1){
       message("There is only 1 ctategory, chromatic (C)RQA is not sensible. Setting chromatic to FALSE...")
       chromatic <- FALSE
     }
