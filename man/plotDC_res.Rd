@@ -12,6 +12,9 @@ plotDC_res(
   useTimeVector = NA,
   timeStamp = "31-01-1999",
   markID = NA,
+  markIDcolour = "grey",
+  markIDlabel = "Time points of interest marked grey",
+  markIDalpha = 0.5,
   doPlot = TRUE,
   PlotMeanDC = TRUE,
   title = "Complexity Resonance Diagram",
@@ -37,6 +40,12 @@ plotDC_res(
 \item{timeStamp}{If \code{useTimeVector} is not \code{NA}, a character string that can be passed to \code{\link[lubridate:stamp]{lubridate::stamp()}} to format the the dates/times passed in \code{useTimeVector} (default = \code{"01-01-1999"})}
 
 \item{markID}{Numeric vector of integers in the range \verb{[length of window, length of timeseries]}. Vertical lines will be drawn at these indices (default = \code{NA})}
+
+\item{markIDcolour}{Colour of time point markers (default = \code{"red"})}
+
+\item{markIDlabel}{Label added to subtitle explaining time point markers (default = \verb{Time points of interest marked red})}
+
+\item{markIDalpha}{Alpha of time point marker colour (default = \code{.5})}
 
 \item{doPlot}{If \code{TRUE} shows a Complexity Resonance Diagram of the Dynamic Complexity and returns an invisible \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object. (default = \code{FALSE})}
 

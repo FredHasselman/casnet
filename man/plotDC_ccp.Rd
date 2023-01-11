@@ -17,6 +17,9 @@ plotDC_ccp(
   title = "Critical Instability Plot",
   resVariable = "",
   subtitle = "",
+  markIDcolour = "red",
+  markIDlabel = "Time points of interest marked red",
+  markIDalpha = 0.5,
   xlabel = "Time",
   ylabel = "",
   trimFirstWin = TRUE
@@ -46,6 +49,12 @@ plotDC_ccp(
 \item{resVariable}{Variable displayed in the plot.}
 
 \item{subtitle}{A subtitle for the plot.}
+
+\item{markIDcolour}{Colour of time point markers (default = \code{"red"})}
+
+\item{markIDlabel}{Label added to subtitle explaining time point markers (default = \verb{Time points of interest marked red})}
+
+\item{markIDalpha}{Alpha of time point marker colour (default = \code{.5})}
 
 \item{xlabel}{A label for the x-axis.}
 

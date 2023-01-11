@@ -345,6 +345,13 @@ rp_measures <- function(RM,
     }
   }
 
+  if(chromatic){
+    if(length(range(RM))<=2){
+      message("There is only 1 ctategory, chromatic (C)RQA is not sensible. Setting chromatic to FALSE...")
+      chromatic <- FALSE
+    }
+  }
+
   if(is.na(emRad)){
     if(!is.null(attributes(RM)$emRad)){
       emRad <- attributes(RM)$emRad
@@ -442,6 +449,11 @@ rp_measures <- function(RM,
       }
 
       names(chromaList) <- names(chromaNumbers)
+
+      if(is.na(length(chromaList)%00%NA)){
+        stop("Chromalist is empty")
+      }
+
       if(matrices){
         names(matrixList) <- names(chromaNumbers)
         out <- list(crqaMeasures = plyr::ldply(chromaList, .id = "chroma"),
@@ -1964,6 +1976,10 @@ rp_lineDist <- function(RM,
 
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){stop("Matrix should be a binary (0,1) matrix!!")}
 
+  if(invert){
+    RM <- Matrix::Matrix(1-RM,sparse = TRUE)
+  }
+
   if(length(d)<=2){
     suppressMessages(RM <- setTheiler(RM, theiler))
   } else {
@@ -1972,15 +1988,10 @@ rp_lineDist <- function(RM,
     }
   }
 
-  if(invert){
-    RM <- Matrix::Matrix(1-RM,sparse = TRUE)
-  }
-
   if(!is.null(d)){
     if(length(d)==1){d <- seq(-d,d)}
     if(length(d)==2){d <- seq(min(d),max(d))}
   }
-
 
   B <- rp_nzdiags(RM)
   V <- Matrix::as.matrix(RM)[,colSums(Matrix::as.matrix(RM))>0]
@@ -2000,6 +2011,17 @@ rp_lineDist <- function(RM,
   if(NCOL(H)==0|is.null(dim(H))){
     H <- matrix(0)
   }
+
+  # TEST
+  # if(invert){
+  #   IDremove <- which(B[1,]==1)
+  #   for(i in IDremove){
+  #     l1 <- which(diff(c(B[1,IDremove[i]],B[,IDremove[i]]))!=0)
+  #     if(l1 > DLmin){
+  #       B[1:l1,IDremove[i]] <- 0
+  #     }
+  #   }
+  # }
 
   # Get diagonal lines & pad with zeros
   diagonals   <- rbind.data.frame(rep(0,dim(B)[2]),

@@ -18,6 +18,9 @@ dc_win(
   useTimeVector = NA,
   timeStamp = "31-01-1999",
   markID = NA,
+  markIDcolour = "grey",
+  markIDlabel = "Time points of interest marked grey",
+  markIDalpha = 0.5,
   NAdates = 1:(win - 1),
   trimFirstWin = TRUE
 )
@@ -48,6 +51,12 @@ dc_win(
 \item{timeStamp}{If \code{useTimeVector} is not \code{NA}, a character string that can be passed to \code{\link[lubridate:stamp]{lubridate::stamp()}} to format the the dates/times passed in \code{useTimeVector} (default = \code{"01-01-1999"})}
 
 \item{markID}{Numeric vector of integers in the range \verb{[length of window, length of timeseries]}. Vertical lines will be drawn at these indices (default = \code{NA})}
+
+\item{markIDcolour}{Colour of time point markers (default = \code{"red"})}
+
+\item{markIDlabel}{Label added to subtitle explaining time point markers (default = \verb{Time points of interest marked red})}
+
+\item{markIDalpha}{Alpha of time point marker colour (default = \code{.5})}
 
 \item{NAdates}{Should some dates be considered \code{NA}? Provide a numerical vector with indices, the default is to set \code{1:(win-1)} to NA.  (default = \code{1:(win-1)})}
 

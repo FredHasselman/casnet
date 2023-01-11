@@ -1146,7 +1146,7 @@ plotDC_helper <- function(useTimeVector, timeStamp, win, df_DC, trimFirstWin = T
 #'
 #' @family Dynamic Complexity functions
 #'
-plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", markID = NA, doPlot = TRUE, PlotMeanDC = TRUE, title = 'Complexity Resonance Diagram', resVariable = "Dynamic Complexity", subtitle = "", xlabel = "Time", ylabel = "", NAdates = 1:win, trimFirstWin = TRUE){
+plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", markID = NA, markIDcolour = "grey", markIDlabel = "Time points of interest marked grey", markIDalpha = .5, doPlot = TRUE, PlotMeanDC = TRUE, title = 'Complexity Resonance Diagram', resVariable = "Dynamic Complexity", subtitle = "", xlabel = "Time", ylabel = "", NAdates = 1:win, trimFirstWin = TRUE){
 
   if(!useVarNames){
     df_win <- data.matrix(df_win)
@@ -1168,12 +1168,10 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   minorBreaks <- breaks$minorBreaks
   labels      <- breaks$labels
 
-  if(!all(is.na(markID))){
-    if(!is.numeric(markID)){
-      markID <- markID%ci%df_win %00% NA
-    }
-  } else {
-    markID <- NA
+
+  if(is.na(colOrder)){
+    df_win <- dplyr::select(df_win,names(sort(colMeans(df_win, na.rm = TRUE))))
+    colOrder <- TRUE
   }
 
   if(is.na(colOrder)&subtitle==""){
@@ -1184,10 +1182,17 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
                        'Variables ordered by variable name')
   }
 
-  if(is.na(colOrder)){
-    df_win <- dplyr::select(df_win,names(sort(colMeans(df_win, na.rm = TRUE))))
-    colOrder <- TRUE
+  if(!all(is.na(markID))){
+    subtitle <- paste(subtitle, markIDlabel)
+    if(!is.numeric(markID)){
+      markID   <- markID%ci%df_win %00% NA
+    }
+  } else {
+    markID <- NA
   }
+
+
+
 
   if(PlotMeanDC){
     df_win$meanDC <- rowMeans(as.matrix(df_win[-c("time"%ci%df_win)]), na.rm = TRUE)
@@ -1226,7 +1231,7 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
                                          expand = c(0,0), limits = c((start-.5), max(majorBreaks)+.5))
     if(!all(is.na(markID))){
       markID <- markID[markID%in%unique(sort(c(minorBreaks,majorBreaks)))]
-      g <- g + geom_vline(xintercept = markID)
+      g <- g + geom_vline(xintercept = markID, colour =  add_alpha(markIDcolour,markIDalpha))
     }
   } else {
     g <- g + ggplot2::scale_x_continuous(xlabel, expand = c(0,0),
@@ -1235,7 +1240,7 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
                                          limits = c((start-.5), max(minorBreaks)+.5))
     if(!all(is.na(markID))){
       markID <- markID[markID%in%unique(sort(c(minorBreaks)))]
-      g <- g + geom_vline(xintercept = markID)
+      g <- g + geom_vline(xintercept = markID, colour =  add_alpha(markIDcolour,markIDalpha))
     }
   }
 
@@ -1276,7 +1281,7 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
 #'
 #' @family Dynamic Complexity functions
 #'
-plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", doPlot = TRUE, markID = NA, NAdates = 1:(win-1), title = 'Critical Instability Plot', resVariable = "", subtitle = "", xlabel = "Time", ylabel = "", trimFirstWin = TRUE){
+plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTimeVector = NA, timeStamp = "31-01-1999", doPlot = TRUE, markID = NA, NAdates = 1:(win-1), title = 'Critical Instability Plot', resVariable = "", subtitle = "", markIDcolour = "red", markIDlabel = "Time points of interest marked red", markIDalpha = .5, xlabel = "Time", ylabel = "", trimFirstWin = TRUE){
 
   if(!useVarNames){
     df_ccp <- data.matrix(df_ccp)
@@ -1293,15 +1298,6 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
   majorBreaks <- breaks$majorBreaks
   minorBreaks <- breaks$minorBreaks
   labels      <- breaks$labels
-
-  if(!all(is.na(markID))){
-    if(!is.numeric(markID)){
-      markID <- markID%ci%df_ccp %00% NA
-    }
-  } else {
-    markID <- NA
-  }
-
 
 
   if(is.na(colOrder)){
@@ -1321,6 +1317,19 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
                        'Variables ordered by variable name')
   }
 
+
+
+  if(!all(is.na(markID))){
+    subtitle <- paste(subtitle, markIDlabel)
+    if(!is.numeric(markID)){
+      markID <- markID%ci%df_ccp %00% NA
+    }
+  } else {
+    markID <- NA
+  }
+
+
+
   lcol  <- df_ccp$sig.peaks
   lcol[lcol==0] <- 5
   df_ccp <- df_ccp[,-c("sig.peaks"%ci%df_ccp)]
@@ -1338,6 +1347,7 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
   if(!all(is.na(markID))){
     if(!is.numeric(markID)){
       markID <- markID%ci%df_ccp %00% NA
+      subtitle <- paste(subtitle,markIDlabel)
     }
   } else {
     markID <- NA
@@ -1365,7 +1375,7 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
                                            expand = c(0,0), limits = c((start-.5), max(majorBreaks)+.5))
       if(!all(is.na(markID))){
         markID <- markID[markID%in%unique(sort(c(minorBreaks,majorBreaks)))]
-        g <- g + geom_vline(xintercept = markID)
+        g <- g + geom_vline(xintercept = markID, colour =  add_alpha(markIDcolour,markIDalpha))
       }
 
     } else {
@@ -1375,7 +1385,7 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
                                            limits = c((start-.5), max(minorBreaks)+.5))
       if(!all(is.na(markID))){
         markID <- markID[markID%in%unique(sort(c(minorBreaks)))]
-        g <- g + geom_vline(xintercept = markID)
+        g <- g + geom_vline(xintercept = markID,  colour =  add_alpha(markIDcolour,markIDalpha))
       }
     }
    g <- g + ggplot2::scale_fill_manual("Critical Insability", breaks = c("Sig. DC level","Sig. CCP"), values = c("0"="white","Sig. DC level"="grey","5"="whitesmoke","Sig. CCP"="black"), na.value = "white") +

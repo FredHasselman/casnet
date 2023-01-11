@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.8</span>
       </span>
     </div>
 
@@ -76,6 +76,9 @@
 <span>  useTimeVector <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  timeStamp <span class="op">=</span> <span class="st">"31-01-1999"</span>,</span>
 <span>  markID <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  markIDcolour <span class="op">=</span> <span class="st">"grey"</span>,</span>
+<span>  markIDlabel <span class="op">=</span> <span class="st">"Time points of interest marked grey"</span>,</span>
+<span>  markIDalpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  NAdates <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">win</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  trimFirstWin <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -117,6 +120,18 @@
 
 <dt>markID</dt>
 <dd><p>Numeric vector of integers in the range <code>[length of window, length of timeseries]</code>. Vertical lines will be drawn at these indices (default = <code>NA</code>)</p></dd>
+
+
+<dt>markIDcolour</dt>
+<dd><p>Colour of time point markers (default = <code>"red"</code>)</p></dd>
+
+
+<dt>markIDlabel</dt>
+<dd><p>Label added to subtitle explaining time point markers (default = <code>Time points of interest marked red</code>)</p></dd>
+
+
+<dt>markIDalpha</dt>
+<dd><p>Alpha of time point marker colour (default = <code>.5</code>)</p></dd>
 
 
 <dt>NAdates</dt>
@@ -167,7 +182,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
