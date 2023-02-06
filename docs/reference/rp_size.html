@@ -66,7 +66,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rp_size</span><span class="op">(</span><span class="va">RM</span>, AUTO <span class="op">=</span> <span class="cn">NULL</span>, theiler <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rp_size</span><span class="op">(</span>RM <span class="op">=</span> <span class="cn">NULL</span>, dims <span class="op">=</span> <span class="cn">NULL</span>, AUTO <span class="op">=</span> <span class="cn">NULL</span>, theiler <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -75,8 +75,12 @@
 <dd><p>A Matrix object</p></dd>
 
 
+<dt>dims</dt>
+<dd><p>Two element vector representing the dimensions of Matrix <code>RM</code>. If <code>dims</code> is provided, the Matrix does not have to be passed as an argument (default = <code>NA</code>)</p></dd>
+
+
 <dt>AUTO</dt>
-<dd><p>Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass <code>FALSE</code> to prevent this behaviour. If <code>NULL</code> (default) <code>AUTO</code> will take on the value of <code>isSymmetric(mat)</code>.</p></dd>
+<dd><p>Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass <code>FALSE</code> to prevent this behaviour. If <code>NULL</code> (default) <code>AUTO</code> will take on the value of <code>isSymmetric(RM)</code>.</p></dd>
 
 
 <dt>theiler</dt>
@@ -113,34 +117,51 @@
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org/" class="external-link">Matrix</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>,<span class="fl">10</span>,<span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span><span class="va">m</span>,<span class="cn">TRUE</span>,<span class="fl">0</span><span class="op">)</span>   <span class="co"># Subtract diagonal</span></span></span>
+<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span>RM <span class="op">=</span> <span class="va">m</span>, AUTO <span class="op">=</span> <span class="cn">TRUE</span>, theiler <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>  <span class="co"># Subtract diagonal</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_total</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_theiler</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span><span class="va">m</span>,<span class="cn">FALSE</span>,<span class="fl">0</span><span class="op">)</span>  <span class="co"># Do not subtract diagonal</span></span></span>
+<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span>RM <span class="op">=</span> <span class="va">m</span>, AUTO <span class="op">=</span> <span class="cn">FALSE</span>,theiler <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>  <span class="co"># Do not subtract diagonal</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_total</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_theiler</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span><span class="va">m</span>,<span class="cn">NULL</span>,<span class="fl">0</span><span class="op">)</span>   <span class="co"># Matrix is symmetrical, AUTO is set to TRUE</span></span></span>
+<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span>RM <span class="op">=</span> <span class="va">m</span>, AUTO <span class="op">=</span> <span class="cn">NULL</span>, theiler <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>  <span class="co"># Matrix is symmetrical, AUTO is set to TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_total</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_theiler</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span><span class="va">m</span>,<span class="cn">NULL</span>,<span class="fl">1</span><span class="op">)</span>   <span class="co"># Subtract a Theiler window of 1 around and including the diagonal</span></span></span>
+<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span>RM <span class="op">=</span> <span class="va">m</span>, AUTO <span class="op">=</span> <span class="cn">NULL</span>, theiler <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>  <span class="co"># Subtract a Theiler window of 1 around and including the diagonal</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_total</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_theiler</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 90</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Calculate without a matrix</span></span></span>
+<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span>dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">10</span><span class="op">)</span>, AUTO <span class="op">=</span> <span class="cn">TRUE</span>, <span class="cn">TRUE</span>,<span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_theiler</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu">rp_size</span><span class="op">(</span>dims <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">10</span><span class="op">)</span>, AUTO <span class="op">=</span> <span class="cn">FALSE</span>,<span class="cn">FALSE</span>,<span class="fl">0</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $rp_size_theiler</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>

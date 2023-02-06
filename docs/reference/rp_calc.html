@@ -77,7 +77,6 @@
 <span>  HLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  theiler <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  AUTO <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  includeDiagonal <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  chromatic <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  anisotropyHV <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  asymmetryUL <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -124,7 +123,7 @@
 <dt>theiler</dt>
 <dd><p>Use a <code>theiler</code> window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:</p><ul><li><p><code>0</code> will include the main diagonal in all RQA measure calculations.</p></li>
 <li><p><code>1</code> will remove the main diagonal from all RQA measure calculations.</p></li>
-<li><p><code>NA</code> (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting <code>theiler = 0</code> (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set <code>theiler = 1</code>.</p></li>
+<li><p><code>NA</code> (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting <code>theiler = 1</code> (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set <code>theiler = 0</code>.</p></li>
 <li><p>A value greater than <code>1</code> will remove that many diagonals around and including the diagonal from all RQA measure calculations. So <code>theiler = 2</code> means exclude <code>2</code> diagonals around the main diagonal, including the main diagonal itself: <code>[-1,0,1]</code>.
 If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code> it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. <code>theiler = c(-1,5)</code> will exclude <code>[-1,0,1,2,3,4,5]</code>. If <code>length(theiler) &gt; 2</code>, the values will be considered individual diagonal ID's, e.g. <code>theiler = c(-3,-1,0,2,5)</code>, will exclude only those specific ID's. Also see the note.</p></li>
 </ul></dd>
@@ -132,10 +131,6 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 
 <dt>AUTO</dt>
 <dd><p>Auto-recurrence? (default = <code>FALSE</code>)</p></dd>
-
-
-<dt>includeDiagonal</dt>
-<dd><p>Should the diagonal be included in the calculation of the Recurrence Rate? If <code>NA</code> the value will be decided by the symmetry of the matrix, the diagonal will be removed for Auto RQA (<code>AUTO = TRUE</code>) but not for Cross RQA (<code>AUTO = FALSE</code>)  (default = <code>NA</code>)</p></dd>
 
 
 <dt>chromatic</dt>

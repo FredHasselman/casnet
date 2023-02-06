@@ -4,12 +4,14 @@
 \alias{rp_size}
 \title{rp_size}
 \usage{
-rp_size(RM, AUTO = NULL, theiler = NULL)
+rp_size(RM = NULL, dims = NULL, AUTO = NULL, theiler = NULL)
 }
 \arguments{
 \item{RM}{A Matrix object}
 
-\item{AUTO}{Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass \code{FALSE} to prevent this behaviour. If \code{NULL} (default) \code{AUTO} will take on the value of \code{isSymmetric(mat)}.}
+\item{dims}{Two element vector representing the dimensions of Matrix \code{RM}. If \code{dims} is provided, the Matrix does not have to be passed as an argument (default = \code{NA})}
+
+\item{AUTO}{Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass \code{FALSE} to prevent this behaviour. If \code{NULL} (default) \code{AUTO} will take on the value of \code{isSymmetric(RM)}.}
 
 \item{theiler}{Should a Theiler window be applied?}
 }
@@ -27,10 +29,15 @@ This function can take into account the presence of a \code{theiler} window, tha
 library(Matrix)
 m <- Matrix(rnorm(10),10,10)
 
-rp_size(m,TRUE,0)   # Subtract diagonal
-rp_size(m,FALSE,0)  # Do not subtract diagonal
-rp_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
-rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
+rp_size(RM = m, AUTO = TRUE, theiler = 0)  # Subtract diagonal
+rp_size(RM = m, AUTO = FALSE,theiler = 0)  # Do not subtract diagonal
+rp_size(RM = m, AUTO = NULL, theiler = 0)  # Matrix is symmetrical, AUTO is set to TRUE
+rp_size(RM = m, AUTO = NULL, theiler = 1)  # Subtract a Theiler window of 1 around and including the diagonal
+
+# Calculate without a matrix
+rp_size(dims = c(10,10), AUTO = TRUE, TRUE,0)
+rp_size(dims = c(10,10), AUTO = FALSE,FALSE,0)
+
 }
 \seealso{
 Other Distance matrix operations (recurrence plot): 

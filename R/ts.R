@@ -366,6 +366,7 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
 #' @param emDim Embedding dimension
 #' @param emLag Embedding lag
 #' @param returnOnlyIndices Return only the index of y for each surrogate dimension, not the values (default = `FALSE`)
+#' @param doEmbed Should the series be embedded? If `FALSE` adds attributes.
 #' @param silent Silent-ish mode
 #'
 #' @note If `emLag = 0`, the assumption is the columns in `y` represent the dimensions and `y` will be returned with attributes `emLag = 0` and `emDim = NCOL(y)`. If `emLag > 0` and `NCOL(y)>1` the first column of `y` will used for embedding and a warning will be triggered.
@@ -379,7 +380,7 @@ ts_duration <- function(y, timeVec = stats::time(y), fs = stats::frequency(y), t
 #'
 #' @family Time series operations
 #'
-ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE){
+ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, doEmbed = TRUE, silent = TRUE){
 
   id    <- ifelse(is.null(colnames(y)),ifelse(is.null(names(y)),deparse(substitute(y)),names(y)[1]),colnames(y)[1])
   y.ori <- y
@@ -435,6 +436,9 @@ ts_embed <- function (y, emDim, emLag, returnOnlyIndices = FALSE, silent = TRUE)
 
     # Alternative: rollapply(y, list(-d * seq(0, k-1)), c)
 
+  if(!doEmbed){
+    emDim <- NCOL(emY)
+  }
 
   #} # if emLag = 0
 

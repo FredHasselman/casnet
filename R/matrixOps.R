@@ -215,6 +215,54 @@ mat_mat2ind <- function(mat){
 
 
 
+#' Get indices of matrix diagonals, rows, or columns
+#'
+#' @param Xlength X dim
+#' @param Ylength Y dim
+#' @param index index of diagonal, row or column
+#' @param diagonal diagonal
+#' @param horizontal horizontal
+#'
+#' @return list
+#'
+#' @export
+#'
+#' @examples
+#'
+mat_ind <- function(Xlength, Ylength, index, diagonal = FALSE){
+
+  if(diagonal){
+    if(index>=0){
+      Xx <- seq(1,(Xlength-index))
+      Yy <- seq((index+1),Ylength)
+    } else {
+      index <- abs(index)
+      # Yy <- seq(1,(Xlength-index))
+      # Xx <- seq((index+1),Ylength)
+      Yy <- seq(1,(Xlength-index))
+      Xx <- seq((index+1),Ylength)
+    }
+    return(list(r = Xx, c = Yy))
+  } else {
+   # if(symmetrical){
+      Yy <- seq(1,Ylength)
+      Xx <- index
+  #  } else {
+  #     Yy <- seq(1,Ylength)
+  #     Xx <- index
+  #   }
+
+    # if(horizontal){
+    #   return(list(r = Yy, c = Xx))
+    # } else {
+      return(list(r = Xx, c = Yy))
+   # }
+  }
+}
+
+
+
+
 #' Calculate Hamming distance
 #'
 #' @param X A matrix (of coordinates)
@@ -351,12 +399,13 @@ setTheiler <- function(RM, theiler = NA, silent = FALSE, chromatic = FALSE){
     }
   }
 
-  if(length(theiler==1)){
+  if(length(theiler)==1){
     if(theiler < 0){theiler <- 0}
     if(length(Matrix::diag(RM))<length(-theiler:theiler)){
       if(!silent){message("Ignoring theiler window, it is larger than the matrix...")}
       skip <- TRUE
     }
+    if(theiler == 0){skip <- TRUE}
   }
 
   if(length(theiler==2)){

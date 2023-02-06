@@ -40,6 +40,7 @@ Other Estimate Recurrence Parameters:
 \code{\link{est_emDim}()},
 \code{\link{est_emLag}()},
 \code{\link{est_parameters}()},
+\code{\link{est_radius_rqa}()},
 \code{\link{est_radius}()}
 }
 \concept{Estimate Recurrence Parameters}

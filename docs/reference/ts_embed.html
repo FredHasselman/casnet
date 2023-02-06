@@ -66,7 +66,14 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_embed</span><span class="op">(</span><span class="va">y</span>, <span class="va">emDim</span>, <span class="va">emLag</span>, returnOnlyIndices <span class="op">=</span> <span class="cn">FALSE</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_embed</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  <span class="va">emDim</span>,</span>
+<span>  <span class="va">emLag</span>,</span>
+<span>  returnOnlyIndices <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doEmbed <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -85,6 +92,10 @@
 
 <dt>returnOnlyIndices</dt>
 <dd><p>Return only the index of y for each surrogate dimension, not the values (default = <code>FALSE</code>)</p></dd>
+
+
+<dt>doEmbed</dt>
+<dd><p>Should the series be embedded? If <code>FALSE</code> adds attributes.</p></dd>
 
 
 <dt>silent</dt>

@@ -15,7 +15,6 @@ rp_calc(
   HLmax = length(Matrix::diag(RM)),
   theiler = NA,
   AUTO = NULL,
-  includeDiagonal = NA,
   chromatic = FALSE,
   anisotropyHV = FALSE,
   asymmetryUL = FALSE,
@@ -45,14 +44,12 @@ rp_calc(
 \itemize{
 \item \code{0} will include the main diagonal in all RQA measure calculations.
 \item \code{1} will remove the main diagonal from all RQA measure calculations.
-\item \code{NA} (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting \code{theiler = 0} (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set \code{theiler = 1}.
+\item \code{NA} (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting \code{theiler = 1} (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set \code{theiler = 0}.
 \item A value greater than \code{1} will remove that many diagonals around and including the diagonal from all RQA measure calculations. So \code{theiler = 2} means exclude \code{2} diagonals around the main diagonal, including the main diagonal itself: \verb{[-1,0,1]}.
 If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. \code{theiler = c(-1,5)} will exclude \verb{[-1,0,1,2,3,4,5]}. If \code{length(theiler) > 2}, the values will be considered individual diagonal ID's, e.g. \code{theiler = c(-3,-1,0,2,5)}, will exclude only those specific ID's. Also see the note.
 }}
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
-
-\item{includeDiagonal}{Should the diagonal be included in the calculation of the Recurrence Rate? If \code{NA} the value will be decided by the symmetry of the matrix, the diagonal will be removed for Auto RQA (\code{AUTO = TRUE}) but not for Cross RQA (\code{AUTO = FALSE})  (default = \code{NA})}
 
 \item{chromatic}{Force chromatic RQA? If \code{NA} the value of the \code{RM} attribute \code{"chromatic"} will be used, if present (default = \code{NA})}
 

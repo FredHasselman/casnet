@@ -65,6 +65,10 @@ est_radius <- function(RM = NULL,
     RM[NAid] <- max(Matrix::as.matrix(RM), na.rm = TRUE)+1
   }
 
+  if(all(as.vector(RM)%[]%c(0,1))){
+    stop("Matrix RM is already a binary matrix!")
+  }
+
   # check auto-recurrence
   RM   <- rp_checkfix(RM, checkAUTO = TRUE)
   AUTO <- attr(RM,"AUTO")
@@ -98,9 +102,11 @@ est_radius <- function(RM = NULL,
     RP_N  <- NA
     tollo <- targetValue-tol #(1-tol),
     tolhi <- targetValue+tol #(tol+1),
-    rp.size <- rp_size(RM,AUTO,theiler)$rp_size_theiler
+    rp.size <- rp_size(RM=RM,AUTO = AUTO,theiler = theiler)$rp_size_theiler
     minDist <- suppressMessages(min(RM[RM>0], na.rm = TRUE))
     minRR   <- (sum((as.vector(RM)>0)&(as.vector(RM)==minDist)))/rp.size
+
+
 
     iterList <- data.frame(iter        = seqIter,
                            Measure     = Measure,
@@ -124,6 +130,15 @@ est_radius <- function(RM = NULL,
       minRRfound <- TRUE
       exitIter   <- TRUE
     }
+
+    # if(theiler == 0){
+    #   if((NROW(y1)/RP_max)>targetValue){
+    #     stop(paste0("The minimum RR possible including the diagonal is: ",round(NROW(y1)/RP_max,3),", which is larger than the targetValue for RR: ",targetValue))
+    #   }
+    # }
+
+    #RM <- float::as.float(Matrix::as.matrix(RM))
+
 
     # p <- dplyr::progress_estimated(maxIter)
     while(!exitIter){
@@ -367,6 +382,263 @@ est_radius <- function(RM = NULL,
     }
   } # if "optimal"
 }
+
+#' Estimate Radius without building a recurrence matrix
+#'
+#' Find a fixed or optimal radius.
+#'
+#' @inheritParams rqa
+#' @param startRadius The starting value for the radius (default = SD of time series values)
+#' @param targetValue When argument `type` is set to "fixed", the value represents the target value for the measure in `targetMeasure` (default = `RR = .05`).
+#' @param tol Tolerance for achieving `targetValue` for `targetMeasure` (default = `0.01`)
+#' @param maxIter If `type = "fixed"`: Maximum number of iterations to reach targetValue.
+#' @param theiler Size of theiler window (default `0`)
+#' @param histIter Return iteration history? (default = `FALSE`)
+#' @param noiseLevel Noise level to construct the `signal + noiseLevel *` \eqn{N(\mu=0,\sigma=1)} (default = `0.75`)
+#' @param noiseType Type
+#' @param plotROC Generates an ROC plot if `type = "optimal"`
+#' @param standardise Standardise `y` if `type == "optimal"`
+#' @param radiusOnFail Radius to return when search fails `"tiny" = 0 + ,Machine.double.eps`, this will likely cause a matrix full of zeros. `"huge" = 1 + max. distance`, which will give a matrix full of ones, `"minimum" = minimum distance in matrix`.
+#' @param silent Silent-ish
+#'
+#' @family Estimate Recurrence Parameters
+#'
+#' @return A dataframe listing settings used to search for the radius, the radius found given the settings and the recurrence rate produced by the radius (either 1 row or the entire iteration history)
+#' @export
+#'
+est_radius_rqa <- function(y1 = NULL,
+                       y2 = NULL,
+                       AUTO = NULL,
+                       emLag = 1,
+                       emDim = 1,
+                       method = "Euclidean",
+                       startRadius    = NULL,
+                       targetValue    = 0.05,
+                       tol            = 0.01,
+                       maxIter        = 100,
+                       theiler        = NA,
+                       histIter       = FALSE,
+                       standardise  = c("mean.sd","median.mad","none")[3],
+                       radiusOnFail   = c("tiny","huge","percentile")[1],
+                       silent         = FALSE){
+
+
+  checkPkg("parallel")
+  numCores <- parallel::detectCores()
+
+  if(is.null(AUTO)){
+    stop("Auto-RQA or Cross-RQA? (Provide a value for AUTO)")
+  }
+
+  if(all(is.na(y2%00%NA))){
+    dims <- c(NROW(y1), NROW(y1))
+  } else {
+    dims <- c(NROW(y1), NROW(y2))
+  }
+
+  RP_max <- rp_size(dims = dims, AUTO = AUTO, theiler = theiler)$rp_size_theiler
+
+  if(theiler == 0){
+    if((NROW(y1)/RP_max)>targetValue){
+      stop(paste0("The minimum RR possible including the diagonal is: ",round(NROW(y1)/RP_max,3),", which is larger than the targetValue for RR: ",targetValue))
+    }
+  }
+
+  # if(any(is.na(RM))){
+  #   NAid <- which(is.na(Matrix::as.matrix(RM)))
+  #   RM[NAid] <- max(Matrix::as.matrix(RM), na.rm = TRUE)+1
+  # }
+  #
+  # # check auto-recurrence
+  # RM   <- rp_checkfix(RM, checkAUTO = TRUE)
+  # AUTO <- attr(RM,"AUTO")
+  #
+  # RM <- setTheiler(RM = RM, theiler = theiler, silent = TRUE)
+
+
+  # if(!rescaleDist%in%"none"){
+  #   warning("Cannot rescale distance matrix, please rescale the time series to standardeviation (z-score) or unit scale (min/max)")
+  # }
+
+
+  if(is.null(startRadius)){
+    #startRadius <- mean(c(as.numeric(minDist),as.numeric(maxDist)), na.rm = TRUE)
+    if(!AUTO){
+      startRadius <- as.numeric(proxy::dist(min(unlist(y1), na.rm = TRUE), min(unlist(y2), na.rm = TRUE), pairwise = TRUE))
+    } else {
+      startRadius <- as.numeric(proxy::dist(min(unlist(y1), na.rm = TRUE), (min(unlist(y1), na.rm = TRUE)*.5), pairwise = TRUE))
+    }
+  }
+    tryRadius <- startRadius
+    Measure   <- 0
+    iter      <- 0
+    Converged <- FALSE
+    minRRfound <- FALSE
+    seqIter    <- 1:maxIter
+    stopRadius <- NA
+    RP_N  <- NA
+
+    if(tol%][%c(0,1)){stop("Argument tol must be between 0 and 1.")}
+    tollo <- targetValue-tol #(1-tol),
+    tolhi <- targetValue+tol #(tol+1),
+
+    # Includes LOS (main diagonal)
+    if(theiler==0){
+      rows <- c(-(NROW(y1)-1):(NROW(y1)-1))
+    } else {
+      rows <- c(-(NROW(y1)-1):(-theiler), (theiler):(NROW(y1)-1))
+    }
+
+    if(AUTO){
+      addDiag <- 0
+      if(theiler == 0){
+        rows <- rows[rows>=1]
+        addDiag <- NROW(y1)
+      } else {
+        rows <- rows[rows>=theiler]
+      }
+    }
+
+    #outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE), mc.cores = numCores)
+
+    outD <- lapply(rows, function(i) rqa_fast(index = i, y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE))
+
+    minDist    <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$minDist)))
+    minDistN   <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$minDistN)))
+    minRP_dist <- float::as.float(min(minDist, na.rm = TRUE))
+    minRP_N    <- sum(minDistN[minDist==minRP_dist], na.rm = TRUE)
+    maxDist    <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$maxDist)))
+    maxRP_dist <- float::as.float(max(maxDist, na.rm = TRUE))
+
+    if(AUTO){
+      RP_N <- (2*sum(sapply(outD,sum))+addDiag)
+      minRP_N <- minRP_N*2
+    } else {
+      RP_N <- sum(sapply(outD,sum))
+    }
+    minRR <- minRP_N/RP_max
+
+  #  rp_diags <- parallel::mcmapply(FUN = rqa_fast, index = 1:(NROW(y1)-theiler-1), MoreArgs = list(y1 = y1, y2 = y2, emRad = startRadius, theiler = theiler, symmetrical = AUTO, diagonals = TRUE, horizontals = FALSE), mc.cores = numCores)
+
+    iterList <- data.frame(iter        = seqIter,
+                           Measure     = Measure,
+                           Radius      = tryRadius,
+                           targetValue = targetValue,
+                           tollo       = tollo, #(1-tol),
+                           tolhi       = tolhi, #(tol+1),
+                           startRadius = startRadius,
+                           stopRadius  = stopRadius,
+                           rp.size     = RP_max,
+                           rp.points   = RP_N,
+                           AUTO        = AUTO,
+                           Converged   = Converged, check.names = FALSE)
+
+    exitIter <- FALSE
+    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"±",tol,"for RR\n"))}
+
+    if(targetValue<=minRR){
+      warning(paste("The minimum RR possible for this matrix is", round(minRR,3),
+                    "because the minimum distance is:", round(as.numeric(minRP_dist),3)))
+      minRRfound <- TRUE
+      exitIter   <- TRUE
+    }
+
+    # p <- dplyr::progress_estimated(maxIter)
+    while(!exitIter){
+
+      iter <- iter+1
+      #p$tick()$print()
+
+      if(!silent){cat(paste("Iteration",iter,"\n"))}
+
+      outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonals = TRUE), mc.cores = numCores)
+
+      #RP_N <- sum((as.vector(RM)>0)&(as.vector(RM)<tryRadius))
+
+      if(AUTO){
+        RP_N <- (2*sum(sapply(outD,sum))+addDiag)
+      } else {
+        RP_N <- sum(sapply(outD,sum))
+      }
+
+      # RMs <- mat_di2bi(RM, emRad = tryRadius, convMat = TRUE)
+      # #Total nr. recurrent points
+      # RP_N <- Matrix::nnzero(RMs, na.counted = FALSE)
+      # rm(RMs)
+
+      #RP_N <- RP_N-minDiag
+      #rp.size <- rp_size(RMs) #length(RMs)
+
+      Measure <- RP_N/RP_max
+
+      # crpOut <- rp_measures(RM = RMs, emRad = tryRadius, AUTO=AUTO)
+      #Measure  <-  crpOut[[targetMeasure]]
+      #crpOut <- data.frame(RR = RR, RT = RT, size = length(RMs))
+      #Measure <- RR
+
+      iterList[iter,] <-    cbind.data.frame(iter        = iter,
+                                             Measure     = Measure,
+                                             Radius      = tryRadius,
+                                             targetValue = targetValue,
+                                             tollo       = tollo, #(1-tol),
+                                             tolhi       = tolhi, #(tol+1),
+                                             startRadius = startRadius,
+                                             stopRadius  = stopRadius,
+                                             rp.size     = RP_max,
+                                             rp.points   = RP_N,
+                                             AUTO        = AUTO,
+                                             Converged   = Converged)
+
+
+
+
+      if(any(Measure%[]%c(tollo,tolhi),(iter>=maxIter))){
+        if(Measure%[]%c(tollo,tolhi)){
+          Converged <- TRUE
+          if(!silent){
+            message("\nConverged! Found an appropriate radius...")
+          }
+        }
+        iterList$Converged[iter] <- Converged
+        exitIter <- TRUE
+      }
+
+      if(round(Measure,digits = 2)>round(targetValue,digits = 2)){
+        tryRadius <- tryRadius*(min(c(0.8,1-abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) # tol*2
+      } else {
+        tryRadius <- tryRadius*(min(c(1.8,1+abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) #1+(tol*2)
+      }
+
+
+    } # While ....
+
+
+    if(iter>=maxIter){
+      warning("Max. iterations reached!")
+      iterList$stopRadius[iter] <- tryRadius
+      #iterlist$Measure[iter] <- Measure
+    }
+    if(!minRRfound){
+      if(Measure %][% c(tollo,tolhi)){
+        iterList$Radius[iter] <- dplyr::case_when(
+          radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
+          radiusOnFail%in%"huge" ~ 1 + round(as.numeric(maxRP_dist),3),
+          radiusOnFail%in%"minimum" ~ round(as.numeric(minRP_dist),3)
+        )
+        warning(paste0("\nTarget not found, try increasing tolerance, max. iterations, or, change value of startRadius.\nreturning radius: ",iterList$Radius[iter]))
+        iterList$stopRadius[iter] <- tryRadius
+        #iterlist$Measure[iter] <- Measure
+      }
+    } else {
+      iterList$Radius[iter] <- minDist
+    }
+
+    ifelse(histIter,id<-c(1:iter),id<-iter)
+    return(iterList[id,])
+
+}
+
+
 
 
 #' Estimate RQA parameters

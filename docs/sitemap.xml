@@ -193,6 +193,9 @@
     <loc>/reference/est_radius.html</loc>
   </url>
   <url>
+    <loc>/reference/est_radius_rqa.html</loc>
+  </url>
+  <url>
     <loc>/reference/factor_obs_exp.html</loc>
   </url>
   <url>
@@ -317,6 +320,9 @@
   </url>
   <url>
     <loc>/reference/mat_hamming.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mat_ind.html</loc>
   </url>
   <url>
     <loc>/reference/mat_mat2ind.html</loc>
@@ -484,6 +490,15 @@
     <loc>/reference/rp_empty.html</loc>
   </url>
   <url>
+    <loc>/reference/rp_fast.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rp_fast_lineDist.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rp_fast_measures.html</loc>
+  </url>
+  <url>
     <loc>/reference/rp_lineDist.html</loc>
   </url>
   <url>
@@ -503,6 +518,30 @@
   </url>
   <url>
     <loc>/reference/rp_size.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rqa.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rqa_calc.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rqa_calc_lineMeasures.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rqa_fast.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rqa_getSeries.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rqa_lineDist.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rqa_measures.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rqa_stitchRows.html</loc>
   </url>
   <url>
     <loc>/reference/sa2fd_dfa.html</loc>

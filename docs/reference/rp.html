@@ -73,7 +73,6 @@
 <span>  emLag <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  emRad <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  theiler <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  includeDiagonal <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  to.ts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  order.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  to.sparse <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -116,14 +115,10 @@
 <dt>theiler</dt>
 <dd><p>Use a <code>theiler</code> window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:</p><ul><li><p><code>0</code> will include the main diagonal in all RQA measure calculations.</p></li>
 <li><p><code>1</code> will remove the main diagonal from all RQA measure calculations.</p></li>
-<li><p><code>NA</code> (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting <code>theiler = 0</code> (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set <code>theiler = 1</code>.</p></li>
+<li><p><code>NA</code> (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting <code>theiler = 1</code> (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set <code>theiler = 0</code>.</p></li>
 <li><p>A value greater than <code>1</code> will remove that many diagonals around and including the diagonal from all RQA measure calculations. So <code>theiler = 2</code> means exclude <code>2</code> diagonals around the main diagonal, including the main diagonal itself: <code>[-1,0,1]</code>.
 If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code> it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. <code>theiler = c(-1,5)</code> will exclude <code>[-1,0,1,2,3,4,5]</code>. If <code>length(theiler) &gt; 2</code>, the values will be considered individual diagonal ID's, e.g. <code>theiler = c(-3,-1,0,2,5)</code>, will exclude only those specific ID's. Also see the note.</p></li>
 </ul></dd>
-
-
-<dt>includeDiagonal</dt>
-<dd><p>Use to force inclusion of the diagonal when calculating RQA measures. The default <code>NA</code> behaves the same way as parameter <code>theiler</code>. If set to <code>TRUE</code> it will include the diagonal even in the case of Auto-RQA (default = <code>NA</code>)</p></dd>
 
 
 <dt>to.ts</dt>

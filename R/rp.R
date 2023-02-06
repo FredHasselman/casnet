@@ -14,10 +14,9 @@
 #' @param theiler Use a `theiler` window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:
 #' * `0` will include the main diagonal in all RQA measure calculations.
 #' * `1` will remove the main diagonal from all RQA measure calculations.
-#' * `NA` (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting `theiler = 0` (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set `theiler = 1`.
+#' * `NA` (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting `theiler = 1` (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set `theiler = 0`.
 #' * A value greater than `1` will remove that many diagonals around and including the diagonal from all RQA measure calculations. So `theiler = 2` means exclude `2` diagonals around the main diagonal, including the main diagonal itself: `[-1,0,1]`.
 #' If `theiler` is a numeric vector of `length(theiler) == 2` it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. `theiler = c(-1,5)` will exclude `[-1,0,1,2,3,4,5]`. If `length(theiler) > 2`, the values will be considered individual diagonal ID's, e.g. `theiler = c(-3,-1,0,2,5)`, will exclude only those specific ID's. Also see the note.
-#' @param includeDiagonal Use to force inclusion of the diagonal when calculating RQA measures. The default `NA` behaves the same way as parameter `theiler`. If set to `TRUE` it will include the diagonal even in the case of Auto-RQA (default = `NA`)
 #' @param to.ts Should `y1` and `y2` be converted to time series objects?
 #' @param order.by If `to.ts = TRUE`, pass a vector of the same length as `y1` and `y2`. It will be used as the time index, if `NA` the vector indices will be used to represent time.
 #' @param to.sparse Should sparse matrices be used?
@@ -55,7 +54,6 @@ rp <- function(y1, y2 = NULL,
                emLag = 1,
                emRad = NULL,
                theiler = NA,
-               includeDiagonal = NA,
                to.ts = NULL,
                order.by = NULL,
                to.sparse = TRUE,
@@ -173,7 +171,7 @@ rp <- function(y1, y2 = NULL,
       if(emRad$Converged){
         emRad <- emRad$Radius
       } else {
-        emRad <- est_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue, tol = 0.2, silent = TRUE, radiusOnFail = "percentile")$Radius
+        emRad <- est_radius(RM = dmat, emDim = emDim, emLag = emLag, targetValue = targetValue, tol = 0.1, silent = TRUE, radiusOnFail = "percentile")$Radius
       }
     }
     if(chromatic){
@@ -195,7 +193,6 @@ rp <- function(y1, y2 = NULL,
                           emRad = emRad%00%NA,
                           silent = silent,
                           theiler = theiler,
-                          includeDiagonal = includeDiagonal,
                           chromatic = chromatic)
   } else {
     rpOut <- NA
@@ -216,6 +213,7 @@ rp <- function(y1, y2 = NULL,
     attributes(dmat)$chromatic <- chromatic
     attributes(dmat)$chromaNames <- chromaNames
     attributes(dmat)$chromaDims <- chromaDims
+    attributes(dmat)$theiler <- theiler
   } else {
     attr(dmat,"emDims1") <- et1
     attr(dmat,"emDims2") <- et2
@@ -232,13 +230,14 @@ rp <- function(y1, y2 = NULL,
     attr(dmat,"chromatic") <- chromatic
     attr(dmat,"chromaNames") <- chromaNames
     attr(dmat,"chromaDims") <- chromaDims
+    attr(dmat,"theiler") <- theiler
   }
 
   if(is.null(attributes(dmat))){stop("lost attributes")}
 
   if(doPlot){
 
-    if(rp_size(dmat)$rp_size_total>1024){
+    if(rp_size(RM = dmat)$rp_size_total>1024){
       warning("Plotting will take a long time. Consider running rp_plot(..., courseGrain = TRUE)", immediate. = TRUE)
     }
     rp_plot(RM = dmat, courseGrain = FALSE)
@@ -281,7 +280,6 @@ rp <- function(y1, y2 = NULL,
 #' @param VLmax Maximal vertical line length (default = length of diagonal -1)
 #' @param HLmax Maximal horizontal line length (default = length of diagonal -1)
 #' @param AUTO Auto-recurrence? (default = `FALSE`)
-#' @param includeDiagonal Should the diagonal be included in the calculation of the Recurrence Rate? If `NA` the value will be decided by the symmetry of the matrix, the diagonal will be removed for Auto RQA (`AUTO = TRUE`) but not for Cross RQA (`AUTO = FALSE`)  (default = `NA`)
 #' @param chromatic Force chromatic RQA? If `NA` the value of the `RM` attribute `"chromatic"` will be used, if present (default = `NA`)
 #' @param anisotropyHV Return anisotropy ratio measures based on Horizontal and Vertical lines. The ratios are calculated as `(horizontal - vertical) / (horizontal + vertical)`. So a value of 0 means no anisotropy, negative ratios indicate the measures based on vertical lines had  higher values, positive ratios indicate the measures based on horizontal lines had higher values  (default = `FALSE`)
 #' @param asymmetryUL Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as `(upper - lower) / (upper + lower)`. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = `FALSE`)
@@ -311,7 +309,6 @@ rp_measures <- function(RM,
                         HLmax = length(Matrix::diag(RM)),
                         AUTO      = NULL,
                         theiler   = NA,
-                        includeDiagonal = NA,
                         chromatic = NA,
                         anisotropyHV = FALSE,
                         asymmetryUL = FALSE,
@@ -431,7 +428,6 @@ rp_measures <- function(RM,
                                            HLmax = HLmax,
                                            theiler = theiler,
                                            AUTO  = AUTO,
-                                           includeDiagonal = includeDiagonal,
                                            chromatic = chromatic,
                                            anisotropyHV = anisotropyHV,
                                            asymmetryUL = asymmetryUL,
@@ -485,7 +481,6 @@ rp_measures <- function(RM,
                                     HLmax = HLmax,
                                     theiler = theiler,
                                     AUTO  = AUTO,
-                                    includeDiagonal = includeDiagonal,
                                     chromatic = chromatic,
                                     anisotropyHV = anisotropyHV,
                                     asymmetryUL = asymmetryUL,
@@ -1767,7 +1762,7 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
 
     s  <- Sys.time()
 
-    nzdiagsM <- methods::as(RM, "dgTMatrix")
+    nzdiagsM <- methods::as(RM, "TsparseMatrix") #methods::as(RM, "dgTMatrix")
     nzdiags  <- data.frame(row   = nzdiagsM@i,
                            col   = nzdiagsM@j,
                            value = nzdiagsM@x,
@@ -1936,7 +1931,7 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 #' @inheritParams rp
 #' @inheritParams rp_measures
 #' @param d Vector of diagonals to be extracted from matrix `RP` before line length distributions are calculated. A one element vector will be interpreted as a windowsize, e.g., `d = 50` will extract the diagonal band `-50:50`. A two element vector will be interpreted as a band, e.g. `d = c(-50,100)` will extract diagonals `-50:100`. If `length(d) > 2`, the numbers will be interpreted to refer to individual diagonals, `d = c(-50,50,100)` will extract diagonals `-50,50,100`. If `length(d)` is `NULL`, 1 or 2, the theiler window is applied before diagonals are extracted. The theiler window is ignored if `length(d)>2`, or if it is larger than the matrix or band indicated by parameter `d`. A warning will be given is a theiler window was already applied to the matrix.
-#' @param invert Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
+#' @param recurrenceTimes Relevant for Recurrence Time analysis: Return the distribution of 0 valued segments in nonzero diagonals/verticals/horizontals. This indicates the time between subsequent line structures.
 #'
 #' @description Extract lengths of diagonal, vertical and horizontal line segments from a recurrence matrix.
 #'
@@ -1966,7 +1961,7 @@ rp_lineDist <- function(RM,
                         HLmax = length(Matrix::diag(RM))-1,
                         d         = NULL,
                         theiler   = NA,
-                        invert    = FALSE,
+                        recurrenceTimes    = FALSE,
                         AUTO      = NULL,
                         chromatic = FALSE,
                         matrices  = FALSE){
@@ -1976,7 +1971,7 @@ rp_lineDist <- function(RM,
 
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){stop("Matrix should be a binary (0,1) matrix!!")}
 
-  if(invert){
+  if(recurrenceTimes){
     RM <- Matrix::Matrix(1-RM,sparse = TRUE)
   }
 
@@ -2047,11 +2042,11 @@ rp_lineDist <- function(RM,
   horizontals.ind <- tidyr::gather(horizontals, key = "horizontal", value = "segment")
 
   D <- diagonals.ind$segment
-  names(D) <- paste0(diagonals.ind$diagonal,ifelse(invert,"DT","D"))
+  names(D) <- paste0(diagonals.ind$diagonal,ifelse(recurrenceTimes,"DT","D"))
   V <- verticals.ind$segment
-  names(V) <- paste0(verticals.ind$vertical,ifelse(invert,"VT","V"))
+  names(V) <- paste0(verticals.ind$vertical,ifelse(recurrenceTimes,"VT","V"))
   H <- horizontals.ind$segment
-  names(H) <- paste0(horizontals.ind$horizontal,ifelse(invert,"HT","H"))
+  names(H) <- paste0(horizontals.ind$horizontal,ifelse(recurrenceTimes,"HT","H"))
 
   # Get consecutive nonzero segments from indices, their difference is the segment length
   # We added a row of 0s so we'll get sequences of -1, 1, -1
@@ -2153,7 +2148,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
       RM <- Matrix::Matrix(RM, sparse = TRUE)
     }
     Mtype <- gsub("CMatrix","TMatrix",class(RM)[1])
-    eval(parse(text=paste0("RM <- as(RM,'",Mtype,"')")))
+    eval(parse(text=paste0("RM <- methods::as(RM,'",Mtype,"')")))
   }
 
 
@@ -2270,9 +2265,9 @@ rp_plot <- function(RM,
 
   # Size check
   reduced <- FALSE
-  if((rp_size(RM)$rp_size_total>=maxSize)&courseGrain){
+  if((rp_size(RM=RM)$rp_size_total>=maxSize)&courseGrain){
     message("NOTE: To speed up the plotting process, the RP will represent a coursegrained matrix. Set argument 'courseGrain = FALSE' to see the full matrix.")
-    if((rp_size(RM)$rp_size_total/2)>=maxSize){
+    if((rp_size(RM=RM)$rp_size_total/2)>=maxSize){
       target_height <- round(sqrt(maxSize))
       target_width  <- round(sqrt(maxSize))
     } else {
@@ -3026,7 +3021,8 @@ rp_plot <- function(RM,
 #' This function can take into account the presence of a `theiler` window, that is the points in the window will be excluded from the calculation. For example, some scholars will exclude the main diagonal from the calculation of the recurrence rate.
 #'
 #' @param RM A Matrix object
-#' @param AUTO Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass `FALSE` to prevent this behaviour. If `NULL` (default) `AUTO` will take on the value of `isSymmetric(mat)`.
+#' @param dims Two element vector representing the dimensions of Matrix `RM`. If `dims` is provided, the Matrix does not have to be passed as an argument (default = `NA`)
+#' @param AUTO Is the Matrix an Auto Recurrence Matrix? If so, the length of the diagonal will be subtracted from the matrix size, pass `FALSE` to prevent this behaviour. If `NULL` (default) `AUTO` will take on the value of `isSymmetric(RM)`.
 #' @param theiler Should a Theiler window be applied?
 #'
 #' @return Matrix size for computation of recurrence measures.
@@ -3039,32 +3035,62 @@ rp_plot <- function(RM,
 #' library(Matrix)
 #' m <- Matrix(rnorm(10),10,10)
 #'
-#' rp_size(m,TRUE,0)   # Subtract diagonal
-#' rp_size(m,FALSE,0)  # Do not subtract diagonal
-#' rp_size(m,NULL,0)   # Matrix is symmetrical, AUTO is set to TRUE
-#' rp_size(m,NULL,1)   # Subtract a Theiler window of 1 around and including the diagonal
-rp_size <- function(RM, AUTO=NULL, theiler = NULL){
+#' rp_size(RM = m, AUTO = TRUE, theiler = 0)  # Subtract diagonal
+#' rp_size(RM = m, AUTO = FALSE,theiler = 0)  # Do not subtract diagonal
+#' rp_size(RM = m, AUTO = NULL, theiler = 0)  # Matrix is symmetrical, AUTO is set to TRUE
+#' rp_size(RM = m, AUTO = NULL, theiler = 1)  # Subtract a Theiler window of 1 around and including the diagonal
+#'
+#' # Calculate without a matrix
+#' rp_size(dims = c(10,10), AUTO = TRUE, TRUE,0)
+#' rp_size(dims = c(10,10), AUTO = FALSE,FALSE,0)
+#'
+rp_size <- function(RM = NULL, dims = NULL, AUTO = NULL, theiler = NULL){
 
   if(is.null(AUTO)){
+    if(!is.null(RM)){
       AUTO <- Matrix::isSymmetric(RM)
+    } else {
+      stop("Please provide a value for AUTO (TRUE/FALSE).")
     }
+  }
+
+  if(is.null(RM)&is.null(dims)){
+    stop("Need either a Matrix (RM) object or its dimensions (dims)!")
+  }
+
+  if(!is.null(dims)&is.null(RM)){
+    if(length(dims)!=2){
+      stop("dims must be a vector of length 2.")
+    }
+  }
 
   if(is.null(theiler)){
-    if(is.null(attributes(RM)$theiler)){
+    if(!is.null(RM)){
+     if(is.null(attributes(RM)$theiler)){
       if(AUTO){
-        theiler <- 0
-      } else {
         theiler <- 1
+      } else {
+        theiler <- 0
       }
     } else {
       theiler <- attributes(RM)$theiler
     }
+   }
   }
 
-  R_N <- cumprod(dim(RM))[2]
+  if(is.null(dims)){
+    if(!is.null(RM)){
+      dims <- dim(RM)
+      RMdiag <- length(Matrix::diag(RM))
+    }
+  } else {
+    RMdiag <- max(dims, na.rm = TRUE)
+  }
+
+  R_N <- cumprod(dims)[2]
   minDiag <- 0
 
-  if(is.na(theiler)){
+  if(is.na(theiler%00%NA)){
     if(AUTO){
       theiler <- 1
     } else {
@@ -3074,19 +3100,19 @@ rp_size <- function(RM, AUTO=NULL, theiler = NULL){
 
   if(length(theiler)==1){
     if(theiler==1){
-      minDiag <- length(Matrix::diag(RM))
+      minDiag <- RMdiag
     }
     if(theiler>1){
-      minDiag <- sum(rep(length(Matrix::diag(RM)),length(seq(-theiler,theiler))) - abs(seq(-theiler,theiler)))
+      minDiag <- sum(rep(RMdiag,length(seq(-theiler,theiler))) - abs(seq(-theiler,theiler)))
     }
   }
 
   if(length(theiler)==2){
-    minDiag <- sum(rep(length(Matrix::diag(RM)),length(seq(min(theiler),max(theiler)))) - abs(seq(min(theiler),max(theiler))))
+    minDiag <- sum(rep(RMdiag,length(seq(min(theiler),max(theiler)))) - abs(seq(min(theiler),max(theiler))))
   }
 
   if(length(theiler)>2){
-    minDiag <- sum(rep(length(Matrix::diag(RM)),length(theiler)) - abs(theiler))
+    minDiag <- sum(rep(RMdiag,length(theiler)) - abs(theiler))
   }
 
   return(list(rp_size_total = R_N, rp_size_theiler = R_N - minDiag))
@@ -3156,7 +3182,6 @@ rp_calc <- function(RM,
                     HLmax = length(Matrix::diag(RM)),
                     theiler   = NA,
                     AUTO      = NULL,
-                    includeDiagonal = NA,
                     chromatic = FALSE,
                     anisotropyHV = FALSE,
                     asymmetryUL = FALSE,
@@ -3173,16 +3198,13 @@ rp_calc <- function(RM,
   }
 
   if(is.na(theiler)){
-    if(is.na(attributes(RM)$theiler)){
-      RM <- setTheiler(RM, theiler = theiler)
+    if(is.na(attributes(RM)$theiler%00%NA)){
+      RM <- setTheiler(RM, theiler = NA)
     }
     theiler <- attributes(RM)$theiler
   }
 
-  if(!is.na(includeDiagonal)){
-    AUTO <- includeDiagonal
-  }
-  recmatsize <- rp_size(RM, AUTO = AUTO, theiler = theiler)
+  recmatsize <- rp_size(RM = RM, AUTO = AUTO, theiler = theiler)
 
   if(!is.null(attributes(RM)$emRad)){
     emRad <- attributes(RM)$emRad
@@ -3217,7 +3239,7 @@ rp_calc <- function(RM,
                                               VLmin = VLmin, VLmax = VLmax,
                                               HLmin = HLmin, HLmax = HLmax,
                                               theiler = theiler,
-                                              invert = recurrenceTimes,
+                                              recurrenceTimes = recurrenceTimes,
                                               AUTO = AUTO,
                                               chromatic = chromatic,
                                               matrices = matrices)
@@ -3243,7 +3265,7 @@ rp_calc <- function(RM,
   if(anisotropyHV){
     out_hv_ani <- data.frame(
       Nlines_ani   = ((lineMeasures_global$N_hlp - lineMeasures_global$N_vlp)  / (lineMeasures_global$N_hlp  + lineMeasures_global$N_vlp))%00%NA,
-      LAM_ani      = (lineMeasures_global$LAM_hl - lineMeasures_global$LAM_vl) / (lineMeasures_global$LAM_hl + lineMeasures_global$LAM_vl),
+      LAM_ani  = (lineMeasures_global$LAM_hl - lineMeasures_global$LAM_vl) / (lineMeasures_global$LAM_hl + lineMeasures_global$LAM_vl),
       MEAN_ani = (lineMeasures_global$TT_hl  - lineMeasures_global$TT_vl)  / (lineMeasures_global$TT_hl  + lineMeasures_global$TT_vl),
       MAX_ani  = (lineMeasures_global$MAX_hl - lineMeasures_global$MAX_vl) / (lineMeasures_global$MAX_hl + lineMeasures_global$MAX_vl),
       ENT_ani  = (lineMeasures_global$ENT_hl - lineMeasures_global$ENT_vl) / (lineMeasures_global$ENT_hl + lineMeasures_global$ENT_vl)
@@ -3258,7 +3280,7 @@ rp_calc <- function(RM,
     RMu <- RM
     RMu[lower.tri(RMu)] <- 0
 
-    recmatsize_u <- rp_size(RMu, AUTO = AUTO, theiler = theiler)
+    recmatsize_u <- rp_size(RM = RMu, AUTO = AUTO, theiler = theiler)
 
     lineMeasures_upper <- rp_calc_lineMeasures(RM = RMu,
                                                RP_N = RP_N,
@@ -3266,7 +3288,7 @@ rp_calc <- function(RM,
                                                VLmin = VLmin, VLmax = VLmax,
                                                HLmin = HLmin, HLmax = HLmax,
                                                theiler = theiler,
-                                               invert = recurrenceTimes,
+                                               recurrenceTimes = recurrenceTimes,
                                                AUTO = AUTO,
                                                chromatic = chromatic,
                                                matrices = FALSE)
@@ -3293,7 +3315,7 @@ rp_calc <- function(RM,
     RMl <- RM
     RMl[upper.tri(RMl)] <- 0
 
-    recmatsize_l <- rp_size(RMl, AUTO = AUTO, theiler = theiler)
+    recmatsize_l <- rp_size(RM = RMl, AUTO = AUTO, theiler = theiler)
 
     lineMeasures_lower <- rp_calc_lineMeasures(RM = RMl,
                                                RP_N = RP_N,
@@ -3302,7 +3324,7 @@ rp_calc <- function(RM,
                                                HLmin = HLmin, HLmax = HLmax,
                                                theiler = theiler,
                                                AUTO = AUTO,
-                                               invert = recurrenceTimes,
+                                               recurrenceTimes = recurrenceTimes,
                                                chromatic = chromatic,
                                                matrices = FALSE)
 
@@ -3402,7 +3424,7 @@ rp_calc_lineMeasures <- function(RM,
                                  HLmax = length(Matrix::diag(RM)),
                                  d         = NULL,
                                  theiler   = NA,
-                                 invert    = FALSE,
+                                 recurrenceTimes    = FALSE,
                                  AUTO      = NULL,
                                  chromatic = FALSE,
                                  matrices  = FALSE){
@@ -3414,7 +3436,7 @@ rp_calc_lineMeasures <- function(RM,
                               VLmin = VLmin, VLmax = VLmax,
                               HLmin = HLmin, HLmax = HLmax,
                               d = d, theiler = theiler,
-                              invert = invert, AUTO = AUTO,
+                              recurrenceTimes = recurrenceTimes, AUTO = AUTO,
                               chromatic = chromatic,
                               matrices = matrices)
 
@@ -3555,6 +3577,27 @@ rp_calc_lineMeasures <- function(RM,
   }
 }
 
+
+rp_calc_par <- function(X,
+                        Y,
+                        emRad = NULL,
+                        DLmin = 2,
+                        VLmin = 2,
+                        HLmin = 2,
+                        DLmax = NROW(X),
+                        VLmax = NROW(X),
+                        HLmax = NROW(X),
+                        theiler   = NA,
+                        AUTO      = NULL,
+                        chromatic = FALSE,
+                        anisotropyHV = FALSE,
+                        asymmetryUL = FALSE,
+                        returnUL = FALSE,
+                        recurrenceTimes = FALSE,
+                        matrices  = FALSE){
+
+
+}
 
 
 #' Prepare matrix
