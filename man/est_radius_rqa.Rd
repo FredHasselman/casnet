@@ -8,8 +8,6 @@ est_radius_rqa(
   y1 = NULL,
   y2 = NULL,
   AUTO = NULL,
-  emLag = 1,
-  emDim = 1,
   method = "Euclidean",
   startRadius = NULL,
   targetValue = 0.05,
@@ -23,18 +21,6 @@ est_radius_rqa(
 )
 }
 \arguments{
-\item{y1}{A numeric vector or time series}
-
-\item{y2}{A numeric vector or time series for cross recurrence}
-
-\item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
-
-\item{emLag}{The embedding lag}
-
-\item{emDim}{The embedding dimensions}
-
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
-
 \item{startRadius}{The starting value for the radius (default = SD of time series values)}
 
 \item{targetValue}{When argument \code{type} is set to "fixed", the value represents the target value for the measure in \code{targetMeasure} (default = \code{RR = .05}).}

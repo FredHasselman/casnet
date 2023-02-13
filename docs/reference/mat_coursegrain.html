@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
       </span>
     </div>
 
@@ -143,16 +143,21 @@
 <span class="r-in"><span><span class="co"># Binary</span></span></span>
 <span class="r-in"><span><span class="va">RMb1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span>, emRad <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb1</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Auto-RQA, not including diagonal, theiler set to 1...</span>
 <span class="r-plt img"><img src="mat_coursegrain-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Reported RQA measures in rp_plot will be based on the full matrix</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb1</span>, maxSize <span class="op">=</span> <span class="fl">100</span><span class="op">^</span><span class="fl">2</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Auto-RQA, not including diagonal, theiler set to 1...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> NOTE: To speed up the plotting process, the RP will represent a coursegrained matrix. Set argument 'courseGrain = FALSE' to see the full matrix.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Auto-RQA, not including diagonal, theiler set to 1...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Binary matrix... using summary function 'ifelse(mean(x, na.rm = TRUE)&gt;recurrence_threshold,1,0)' for coursegraining.</span>
 <span class="r-plt img"><img src="mat_coursegrain-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Plotting the coursegrained matrix itself will yield different values</span></span></span>
 <span class="r-in"><span><span class="va">RMb2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMb1</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Auto-RQA, not including diagonal, theiler set to 1...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Binary matrix... using summary function 'ifelse(mean(x, na.rm = TRUE)&gt;recurrence_threshold,1,0)' for coursegraining.</span>
 <span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMb2</span>, plotMeasures <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Auto-RQA, not including diagonal, theiler set to 1...</span>
 <span class="r-plt img"><img src="mat_coursegrain-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Categorical</span></span></span>

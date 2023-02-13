@@ -22,38 +22,6 @@ rqa_calc_lineMeasures(
   matrices = FALSE
 )
 }
-\arguments{
-\item{y1}{A numeric vector or time series}
-
-\item{y2}{A numeric vector or time series for cross recurrence}
-
-\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
-
-\item{DLmin}{Minimal diagonal line length (default = \code{2})}
-
-\item{VLmin}{Minimal vertical line length (default = \code{2})}
-
-\item{HLmin}{Minimal horizontal line length (default = \code{2})}
-
-\item{DLmax}{Maximal diagonal line length (default = length of diagonal -1)}
-
-\item{VLmax}{Maximal vertical line length (default = length of diagonal -1)}
-
-\item{HLmax}{Maximal horizontal line length (default = length of diagonal -1)}
-
-\item{theiler}{Use a \code{theiler} window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:
-\itemize{
-\item \code{0} will include the main diagonal in all RQA measure calculations.
-\item \code{1} will remove the main diagonal from all RQA measure calculations.
-\item \code{NA} (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting \code{theiler = 1} (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set \code{theiler = 0}.
-\item A value greater than \code{1} will remove that many diagonals around and including the diagonal from all RQA measure calculations. So \code{theiler = 2} means exclude \code{2} diagonals around the main diagonal, including the main diagonal itself: \verb{[-1,0,1]}.
-If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. \code{theiler = c(-1,5)} will exclude \verb{[-1,0,1,2,3,4,5]}. If \code{length(theiler) > 2}, the values will be considered individual diagonal ID's, e.g. \code{theiler = c(-3,-1,0,2,5)}, will exclude only those specific ID's. Also see the note.
-}}
-
-\item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
-
-\item{chromatic}{Perform a chromatic RQA. This assumes the recurring values represent the labels of an unordered categorical variable (default = \code{FALSE})}
-}
 \description{
 rqa_lineMeasures
 }

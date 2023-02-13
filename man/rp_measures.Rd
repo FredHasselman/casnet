@@ -26,6 +26,7 @@ rp_measures(
   CL = 0.95,
   targetValue = 0.05,
   doParallel = FALSE,
+  alwaysUseRP = FALSE,
   silent = TRUE
 )
 }
@@ -76,6 +77,8 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR", tol = .2)} if \code{is.na(emRad)==TRUE}, it will estimate a radius (default = \code{.05}).}
 
 \item{doParallel}{Speed up calculations by using the parallel processing options provided by \code{parallel} to assign a separate process/core for each window in windowed (C)RQA analysis and \code{\link[parallel:detectCores]{parallel::detectCores()}} with  \code{logical = TRUE} to decide on the available cores (default = \code{FALSE})}
+
+\item{alwaysUseRP}{Always use the Recurrence Matrix to calculate RQA measures (default = \code{FALSE})}
 
 \item{silent}{Do not display any messages (default = \code{TRUE})}
 }

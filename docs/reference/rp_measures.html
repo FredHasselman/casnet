@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
       </span>
     </div>
 
@@ -87,6 +87,7 @@
 <span>  CL <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  targetValue <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  doParallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  alwaysUseRP <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  silent <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -176,6 +177,10 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 
 <dt>doParallel</dt>
 <dd><p>Speed up calculations by using the parallel processing options provided by <code>parallel</code> to assign a separate process/core for each window in windowed (C)RQA analysis and <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> with  <code>logical = TRUE</code> to decide on the available cores (default = <code>FALSE</code>)</p></dd>
+
+
+<dt>alwaysUseRP</dt>
+<dd><p>Always use the Recurrence Matrix to calculate RQA measures (default = <code>FALSE</code>)</p></dd>
 
 
 <dt>silent</dt>

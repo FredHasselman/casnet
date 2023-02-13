@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
       </span>
     </div>
 
@@ -85,61 +85,6 @@
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
-    <div id="arguments">
-    <h2>Arguments</h2>
-    <dl><dt>y1</dt>
-<dd><p>A numeric vector or time series</p></dd>
-
-
-<dt>y2</dt>
-<dd><p>A numeric vector or time series for cross recurrence</p></dd>
-
-
-<dt>emRad</dt>
-<dd><p>The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If <code>NULL</code>, an unthresholded matrix will be created (default = <code>NULL</code>)</p></dd>
-
-
-<dt>DLmin</dt>
-<dd><p>Minimal diagonal line length (default = <code>2</code>)</p></dd>
-
-
-<dt>VLmin</dt>
-<dd><p>Minimal vertical line length (default = <code>2</code>)</p></dd>
-
-
-<dt>HLmin</dt>
-<dd><p>Minimal horizontal line length (default = <code>2</code>)</p></dd>
-
-
-<dt>DLmax</dt>
-<dd><p>Maximal diagonal line length (default = length of diagonal -1)</p></dd>
-
-
-<dt>VLmax</dt>
-<dd><p>Maximal vertical line length (default = length of diagonal -1)</p></dd>
-
-
-<dt>HLmax</dt>
-<dd><p>Maximal horizontal line length (default = length of diagonal -1)</p></dd>
-
-
-<dt>theiler</dt>
-<dd><p>Use a <code>theiler</code> window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:</p><ul><li><p><code>0</code> will include the main diagonal in all RQA measure calculations.</p></li>
-<li><p><code>1</code> will remove the main diagonal from all RQA measure calculations.</p></li>
-<li><p><code>NA</code> (default), will check if the matrix is symmetrical , if so, it will remove the diagonal by setting <code>theiler = 1</code> (Line of Identity, Auto-RQA), if it is not symmetrical (Line of Synchronisation, Cross-RQA) it will set <code>theiler = 0</code>.</p></li>
-<li><p>A value greater than <code>1</code> will remove that many diagonals around and including the diagonal from all RQA measure calculations. So <code>theiler = 2</code> means exclude <code>2</code> diagonals around the main diagonal, including the main diagonal itself: <code>[-1,0,1]</code>.
-If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code> it is possible to exclude an asymmetrical window. The values are interpreted as end points in a sequence of diagonal ID's, e.g. <code>theiler = c(-1,5)</code> will exclude <code>[-1,0,1,2,3,4,5]</code>. If <code>length(theiler) &gt; 2</code>, the values will be considered individual diagonal ID's, e.g. <code>theiler = c(-3,-1,0,2,5)</code>, will exclude only those specific ID's. Also see the note.</p></li>
-</ul></dd>
-
-
-<dt>AUTO</dt>
-<dd><p>Auto-recurrence? (default = <code>FALSE</code>)</p></dd>
-
-
-<dt>chromatic</dt>
-<dd><p>Perform a chromatic RQA. This assumes the recurring values represent the labels of an unordered categorical variable (default = <code>FALSE</code>)</p></dd>
-
-</dl></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

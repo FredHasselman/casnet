@@ -13,6 +13,7 @@ plotRN_phaseSeries(
   excludeNorec = TRUE,
   excludeVars = "",
   excludePhases = "",
+  plotCentroid = FALSE,
   returnGraph = FALSE
 )
 }

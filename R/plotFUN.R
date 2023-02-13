@@ -2130,6 +2130,7 @@ plotRN_phaseSeries <- function(phaseOutput,
                                excludeNorec = TRUE,
                                excludeVars = "",
                                excludePhases = "",
+                               plotCentroid = FALSE,
                                returnGraph = FALSE){
 
 

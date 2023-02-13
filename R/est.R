@@ -409,8 +409,6 @@ est_radius <- function(RM = NULL,
 est_radius_rqa <- function(y1 = NULL,
                        y2 = NULL,
                        AUTO = NULL,
-                       emLag = 1,
-                       emDim = 1,
                        method = "Euclidean",
                        startRadius    = NULL,
                        targetValue    = 0.05,
@@ -426,8 +424,18 @@ est_radius_rqa <- function(y1 = NULL,
   checkPkg("parallel")
   numCores <- parallel::detectCores()
 
+  if(is.null(y2)|all(is.na(y2))){
+    message("Assuming Auto-RQA...")
+    AUTO <- TRUE
+    y2 <- NA
+  }
+
   if(is.null(AUTO)){
     stop("Auto-RQA or Cross-RQA? (Provide a value for AUTO)")
+  }
+
+  if(is.null(attributes(y1)$embedding.lag)){
+    stop("Please use `ts_embed()` to generate `y1` and/or `y2`.")
   }
 
   if(all(is.na(y2%00%NA))){
@@ -455,20 +463,28 @@ est_radius_rqa <- function(y1 = NULL,
   #
   # RM <- setTheiler(RM = RM, theiler = theiler, silent = TRUE)
 
-
   # if(!rescaleDist%in%"none"){
   #   warning("Cannot rescale distance matrix, please rescale the time series to standardeviation (z-score) or unit scale (min/max)")
   # }
 
+  dist_method <- return_error(proxy::pr_DB$get_entry(method))
+  if("error"%in%class(dist_method$value)){
+    stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
+  }
 
   if(is.null(startRadius)){
     #startRadius <- mean(c(as.numeric(minDist),as.numeric(maxDist)), na.rm = TRUE)
     if(!AUTO){
-      startRadius <- as.numeric(proxy::dist(min(unlist(y1), na.rm = TRUE), min(unlist(y2), na.rm = TRUE), pairwise = TRUE))
+      startRadius <- as.numeric(stats::quantile(unique(proxy::dist(x = y1, y = y2, pairwise = FALSE, method = method)),
+                                                probs = ifelse(targetValue>=1,.05,targetValue)))
     } else {
-      startRadius <- as.numeric(proxy::dist(min(unlist(y1), na.rm = TRUE), (min(unlist(y1), na.rm = TRUE)*.5), pairwise = TRUE))
+      startRadius <- as.numeric(stats::quantile(unique(proxy::dist(x = y1, y = y1, pairwise = FALSE, method = method)),
+                                                probs = ifelse(targetValue>=1,.05,targetValue)))
     }
   }
+
+    # as.numeric(quantile(proxy::dist(y1, pairwise = FALSE), probs = targetValue))
+
     tryRadius <- startRadius
     Measure   <- 0
     iter      <- 0
@@ -551,7 +567,12 @@ est_radius_rqa <- function(y1 = NULL,
 
       if(!silent){cat(paste("Iteration",iter,"\n"))}
 
-      outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonals = TRUE), mc.cores = numCores)
+      outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE), mc.cores = numCores)
+
+      # tmpp <- list()
+      # for(i in 1:length(rows)){
+      #   tmpp[[i]] <- rqa_fast(index = rows[i], y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE)
+      # }
 
       #RP_N <- sum((as.vector(RM)>0)&(as.vector(RM)<tryRadius))
 
@@ -623,7 +644,7 @@ est_radius_rqa <- function(y1 = NULL,
         iterList$Radius[iter] <- dplyr::case_when(
           radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
           radiusOnFail%in%"huge" ~ 1 + round(as.numeric(maxRP_dist),3),
-          radiusOnFail%in%"minimum" ~ round(as.numeric(minRP_dist),3)
+          radiusOnFail%in%"percentile" ~ round(as.numeric(startRadius),3)
         )
         warning(paste0("\nTarget not found, try increasing tolerance, max. iterations, or, change value of startRadius.\nreturning radius: ",iterList$Radius[iter]))
         iterList$stopRadius[iter] <- tryRadius

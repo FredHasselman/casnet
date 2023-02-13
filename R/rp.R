@@ -290,6 +290,7 @@ rp <- function(y1, y2 = NULL,
 #' @param CL Confidence limit for bootstrap results (default = `.95`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR", tol = .2)` if `is.na(emRad)==TRUE`, it will estimate a radius (default = `.05`).
 #' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a separate process/core for each window in windowed (C)RQA analysis and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
+#' @param alwaysUseRP Always use the Recurrence Matrix to calculate RQA measures (default = `FALSE`)
 #' @param silent Do not display any messages (default = `TRUE`)
 #'
 #' @return A list object containing (C)RQA measures (and matrices if requested)
@@ -319,13 +320,12 @@ rp_measures <- function(RM,
                         CL        = .95,
                         targetValue = .05,
                         doParallel = FALSE,
+                        alwaysUseRP  = FALSE,
                         silent     = TRUE){
 
 
   # Input should be a distance matrix, or a matrix of zeroes and ones with emRad = NULL, output is a list
   # Fred Hasselman - August 2013
-
-  #require(parallel)
 
   # check auto-recurrence and make sure Matrix has sparse triplet representation
   RM <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
@@ -333,6 +333,52 @@ rp_measures <- function(RM,
   if(is.null(AUTO)){
     AUTO <- attr(RM,"AUTO")
   }
+
+  #require(parallel)
+  if(is.na(theiler)){
+    if(AUTO){
+      theiler <- 0
+      message("Auto-RQA, not including diagonal, theiler set to 1...")
+    } else {
+      theiler <- 1
+      message("Cross-RQA, including diagonal, theiler set to 0...")
+    }
+  }
+
+  if(!alwaysUseRP){
+    if(max(dim(RM))>2046){
+
+      y1 <- attributes(RM)$emDims1
+      y2 <- attributes(RM)$emDims2
+
+      out <- rqa_par(y1 = y1,
+                 y2 = y2,
+                 emRad = emRad,
+                 DLmin = DLmin,
+                 VLmin = VLmin,
+                 HLmin = HLmin,
+                 DLmax = DLmax,
+                 VLmax = VLmax,
+                 HLmax = HLmax,
+                 theiler = theiler,
+                 AUTO  = AUTO,
+                 chromatic = chromatic,
+                 anisotropyHV = anisotropyHV,
+                 asymmetryUL = asymmetryUL,
+                 recurrenceTimes = recurrenceTimes,
+                 weighted = FALSE,
+                 weightedBy = "si",
+                 method = method,
+                 rescaleDist = c("none","maxDist","meanDist")[1],
+                 targetValue  = targetValue,
+                 doEmbed = FALSE,
+                 silent = silent,
+                 ...)
+
+      return(out)
+    }
+  }
+
 
   if(is.na(chromatic)){
     if(!is.null(attr(RM,"chromatic"))){
@@ -471,24 +517,43 @@ rp_measures <- function(RM,
   #rm(RM)
 
   if(!chromatic){
-    suppressMessages(out <- rp_calc(RM,
-                                    emRad = emRad,
-                                    DLmin = DLmin,
-                                    VLmin = VLmin,
-                                    HLmin = HLmin,
-                                    DLmax = DLmax,
-                                    VLmax = VLmax,
-                                    HLmax = HLmax,
-                                    theiler = theiler,
-                                    AUTO  = AUTO,
-                                    chromatic = chromatic,
-                                    anisotropyHV = anisotropyHV,
-                                    asymmetryUL = asymmetryUL,
-                                    recurrenceTimes = recurrenceTimes,
-                                    matrices  = matrices))
-    }
 
-    if(matrices){
+      suppressMessages(out <- rp_calc(RM,
+                                      emRad = emRad,
+                                      DLmin = DLmin,
+                                      VLmin = VLmin,
+                                      HLmin = HLmin,
+                                      DLmax = DLmax,
+                                      VLmax = VLmax,
+                                      HLmax = HLmax,
+                                      theiler = theiler,
+                                      AUTO  = AUTO,
+                                      chromatic = chromatic,
+                                      anisotropyHV = anisotropyHV,
+                                      asymmetryUL = asymmetryUL,
+                                      recurrenceTimes = recurrenceTimes))
+  }
+
+    # } else {
+    #
+    #   suppressMessages(out <- rp_calc(RM,
+    #                                   emRad = emRad,
+    #                                   DLmin = DLmin,
+    #                                   VLmin = VLmin,
+    #                                   HLmin = HLmin,
+    #                                   DLmax = DLmax,
+    #                                   VLmax = VLmax,
+    #                                   HLmax = HLmax,
+    #                                   theiler = theiler,
+    #                                   AUTO  = AUTO,
+    #                                   chromatic = chromatic,
+    #                                   anisotropyHV = anisotropyHV,
+    #                                   asymmetryUL = asymmetryUL,
+    #                                   recurrenceTimes = recurrenceTimes,
+    #                                   matrices  = matrices))
+    # }
+  #}
+  if(matrices){
       tab <- out$crqaMeasures
     } else {
       tab <- out
@@ -568,7 +633,6 @@ rp_measures <- function(RM,
         rownames(outTable[[id]]$`Line-based Measures`) <- paste(1:NROW(outTable[[id]]$`Line-based Measures`), rep(chromaNames, 3))
       }
     }
-
 
     if(!silent){
       cat("\n~~~o~~o~~casnet~~o~~o~~~\n")

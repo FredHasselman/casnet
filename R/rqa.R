@@ -18,7 +18,7 @@
 #'
 #' @examples
 #'
-rqa <- function(y1, y2 = NULL,
+rqa_par <- function(y1, y2 = NULL,
                 emDim = 1,
                 emLag = 1,
                 emRad = NULL,
@@ -31,16 +31,13 @@ rqa <- function(y1, y2 = NULL,
                 DLmax = NROW(y1),
                 VLmax = NROW(y1),
                 HLmax = NROW(y1),
-                to.ts = NULL,
-                order.by = NULL,
-                to.sparse = TRUE,
                 weighted = FALSE,
                 weightedBy = "si",
                 method = "Euclidean",
                 rescaleDist = c("none","maxDist","meanDist")[1],
                 targetValue  = .05,
                 chromatic = FALSE,
-                returnMeasures = FALSE,
+                recurrenceTimes = FALSE,
                 doPlot = FALSE,
                 doEmbed = TRUE,
                 silent = TRUE,
@@ -109,7 +106,7 @@ rqa <- function(y1, y2 = NULL,
         emLag <- 1
       }
 
-      emRad <- est_radius_rqa(y1 = et1, y2 = et2, AUTO = AUTO, emDim = emDim, emLag = emLag, targetValue = targetValue, radiusOnFail = "minimum", theiler = theiler, method = method, silent = silent)
+      emRad <- est_radius_rqa(y1 = et1, y2 = et2, AUTO = AUTO, targetValue = targetValue, radiusOnFail = "quantile", theiler = theiler, method = method, silent = silent)
 
       if(emRad$Converged){
         emRad <- emRad$Radius
@@ -1129,3 +1126,28 @@ rqa_stitchRows <- function(rowA, rowB, revA = FALSE){
   }
 }
 
+
+rqa_plot <- function(RM, imagePath = NA, wMax = 2048, hMax = 2048){
+
+  if(is.na(imagePath)){
+    imagePath <- getwd()
+  }
+
+  if(all(stats::na.exclude(as.vector(RM))%in%c(0,1))){
+    cols <- c("white", "black")
+  } else {
+    cols <- scales::gradient_n_pal(colours = c("black","red3", "white", "steelblue"),
+                                   values = c(0, 0.0001,(mean(stats::na.exclude(as.vector(RM)), na.rm = TRUE)/max(stats::na.exclude(as.vector(RM)), na.rm = TRUE)),1))(as.vector(RM))
+  }
+
+  mar_old <- par("mar")  #lets not permanently change values
+  xpd_old <- par("xpd")  #lets not permanently change values
+  par(mar=rep(0, 4), xpd = NA)
+  png(filename = paste0(imagePath,"RPtmp.png"), width = min(wMax,dim(RM[1])), height = min(wMax,dim(RM[2])), units = "px")
+  graphics::image(as.matrix(RM), bty ="n",axes=FALSE,frame.plot=FALSE, xaxt="n", ann=FALSE, yaxt="n", asp=1, useRaster = TRUE, col = cols)
+  dev.off()
+  par(mar=mar_old, xpd=xpd_old)
+
+  return(paste0(imagePath,"RPtmp.png"))
+
+}

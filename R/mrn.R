@@ -466,7 +466,7 @@ mrn_plot     <- function(layers = NA,
                                     epochColours       = getColours(Ncols = 20),
                                     showSizeLegend     = FALSE,
                                     defaultEdgeColour  = "grey80",
-                                    vertexBorderColour = "gray99",
+                                    vertexBorderColour = "grey99",
                                     edgeColourByEpoch  = TRUE,
                                     doPlot             = FALSE)
 
