@@ -70,6 +70,9 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{silent}{Silent-ish mode}
 }
+\value{
+RQA measures
+}
 \description{
 Calculates RQA measures without building the recurrence matrix. Requires package \link{parallel}.
 }

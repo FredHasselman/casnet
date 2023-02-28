@@ -90,6 +90,8 @@
 <span>  recurrenceTimes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doEmbed <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  anisotropyHV <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  asymmetryUL <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  silent <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -190,6 +192,14 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 <dd><p>If <code>FALSE</code>, a distance matrix will be returned that is not embedded by <code>emDim</code> and <code>emLag</code> (Multidimensional RQA). If <code>y1</code> and/or <code>y2</code> are data frames, the columns will be used as the state space dimensions (default = <code>TRUE</code>)</p></dd>
 
 
+<dt>anisotropyHV</dt>
+<dd><p>Return anisotropy ratio measures based on Horizontal and Vertical lines. The ratios are calculated as <code>(horizontal - vertical) / (horizontal + vertical)</code>. So a value of 0 means no anisotropy, negative ratios indicate the measures based on vertical lines had  higher values, positive ratios indicate the measures based on horizontal lines had higher values  (default = <code>FALSE</code>)</p></dd>
+
+
+<dt>asymmetryUL</dt>
+<dd><p>Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as <code>(upper - lower) / (upper + lower)</code>. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = <code>FALSE</code>)</p></dd>
+
+
 <dt>silent</dt>
 <dd><p>Silent-ish mode</p></dd>
 
@@ -198,6 +208,12 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 <dd><p>Any parameters to pass to <code><a href="rp_plot.html">rp_plot()</a></code> if <code>doPlot = TRUE</code></p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>RQA</p>
+    </div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

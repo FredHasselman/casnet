@@ -28,6 +28,8 @@ rqa_par(
   recurrenceTimes = FALSE,
   doPlot = FALSE,
   doEmbed = TRUE,
+  anisotropyHV = FALSE,
+  asymmetryUL = FALSE,
   silent = TRUE,
   ...
 )
@@ -84,9 +86,16 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag} (Multidimensional RQA). If \code{y1} and/or \code{y2} are data frames, the columns will be used as the state space dimensions (default = \code{TRUE})}
 
+\item{anisotropyHV}{Return anisotropy ratio measures based on Horizontal and Vertical lines. The ratios are calculated as \code{(horizontal - vertical) / (horizontal + vertical)}. So a value of 0 means no anisotropy, negative ratios indicate the measures based on vertical lines had  higher values, positive ratios indicate the measures based on horizontal lines had higher values  (default = \code{FALSE})}
+
+\item{asymmetryUL}{Return asymmetry ratio measures based on Upper and Lower triangles. The ratios are calculated as \code{(upper - lower) / (upper + lower)}. So a value of 0 means no asymmetry, negative ratios indicate the measures based on the lower triangle had the higher values, positive ratios indicate measures based on the upper triangle had higher values (default = \code{FALSE})}
+
 \item{silent}{Silent-ish mode}
 
 \item{...}{Any parameters to pass to \code{\link[=rp_plot]{rp_plot()}} if \code{doPlot = TRUE}}
+}
+\value{
+RQA
 }
 \description{
 Calculate (C)RQA measures without creating a recurrence matrix. Can handle very large time series and requires package \link{parallel} to be installed.

@@ -32,6 +32,9 @@ rqa_fast(
 
 \item{method}{distance method}
 }
+\value{
+list of vectors
+}
 \description{
 Fast rqa
 }

@@ -16,7 +16,6 @@ A data.frame with two index columns named \code{"Var1"} and \code{"Var2"}
 Mimics the default behaviour of \code{reshape2::melt()}
 }
 \examples{
-
 mat_mat2ind(as.matrix(1:100,ncol=10))
 
 }

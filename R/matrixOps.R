@@ -202,7 +202,6 @@ mat_di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
 #' @export
 #'
 #' @examples
-#'
 #' mat_mat2ind(as.matrix(1:100,ncol=10))
 #'
 mat_mat2ind <- function(mat){
@@ -226,8 +225,6 @@ mat_mat2ind <- function(mat){
 #' @return list
 #'
 #' @export
-#'
-#' @examples
 #'
 mat_ind <- function(Xlength, Ylength, index, diagonal = FALSE){
 

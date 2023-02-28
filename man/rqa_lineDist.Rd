@@ -9,6 +9,9 @@ rqa_lineDist(idx)
 \arguments{
 \item{idx}{idx}
 }
+\value{
+line distributions
+}
 \description{
 Fast line dist
 }

@@ -14,9 +14,8 @@
 #'
 #' @export
 #'
-#' @return
+#' @return RQA
 #'
-#' @examples
 #'
 rqa_par <- function(y1, y2 = NULL,
                 emDim = 1,
@@ -40,6 +39,8 @@ rqa_par <- function(y1, y2 = NULL,
                 recurrenceTimes = FALSE,
                 doPlot = FALSE,
                 doEmbed = TRUE,
+                anisotropyHV = FALSE,
+                asymmetryUL = FALSE,
                 silent = TRUE,
                 ...){
 
@@ -120,7 +121,7 @@ rqa_par <- function(y1, y2 = NULL,
     stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
   } else {
 
-    RQAout <- rqa_measures(y1 = et1, y2 = et2, emRad = emRad, DLmin = DLmin, VLmin = VLmin, HLmin = HLmin, DLmax = DLmax, VLmax = VLmax, HLmax = HLmax, AUTO = AUTO, theiler = theiler, method = method, silent = silent)
+    RQAout <- rqa_measures(y1 = et1, y2 = et2, emRad = emRad, DLmin = DLmin, VLmin = VLmin, HLmin = HLmin, DLmax = DLmax, VLmax = VLmax, HLmax = HLmax, AUTO = AUTO, theiler = theiler, method = method, chromatic = chromatic, anisotropyHV = anisotropyHV, asymmetryUL = asymmetryUL, silent = silent)
 
   }
 
@@ -255,7 +256,7 @@ rqa_getSeries <- function(y1, y2 = NULL,
 #' @param diagonal diagonals
 #' @param method distance method
 #'
-#' @return
+#' @return list of vectors
 #'
 #' @export
 #'
@@ -366,10 +367,10 @@ rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, dia
 #'
 #' @param idx idx
 #'
-#' @return
+#' @return line distributions
+#'
 #' @export
 #'
-#' @examples
 rqa_lineDist <- function(idx){
   sort(which(diff(c(0,as.numeric(idx),0))==-1)-which(diff(c(0,as.numeric(idx),0))==1))
 }
@@ -381,12 +382,9 @@ rqa_lineDist <- function(idx){
 #' @inheritParams rp
 #' @inheritParams rp_measures
 #'
-#' @return
+#' @return RQA measures
 #'
 #' @export
-#'
-#' @examples
-#'
 #'
 #'
 rqa_measures <- function(y1,
@@ -715,11 +713,12 @@ rqa_measures <- function(y1,
 
 #' rqa_calc
 #'
-#' @inheritParams rqa_measures
+#' @inheritParams  rqa_measures
 #' @param distributions Return line length distributions.
 #'
 #' @return CRQA measures and matrices of line distributions (if requested) based on massively parallel analysis, without building the recurrence matrix.
 #' @export
+#'
 #' @keywords internal
 #'
 rqa_calc <- function(y1,
@@ -831,7 +830,7 @@ rqa_calc <- function(y1,
   rm(outD, diagonals.distX, diagonals.distY)
 
   # Verticals ----
-  outV <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = AUTO, diagonal = FALSE, theiler = theiler, method = method), mc.cores = numCores)
+  outV <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = TRUE, diagonal = FALSE, theiler = theiler, method = method), mc.cores = numCores)
 
   verticals.dist <- sort(unlist(parallel::mclapply(outV,rqa_lineDist)))
   verticals.dist <- verticals.dist[verticals.dist%[]%c(VLmin,VLmax)]
@@ -1009,9 +1008,9 @@ rqa_calc <- function(y1,
 
 #' rqa_lineMeasures
 #'
-#' @inheritParams rqa
+#' @inheritParams rqa_par
 #'
-#' @return
+#' @return RQA line measures
 #' @export
 #'
 #' @keywords internal
@@ -1112,7 +1111,7 @@ rqa_calc_lineMeasures <- function(y1,
 #' @param rowB rowB
 #' @param revA revA
 #'
-#' @return
+#' @return stitching
 #'
 #' @export
 #'
@@ -1127,6 +1126,19 @@ rqa_stitchRows <- function(rowA, rowB, revA = FALSE){
 }
 
 
+#' Plot large RP
+#'
+#' @param RM  RM
+#' @param imagePath imagePath
+#' @param wMax wMax
+#' @param hMax hMax
+#'
+#' @return image
+#'
+#' @keywords internal
+#'
+#' @export
+#'
 rqa_plot <- function(RM, imagePath = NA, wMax = 2048, hMax = 2048){
 
   if(is.na(imagePath)){

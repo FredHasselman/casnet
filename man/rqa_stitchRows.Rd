@@ -13,6 +13,9 @@ rqa_stitchRows(rowA, rowB, revA = FALSE)
 
 \item{revA}{revA}
 }
+\value{
+stitching
+}
 \description{
 Stitch rows
 }
