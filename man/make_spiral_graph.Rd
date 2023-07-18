@@ -33,7 +33,9 @@ make_spiral_graph(
   showEdgeColourLegend = FALSE,
   edgeColourByEpoch = TRUE,
   defaultEdgeColour = "grey70",
-  doPlot = TRUE
+  doPlot = TRUE,
+  ggplotReturn = FALSE,
+  igraphReturn = FALSE
 )
 }
 \arguments{
@@ -94,6 +96,10 @@ make_spiral_graph(
 \item{defaultEdgeColour}{Colour of edges that do not connect to the same epoch (default = \code{"grey70"})}
 
 \item{doPlot}{Produce a plot? (default = \code{TRUE})}
+
+\item{ggplotReturn}{returns the ggplot object (default = \code{FALSE})}
+
+\item{igraphReturn}{returns the intermediate iGraph object. This will not look the same as the final graph, but has most of the attributes, like edge and vertex colors and spiral layout (default = \code{FALSE})}
 }
 \value{
 A ggplot object.

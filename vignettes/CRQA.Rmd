@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 	message = FALSE,
 	warning = FALSE,
 	collapse = FALSE,
+	cache = FALSE,
 	comment = ">",
 	tidy=FALSE,
 	dpi = 72,
@@ -41,32 +42,233 @@ p code {
 }
 ```
 
-This vignette discusses how to conduct a large variety of recurrence-based time series analyses using R-package *casnet*. It is not the only `R` package that can run recurrence analyses, the closest alternative to `casnet` is probably package [`crqa`](https://cran.r-project.org/web/packages/crqa/index.html). It has a great tutorial paper by [@coco2014]). Several other packages have dedicated functions, e.g. package `nonlinearTseries` has a function `RQA`. There are also many options outside of the `R` framework, see the [Recurrence Plot webpage](http://www.recurrence-plot.tk/programmes.php) for a comprehensive list of software.
+This vignette discusses how to conduct a large variety of recurrence-based time series analyses using R-package *casnet*. It is not the only `R` package that can run recurrence analyses, the closest alternative in `R` to `casnet` is probably package [`crqa`](https://cran.r-project.org/web/packages/crqa/index.html). It has a great tutorial paper by [@coco2014]). Several other packages have dedicated functions, e.g. package `nonlinearTseries` has a function `RQA`. There are also many options outside of the `R` framework, see the [Recurrence Plot webpage](http://www.recurrence-plot.tk/programmes.php) for a comprehensive list of software.
 
-There are 2 main ways to run Recurrence Quantification Analyses in `casnet`:
+There are 3 ways to run Recurrence Quantification Analyses in `casnet`:
 
-* Using functions `rp`, `rp_measures` and `rp_plot`
-* Using function `rp_cl` which will run Norbert Marwan's [commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php)
+* Using functions `rp`, `rp_measures` and `rp_plot`. These functions use a thresholded distance matrix known as a recurrence plot to calculate RQA measures. Use these functions if your time series length is around `2000` data points or less.
+* Using function `rqa_par`, which does not construct a distance matrix, but processes matrix diagonals in parallel. The function is very fast and can handle very large time series.
+* Using function `rqa_cl` which will run Norbert Marwan's [commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php). You can run this if your OS allows execution of 32 bit command line executable.
 
-The following examples will use the native `casnet` functions, see the paragraph [An R interface to Marwan's commandline recurrence plots](#marwan) to learn about using `rp_cl()`.
+The following examples will demonstrate the basic use of the native `casnet` functions based on the `rqa_par` and `rp` families of functions, see the paragraph [An R interface to Marwan's commandline recurrence plots](#marwan) to learn about using `rqa_cl()` and [An R interface to Marwan's commandline recurrence plots](#marwan).
 
-The first part of this vignette will demonstrate the basics of recurrence quantification using unordered categorical data. The second part will discuss RQA for [continuous data](#lvSystem). This will be a bit more formal with respect to defining the recurrence matrix and how to calculate the various RQA measures.
-
-
-Please see the chapters on RQA the Complex Systems Approach book for more details: 
+To learn more about the different types of Recurrence Quantification Analysis that can be conducted in `casnet` please see the chapters on RQA in the Complex Systems Approach book for more details: 
 
 * [RQA on unordered categorical data](https://complexity-methods.github.io/book/unordered-categorical-data.html)
 
 * [RQA on continuous data](https://complexity-methods.github.io/book/lvSystem.html)
 
 
+
+# RQA based on a matrix: `rp()`
+
+
+
+## Unordered categorical data
+
+```{r}
+emDim   <- 1
+emLag   <- 1
+emRad   <- 0
+theiler <- 0 # Do not include the diagonal
+```
+
+## Continuous data 
+
+We'll use the examples used in the manual of the [PyRQA](https://pypi.org/project/PyRQA/) library for Python. This is convenient, the parameters `emDim`, `emLag` and `emRad` are already given (see [the CSA book](https://complexity-methods.github.io/book/lvSystem.html) for examples on how to estimate them with `casnet`) and it allows for a comparison of the output.
+
+```{r}
+# PyRQA example data
+data_points <- as.numeric(c(0.1, 0.5, 1.3, 0.7, 0.8, 1.4, 1.6, 1.2, 0.4, 1.1, 0.8, 0.2, 1.3))
+
+plot(ts(data_points), type = "b")
+```
+
+First, we create a distance matrix based on the (delay embedded) time series and decide on a threshold criterion to turn it into a recurrence matrix of `0`s and `1`s. We already have a radius given in the PyRQA example, using a convenient graphical tool for visual inspection of the relationship between different thresholds values and the resulting recurrence rate (`RR`), we can check what this radius will yield. 
+
+```{r}
+library(casnet)
+
+emDim   <- 2
+emLag   <- 2
+emRad   <- 0.65
+
+RM <- rp(y1 = data_points, emDim = emDim, emLag = emLag)
+rp_plot(RM, plotDimensions = TRUE, drawGrid = TRUE)
+```
+
+The code below applies the threshold `emRad` to the distance matrix, which generates a sparse matrix (class `dgcMatrix`, see package [Matrix]). 
+
+```{r}
+(RM <- rp(y1 = data_points, emDim = emDim, emLag = emLag, emRad = emRad))
+```
+
+The relevant analysis parameters, including the embedded series, are stored as attributes of the matrix object.
+
+```{r}
+attributes(RM)
+```
+
+It is custom to represent the recurrence matrix as a plot with coordinate `(1,1)` in the left lower corner. 
+
+```{r}
+rp_plot(RM, plotDimensions = TRUE, drawGrid = TRUE)
+```
+
+Because this analysis concerns Auto-RQA, the diagonal is usually excluded from the calculations of RQA measures. This can be achieved by setting the `theiler` parameter to `1`. This is in fact the default behavior in `casnet` if the `theiler` argument is `NA` and the recurrence matrix is detected to be symmetrical.  
+
+```{r}
+# Current value of theiler
+attributes(RM)$theiler
+# Values on the diagonal
+Matrix::diag(RM)
+
+# To explicitly include the diagonal in calculations set theiler to 0
+(RM <- rp(y1 = data_points, emDim = emDim, emLag = emLag, emRad = emRad, theiler = 0))
+attributes(RM)$theiler
+```
+
+In `casnet` the `theiler` correction will affect *all* calculations. This is different from, for example, PyRQA where it only affects the recurrence rate and measures based on diagonal line structures. Below are the results reported in the online [PyRQA manual](https://pypi.org/project/PyRQA/#usage), with the diagonal included:
+
+```
+RQA Result:
+===========
+
+Minimum diagonal line length (L_min): 2
+Minimum vertical line length (V_min): 2
+Minimum white vertical line length (W_min): 2
+
+Recurrence rate (RR): 0.371901
+Determinism (DET): 0.411765
+Average diagonal line length (L): 2.333333
+Longest diagonal line length (L_max): 3
+Divergence (DIV): 0.333333
+Entropy diagonal lines (L_entr): 0.636514
+Laminarity (LAM): 0.400000
+Trapping time (TT): 2.571429
+Longest vertical line length (V_max): 4
+Entropy vertical lines (V_entr): 0.955700
+Average white vertical line length (W): 2.538462
+Longest white vertical line length (W_max): 6
+Longest white vertical line length inverse (W_div): 0.166667
+Entropy white vertical lines (W_entr): 0.839796
+
+Ratio determinism / recurrence rate (DET/RR): 1.107190
+Ratio laminarity / determinism (LAM/DET): 0.971429
+```
+
+The same for `casnet`:
+
+```{r}
+# Including diagonal
+RM <- rp(y1 = data_points, emDim = emDim, emLag = emLag, emRad = emRad, theiler = 0)
+out_rqa <- rp_measures(RM, silent = FALSE)
+```
+
+
+```{r, echo = FALSE}
+# Exclude diagonal
+RM2 <- rp(y1 = data_points, emDim = emDim, emLag = emLag, emRad = emRad, theiler = 1)
+out_rqa2 <- rp_measures(RM2, silent = TRUE)
+
+compOUT <- data.frame(Quantity = c("RR","DET", "MAX_dl", "MEAN_dl", "ENT_dl", "LAM", "MAX_vl", "MEAN_vl", "ENT_vl"), 
+                      casnet = round(c(out_rqa$RR, out_rqa$DET, out_rqa$MAX_dl, out_rqa$MEAN_dl, out_rqa$ENT_dl, out_rqa$LAM_vl, out_rqa$MAX_vl, out_rqa$TT_vl, out_rqa$ENT_vl), digits = 6),
+                      casnet = round(c(out_rqa2$RR, out_rqa2$DET, out_rqa2$MAX_dl, out_rqa2$MEAN_dl, out_rqa2$ENT_dl, out_rqa2$LAM_vl, out_rqa2$MAX_vl, out_rqa2$TT_vl, out_rqa2$ENT_vl), digits = 6),
+                      PyRQA = c(0.371901, 0.411765, 3, 2.333333, 0.636514, 0.400000, 4, 2.571429, 0.955700),
+                      PyRQA = c("Yes","No","No","No","No","Yes","Yes","Yes","Yes"))
+
+```
+
+
+Below is a comparison of the output from `casnet::rp()` and `PyRQA`. Note that `PyRQA` includes the main diagonal for `RR` and measures based on vertical (and horizontal) lines.
+
+```{r, echo=FALSE}
+library(kableExtra)
+knitr::kable(compOUT, align = c("l","c","c","c","c"), col.names = NULL) %>%
+ kableExtra::add_header_above(c("\nMeasure","rp\n(theiler = 0)","rp\n(theiler = 1)", "PyRQA\n(theiler_corrector = 1)", "PyRQA\nDiagonal included?"))
+```
+
+
+# RQA based on massively parallel processing: `rqa_par()`
+
+
+`PyRQA` was developed to perform RQA on very long time series, without overloading memory and inflating the computing time to a degree that is unmanageable in a regular workflow. It is not recommended to use matrix based functions like `casnet::rp_measures()` on time series larger than `5,000` data points, instead, `casne::rqa_par()` can be used, which implements some of the methods used in `PyRQA`. Specifically, the memory management by limiting the precision (package [float]) and using bit compression (package [float]), as well as by computing RQA measures in a massively parallel way (package [parallel]). Compared to `casnet::rqa_par()`,`PyRQA` is still faster, but this difference becomes noticeable for very large time series (`>100,000`). 
+
+```{r}
+noise <- casnet::noise_powerlaw(N=10000, seed = 1234)
+plot(ts(noise),type = "l")
+
+#est_radius_rqa(ts_embed(noise, emDim = emDim, emLag = emLag), noise, AUTO = TRUE)
+```
+
+
+
+```
+RQA Result:
+===========
+
+Minimum diagonal line length (L_min): 2
+Minimum vertical line length (V_min): 2
+Minimum white vertical line length (W_min): 2
+
+Recurrence rate (RR): 0.049585
+Determinism (DET): 0.230880
+Average diagonal line length (L): 2.149236
+Longest diagonal line length (L_max): 7
+Divergence (DIV): 0.142857
+Entropy diagonal lines (L_entr): 0.443727
+Laminarity (LAM): 0.374149
+Trapping time (TT): 2.305511
+Longest vertical line length (V_max): 8
+Entropy vertical lines (V_entr): 0.709903
+Average white vertical line length (W): 28.154700
+Longest white vertical line length (W_max): 9079
+Longest white vertical line length inverse (W_div): 0.000110
+Entropy white vertical lines (W_entr): 3.909756
+
+Ratio determinism / recurrence rate (DET/RR): 4.656240
+Ratio laminarity / determinism (LAM/DET): 1.620535
+```
+
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# Including diagonal
+emRad <- 2
+emLag <- 100
+emDim <- 2
+emRad <- .00018
+out_rqa_par <-  casnet::rqa_par(y1 = noise, AUTO = TRUE, emDim = emDim, emLag = emLag, emRad = emRad, silent = FALSE, theiler = 0)
+```
+
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+# Exclude diagonal
+out_rqa_par2 <- rqa_par(y1 = noise, AUTO = TRUE, emDim = emDim, emLag = emLag, emRad = emRad, theiler = 1, silent = TRUE)
+
+compOUT2 <- data.frame(Meausure = c("RR","DET", "MAX_dl", "MEAN_dl", "ENT_dl", "LAM", "MAX_vl", "MEAN_vl", "ENT_vl"), 
+                      rqa_theiler0 = round(c(out_rqa_par$RR, out_rqa_par$DET, out_rqa_par$MAX_dl, out_rqa_par$MEAN_dl, out_rqa_par$ENT_dl, out_rqa_par$LAM_vl, out_rqa_par$MAX_vl, out_rqa_par$TT_vl, out_rqa_par$ENT_vl), digits = 6),
+                      rqa_theiler1 = round(c(out_rqa_par2$RR, out_rqa_par2$DET, out_rqa_par2$MAX_dl, out_rqa_par2$MEAN_dl, out_rqa_par2$ENT_dl, out_rqa_par2$LAM_vl, out_rqa_par2$MAX_vl, out_rqa_par2$TT_vl, out_rqa_par2$ENT_vl), digits = 6),
+                      PyRQA = c(0.049585, 0.230880, 7, 2.149236, 0.443727, 0.374149, 8, 2.305511, 0.709903),
+                      Diagonal = c("Yes","No","No","No","No","Yes","Yes","Yes","Yes"))
+
+```
+
+```{r, echo=FALSE}
+knitr::kable(compOUT2, col.names = NULL, align = c("l","c","c","c","c")) %>%
+ kableExtra::add_header_above(c("\nMeasure","crqa_par\n(theiler = 0)","crqa_par\n(theiler = 1)", "PyRQA\n(theiler_corrector = 1)", "PyRQA\nDiagonal included?"))
+```
+
+
+
 # An R interface to Marwan's commandline recurrence plots {#marwan}
 
-> **IMPORTANT**: Currently `rp_cl` can only run on an operating system that allows execution of 32-bit applications!
+> **IMPORTANT**: Currently `crqa_cl` can only run on an operating system that allows execution of 32-bit applications!
 
-The `rp_cl()` function is a wrapper for the [commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php) executable provided by Norbert Marwan. 
+The `crqa_cl()` function is a wrapper for the [commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php) executable provided by Norbert Marwan. 
 
-The `rp` executable is installed on your machine when the function `rp_cl()` is called for the first time:
+The `rp` executable file is installed on your machine when the function `rp_cl()` is called for the first time:
 
 * It is renamed to `rp` from a platform specific file downloaded from the [commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php) site.
 * The file is copied to the directory: `r normalizePath("[path to casnet]/exec/",mustWork = FALSE)`

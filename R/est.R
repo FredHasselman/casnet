@@ -65,7 +65,7 @@ est_radius <- function(RM = NULL,
     RM[NAid] <- max(Matrix::as.matrix(RM), na.rm = TRUE)+1
   }
 
-  if(all(as.vector(RM)%[]%c(0,1))){
+  if(all(as.vector(RM)%in%c(0,1))){
     stop("Matrix RM is already a binary matrix!")
   }
 
@@ -440,6 +440,14 @@ est_radius_rqa <- function(y1 = NULL,
     y2 <- NA
   }
 
+  if(is.na(theiler)){
+    if(AUTO){
+      theiler <- 1
+    } else {
+      theiler <- 0
+    }
+  }
+
   if(is.null(attributes(y1)$embedding.lag)){
     stop("Please use `ts_embed()` to generate `y1` and/or `y2`.")
   }
@@ -526,6 +534,7 @@ est_radius_rqa <- function(y1 = NULL,
 
       if(useParallel){
         outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
+        parallel::stopCluster(numCores)
       } else {
         outD <- lapply(rows, function(i) rqa_fast(y1 = y1, y2 = y2, index = i, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
       }

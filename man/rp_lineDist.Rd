@@ -74,6 +74,7 @@ Copyright (C) 2009 Stefan Schinkel, University of Potsdam
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
+\code{\link{createCorridor}()},
 \code{\link{mat_di2bi}()},
 \code{\link{mat_di2ch}()},
 \code{\link{mat_di2we}()},

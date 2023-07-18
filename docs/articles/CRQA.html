@@ -85,14 +85,15 @@
 
       
 
-      </header><div class="row">
+      </header><script src="CRQA_files/kePrint-0.0.1/kePrint.js"></script><link href="CRQA_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Recurrence Quantification Analysis</h1>
                         <h4 data-toc-skip class="author">Fred
 Hasselman</h4>
             
-            <h4 data-toc-skip class="date">2023-02-28</h4>
+            <h4 data-toc-skip class="date">2023-07-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/CRQA.Rmd" class="external-link"><code>vignettes/CRQA.Rmd</code></a></small>
       <div class="hidden name"><code>CRQA.Rmd</code></div>
@@ -109,34 +110,38 @@ p code {
 <p>This vignette discusses how to conduct a large variety of
 recurrence-based time series analyses using R-package <em>casnet</em>.
 It is not the only <code>R</code> package that can run recurrence
-analyses, the closest alternative to <code>casnet</code> is probably
-package <a href="https://cran.r-project.org/web/packages/crqa/index.html" class="external-link"><code>crqa</code></a>.
+analyses, the closest alternative in <code>R</code> to
+<code>casnet</code> is probably package <a href="https://cran.r-project.org/web/packages/crqa/index.html" class="external-link"><code>crqa</code></a>.
 It has a great tutorial paper by <span class="citation">[@coco2014]</span>). Several other packages have
 dedicated functions, e.g. package <code>nonlinearTseries</code> has a
 function <code>RQA</code>. There are also many options outside of the
 <code>R</code> framework, see the <a href="http://www.recurrence-plot.tk/programmes.php" class="external-link">Recurrence Plot
 webpage</a> for a comprehensive list of software.</p>
-<p>There are 2 main ways to run Recurrence Quantification Analyses in
+<p>There are 3 ways to run Recurrence Quantification Analyses in
 <code>casnet</code>:</p>
 <ul>
 <li>Using functions <code>rp</code>, <code>rp_measures</code> and
-<code>rp_plot</code>
-</li>
-<li>Using function <code>rp_cl</code> which will run Norbert Marwan’s <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
-Recurrence Plots</a>
-</li>
+<code>rp_plot</code>. These functions use a thresholded distance matrix
+known as a recurrence plot to calculate RQA measures. Use these
+functions if your time series length is around <code>2000</code> data
+points or less.</li>
+<li>Using function <code>rqa_par</code>, which does not construct a
+distance matrix, but processes matrix diagonals in parallel. The
+function is very fast and can handle very large time series.</li>
+<li>Using function <code>rqa_cl</code> which will run Norbert Marwan’s
+<a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
+Recurrence Plots</a>. You can run this if your OS allows execution of 32
+bit command line executable.</li>
 </ul>
-<p>The following examples will use the native <code>casnet</code>
-functions, see the paragraph <a href="#marwan">An R interface to
-Marwan’s commandline recurrence plots</a> to learn about using
-<code><a href="../reference/rp_cl.html">rp_cl()</a></code>.</p>
-<p>The first part of this vignette will demonstrate the basics of
-recurrence quantification using unordered categorical data. The second
-part will discuss RQA for <a href="#lvSystem">continuous data</a>. This
-will be a bit more formal with respect to defining the recurrence matrix
-and how to calculate the various RQA measures.</p>
-<p>Please see the chapters on RQA the Complex Systems Approach book for
-more details:</p>
+<p>The following examples will demonstrate the basic use of the native
+<code>casnet</code> functions based on the <code>rqa_par</code> and
+<code>rp</code> families of functions, see the paragraph <a href="#marwan">An R interface to Marwan’s commandline recurrence
+plots</a> to learn about using <code>rqa_cl()</code> and <a href="#marwan">An R interface to Marwan’s commandline recurrence
+plots</a>.</p>
+<p>To learn more about the different types of Recurrence Quantification
+Analysis that can be conducted in <code>casnet</code> please see the
+chapters on RQA in the Complex Systems Approach book for more
+details:</p>
 <ul>
 <li><p><a href="https://complexity-methods.github.io/book/unordered-categorical-data.html" class="external-link">RQA
 on unordered categorical data</a></p></li>
@@ -144,16 +149,737 @@ on unordered categorical data</a></p></li>
 continuous data</a></p></li>
 </ul>
 <div class="section level2">
+<h2 id="rqa-based-on-a-matrix-rp">RQA based on a matrix: <code>rp()</code><a class="anchor" aria-label="anchor" href="#rqa-based-on-a-matrix-rp"></a>
+</h2>
+<div class="section level3">
+<h3 id="unordered-categorical-data">Unordered categorical data<a class="anchor" aria-label="anchor" href="#unordered-categorical-data"></a>
+</h3>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">emDim</span>   <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">emLag</span>   <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">emRad</span>   <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">theiler</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co"># Do not include the diagonal</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="continuous-data">Continuous data<a class="anchor" aria-label="anchor" href="#continuous-data"></a>
+</h3>
+<p>We’ll use the examples used in the manual of the <a href="https://pypi.org/project/PyRQA/" class="external-link">PyRQA</a> library for Python.
+This is convenient, the parameters <code>emDim</code>,
+<code>emLag</code> and <code>emRad</code> are already given (see <a href="https://complexity-methods.github.io/book/lvSystem.html" class="external-link">the CSA
+book</a> for examples on how to estimate them with <code>casnet</code>)
+and it allows for a comparison of the output.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># PyRQA example data</span></span>
+<span><span class="va">data_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">1.3</span>, <span class="fl">0.7</span>, <span class="fl">0.8</span>, <span class="fl">1.4</span>, <span class="fl">1.6</span>, <span class="fl">1.2</span>, <span class="fl">0.4</span>, <span class="fl">1.1</span>, <span class="fl">0.8</span>, <span class="fl">0.2</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html" class="external-link">ts</a></span><span class="op">(</span><span class="va">data_points</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-3-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>First, we create a distance matrix based on the (delay embedded) time
+series and decide on a threshold criterion to turn it into a recurrence
+matrix of <code>0</code>s and <code>1</code>s. We already have a radius
+given in the PyRQA example, using a convenient graphical tool for visual
+inspection of the relationship between different thresholds values and
+the resulting recurrence rate (<code>RR</code>), we can check what this
+radius will yield.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/casnet" class="external-link">casnet</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">emDim</span>   <span class="op">&lt;-</span> <span class="fl">2</span></span>
+<span><span class="va">emLag</span>   <span class="op">&lt;-</span> <span class="fl">2</span></span>
+<span><span class="va">emRad</span>   <span class="op">&lt;-</span> <span class="fl">0.65</span></span>
+<span></span>
+<span><span class="va">RM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">data_points</span>, emDim <span class="op">=</span> <span class="va">emDim</span>, emLag <span class="op">=</span> <span class="va">emLag</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RM</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, drawGrid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>The code below applies the threshold <code>emRad</code> to the
+distance matrix, which generates a sparse matrix (class
+<code>dgcMatrix</code>, see package [Matrix]).</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">RM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">data_points</span>, emDim <span class="op">=</span> <span class="va">emDim</span>, emLag <span class="op">=</span> <span class="va">emLag</span>, emRad <span class="op">=</span> <span class="va">emRad</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt; 11 x 11 sparse Matrix of class "dgCMatrix"
+&gt;                            
+&gt;  [1,] . . . 1 . . . . 1 . .
+&gt;  [2,] . . . . . . . . 1 . .
+&gt;  [3,] . . . . . 1 1 1 . 1 .
+&gt;  [4,] 1 . . . 1 . . 1 . . 1
+&gt;  [5,] . . . 1 . . . 1 . . 1
+&gt;  [6,] . . 1 . . . . 1 . . 1
+&gt;  [7,] . . 1 . . . . . . 1 .
+&gt;  [8,] . . 1 1 1 1 . . . . 1
+&gt;  [9,] 1 1 . . . . . . . . 1
+&gt; [10,] . . 1 . . . 1 . . . .
+&gt; [11,] . . . 1 1 1 . 1 1 . .</code></pre>
+<p>The relevant analysis parameters, including the embedded series, are
+stored as attributes of the matrix object.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">RM</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt; $i
+&gt;  [1]  3  8  8  5  6  7  9  0  4  7 10  3  7 10  2  7 10  2  9  2  3  4  5 10  0
+&gt; [26]  1 10  2  6  3  4  5  7  8
+&gt; 
+&gt; $p
+&gt;  [1]  0  2  3  7 11 14 17 19 24 27 29 34
+&gt; 
+&gt; $Dim
+&gt; [1] 11 11
+&gt; 
+&gt; $Dimnames
+&gt; $Dimnames[[1]]
+&gt; NULL
+&gt; 
+&gt; $Dimnames[[2]]
+&gt; NULL
+&gt; 
+&gt; 
+&gt; $x
+&gt;  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+&gt; 
+&gt; $factors
+&gt; list()
+&gt; 
+&gt; $class
+&gt; [1] "dgCMatrix"
+&gt; attr(,"package")
+&gt; [1] "Matrix"
+&gt; 
+&gt; $method
+&gt; [1] "Euclidean"
+&gt; 
+&gt; $call
+&gt; proxy::dist(x = et1, y = et2, method = method, diag = TRUE)
+&gt; 
+&gt; $AUTO
+&gt; [1] TRUE
+&gt; 
+&gt; $emRad
+&gt; [1] 0.65
+&gt; 
+&gt; $NAij
+&gt; [1] NA
+&gt; 
+&gt; $theiler
+&gt; [1] 1
+&gt; 
+&gt; $emDims1
+&gt;       tau.0 tau.1
+&gt;  [1,]   0.1   1.3
+&gt;  [2,]   0.5   0.7
+&gt;  [3,]   1.3   0.8
+&gt;  [4,]   0.7   1.4
+&gt;  [5,]   0.8   1.6
+&gt;  [6,]   1.4   1.2
+&gt;  [7,]   1.6   0.4
+&gt;  [8,]   1.2   1.1
+&gt;  [9,]   0.4   0.8
+&gt; [10,]   1.1   0.2
+&gt; [11,]   0.8   1.3
+&gt; attr(,"embedding.dims")
+&gt; [1] 2
+&gt; attr(,"embedding.lag")
+&gt; [1] 2
+&gt; attr(,"embedding.time")
+&gt; [1] 2
+&gt; attr(,"variable.y")
+&gt; [1] "data_points"
+&gt; 
+&gt; $emDims2
+&gt;       tau.0 tau.1
+&gt;  [1,]   0.1   1.3
+&gt;  [2,]   0.5   0.7
+&gt;  [3,]   1.3   0.8
+&gt;  [4,]   0.7   1.4
+&gt;  [5,]   0.8   1.6
+&gt;  [6,]   1.4   1.2
+&gt;  [7,]   1.6   0.4
+&gt;  [8,]   1.2   1.1
+&gt;  [9,]   0.4   0.8
+&gt; [10,]   1.1   0.2
+&gt; [11,]   0.8   1.3
+&gt; attr(,"embedding.dims")
+&gt; [1] 2
+&gt; attr(,"embedding.lag")
+&gt; [1] 2
+&gt; attr(,"embedding.time")
+&gt; [1] 2
+&gt; attr(,"variable.y")
+&gt; [1] "y2"
+&gt; 
+&gt; $emDims1.name
+&gt; [1] "data_points"
+&gt; 
+&gt; $emDims2.name
+&gt; [1] "y2"
+&gt; 
+&gt; $embedded
+&gt; [1] TRUE
+&gt; 
+&gt; $emLag
+&gt; [1] 2
+&gt; 
+&gt; $emDim
+&gt; [1] 2
+&gt; 
+&gt; $measures
+&gt; [1] NA
+&gt; 
+&gt; $weighted
+&gt; [1] FALSE
+&gt; 
+&gt; $weightedBy
+&gt; [1] "si"
+&gt; 
+&gt; $chromatic
+&gt; [1] FALSE
+&gt; 
+&gt; $chromaNames
+&gt; [1] NA
+&gt; 
+&gt; $chromaDims
+&gt; [1] NA</code></pre>
+<p>It is custom to represent the recurrence matrix as a plot with
+coordinate <code>(1,1)</code> in the left lower corner.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RM</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, drawGrid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>Because this analysis concerns Auto-RQA, the diagonal is usually
+excluded from the calculations of RQA measures. This can be achieved by
+setting the <code>theiler</code> parameter to <code>1</code>. This is in
+fact the default behavior in <code>casnet</code> if the
+<code>theiler</code> argument is <code>NA</code> and the recurrence
+matrix is detected to be symmetrical.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Current value of theiler</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">$</span><span class="va">theiler</span></span></code></pre></div>
+<pre><code>&gt; [1] 1</code></pre>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Values on the diagonal</span></span>
+<span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RM</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt;  [1] 0 0 0 0 0 0 0 0 0 0 0</code></pre>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># To explicitly include the diagonal in calculations set theiler to 0</span></span>
+<span><span class="op">(</span><span class="va">RM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">data_points</span>, emDim <span class="op">=</span> <span class="va">emDim</span>, emLag <span class="op">=</span> <span class="va">emLag</span>, emRad <span class="op">=</span> <span class="va">emRad</span>, theiler <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt; 11 x 11 sparse Matrix of class "dgCMatrix"
+&gt;                            
+&gt;  [1,] 1 . . 1 . . . . 1 . .
+&gt;  [2,] . 1 . . . . . . 1 . .
+&gt;  [3,] . . 1 . . 1 1 1 . 1 .
+&gt;  [4,] 1 . . 1 1 . . 1 . . 1
+&gt;  [5,] . . . 1 1 . . 1 . . 1
+&gt;  [6,] . . 1 . . 1 . 1 . . 1
+&gt;  [7,] . . 1 . . . 1 . . 1 .
+&gt;  [8,] . . 1 1 1 1 . 1 . . 1
+&gt;  [9,] 1 1 . . . . . . 1 . 1
+&gt; [10,] . . 1 . . . 1 . . 1 .
+&gt; [11,] . . . 1 1 1 . 1 1 . 1</code></pre>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">$</span><span class="va">theiler</span></span></code></pre></div>
+<pre><code>&gt; NULL</code></pre>
+<p>In <code>casnet</code> the <code>theiler</code> correction will
+affect <em>all</em> calculations. This is different from, for example,
+PyRQA where it only affects the recurrence rate and measures based on
+diagonal line structures. Below are the results reported in the online
+<a href="https://pypi.org/project/PyRQA/#usage" class="external-link">PyRQA manual</a>, with
+the diagonal included:</p>
+<pre><code>RQA Result:
+===========
+
+Minimum diagonal line length (L_min): 2
+Minimum vertical line length (V_min): 2
+Minimum white vertical line length (W_min): 2
+
+Recurrence rate (RR): 0.371901
+Determinism (DET): 0.411765
+Average diagonal line length (L): 2.333333
+Longest diagonal line length (L_max): 3
+Divergence (DIV): 0.333333
+Entropy diagonal lines (L_entr): 0.636514
+Laminarity (LAM): 0.400000
+Trapping time (TT): 2.571429
+Longest vertical line length (V_max): 4
+Entropy vertical lines (V_entr): 0.955700
+Average white vertical line length (W): 2.538462
+Longest white vertical line length (W_max): 6
+Longest white vertical line length inverse (W_div): 0.166667
+Entropy white vertical lines (W_entr): 0.839796
+
+Ratio determinism / recurrence rate (DET/RR): 1.107190
+Ratio laminarity / determinism (LAM/DET): 0.971429</code></pre>
+<p>The same for <code>casnet</code>:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Including diagonal</span></span>
+<span><span class="va">RM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">data_points</span>, emDim <span class="op">=</span> <span class="va">emDim</span>, emLag <span class="op">=</span> <span class="va">emLag</span>, emRad <span class="op">=</span> <span class="va">emRad</span>, theiler <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">out_rqa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp_measures.html">rp_measures</a></span><span class="op">(</span><span class="va">RM</span>, silent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt;  Global Measures
+&gt;   Global Max.points N.points    RR Singular Divergence Repetitiveness
+&gt; 1 Matrix        110       45 0.409       20      0.333              2
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;        Lines N.lines N.points Measure  Rate Mean Max.   ENT ENT_rel   CoV
+&gt; 1   Diagonal       6       14     DET 0.311 2.33    3 0.637   0.265 0.221
+&gt; 2   Vertical       5       14   V LAM 0.311 2.80    4 1.055   0.440 0.299
+&gt; 3 Horizontal       5       14   H LAM 0.311 2.80    4 1.055   0.440 0.299
+&gt; 4  V+H Total      10       28 V+H LAM 0.311 2.80    4 1.055   0.440 0.282
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<p>Below is a comparison of the output from <code><a href="../reference/rp.html">casnet::rp()</a></code>
+and <code>PyRQA</code>. Note that <code>PyRQA</code> includes the main
+diagonal for <code>RR</code> and measures based on vertical (and
+horizontal) lines.</p>
+<table class="table">
+<thead><tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+<br>Measure
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+rp<br>(theiler = 0)
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+rp<br>(theiler = 1)
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+PyRQA<br>(theiler_corrector = 1)
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+PyRQA<br>Diagonal included?
+</div>
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:center;">
+0.409091
+</td>
+<td style="text-align:center;">
+0.309091
+</td>
+<td style="text-align:center;">
+0.371901
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DET
+</td>
+<td style="text-align:center;">
+0.311111
+</td>
+<td style="text-align:center;">
+0.411765
+</td>
+<td style="text-align:center;">
+0.411765
+</td>
+<td style="text-align:center;">
+No
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MAX_dl
+</td>
+<td style="text-align:center;">
+3.000000
+</td>
+<td style="text-align:center;">
+3.000000
+</td>
+<td style="text-align:center;">
+3.000000
+</td>
+<td style="text-align:center;">
+No
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MEAN_dl
+</td>
+<td style="text-align:center;">
+2.333333
+</td>
+<td style="text-align:center;">
+2.333333
+</td>
+<td style="text-align:center;">
+2.333333
+</td>
+<td style="text-align:center;">
+No
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ENT_dl
+</td>
+<td style="text-align:center;">
+0.636514
+</td>
+<td style="text-align:center;">
+0.636514
+</td>
+<td style="text-align:center;">
+0.636514
+</td>
+<td style="text-align:center;">
+No
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LAM
+</td>
+<td style="text-align:center;">
+0.311111
+</td>
+<td style="text-align:center;">
+0.411765
+</td>
+<td style="text-align:center;">
+0.400000
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MAX_vl
+</td>
+<td style="text-align:center;">
+4.000000
+</td>
+<td style="text-align:center;">
+4.000000
+</td>
+<td style="text-align:center;">
+4.000000
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MEAN_vl
+</td>
+<td style="text-align:center;">
+2.800000
+</td>
+<td style="text-align:center;">
+2.800000
+</td>
+<td style="text-align:center;">
+2.571429
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ENT_vl
+</td>
+<td style="text-align:center;">
+1.054920
+</td>
+<td style="text-align:center;">
+1.054920
+</td>
+<td style="text-align:center;">
+0.955700
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section level2">
+<h2 id="rqa-based-on-massively-parallel-processing-rqa_par">RQA based on massively parallel processing:
+<code>rqa_par()</code><a class="anchor" aria-label="anchor" href="#rqa-based-on-massively-parallel-processing-rqa_par"></a>
+</h2>
+<p><code>PyRQA</code> was developed to perform RQA on very long time
+series, without overloading memory and inflating the computing time to a
+degree that is unmanageable in a regular workflow. It is not recommended
+to use matrix based functions like <code><a href="../reference/rp_measures.html">casnet::rp_measures()</a></code> on
+time series larger than <code>5,000</code> data points, instead,
+<code>casne::rqa_par()</code> can be used, which implements some of the
+methods used in <code>PyRQA</code>. Specifically, the memory management
+by limiting the precision (package [float]) and using bit compression
+(package [float]), as well as by computing RQA measures in a massively
+parallel way (package [parallel]). Compared to
+<code><a href="../reference/rqa_par.html">casnet::rqa_par()</a></code>,<code>PyRQA</code> is still faster, but
+this difference becomes noticeable for very large time series
+(<code>&gt;100,000</code>).</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">noise</span> <span class="op">&lt;-</span> <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="fl">10000</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html" class="external-link">ts</a></span><span class="op">(</span><span class="va">noise</span><span class="op">)</span>,type <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-12-1.png" width="576" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#est_radius_rqa(ts_embed(noise, emDim = emDim, emLag = emLag), noise, AUTO = TRUE)</span></span></code></pre></div>
+<pre><code>RQA Result:
+===========
+
+Minimum diagonal line length (L_min): 2
+Minimum vertical line length (V_min): 2
+Minimum white vertical line length (W_min): 2
+
+Recurrence rate (RR): 0.049585
+Determinism (DET): 0.230880
+Average diagonal line length (L): 2.149236
+Longest diagonal line length (L_max): 7
+Divergence (DIV): 0.142857
+Entropy diagonal lines (L_entr): 0.443727
+Laminarity (LAM): 0.374149
+Trapping time (TT): 2.305511
+Longest vertical line length (V_max): 8
+Entropy vertical lines (V_entr): 0.709903
+Average white vertical line length (W): 28.154700
+Longest white vertical line length (W_max): 9079
+Longest white vertical line length inverse (W_div): 0.000110
+Entropy white vertical lines (W_entr): 3.909756
+
+Ratio determinism / recurrence rate (DET/RR): 4.656240
+Ratio laminarity / determinism (LAM/DET): 1.620535</code></pre>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Including diagonal</span></span>
+<span><span class="va">emRad</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
+<span><span class="va">emLag</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
+<span><span class="va">emDim</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
+<span><span class="va">emRad</span> <span class="op">&lt;-</span> <span class="fl">.00018</span></span>
+<span><span class="va">out_rqa_par</span> <span class="op">&lt;-</span>  <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="../reference/rqa_par.html">rqa_par</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">noise</span>, AUTO <span class="op">=</span> <span class="cn">TRUE</span>, emDim <span class="op">=</span> <span class="va">emDim</span>, emLag <span class="op">=</span> <span class="va">emLag</span>, emRad <span class="op">=</span> <span class="va">emRad</span>, silent <span class="op">=</span> <span class="cn">FALSE</span>, theiler <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt;  Global Measures
+&gt;   Global Max.points N.points     RR Singular Divergence Repetitiveness
+&gt; 1 Matrix    9.8e+07  4859832 0.0496  3730180   0.000101           3.22
+&gt; 
+&gt; 
+&gt;  Line-based Measures
+&gt;        Lines N.lines N.points Measure  Rate Mean Max.   ENT ENT_rel   CoV
+&gt; 1   Diagonal  521001  1129652     DET 0.232 2.17 9900 0.444  0.0482 6.327
+&gt; 2   Vertical  788676  1818301   V LAM 0.374 2.31    8 0.710  0.0772 0.269
+&gt; 3 Horizontal  788676  1818301   H LAM 0.374 2.31    8 0.710  0.0772 0.269
+&gt; 4  V+H Total 1577352  3636602 V+H LAM 0.374 2.31    8 0.710  0.0772 0.269
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<table class="table">
+<thead><tr>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+<br>Measure
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+crqa_par<br>(theiler = 0)
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+crqa_par<br>(theiler = 1)
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+PyRQA<br>(theiler_corrector = 1)
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+PyRQA<br>Diagonal included?
+</div>
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+RR
+</td>
+<td style="text-align:center;">
+0.049585
+</td>
+<td style="text-align:center;">
+0.049489
+</td>
+<td style="text-align:center;">
+0.049585
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DET
+</td>
+<td style="text-align:center;">
+0.232447
+</td>
+<td style="text-align:center;">
+0.230880
+</td>
+<td style="text-align:center;">
+0.230880
+</td>
+<td style="text-align:center;">
+No
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MAX_dl
+</td>
+<td style="text-align:center;">
+9900.000000
+</td>
+<td style="text-align:center;">
+7.000000
+</td>
+<td style="text-align:center;">
+7.000000
+</td>
+<td style="text-align:center;">
+No
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MEAN_dl
+</td>
+<td style="text-align:center;">
+2.168234
+</td>
+<td style="text-align:center;">
+2.149236
+</td>
+<td style="text-align:center;">
+2.149236
+</td>
+<td style="text-align:center;">
+No
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ENT_dl
+</td>
+<td style="text-align:center;">
+0.443753
+</td>
+<td style="text-align:center;">
+0.443727
+</td>
+<td style="text-align:center;">
+0.443727
+</td>
+<td style="text-align:center;">
+No
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LAM
+</td>
+<td style="text-align:center;">
+0.374149
+</td>
+<td style="text-align:center;">
+0.373418
+</td>
+<td style="text-align:center;">
+0.374149
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MAX_vl
+</td>
+<td style="text-align:center;">
+8.000000
+</td>
+<td style="text-align:center;">
+8.000000
+</td>
+<td style="text-align:center;">
+8.000000
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MEAN_vl
+</td>
+<td style="text-align:center;">
+2.305511
+</td>
+<td style="text-align:center;">
+2.304642
+</td>
+<td style="text-align:center;">
+2.305511
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ENT_vl
+</td>
+<td style="text-align:center;">
+0.709903
+</td>
+<td style="text-align:center;">
+0.708647
+</td>
+<td style="text-align:center;">
+0.709903
+</td>
+<td style="text-align:center;">
+Yes
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
 <h2 id="marwan">An R interface to Marwan’s commandline recurrence plots<a class="anchor" aria-label="anchor" href="#marwan"></a>
 </h2>
 <blockquote>
-<p><strong>IMPORTANT</strong>: Currently <code>rp_cl</code> can only run
-on an operating system that allows execution of 32-bit applications!</p>
+<p><strong>IMPORTANT</strong>: Currently <code>crqa_cl</code> can only
+run on an operating system that allows execution of 32-bit
+applications!</p>
 </blockquote>
-<p>The <code><a href="../reference/rp_cl.html">rp_cl()</a></code> function is a wrapper for the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
+<p>The <code><a href="../reference/rp_cl.html">crqa_cl()</a></code> function is a wrapper for the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
 Recurrence Plots</a> executable provided by Norbert Marwan.</p>
-<p>The <code>rp</code> executable is installed on your machine when the
-function <code><a href="../reference/rp_cl.html">rp_cl()</a></code> is called for the first time:</p>
+<p>The <code>rp</code> executable file is installed on your machine when
+the function <code><a href="../reference/rp_cl.html">rp_cl()</a></code> is called for the first time:</p>
 <ul>
 <li>It is renamed to <code>rp</code> from a platform specific file
 downloaded from the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
@@ -217,26 +943,26 @@ date</li>
 <li>Install <code>PyRQA</code> into the virtual environment.</li>
 </ul>
 <p>You should only have to create and setup the environment once.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># OS requirements</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Python3.X is installed and updated.</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># On MacOS you'll probably need to run these commands in a Terminal window:</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>python3 pip install <span class="sc">--</span>update pip <span class="co"># Updates the Python module installer</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>python3 pip intall pyrqa <span class="co"># Installs the pyrqa module on your machine</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># First make sure you use the latest Python version</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># You can check your machine by calling: reticulate::py_discover_config()</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_python</span>(<span class="st">"/usr/local/bin/python3"</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new environment "r-reticulate", the path is stored in vEnv</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># On Windows use coda_create() see the reticulate manual.</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>vEnv <span class="ot">&lt;-</span> reticulate<span class="sc">::</span><span class="fu">virtualenv_create</span>(<span class="st">"r-reticulate"</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Install pyrqa into the virtual environment</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">virtualenv_install</span>(<span class="st">"r-reticulate"</span>,<span class="st">"pyrqa"</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># If you wish to remove the environment use: reticulate::virtualenv_remove("r-reticulate")</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="co"># OS requirements</span></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="co"># Python3.X is installed and updated.</span></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="co"># On MacOS you'll probably need to run these commands in a Terminal window:</span></span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>python3 pip install <span class="sc">--</span>update pip <span class="co"># Updates the Python module installer</span></span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a>python3 pip intall pyrqa <span class="co"># Installs the pyrqa module on your machine</span></span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a><span class="co"># First make sure you use the latest Python version</span></span>
+<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a><span class="co"># You can check your machine by calling: reticulate::py_discover_config()</span></span>
+<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_python</span>(<span class="st">"/usr/local/bin/python3"</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" tabindex="-1"></a></span>
+<span id="cb25-13"><a href="#cb25-13" tabindex="-1"></a><span class="co"># Create a new environment "r-reticulate", the path is stored in vEnv</span></span>
+<span id="cb25-14"><a href="#cb25-14" tabindex="-1"></a><span class="co"># On Windows use coda_create() see the reticulate manual.</span></span>
+<span id="cb25-15"><a href="#cb25-15" tabindex="-1"></a>vEnv <span class="ot">&lt;-</span> reticulate<span class="sc">::</span><span class="fu">virtualenv_create</span>(<span class="st">"r-reticulate"</span>)</span>
+<span id="cb25-16"><a href="#cb25-16" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" tabindex="-1"></a><span class="co"># Install pyrqa into the virtual environment</span></span>
+<span id="cb25-18"><a href="#cb25-18" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">virtualenv_install</span>(<span class="st">"r-reticulate"</span>,<span class="st">"pyrqa"</span>)</span>
+<span id="cb25-19"><a href="#cb25-19" tabindex="-1"></a></span>
+<span id="cb25-20"><a href="#cb25-20" tabindex="-1"></a><span class="co"># If you wish to remove the environment use: reticulate::virtualenv_remove("r-reticulate")</span></span></code></pre></div>
 <p>After the environment is set up:</p>
 <ul>
 <li>Restart your R session and instruct the system to use Python in the
@@ -247,12 +973,12 @@ fields (<code>$</code>) of the imported object!</li>
 </ul>
 <p>An important thing to note in the example below is the use of
 <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> to pass integer variables to Python.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Make sure you associate reticulate with your virtual environment.</span></span>
-<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu">use_virtualenv</span><span class="op">(</span><span class="st">"r-reticulate"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">"r-reticulate"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Import pyrqa into your R session</span></span>
-<span><span class="va">pyrqa</span> <span class="op">&lt;-</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu">import</span><span class="op">(</span><span class="st">"pyrqa"</span><span class="op">)</span></span>
+<span><span class="va">pyrqa</span> <span class="op">&lt;-</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"pyrqa"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Alternatively, you can import from a path in the virtual environment.</span></span>
 <span><span class="co"># On MacOS this will be a hidden folder in your home directory:</span></span>
@@ -317,11 +1043,11 @@ Entropy white vertical lines (W_entr): 4.726210
 Ratio determinism / recurrence rate (DET/RR): 19.081989
 Ratio laminarity / determinism (LAM/DET): 1.014530</code></pre>
 <p>You can also save the Recurrence Plot.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">RPcomputation</span> <span class="op">&lt;-</span> <span class="va">pyrqa</span><span class="op">$</span><span class="va">computation</span><span class="op">$</span><span class="va">RPComputation</span><span class="op">$</span><span class="fu">create</span><span class="op">(</span><span class="va">settings</span><span class="op">)</span></span>
 <span><span class="va">RPresult</span> <span class="op">&lt;-</span> <span class="va">RPcomputation</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">pyrqa</span><span class="op">$</span><span class="va">image_generator</span><span class="op">$</span><span class="va">ImageGenerator</span><span class="op">$</span><span class="fu">save_recurrence_plot</span><span class="op">(</span><span class="va">RPresult</span><span class="op">$</span><span class="va">recurrence_matrix_reverse</span>,<span class="st">'recurrence_plot_python.png'</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"recurrence_plot_python.png"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="recurrence_plot_python.png" alt="RP produced by PyRQA" width="6577"><p class="caption">

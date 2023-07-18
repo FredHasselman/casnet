@@ -95,6 +95,7 @@ The calculation of the (C)RQA measures in \link{casnet} can be different from ot
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
+\code{\link{createCorridor}()},
 \code{\link{mat_di2bi}()},
 \code{\link{mat_di2ch}()},
 \code{\link{mat_di2we}()},

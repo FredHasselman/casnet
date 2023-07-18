@@ -2575,6 +2575,8 @@ layout_as_spiral <- function(g,
 #' @param edgeColourByEpoch Should edges that connect to the same epoch be assigned the epoch colour? This will ignore edge colour info in `E(g)$color`. (default = `TRUE`)
 #' @param defaultEdgeColour Colour of edges that do not connect to the same epoch (default = `"grey70"`)
 #' @param doPlot Produce a plot? (default = `TRUE`)
+#' @param ggplotReturn returns the ggplot object (default = `FALSE`)
+#' @param igraphReturn returns the intermediate iGraph object. This will not look the same as the final graph, but has most of the attributes, like edge and vertex colors and spiral layout (default = `FALSE`)
 #'
 #' @note To keep the igraph object, use the layout function [layout_as_spiral()] when plotting the graph.
 #'
@@ -2618,7 +2620,9 @@ make_spiral_graph <- function(g,
                               showEdgeColourLegend = FALSE,
                               edgeColourByEpoch = TRUE,
                               defaultEdgeColour = "grey70",
-                              doPlot = TRUE){
+                              doPlot = TRUE,
+                              ggplotReturn = FALSE,
+                              igraphReturn = FALSE){
 
   g$layout <- layout_as_spiral(g, type = type, arcs = arcs, a = a, b = b, rev = rev)
 
@@ -2835,7 +2839,12 @@ make_spiral_graph <- function(g,
     print(gg)
   }
 
+  out <- list(ggplot = gg, igraph = g)
+  if(any(ggplotReturn,igraphReturn)){
+    return(out[c(ggplotReturn,igraphReturn)])
+  } else {
   return(invisible(gg))
+  }
 }
 
 #' Get some nice colours

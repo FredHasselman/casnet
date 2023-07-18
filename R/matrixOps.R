@@ -189,7 +189,61 @@ mat_di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
 }
 
 
+#' Title
+#'
+#' @param distmat
+#' @param emRad
+#' @param theiler
+#' @param convMat
+#'
+#' @return
+#' @export
+#'
+#' @examples
+mat_we2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
+  matPack <- FALSE
+  if(any(grepl("Matrix",class(distmat)))){
+    matPack <- TRUE
+    convMat <- TRUE
+  }
+
+
+  # RP <- NetComp::matrix_threshold(distmat,threshold = emRad, minval = 1, maxval = 0)
+  if(emRad==0) emRad <- .Machine$double.eps
+  # RP <- distmat #matrix(0,dim(distmat)[1],dim(distmat)[2])
+  # RP[distmat <= emRad] <- 0
+
+  if(any(is.na(distmat))){
+    NAij  <- Matrix::which(is.na(distmat), arr.ind=TRUE)
+  } else {
+    NAij <- NA
+  }
+
+  ij  <- Matrix::which(distmat > 0, arr.ind=TRUE)
+
+  if(NROW(ij)>0){
+
+    # Always use sparse representation for conversion to save memory load
+    #xij <- data.frame(y =  sapply(which(distmat > emRad, arr.ind=TRUE)[,1],function(r){distmat[ij[[r,1]],ij[[r,2]]]}), which(distmat > emRad, arr.ind=TRUE))
+    xij <- data.frame(y =  sapply(seq_along(ij[,1]),function(r){distmat[ij[[r,1]],ij[[r,2]]]}), ij)
+
+    suppressWarnings(RP <- Matrix::sparseMatrix(x=1,i=xij$row,j=xij$col, dims = dim(distmat)))
+
+    #  if(!all(as.vector(RP)==0|as.vector(RP)==1)){warning("Matrix did not convert to a binary (0,1) matrix!!")}
+  } else {
+
+    RP <- matrix(0,dim(distmat)[1],dim(distmat)[2])
+  }
+
+  if(convMat&matPack){RP <- Matrix::as.matrix(RP)}
+
+  RP <- rp_copy_attributes(source = distmat,  target = RP)
+  attributes(RP)$emRad <- emRad
+  attributes(RP)$NAij <- NAij
+
+  return(RP)
+}
 
 #' Matrix to indexed data frame
 #'
@@ -343,6 +397,57 @@ bandReplace <- function(mat, lower, upper, value = NA, silent=TRUE){
   tmp <- mat
   delta <- col(mat)-row(mat)
   indc  <- delta >= lower & delta <= upper
+  suppressMessages(mat[indc] <- value)
+  mat <- methods::as(mat, "dgCMatrix")
+  mat <- rp_copy_attributes(source = tmp, target = mat, source_remove = c("names", "row.names", "class","dim", "dimnames","x","i","p"))
+  rm(tmp)
+
+  return(mat)
+}
+
+
+#' Corridor analysis
+#'
+#' Create a corridor around the main diagonal. For long time series it may not make sense to evaluate recurrences on the longest time scales.
+#'
+#' @param mat A Matrix
+#' @param lower Lower diagonal to be included in the corridor (should be \eqn{\le 0})
+#' @param upper Upper diagonal to be included in the corridor (should be \eqn{\ge 0})
+#' @param value A single value to replace all values outside the corridor (default = `NA`)
+#' @param silent Operate in silence, only (some) warnings will be shown (default = `TRUE`)
+#'
+#' @return A matrix in which the values outside the corridor have been replaced
+#'
+#' @export
+#'
+#' @family Distance matrix operations (recurrence plot)
+#'
+#' @author Fred Hasselman
+#'
+#'
+#' @examples
+#' # Create a 10 by 10 matrix
+#' library(Matrix)
+#' m <- Matrix(rnorm(10),10,10)
+#'
+#' createCorridor(m,-7,7,0)   # Set diagonals 10 9 and 8 to 0.
+createCorridor <- function(mat, lower, upper, value = NA, silent=TRUE){
+
+  # if(lower>0){lower=-1*lower
+  # warning("lower > 0 ...\n using: -1*lower")
+  # }
+  # if(upper<0){upper=abs(upper)
+  # warning("upper > 0 ...\n using: abs(upper)")
+  # }
+
+  # if(all(lower==0,upper==0)){
+  #   #diag(mat) <- value
+  #   if(!silent){message(paste0("lower and upper are both 0 (no band, just diagonal)\n using: diag(mat) <- ",round(value,4),"..."))}
+  # }
+
+  tmp <- mat
+  delta <- col(mat)-row(mat)
+  indc  <- delta < lower & delta > upper
   suppressMessages(mat[indc] <- value)
   mat <- methods::as(mat, "dgCMatrix")
   mat <- rp_copy_attributes(source = tmp, target = mat, source_remove = c("names", "row.names", "class","dim", "dimnames","x","i","p"))

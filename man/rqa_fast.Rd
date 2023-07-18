@@ -38,4 +38,3 @@ list of vectors
 \description{
 Fast rqa
 }
-\keyword{internal}

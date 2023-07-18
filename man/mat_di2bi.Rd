@@ -22,6 +22,7 @@ Distance matrix to binary matrix based on threshold value
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
+\code{\link{createCorridor}()},
 \code{\link{mat_di2ch}()},
 \code{\link{mat_di2we}()},
 \code{\link{mat_hamming}()},

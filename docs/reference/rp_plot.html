@@ -74,6 +74,7 @@
 <span>  plotRadiusRRbar <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  drawGrid <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  drawDiagonal <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  diagColour <span class="op">=</span> <span class="st">"grey50"</span>,</span>
 <span>  drawNA <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  markEpochsLOI <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  radiusValue <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -115,6 +116,10 @@
 
 <dt>drawDiagonal</dt>
 <dd><p>One usually omits the main diagonal, the Line Of Incidence (LOI) from the calculation of Auto-RQA measures., it is however common to plot it. Set to <code>FALSE</code> to omit the LOI from an Auto-Recurrence Plot (default = <code>TRUE</code>)</p></dd>
+
+
+<dt>diagColour</dt>
+<dd><p>Colour of the main diagonal (default = <code>"grey50"</code>)</p></dd>
 
 
 <dt>drawNA</dt>
@@ -167,6 +172,7 @@
     <h2>See also</h2>
     <div class="dont-index"><p>Other Distance matrix operations (recurrence plot): 
 <code><a href="bandReplace.html">bandReplace</a>()</code>,
+<code><a href="createCorridor.html">createCorridor</a>()</code>,
 <code><a href="mat_di2bi.html">mat_di2bi</a>()</code>,
 <code><a href="mat_di2ch.html">mat_di2ch</a>()</code>,
 <code><a href="mat_di2we.html">mat_di2we</a>()</code>,

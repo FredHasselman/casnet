@@ -18,9 +18,11 @@ rp_diagProfile(
   VLmax = length(Matrix::diag(RM)),
   HLmax = length(Matrix::diag(RM)),
   doShuffle = FALSE,
-  y1 = NA,
-  y2 = NA,
+  y1 = NULL,
+  y2 = NULL,
+  shuffleWhich = "y1",
   Nshuffle = 19,
+  doEmbed = TRUE,
   AUTO = NULL,
   chromatic = FALSE,
   matrices = FALSE,
@@ -64,7 +66,11 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{y2}{The original \code{y2} time series}
 
+\item{shuffleWhich}{Which of the time series should be shuffled: 'y1' or 'y2'? (default = 'y2')}
+
 \item{Nshuffle}{How many shuffled versions to make up the baseline? The default is \code{19}, which is the minimum for a one-sided surrogate test.}
+
+\item{doEmbed}{If \code{doShuffle = TRUE}, should the data in y1 and y2 be considered embedded time series? The temporal order of all columns in \code{y2} will be randomly shuffled in the same way, keeping coordinates together (default = \code{FALSE})}
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 

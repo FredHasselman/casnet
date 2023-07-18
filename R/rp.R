@@ -187,6 +187,7 @@ rp <- function(y1, y2 = NULL,
 
   dmat <- rp_checkfix(dmat, checkAUTO = TRUE, fixAUTO = TRUE, checkSPARSE = TRUE, fixSPARSE = TRUE, checkS4 = TRUE, fixS4 = TRUE)
   suppressMessages(dmat <- setTheiler(RM = dmat, theiler = theiler, chromatic = chromatic))
+  theiler <- attributes(dmat)$theiler
 
   if(returnMeasures){
     rpOut <-  rp_measures(RM = dmat,
@@ -337,10 +338,10 @@ rp_measures <- function(RM,
   #require(parallel)
   if(is.na(theiler)){
     if(AUTO){
-      theiler <- 0
+      theiler <- 1
       message("Auto-RQA, not including diagonal, theiler set to 1...")
     } else {
-      theiler <- 1
+      theiler <- 0
       message("Cross-RQA, including diagonal, theiler set to 0...")
     }
   }
@@ -907,8 +908,10 @@ rp_measures_main <- function(RM,
 #' @param doShuffle Should a shuffled baseline be calculated (default = `FALSE`)
 #' @param y1 The original `y1` time series
 #' @param y2 The original `y2` time series
+#' @param shuffleWhich Which of the time series should be shuffled: 'y1' or 'y2'? (default = 'y2')
 #' @param Nshuffle How many shuffled versions to make up the baseline? The default is `19`, which is the minimum for a one-sided surrogate test.
 #' @param AUTO Auto-recurrence? (default = `FALSE`)
+#' @param doEmbed If `doShuffle = TRUE`, should the data in y1 and y2 be considered embedded time series? The temporal order of all columns in `y2` will be randomly shuffled in the same way, keeping coordinates together (default = `FALSE`)
 #' @param chromatic Force chromatic RQA? (default = `FALSE`)
 #' @param matrices Return matrices? (default = `FALSE`)
 #' @param doPlot Plot (default = `TRUE`)
@@ -930,9 +933,11 @@ rp_diagProfile <- function(RM,
                            VLmax = length(Matrix::diag(RM)),
                            HLmax = length(Matrix::diag(RM)),
                            doShuffle = FALSE,
-                           y1        = NA,
-                           y2        = NA,
+                           y1        = NULL,
+                           y2        = NULL,
+                           shuffleWhich = "y1",
                            Nshuffle  = 19,
+                           doEmbed   = TRUE,
                            AUTO      = NULL,
                            chromatic = FALSE,
                            matrices  = FALSE,
@@ -947,8 +952,15 @@ rp_diagProfile <- function(RM,
     stop("Expecting a binary (0,1) matrix.")
   }
 
+  if(is.null(AUTO)){
+    checkAUTO <- TRUE
+    fixAUTO <- TRUE
+  } else {
+    checkAUTO <- AUTO
+    fixAUTO <- AUTO
+  }
   # check auto-recurrence and make sure Matrix has sparse triplet representation
-  RM <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
+  RM <- rp_checkfix(RM, checkAUTO = checkAUTO, fixAUTO = checkAUTO, checkTSPARSE = TRUE, fixTSPARSE = TRUE)
 
   if(is.null(AUTO)){
     AUTO <- attr(RM,"AUTO")
@@ -981,40 +993,68 @@ rp_diagProfile <- function(RM,
   }
 
   if(doShuffle){
-    if(any(is.na(y1),is.na(y2))){
+    if(any(is.null(y1),is.null(y2))){
       stop("Need time series (y1 and y2) in order to do the shuffle!!")
     } else {
       cat("Calculating diagonal recurrence profiles... \n")
-      TSrnd <- tseries::surrogate(x=y2, ns=Nshuffle, fft=FALSE, amplitude = FALSE)
-      if(Nshuffle==1){
-        TSrnd <- matrix(TSrnd,ncol=1)
+
+      if(!is.data.frame(y1)){
+        y1 <- data.frame(y1)
       }
+      if(!is.data.frame(y2)){
+        y2 <- data.frame(y2)
+      }
+
+        if(shuffleWhich %in% "y1"){
+         TSrnd <- plyr::llply(0:Nshuffle, function(r){
+           if(r==0){
+             return(y1)
+           } else {
+           return(data.frame(y1[sample.int(n = NROW(y1), size = NROW(y1)),]))
+             }
+         })
+        }
+        if(shuffleWhich %in% "y2"){
+          TSrnd <- plyr::llply(0:Nshuffle, function(r){
+            if(r==0){
+              return(y2)
+            } else {
+            return(data.frame(y2[sample.int(n = NROW(y2), size = NROW(y2)),]))
+            }
+        })
+       }
+
+      # else {
+      #   if(shuffleWhich %in% "y1"){
+      #   TSrnd <- tseries::surrogate(x=y2, ns=Nshuffle, fft=FALSE, amplitude = FALSE)
+      #   if(Nshuffle==1){
+      #     TSrnd <- matrix(TSrnd,ncol=1)
+      # }
     }
     emDim <- attr(RM,"emDim")
     emLag <- attr(RM,"emLag")
     emRad <- attr(RM,"emRad")
   } else {
     Nshuffle <- 0
+    TSrnd<- list(RM)
   }
 
-  out <- vector(mode = "list", length = Nshuffle+1)
+  #out <- vector(mode = "list", length = Nshuffle+1)
 
-  if(doShuffle){
-    names(out) <- c("obs",paste0("Shuffled", 1:Nshuffle))
-  } else {
-    names(out) <- "obs"
-  }
+  out <- llply(TSrnd, function(r){
 
-  for(r in seq_along(out)){
-
-    if(r==1){
-      RMd <- RM
+    if(doShuffle){
+      if(shuffleWhich %in% "y1"){
+        RMtmp <- rp(y1 = r, y2 = y2, emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+      } else {
+        RMtmp <- rp(y1 = y1, y2 = r, emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+      }
     } else {
-      RMd <- rp(y1 = y1, y2 = TSrnd[,(r-1)],emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+      RMtmp <- r
     }
-    #rp_lineDist(RM,d = diagWin, matrices = TRUE)
-    B <- rp_nzdiags(RMd, removeNZ = FALSE, d = diagWin)
-    rm(RMd)
+
+    B <- rp_nzdiags(RMtmp, removeNZ = FALSE, d = diagWin)
+    rm(RMtmp)
 
     diagID <- 1:NCOL(B)
     names(diagID) <- colnames(B)
@@ -1034,12 +1074,49 @@ rp_diagProfile <- function(RM,
     df$labels <- paste(df$Diagonal)
     # df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
     df$labels <- factor(df$labels,levels = df$labels, ordered = TRUE)
+    return(df)
+  })
 
-    out[[r]] <- df
-    #rm(df,B,cID,diagID)
 
-    cat(paste("Profile"),r,"\n")
+  if(doShuffle){
+    names(out) <- c("obs",paste0("Shuffled", 1:Nshuffle))
+  } else {
+    names(out) <- "obs"
   }
+
+  # for(r in seq_along(out)){
+  #
+  #   if(r==1){
+  #     RMd <- RM
+  #   } else {
+  #     RMd <- rp(y1 = y1, y2 = TSrnd[,(r-1)],emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+  #   }
+    #rp_lineDist(RM,d = diagWin, matrices = TRUE)
+    # B <- rp_nzdiags(RMd, removeNZ = FALSE, d = diagWin)
+    # rm(RMd)
+    #
+    # diagID <- 1:NCOL(B)
+    # names(diagID) <- colnames(B)
+    # if(length(diagWin)<NCOL(B)){
+    #   cID <- which(colnames(B)%in%diagWin)
+    #   B <- B[,cID]
+    #   diagID <- seq_along(cID)
+    #   names(diagID) <- colnames(B)
+    # }
+    #
+    # #winRR <- sum(B==1, na.rm = TRUE)
+    # df <- plyr::ldply(diagID, function(i){
+    #   data.frame(index = i, RR = sum(B[,i]==1, na.rm = TRUE)/ (NROW(B)-abs(as.numeric(colnames(B)[i]))))
+    # }, .id = "Diagonal")
+    #
+    # df$group  <- 1
+    # df$labels <- paste(df$Diagonal)
+    # # df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
+    # df$labels <- factor(df$labels,levels = df$labels, ordered = TRUE)
+    #
+    # out[[r]] <- df
+    # #rm(df,B,cID,diagID)
+  #}
 
   dy      <- plyr::ldply(out)
   if(doShuffle){
@@ -1130,22 +1207,25 @@ rp_diagProfile <- function(RM,
     #siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
     #g<- ggplot(df, aes_(x = ~labels, y = ~RR, colour = ~variable))
     #   geom_line() + theme_bw()
-
+    maxData <- max(df$RR, na.rm = TRUE)
     g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
       ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey80")
       if(doShuffle){
+        maxData <- max(c(maxData,df$ciHI), na.rm = TRUE)
         g <- g + ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3)
       }
     g <- g + ggplot2::geom_line(ggplot2::aes_(y=~RR, colour = ~variable), size = .5) +
       #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
-      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,1)) +
-      ggplot2::scale_x_continuous("Diagonals in recurrence Matrix", breaks = breaks, labels = labels) +
-      ggplot2::geom_label(x=x1,y=.8,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE, size = 3) +
-      ggplot2::geom_label(x=x2,y=.8,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE, size = 3) +
+      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,max(c(.5,maxData)))) +
+      ggplot2::scale_x_continuous(name = paste0(xname, " << recurrences due to >> ", yname),
+                                  breaks = breaks, labels = labels, expand = c(0,0)) +
+      # ggplot2::geom_label(x=x1,y=.8,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE, size = 3) +
+      # ggplot2::geom_label(x=x2,y=.8,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE, size = 3) +
       ggplot2::scale_colour_manual(leg, values = col) +
       ggplot2::theme_bw() +
       theme(panel.grid.minor = element_blank(),
-            axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5, size = rel(.6)))
+            axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5, size = rel(.6)),
+            axis.title.x = element_text(size = rel(.8)))
 
     if(!returnOnlyPlot){
       print(g)
@@ -2231,6 +2311,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
 #' @param plotRadiusRRbar The `Radius-RR-bar` is a colour-bar guide plotted with an unthresholded distance matrix indicating a number of `RR` values one would get if a certain distance threshold were chosen (default = `TRUE`)
 #' @param drawGrid Draw a grid on the recurrence plot (default = `FALSE`)
 #' @param drawDiagonal One usually omits the main diagonal, the Line Of Incidence (LOI) from the calculation of Auto-RQA measures., it is however common to plot it. Set to `FALSE` to omit the LOI from an Auto-Recurrence Plot (default = `TRUE`)
+#' @param diagColour Colour of the main diagonal (default = `"grey50"`)
 #' @param drawNA Draw `NA` values in the recurrence plot? If `FALSE` then `NA` values will be considered non-recurring (default = `FALSE`)
 #' @param markEpochsLOI Pass a factor whose levels indicate different epochs or phases in the time series and use the line of identity to represent the levels by different colours (default = `NULL`)
 #' @param radiusValue If `plotMeasures = TRUE` and RM is an unthresholded matrix, this value will be used to calculate recurrence measures. If `plotMeasures = TRUE` and RM is already a binary recurrence matrix, pass the radius that was used as a threshold to create the matrix for display purposes. If `plotMeasures = TRUE` and `radiusValue = NA`, function `est_radius()` will be called with default settings (find a radius that yields `.05` recurrence rate). If `plotMeasures = FALSE` this setting will be ignored.
@@ -2254,6 +2335,7 @@ rp_plot <- function(RM,
                     plotRadiusRRbar = TRUE,
                     drawGrid = FALSE,
                     drawDiagonal = TRUE,
+                    diagColour = "grey50",
                     drawNA = FALSE,
                     markEpochsLOI = NULL,
                     radiusValue = NA,
@@ -2306,9 +2388,13 @@ rp_plot <- function(RM,
   } # is.na(radiusvalue)
 
   # check auto-recurrence and make sure Matrix has sparse triplet representation
-  RM   <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkSPARSE = TRUE)
   AUTO <- attr(RM,"AUTO")
-
+  if(!is.na(AUTO%00%NA)){
+    RM   <- rp_checkfix(RM, checkAUTO = AUTO, fixAUTO = AUTO, checkSPARSE = TRUE)
+  } else {
+    RM   <- rp_checkfix(RM, checkAUTO = TRUE, fixAUTO = TRUE, checkSPARSE = TRUE)
+    AUTO <- attr(RM,"AUTO")
+  }
 
   # Get CRQA measures if requested
   if(plotMeasures){
@@ -2563,7 +2649,7 @@ rp_plot <- function(RM,
     ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL)
 
   if(drawDiagonal){
-    gRP <- gRP + ggplot2::geom_abline(slope = 1,colour = "grey30", size = 1)
+    gRP <- gRP + ggplot2::geom_abline(slope = 1,colour = diagColour, size = 1)
   }
 
   ## Unthresholded START ----
@@ -2646,13 +2732,13 @@ rp_plot <- function(RM,
 
       gDist <-  ggplot2::ggplot(resol,ggplot2::aes_(x=~x,y=~y,fill=~value)) +
         ggplot2::geom_tile(show.legend = FALSE) +
-        ggplot2::scale_y_continuous(name = "Recurrence Rate", breaks = log(RecScale$RR), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence threshold",~ epsilon)), labels = paste(round(RecScale$epsilon,2)))) +
+        ggplot2::scale_y_continuous(name = "Recurrence Rate", breaks = log(round(RecScale$RR,3)), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence threshold",~ epsilon)), labels = paste(round(RecScale$epsilon,3)))) +
         ggplot2::scale_fill_gradient2(low      = "red3",
                                       high     = "steelblue",
                                       mid      = "white",
-                                      na.value = "#FF0000",
+                                      na.value = "grey",
                                       midpoint =  barValue * 1.1,#mean(meltRP$value, na.rm = TRUE),
-                                      #limit    = c(min(meltRP$value, na.rm = TRUE),max(meltRP$value, na.rm = TRUE)),
+                                      #limit    = c(min(RecScale$epsilon),max(RecScale$epsilon, na.rm = TRUE)),
                                       space    = "Lab",
                                       name     = "") +
         ggplot2::coord_equal(1, expand = FALSE) +

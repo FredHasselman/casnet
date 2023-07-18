@@ -103,6 +103,9 @@
     <loc>/reference/casnet-package.html</loc>
   </url>
   <url>
+    <loc>/reference/createCorridor.html</loc>
+  </url>
+  <url>
     <loc>/reference/crit_in-deprecated.html</loc>
   </url>
   <url>
@@ -326,6 +329,9 @@
   </url>
   <url>
     <loc>/reference/mat_mat2ind.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mat_we2bi.html</loc>
   </url>
   <url>
     <loc>/reference/mi_interlayer.html</loc>

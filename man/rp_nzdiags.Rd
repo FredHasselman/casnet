@@ -35,6 +35,7 @@ Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vecto
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
+\code{\link{createCorridor}()},
 \code{\link{mat_di2bi}()},
 \code{\link{mat_di2ch}()},
 \code{\link{mat_di2we}()},

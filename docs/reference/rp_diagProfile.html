@@ -79,9 +79,11 @@
 <span>  VLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  HLmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">Matrix</span><span class="fu">::</span><span class="fu">diag</span><span class="op">(</span><span class="va">RM</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  doShuffle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  y1 <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  y2 <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  y1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  shuffleWhich <span class="op">=</span> <span class="st">"y1"</span>,</span>
 <span>  Nshuffle <span class="op">=</span> <span class="fl">19</span>,</span>
+<span>  doEmbed <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  AUTO <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  chromatic <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  matrices <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -153,8 +155,16 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 <dd><p>The original <code>y2</code> time series</p></dd>
 
 
+<dt>shuffleWhich</dt>
+<dd><p>Which of the time series should be shuffled: 'y1' or 'y2'? (default = 'y2')</p></dd>
+
+
 <dt>Nshuffle</dt>
 <dd><p>How many shuffled versions to make up the baseline? The default is <code>19</code>, which is the minimum for a one-sided surrogate test.</p></dd>
+
+
+<dt>doEmbed</dt>
+<dd><p>If <code>doShuffle = TRUE</code>, should the data in y1 and y2 be considered embedded time series? The temporal order of all columns in <code>y2</code> will be randomly shuffled in the same way, keeping coordinates together (default = <code>FALSE</code>)</p></dd>
 
 
 <dt>AUTO</dt>

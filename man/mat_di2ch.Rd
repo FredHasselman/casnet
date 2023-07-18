@@ -26,6 +26,7 @@ Distance matrix to chromatic matrix based on unordered categorical series
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
+\code{\link{createCorridor}()},
 \code{\link{mat_di2bi}()},
 \code{\link{mat_di2we}()},
 \code{\link{mat_hamming}()},

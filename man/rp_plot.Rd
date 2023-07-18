@@ -12,6 +12,7 @@ rp_plot(
   plotRadiusRRbar = TRUE,
   drawGrid = FALSE,
   drawDiagonal = TRUE,
+  diagColour = "grey50",
   drawNA = FALSE,
   markEpochsLOI = NULL,
   radiusValue = NA,
@@ -38,6 +39,8 @@ rp_plot(
 \item{drawGrid}{Draw a grid on the recurrence plot (default = \code{FALSE})}
 
 \item{drawDiagonal}{One usually omits the main diagonal, the Line Of Incidence (LOI) from the calculation of Auto-RQA measures., it is however common to plot it. Set to \code{FALSE} to omit the LOI from an Auto-Recurrence Plot (default = \code{TRUE})}
+
+\item{diagColour}{Colour of the main diagonal (default = \code{"grey50"})}
 
 \item{drawNA}{Draw \code{NA} values in the recurrence plot? If \code{FALSE} then \code{NA} values will be considered non-recurring (default = \code{FALSE})}
 
@@ -68,6 +71,7 @@ Plot (thresholded) distance matrix as a recurrence plot
 \seealso{
 Other Distance matrix operations (recurrence plot): 
 \code{\link{bandReplace}()},
+\code{\link{createCorridor}()},
 \code{\link{mat_di2bi}()},
 \code{\link{mat_di2ch}()},
 \code{\link{mat_di2we}()},

@@ -17,35 +17,39 @@
 #' @return RQA
 #'
 #'
-rqa_par <- function(y1, y2 = NULL,
-                emDim = 1,
-                emLag = 1,
-                emRad = NULL,
-                theiler = NA,
-                includeDiagonal = NA,
-                AUTO = NULL,
-                DLmin = 2,
-                VLmin = 2,
-                HLmin = 2,
-                DLmax = NROW(y1),
-                VLmax = NROW(y1),
-                HLmax = NROW(y1),
-                weighted = FALSE,
-                weightedBy = "si",
-                method = "Euclidean",
-                rescaleDist = c("none","maxDist","meanDist")[1],
-                targetValue  = .05,
-                chromatic = FALSE,
-                recurrenceTimes = FALSE,
-                doPlot = FALSE,
-                doEmbed = TRUE,
-                anisotropyHV = FALSE,
-                asymmetryUL = FALSE,
-                silent = TRUE,
-                ...){
+rqa_par <- function(y1,
+                    y2 = NULL,
+                    emDim = 1,
+                    emLag = 1,
+                    emRad = NULL,
+                    theiler = NA,
+                    includeDiagonal = NA,
+                    AUTO = NULL,
+                    DLmin = 2,
+                    VLmin = 2,
+                    HLmin = 2,
+                    DLmax = NA,
+                    VLmax = NA,
+                    HLmax = NA,
+                    weighted = FALSE,
+                    weightedBy = "si",
+                    method = "Euclidean",
+                    rescaleDist = c("none","maxDist","meanDist")[1],
+                    targetValue  = .05,
+                    chromatic = FALSE,
+                    recurrenceTimes = FALSE,
+                    doPlot = FALSE,
+                    doEmbed = TRUE,
+                    anisotropyHV = FALSE,
+                    asymmetryUL = FALSE,
+                    silent = TRUE,
+                    ...){
 
+  checkPkg("parallel")
+  checkPkg("bit")
+  checkPkg("float")
 
-  if(is.null(AUTO)){
+   if(is.null(AUTO)){
     stop("Auto-RQA or Cross-RQA? (Provide a value for AUTO)")
   }
 
@@ -53,13 +57,13 @@ rqa_par <- function(y1, y2 = NULL,
     warning("Cannot rescale distance matrix, please rescale the time series to standardeviation (z-score) or unit scale (min/max)")
   }
 
-  if(is.na(chromatic)){
-    # if(!is.null(attr(RM,"chromatic"))){
-    #   chromatic <- attr(RM,"chromatic")
-    # } else {
-    chromatic <- FALSE
-  }
-  #}
+  # if(is.na(chromatic)){
+  #   # if(!is.null(attr(RM,"chromatic"))){
+  #   #   chromatic <- attr(RM,"chromatic")
+  #   # } else {
+  #   chromatic <- FALSE
+  # }
+  # #}
 
   if(chromatic){
     if(abs(diff(range(y1)))==1){
@@ -76,6 +80,7 @@ rqa_par <- function(y1, y2 = NULL,
     }
   }
 
+  # Embed series
   tmp <- rqa_getSeries(y1 = y1,
                 y2 = y2,
                 emDim = emDim,
@@ -107,23 +112,53 @@ rqa_par <- function(y1, y2 = NULL,
         emLag <- 1
       }
 
-      emRad <- est_radius_rqa(y1 = et1, y2 = et2, AUTO = AUTO, targetValue = targetValue, radiusOnFail = "quantile", theiler = theiler, method = method, silent = silent)
+      emRad <- est_radius_rqa(y1 = et1,
+                              y2 = et2,
+                              AUTO = AUTO,
+                              targetValue = targetValue,
+                              radiusOnFail = "quantile",
+                              theiler = theiler,
+                              method = method,
+                              silent = silent)
 
-      if(emRad$Converged){
-        emRad <- emRad$Radius
-      } else {
-        emRad <- stats::sd(RM,na.rm = TRUE)
+      if(!emRad$Converged){
+        warning("Radius did not converge, using quantile...")
       }
+
+      emRad <- emRad$Radius
   }
 
   dist_method <- return_error(proxy::pr_DB$get_entry(method))
   if("error"%in%class(dist_method$value)){
     stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
-  } else {
-
-    RQAout <- rqa_measures(y1 = et1, y2 = et2, emRad = emRad, DLmin = DLmin, VLmin = VLmin, HLmin = HLmin, DLmax = DLmax, VLmax = VLmax, HLmax = HLmax, AUTO = AUTO, theiler = theiler, method = method, chromatic = chromatic, anisotropyHV = anisotropyHV, asymmetryUL = asymmetryUL, silent = silent)
-
   }
+
+  if(is.na(DLmax)){
+      DLmax <- NROW(et1)
+    }
+    if(is.na(VLmax)){
+      VLmax <- NROW(et1)
+    }
+    if(is.na(HLmax)){
+      HLmax <- NROW(et1)
+    }
+
+    RQAout <- rqa_measures(y1 = et1,
+                           y2 = et2,
+                           emRad = emRad,
+                           DLmin = DLmin,
+                           VLmin = VLmin,
+                           HLmin = HLmin,
+                           DLmax = DLmax,
+                           VLmax = VLmax,
+                           HLmax = HLmax,
+                           AUTO = AUTO,
+                           theiler = theiler,
+                           method = method,
+                           chromatic = chromatic,
+                           anisotropyHV = anisotropyHV,
+                           asymmetryUL = asymmetryUL,
+                           silent = silent)
 
   #require(parallel)
 #
@@ -160,6 +195,32 @@ rqa_par <- function(y1, y2 = NULL,
 #     attr(dmat,"chromaDims") <- chromaDims
 #   }
 }
+
+# y2 = NULL
+# emDim = 1
+# emLag = 1
+# emRad = NULL
+# theiler = NA
+# includeDiagonal = NA
+# AUTO = NULL
+# DLmin = 2
+# VLmin = 2
+# HLmin = 2
+# DLmax = NA
+# VLmax = NA
+# HLmax = NA
+# weighted = FALSE
+# weightedBy = "si"
+# method = "Euclidean"
+# rescaleDist = "none"
+# targetValue  = .05
+# chromatic = FALSE
+# recurrenceTimes = FALSE
+# doPlot = FALSE
+# doEmbed = TRUE
+# anisotropyHV = FALSE
+# asymmetryUL = FALSE
+# silent = TRUE
 
 
 #' Get embedded series for rp() and rqa()
@@ -260,10 +321,10 @@ rqa_getSeries <- function(y1, y2 = NULL,
 #'
 #' @export
 #'
-#' @keywords internal
 #'
 rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, diagonal = FALSE, method = "Euclidean"){
 
+  checkPkg("parallel")
   checkPkg("bit")
   checkPkg("float")
 
@@ -393,9 +454,9 @@ rqa_measures <- function(y1,
                          DLmin = 2,
                          VLmin = 2,
                          HLmin = 2,
-                         DLmax = NROW(y1),
-                         VLmax = NROW(y1),
-                         HLmax = NROW(y1),
+                         DLmax = NA,
+                         VLmax = NA,
+                         HLmax = NA,
                          AUTO      = NULL,
                          theiler   = NA,
                          method = "Euclidean",
@@ -416,9 +477,13 @@ rqa_measures <- function(y1,
     }
   }
 
-  if(AUTO){
-    y2 <- NA
+  if(!is.matrix(y1)){
+    stop("Input is not a data frame.")
   }
+
+  # if(AUTO){
+  #   y2 <- NA
+  # }
 
   lineMeasures_global <- rqa_calc(y1 = y1, y2 = y2,
                                   emRad = emRad,
@@ -558,6 +623,10 @@ rqa_measures <- function(y1,
   #   )
   #
   #
+  } else {
+    lineMeasures_upper <- NA
+    lineMeasures_lower <- NA
+    out_ul_asym <- NA
    }
 
   #Output
@@ -715,6 +784,7 @@ rqa_measures <- function(y1,
 #'
 #' @inheritParams  rqa_measures
 #' @param distributions Return line length distributions.
+#' @param corridor corridor
 #'
 #' @return CRQA measures and matrices of line distributions (if requested) based on massively parallel analysis, without building the recurrence matrix.
 #' @export
@@ -727,10 +797,11 @@ rqa_calc <- function(y1,
                      DLmin = 2,
                      VLmin = 2,
                      HLmin = 2,
-                     DLmax = NROW(y1),
-                     VLmax = NROW(y1),
-                     HLmax = NROW(y1),
+                     DLmax = NA,
+                     VLmax = NA,
+                     HLmax = NA,
                      theiler   = NA,
+                     corridor  = NA,
                      AUTO      = NULL,
                      method = "Euclidean",
                      includeDiagonal = NA,
@@ -743,6 +814,10 @@ rqa_calc <- function(y1,
 
   checkPkg("parallel")
   numCores <- parallel::detectCores()
+
+  if(!is.matrix(y1)){
+    stop("Input is not a data frame.")
+  }
 
   if(is.null(AUTO)){
     if(all(is.na(y2))){
@@ -776,6 +851,21 @@ rqa_calc <- function(y1,
     rows <- c(-(NROW(y1)-1):(-theiler), (theiler):(NROW(y1)-1))
   }
 
+  if(!is.na(corridor)){
+    if(length(corridor)==1){
+      corridor <- c(-abs(corridor),abs(corridor))
+    }
+    if(length(corridor!=2)){
+      stop("Argument corridor has to be a length 1 or 2 numeric vector.")
+    }
+    if(all(corridor%[]%c(rows[1],rows[length(rows)]))){
+      rows[1] <- corridor[1]
+      rows(length(rows)) <- corridor[2]
+    } else {
+      stop("Argument corridor specifies diagonal indices beyond the matrix dimensions.")
+    }
+  }
+
   if(is.na(asymmetryUL%00%NA)){
     asymmetryUL <- FALSE
   }
@@ -803,9 +893,22 @@ rqa_calc <- function(y1,
     }
   }
 
-  outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
+
+  cl <- parallel::makeCluster(numCores)
+  # outD <- parallel::clusterMap(cl = cl, index = rows[1], fun = rqa_fast, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
+  outD <- parallel::clusterMap(cl = cl, index = rows, fun = rqa_fast, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
+  parallel::stopCluster(cl)
+
+  # # For some reason, rqa_fast has to be called one time, before this works.
+  # outD <- parallel::mcmapply(FUN = rqa_fast, index = rows[1], MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
+  #
+  # outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
 
   #outD <- lapply(rows, function(r) rqa_fast(index = r, y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
+  #diagonals.distX <- sort(unlist(parallel::mclapply(outD,rqa_lineDist)))
 
   diagonals.distX <- sort(unlist(parallel::mclapply(outD,rqa_lineDist)))
 
@@ -885,6 +988,7 @@ rqa_calc <- function(y1,
   N_vl <- sum(freq_vl, na.rm = TRUE)%00%0
   N_hl <- sum(freq_hl, na.rm = TRUE)%00%0
   N_hv <- sum(freq_hv, na.rm = TRUE)%00%0
+
 
   #Number of recurrent points on diagonal, vertical and horizontal lines
   N_dlp <- sum(freqvec_dl*freq_dl, na.rm = TRUE)
