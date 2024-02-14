@@ -48,7 +48,7 @@ fd_sda(
 
 \item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
 
-\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
+\item{overlap}{A number in \verb{[0 ... 1]} representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
 
 \item{doPlot}{Output the log-log scale versus fluctuation plot with linear fit by calling function \code{plotFD_loglog()} (default = \code{TRUE})}
 

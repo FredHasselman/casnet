@@ -152,7 +152,7 @@ Some notes on resolving errors with \code{rp}.The script will first try to downl
 
 \seealso{
 Other Recurrence Quantification Analysis: 
-\code{\link{rp_measures_main}()},
-\code{\link{rp_measures}()}
+\code{\link{rp_measures}()},
+\code{\link{rp_measures_main}()}
 }
 \concept{Recurrence Quantification Analysis}

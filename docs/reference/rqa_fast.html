@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
       </span>
     </div>
 
@@ -74,7 +74,9 @@
 <span>  <span class="va">emRad</span>,</span>
 <span>  symmetrical <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  diagonal <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"Euclidean"</span></span>
+<span>  method <span class="op">=</span> <span class="st">"Euclidean"</span>,</span>
+<span>  withSplits <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  splitSize <span class="op">=</span> <span class="fl">2048</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -110,6 +112,14 @@
 
 <dt>method</dt>
 <dd><p>distance method</p></dd>
+
+
+<dt>withSplits</dt>
+<dd><p>split long vectors into chunks of size splitSize</p></dd>
+
+
+<dt>splitSize</dt>
+<dd><p>size of splits</p></dd>
 
 </dl></div>
     <div id="value">

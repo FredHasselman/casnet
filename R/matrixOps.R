@@ -64,9 +64,9 @@ mat_di2bi <- function(distmat, emRad = NA, convMat = FALSE){
 }
 
 
-#' Distance 2 weighted matrix
+#' @title Distance to weighted matrix
 #'
-#' Distance matrix to weighted matrix based on threshold value
+#' @description Distance matrix to weighted matrix based on threshold value
 #'
 #' @param distmat Distance matrix
 #' @param emRad The radius or threshold value
@@ -127,9 +127,10 @@ mat_di2we <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
 
 
-#' Distance 2 chromatic matrix
+#' @title Distance to chromatic matrix
 #'
-#' Distance matrix to chromatic matrix based on unordered categorical series
+#' @description
+#'   Distance matrix to chromatic matrix based on unordered categorical series
 #'
 #' @param distmat Distance matrix
 #' @param y One of the dimensions (as a data frame or matrix) of the RP which must contain unique unordered categorical values
@@ -189,17 +190,14 @@ mat_di2ch <- function(distmat, y, emRad, theiler = 0, convMat = FALSE){
 }
 
 
-#' Title
+#' @title Weighted to Binary matrix
 #'
-#' @param distmat
-#' @param emRad
-#' @param theiler
-#' @param convMat
+#' @inheritParams mat_di2bi
 #'
-#' @return
+#' @return A binary matrix
+#'
 #' @export
 #'
-#' @examples
 mat_we2bi <- function(distmat, emRad, theiler = 0, convMat = FALSE){
 
   matPack <- FALSE
@@ -310,8 +308,6 @@ mat_ind <- function(Xlength, Ylength, index, diagonal = FALSE){
    # }
   }
 }
-
-
 
 
 #' Calculate Hamming distance

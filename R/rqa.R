@@ -4,13 +4,15 @@
 #
 # rqa functions
 
-
 #' Massively Parallel RQA analysis
 #'
-#' @description Calculate (C)RQA measures without creating a recurrence matrix. Can handle very large time series and requires package [parallel] to be installed.
+#' @description
+#' `r lifecycle::badge('experimental')`
+#' Calculate (C)RQA measures without creating a recurrence matrix. Can handle very large time series and requires package [parallel] to be installed.
 #'
 #' @inheritParams rp
 #' @inheritParams rp_measures
+#'
 #'
 #' @export
 #'
@@ -112,14 +114,21 @@ rqa_par <- function(y1,
         emLag <- 1
       }
 
-      emRad <- est_radius_rqa(y1 = et1,
-                              y2 = et2,
-                              AUTO = AUTO,
-                              targetValue = targetValue,
-                              radiusOnFail = "quantile",
-                              theiler = theiler,
-                              method = method,
-                              silent = silent)
+      # emRad <- est_radius_rqa(y1 = et1,
+      #                         y2 = et2,
+      #                         AUTO = AUTO,
+      #                         targetValue = targetValue,
+      #                         radiusOnFail = "quantile",
+      #                         theiler = theiler,
+      #                         method = method,
+      #                         silent = silent)
+
+      emRad <- est_radius(y1 = et1,
+                          targetValue = targetValue,
+                          radiusOnFail = "quantile",
+                          theiler = theiler,
+                          method = method,
+                          silent = silent)
 
       if(!emRad$Converged){
         warning("Radius did not converge, using quantile...")
@@ -202,7 +211,7 @@ rqa_par <- function(y1,
 # emRad = NULL
 # theiler = NA
 # includeDiagonal = NA
-# AUTO = NULL
+# AUTO = TRUE
 # DLmin = 2
 # VLmin = 2
 # HLmin = 2
@@ -316,17 +325,23 @@ rqa_getSeries <- function(y1, y2 = NULL,
 #' @param symmetrical symmetrical
 #' @param diagonal diagonals
 #' @param method distance method
+#' @param withSplits split long vectors into chunks of size splitSize
+#' @param splitSize size of splits
 #'
 #' @return list of vectors
 #'
 #' @export
 #'
 #'
-rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, diagonal = FALSE, method = "Euclidean"){
+rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, diagonal = FALSE, method = "Euclidean", withSplits = FALSE, splitSize = 2048){
 
-  checkPkg("parallel")
+  #checkPkg("parallel")
   checkPkg("bit")
   checkPkg("float")
+
+  if(is.na(emRad%00%NA)){
+    stop("Need a value for emRad!")
+  }
 
   Xlength <- NROW(y1)
   if(all(is.na(y2))){
@@ -346,12 +361,25 @@ rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, dia
 
   inds <- mat_ind(Xlength = Xlength, Ylength = Ylength, index = index, diagonal = diagonal)
 
+  if(withSplits){
+
+  splits <- seq.int(1,max(lengths(inds)),by= splitSize)
+  if(dplyr::last(splits)<max(lengths(inds))){
+    splits <- c(splits,max(lengths(inds)))
+  }
+
+ splits_ind <- plyr::llply(1:(length(splits)-1),function(i){
+   data.frame(rows = inds$r[splits[i]:splits[i+1]],
+        cols = inds$c[splits[i]:splits[i+1]])
+ })
+
   # if(all(is.na(y2))){
   #   Y <- matrix(y1[inds$c,], ncol = 2)
   # } else {
   #   Y <- matrix(y2[inds$c,], ncol = 2)
   # }
   # X <- matrix(y1[inds$r,], ncol = 2)
+  }
 
   if(all(is.na(y2))){
     Y <- matrix(y1[inds$c,], nrow = NROW(inds$c))
@@ -812,8 +840,11 @@ rqa_calc <- function(y1,
                      recurrenceTimes = FALSE,
                      distributions = FALSE){
 
+
+  checkPkg("future")
   checkPkg("parallel")
-  numCores <- parallel::detectCores()
+
+  # numCores <- parallel::detectCores()
 
   if(!is.matrix(y1)){
     stop("Input is not a data frame.")
@@ -893,13 +924,12 @@ rqa_calc <- function(y1,
     }
   }
 
+  #cl <- parallel::makeCluster(numCores)
 
-  cl <- parallel::makeCluster(numCores)
-  # outD <- parallel::clusterMap(cl = cl, index = rows[1], fun = rqa_fast, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+#   outD <- parallel::clusterMap(cl = cl, index = rows[1], fun = rqa_fast, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+#
+# outD <- parallel::clusterMap(cl = cl, index = rows, fun = rqa_fast, RECYCLE = FALSE, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
 
-  outD <- parallel::clusterMap(cl = cl, index = rows, fun = rqa_fast, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
-
-  parallel::stopCluster(cl)
 
   # # For some reason, rqa_fast has to be called one time, before this works.
   # outD <- parallel::mcmapply(FUN = rqa_fast, index = rows[1], MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
@@ -910,11 +940,16 @@ rqa_calc <- function(y1,
 
   #diagonals.distX <- sort(unlist(parallel::mclapply(outD,rqa_lineDist)))
 
-  diagonals.distX <- sort(unlist(parallel::mclapply(outD,rqa_lineDist)))
+  future::plan("multisession")
+
+  outD <- future.apply::future_mapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
+  diagonals.distX <- sort(unlist(future.apply::future_lapply(outD, FUN = rqa_lineDist)))
 
   singularities.dist <- diagonals.distX[diagonals.distX%[]%c(1,1)]
 
   diagonals.distX <- diagonals.distX[diagonals.distX%[]%c(DLmin,DLmax)]
+
 
   if(AUTO){
     RP_N <- (2*sum(sapply(outD,sum))+addDiag)
@@ -933,9 +968,13 @@ rqa_calc <- function(y1,
   rm(outD, diagonals.distX, diagonals.distY)
 
   # Verticals ----
-  outV <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = TRUE, diagonal = FALSE, theiler = theiler, method = method), mc.cores = numCores)
 
-  verticals.dist <- sort(unlist(parallel::mclapply(outV,rqa_lineDist)))
+  outV <- future.apply::future_mapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = TRUE, diagonal = FALSE, theiler = theiler, method = method))
+
+  #outV <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = TRUE, diagonal = FALSE, theiler = theiler, method = method), mc.cores = numCores)
+
+  #verticals.dist <- sort(unlist(parallel::mclapply(outV,rqa_lineDist)))
+  verticals.dist <- sort(unlist(future.apply::future_lapply(outV,rqa_lineDist)))
   verticals.dist <- verticals.dist[verticals.dist%[]%c(VLmin,VLmax)]
 
   rm(outV)
@@ -946,9 +985,12 @@ rqa_calc <- function(y1,
     horizontals.dist <- verticals.dist
   } else {
 
-    outH <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method), mc.cores = numCores)
+    outH <- future.apply::future_mapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method))
 
-    horizontals.dist <- sort(unlist(parallel::mclapply(outH,rqa_lineDist)))
+   # outH <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method), mc.cores = numCores)
+
+    horizontals.dist <- sort(unlist(future.apply::future_lapply(outH,rqa_lineDist)))
+    #horizontals.dist <- sort(unlist(parallel::mclapply(outH,rqa_lineDist)))
     horizontals.dist <- horizontals.dist[horizontals.dist%[]%c(HLmin,HLmax)]
     rm(outH)
   }
@@ -967,6 +1009,9 @@ rqa_calc <- function(y1,
   }
 
   RR <- RP_N / RP_max
+
+  future::plan("sequential")
+  #parallel::stopCluster(cl)
 
   # Singularities ----
   SING_N <- sum(singularities.dist)

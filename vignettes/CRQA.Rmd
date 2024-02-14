@@ -192,7 +192,7 @@ knitr::kable(compOUT, align = c("l","c","c","c","c"), col.names = NULL) %>%
 # RQA based on massively parallel processing: `rqa_par()`
 
 
-`PyRQA` was developed to perform RQA on very long time series, without overloading memory and inflating the computing time to a degree that is unmanageable in a regular workflow. It is not recommended to use matrix based functions like `casnet::rp_measures()` on time series larger than `5,000` data points, instead, `casne::rqa_par()` can be used, which implements some of the methods used in `PyRQA`. Specifically, the memory management by limiting the precision (package [float]) and using bit compression (package [float]), as well as by computing RQA measures in a massively parallel way (package [parallel]). Compared to `casnet::rqa_par()`,`PyRQA` is still faster, but this difference becomes noticeable for very large time series (`>100,000`). 
+`PyRQA` was developed to perform RQA on very long time series, without overloading memory and inflating the computing time to a degree that is unmanageable in a regular workflow. It is not recommended to use matrix based functions like `casnet::rp_measures()` on time series larger than `5,000` data points, instead, `casnet::rqa_par()` can be used, which implements some of the methods used in `PyRQA`. Specifically, the memory management by limiting the precision (package [float]) and using bit compression (package [float]), as well as by computing RQA measures in a massively parallel way (package [parallel]). Compared to `casnet::rqa_par()`,`PyRQA` is still faster, but this difference becomes noticeable for very large time series (`>100,000`). 
 
 ```{r}
 noise <- casnet::noise_powerlaw(N=10000, seed = 1234)
@@ -234,7 +234,7 @@ Ratio laminarity / determinism (LAM/DET): 1.620535
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
 # Including diagonal
-emRad <- 2
+# emRad <- est_radius(rp(noise,emDim = emDim, emLag = emLag))
 emLag <- 100
 emDim <- 2
 emRad <- .00018
@@ -245,6 +245,7 @@ out_rqa_par <-  casnet::rqa_par(y1 = noise, AUTO = TRUE, emDim = emDim, emLag = 
 
 ```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 # Exclude diagonal
+#emRad2 <- est_radius(rp(noise,emDim = emDim, emLag = emLag))
 out_rqa_par2 <- rqa_par(y1 = noise, AUTO = TRUE, emDim = emDim, emLag = emLag, emRad = emRad, theiler = 1, silent = TRUE)
 
 compOUT2 <- data.frame(Meausure = c("RR","DET", "MAX_dl", "MEAN_dl", "ENT_dl", "LAM", "MAX_vl", "MEAN_vl", "ENT_vl"), 
@@ -264,14 +265,14 @@ knitr::kable(compOUT2, col.names = NULL, align = c("l","c","c","c","c")) %>%
 
 # An R interface to Marwan's commandline recurrence plots {#marwan}
 
-> **IMPORTANT**: Currently `crqa_cl` can only run on an operating system that allows execution of 32-bit applications!
+> **IMPORTANT**: Currently `rp_cl` can only run on an operating system that allows execution of 32-bit applications!
 
 The `crqa_cl()` function is a wrapper for the [commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php) executable provided by Norbert Marwan. 
 
 The `rp` executable file is installed on your machine when the function `rp_cl()` is called for the first time:
 
 * It is renamed to `rp` from a platform specific file downloaded from the [commandline Recurrence Plots](http://tocsy.pik-potsdam.de/commandline-rp.php) site.
-* The file is copied to the directory: `r normalizePath("[path to casnet]/exec/",mustWork = FALSE)`
+* The file is copied to the directory: `normalizePath("[path to casnet]/exec/",mustWork = FALSE)`
    - Make sure that you have rights to execute programs in this directory!
 * The latter location is stored as an option and can be read by calling `getOption("casnet.path_to_rp")`
 
@@ -429,4 +430,11 @@ knitr::include_graphics("recurrence_plot_python.png")
 
 
 
-## References
+# Other options: Julia 
+
+The Julia software has a number of very powerful packages to simulate and analyze dynamical systems, see: https://juliadynamics.github.io/DynamicalSystems.jl/latest/
+
+You can perform RQA (https://juliadynamics.github.io/DynamicalSystems.jl/latest/tutorial/#State-space-sets), but perhaps more interestingly, you can use a powerful automatic parameter selection algorithm for embedding called PECUZAL: https://juliadynamics.github.io/DelayEmbeddings.jl/stable/unified/  
+
+I use the freely available software *Visual Studio Code* to write and run Python (https://code.visualstudio.com/docs/languages/python) and Julia (https://code.visualstudio.com/docs/languages/julia)
+

@@ -24,7 +24,7 @@ monoH(
 
 \item{polyOrder}{Order of global polynomial trend to remove if \code{removeTrend = "poly"}. If \code{removeTrend = "adaptive"} polynomials \code{1} to \code{polyOrder} will be evaluated and the best fitting curve (R squared) will be removed (default = \code{1})}
 
-\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
+\item{overlap}{A number in \verb{[0 ... 1]} representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
 
 \item{returnPLAW}{Return the power law data (default = \code{FALSE})}
 }

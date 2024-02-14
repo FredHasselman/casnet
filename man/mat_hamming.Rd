@@ -26,11 +26,11 @@ Other Distance matrix operations (recurrence plot):
 \code{\link{mat_di2bi}()},
 \code{\link{mat_di2ch}()},
 \code{\link{mat_di2we}()},
+\code{\link{rp}()},
 \code{\link{rp_lineDist}()},
 \code{\link{rp_nzdiags}()},
 \code{\link{rp_plot}()},
-\code{\link{rp_size}()},
-\code{\link{rp}()}
+\code{\link{rp_size}()}
 }
 \author{
 Fred Hasselman

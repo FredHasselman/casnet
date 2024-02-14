@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
 
 
 <dt>overlap</dt>
-<dd><p>Turn DFA into a sliding window analysis. A number in <code>[0 ... 1]</code> representing the amount of 'bin overlap'. If <code>length(y) = 1024</code> and overlap is <code>.5</code>, a scale of <code>4</code> will be considered a sliding window of size <code>4</code> with step-size <code>floor(.5 * 4) = 2</code>, so for scale <code>128</code> step-size will be <code>64</code> (default = <code>NA</code>)</p></dd>
+<dd><p>A number in <code>[0 ... 1]</code> representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If <code>length(y) = 1024</code> and overlap is <code>.5</code>, a scale of <code>4</code> will be considered a sliding window of size <code>4</code> with step-size <code>floor(.5 * 4) = 2</code>, so for scale <code>128</code> step-size will be <code>64</code> (default = <code>NA</code>)</p></dd>
 
 
 <dt>returnPLAW</dt>

@@ -49,8 +49,8 @@ Other Distance matrix operations (recurrence network):
 \code{\link{mat_di2bi}()},
 \code{\link{mat_di2ch}()},
 \code{\link{mat_di2we}()},
+\code{\link{rn}()},
 \code{\link{rn_phases}()},
-\code{\link{rn_plot}()},
-\code{\link{rn}()}
+\code{\link{rn_plot}()}
 }
 \concept{Distance matrix operations (recurrence network)}

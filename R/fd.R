@@ -330,6 +330,10 @@ fd_prepSeries <- function(y,
                           overlap = NA,
                           silent = TRUE){
 
+  if(any(is.na(y))){
+    warning("Missing values in y! Analysis may throw an error.")
+  }
+
   y_ori <- y
 
   if(!stats::is.ts(y)){
@@ -595,7 +599,7 @@ fd_sda <- function(y,
 #' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculated as: `seq(scaleMin, scaleMax, length.out = scaleResolution)` (default =  `round(log2(scaleMax-scaleMin))`).
 #' #' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if `length(y) = 1024` and `dataMin = 4`, the maximum scale used to calculate the slope will be `1024 / 4 = 256`. This value will take precedence over the `scaleMax` (default = `NA`)
 #' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` and `dataMin` will be ignored (default = `NA`)
-#' @param overlap Turn DFA into a sliding window analysis. A number in `[0 ... 1]` representing the amount of 'bin overlap'. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with step-size `floor(.5 * 4) = 2`, so for scale `128` step-size will be `64` (default = `NA`)
+#' @param overlap A number in `[0 ... 1]` representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with step-size `floor(.5 * 4) = 2`, so for scale `128` step-size will be `64` (default = `NA`)
 #' @param y    A numeric vector or time series object.
 #' @param doPlot   Output the log-log scale versus fluctuation plot with linear fit by calling function `plotFD_loglog()` (default = `TRUE`)
 #' @param returnPlot Return ggplot2 object (default = `FALSE`)
@@ -621,6 +625,33 @@ fd_sda <- function(y,
 #'
 #' @family Fluctuation Analyses
 #'
+#' @examples
+#'
+#' set.seed(1234)
+#'
+#' # Brownian noise
+#' fd_dfa(cumsum(rnorm(512)))
+#'
+#' # Brownian noise with overlapping bins
+#' fd_dfa(cumsum(rnorm(512)), overlap = 0.5)
+#'
+#' # Brownian noise to white noise - windowed analysis
+#' y <- rnorm(1024)
+#' y[1:512] <- cumsum(y[1:512])
+#'
+#' id <- ts_windower(y, win = 256, step = 1)
+#'
+#' DFAseries <- plyr::ldply(id, function(w){
+#' fd <- fd_dfa(y[w], silent = TRUE)
+#' return(fd$fitRange$FD)
+#' })
+#'
+#' op <- par(mfrow=c(2,1))
+#' plot(ts(y))
+#' plot(ts(DFAseries[,2]))
+#' lines(c(0,770),c(1.5,1.5), col = "red3")
+#' lines(c(0,770),c(1.1,1.1), col = "steelblue")
+#' par(op)
 #'
 fd_dfa <- function(y,
                    fs = NULL,

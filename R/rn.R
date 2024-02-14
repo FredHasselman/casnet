@@ -348,13 +348,13 @@ rn_measures <- function(g, cumulative = TRUE, silent = TRUE){
 
   if(igraph::is_directed(g)){
     if(cumulative){
-      dmat <- igraph::as_adjacency_matrix(g, edges = TRUE, sparse = FALSE)
+      dmat <- igraph::as_adjacency_matrix(g, sparse = FALSE)
       dmat[upper.tri(dmat)] <- 0
       vertex_prop$LocalClustering  <- DirectedClustering::ClustBCG(dmat, "directed", isolates = "zero")$outCC
       degType <- "out"
       efType <- "local"
     } else {
-      vertex_prop$LocalClustering  <- DirectedClustering::ClustBCG(igraph::as_adjacency_matrix(g, edges = TRUE, sparse = FALSE), "directed", isolates = "zero")$totalCC
+      vertex_prop$LocalClustering  <- DirectedClustering::ClustBCG(igraph::as_adjacency_matrix(g, sparse = FALSE), "directed", isolates = "zero")$totalCC
     }
   } else {
     vertex_prop$LocalClustering  <- igraph::transitivity(g, type = clType, isolates = "zero")
@@ -362,7 +362,7 @@ rn_measures <- function(g, cumulative = TRUE, silent = TRUE){
 
   vertex_prop$DegreeDensity    <- igraph::degree(g, loops = FALSE)/(igraph::vcount(g)-1)
   vertex_prop$LocalCloseness   <- igraph::closeness(g, normalized = TRUE, mode = degType)
-  vertex_prop$LocalEfficiency  <- brainGraph::efficiency(g,type = efType, use.parallel = FALSE, A = igraph::as_adjacency_matrix(g,edges = TRUE, sparse = FALSE))
+  vertex_prop$LocalEfficiency  <- brainGraph::efficiency(g,type = efType, use.parallel = FALSE, A = igraph::as_adjacency_matrix(g, sparse = FALSE))
   vertex_prop$LocalBetweenness <- igraph::betweenness(g, directed = igraph::is_directed(g), normalized = TRUE)
 
 

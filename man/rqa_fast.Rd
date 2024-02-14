@@ -12,7 +12,9 @@ rqa_fast(
   emRad,
   symmetrical = TRUE,
   diagonal = FALSE,
-  method = "Euclidean"
+  method = "Euclidean",
+  withSplits = FALSE,
+  splitSize = 2048
 )
 }
 \arguments{
@@ -31,6 +33,10 @@ rqa_fast(
 \item{diagonal}{diagonals}
 
 \item{method}{distance method}
+
+\item{withSplits}{split long vectors into chunks of size splitSize}
+
+\item{splitSize}{size of splits}
 }
 \value{
 list of vectors

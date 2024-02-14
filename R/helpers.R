@@ -2,7 +2,15 @@
 
 # Misc. ----
 
-# Check package
+#' Check package
+#'
+#' @param pkg Package name
+#'
+#' @return If present load package, otherwise throw error.
+#'
+#' @export
+#'
+#'
 checkPkg <- function(pkg){
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop(paste0("Package '", pkg,"' is needed for this function to work. Please install it."), call. = FALSE)

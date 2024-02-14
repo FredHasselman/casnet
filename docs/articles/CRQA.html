@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
       </span>
     </div>
 
@@ -93,7 +93,7 @@
                         <h4 data-toc-skip class="author">Fred
 Hasselman</h4>
             
-            <h4 data-toc-skip class="date">2023-07-18</h4>
+            <h4 data-toc-skip class="date">2024-02-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/CRQA.Rmd" class="external-link"><code>vignettes/CRQA.Rmd</code></a></small>
       <div class="hidden name"><code>CRQA.Rmd</code></div>
@@ -429,7 +429,8 @@ and <code>PyRQA</code>. Note that <code>PyRQA</code> includes the main
 diagonal for <code>RR</code> and measures based on vertical (and
 horizontal) lines.</p>
 <table class="table">
-<thead><tr>
+<thead>
+<tr>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
 <br>Measure
@@ -455,7 +456,20 @@ PyRQA<br>(theiler_corrector = 1)
 PyRQA<br>Diagonal included?
 </div>
 </th>
-</tr></thead>
+</tr>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+</th>
+<th style="text-align:center;">
+</th>
+<th style="text-align:center;">
+</th>
+<th style="text-align:center;">
+</th>
+</tr>
+</thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
@@ -623,7 +637,7 @@ series, without overloading memory and inflating the computing time to a
 degree that is unmanageable in a regular workflow. It is not recommended
 to use matrix based functions like <code><a href="../reference/rp_measures.html">casnet::rp_measures()</a></code> on
 time series larger than <code>5,000</code> data points, instead,
-<code>casne::rqa_par()</code> can be used, which implements some of the
+<code><a href="../reference/rqa_par.html">casnet::rqa_par()</a></code> can be used, which implements some of the
 methods used in <code>PyRQA</code>. Specifically, the memory management
 by limiting the precision (package [float]) and using bit compression
 (package [float]), as well as by computing RQA measures in a massively
@@ -663,7 +677,7 @@ Ratio determinism / recurrence rate (DET/RR): 4.656240
 Ratio laminarity / determinism (LAM/DET): 1.620535</code></pre>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Including diagonal</span></span>
-<span><span class="va">emRad</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
+<span><span class="co"># emRad &lt;- est_radius(rp(noise,emDim = emDim, emLag = emLag))</span></span>
 <span><span class="va">emLag</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
 <span><span class="va">emDim</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
 <span><span class="va">emRad</span> <span class="op">&lt;-</span> <span class="fl">.00018</span></span>
@@ -684,7 +698,8 @@ Ratio laminarity / determinism (LAM/DET): 1.620535</code></pre>
 &gt; 
 &gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
 <table class="table">
-<thead><tr>
+<thead>
+<tr>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
 <br>Measure
@@ -710,7 +725,20 @@ PyRQA<br>(theiler_corrector = 1)
 PyRQA<br>Diagonal included?
 </div>
 </th>
-</tr></thead>
+</tr>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+</th>
+<th style="text-align:center;">
+</th>
+<th style="text-align:center;">
+</th>
+<th style="text-align:center;">
+</th>
+</tr>
+</thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
@@ -872,9 +900,8 @@ Yes
 <h2 id="marwan">An R interface to Marwan’s commandline recurrence plots<a class="anchor" aria-label="anchor" href="#marwan"></a>
 </h2>
 <blockquote>
-<p><strong>IMPORTANT</strong>: Currently <code>crqa_cl</code> can only
-run on an operating system that allows execution of 32-bit
-applications!</p>
+<p><strong>IMPORTANT</strong>: Currently <code>rp_cl</code> can only run
+on an operating system that allows execution of 32-bit applications!</p>
 </blockquote>
 <p>The <code><a href="../reference/rp_cl.html">crqa_cl()</a></code> function is a wrapper for the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
 Recurrence Plots</a> executable provided by Norbert Marwan.</p>
@@ -884,7 +911,8 @@ the function <code><a href="../reference/rp_cl.html">rp_cl()</a></code> is calle
 <li>It is renamed to <code>rp</code> from a platform specific file
 downloaded from the <a href="http://tocsy.pik-potsdam.de/commandline-rp.php" class="external-link">commandline
 Recurrence Plots</a> site.</li>
-<li>The file is copied to the directory: [path to casnet]/exec/
+<li>The file is copied to the directory:
+<code>normalizePath("[path to casnet]/exec/",mustWork = FALSE)</code>
 <ul>
 <li>Make sure that you have rights to execute programs in this
 directory!</li>
@@ -1055,10 +1083,18 @@ RP produced by PyRQA
 </p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h3>
 </div>
+<div class="section level2">
+<h2 id="other-options-julia">Other options: Julia<a class="anchor" aria-label="anchor" href="#other-options-julia"></a>
+</h2>
+<p>The Julia software has a number of very powerful packages to simulate
+and analyze dynamical systems, see: <a href="https://juliadynamics.github.io/DynamicalSystems.jl/latest/" class="external-link uri">https://juliadynamics.github.io/DynamicalSystems.jl/latest/</a></p>
+<p>You can perform RQA (<a href="https://juliadynamics.github.io/DynamicalSystems.jl/latest/tutorial/#State-space-sets" class="external-link uri">https://juliadynamics.github.io/DynamicalSystems.jl/latest/tutorial/#State-space-sets</a>),
+but perhaps more interestingly, you can use a powerful automatic
+parameter selection algorithm for embedding called PECUZAL: <a href="https://juliadynamics.github.io/DelayEmbeddings.jl/stable/unified/" class="external-link uri">https://juliadynamics.github.io/DelayEmbeddings.jl/stable/unified/</a></p>
+<p>I use the freely available software <em>Visual Studio Code</em> to
+write and run Python (<a href="https://code.visualstudio.com/docs/languages/python" class="external-link uri">https://code.visualstudio.com/docs/languages/python</a>) and
+Julia (<a href="https://code.visualstudio.com/docs/languages/julia" class="external-link uri">https://code.visualstudio.com/docs/languages/julia</a>)</p>
 </div>
   </div>
 

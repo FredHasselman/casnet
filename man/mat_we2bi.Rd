@@ -2,13 +2,20 @@
 % Please edit documentation in R/matrixOps.R
 \name{mat_we2bi}
 \alias{mat_we2bi}
-\title{Title}
+\title{Weighted to Binary matrix}
 \usage{
 mat_we2bi(distmat, emRad, theiler = 0, convMat = FALSE)
 }
 \arguments{
-\item{convMat}{}
+\item{distmat}{Distance matrix}
+
+\item{emRad}{The radius or threshold value}
+
+\item{convMat}{Should the matrix be converted from a \code{distmat} object of class \code{\link[Matrix:Matrix]{Matrix::Matrix()}} to \code{\link[base:matrix]{base::matrix()}} (or vice versa)}
+}
+\value{
+A binary matrix
 }
 \description{
-Title
+Weighted to Binary matrix
 }

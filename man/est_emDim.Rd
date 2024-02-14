@@ -41,9 +41,9 @@ A wrapper for \link[nonlinearTseries:estimateEmbeddingDim]{nonlinearTseries::est
 \seealso{
 Other Estimate Recurrence Parameters: 
 \code{\link{est_emLag}()},
-\code{\link{est_parameters_roc}()},
 \code{\link{est_parameters}()},
-\code{\link{est_radius_rqa}()},
-\code{\link{est_radius}()}
+\code{\link{est_parameters_roc}()},
+\code{\link{est_radius}()},
+\code{\link{est_radius_rqa}()}
 }
 \concept{Estimate Recurrence Parameters}

@@ -98,5 +98,6 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 RQA
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 Calculate (C)RQA measures without creating a recurrence matrix. Can handle very large time series and requires package \link{parallel} to be installed.
 }

@@ -54,7 +54,7 @@ fd_dfa(
 
 \item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
 
-\item{overlap}{Turn DFA into a sliding window analysis. A number in \verb{[0 ... 1]} representing the amount of 'bin overlap'. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
+\item{overlap}{A number in \verb{[0 ... 1]} representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
 
 \item{doPlot}{Output the log-log scale versus fluctuation plot with linear fit by calling function \code{plotFD_loglog()} (default = \code{TRUE})}
 
@@ -82,6 +82,35 @@ A list object containing:
 }
 \description{
 fd_dfa
+}
+\examples{
+
+set.seed(1234)
+
+# Brownian noise
+fd_dfa(cumsum(rnorm(512)))
+
+# Brownian noise with overlapping bins
+fd_dfa(cumsum(rnorm(512)), overlap = 0.5)
+
+# Brownian noise to white noise - windowed analysis
+y <- rnorm(1024)
+y[1:512] <- cumsum(y[1:512])
+
+id <- ts_windower(y, win = 256, step = 1)
+
+DFAseries <- plyr::ldply(id, function(w){
+fd <- fd_dfa(y[w], silent = TRUE)
+return(fd$fitRange$FD)
+})
+
+op <- par(mfrow=c(2,1))
+plot(ts(y))
+plot(ts(DFAseries[,2]))
+lines(c(0,770),c(1.5,1.5), col = "red3")
+lines(c(0,770),c(1.1,1.1), col = "steelblue")
+par(op)
+
 }
 \references{
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
