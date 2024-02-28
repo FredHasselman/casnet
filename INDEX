@@ -4,6 +4,7 @@ as.numeric_character       Character vector to named numeric vector
 as.numeric_discrete        Discrete (factor or character) to numeric vector
 as.numeric_factor          Numeric factor to numeric vector
 bandReplace                Replace matrix diagonals
+checkPkg                   Check package
 ColouredNoise              Coloured noise data
 createCorridor             Corridor analysis
 dc_ccp                     Cumulative Complexity Peaks (CCP)
@@ -33,8 +34,7 @@ get_os                     Which OS is running?
 getColours                 Get some nice colours
 getPairs                   Get all combinations
 growth_ac                  Examples of dynamical growth models (maps)
-growth_ac_cond             Examples of conditional dynamical growth models
-                           (maps)
+growth_ac_cond             Examples of conditional dynamical growth models (maps)
 inf_MSE                    Multi-Scale Entropy
 inf_SampEn                 Sample Entropy
 is.date                    It's a Date!
@@ -61,8 +61,8 @@ noise_powerlaw             Generate noise series with power law scaling exponent
 plotDC_ccp                 Plot Cumulative Complexity Peaks
 plotDC_lvl                 Plot Peaks versus Levels
 plotDC_res                 Plot Complexity Resonance Diagram
-plotFD_loglog              Plot output from fluctuation analyses based on
-                           log-log regression
+plotFD_loglog              Plot output from fluctuation analyses based on log-log
+                           regression
 plotMRN_win                Plot windowed Multiplex Recurrence Network measures
 plotNET_BA                 Example of Barabasi scale-free network
 plotNET_groupColour        Vertex and Edge Group Colours

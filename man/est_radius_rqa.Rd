@@ -18,7 +18,8 @@ est_radius_rqa(
   standardise = c("mean.sd", "median.mad", "none")[3],
   radiusOnFail = c("tiny", "huge", "percentile")[3],
   silent = FALSE,
-  useParallel = TRUE
+  useParallel = TRUE,
+  doEmbed = TRUE
 )
 }
 \arguments{
@@ -28,7 +29,7 @@ est_radius_rqa(
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: \verb{"Euclidean", "Manhattan", "Minkowski", "Chebysev"} (or the same but shorter: \verb{"L2","L1","Lp", "max"} distance). To use the shape based distance for phase-based recurrence use \code{"SBD"} (default = \code{"Euclidean"})}
 
 \item{startRadius}{The starting value for the radius (default = SD of time series values)}
 
@@ -49,6 +50,8 @@ est_radius_rqa(
 \item{silent}{Silent-ish}
 
 \item{useParallel}{Should evaluation run using package parallel? This is will only be beneficial if the time series contains more than 10k data points (default = \code{TRUE})}
+
+\item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag} (Multidimensional RQA). If \code{y1} and/or \code{y2} are data frames, the columns will be used as the state space dimensions (default = \code{TRUE})}
 
 \item{noiseLevel}{Noise level to construct the \verb{signal + noiseLevel *} \eqn{N(\mu=0,\sigma=1)} (default = \code{0.75})}
 

@@ -40,7 +40,7 @@ est_radius(
 
 \item{emDim}{The embedding dimensions}
 
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: \verb{"Euclidean", "Manhattan", "Minkowski", "Chebysev"} (or the same but shorter: \verb{"L2","L1","Lp", "max"} distance). To use the shape based distance for phase-based recurrence use \code{"SBD"} (default = \code{"Euclidean"})}
 
 \item{type}{Either \code{"fixed"} (default) or \code{"optimal"}, \code{"fixed"} will search for a radius that is close to the value for the \code{targetMeasure} in \code{targetValue}, \code{"optimal"} will optimise the radius for the \code{targetMeasure}, \code{targetValue} is ignored.}
 

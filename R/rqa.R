@@ -8,7 +8,7 @@
 #'
 #' @description
 #' `r lifecycle::badge('experimental')`
-#' Calculate (C)RQA measures without creating a recurrence matrix. Can handle very large time series and requires package [parallel] to be installed.
+#' Calculate (C)RQA measures without creating a recurrence matrix. Can handle very large time series and requires package [future.apply] to be installed.
 #'
 #' @inheritParams rp
 #' @inheritParams rp_measures
@@ -35,7 +35,7 @@ rqa_par <- function(y1,
                     HLmax = NA,
                     weighted = FALSE,
                     weightedBy = "si",
-                    method = "Euclidean",
+                    method = c("Euclidean","SBD")[1],
                     rescaleDist = c("none","maxDist","meanDist")[1],
                     targetValue  = .05,
                     chromatic = FALSE,
@@ -47,9 +47,13 @@ rqa_par <- function(y1,
                     silent = TRUE,
                     ...){
 
-  checkPkg("parallel")
+  checkPkg("future.apply")
   checkPkg("bit")
   checkPkg("float")
+
+  if(method == "SBD"){
+    checkPkg("dtwclust")
+  }
 
    if(is.null(AUTO)){
     stop("Auto-RQA or Cross-RQA? (Provide a value for AUTO)")
@@ -141,6 +145,11 @@ rqa_par <- function(y1,
   if("error"%in%class(dist_method$value)){
     stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
   }
+
+  # if(method == "SBD"){
+  #   message("Make sure all phase space dimensions are on the same scale when using Shape Based Distance.")
+  #   dmat <- Matrix::as.matrix(dmat)
+  # }
 
   if(is.na(DLmax)){
       DLmax <- NROW(et1)
@@ -335,9 +344,17 @@ rqa_getSeries <- function(y1, y2 = NULL,
 #'
 rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, diagonal = FALSE, method = "Euclidean", withSplits = FALSE, splitSize = 2048){
 
-  #checkPkg("parallel")
+  if(method == "SBD"){
+    checkPkg("dtwclust")
+  }
+
   checkPkg("bit")
   checkPkg("float")
+
+  if(withSplits){
+    message("With splits is not implemented yet")
+    withSplits <- FALSE
+  }
 
   if(is.na(emRad%00%NA)){
     stop("Need a value for emRad!")
@@ -841,8 +858,8 @@ rqa_calc <- function(y1,
                      distributions = FALSE){
 
 
-  checkPkg("future")
-  checkPkg("parallel")
+  checkPkg("future.apply")
+  #checkPkg("parallel")
 
   # numCores <- parallel::detectCores()
 
@@ -1155,104 +1172,109 @@ rqa_calc <- function(y1,
 }
 
 
-#' rqa_lineMeasures
-#'
-#' @inheritParams rqa_par
-#'
-#' @return RQA line measures
-#' @export
-#'
-#' @keywords internal
-#'
-rqa_calc_lineMeasures <- function(y1,
-                                  y2 = NA,
-                                  emRad = NA,
-                                  DLmin = 2,
-                                  VLmin = 2,
-                                  HLmin = 2,
-                                  DLmax = NROW(y1),
-                                  VLmax = NROW(y1),
-                                  HLmax = NROW(y1),
-                                  d         = NULL,
-                                  theiler   = NA,
-                                  recurrenceTimes    = FALSE,
-                                  AUTO      = NULL,
-                                  chromatic = FALSE,
-                                  matrices  = FALSE){
-
-
-  # Diagonal ----
-
-  # Includes LOS (main diagonal)
-  if(theiler==0){
-    rows <- c(-(NROW(y1)-1):(NROW(y1)-1))
-  } else {
-    rows <- c(-(NROW(y1)-1):(-theiler), (theiler):(NROW(y1)-1))
-  }
-
-  if(AUTO){
-    addDiag <- 0
-    if(theiler == 0){
-      rows <- rows[rows>=1]
-      addDiag <- NROW(y1)
-    } else {
-      rows <- rows[rows>=theiler]
-    }
-  }
-
-  outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
-
-  diagonals.distX <- sort(unlist(parallel::mclapply(outD,rqa_lineDist)))
-
-  singular.distD <- diagonals.distX[diagonals.distX%[]%c(1,1)]
-
-  diagonals.distX <- diagonals.distX[diagonals.distX%[]%c(DLmin,DLmax)]
-
-  if(AUTO){
-    RP_N <- (2*sum(sapply(outD,sum))+addDiag)
-    diagonals.distY <- diagonals.distX
-    singular.distD <- c(singular.distD,singular.distD)
-    if(theiler==0){
-      diagonals.distX <- c(diagonals.distX, addDiag)
-    }
-  } else {
-    RP_N <- sum(sapply(outD,sum))
-    diagonals.distY <- NULL
-  }
-
-  diagonals.dist <- sort(c(diagonals.distX,diagonals.distY))
-
-  rm(outD, diagonals.distX, diagonals.distY)
-
-
-  # Vertical ----
-  outV <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = AUTO, diagonal = FALSE, theiler = theiler, method = method), mc.cores = numCores)
-
-  verticals.dist <- sort(unlist(parallel::mclapply(outV,rqa_lineDist)))
-  verticals.dist <- verticals.dist[verticals.dist%[]%c(VLmin,VLmax)]
-
-  rm(outV)
-
-  # Horizontal ----
-
-  if(AUTO){
-    horizontals.dist <- verticals.dist
-  } else {
-
-    outH <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method), mc.cores = numCores)
-
-    horizontals.dist <- sort(unlist(parallel::mclapply(outH,rqa_lineDist)))
-    horizontals.dist <- horizontals.dist[horizontals.dist%[]%c(HLmin,HLmax)]
-    rm(outH)
-  }
-
-  return(list(RP_N = RP_N,
-              diagonals.dist = diagonals.dist,
-              verticals.dist = verticals.dist,
-              horizontas.dist = horizontals.dits,
-              singular.distD = singular.distD))
-
-}
+#
+# #' rqa_lineMeasures
+# #'
+# #' @inheritParams rqa_par
+# #'
+# #' @return RQA line measures
+# #' @export
+# #'
+# #' @keywords internal
+# #'
+# rqa_calc_lineMeasures <- function(y1,
+#                                   y2 = NA,
+#                                   emRad = NA,
+#                                   DLmin = 2,
+#                                   VLmin = 2,
+#                                   HLmin = 2,
+#                                   DLmax = NROW(y1),
+#                                   VLmax = NROW(y1),
+#                                   HLmax = NROW(y1),
+#                                   d         = NULL,
+#                                   theiler   = NA,
+#                                   recurrenceTimes    = FALSE,
+#                                   AUTO      = NULL,
+#                                   chromatic = FALSE,
+#                                   matrices  = FALSE){
+#
+#
+#   checkPkg("future.apply")
+#
+#   # Diagonal ----
+#
+#   # Includes LOS (main diagonal)
+#   if(theiler==0){
+#     rows <- c(-(NROW(y1)-1):(NROW(y1)-1))
+#   } else {
+#     rows <- c(-(NROW(y1)-1):(-theiler), (theiler):(NROW(y1)-1))
+#   }
+#
+#   if(AUTO){
+#     addDiag <- 0
+#     if(theiler == 0){
+#       rows <- rows[rows>=1]
+#       addDiag <- NROW(y1)
+#     } else {
+#       rows <- rows[rows>=theiler]
+#     }
+#   }
+#
+#   outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
+#
+#
+#
+#   diagonals.distX <- sort(unlist(parallel::mclapply(outD,rqa_lineDist)))
+#
+#   singular.distD <- diagonals.distX[diagonals.distX%[]%c(1,1)]
+#
+#   diagonals.distX <- diagonals.distX[diagonals.distX%[]%c(DLmin,DLmax)]
+#
+#   if(AUTO){
+#     RP_N <- (2*sum(sapply(outD,sum))+addDiag)
+#     diagonals.distY <- diagonals.distX
+#     singular.distD <- c(singular.distD,singular.distD)
+#     if(theiler==0){
+#       diagonals.distX <- c(diagonals.distX, addDiag)
+#     }
+#   } else {
+#     RP_N <- sum(sapply(outD,sum))
+#     diagonals.distY <- NULL
+#   }
+#
+#   diagonals.dist <- sort(c(diagonals.distX,diagonals.distY))
+#
+#   rm(outD, diagonals.distX, diagonals.distY)
+#
+#
+#   # Vertical ----
+#   outV <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = AUTO, diagonal = FALSE, theiler = theiler, method = method), mc.cores = numCores)
+#
+#   verticals.dist <- sort(unlist(parallel::mclapply(outV,rqa_lineDist)))
+#   verticals.dist <- verticals.dist[verticals.dist%[]%c(VLmin,VLmax)]
+#
+#   rm(outV)
+#
+#   # Horizontal ----
+#
+#   if(AUTO){
+#     horizontals.dist <- verticals.dist
+#   } else {
+#
+#     outH <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method), mc.cores = numCores)
+#
+#     horizontals.dist <- sort(unlist(parallel::mclapply(outH,rqa_lineDist)))
+#     horizontals.dist <- horizontals.dist[horizontals.dist%[]%c(HLmin,HLmax)]
+#     rm(outH)
+#   }
+#
+#   return(list(RP_N = RP_N,
+#               diagonals.dist = diagonals.dist,
+#               verticals.dist = verticals.dist,
+#               horizontas.dist = horizontals.dits,
+#               singular.distD = singular.distD))
+#
+# }
 
 #' Stitch rows
 #'

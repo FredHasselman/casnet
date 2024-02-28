@@ -22,7 +22,7 @@
 #' @param to.sparse Should sparse matrices be used?
 #' @param weighted If `FALSE` a binary matrix will be returned. If `TRUE` every value larger than `emRad` will be `0`, but values smaller than `emRad` will be retained (default = `FALSE`)
 #' @param weightedBy After setting values smaller than `emRad` to `0`, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (`"si"`). Other option are `"rt"` for *recurrence time* and `"rf"` for *recurrence time frequency* (default = `"si"`)
-#' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = `"Euclidean"`)
+#' @param method Distance measure to use. Any option that is valid for argument `method` of [proxy::dist()]. Type `proxy::pr_DB$get_entries()` to see a list of all the options. Common methods are: `"Euclidean", "Manhattan", "Minkowski", "Chebysev"` (or the same but shorter: `"L2","L1","Lp", "max"` distance). To use the shape based distance for phase-based recurrence use `"SBD"` (default = `"Euclidean"`)
 #' @param rescaleDist Should the distance matrix be rescaled? Options are "none", "maxDist" to create a unit scale, "meanScale" to creat z-scores based on the mean distance. (default = `"none"`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR")` if `is.na(emRad)==TRUE`.
 #' @param chromatic Perform a chromatic RQA. This assumes the recurring values represent the labels of an unordered categorical variable (default = `FALSE`)
@@ -59,7 +59,7 @@ rp <- function(y1, y2 = NULL,
                to.sparse = TRUE,
                weighted = FALSE,
                weightedBy = "si",
-               method = "Euclidean",
+               method = c("Euclidean","SBD")[1],
                rescaleDist = c("none","maxDist","meanDist")[1],
                targetValue  = .05,
                chromatic = FALSE,
@@ -73,6 +73,11 @@ rp <- function(y1, y2 = NULL,
   if(is.null(y2)){
     y2 <- y1
     attributes(y2) <- attributes(y1)
+    AUTO <- TRUE
+  }
+
+  if(method == "SBD"){
+    checkPkg("dtwclust")
   }
 
   atlist <- attributes(y1)
@@ -135,10 +140,16 @@ rp <- function(y1, y2 = NULL,
   if("error"%in%class(dist_method$value)){
     stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
   } else {
+
     dmat <- proxy::dist(x = et1,
                         y = et2,
                         method = method,
                         diag = TRUE)
+
+    if(method == "SBD"){
+      message("Make sure all phase space dimensions are on the same scale when using Shape Based Distance.")
+      dmat <- Matrix::as.matrix(dmat)
+    }
   }
 
   # Remove proxy class
@@ -290,8 +301,7 @@ rp <- function(y1, y2 = NULL,
 #' @param Nboot How many bootstrap replications? (default = `NULL`)
 #' @param CL Confidence limit for bootstrap results (default = `.95`)
 #' @param targetValue A value passed to `est_radius(...,type="fixed", targetMeasure="RR", tol = .2)` if `is.na(emRad)==TRUE`, it will estimate a radius (default = `.05`).
-#' @param doParallel Speed up calculations by using the parallel processing options provided by `parallel` to assign a separate process/core for each window in windowed (C)RQA analysis and [parallel::detectCores()] with  `logical = TRUE` to decide on the available cores (default = `FALSE`)
-#' @param alwaysUseRP Always use the Recurrence Matrix to calculate RQA measures (default = `FALSE`)
+#' @param use_rqa_par Use function [rqa_par()] if matrix dims >  (default = `FALSE`)
 #' @param silent Do not display any messages (default = `TRUE`)
 #'
 #' @return A list object containing (C)RQA measures (and matrices if requested)
@@ -320,8 +330,7 @@ rp_measures <- function(RM,
                         Nboot     = NULL,
                         CL        = .95,
                         targetValue = .05,
-                        doParallel = FALSE,
-                        alwaysUseRP  = FALSE,
+                        use_rqa_par  = FALSE,
                         silent     = TRUE){
 
 
@@ -346,39 +355,7 @@ rp_measures <- function(RM,
     }
   }
 
-  if(!alwaysUseRP){
-    if(max(dim(RM))>2046){
 
-      y1 <- attributes(RM)$emDims1
-      y2 <- attributes(RM)$emDims2
-
-      out <- rqa_par(y1 = y1,
-                 y2 = y2,
-                 emRad = emRad,
-                 DLmin = DLmin,
-                 VLmin = VLmin,
-                 HLmin = HLmin,
-                 DLmax = DLmax,
-                 VLmax = VLmax,
-                 HLmax = HLmax,
-                 theiler = theiler,
-                 AUTO  = AUTO,
-                 chromatic = chromatic,
-                 anisotropyHV = anisotropyHV,
-                 asymmetryUL = asymmetryUL,
-                 recurrenceTimes = recurrenceTimes,
-                 weighted = FALSE,
-                 weightedBy = "si",
-                 method = method,
-                 rescaleDist = c("none","maxDist","meanDist")[1],
-                 targetValue  = targetValue,
-                 doEmbed = FALSE,
-                 silent = silent,
-                 ...)
-
-      return(out)
-    }
-  }
 
 
   if(is.na(chromatic)){
@@ -423,6 +400,41 @@ rp_measures <- function(RM,
       }
     } # not emRad attr
   }
+
+  if(use_rqa_par){
+    if(max(dim(RM))>2046){
+
+      y1 <- attributes(RM)$emDims1
+      y2 <- attributes(RM)$emDims2
+
+      out <- rqa_par(y1 = y1,
+                     y2 = y2,
+                     emRad = emRad,
+                     DLmin = DLmin,
+                     VLmin = VLmin,
+                     HLmin = HLmin,
+                     DLmax = DLmax,
+                     VLmax = VLmax,
+                     HLmax = HLmax,
+                     theiler = theiler,
+                     AUTO  = AUTO,
+                     chromatic = chromatic,
+                     anisotropyHV = anisotropyHV,
+                     asymmetryUL = asymmetryUL,
+                     recurrenceTimes = recurrenceTimes,
+                     weighted = FALSE,
+                     weightedBy = "si",
+                     method = method,
+                     rescaleDist = c("none","maxDist","meanDist")[1],
+                     targetValue  = targetValue,
+                     doEmbed = FALSE,
+                     silent = silent,
+                     ...)
+
+      return(out)
+    }
+  } else {
+
 
   #uval <- unique(as.vector(RM))
   if(!all(as.vector(RM)==0|as.vector(RM)==1)){
@@ -554,6 +566,10 @@ rp_measures <- function(RM,
     #                                   matrices  = matrices))
     # }
   #}
+
+  } # if !use_rqa_par
+
+
   if(matrices){
       tab <- out$crqaMeasures
     } else {

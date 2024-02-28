@@ -67,7 +67,7 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{to.sparse}{Should sparse matrices be used?}
 
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: \verb{"Euclidean", "Manhattan", "Minkowski", "Chebysev"} (or the same but shorter: \verb{"L2","L1","Lp", "max"} distance). To use the shape based distance for phase-based recurrence use \code{"SBD"} (default = \code{"Euclidean"})}
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 

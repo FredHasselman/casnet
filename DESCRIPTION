@@ -74,7 +74,8 @@ Suggests:
     dtwclust,
     forcats,
     plot3D,
-    ggridges
+    ggridges,
+    future.apply
 Language: en-US
 URL: https://github.com/FredHasselman/casnet
 BugReports: https://github.com/FredHasselman/casnet/issues

@@ -16,7 +16,7 @@ rp(
   to.sparse = TRUE,
   weighted = FALSE,
   weightedBy = "si",
-  method = "Euclidean",
+  method = c("Euclidean", "SBD")[1],
   rescaleDist = c("none", "maxDist", "meanDist")[1],
   targetValue = 0.05,
   chromatic = FALSE,
@@ -57,7 +57,7 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 
 \item{weightedBy}{After setting values smaller than \code{emRad} to \code{0}, what should the recurrent values represent? The default is to use the state space similarity (distance/proximity) values as weights (\code{"si"}). Other option are \code{"rt"} for \emph{recurrence time} and \code{"rf"} for \emph{recurrence time frequency} (default = \code{"si"})}
 
-\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = \code{"Euclidean"})}
+\item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: \verb{"Euclidean", "Manhattan", "Minkowski", "Chebysev"} (or the same but shorter: \verb{"L2","L1","Lp", "max"} distance). To use the shape based distance for phase-based recurrence use \code{"SBD"} (default = \code{"Euclidean"})}
 
 \item{rescaleDist}{Should the distance matrix be rescaled? Options are "none", "maxDist" to create a unit scale, "meanScale" to creat z-scores based on the mean distance. (default = \code{"none"})}
 

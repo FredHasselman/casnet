@@ -420,11 +420,13 @@ est_radius_rqa <- function(y1 = NULL,
                        standardise  = c("mean.sd","median.mad","none")[3],
                        radiusOnFail   = c("tiny","huge","percentile")[3],
                        silent         = FALSE,
-                       useParallel    = TRUE){
+                       useParallel    = TRUE,
+                       doEmbed        = TRUE){
 
   if(useParallel){
-    checkPkg("parallel")
-    numCores <- parallel::detectCores()
+    checkPkg("future.apply")
+    future::plan("multisession")
+    #numCores <- parallel::detectCores()
   }
 
   if(is.null(AUTO)){
@@ -436,9 +438,24 @@ est_radius_rqa <- function(y1 = NULL,
     }
   }
 
-  if(AUTO){
-    y2 <- NA
+
+  if(!doEmbed){
+    emDim <- 1
+    emLag <- 0
   }
+
+  # Embed series
+  tmp <- rqa_getSeries(y1 = y1,
+                       y2 = y2,
+                       emDim = emDim,
+                       emLag = emLag,
+                       chromatic = FALSE,
+                       doEmbed = doEmbed)
+
+  y1 <- tmp$et1
+  y2 <- tmp$et2
+
+  rm(tmp)
 
   if(is.na(theiler)){
     if(AUTO){
@@ -446,6 +463,10 @@ est_radius_rqa <- function(y1 = NULL,
     } else {
       theiler <- 0
     }
+  }
+
+  if(AUTO){
+    y2 <- NA
   }
 
   if(is.null(attributes(y1)$embedding.lag)){
@@ -469,6 +490,9 @@ est_radius_rqa <- function(y1 = NULL,
   dist_method <- return_error(proxy::pr_DB$get_entry(method))
   if("error"%in%class(dist_method$value)){
     stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
+  }
+  if(method == "SBD"){
+    message("Make sure all phase space dimensions are on the same scale when using Shape Based Distance.")
   }
 
   if(is.null(startRadius)){
@@ -533,20 +557,41 @@ est_radius_rqa <- function(y1 = NULL,
     while(!exitIter){
 
       if(useParallel){
-        outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
-        parallel::stopCluster(numCores)
+
+       # outD <- parallel::mcmapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method), mc.cores = numCores)
+        #parallel::stopCluster(numCores)
+
+        outD <- future.apply::future_mapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
       } else {
+
         outD <- lapply(rows, function(i) rqa_fast(y1 = y1, y2 = y2, index = i, emRad = tryRadius, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
+
+
       }
 
       if(iter == 0){
 
-        minDist    <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$minDist)))
-        minDistN   <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$minDistN)))
-        minRP_dist <- float::as.float(min(minDist, na.rm = TRUE))
-        minRP_N    <- sum(minDistN[minDist==minRP_dist], na.rm = TRUE)
-        maxDist    <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$maxDist)))
-        maxRP_dist <- float::as.float(max(maxDist, na.rm = TRUE))
+        if(useParallel){
+
+          minDist    <- float::as.float(future.apply::future_sapply(outD, function(d) as.numeric(attributes(d)$minDist)))
+          minDistN   <- float::as.float(future.apply::future_sapply(outD, function(d) as.numeric(attributes(d)$minDistN)))
+          minRP_dist <- float::as.float(min(minDist, na.rm = TRUE))
+          minRP_N    <- sum(minDistN[minDist==minRP_dist], na.rm = TRUE)
+          maxDist    <- float::as.float(future.apply::future_sapply(outD, function(d) as.numeric(attributes(d)$maxDist)))
+          maxRP_dist <- float::as.float(max(maxDist, na.rm = TRUE))
+
+        } else {
+
+          minDist    <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$minDist)))
+          minDistN   <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$minDistN)))
+          minRP_dist <- float::as.float(min(minDist, na.rm = TRUE))
+          minRP_N    <- sum(minDistN[minDist==minRP_dist], na.rm = TRUE)
+          maxDist    <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$maxDist)))
+          maxRP_dist <- float::as.float(max(maxDist, na.rm = TRUE))
+
+        }
 
         if(AUTO){
           minRP_N <- (minRP_N*2) + addDiag
@@ -563,23 +608,35 @@ est_radius_rqa <- function(y1 = NULL,
         #   warning("Cannot rescale distance matrix, please rescale the time series to standardeviation (z-score) or unit scale (min/max)")
         # }
 
-      }
+        if(targetValue<=minRR){
+          warning(paste("The minimum RR possible for this matrix is", round(minRR,3),
+                        "because the minimum distance is:", round(as.numeric(minRP_dist),3)))
+          minRRfound <- TRUE
+          exitIter   <- TRUE
+        }
 
-      if(targetValue<=minRR){
-        warning(paste("The minimum RR possible for this matrix is", round(minRR,3),
-                      "because the minimum distance is:", round(as.numeric(minRP_dist),3)))
-        minRRfound <- TRUE
-        exitIter   <- TRUE
       }
 
       iter <- iter+1
       if(!silent){cat(paste("Iteration",iter,"\n"))}
 
+      if(useParallel){
+
       if(AUTO){
-        RP_N <- (2*sum(sapply(outD,sum)))+addDiag
+        RP_N <- (2*sum( future.apply::future_sapply(outD,sum)))+addDiag
       } else {
-        RP_N <- sum(sapply(outD,sum))
+        RP_N <- sum( future.apply::future_sapply(outD,sum))
       }
+
+      } else {
+
+        if(AUTO){
+          RP_N <- (2*sum(sapply(outD,sum)))+addDiag
+        } else {
+          RP_N <- sum(sapply(outD,sum))
+        }
+      }
+
 
       Measure <- RP_N/RP_max
 
@@ -619,6 +676,11 @@ est_radius_rqa <- function(y1 = NULL,
 
     } # While ....
 
+    if(useParallel){
+
+      future::plan("sequential")
+
+    }
 
     if(iter>=maxIter){
       warning("Max. iterations reached!")

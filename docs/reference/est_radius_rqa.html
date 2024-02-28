@@ -80,7 +80,8 @@
 <span>  standardise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"none"</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,</span>
 <span>  radiusOnFail <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tiny"</span>, <span class="st">"huge"</span>, <span class="st">"percentile"</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,</span>
 <span>  silent <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  useParallel <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  useParallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  doEmbed <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,7 +100,7 @@
 
 
 <dt>method</dt>
-<dd><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code>proxy::dist()</code>. Type <code>proxy::pr_DB$get_entries()</code> to see a list of all the options. Common methods are: "Euclidean", "Manhattan", "Minkowski", "Chebysev" (or the same but shorter: "L2","L1","Lp" and "max" distance) (default = <code>"Euclidean"</code>)</p></dd>
+<dd><p>Distance measure to use. Any option that is valid for argument <code>method</code> of <code>proxy::dist()</code>. Type <code>proxy::pr_DB$get_entries()</code> to see a list of all the options. Common methods are: <code>"Euclidean", "Manhattan", "Minkowski", "Chebysev"</code> (or the same but shorter: <code>"L2","L1","Lp", "max"</code> distance). To use the shape based distance for phase-based recurrence use <code>"SBD"</code> (default = <code>"Euclidean"</code>)</p></dd>
 
 
 <dt>startRadius</dt>
@@ -140,6 +141,10 @@
 
 <dt>useParallel</dt>
 <dd><p>Should evaluation run using package parallel? This is will only be beneficial if the time series contains more than 10k data points (default = <code>TRUE</code>)</p></dd>
+
+
+<dt>doEmbed</dt>
+<dd><p>If <code>FALSE</code>, a distance matrix will be returned that is not embedded by <code>emDim</code> and <code>emLag</code> (Multidimensional RQA). If <code>y1</code> and/or <code>y2</code> are data frames, the columns will be used as the state space dimensions (default = <code>TRUE</code>)</p></dd>
 
 
 <dt>noiseLevel</dt>

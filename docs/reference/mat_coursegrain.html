@@ -163,10 +163,12 @@
 <span class="r-in"><span><span class="co"># Categorical</span></span></span>
 <span class="r-in"><span><span class="va">RMl1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span>, min <span class="op">=</span> <span class="fl">1</span>, max <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>, chromatic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMl1</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Multiple components found; returning the first one. To return all, use `return_all = TRUE`.</span>
 <span class="r-plt img"><img src="mat_coursegrain-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">RMl2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMl1</span>, categorical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Categorical matrix... using summary function 'attributes(ftable(x))$col.vars[[which.max(ftable(x))]]' for coursegraining.</span>
 <span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMl2</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Multiple components found; returning the first one. To return all, use `return_all = TRUE`.</span>
 <span class="r-plt img"><img src="mat_coursegrain-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
