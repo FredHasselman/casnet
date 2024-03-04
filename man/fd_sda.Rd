@@ -12,8 +12,8 @@ fd_sda(
   standardise = c("none", "mean.sd", "median.mad")[2],
   adjustSumOrder = FALSE,
   scaleMin = 4,
-  scaleMax = log2(floor(NROW(y)/2)),
-  scaleResolution = (scaleMax - scaleMin),
+  scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
+  scaleResolution = log2(scaleMax) - log2(scaleMin),
   dataMin = NA,
   scaleS = NA,
   overlap = 0,
@@ -41,7 +41,7 @@ fd_sda(
 
 \item{scaleMin}{Minimum scale (in data points) to use for log-log regression (default = \code{4})}
 
-\item{scaleMax}{Maximum scale (in data points) to use for log-log regression. This value will be ignored if \code{dataMin} is not \code{NA} (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
+\item{scaleMax}{Maximum scale (in data points) to use for log-log regression. This value will be ignored if \code{dataMin} is not \code{NA}, in which case bins of size \verb{< dataMin} will be removed (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
 
 \item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculated as: \code{seq(scaleMin, scaleMax, length.out = scaleResolution)} (default =  \code{round(log2(scaleMax-scaleMin))}).
 #' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if \code{length(y) = 1024} and \code{dataMin = 4}, the maximum scale used to calculate the slope will be \code{1024 / 4 = 256}. This value will take precedence over the \code{scaleMax} (default = \code{NA})}

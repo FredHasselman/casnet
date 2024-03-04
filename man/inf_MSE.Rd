@@ -59,7 +59,7 @@ inf_MSE(
 
 \item{scaleMin}{Minimum scale (in data points) to use for log-log regression (default = \code{4})}
 
-\item{scaleMax}{Maximum scale (in data points) to use for log-log regression. This value will be ignored if \code{dataMin} is not \code{NA} (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
+\item{scaleMax}{Maximum scale (in data points) to use for log-log regression. This value will be ignored if \code{dataMin} is not \code{NA}, in which case bins of size \verb{< dataMin} will be removed (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
 
 \item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
 

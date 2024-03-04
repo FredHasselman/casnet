@@ -7,6 +7,8 @@ vignette: >
   %\VignetteIndexEntry{Quantifying Scaling Phenomena in Time Series}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown} 
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include = FALSE}
@@ -21,12 +23,77 @@ library(invctr)
 ```
 
 
-## **Temporal Scale Invariance**
+## **Global Scaling Phenomena**
 
 > “If you have not found the 1/f spectrum, it is because you have not waited long enough. You have not looked at low enough frequencies.”     
 > [- Machlup (1981)]{style="float:right"}
 
-As @machlup1981 noted
+```{r}
+library(casnet)
+y0 <- noise_powerlaw(alpha = -2, N = 512)
+y1 <- noise_powerlaw(alpha = -1, N = 512)
+y2 <- noise_powerlaw(alpha =  0, N = 512)
+y3 <- noise_powerlaw(alpha =  1, N = 512)
+y4 <- noise_powerlaw(alpha =  2, N = 512)
+
+```
+
+
+The family of scaling analyses all start with `fd_`
+
+# Standardised Dispersion Analysis (SDA)
+
+```{r,fig.height=12}
+library(cowplot)
+
+sda0 <- fd_sda(y0, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y0: Brownian (red) noise")
+sda1 <- fd_sda(y1, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y1: Pink noise")
+sda2 <- fd_sda(y2, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y2: White noise")
+sda3 <- fd_sda(y3, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y3: Blue noise")
+sda4 <- fd_sda(y4, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y4: Violet noise")
+
+cowplot::plot_grid(plotlist = list(sda0$plot,sda1$plot,sda2$plot,sda3$plot,sda4$plot), ncol = 1)
+
+```
+
+
+
+
+# Detrended Fluctuation Analysis (DFA)
+
+```{r,fig.height=12}
+
+dfa0 <- fd_dfa(y0, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y0: Brownian (red) noise")
+dfa1 <- fd_dfa(y1, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y1: Pink noise")
+dfa2 <- fd_dfa(y2, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y2: White noise")
+dfa3 <- fd_dfa(y3, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y3: Blue noise")
+dfa4 <- fd_dfa(y4, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y4: Violet noise")
+
+cowplot::plot_grid(plotlist = list(dfa0$plot,dfa1$plot,dfa2$plot,dfa3$plot,dfa4$plot), ncol = 1)
+```
+
+For more customization options, use function `plotFD_loglog()`, make sure to return the Power Law in the output by setting `returnPLAW = TRUE`.
+
+```{r}
+dfa0a <- fd_dfa(y0, silent = TRUE, returnPLAW = TRUE)
+plotFD_loglog(dfa0a, title = "Custom title",  subtitle = "Custom subtitle", xlabel = "X", ylabel = "Y")
+```
+
+
+
+# Power Spectral Density Slope (PSD slope)
+
+```{r,fig.height=12}
+
+psd0 <- fd_psd(y0, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y0: Brownian (red) noise")
+psd1 <- fd_psd(y1, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y1: Pink noise")
+psd2 <- fd_psd(y2, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y2: White noise")
+psd3 <- fd_psd(y3, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y3: Blue noise")
+psd4 <- fd_psd(y4, silent = TRUE, returnPlot = TRUE, noTitle = TRUE, tsName = "y4: Violet noise")
+
+cowplot::plot_grid(plotlist = list(psd0$plot,psd1$plot,psd2$plot,psd3$plot,psd4$plot), ncol = 1)
+```
+
 
 ## **References**
 

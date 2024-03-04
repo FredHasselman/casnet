@@ -271,11 +271,9 @@ fd_psd <- function(y,
     } else {
       title <- "log-log regression (PSD)"
     }
-    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Normalised Frequency", ylabel = "Power", doPlot = doPlot)
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "10",xlabel = "Normalised Frequency", ylabel = "Power", doPlot = doPlot, returnPlot = returnPlot)
 
-    if(doPlot){
-      print(g)
-    }
+
       if(returnPlot){
         outList$plot <- g
       }
@@ -322,9 +320,9 @@ fd_prepSeries <- function(y,
                           polyOrder=1,
                           standardise = c("none","mean.sd","median.mad")[2],
                           adjustSumOrder = FALSE,
-                          scaleMin = 4,
-                          scaleMax = log2(floor(NROW(y)/2)),
-                          scaleResolution = (scaleMax-scaleMin),
+                          scaleMin = NA,
+                          scaleMax = NA,
+                          scaleResolution = NA,
                           dataMin = NA,
                           scaleS = NA,
                           overlap = NA,
@@ -336,6 +334,28 @@ fd_prepSeries <- function(y,
 
   y_ori <- y
 
+  if(is.na(scaleMin)){
+    scaleMin <- 16
+  }
+
+  if(is.na(scaleMax)){
+    scaleMax <- floor(NROW(y)/2)
+  }
+
+  if(is.na(scaleResolution)){
+    scaleResolution <- stats::nextn(log2(scaleMax)-log2(scaleMin), factors = 2)
+  }
+
+  if(any(is.na(scaleS))){
+    exponents <- seq(log2(scaleMin), log2(scaleMax), length.out = scaleResolution+1)
+    scaleS    <- round(2^exponents) #unique(round(seq(scaleMin,scaleMax, length.out= (scaleMax-scaleMin)/(scaleResolution-1))))
+  } else {
+    if(is.null(scaleS)){
+      scaleS <- NA
+    }
+  }
+
+
   if(!stats::is.ts(y)){
     if(is.null(fs)){
       fs <- 1
@@ -344,20 +364,6 @@ fd_prepSeries <- function(y,
     y <- stats::ts(y, frequency = fs)
   }
 
-  if(!is.na(dataMin)){
-    scaleMax <- floor(log2(NROW(y)/dataMin))
-  } else {
-    dataMin <- floor(NROW(y)/(scaleMax))
-  }
-
-  if(any(is.na(scaleS))){
-    exponents <- seq(log2(scaleMin),log2(scaleMax), length.out = scaleResolution)
-    scaleS    <- round(2^exponents) #unique(round(seq(scaleMin,scaleMax, length.out= (scaleMax-scaleMin)/(scaleResolution-1))))
-  } else {
-    if(is.null(scaleS)){
-      scaleS <- NA
-    }
-  }
 
   if(!all(is.na(scaleS))){
     # Nyquist-ish
@@ -385,6 +391,9 @@ fd_prepSeries <- function(y,
     y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
   }
 
+  if(is.na(dataMin)){
+    dataMin <- ceiling(NROW(y)/max(scaleS, na.rm = TRUE))+1
+  }
 
   # if(adjustSumOrder){
   #   y       <- ts_sumorder(y_ori, scaleS = scaleS, polyOrder = polyOrder, dataMin = dataMin)
@@ -453,8 +462,8 @@ fd_sda <- function(y,
                    standardise = c("none","mean.sd","median.mad")[2],
                    adjustSumOrder = FALSE,
                    scaleMin = 4,
-                   scaleMax = log2(floor(NROW(y)/2)),
-                   scaleResolution = (scaleMax-scaleMin),
+                   scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
+                   scaleResolution = log2(scaleMax)-log2(scaleMin),
                    dataMin = NA,
                    scaleS = NA,
                    overlap = 0,
@@ -524,27 +533,31 @@ fd_sda <- function(y,
   #   Hglobal <- NA
   # }
 
-  out <- SDA(y, front = FALSE)
+  out <- SDA(y, front = FALSE, scaleS)
 
-  fitRange <- which(lengths(lapply(out$scale, function(s){ts_slice(y,s)}))>=dataMin)
+  scale <- out$scale[out$scale%[]%c(scaleMin,scaleMax)]
+  sd    <- out$sd[out$scale%[]%c(scaleMin,scaleMax)]
 
-  lmfit1        <- stats::lm(log(out$sd) ~ log(out$scale))
-  lmfit2        <- stats::lm(log(out$sd[fitRange]) ~ log(out$scale[fitRange]))
+  fitRange1 <- which(lengths(lapply(scale, function(s){ts_slice(y,s)}))<NROW(y))
+  fitRange2 <- which(lengths(lapply(scale, function(s){ts_slice(y,s)}))%[)%c(dataMin,NROW(y)))
+
+  lmfit1        <- stats::lm(log(sd[fitRange1]) ~ log(scale[fitRange1]))
+  lmfit2        <- stats::lm(log(sd[fitRange2]) ~ log(scale[fitRange2]))
 
   outList <- list(
-    PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/out$scale,
-                              size = out$scale,
-                              bulk = out$sd),
+    PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/scale[fitRange1],
+                              size = scale[fitRange1],
+                              bulk = sd[fitRange1]),
     fullRange = list(sap = stats::coef(lmfit1)[2],
                      H = 1+stats::coef(lmfit1)[2] + Hadj,
                      FD = sa2fd_sda(stats::coef(lmfit1)[2]),
                      fitlm1 = lmfit1,
-                     method = paste0("Full range (n = ",length(out$scale),")\nSlope = ",round(stats::coef(lmfit1)[2],2)," | FD = ",round(sa2fd_sda(stats::coef(lmfit1)[2]),2))),
+                     method = paste0("Full range (n = ",length(scale[fitRange1]), ")\nSlope = ", round(stats::coef(lmfit1)[2],2)," | FD = ", round(sa2fd_sda(stats::coef(lmfit1)[2]),2))),
     fitRange  = list(sap = stats::coef(lmfit2)[2],
                      H = 1+stats::coef(lmfit2)[2] + Hadj,
                      FD = sa2fd_sda(stats::coef(lmfit2)[2]),
                      fitlm2 = lmfit2,
-                     method = paste0("Fit range (n = ",length(out$scale[fitRange]),")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ",round(sa2fd_sda(stats::coef(lmfit2)[2]),2))),
+                     method = paste0("Fit range (n = ", length(scale[fitRange2]),")\nSlope = ",round(stats::coef(lmfit2)[2],2)," | FD = ", round(sa2fd_sda(stats::coef(lmfit2)[2]),2))),
     info = out,
     plot = NA,
     analysis = list(
@@ -559,10 +572,8 @@ fd_sda <- function(y,
     } else {
       title <- "log-log regression (SDA)"
     }
-    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion", doPlot = doPlot)
-    if(doPlot){
-     print(g)
-    }
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "e", ylabel = "Standardised Dispersion", doPlot = doPlot, returnPlot = returnPlot)
+
       if(returnPlot){
         outList$plot <- g
       }
@@ -595,7 +606,7 @@ fd_sda <- function(y,
 #' @param removeTrendSegment Method to use for detrending in the bins (default = `"poly"`)
 #' @param polyOrderSegment The DFA order, the order of polynomial trend to remove from the bin if `removeTrendSegment = "poly"`. If `removeTrendSegment = "adaptive"` polynomials `1` to `polyOrder` will be evaluated and the best fitting polynomial (R squared) will be removed (default = `1`)
 #' @param scaleMin   Minimum scale (in data points) to use for log-log regression (default = `4`)
-#' @param scaleMax   Maximum scale (in data points) to use for log-log regression. This value will be ignored if `dataMin` is not `NA` (default = `stats::nextn(floor(NROW(y)/4), factors = 2)`)
+#' @param scaleMax   Maximum scale (in data points) to use for log-log regression. This value will be ignored if `dataMin` is not `NA`, in which case bins of size `< dataMin` will be removed (default = `stats::nextn(floor(NROW(y)/4), factors = 2)`)
 #' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculated as: `seq(scaleMin, scaleMax, length.out = scaleResolution)` (default =  `round(log2(scaleMax-scaleMin))`).
 #' #' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if `length(y) = 1024` and `dataMin = 4`, the maximum scale used to calculate the slope will be `1024 / 4 = 256`. This value will take precedence over the `scaleMax` (default = `NA`)
 #' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` and `dataMin` will be ignored (default = `NA`)
@@ -660,10 +671,10 @@ fd_dfa <- function(y,
                    standardise = c("none","mean.sd","median.mad")[2],
                    adjustSumOrder = FALSE,
                    removeTrendSegment = c("no","poly","adaptive","bridge")[2],
-                   polyOrderSegment=1,
-                   scaleMin = 16,
-                   scaleMax = stats::nextn(floor(NROW(y)/4), factors = 2),
-                   scaleResolution = round(log2(scaleMax-scaleMin)),
+                   polyOrderSegment = 1,
+                   scaleMin = 4,
+                   scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
+                   scaleResolution = log2(scaleMax)-log2(scaleMin),
                    dataMin = NA,
                    scaleS = NA,
                    overlap = NA,
@@ -736,7 +747,7 @@ fd_dfa <- function(y,
     info = list(fullRange=lmfit1,fitRange=lmfit2,segments=DFAout$segments),
     plot = NA,
     analysis = list(
-      name = "Detrended FLuctuation Analysis",
+      name = "Detrended Fluctuation Analysis",
       logBaseFit = "log2",
       logBasePlot = "2")
   )
@@ -747,11 +758,10 @@ fd_dfa <- function(y,
     } else {
       title <- "log-log regression (DFA)"
     }
-    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation", doPlot = doPlot)
-    if(doPlot){
-      print(g)
-      }
-      if(returnPlot){
+
+    g <- plotFD_loglog(fd.OUT = outList, title = title, subtitle = tsName, logBase = "2",xlabel = "Scale", ylabel = "Detrended Fluctuation", doPlot = doPlot, returnPlot = returnPlot)
+
+    if(returnPlot){
         outList$plot <- g
       }
     }

@@ -444,6 +444,7 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
 #' @param groupColours A list of length `groups` with valid colour codes
 #' @param defaultEdgeColour Default edge colour
 #' @param doPlot Plot the igraph object
+#' @param returnPlot return the [ggplot2] object
 #'
 #' @return An igraph object with vertices and/or edges coloured by groups listed in `groups`
 #'
@@ -451,7 +452,7 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
 #'
 #' @family tools for plotting networks
 #'
-plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=1, colourE=FALSE, alphaE=.8, groupColours=NULL, defaultEdgeColour = "grey70", doPlot = TRUE){
+plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=1, colourE=FALSE, alphaE=.8, groupColours=NULL, defaultEdgeColour = "grey70", doPlot = TRUE, returnPlot = FALSE){
 
   unicolours <- na.exclude(unique(groupColours))
   unigroups  <- na.exclude(unique(groups))
@@ -570,7 +571,10 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=1, colourE=FALSE
     # graphics::plot.new()
     graphics::plot(g)
   }
-  return(invisible(g))
+
+  if(returnPlot){
+    return(invisible(g))
+  }
 }
 
 
@@ -584,12 +588,13 @@ plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=1, colourE=FALSE
 #' @param ylabel y label
 #' @param logBase base of the log used
 #' @param doPlot Display the plot (A plot object is always returned invisibly)
+#' @param returnPlot return a [ggplot2] object
 #'
 #' @return A ggplot object
 #'
 #' @export
 #'
-plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylabel="Fluctuation", logBase=NA, doPlot = TRUE){
+plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylabel="Fluctuation", logBase=NA, doPlot = TRUE, returnPlot = FALSE){
 
   if(!all(c("PLAW","fullRange","fitRange")%in%names(fd.OUT))){
     stop("Object fd.OUT should have 3 fields: PLAW, fullRange and fitRange")
@@ -654,7 +659,7 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
                                        rep(fd.OUT[[3]]$method,NROW(fd.OUT[[3]]$fitlm2$fitted.values))))
   }
 
-  g <- ggplot2::ggplot(data.frame(fd.OUT$PLAW), ggplot2::aes_(x=~size,y=~bulk), na.rm=TRUE) +
+  g <- ggplot2::ggplot(data.frame(fd.OUT$PLAW), ggplot2::aes(x=size,y=bulk), na.rm=TRUE) +
     ggplot2::geom_point() +
     ggplot2::ggtitle(label = title, subtitle = subtitle)
 
@@ -675,20 +680,44 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
   # }
   #
 
-  breaksX <- unique(fd.OUT$PLAW$size[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)])
+  if(fd.OUT$analysis$name%in%"Power Spectral Density Slope"){
+    breaksX <- unique(fd.OUT$PLAW$freq.norm[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)])
+  } else {
+    breaksX <- unique(fd.OUT$PLAW$size[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)])
+  }
   breaksY <- unique(fd.OUT$PLAW$bulk[1:NROW(fd.OUT[[2]]$fitlm1$fitted.values)])
 
-  if(length(breaksX)>10){breaksX <- breaksX[seq.int(1,length(breaksX),length.out = 10)]}
-  if(length(breaksY)>10){breaksY <- breaksY[seq.int(1,length(breaksY),length.out = 10)]}
+  if(length(breaksX)>10){
+
+     breaksX <- breaksX[seq.int(1,length(breaksX),length.out = 10)]
+
+  } else {
+    breaksX <- breaksX[seq.int(1,length(breaksX),length.out = length(breaksX))]
+    }
+
+  if(length(breaksY)>10){
+    breaksY <- breaksY[seq.int(1,length(breaksY),length.out = 10)]
+    } else {
+    breaksY <- breaksY[seq.int(1,length(breaksY),length.out = length(breaksY))]
+    }
+
+
+  if(nchar(xlabel)%in%"Bin size"){
+    xlabel <- paste0(xlabel," (",logFormat,")")
+  }
+  if(nchar(ylabel)%in%"Fluctuation"){
+    ylabel <- paste0(fd.OUT$analysis$name," (",logFormat,")")
+  }
 
   if(logBase!="no"){
     g <- g +
-      ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) +
-      ggplot2::scale_x_continuous(name = paste0(xlabel," (",logFormat,")"),
+      #ggplot2::geom_path(data = logSlopes, ggplot2::aes(x=x, y=y, colour = Method, group = Method)) +
+      ggplot2::geom_smooth(data = logSlopes, ggplot2::aes(x=x, y=y, colour = Method, fill = Method, linetype=Method), se = FALSE, method="lm", alpha = .2) +
+      ggplot2::scale_x_continuous(name = xlabel,
                                   breaks = breaksX,
                                   labels = scales::number_format(accuracy = xAcc),
                                   trans = scales::log_trans(base = logBaseNum)) +
-      ggplot2::scale_y_continuous(name = paste0(ylabel," (",logFormat,")"),
+      ggplot2::scale_y_continuous(name = ylabel,
                                   breaks = breaksY,
                                   labels = scales::number_format(accuracy = yAcc),
                                   trans = scales::log_trans(base = logBaseNum))
@@ -697,7 +726,7 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
     # if(logBase=="no"){
 
     g <- g +
-      ggplot2::geom_vline(data = data.frame(x = c(NROW(fd.OUT[[2]]$fitlm1$fitted.values),NROW(fd.OUT[[3]]$fitlm2$fitted.values)),Method = c(fd.OUT[[2]]$method,fd.OUT[[3]]$method)),  ggplot2::aes_(xintercept=~x, colour = ~Method)) +
+      ggplot2::geom_vline(data = data.frame(x = c(NROW(fd.OUT[[2]]$fitlm1$fitted.values),NROW(fd.OUT[[3]]$fitlm2$fitted.values)),Method = c(fd.OUT[[2]]$method,fd.OUT[[3]]$method)),  ggplot2::aes(xintercept=x, colour = Method)) +
       ggplot2::scale_x_continuous(name = xlabel, breaks = breaksX) +
       ggplot2::scale_y_continuous(name = ylabel, breaks = breaksY)
   }
@@ -707,8 +736,8 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
     ggplot2::scale_fill_manual(values = c("red3","steelblue")) +
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.minor =  ggplot2::element_blank(),
-                   legend.text = ggplot2::element_text(margin = ggplot2::margin(t = 5,b = 5, unit = "pt"), vjust = .5),
-                   plot.margin = ggplot2::margin(t = 5,b = 5, r = 5,l = 5, unit = "pt"))
+                   legend.text = ggplot2::element_text(margin = ggplot2::margin(t = 5, b = 5, unit = "pt"), vjust = .5),
+                   plot.margin = ggplot2::margin(t = 5, b = 5, r = 5,l = 5, unit = "pt"))
 
 
   # graphics::plot.new()

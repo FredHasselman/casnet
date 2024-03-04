@@ -13,7 +13,8 @@ plotNET_groupColour(
   alphaE = 0.8,
   groupColours = NULL,
   defaultEdgeColour = "grey70",
-  doPlot = TRUE
+  doPlot = TRUE,
+  returnPlot = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ plotNET_groupColour(
 \item{defaultEdgeColour}{Default edge colour}
 
 \item{doPlot}{Plot the igraph object}
+
+\item{returnPlot}{return the \link{ggplot2} object}
 }
 \value{
 An igraph object with vertices and/or edges coloured by groups listed in \code{groups}

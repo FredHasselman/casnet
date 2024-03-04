@@ -11,7 +11,8 @@ plotFD_loglog(
   xlabel = "Bin size",
   ylabel = "Fluctuation",
   logBase = NA,
-  doPlot = TRUE
+  doPlot = TRUE,
+  returnPlot = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ plotFD_loglog(
 \item{logBase}{base of the log used}
 
 \item{doPlot}{Display the plot (A plot object is always returned invisibly)}
+
+\item{returnPlot}{return a \link{ggplot2} object}
 }
 \value{
 A ggplot object

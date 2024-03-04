@@ -122,7 +122,7 @@ est_radius <- function(RM = NULL,
                            Converged   = Converged, check.names = FALSE)
 
     exitIter <- FALSE
-    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"±",tol,"for", targetMeasure,"\n"))}
+    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"??",tol,"for", targetMeasure,"\n"))}
 
     if(tryRadius<=minDist){
       warning(paste("The minimum RR possible for this matrix is", round(Measure,3),

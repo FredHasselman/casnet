@@ -497,6 +497,7 @@ HurvichDeo <- function(nr, spec, A=0.3, delta=6/7){
 #'
 #' Adaptation from discontinued package `fractal` by William Constantine and Donald Percival.
 #'
+#' @inheritParams fd_sda
 #' @param x x
 #' @param front front
 #'
@@ -505,14 +506,13 @@ HurvichDeo <- function(nr, spec, A=0.3, delta=6/7){
 #'
 #' @keywords internal
 #'
-SDA <- function(x, front=FALSE){
+SDA <- function(x, front=FALSE, scaleS){
 
   n.sample <- length(x)
   if (n.sample < 32)
     stop("Time series must contain at least 32 points")
 
-  scale <- as.integer(scale_log(scale.min=1, scale.max=n.sample, scale.ratio=2))
-  sd <- unlist(lapply(scale, function(m, x, n.sample, front){
+  sd <- unlist(lapply(scaleS, function(m, x, n.sample, front){
     nscale   <- n.sample %/% m
     dyad     <- nscale * m
     n.offset <- splus2R::ifelse1(front, n.sample - dyad, 0)
@@ -522,7 +522,7 @@ SDA <- function(x, front=FALSE){
   n.sample=n.sample,
   front=front))
 
-  list(sd=as.numeric(sd), scale=scale)
+  return(list(sd=as.numeric(sd), scale=scaleS))
 }
 
 
@@ -533,14 +533,13 @@ SDA <- function(x, front=FALSE){
 #' @param scale.min min
 #' @param scale.max max
 #' @param scale.ratio ratio
-#' @param scale.res reolution
-#' @param coerce coerce?
+#' @param scale.res resolution
 #'
 #' @return output
 #' @export
 #' @keywords internal
 #'
-scale_log <- function(scale.min, scale.max, scale.ratio=2, scale.res=NULL, coerce=NULL){
+scale_log <- function(scale.min, scale.max, scale.ratio=2, scale.res=NULL){
   # check input arguments
   if (!is.null(scale.res)){
     scale.ratio <- 1 / scale.res + 1
@@ -550,7 +549,8 @@ scale_log <- function(scale.min, scale.max, scale.ratio=2, scale.res=NULL, coerc
   if (scale.ratio == 1){stop("scale.ratio cannot be unity")}
   if (scale.ratio <= 0){stop("scale.ratio must be positive")}
 
-  n.scale <- splus2R::ifelse1(scale.ratio > 1, ceiling(log(scale.max/scale.min)/log(scale.ratio)),
+  n.scale <- splus2R::ifelse1(scale.ratio > 1,
+                              ceiling(log(scale.max/scale.min)/log(scale.ratio)),
                               ceiling(log(scale.min/scale.max)/log(scale.ratio)))
 
   scale    <- vector("numeric", length=n.scale)
@@ -559,9 +559,6 @@ scale_log <- function(scale.min, scale.max, scale.ratio=2, scale.res=NULL, coerc
   for (i in seq(2, n.scale)){
     scale[i] <- scale[i - 1] * scale.ratio
   }
-
-  if (!is.null(coerce) && is.function(coerce))
-    scale <- coerce(scale)
 
   unique(scale)
 }

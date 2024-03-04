@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.2</span>
       </span>
     </div>
 
@@ -128,7 +128,7 @@
 
 
 <dt>scaleMax</dt>
-<dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code> (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
+<dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code>, in which case bins of size <code>&lt; dataMin</code> will be removed (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
 
 
 <dt>scaleResolution</dt>
@@ -200,7 +200,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Multifractal Detrended FLuctuation Analysis </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Spec_AUC Spec_Width Spec_CVplus Spec_CVmin Spec_CVtot Spec_CVasymm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.0977      0.104      0.0495     0.0513     0.0503      -0.0179</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.0894     0.0947      0.0455     0.0466     0.0459      -0.0114</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
@@ -219,7 +219,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Multifractal Detrended FLuctuation Analysis </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Spec_AUC Spec_Width Spec_CVplus Spec_CVmin Spec_CVtot Spec_CVasymm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    0.284      0.328       0.085      0.198      0.155       -0.399</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    0.199      0.217      0.0709      0.104     0.0892       -0.189</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
@@ -240,7 +240,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Multifractal Detrended FLuctuation Analysis </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Spec_AUC Spec_Width Spec_CVplus Spec_CVmin Spec_CVtot Spec_CVasymm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     0.14      0.169       0.031      0.179      0.145       -0.705</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    0.212      0.246      0.0732      0.176       0.14       -0.412</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.2</span>
       </span>
     </div>
 
@@ -150,7 +150,7 @@
 
 
 <dt>scaleMax</dt>
-<dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code> (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
+<dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code>, in which case bins of size <code>&lt; dataMin</code> will be removed (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
 
 
 <dt>scaleS</dt>

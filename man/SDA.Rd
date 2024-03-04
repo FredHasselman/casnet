@@ -4,12 +4,14 @@
 \alias{SDA}
 \title{Standardised Dispersion Analysis}
 \usage{
-SDA(x, front = FALSE)
+SDA(x, front = FALSE, scaleS)
 }
 \arguments{
 \item{x}{x}
 
 \item{front}{front}
+
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
 }
 \value{
 output

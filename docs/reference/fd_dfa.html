@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.2</span>
       </span>
     </div>
 
@@ -75,9 +75,9 @@
 <span>  adjustSumOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  removeTrendSegment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"poly"</span>, <span class="st">"adaptive"</span>, <span class="st">"bridge"</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
 <span>  polyOrderSegment <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  scaleMin <span class="op">=</span> <span class="fl">16</span>,</span>
-<span>  scaleMax <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/nextn.html" class="external-link">nextn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">4</span><span class="op">)</span>, factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
-<span>  scaleResolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMax</span> <span class="op">-</span> <span class="va">scaleMin</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  scaleMin <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  scaleMax <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/nextn.html" class="external-link">nextn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  scaleResolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMax</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMin</span><span class="op">)</span>,</span>
 <span>  dataMin <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  scaleS <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -130,7 +130,7 @@
 
 
 <dt>scaleMax</dt>
-<dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code> (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
+<dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code>, in which case bins of size <code>&lt; dataMin</code> will be removed (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
 
 
 <dt>scaleResolution</dt>
@@ -217,13 +217,13 @@ A list object containing:</p><ul><li><p>A data matrix <code>PLAW</code> with col
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Detrended FLuctuation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Detrended Fluctuation Analysis </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Full range (n = 7)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slope = 1.56 | FD = 1.06 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Slope = 1.46 | FD = 1.08 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Exclude large bin sizes (n = 7)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slope = 1.56 | FD = 1.06 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Exclude large bin sizes (n = 6)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Slope = 1.51 | FD = 1.07 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Detrending: poly</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -238,7 +238,7 @@ A list object containing:</p><ul><li><p>A data matrix <code>PLAW</code> with col
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Detrended FLuctuation Analysis </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Detrended Fluctuation Analysis </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Full range (n = 7)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Slope = 1.49 | FD = 1.07 </span>

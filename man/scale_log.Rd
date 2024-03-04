@@ -4,13 +4,7 @@
 \alias{scale_log}
 \title{scale_log}
 \usage{
-scale_log(
-  scale.min,
-  scale.max,
-  scale.ratio = 2,
-  scale.res = NULL,
-  coerce = NULL
-)
+scale_log(scale.min, scale.max, scale.ratio = 2, scale.res = NULL)
 }
 \arguments{
 \item{scale.min}{min}
@@ -19,9 +13,7 @@ scale_log(
 
 \item{scale.ratio}{ratio}
 
-\item{scale.res}{reolution}
-
-\item{coerce}{coerce?}
+\item{scale.res}{resolution}
 }
 \value{
 output
