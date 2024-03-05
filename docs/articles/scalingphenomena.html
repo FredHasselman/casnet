@@ -93,7 +93,7 @@ Series</h1>
                         <h4 data-toc-skip class="author">Fred
 Hasselman</h4>
             
-            <h4 data-toc-skip class="date">2024-03-04</h4>
+            <h4 data-toc-skip class="date">2024-03-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/scalingphenomena.Rmd" class="external-link"><code>vignettes/scalingphenomena.Rmd</code></a></small>
       <div class="hidden name"><code>scalingphenomena.Rmd</code></div>
@@ -102,105 +102,270 @@ Hasselman</h4>
 
     
     
-<div class="section level3">
-<h3 id="global-scaling-phenomena">
+<div class="section level2">
+<h2 id="global-scaling-phenomena">
 <strong>Global Scaling Phenomena</strong><a class="anchor" aria-label="anchor" href="#global-scaling-phenomena"></a>
-</h3>
+</h2>
 <blockquote>
 <p>“If you have not found the 1/f spectrum, it is because you have not
-waited long enough. You have not looked at low enough
-frequencies.”<br><span style="float:right">- Machlup (1981)</span></p>
+waited long enough. You have not looked at low enough frequencies.”</p>
 </blockquote>
+<div style="float:right">
+<p>- <span class="citation">Machlup (<a href="#ref-machlup1981">1981</a>)</span></p>
+</div>
+<p><br><br><br></p>
+<p>The family of fluctuation analyses all start with <code>fd_</code>
+and most of them are based on quantifying a dependency of the magnitude
+of fluctuations observed at different time scales.</p>
+<p>The slope of time scale with fluctuation in log-log coordinates
+represents the scaling exponent, which can be transformed into an
+estimate of the Fractal Dimension. In <code>casnet</code> this
+conversion is performed by applying the formula’s provided in <span class="citation">(<a href="#ref-hasselman2013">Hasselman
+2013</a>)</span>.</p>
+<p><a href="https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2013.00075/full" class="external-link"><img src="https://www.frontiersin.org/files/Articles/44850/fphys-04-00075-HTML/image_m/fphys-04-00075-g001.jpg" width="750" alt="Scaling Exponent to Fractal Dimension"></a></p>
+<p>Let’s create some noise series:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/FredHasselman/casnet" class="external-link">casnet</a></span><span class="op">)</span></span>
 <span><span class="va">y0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>, N <span class="op">=</span> <span class="fl">512</span><span class="op">)</span></span>
 <span><span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, N <span class="op">=</span> <span class="fl">512</span><span class="op">)</span></span>
 <span><span class="va">y2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>alpha <span class="op">=</span>  <span class="fl">0</span>, N <span class="op">=</span> <span class="fl">512</span><span class="op">)</span></span>
 <span><span class="va">y3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>alpha <span class="op">=</span>  <span class="fl">1</span>, N <span class="op">=</span> <span class="fl">512</span><span class="op">)</span></span>
-<span><span class="va">y4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>alpha <span class="op">=</span>  <span class="fl">2</span>, N <span class="op">=</span> <span class="fl">512</span><span class="op">)</span></span></code></pre></div>
-<p>The family of scaling analyses all start with <code>fd_</code></p>
-</div>
-<div class="section level2">
-<h2 id="standardised-dispersion-analysis-sda">Standardised Dispersion Analysis (SDA)<a class="anchor" aria-label="anchor" href="#standardised-dispersion-analysis-sda"></a>
-</h2>
+<span><span class="va">y4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>alpha <span class="op">=</span>  <span class="fl">2</span>, N <span class="op">=</span> <span class="fl">512</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plotTS_multi.html">plotTS_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">y0</span>,<span class="va">y1</span>,<span class="va">y2</span>,<span class="va">y3</span>,<span class="va">y4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ts_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">y0</span>,<span class="va">y1</span>,<span class="va">y2</span>,<span class="va">y3</span>,<span class="va">y4</span><span class="op">)</span></span>
+<span><span class="va">noiseNames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"y0: Brownian (red) noise"</span>, <span class="st">"y1: Pink noise"</span>, <span class="st">"y2: White noise"</span>, <span class="st">"y3: Blue noise"</span> ,<span class="st">"y4: Violet noise"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="standardised-dispersion-analysis-sda">Standardised Dispersion Analysis (SDA)<a class="anchor" aria-label="anchor" href="#standardised-dispersion-analysis-sda"></a>
+</h3>
+<p>In Standardised Dispersion Analysis, the time series is converted to
+z-scores (standardised) and the way the average standard deviation (SD)
+calculated in bins of a particular size scales with the bin size should
+be an indication of the presence of power-laws. That is, if the bins get
+larger and the variability decreases, there probably is no scaling
+relation. If the SD systematically increases either with larger bin
+sizes, or, in reverse, this means the fluctuations depend on the size of
+the bins, the size of the measurement stick.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">sda0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">y0</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y0: Brownian (red) noise"</span><span class="op">)</span></span>
-<span><span class="va">sda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">y1</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y1: Pink noise"</span><span class="op">)</span></span>
-<span><span class="va">sda2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">y2</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y2: White noise"</span><span class="op">)</span></span>
-<span><span class="va">sda3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">y3</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y3: Blue noise"</span><span class="op">)</span></span>
-<span><span class="va">sda4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">y4</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y4: Violet noise"</span><span class="op">)</span></span>
+<span><span class="va">sdaPlots</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/llply.html" class="external-link">llply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">ts_list</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">ts_list</span><span class="op">[[</span><span class="va">t</span><span class="op">]</span><span class="op">]</span>,silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>         tsName <span class="op">=</span> <span class="va">noiseNames</span><span class="op">[</span><span class="va">t</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">plot</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">sda0</span><span class="op">$</span><span class="va">plot</span>,<span class="va">sda1</span><span class="op">$</span><span class="va">plot</span>,<span class="va">sda2</span><span class="op">$</span><span class="va">plot</span>,<span class="va">sda3</span><span class="op">$</span><span class="va">plot</span>,<span class="va">sda4</span><span class="op">$</span><span class="va">plot</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'</code></pre>
+<span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="va">sdaPlots</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="scalingphenomena_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;"></p>
-</div>
-<div class="section level2">
-<h2 id="detrended-fluctuation-analysis-dfa">Detrended Fluctuation Analysis (DFA)<a class="anchor" aria-label="anchor" href="#detrended-fluctuation-analysis-dfa"></a>
-</h2>
+<p>To increase the resolution of the bins adjust the argument
+<code>scaleResolution</code> and/or the values of <code>scaleMin</code>
+and <code>scaleMax</code>, OR the value <code>dataMin</code>.</p>
+<p>At a resolution of <code>32</code> there appear to be 2 scaling
+regions</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dfa0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_dfa.html">fd_dfa</a></span><span class="op">(</span><span class="va">y0</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y0: Brownian (red) noise"</span><span class="op">)</span></span>
-<span><span class="va">dfa1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_dfa.html">fd_dfa</a></span><span class="op">(</span><span class="va">y1</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y1: Pink noise"</span><span class="op">)</span></span>
-<span><span class="va">dfa2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_dfa.html">fd_dfa</a></span><span class="op">(</span><span class="va">y2</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y2: White noise"</span><span class="op">)</span></span>
-<span><span class="va">dfa3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_dfa.html">fd_dfa</a></span><span class="op">(</span><span class="va">y3</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y3: Blue noise"</span><span class="op">)</span></span>
-<span><span class="va">dfa4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_dfa.html">fd_dfa</a></span><span class="op">(</span><span class="va">y4</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y4: Violet noise"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">dfa0</span><span class="op">$</span><span class="va">plot</span>,<span class="va">dfa1</span><span class="op">$</span><span class="va">plot</span>,<span class="va">dfa2</span><span class="op">$</span><span class="va">plot</span>,<span class="va">dfa3</span><span class="op">$</span><span class="va">plot</span>,<span class="va">dfa4</span><span class="op">$</span><span class="va">plot</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'</code></pre>
+<code class="sourceCode R"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="co"># Pink noise</span></span>
+<span><span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">ts_list</span><span class="op">[[</span><span class="va">t</span><span class="op">]</span><span class="op">]</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>,  scaleResolution <span class="op">=</span> <span class="fl">32</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="va">noiseNames</span><span class="op">[</span><span class="va">t</span><span class="op">]</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="scalingphenomena_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>Below the argument <code>dataMin</code>, which defaults to
+<code>4</code>, is used to adjust the fit range.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">ts_list</span><span class="op">[[</span><span class="va">t</span><span class="op">]</span><span class="op">]</span>,  silent <span class="op">=</span> <span class="cn">TRUE</span>, scaleResolution <span class="op">=</span> <span class="fl">32</span>, dataMin <span class="op">=</span> <span class="fl">10</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="va">noiseNames</span><span class="op">[</span><span class="va">t</span><span class="op">]</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>This is probably not a good idea…</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fd_sda.html">fd_sda</a></span><span class="op">(</span><span class="va">ts_list</span><span class="op">[[</span><span class="va">t</span><span class="op">]</span><span class="op">]</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, scaleResolution <span class="op">=</span> <span class="fl">2</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="va">noiseNames</span><span class="op">[</span><span class="va">t</span><span class="op">]</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level3">
+<h3 id="detrended-fluctuation-analysis-dfa">Detrended Fluctuation Analysis (DFA)<a class="anchor" aria-label="anchor" href="#detrended-fluctuation-analysis-dfa"></a>
+</h3>
+<p>The procedure for Detrended Fluctuation Analysis is similar to SDA,
+except that within each bin, the signal is first detrended, what remains
+is then considered the residual variance <span class="citation">(see
+e.g., <a href="#ref-kantelhardt2002">Kantelhardt et al.
+2002</a>)</span>. The logic is the same, the way the average residual
+variance scales with the bin size should be an indication of the
+presence of power-laws. There are many different versions of DFA, one
+can choose to detrend polynomials of a higher order, or even detrend
+using the best fitting model, which is decided for each bin
+individually. See the manual pages of <code><a href="../reference/fd_dfa.html">fd_dfa()</a></code> for
+details.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dfaPlots</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/llply.html" class="external-link">llply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">ts_list</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/fd_dfa.html">fd_dfa</a></span><span class="op">(</span><span class="va">ts_list</span><span class="op">[[</span><span class="va">t</span><span class="op">]</span><span class="op">]</span>,silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>         tsName <span class="op">=</span> <span class="va">noiseNames</span><span class="op">[</span><span class="va">t</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">plot</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="va">dfaPlots</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></p>
 <p>For more customization options, use function
 <code><a href="../reference/plotFD_loglog.html">plotFD_loglog()</a></code>, make sure to return the Power Law in the
-output by setting <code>returnPLAW = TRUE</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+output by setting <code>returnPLAW = TRUE</code>. You could use
+<code><a href="../reference/plotFD_loglog.html">plotFD_loglog()</a></code> or create your own figure based on the data
+in the <code>PLAW</code> field of the output.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dfa0a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_dfa.html">fd_dfa</a></span><span class="op">(</span><span class="va">y0</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPLAW <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plotFD_loglog.html">plotFD_loglog</a></span><span class="op">(</span><span class="va">dfa0a</span>, title <span class="op">=</span> <span class="st">"Custom title"</span>,  subtitle <span class="op">=</span> <span class="st">"Custom subtitle"</span>, xlabel <span class="op">=</span> <span class="st">"X"</span>, ylabel <span class="op">=</span> <span class="st">"Y"</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'</code></pre>
-<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level3">
+<h3 id="power-spectral-density-slope-psd-slope">Power Spectral Density Slope (PSD slope)<a class="anchor" aria-label="anchor" href="#power-spectral-density-slope-psd-slope"></a>
+</h3>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">psd0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y0</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y0: Brownian (red) noise"</span><span class="op">)</span></span>
+<span><span class="va">psd1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y1</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y1: Pink noise"</span><span class="op">)</span></span>
+<span><span class="va">psd2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y2</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y2: White noise"</span><span class="op">)</span></span>
+<span><span class="va">psd3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y3</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y3: Blue noise"</span><span class="op">)</span></span>
+<span><span class="va">psd4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y4</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y4: Violet noise"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">psd0</span><span class="op">$</span><span class="va">plot</span>,<span class="va">psd1</span><span class="op">$</span><span class="va">plot</span>,<span class="va">psd2</span><span class="op">$</span><span class="va">plot</span>,<span class="va">psd3</span><span class="op">$</span><span class="va">plot</span>,<span class="va">psd4</span><span class="op">$</span><span class="va">plot</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level3">
+<h3 id="windowed-analysis-brownian-noise-to-white-noise">Windowed Analysis: Brownian noise to white noise<a class="anchor" aria-label="anchor" href="#windowed-analysis-brownian-noise-to-white-noise"></a>
+</h3>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1024</span><span class="op">)</span></span>
+<span><span class="va">y</span><span class="op">[</span><span class="fl">513</span><span class="op">:</span><span class="fl">1024</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="fl">513</span><span class="op">:</span><span class="fl">1024</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_windower.html">ts_windower</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">y</span>, win <span class="op">=</span> <span class="fl">256</span>, step <span class="op">=</span> <span class="fl">1</span>, alignment <span class="op">=</span> <span class="st">"r"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">DFAseries</span> <span class="op">&lt;-</span> <span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/ldply.html" class="external-link">ldply</a></span><span class="op">(</span><span class="va">id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">w</span><span class="op">)</span><span class="op">{</span></span>
+<span><span class="va">fd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_dfa.html">fd_dfa</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="va">w</span><span class="op">]</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">fd</span><span class="op">$</span><span class="va">fitRange</span><span class="op">$</span><span class="va">FD</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df_FD</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">1024</span>, y <span class="op">=</span> <span class="va">y</span>, FD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>,<span class="fl">255</span><span class="op">)</span>, <span class="va">DFAseries</span><span class="op">$</span><span class="va">`DFAout$PLAW$size.log2[fitRange]`</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">3</span>, names_to <span class="op">=</span> <span class="st">"Variable"</span>, values_to <span class="op">=</span> <span class="st">"Value"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df_FD</span><span class="op">$</span><span class="va">Variable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/relevel.html" class="external-link">relevel</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">df_FD</span><span class="op">$</span><span class="va">Variable</span><span class="op">)</span>, ref <span class="op">=</span> <span class="st">"y"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_FD</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">time</span>, y <span class="op">=</span> <span class="va">Value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_FD</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Variable</span> <span class="op">==</span> <span class="st">"FD"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.1</span><span class="op">)</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"brown"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_FD</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Variable</span> <span class="op">==</span> <span class="st">"FD"</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span><span class="op">)</span><span class="op">)</span>, colour <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">512</span>, linetype <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">Variable</span><span class="op">~</span><span class="va">.</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;"></p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="power-spectral-density-slope-psd-slope">Power Spectral Density Slope (PSD slope)<a class="anchor" aria-label="anchor" href="#power-spectral-density-slope-psd-slope"></a>
+<h2 id="local-scaling-phenomena-multi-fractal-dfa">Local Scaling Phenomena: Multi fractal DFA<a class="anchor" aria-label="anchor" href="#local-scaling-phenomena-multi-fractal-dfa"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">psd0</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y0</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y0: Brownian (red) noise"</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt; Warning in max(scaleS, na.rm = TRUE): no non-missing arguments to max;
-&gt; returning -Inf</code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">psd1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y1</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y1: Pink noise"</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt; Warning in max(scaleS, na.rm = TRUE): no non-missing arguments to max;
-&gt; returning -Inf</code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">psd2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y2</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y2: White noise"</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt; Warning in max(scaleS, na.rm = TRUE): no non-missing arguments to max;
-&gt; returning -Inf</code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">psd3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y3</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y3: Blue noise"</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt; Warning in max(scaleS, na.rm = TRUE): no non-missing arguments to max;
-&gt; returning -Inf</code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">psd4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fd_psd.html">fd_psd</a></span><span class="op">(</span><span class="va">y4</span>, silent <span class="op">=</span> <span class="cn">TRUE</span>, returnPlot <span class="op">=</span> <span class="cn">TRUE</span>, noTitle <span class="op">=</span> <span class="cn">TRUE</span>, tsName <span class="op">=</span> <span class="st">"y4: Violet noise"</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt; Warning in max(scaleS, na.rm = TRUE): no non-missing arguments to max;
-&gt; returning -Inf</code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span>plotlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">psd0</span><span class="op">$</span><span class="va">plot</span>,<span class="va">psd1</span><span class="op">$</span><span class="va">plot</span>,<span class="va">psd2</span><span class="op">$</span><span class="va">plot</span>,<span class="va">psd3</span><span class="op">$</span><span class="va">plot</span>,<span class="va">psd4</span><span class="op">$</span><span class="va">plot</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code>&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'
-&gt;  [1m [22m`geom_smooth()` using formula = 'y ~ x'</code></pre>
-<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>Function <code><a href="../reference/fd_mfdfa.html">fd_mfdfa()</a></code> should reproduce results similar to
+the Matlab code provided by <span class="citation">(<a href="#ref-ihlen2012">Ihlen 2012</a>)</span>.</p>
 <div class="section level3">
-<h3 id="references">
+<h3 id="mono-fractal">Mono fractal<a class="anchor" aria-label="anchor" href="#mono-fractal"></a>
+</h3>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">33</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># White noise</span></span>
+<span><span class="fu"><a href="../reference/fd_mfdfa.html">fd_mfdfa</a></span><span class="op">(</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0</span>, N<span class="op">=</span><span class="fl">4096</span><span class="op">)</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt; 
+&gt; 
+&gt; (mf)dfa:  Sample rate was set to 1.</code></pre>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;"></p>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt;  Multifractal Detrended FLuctuation Analysis 
+&gt; 
+&gt;   Spec_AUC Spec_Width Spec_CVplus Spec_CVmin Spec_CVtot Spec_CVasymm
+&gt; 1   0.0615     0.0649     0.00597     0.0524     0.0435       -0.795
+&gt; 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Pink noise</span></span>
+<span><span class="fu"><a href="../reference/fd_mfdfa.html">fd_mfdfa</a></span><span class="op">(</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, N<span class="op">=</span><span class="fl">4096</span><span class="op">)</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt; 
+&gt; 
+&gt; (mf)dfa:  Sample rate was set to 1.</code></pre>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;"></p>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt;  Multifractal Detrended FLuctuation Analysis 
+&gt; 
+&gt;   Spec_AUC Spec_Width Spec_CVplus Spec_CVmin Spec_CVtot Spec_CVasymm
+&gt; 1    0.202       0.22      0.0868     0.0883      0.087     -0.00877
+&gt; 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+</div>
+<div class="section level3">
+<h3 id="multi-fractal">‘Multi’ fractal<a class="anchor" aria-label="anchor" href="#multi-fractal"></a>
+</h3>
+<p>Function <code><a href="../reference/fd_mfdfa.html">fd_mfdfa()</a></code></p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 'multi' fractal</span></span>
+<span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">2048</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="../reference/elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.2</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.5</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.7</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">512</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fd_mfdfa.html">fd_mfdfa</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">y</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code>&gt; 
+&gt; 
+&gt; (mf)dfa:  Sample rate was set to 1.</code></pre>
+<p><img src="scalingphenomena_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;"></p>
+<pre><code>&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~
+&gt; 
+&gt;  Multifractal Detrended FLuctuation Analysis 
+&gt; 
+&gt;   Spec_AUC Spec_Width Spec_CVplus Spec_CVmin Spec_CVtot Spec_CVasymm
+&gt; 1    0.226      0.284       0.176      0.202      0.189      -0.0696
+&gt; 
+&gt; 
+&gt; ~~~o~~o~~casnet~~o~~o~~~</code></pre>
+<p>For more information on how to use the output from multi-fractal DFA
+in you studies see e.g. <span class="citation">(<a href="#ref-kelty-stephen2013">Kelty-Stephen et al. 2013</a>; <a href="#ref-hasselman2015">Hasselman 2015</a>)</span>.</p>
+</div>
+<div class="section level3">
+<h3 class="unnumbered" id="references">
 <strong>References</strong><a class="anchor" aria-label="anchor" href="#references"></a>
 </h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-hasselman2013" class="csl-entry">
+Hasselman, Fred. 2013. <span>“When the Blind Curve Is Finite: Dimension
+Estimation and Model Inference Based on Empirical Waveforms.”</span>
+<em>Frontiers in Physiology</em> 4: 75.
+</div>
+<div id="ref-hasselman2015" class="csl-entry">
+———. 2015. <span>“Classifying Acoustic Signals into Phoneme Categories:
+Average and Dyslexic Readers Make Use of Complex Dynamical Patterns and
+Multifractal Scaling Properties of the Speech Signal.”</span>
+<em>PeerJ</em> 3: e837.
+</div>
+<div id="ref-ihlen2012" class="csl-entry">
+Ihlen, Espen A F. 2012. <span>“Introduction to Multifractal Detrended
+Fluctuation Analysis in Matlab.”</span> <em>Frontiers in
+Physiology</em>. <a href="http://www.ncbi.nlm.nih.gov/pmc/articles/pmc3366552/" class="external-link">http://www.ncbi.nlm.nih.gov/pmc/articles/pmc3366552/</a>.
+</div>
+<div id="ref-kantelhardt2002" class="csl-entry">
+Kantelhardt, Jan W, S Zschiegner, E Koscielnybunde, S Havlin, A Bunde,
+and H Stanley. 2002. <span>“Multifractal Detrended Fluctuation Analysis
+of Nonstationary Time Series.”</span> <em>Physica A: Statistical
+Mechanics and Its Applications</em> 316 (1-4): 87114. <a href="https://doi.org/10.1016/S0378-4371(02)01383-3" class="external-link">https://doi.org/10.1016/S0378-4371(02)01383-3</a>.
+</div>
+<div id="ref-kelty-stephen2013" class="csl-entry">
+Kelty-Stephen, Damian G., Kinga Palatinus, Elliot Saltzman, and James a.
+Dixon. 2013. <span>“A Tutorial on Multifractality, Cascades, and
+Interactivity for Empirical Time Series in Ecological Science.”</span>
+<em>Ecological Psychology</em> 25 (1): 162. <a href="http://www.tandfonline.com/doi/abs/10.1080/10407413.2013.753804" class="external-link">http://www.tandfonline.com/doi/abs/10.1080/10407413.2013.753804</a>.
+</div>
+<div id="ref-machlup1981" class="csl-entry">
+Machlup, S. 1981. <span>“Earthquakes, Thunderstorms and Other 1/f
+Noises.”</span> In, edited by P. H. E. Meijer, R. D. Mountain, and R. J.
+Soulen, 614:157–60. Washington, DC: National Bureau of Standards. <a href="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication614.pdf#page=169" class="external-link">https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication614.pdf#page=169</a>.
+</div>
+</div>
 </div>
 </div>
   </div>

@@ -39,7 +39,7 @@ fd_dfa(
 
 \item{standardise}{Standardise the series using \code{\link[=ts_standardise]{ts_standardise()}} with \code{adjustN = FALSE} (default = "mean.sd")}
 
-\item{adjustSumOrder}{Adjust the time series (summation or difference), based on the global scaling exponent, see e.g. \url{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
+\item{adjustSumOrder}{Adjust the time series (summation or difference), based on the global scaling exponent, see e.g. \href{https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg}{Ihlen (2012)} (default = \code{FALSE})}
 
 \item{removeTrendSegment}{Method to use for detrending in the bins (default = \code{"poly"})}
 

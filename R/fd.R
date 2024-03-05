@@ -602,7 +602,7 @@ fd_sda <- function(y,
 #' @param removeTrend Method to use for global detrending (default = `"poly"`)
 #' @param polyOrder Order of global polynomial trend to remove if `removeTrend = "poly"`. If `removeTrend = "adaptive"` polynomials `1` to `polyOrder` will be evaluated and the best fitting curve (R squared) will be removed (default = `1`)
 #' @param standardise Standardise the series using [casnet::ts_standardise()] with `adjustN = FALSE` (default = "mean.sd")
-#' @param adjustSumOrder  Adjust the time series (summation or difference), based on the global scaling exponent, see e.g. <https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg>{Ihlen (2012)} (default = `FALSE`)
+#' @param adjustSumOrder  Adjust the time series (summation or difference), based on the global scaling exponent, see e.g. [Ihlen (2012)](https://www.frontiersin.org/files/Articles/23948/fphys-03-00141-r2/image_m/fphys-03-00141-t001.jpg) (default = `FALSE`)
 #' @param removeTrendSegment Method to use for detrending in the bins (default = `"poly"`)
 #' @param polyOrderSegment The DFA order, the order of polynomial trend to remove from the bin if `removeTrendSegment = "poly"`. If `removeTrendSegment = "adaptive"` polynomials `1` to `polyOrder` will be evaluated and the best fitting polynomial (R squared) will be removed (default = `1`)
 #' @param scaleMin   Minimum scale (in data points) to use for log-log regression (default = `4`)
@@ -1423,6 +1423,7 @@ fd_allan <- function(y,
 #' Multi-fractal Detrended Fluctuation Analysis
 #'
 #' @inheritParams fd_dfa
+#'
 #' @param qq A vector containing a range of values for the order of fluctuation `q` (default = `seq(-5, 5,length.out=101)`)
 #'
 #' @return A dataframe with values of `q`,`H(q)`, `t(q)`, `h(q)`, `D(q)``

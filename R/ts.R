@@ -1259,7 +1259,8 @@ ts_trimfill <- function(x,y,action=c("fill","trim.cut","trim.NA")[1],type=c("end
 #' @param alignment Whether to right (`"r"`), center (`"c"`), or left (`"l"`) align the window.
 #' @param silent Silent mode.
 #'
-#' @return If `adjustY = FALSE`, or, a list object with fields that represent arguments of \link[casnet]{ts_trimfill}, then the (adjusted) vector `y` is returned with an attribute `"windower"`. This is a list object with fields that contain the indices for each window that fits on `y`, given `win`, `step` or `overlap` and the settings of `adjustY`. If `adjustY = NA`, only the list object is returned.
+#' @return If `adjustY` is a list object with fields that represent arguments of \link[casnet]{ts_trimfill}, then the (adjusted) vector `y` is returned with an attribute `"windower"`. This is a list object with fields that contain the indices for each window that fits on `y`, given `win`, `step` or `overlap` and the settings of `adjustY`. If `adjustY = NA`, only the list object is returned.
+#' An attribute `time` is returned with the time index based on the `alignment` arguments.
 #' @export
 #'
 #' @family Time series operations
@@ -1352,6 +1353,11 @@ ts_windower <- function(y, win=length(y), step=NA, overlap=NA, adjustY=NA, align
   )
 
   attr(x = wIndices, which = "time") <- tIndex
+
+  if(adjustOK){
+    warning("asjustY not implemented, use  ts_trimfill() first.")
+    #y <- ts_trimfill(x=y, adjustY)
+  }
 
   #names(wIndices) <- paste("stepsize",floor(step*win),"| window",1:length(wIndex))
   return(wIndices)

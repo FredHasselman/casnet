@@ -111,7 +111,8 @@
     <h2>Value</h2>
     
 
-<p>If <code>adjustY = FALSE</code>, or, a list object with fields that represent arguments of <a href="ts_trimfill.html">ts_trimfill</a>, then the (adjusted) vector <code>y</code> is returned with an attribute <code>"windower"</code>. This is a list object with fields that contain the indices for each window that fits on <code>y</code>, given <code>win</code>, <code>step</code> or <code>overlap</code> and the settings of <code>adjustY</code>. If <code>adjustY = NA</code>, only the list object is returned.</p>
+<p>If <code>adjustY</code> is a list object with fields that represent arguments of <a href="ts_trimfill.html">ts_trimfill</a>, then the (adjusted) vector <code>y</code> is returned with an attribute <code>"windower"</code>. This is a list object with fields that contain the indices for each window that fits on <code>y</code>, given <code>win</code>, <code>step</code> or <code>overlap</code> and the settings of <code>adjustY</code>. If <code>adjustY = NA</code>, only the list object is returned.
+An attribute <code>time</code> is returned with the time index based on the <code>alignment</code> arguments.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
