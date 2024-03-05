@@ -1057,7 +1057,7 @@ rp_diagProfile <- function(RM,
 
   #out <- vector(mode = "list", length = Nshuffle+1)
 
-  out <- llply(TSrnd, function(r){
+  out <- plyr::llply(TSrnd, function(r){
 
     if(doShuffle){
       if(shuffleWhich %in% "y1"){
