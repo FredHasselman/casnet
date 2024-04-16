@@ -6,12 +6,12 @@
 \usage{
 ts_levels(
   y,
-  minDataSplit = 12,
+  minDataSplit = NROW(y)/4,
   minLevelDuration = round(minDataSplit/3),
   changeSensitivity = 0.01,
-  maxLevels = 30,
+  maxLevels = floor(NROW(y)/minLevelDuration),
   method = c("anova", "poisson", "class", "exp")[1],
-  minChange = sd(y, na.rm = TRUE),
+  minChange = NA,
   doLevelPlot = FALSE,
   doTreePlot = FALSE
 )
@@ -25,11 +25,11 @@ ts_levels(
 
 \item{changeSensitivity}{A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if \code{method = "anova"}, the overall \code{R^2} after a level is introduced must increase by the value of \code{changeSensitivity}, see the \code{cp} parameter in \code{\link[rpart:rpart.control]{rpart::rpart.control()}}.     (default = \code{0.01})}
 
-\item{maxLevels}{Maximum number of levels in one series (default = \code{30})}
+\item{maxLevels}{Maximum number of levels in one series (default = floor(max(NROW(y), na.rm = TRUE)/minLevelDuration))}
 
 \item{method}{The partitioning method to use, see the manual pages of \link{rpart} for details.}
 
-\item{minChange}{After the call to \link{rpart}, adjust detected level changes to a minimum absolute change in \code{y}. If a level change is smaller than \code{minChange}, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end (default  = \code{sd(y, na.rm = TRUE)})}
+\item{minChange}{After the call to \link{rpart}, adjust detected level changes to a minimum absolute change in \code{y}. If a level change is smaller than \code{minChange}, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{sd(y, na.rm = TRUE)})}
 
 \item{doLevelPlot}{Should a plot with the original series and the levels be produced? (default = \code{FALSE})}
 
@@ -75,6 +75,7 @@ Other Time series operations:
 \code{\link{ts_rasterize}()},
 \code{\link{ts_sd}()},
 \code{\link{ts_slice}()},
+\code{\link{ts_slopes}()},
 \code{\link{ts_standardise}()},
 \code{\link{ts_sumorder}()},
 \code{\link{ts_symbolic}()},

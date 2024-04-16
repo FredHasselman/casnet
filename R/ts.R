@@ -1403,9 +1403,9 @@ ts_detrend <- function(y, polyOrder=1, adaptive = FALSE){
 #' @param minDataSplit An integer indicating how many datapoints should be in a segment before it will be analysed for presence of a level change (default = `12`)
 #' @param minLevelDuration Minimum duration (number of datapoint) of a level (default = `round(minDataSplit/3)`)
 #' @param changeSensitivity A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if `method = "anova"`, the overall `R^2` after a level is introduced must increase by the value of `changeSensitivity`, see the `cp` parameter in [rpart::rpart.control()].     (default = `0.01`)
-#' @param maxLevels Maximum number of levels in one series (default = `30`)
+#' @param maxLevels Maximum number of levels in one series (default = floor(max(NROW(y), na.rm = TRUE)/minLevelDuration))
 #' @param method The partitioning method to use, see the manual pages of [rpart] for details.
-#' @param minChange After the call to [rpart], adjust detected level changes to a minimum absolute change in `y`. If a level change is smaller than `minChange`, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end (default  = `sd(y, na.rm = TRUE)`)
+#' @param minChange After the call to [rpart], adjust detected level changes to a minimum absolute change in `y`. If a level change is smaller than `minChange`, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in `p_adj`. Set to `NA` to skip, which means `p_adj` will be identical to `p` (default  = `sd(y, na.rm = TRUE)`)
 #' @param doLevelPlot Should a plot with the original series and the levels be produced? (default = `FALSE`)
 #' @param doTreePlot Should a plot of the decision tree be produced. This requires package [partykit](https://cran.r-project.org/web/packages/partykit/index.html) (default = `FALSE`)
 #'
@@ -1433,7 +1433,15 @@ ts_detrend <- function(y, polyOrder=1, adaptive = FALSE){
 #' lines(wn2$pred$p, col = "steelblue", lwd = 2)
 #'
 #'
-ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/3), changeSensitivity = 0.01, maxLevels=30, method=c("anova","poisson","class","exp")[1], minChange = sd(y, na.rm = TRUE), doLevelPlot = FALSE, doTreePlot = FALSE){
+ts_levels <- function(y,
+                      minDataSplit = NROW(y)/4,
+                      minLevelDuration=round(minDataSplit/3),
+                      changeSensitivity = 0.01,
+                      maxLevels= floor(NROW(y)/minLevelDuration),
+                      method=c("anova","poisson","class","exp")[1],
+                      minChange = NA,
+                      doLevelPlot = FALSE,
+                      doTreePlot = FALSE){
 
   checkPkg("rpart")
 
@@ -1457,13 +1465,14 @@ ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/
   dfs$p     <- stats::predict(tree, data.frame(x=x))
   dfs$p_adj <- dfs$p
 
-  if(minChange>=max(abs(diff(dfs$p)), na.rm = TRUE)){
-    warning("The largest level difference is smaller than the value of argument minChange. Setting minChange to NA")
-  minChange <- NA
-  }
-
   minChange <- abs(minChange)
-  if(!is.na(minChange%00%NA)&is.numeric(minChange)){
+  if(!is.na(minChange%00%NA)){
+    if(is.numeric(minChange)){
+
+    if(minChange>=max(abs(diff(dfs$p)), na.rm = TRUE)){
+      warning("The largest level difference is smaller than the value of argument minChange.\nPartitioning results are stored in variable `p`, the adjusted results are stored in variable `p_adj`.")
+    }
+
     if(minChange>0){
       checkPkg("imputeTS")
       ind <- which(abs(diff(c(dfs$p[1],dfs$p)))%()%c(0,minChange))
@@ -1479,14 +1488,21 @@ ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/
         dfs$p_adj[NAind] <- NA
       }
     }
-  }
+    } # numeric
+   } else {
+     message("Skipping adjustment by argument minChange...")
+   }# NA
 
 
   if(doLevelPlot){
    g <- ggplot2::ggplot(dfs) +
-      geom_line(aes_(x=~x,y=~y)) +
-      geom_step(aes_(x=~x,y=~p), colour = "red3", size=1) +
-      theme_bw() + theme(panel.grid.minor = element_blank())
+      geom_line(aes(x=x,y=y))
+   if(!is.na(minChange)){
+     g <- g + geom_step(aes(x=x,y=p_adj), colour = "red3", size=1)
+   } else {
+     g <- g + geom_step(aes(x=x,y=p), colour = "red3", size=1)
+   }
+    g <- g + theme_bw() + theme(panel.grid.minor = element_blank())
    print(g)
   }
 
@@ -1498,6 +1514,149 @@ ts_levels <- function(y, minDataSplit = 12, minLevelDuration=round(minDataSplit/
   return(list(tree  = tree,
               pred  = dfs))
 }
+
+
+
+#' Detect slopes in time series
+#'
+#'  Use recursive partitioning function [rpart::rpart()] to perform a 'classification' of relatively stable slopes in a timeseries.
+#'
+#' @param y A time series of numeric vector
+#' @param minDataSplit An integer indicating how many datapoints should be in a segment before it will be analysed for presence of a slope (default = `12`)
+#' @param minSlopeDuration Minimum duration (number of datapoints) of a slope (default = `round(minDataSplit/3)`)
+#' @param changeSensitivity A number indicating a criterion of change that must occur before declaring the presence of a slope Higher numbers indicate higher levels of change must occur before a slope is considered. For example, if `method = "anova"`, the overall `R^2` after a slope is introduced must increase by the value of `changeSensitivity`, see the `cp` parameter in [rpart::rpart.control()]. (default = `0.01`)
+#' @param maxSlopes Maximum number of levels in one series (default = floor(max(NROW(y), na.rm = TRUE)/minSlopeDuration))
+#' @param method The partitioning method to use, see the manual pages of [rpart] for details.
+#' @param minChange After the call to [rpart], adjust detected slope value to a minimum absolute change in `y`. If a slope value is smaller than `minChange`, the previous slope will be continued. Set e.g. to `sd(diff(y), na.rm = TRUE)`. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in `p_adj`. Set to `NA` to skip, which means `p_adj` will be identical to `p` (default  = `NA`)
+#' @param doSlopePlot Should a plot with the original series and the levels be produced? (default = `FALSE`)
+#' @param doTreePlot Should a plot of the decision tree be produced. This requires package [partykit](https://cran.r-project.org/web/packages/partykit/index.html) (default = `FALSE`)
+#'
+#' @return A list object with fields `tree` and `pred`. The latter is a data frame with columns `x` (time), `y` (the variable of interest) and `p` the predicted slopes in `y` and `p_adj`, the slopes in `p` but adjusted for the value passed to `minChange`.
+#'
+#' @export
+#'
+#' @family Time series operations
+#'
+#' @author Fred Hasselman
+#'
+#' @examples
+#'
+#' # Slopes in white noise?
+#'
+#' set.seed(4321)
+#' y <- rnorm(100)
+#' wn <- ts_levels(y)
+#' plot(wn$pred$x,wn$pred$y, type = "l")
+#' lines(wn$pred$p, col = "red3", lwd = 2)
+#'
+#' # This is due to the default changeSensitivity of 0.01
+#'
+#' wn2 <- ts_slopes(y,changeSensitivity = .1)
+#' lines(wn2$pred$p, col = "steelblue", lwd = 2)
+#'
+#'
+ts_slopes <- function(y,
+                      minDataSplit = NROW(y)/4,
+                      minSlopeDuration=round(minDataSplit/3),
+                      changeSensitivity = 0.01,
+                      maxSlopes= floor(NROW(y)/minSlopeDuration),
+                      method=c("anova","poisson","class","exp")[1],
+                      minChange = NA,
+                      doSlopePlot = FALSE,
+                      doTreePlot = FALSE){
+
+  checkPkg("rpart")
+
+  if(any(is.na(y))){
+    NAind <- which(is.na(y))
+  } else {
+    NAind <- NA
+  }
+
+  x    <- seq_along(y)
+  dfs  <- data.frame(x=x, y = y, y_diff = diff(c(y[1],y)))
+  tree <- rpart::rpart(y_diff ~ x,
+                       method = method,
+                       control = list(
+                         minsplit  = minDataSplit,
+                         minbucket = minSlopeDuration,
+                         maxdepth  = maxSlopes,
+                         cp = changeSensitivity),
+                       data=dfs)
+
+  dfs$p     <- stats::predict(tree, data.frame(x=x))
+  dfs$p_adj <- dfs$p
+
+  minChange <- abs(minChange)
+  if(!is.na(minChange%00%NA)){
+    if(is.numeric(minChange)){
+
+      if(minChange>=abs(max(dfs$y, na.rm = TRUE)-min(dfs$y, na.rm = TRUE))){
+        warning("The largest slope value is smaller than the value of argument minChange.\nPartitioning results are stored in variable `p`, the adjusted results are stored in variable `p_adj`.")
+      }
+
+      if(minChange>0){
+        checkPkg("imputeTS")
+        ind <- which(abs(diff(c(dfs$p[1],dfs$p)))%()%c(0,minChange))
+        for(i in ind){
+          if(all(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)){
+            dfs$p_adj[i:dplyr::last(which(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)+i)] <- NA
+          } else {
+            dfs$p_adj[i:(which(diff(dfs$p_adj[i:length(dfs$p_adj)])!=0)[1]+i-1)] <- NA
+          }
+        }
+        dfs$p_adj <- imputeTS::na_locf(dfs$p_adj)
+        if(any(is.na(NAind))){
+          dfs$p_adj[NAind] <- NA
+        }
+      }
+    } # numeric
+  } else {
+    message("Skipping adjustment by argument minChange...")
+  }# NA
+
+
+  if(!is.na(minChange)){
+    dfs$slopes <- elascer(cumsum(round(dfs$p,2)))
+  } else {
+    dfs$slopes <- elascer(cumsum(round(dfs$p_adj,2)))
+  }
+
+
+  if(doSlopePlot){
+
+  tmp <- dfs %>%
+      select(c(1,2,6)) %>%
+      pivot_longer(cols = c(2,3), names_to = "vars", values_to = "values")
+
+  g <- ggplot2::ggplot(tmp, aes(x=x,y=values)) +
+        geom_line() +
+        facet_wrap(vars~., nrow=2, scales = "free_y") +
+        theme_bw() +
+        theme(panel.grid.minor = element_blank())
+
+  print(g)
+
+    g2 <- ggplot2::ggplot(dfs) +
+      geom_line(aes(x=x,y=y))
+    if(!is.na(minChange)){
+      g2 <- g2 + geom_step(aes(x=x,y=p_adj), colour = "red3", size=1)
+    } else {
+      g2 <- g2 + geom_step(aes(x=x,y=p), colour = "red3", size=1)
+    }
+    g2 <- g2 + theme_bw() + theme(panel.grid.minor = element_blank())
+    print(g2)
+  }
+
+  if(doTreePlot){
+    checkPkg("partykit")
+    plot(partykit::as.party(tree))
+  }
+
+  return(list(tree  = tree,
+              pred  = dfs))
+}
+
 
 
 #' Find Peaks or Wells

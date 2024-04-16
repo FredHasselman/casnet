@@ -63,6 +63,7 @@ Other Time series operations:
 \code{\link{ts_rasterize}()},
 \code{\link{ts_sd}()},
 \code{\link{ts_slice}()},
+\code{\link{ts_slopes}()},
 \code{\link{ts_standardise}()},
 \code{\link{ts_sumorder}()},
 \code{\link{ts_symbolic}()},

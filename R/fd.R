@@ -368,9 +368,10 @@ fd_prepSeries <- function(y,
   if(!all(is.na(scaleS))){
     # Nyquist-ish
     if(max(scaleS)>floor(NROW(y)/2)){
-      warning("The maximum bin should be smaller than floor(NROW(y)/2) data points")
+      warning(paste("The maximum bin should be smaller than floor(NROW(y)/2) data points. Changed to",floor(NROW(y)/2)))
+      scaleS <- seq(min(scaleS),floor(NROW(y)/2),length.out = NROW(scaleS))
+      #scaleS[which.max(scaleS)] <- floor(NROW(y)/2)
     }
-
 
   if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
     stop("Something wrong with vector passed to scaleS.... \nUsing defaults: (scaleMax-scaleMin)/scaleResolution")
