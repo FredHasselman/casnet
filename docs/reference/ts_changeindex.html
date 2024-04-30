@@ -144,6 +144,7 @@
 <span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
 <span class="r-in"><span> <span class="va">yy</span>     <span class="op">&lt;-</span> <span class="fu"><a href="noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>standardise <span class="op">=</span> <span class="cn">TRUE</span>, N<span class="op">=</span><span class="fl">50</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span> <span class="va">tr</span>     <span class="op">&lt;-</span> <span class="fu"><a href="ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">yy</span>, doTreePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping adjustment by argument minChange...</span>
 <span class="r-plt img"><img src="ts_changeindex-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span> <span class="va">breaks</span> <span class="op">&lt;-</span> <span class="fu">ts_changeindex</span><span class="op">(</span><span class="va">tr</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">p</span>, returnRectdata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span> <span class="va">breaks</span><span class="op">$</span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="getColours.html">getColours</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">breaks</span><span class="op">$</span><span class="va">label</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -176,7 +177,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>

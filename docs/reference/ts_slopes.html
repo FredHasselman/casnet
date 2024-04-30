@@ -68,12 +68,12 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_slopes</span><span class="op">(</span></span>
 <span>  <span class="va">y</span>,</span>
-<span>  minDataSplit <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  minDataSplit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">4</span>,</span>
 <span>  minSlopeDuration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">minDataSplit</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span>,</span>
 <span>  changeSensitivity <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  maxSlopes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">/</span><span class="va">minSlopeDuration</span><span class="op">)</span>,</span>
+<span>  maxSlopes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="va">minSlopeDuration</span><span class="op">)</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"anova"</span>, <span class="st">"poisson"</span>, <span class="st">"class"</span>, <span class="st">"exp"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>  minChange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">y</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  minChange <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  doSlopePlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doTreePlot <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -106,7 +106,7 @@
 
 
 <dt>minChange</dt>
-<dd><p>After the call to rpart, adjust detected slope value to a minimum absolute change in <code>y</code>. If a slope value is smaller than <code>minChange</code>, the previous slope will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in <code>p_adj</code>. Set to <code>NA</code> to skip, which means <code>p_adj</code> will be identical to <code>p</code> (default  = <code>sd(diff(y), na.rm = TRUE)</code>)</p></dd>
+<dd><p>After the call to rpart, adjust detected slope value to a minimum absolute change in <code>y</code>. If a slope value is smaller than <code>minChange</code>, the previous slope will be continued. Set e.g. to <code>sd(diff(y), na.rm = TRUE)</code>. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in <code>p_adj</code>. Set to <code>NA</code> to skip, which means <code>p_adj</code> will be identical to <code>p</code> (default  = <code>NA</code>)</p></dd>
 
 
 <dt>doSlopePlot</dt>
@@ -161,14 +161,14 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4321</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">wn</span> <span class="op">&lt;-</span> <span class="fu"><a href="ts_levels.html">ts_levels</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping adjustment by argument minChange...</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">wn</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">x</span>,<span class="va">wn</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">y</span>, type <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">wn</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">p</span>, col <span class="op">=</span> <span class="st">"red3"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># This is due to the default changeSensitivity of 0.01</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">wn2</span> <span class="op">&lt;-</span> <span class="fu">ts_slopes</span><span class="op">(</span><span class="va">y</span>,changeSensitivity <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The largest slope value is smaller than the value of argument minChange.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> Partitioning results are stored in variable `p`, the adjusted results are stored in variable `p_adj`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping adjustment by argument minChange...</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">wn2</span><span class="op">$</span><span class="va">pred</span><span class="op">$</span><span class="va">p</span>, col <span class="op">=</span> <span class="st">"steelblue"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="ts_slopes-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -187,7 +187,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer></div>
