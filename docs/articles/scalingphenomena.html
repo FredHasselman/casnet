@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.3</span>
       </span>
     </div>
 
@@ -93,7 +93,7 @@ Series</h1>
                         <h4 data-toc-skip class="author">Fred
 Hasselman</h4>
             
-            <h4 data-toc-skip class="date">2024-04-30</h4>
+            <h4 data-toc-skip class="date">2024-06-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/scalingphenomena.Rmd" class="external-link"><code>vignettes/scalingphenomena.Rmd</code></a></small>
       <div class="hidden name"><code>scalingphenomena.Rmd</code></div>
@@ -306,7 +306,7 @@ the Matlab code provided by <span class="citation">(<a href="#ref-ihlen2012">Ihl
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 'multi' fractal</span></span>
 <span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">2048</span></span>
-<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="../reference/elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.2</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.5</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.7</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">512</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="../reference/elascer.html">elascer</a></span><span class="op">(</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="va">N</span>, alpha <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.2</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.5</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.7</span>,<span class="fl">512</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">512</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fd_mfdfa.html">fd_mfdfa</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">y</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -331,7 +331,7 @@ in you studies see e.g. <span class="citation">(<a href="#ref-kelty-stephen2013"
 <h3 class="unnumbered" id="references">
 <strong>References</strong><a class="anchor" aria-label="anchor" href="#references"></a>
 </h3>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-hasselman2013" class="csl-entry">
 Hasselman, Fred. 2013. <span>“When the Blind Curve Is Finite: Dimension
 Estimation and Model Inference Based on Empirical Waveforms.”</span>

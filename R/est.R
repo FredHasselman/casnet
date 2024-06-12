@@ -1207,3 +1207,41 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 #
 # }
 #
+
+
+#' Estimate the maximum number of Phases
+#'
+#' @description Parameter sweep of function [rn_phases] for argument `maxPhases`. Use to check at which value of `maxPhases` no additional phases will be detected.
+#'
+#' @inheritParams rn_phases
+#' @param RN
+#' @param range Two element vector with minimum and maximum `c(min,max)` number of phases to check.
+#'
+#' @return Data frame with maxPhases by detectedPhases
+#' @export
+#'
+#' @examples
+est_maxPhases <- function(RN,
+                          range = 2:10,
+                          minStatesinPhase = 1,
+                          maxStatesinPhase = NROW(RN),
+                          useDegree = FALSE,
+                          inverseWeight = TRUE,
+                          cleanUp = TRUE,
+                          removeSingularities = TRUE){
+
+  maxPhaseOut <- plyr::ldply(range[1]:max(range), function(p){
+    tmp <- rn_phases(RN, minStatesinPhase = minStatesinPhase, maxStatesinPhase = maxStatesinPhase, inverseWeight = inverseWeight, cleanUp = cleanUp, removeSingularities = removeSingularities, maxPhases = p)
+    data.frame(Phases = max(tmp$phase_number), maxPhases = p)
+    })
+
+ g <- ggplot(maxPhaseOut, aes(y = Phases, x = maxPhases)) +
+    geom_line() +
+    geom_point() +
+    theme_bw()
+
+ print(g)
+
+
+  return(invisible(maxPhaseOut))
+}

@@ -190,6 +190,9 @@
     <loc>/reference/est_emLag.html</loc>
   </url>
   <url>
+    <loc>/reference/est_maxPhases.html</loc>
+  </url>
+  <url>
     <loc>/reference/est_parameters.html</loc>
   </url>
   <url>
@@ -428,6 +431,9 @@
   </url>
   <url>
     <loc>/reference/plotRN_phaseProfile.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plotRN_phaseProjection.html</loc>
   </url>
   <url>
     <loc>/reference/plotRN_phaseSeries.html</loc>

@@ -40,7 +40,7 @@ rn <- function(y1, y2 = NULL,
                to.ts = NULL,
                order.by = NULL,
                to.sparse = FALSE,
-               method = "Euclidean",
+               method = c("Euclidean","max","SBD")[1],
                targetValue = .05,
                returnGraph = FALSE,
                doPlot = FALSE,
@@ -582,9 +582,10 @@ rn_recSpec <- function(RN,
 #' @inheritParams make_spiral_graph
 #' @inheritParams fd_dfa
 #' @param RN A matrix produced by the function [rn]
-#' @param maxPhases The maximum number of phases to extract. If `NA`, the value will be set to `NROW(RN)`  (default = `5`)
+#' @param maxPhases The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent point will be labelled with "Other". If `NA`, the value will be set to `NROW(RN)`, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = `5`)
 #' @param minStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases do not have a minimum number of `minStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `1`)
 #' @param maxStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases exceeds a maximum number of `maxStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `NROW(RN)`)
+#' @param useDegree By default, node strength will be used to determine the phases. Set to `TRUE` to use the node degree (default = `FALSE`)
 #' @param removeSingularities Will remove states that recur only once (nodes with `degree(g) == 1`) (default = `FALSE`)
 #' @param inverseWeight Whether to perform the operation `1/weight` on the edge weights. The default is `TRUE`, if the matrix was weighted by a distance metric (`weightedBy = "si"`) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on the node strength calculation used to select the phases. If the matrix was weighted by recurrence time (`weightedBy = "rt"`) and `inverseWeight = TRUE`, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If `weightedBy = "rf"`, lower frequencies will end up having more impact. (default = `TRUE`)
 #' @param cleanUp Try to assign states to phases that were not assigned by the algorithm. If `FALSE`, these states will be added to category "Other" (default = `TRUE`)
@@ -596,6 +597,7 @@ rn_recSpec <- function(RN,
 #' @param phaseColours Colours for the different phases in the phase plot. If `epochColours` also has a value, `phaseColours` will be used instead (default = `NULL`)
 #' @param doSpiralPlot Produce a plot of the recurrence network with the nodes coloured by phases (default = `FALSE`)
 #' @param doPhaseSeriesPlot Produce a time series of the phases as they occur with a marginal histogram of their frequency (default = `FALSE`)
+#' @param doPhaseSpaceProjectionPlot produce a 2D `umap` projection of the phases (default = `FALSE`)
 #' @param excludeOther Should the phase "Other" be excluded from plots? (default = `FALSE`)
 #' @param excludeNorec Should the category "No recurrence" be excluded from plots? (default = `TRUE`)
 #' @param returnGraph Returns all the graph object objects of the plots that have been produced (default = `FALSE`)
@@ -622,6 +624,7 @@ rn_phases <- function(RN,
                       maxPhases = 5,
                       minStatesinPhase = 1,
                       maxStatesinPhase = NROW(RN),
+                      useDegree = FALSE,
                       inverseWeight = TRUE,
                       cleanUp = TRUE,
                       returnCentroid = c("no","mean.sd","median.mad","centroid")[1],
@@ -635,6 +638,7 @@ rn_phases <- function(RN,
                       phaseColours = NULL,
                       doSpiralPlot = FALSE,
                       doPhaseSeriesPlot = FALSE,
+                      doPhaseSpacePojectionPlot = FALSE,
                       showEpochLegend = TRUE,
                       epochColours = NULL,
                       epochLabel = "Phase",
@@ -652,9 +656,9 @@ rn_phases <- function(RN,
     stop("RN has to be a distance weighted recurrence network.")
   }
 
-  if(!attributes(RN)$cumulative%00%FALSE){
-    stop("RN has to be a cumulative recurrence network.")
-  }
+  # if(!attributes(RN)$cumulative%00%FALSE){
+  #   stop("RN has to be a cumulative recurrence network.")
+  # }
 
   weighted <- attributes(RN)$weighted
   directed <- attributes(RN)$directed%00%FALSE
@@ -664,6 +668,7 @@ rn_phases <- function(RN,
    directed <- "directed"
  }
 
+  # Creat graph
   gRN <- igraph::graph_from_adjacency_matrix(RN,
                                              weighted = weighted,
                                              mode = directed)
@@ -725,7 +730,7 @@ rn_phases <- function(RN,
     phases[[i]] <- unique(c(tmp_edges$from,tmp_edges$to))
 
     igraph::V(gRN)$phase[phases[[i]]] <- i
-    names(phases)[i] <- paste("Phase",i)
+    names(phases)[i] <- ifelse(i<10, paste0("Phase 0",i), paste("Phase",i))
 
     if(i > 1){
       if(any(i>=NROW(RN_nodes), i==maxPhases, NROW(tmp_edges)==0, nodeID[[i]]==nodeID[[i-1]])){

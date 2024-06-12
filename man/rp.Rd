@@ -16,7 +16,7 @@ rp(
   to.sparse = TRUE,
   weighted = FALSE,
   weightedBy = "si",
-  method = c("Euclidean", "SBD")[1],
+  method = c("Euclidean", "max", "SBD")[1],
   rescaleDist = c("none", "maxDist", "meanDist")[1],
   targetValue = 0.05,
   chromatic = FALSE,

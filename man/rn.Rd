@@ -20,7 +20,7 @@ rn(
   to.ts = NULL,
   order.by = NULL,
   to.sparse = FALSE,
-  method = "Euclidean",
+  method = c("Euclidean", "max", "SBD")[1],
   targetValue = 0.05,
   returnGraph = FALSE,
   doPlot = FALSE,

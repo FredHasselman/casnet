@@ -9,6 +9,7 @@ rn_phases(
   maxPhases = 5,
   minStatesinPhase = 1,
   maxStatesinPhase = NROW(RN),
+  useDegree = FALSE,
   inverseWeight = TRUE,
   cleanUp = TRUE,
   returnCentroid = c("no", "mean.sd", "median.mad", "centroid")[1],
@@ -22,6 +23,7 @@ rn_phases(
   phaseColours = NULL,
   doSpiralPlot = FALSE,
   doPhaseSeriesPlot = FALSE,
+  doPhaseSpacePojectionPlot = FALSE,
   showEpochLegend = TRUE,
   epochColours = NULL,
   epochLabel = "Phase",
@@ -32,11 +34,13 @@ rn_phases(
 \arguments{
 \item{RN}{A matrix produced by the function \link{rn}}
 
-\item{maxPhases}{The maximum number of phases to extract. If \code{NA}, the value will be set to \code{NROW(RN)}  (default = \code{5})}
+\item{maxPhases}{The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent point will be labelled with "Other". If \code{NA}, the value will be set to \code{NROW(RN)}, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = \code{5})}
 
 \item{minStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases do not have a minimum number of \code{minStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{1})}
 
 \item{maxStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases exceeds a maximum number of \code{maxStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{NROW(RN)})}
+
+\item{useDegree}{By default, node strength will be used to determine the phases. Set to \code{TRUE} to use the node degree (default = \code{FALSE})}
 
 \item{inverseWeight}{Whether to perform the operation \code{1/weight} on the edge weights. The default is \code{TRUE}, if the matrix was weighted by a distance metric (\code{weightedBy = "si"}) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on the node strength calculation used to select the phases. If the matrix was weighted by recurrence time (\code{weightedBy = "rt"}) and \code{inverseWeight = TRUE}, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If \code{weightedBy = "rf"}, lower frequencies will end up having more impact. (default = \code{TRUE})}
 
@@ -73,6 +77,8 @@ rn_phases(
 \item{excludeOther}{Should the phase "Other" be excluded from plots? (default = \code{FALSE})}
 
 \item{excludeNorec}{Should the category "No recurrence" be excluded from plots? (default = \code{TRUE})}
+
+\item{doPhaseSpaceProjectionPlot}{produce a 2D \code{umap} projection of the phases (default = \code{FALSE})}
 }
 \value{
 A data frame with information about the phases or a list object with data and graph objects (if requested).

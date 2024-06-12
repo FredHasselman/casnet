@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.3</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
 
 
 <dt>nnSize</dt>
-<dd><p>Neighbourhood diameter (integer, the <code>number.boxes</code> parameter of <code><a href="https://rdrr.io/pkg/tseriesChaos/man/false.nearest.html" class="external-link">tseriesChaos::false.nearest()</a></code>) used to speed up neighbour search. (default = <code>NA</code>)</p></dd>
+<dd><p>Neighbourhood diameter (integer, the <code>number.boxes</code> parameter of <code>tseriesChaos::false.nearest()</code>) used to speed up neighbour search. (default = <code>NA</code>)</p></dd>
 
 
 <dt>nnRadius</dt>
@@ -156,7 +156,7 @@
     <div id="details">
     <h2>Details</h2>
     <p>A number of functions are called to determine optimal parameters for delay embedding a time series:</p><ul><li><p>Embedding lag (<code>emLag</code>): The default is to call <code><a href="est_emLag.html">est_emLag()</a></code>, which is a wrapper around <code><a href="https://rdrr.io/pkg/nonlinearTseries/man/timeLag.html" class="external-link">nonlinearTseries::timeLag()</a></code> with <code>technique=ami</code> to get lags based on the mutual information function.</p></li>
-<li><p>Embedding dimension (<code>m</code>, <code>emDim</code>): The default is to call <code><a href="est_emDim.html">est_emDim()</a></code>, which is a wrapper around <code><a href="https://rdrr.io/pkg/tseriesChaos/man/false.nearest.html" class="external-link">tseriesChaos::false.nearest()</a></code></p></li>
+<li><p>Embedding dimension (<code>m</code>, <code>emDim</code>): The default is to call <code><a href="est_emDim.html">est_emDim()</a></code>, which is a wrapper around <code>tseriesChaos::false.nearest()</code></p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>

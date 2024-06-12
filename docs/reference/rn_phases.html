@@ -19,7 +19,7 @@ or with high-frequency, are regions of attraction for the system."><meta propert
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.3</span>
       </span>
     </div>
 
@@ -75,6 +75,7 @@ or with high-frequency, are regions of attraction for the system.</p>
 <span>  maxPhases <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  minStatesinPhase <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  maxStatesinPhase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">RN</span><span class="op">)</span>,</span>
+<span>  useDegree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  inverseWeight <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cleanUp <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  returnCentroid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"mean.sd"</span>, <span class="st">"median.mad"</span>, <span class="st">"centroid"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
@@ -88,6 +89,7 @@ or with high-frequency, are regions of attraction for the system.</p>
 <span>  phaseColours <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  doSpiralPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doPhaseSeriesPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  doPhaseSpacePojectionPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  showEpochLegend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  epochColours <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  epochLabel <span class="op">=</span> <span class="st">"Phase"</span>,</span>
@@ -103,7 +105,7 @@ or with high-frequency, are regions of attraction for the system.</p>
 
 
 <dt>maxPhases</dt>
-<dd><p>The maximum number of phases to extract. If <code>NA</code>, the value will be set to <code>NROW(RN)</code>  (default = <code>5</code>)</p></dd>
+<dd><p>The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent point will be labelled with "Other". If <code>NA</code>, the value will be set to <code>NROW(RN)</code>, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = <code>5</code>)</p></dd>
 
 
 <dt>minStatesinPhase</dt>
@@ -112,6 +114,10 @@ or with high-frequency, are regions of attraction for the system.</p>
 
 <dt>maxStatesinPhase</dt>
 <dd><p>A parameter applied after the extraction of phases (limited by <code>maxPhases</code>). If any extracted phases exceeds a maximum number of <code>maxStatesinPhase</code> + <code>1</code> (= the state that was selected based on node strength), the phase will be removed from the result (default = <code>NROW(RN)</code>)</p></dd>
+
+
+<dt>useDegree</dt>
+<dd><p>By default, node strength will be used to determine the phases. Set to <code>TRUE</code> to use the node degree (default = <code>FALSE</code>)</p></dd>
 
 
 <dt>inverseWeight</dt>
@@ -184,6 +190,10 @@ or with high-frequency, are regions of attraction for the system.</p>
 
 <dt>excludeNorec</dt>
 <dd><p>Should the category "No recurrence" be excluded from plots? (default = <code>TRUE</code>)</p></dd>
+
+
+<dt>doPhaseSpaceProjectionPlot</dt>
+<dd><p>produce a 2D <code>umap</code> projection of the phases (default = <code>FALSE</code>)</p></dd>
 
 </dl></div>
     <div id="value">

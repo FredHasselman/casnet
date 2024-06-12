@@ -59,7 +59,7 @@ rp <- function(y1, y2 = NULL,
                to.sparse = TRUE,
                weighted = FALSE,
                weightedBy = "si",
-               method = c("Euclidean","SBD")[1],
+               method = c("Euclidean","max","SBD")[1],
                rescaleDist = c("none","maxDist","meanDist")[1],
                targetValue  = .05,
                chromatic = FALSE,
@@ -222,6 +222,7 @@ rp <- function(y1, y2 = NULL,
     attributes(dmat)$measures <- rpOut
     attributes(dmat)$weighted <- weighted
     attributes(dmat)$weightedBy <- weightedBy
+    attributes(dmat)$method <- method
     attributes(dmat)$chromatic <- chromatic
     attributes(dmat)$chromaNames <- chromaNames
     attributes(dmat)$chromaDims <- chromaDims
@@ -239,6 +240,7 @@ rp <- function(y1, y2 = NULL,
     attr(dmat,"measures") <- rpOut
     attr(dmat,"weighted") <- weighted
     attr(dmat,"weightedBy") <- weightedBy
+    attr(dmat, "method") <- method
     attr(dmat,"chromatic") <- chromatic
     attr(dmat,"chromaNames") <- chromaNames
     attr(dmat,"chromaDims") <- chromaDims

@@ -2256,6 +2256,84 @@ plotRN_phaseSeries <- function(phaseOutput,
 }
 
 
+#' Plot Phase Space Projection
+#'
+#' 2D umap projection of multidimensional Phase Space. Categories "No recurrence" and "Other" are removed.
+#'
+#' @inheritParams plotRN_phaseProfile
+#' @param RNdist A distance matrix (unthresholded) created with [rn] or [rp]
+#' @param PhaseOut Output from function [rn_phases] based on the thresholded matrix in `RNdist`
+#'
+#' @return Dataframe with coordinates
+#' @export
+#'
+#' @examples
+plotRN_phaseProjection <- function(RNdist,
+                                   phaseOutput,
+                                   epochColours = NULL,
+                                   showEpochLegend = TRUE,
+                                   epochLabel   = "Phase",
+                                   excludeOther = TRUE,
+                                   excludeNorec = TRUE){
+
+  if(length(phaseOutput)>1){
+    phaseOutput <- phaseOutput$phaseSeries
+  }
+
+  checkPkg("umap")
+
+  if(!(attributes(RNdist)$method %in% c("euclidean","manhattan","cosine","pearson","pearson2"))){
+    warning('Distance measure cannot be used with umap!\nShould be one of: "euclidean","manhattan","cosine","pearson","pearson2"\nResults will be based on assuming "euclidean"... Change the distance measure of RNdist')
+    method <- "euclidean"
+  } else {
+    method <- attributes(RNdist)$method
+  }
+
+  custom.config <- umap::umap.defaults
+  custom.config$n_neighbours <- max(phaseOutput$phase_size)
+  custom.config$metric <- method
+  custom.config$random_state <- 1234
+
+  rn.umap <-  umap::umap(RNdist, config = custom.config, input = "dist")
+  df.umap <- data.frame(rn.umap$layout)
+  df.umap$labels <- phaseOutput$phase_name
+  df.umap$size <- phaseOutput$phase_size
+
+  if(excludeOther){
+    df.umap <- df.umap %>% filter(!(labels %in% c("Other")))
+  }
+
+  if(excludeNorec){
+    df.umap <- df.umap %>% filter(!(labels %in% c("No recurrence")))
+  }
+
+  epochColours <- getColours(Ncols = length(unique(phaseOutput$phase_name)))
+  names(epochColours) <- unique(phaseOutput$phase_name)
+  #
+  # ID <- ldply(names(epochColours), function(n){
+  #
+  # })
+  # phaseOutput[]
+  #
+
+  epochSizes <- unique(phaseOutput$phase_size)
+  names(epochSizes) <- unique(phaseOutput$phase_name)
+
+ g <- ggplot(df.umap, aes(x = X1, y = X2, colour = labels)) +
+    geom_point(aes(size = size)) +
+    scale_x_continuous("") +
+    scale_y_continuous("") +
+    scale_size_manual(epochLabel, values = epochSizes) +
+    scale_color_manual(epochLabel, values = epochColours) +
+    theme_void()
+
+ print(g)
+
+ return(invisible(df.umap))
+
+}
+
+
 #
 # phases <- casnet::rn_phases(RN$RN,
 #                             standardise = "unit",
