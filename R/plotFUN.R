@@ -2307,8 +2307,12 @@ plotRN_phaseProjection <- function(RNdist,
     df.umap <- df.umap %>% filter(!(labels %in% c("No recurrence")))
   }
 
-  epochColours <- getColours(Ncols = length(unique(phaseOutput$phase_name)))
-  names(epochColours) <- unique(phaseOutput$phase_name)
+  dfepochs <- phaseOutput %>% group_by(phase_name) %>% summarize(phase_size = first(phase_size))
+
+
+  epochColours <- getColours(Ncols = NROW(dfepochs))
+  names(epochColours) <- dfepochs$phase_name
+
   #
   # ID <- ldply(names(epochColours), function(n){
   #
@@ -2316,14 +2320,14 @@ plotRN_phaseProjection <- function(RNdist,
   # phaseOutput[]
   #
 
-  epochSizes <- unique(phaseOutput$phase_size)
-  names(epochSizes) <- unique(phaseOutput$phase_name)
+  epochSizes <- dfepochs$phase_size
+  names(epochSizes) <- dfepochs$phase_name
 
  g <- ggplot(df.umap, aes(x = X1, y = X2, colour = labels)) +
     geom_point(aes(size = size)) +
     scale_x_continuous("") +
     scale_y_continuous("") +
-    scale_size_manual(epochLabel, values = epochSizes) +
+    #scale_size_manual(epochLabel, values = sort(epochSizes)) +
     scale_color_manual(epochLabel, values = epochColours) +
     theme_void()
 
