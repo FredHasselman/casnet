@@ -452,10 +452,15 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
 #'
 #' @family tools for plotting networks
 #'
-plotNET_groupColour <- function(g, groups, colourV=TRUE, alphaV=1, colourE=FALSE, alphaE=.8, groupColours=NULL, defaultEdgeColour = "grey70", doPlot = TRUE, returnPlot = FALSE){
+plotNET_groupColour <- function(g, groups = NULL, colourV=TRUE, alphaV=1, colourE=FALSE, alphaE=.8, groupColours=NULL, defaultEdgeColour = "grey70", doPlot = TRUE, returnPlot = FALSE){
 
-  unicolours <- na.exclude(unique(groupColours))
-  unigroups  <- na.exclude(unique(groups))
+  if(!is.null(unicolours)){
+    unicolours <- na.exclude(unique(groupColours))
+  }
+
+  if(!is.null(groups)){
+    unigroups  <- na.exclude(unique(groups))
+  }
 
   if(length(groups)==igraph::gorder(g)){
     if(is.null(names(groups))){
@@ -1338,15 +1343,22 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
     df_ccp <- df_ccp[,sort(colnames(df_ccp))]
   }
 
-  if(is.na(colOrder)&subtitle==""){
-    subtitle <- paste0('Variables ordered by mean ',resVariable)
+
+  # if(is.na(colOrder)&subtitle==""){
+  #   subtitle <- paste0('Variables ordered by mean ',resVariable)
+  # }
+
+  if(is.na(colOrder)){
+    if(subtitle==""){
+      subtitle <- paste0('Variables ordered by mean ',resVariable)
+    }
   } else {
-    subtitle <- ifelse(colOrder,
-                       'Variables ordered by position in data source',
-                       'Variables ordered by variable name')
+    if(subtitle==""){
+      subtitle <- ifelse(colOrder,
+                         'Variables ordered by position in data source',
+                         'Variables ordered by variable name')
+    }
   }
-
-
 
   if(!all(is.na(markID))){
     subtitle <- paste(subtitle, markIDlabel)
@@ -2267,7 +2279,6 @@ plotRN_phaseSeries <- function(phaseOutput,
 #' @return Dataframe with coordinates
 #' @export
 #'
-#' @examples
 plotRN_phaseProjection <- function(RNdist,
                                    phaseOutput,
                                    epochColours = NULL,
@@ -2739,7 +2750,7 @@ make_spiral_graph <- function(g,
 
   if(is.null(markTimeBy)){
     if(!is.null(markEpochsBy)){
-      grIDs <- ts_changeindex(markEpochsBy)
+      grIDs <- ts_changeindex(markEpochsBy,returnRectdata = TRUE)
       tbreaks <- unique(sort(c(grIDs$xmax,grIDs$xmax)))
       tlabels <- ceiling(tbreaks)
       #markTimeBy <- TRUE
@@ -2814,6 +2825,7 @@ make_spiral_graph <- function(g,
     for(i in 1:(length(tbreaks)-1)){
       markEpochsBy[tbreaks[i]:tbreaks[i+1]] <- rep(paste0(tbreaks[i],"-",tbreaks[i+1]),length(tbreaks[i]:tbreaks[i+1]))
     }
+
     if(!is.null(epochColours)){
       if(length(unique(markEpochsBy))>length(unique(epochColours))){
         warning("Number of unique epochs is unequal to number of unique colours!\nUsing default colour scheme.")
@@ -2830,22 +2842,23 @@ make_spiral_graph <- function(g,
                            # aplhaE = alphaE,
                            groupColours = epochColours,
                            defaultEdgeColour = defaultEdgeColour,
+                           returnPlot = TRUE,
                            doPlot = FALSE)
 
   size <- 1
-  if(!is.null(V(g)$size)){
-    size <- V(g)$size
+  if(!is.null(igraph::V(g)$size)){
+    size <- igraph::V(g)$size
   }
   gNodes        <- as.data.frame(g$layout)
-  gNodes$ID     <- as.numeric(V(g))
-  gNodes$colour <- V(g)$colour
-  gNodes$labels <- factor(V(g)$groupnum, levels = unique(V(g)$groupnum), labels = unique(V(g)$group))
+  gNodes$ID     <- as.numeric(igraph::V(g))
+  gNodes$colour <- igraph::V(g)$colour
+  gNodes$labels <- factor(igraph::V(g)$groupnum, levels = unique(igraph::V(g)$groupnum), labels = unique(igraph::V(g)$group))
   gNodes$size   <- size
-  gNodes$alpha  <- V(g)$alpha
+  gNodes$alpha  <- igraph::V(g)$alpha
 
   width <- 1
-  if(!is.null(E(g)$width)){
-    width <- E(g)$width
+  if(!is.null(igraph::E(g)$width)){
+    width <- igraph::E(g)$width
   }
   gEdges        <- igraph::get.data.frame(g)
   gEdges$from.x <- gNodes$V1[match(gEdges$from, gNodes$ID)]

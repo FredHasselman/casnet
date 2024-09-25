@@ -6,7 +6,7 @@
 \usage{
 plotNET_groupColour(
   g,
-  groups,
+  groups = NULL,
   colourV = TRUE,
   alphaV = 1,
   colourE = FALSE,

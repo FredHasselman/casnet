@@ -955,12 +955,13 @@ rn_phases <- function(RN,
         if(returnCentroid=="mean.sd"){
           Mean <- data.frame(phase_name = p, Mean = colMeans(tmp[,-NCOL(tmp)], na.rm = TRUE))
           SD <- plyr::colwise(sd, na.rm=TRUE)(tmp[,-NCOL(tmp)])
+          Mean$SD      <- as.numeric(t(SD))
         }
         if(returnCentroid=="median.mad"){
           Mean <- data.frame(phase_name = p, Median = t(plyr::colwise(stats::median, na.rm=TRUE)(tmp[,-NCOL(tmp)])))
           SD <- plyr::colwise(stats::mad, na.rm=TRUE)(tmp[,-NCOL(tmp)])
+          Mean$MAD        <- as.numeric(t(SD))
         }
-        Mean$MAD        <- as.numeric(t(SD))
         Mean$Dimension  <- rownames(Mean)
         Mean$phase_size <- unique(out$phase_size[out$phase_name==p])
         return(Mean)

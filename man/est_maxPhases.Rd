@@ -16,7 +16,7 @@ est_maxPhases(
 )
 }
 \arguments{
-\item{RN}{A matrix produced by the function \link{rn}}
+\item{RN}{Recurrence matrix}
 
 \item{range}{Two element vector with minimum and maximum \code{c(min,max)} number of phases to check.}
 

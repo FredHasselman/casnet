@@ -1214,13 +1214,12 @@ est_emDim <- function(y, delay = est_emLag(y), maxDim = 15, threshold = .95, max
 #' @description Parameter sweep of function [rn_phases] for argument `maxPhases`. Use to check at which value of `maxPhases` no additional phases will be detected.
 #'
 #' @inheritParams rn_phases
-#' @param RN
+#' @param RN Recurrence matrix
 #' @param range Two element vector with minimum and maximum `c(min,max)` number of phases to check.
 #'
 #' @return Data frame with maxPhases by detectedPhases
 #' @export
 #'
-#' @examples
 est_maxPhases <- function(RN,
                           range = 2:10,
                           minStatesinPhase = 1,
