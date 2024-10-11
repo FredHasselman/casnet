@@ -1413,6 +1413,7 @@ ts_detrend <- function(y, polyOrder=1, adaptive = FALSE){
 #' @param removeTrendShorter Pass `NA` to ignore. If there are trends in the data, remove them before estimating stationary levels. Provide a trend duration in terms of data points that can reasonably be considered a period of transient behaviour before a new stationary level is reached. If `removeTrendsLarger` is not `NA` it takes precedence over `removeTrendShorter`. (default = `5`)
 #' @param doLevelPlot Should a plot with the original series and the levels and/or trends be produced? (default = `FALSE`)
 #' @param doTreePlot Should a plot of the decision tree be produced. If `returnTrends = TRUE` there will be 2 trees. This requires package [partykit](https://cran.r-project.org/web/packages/partykit/index.html) (default = `FALSE`)
+#' @param silent silent(-ish) mode
 #'
 #' @return A list object with fields `tree` and `pred`. The latter is a data frame with columns `x` (time), `y` (the variable of interest) and `p` the predicted levels in `y` and `p_adj`, the levels in `p` but adjusted for the value passed to `minChange`.
 #'
@@ -1451,7 +1452,8 @@ ts_levels <- function(y,
                       removeTrendsLarger = c(-0.1,0.1),
                       removeTrendsShorter = minTrendDuration,
                       doLevelPlot = FALSE,
-                      doTreePlot = FALSE){
+                      doTreePlot = FALSE,
+                      silent = FALSE){
 
   checkPkg("rpart")
 
@@ -1465,21 +1467,27 @@ ts_levels <- function(y,
   dfs  <- data.frame(x=x, y=y)
 
 
-  if(any(!is.na(removeTrendsLarger), !is.na(removeTrendsShorter), returnTrends)){
-    dfs$y_diff <- diff(c(y[1],y))
-    difftree <- rpart::rpart(y_diff ~ x,
-                             method = method,
-                             control = list(
-                             minsplit  = minDataSplit,
-                             minbucket = minLevelDuration,
-                             maxdepth  = maxLevels,
-                             cp = changeSensitivity),
-                             data=dfs)
+  if(returnTrends){
+    if(any(!is.na(removeTrendsLarger), !is.na(removeTrendsShorter))){
+      dfs$y_diff <- diff(c(y[1],y))
+      difftree <- rpart::rpart(y_diff ~ x,
+                               method = method,
+                               control = list(
+                                 minsplit  = minDataSplit,
+                                 minbucket = minLevelDuration,
+                                 maxdepth  = maxLevels,
+                                 cp = changeSensitivity),
+                               data=dfs)
 
-    dfs$pdiff     <- stats::predict(difftree, data.frame(x=x))
-    dfs$pdiff_adj <- dfs$pdiff
+      dfs$pdiff     <- stats::predict(difftree, data.frame(x=x))
+
+      # if(all(!is.na(removeTrendsLarger))){
+      #   if(length(removeTrendsLarger)==2){
+      #     dfs$pdiff_adj[dfs$pdiff%()%removeTrendsLarger] <- 0
+      #   }
+      # }
+    }
   }
-
 
   tree <- rpart::rpart(y ~ x,
                        method = method,
@@ -1521,10 +1529,12 @@ ts_levels <- function(y,
     }
     } # numeric
    } else {
+     if(!silent){
      message("Skipping adjustment by argument minChange...")
+       }
    }# NA
 
-   tmp <- ts_duration(dfs$p_adj)
+   tmp <- ts_duration(as.vector(dfs$p_adj))
    dfs$epoch <- NA
    for(r in 1:NROW(tmp)){
      dfs$epoch[tmp$t.start[r]:tmp$t.end[r]] <- r
@@ -1532,11 +1542,11 @@ ts_levels <- function(y,
 
   if(doLevelPlot){
    g <- ggplot2::ggplot(dfs) +
-      geom_line(aes(x=x,y=y))
+      geom_line(aes(x=x, y=y))
    if(!is.na(minChange)){
-     g <- g + geom_step(aes(x=x,y=p_adj), colour = "red3", linewidth=1)
+     g <- g + geom_step(aes(x=x, y=p_adj), colour = "red3", linewidth=1)
    } else {
-     g <- g + geom_step(aes(x=x,y=p), colour = "red3", linewidth=1)
+     g <- g + geom_step(aes(x=x, y=p), colour = "red3", linewidth=1)
    }
     g <- g + theme_bw() + theme(panel.grid.minor = element_blank())
    print(g)

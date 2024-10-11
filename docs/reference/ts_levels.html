@@ -80,7 +80,8 @@
 <span>  removeTrendsLarger <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
 <span>  removeTrendsShorter <span class="op">=</span> <span class="va">minTrendDuration</span>,</span>
 <span>  doLevelPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  doTreePlot <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  doTreePlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -138,6 +139,10 @@
 
 <dt id="arg-dotreeplot">doTreePlot<a class="anchor" aria-label="anchor" href="#arg-dotreeplot"></a></dt>
 <dd><p>Should a plot of the decision tree be produced. If <code>returnTrends = TRUE</code> there will be 2 trees. This requires package <a href="https://cran.r-project.org/web/packages/partykit/index.html" class="external-link">partykit</a> (default = <code>FALSE</code>)</p></dd>
+
+
+<dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
+<dd><p>silent(-ish) mode</p></dd>
 
 
 <dt id="arg-removetrendshorter">removeTrendShorter<a class="anchor" aria-label="anchor" href="#arg-removetrendshorter"></a></dt>

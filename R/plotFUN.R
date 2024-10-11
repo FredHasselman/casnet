@@ -454,7 +454,8 @@ plotNET_BA <- function(n=100, pwr=1, out.dist=NULL, doPlot = TRUE){
 #'
 plotNET_groupColour <- function(g, groups = NULL, colourV=TRUE, alphaV=1, colourE=FALSE, alphaE=.8, groupColours=NULL, defaultEdgeColour = "grey70", doPlot = TRUE, returnPlot = FALSE){
 
-  if(!is.null(unicolours)){
+
+  if(!is.null(groupColours)){
     unicolours <- na.exclude(unique(groupColours))
   }
 

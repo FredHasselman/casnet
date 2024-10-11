@@ -18,7 +18,8 @@ ts_levels(
   removeTrendsLarger = c(-0.1, 0.1),
   removeTrendsShorter = minTrendDuration,
   doLevelPlot = FALSE,
-  doTreePlot = FALSE
+  doTreePlot = FALSE,
+  silent = FALSE
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ ts_levels(
 \item{doLevelPlot}{Should a plot with the original series and the levels and/or trends be produced? (default = \code{FALSE})}
 
 \item{doTreePlot}{Should a plot of the decision tree be produced. If \code{returnTrends = TRUE} there will be 2 trees. This requires package \href{https://cran.r-project.org/web/packages/partykit/index.html}{partykit} (default = \code{FALSE})}
+
+\item{silent}{silent(-ish) mode}
 
 \item{removeTrendShorter}{Pass \code{NA} to ignore. If there are trends in the data, remove them before estimating stationary levels. Provide a trend duration in terms of data points that can reasonably be considered a period of transient behaviour before a new stationary level is reached. If \code{removeTrendsLarger} is not \code{NA} it takes precedence over \code{removeTrendShorter}. (default = \code{5})}
 }

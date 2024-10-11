@@ -1244,3 +1244,26 @@ est_maxPhases <- function(RN,
 
   return(invisible(maxPhaseOut))
 }
+
+
+
+
+est_DIEM <- function(RM, v_min, v_max, e_var, e_mean){
+
+  if(attr(RM,"method")%in%"Euclidean"){
+    v_min <- min(RM, na.rm = TRUE)
+    v_max <- max(RM, na.rm = TRUE)
+    e_var <- var(as.vector(RM), na.rm = TRUE)
+    e_mean<- mean(as.vector(RM),na.rm = TRUE)
+    RMdiem <- ((v_max-v_min)/e_var)*(RM-e_mean)
+
+    ((v_max-v_min)/e_var)*(e_mean)
+
+   # RMdiem <- Matrix::as.matrix(elascer(Matrix::as.matrix(RMdiem)))
+  } else {
+    warning("Distances are not Euclidean!")
+  }
+   suppressMessages(RMdiem <- rp_copy_attributes(source = RM,  target = RMdiem))
+  return(RMdiem)
+}
+

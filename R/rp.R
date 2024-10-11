@@ -2309,7 +2309,7 @@ rp_checkfix <- function(RM, checkS4 = TRUE, checkAUTO = TRUE, checkSPARSE = FALS
     if(!yesS4){
       RM <- Matrix::Matrix(RM, sparse = TRUE)
     }
-    Mtype <- gsub("CMatrix","TMatrix",class(RM)[1])
+    Mtype <- gsub("dgCMatrix","TsparseMatrix",class(RM)[1])
     eval(parse(text=paste0("RM <- methods::as(RM,'",Mtype,"')")))
   }
 
@@ -2714,13 +2714,13 @@ rp_plot <- function(RM,
     ## RadiusRRbar START ----
     if(plotRadiusRRbar){
       # Create a custom legend
-      distrange  <- round(seq(0,max(RM,na.rm = TRUE),length.out=7),2)
+      distrange  <- round(seq(0, max(RM,na.rm = TRUE),length.out=7),2)
       resol      <- sort(unique(round(as.vector(RM),2)))
       if(length(resol)<7){
         resol <- distrange
       }
       if(length(resol)>100){
-        resol <- round(seq(0,max(RM,na.rm = TRUE),length.out=100),2)
+        resol <- round(seq(0, max(RM,na.rm = TRUE),length.out=100),2)
       }
       resol <- resol %>% tibble::as_tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
 
@@ -2871,10 +2871,10 @@ rp_plot <- function(RM,
   ydims <- ""
 
   if(!is.null(attr(RM,"emDims1.name"))|nchar(xlabel)>0){
-    xdims <- ifelse(nchar(xlabel)>0, xlabel, attr(RM,"emDims1.name"))
+    xdims <- ifelse(nchar(xlabel)>0, xlabel, paste(attr(RM,"emDims1.name"), collapse = " "))
   }
   if(!is.null(attr(RM,"emDims2.name"))|nchar(ylabel)>0){
-    ydims <- ifelse(nchar(ylabel)>0, ylabel, attr(RM,"emDims2.name"))
+    ydims <- ifelse(nchar(ylabel)>0, ylabel, paste(attr(RM,"emDims2.name"), collapse = " "))
     if(AUTO){
       ydims <- xdims
     }

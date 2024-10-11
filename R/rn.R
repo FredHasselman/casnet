@@ -1020,6 +1020,8 @@ rn_phases <- function(RN,
         markEpochsBy <- out$phase_name
         epochColours <- getColours(Ncols = length(unique(markEpochsBy)))
         names(epochColours) <- markEpochsBy
+      } else {
+        markEpochsBy <- NULL
       }
 
       gg <- casnet::make_spiral_graph(g = gRN,
