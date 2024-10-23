@@ -1403,15 +1403,20 @@ ts_detrend <- function(y, polyOrder=1, adaptive = FALSE){
 #' @param minDataSplit An integer indicating how many datapoints should be in a segment before it will be analysed for presence of a level or trend change (default = `12`)
 #' @param minLevelDuration Minimum duration (number of datapoint) of a level (default = `round(minDataSplit/3)`)
 #' @param changeSensitivity A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if `method = "anova"`, the overall `R^2` after a level is introduced must increase by the value of `changeSensitivity`, see the `cp` parameter in [rpart::rpart.control()]. (default = `0.01`)
-#' @param maxLevels Maximum number of levels in one series (default = floor(max(NROW(y), na.rm = TRUE)/minLevelDuration))
+#' @param maxLevels Approximately the maximum number of levels tht will be detectd. The value indicates the node-depth of the final tree with the root node being depth 0, see [rpart::rpart.control()] argument `maxdepth` (default = 30)
+#' @param crossValidations The number of cross-validations (default = `10`)
 #' @param method The partitioning method to use, see the manual pages of [rpart] for details.
-#' @param minChange After the call to [rpart], adjust detected level changes to a minimum absolute change in `y`. If a level change is smaller than `minChange`, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in `p_adj`. Set to `NA` to skip, which means `p_adj` will be identical to `p` (default  = `sd(y, na.rm = TRUE)`)
-#' @param returnTrends Should stationary trends also be estimated and returned? Arguments `method` and `changeSensitivity` will be the same as for level detection and argument `minChange` will be ignored. (default = `FALSE`)
-#' @param minTrendDuration Required if `returnTrends = TRUE`, the minimum duration for a trend. (default = `max(minLevelDuration, 2)`)
-#' @param maxTrends Maximum number of trends in one series. (default = `maxLevels`)
-#' @param removeTrendsLarger Pass `NA` to ignore. If there are trends in the data, remove them before estimating stationary levels to improve accuracy. Provide a 2 element vector representing a range of slope values that can reasonably be considered a weakly stationary level. If `removeTrendsLarger` is not `NA` it takes precedence over `removeTrendShorter`. (default = `c(-0.1, 0.1)`)
-#' @param removeTrendShorter Pass `NA` to ignore. If there are trends in the data, remove them before estimating stationary levels. Provide a trend duration in terms of data points that can reasonably be considered a period of transient behaviour before a new stationary level is reached. If `removeTrendsLarger` is not `NA` it takes precedence over `removeTrendShorter`. (default = `5`)
-#' @param doLevelPlot Should a plot with the original series and the levels and/or trends be produced? (default = `FALSE`)
+#' @param minChange After the call to [rpart], adjust detected level changes to a minimum absolute change in `y`, e.g. `sd(y)` or in case of a discrete scale, a minimal scale change that represents significant level change relative to the interpretation of the scale. If a level change is smaller than `minChange`, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in `p_adj`. Set to `NA` to skip, which means `p_adj` will be identical to `p` (default  = `NA`)
+#' @param returnTrends Should stationary trends also be estimated and returned? Unless otherwise specified, the arguments will be the same as for the level detection and argument `minChange` will be ignored for trends. This command will just run `ts_levels(diff(y))` and add the slope segments and values to the level plot. See `examples` on how to create a custom plot (default = `FALSE`)
+#' @param Trend_minDataSplit see `minDataSplit`
+#' @param Trend_minLevelDuration see `minLevelDuration`
+#' @param Trend_changeSensitivity see `changeSensitivity`
+#' @param Trend_maxLevels see `maxLevels`
+#' @param Trend_method see `method`
+#' @param Trend_crossValidations see `crossValidations`
+#' @param Trend_minChange see `minChange`
+#' @param returnTree should the tree object from [rpart] be returned in the output? (default = `FALSE`)
+#' @param doLevelPlot Should a plot with the original series and the levels and/or trends be produced? If `returnTrends = TRUE` sloped regions will be displayed as segments (default = `FALSE`)
 #' @param doTreePlot Should a plot of the decision tree be produced. If `returnTrends = TRUE` there will be 2 trees. This requires package [partykit](https://cran.r-project.org/web/packages/partykit/index.html) (default = `FALSE`)
 #' @param silent silent(-ish) mode
 #'
@@ -1440,17 +1445,22 @@ ts_detrend <- function(y, polyOrder=1, adaptive = FALSE){
 #'
 #'
 ts_levels <- function(y,
-                      minDataSplit = NROW(y)/4,
+                      minDataSplit = NROW(y)/5,
                       minLevelDuration=round(minDataSplit/3),
                       changeSensitivity = 0.01,
-                      maxLevels= floor(NROW(y)/minLevelDuration),
+                      maxLevels= 30,
                       method=c("anova","poisson","class","exp")[1],
+                      crossValidations  = 10,
                       minChange = NA,
                       returnTrends = FALSE,
-                      minTrendDuration = max(minLevelDuration,2),
-                      maxTrends = maxLevels,
-                      removeTrendsLarger = c(-0.1,0.1),
-                      removeTrendsShorter = minTrendDuration,
+                      Trend_minDataSplit = minDataSplit,
+                      Trend_minLevelDuration= minLevelDuration,
+                      Trend_changeSensitivity = changeSensitivity,
+                      Trend_maxLevels= maxLevels,
+                      Trend_method = method,
+                      Trend_crossValidations  = crossValidations,
+                      Trend_minChange = NA,
+                      returnTree = FALSE,
                       doLevelPlot = FALSE,
                       doTreePlot = FALSE,
                       silent = FALSE){
@@ -1466,65 +1476,92 @@ ts_levels <- function(y,
   x <- seq_along(y)
   dfs  <- data.frame(x=x, y=y)
 
+  leveltree <- rpart::rpart(y ~ x,
+                            method = method,
+                            control = list(
+                              minsplit  = minDataSplit,
+                              minbucket = minLevelDuration,
+                              maxdepth  = maxLevels,
+                              cp = changeSensitivity),
+                            data=dfs)
 
-  if(returnTrends){
-    if(any(!is.na(removeTrendsLarger), !is.na(removeTrendsShorter))){
-      dfs$y_diff <- diff(c(y[1],y))
-      difftree <- rpart::rpart(y_diff ~ x,
-                               method = method,
-                               control = list(
-                                 minsplit  = minDataSplit,
-                                 minbucket = minLevelDuration,
-                                 maxdepth  = maxLevels,
-                                 cp = changeSensitivity),
-                               data=dfs)
-
-      dfs$pdiff     <- stats::predict(difftree, data.frame(x=x))
-
-      # if(all(!is.na(removeTrendsLarger))){
-      #   if(length(removeTrendsLarger)==2){
-      #     dfs$pdiff_adj[dfs$pdiff%()%removeTrendsLarger] <- 0
-      #   }
-      # }
-    }
-  }
-
-  tree <- rpart::rpart(y ~ x,
-                       method = method,
-                       control = list(
-                         minsplit  = minDataSplit,
-                         minbucket = minLevelDuration,
-                         maxdepth  = maxLevels,
-                         cp = changeSensitivity),
-                       data=dfs)
-
-  dfs$p     <- stats::predict(tree, data.frame(x=x))
+  dfs$p     <- stats::predict(leveltree, data.frame(x=x))
   dfs$p_adj <- dfs$p
 
-  if(returnTrends){
-    minChange <- NA
-  }
   minChange <- abs(minChange)
   if(!is.na(minChange%00%NA)){
     if(is.numeric(minChange)){
 
-    if(minChange>=max(abs(diff(dfs$p)), na.rm = TRUE)){
-      warning("The largest level difference is smaller than the value of argument minChange.\nPartitioning results are stored in variable `p`, the adjusted results are stored in variable `p_adj`.")
-    }
+      if(minChange>=max(abs(diff(dfs$p)), na.rm = TRUE)){
+        warning("The largest level difference is smaller than the value of argument minChange.\nPartitioning results are stored in variable `p`, the adjusted results are stored in variable `p_adj`.")
+      }
 
-    if(minChange>0){
-      checkPkg("imputeTS")
-      ind <- which(abs(diff(c(dfs$p[1],dfs$p)))%()%c(0,minChange))
-      for(i in ind){
-        if(all(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)){
-          dfs$p_adj[i:dplyr::last(which(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)+i)] <- NA
-        } else {
-          dfs$p_adj[i:(which(diff(dfs$p_adj[i:length(dfs$p_adj)])!=0)[1]+i-1)] <- NA
+      if(minChange>0){
+        checkPkg("imputeTS")
+        ind <- which(abs(diff(c(dfs$p[1],dfs$p)))%()%c(0,minChange))
+        for(i in ind){
+          if(all(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)){
+            dfs$p_adj[i:dplyr::last(which(diff(dfs$p_adj[i:length(dfs$p_adj)])==0)+i)] <- NA
+          } else {
+            dfs$p_adj[i:(which(diff(dfs$p_adj[i:length(dfs$p_adj)])!=0)[1]+i-1)] <- NA
+          }
+        }
+        dfs$p_adj <- imputeTS::na_locf(dfs$p_adj)
+        if(any(is.na(NAind))){
+          dfs$p_adj[NAind] <- NA
         }
       }
-      dfs$p_adj <- imputeTS::na_locf(dfs$p_adj)
+    } # numeric
+  } else {
+    if(!silent){
+      message("Skipping adjustment by argument minChange...")
+    }
+  }# NA
+
+  tmp <- ts_duration(as.vector(dfs$p_adj))
+  dfs$epoch <- NA
+  for(r in 1:NROW(tmp)){
+    dfs$epoch[tmp$t.start[r]:tmp$t.end[r]] <- r
+  }
+
+  # TRENDS ----
+  if(returnTrends){
+
+    dfs$y_diff <- diff(c(y[1],y))
+    difftree <- rpart::rpart(y_diff ~ x,
+                             method = Trend_method,
+                             control = list(
+                               minsplit  = Trend_minDataSplit,
+                               minbucket = Trend_minLevelDuration,
+                               maxdepth  = Trend_maxLevels,
+                               cp = Trend_changeSensitivity,
+                               xval = Trend_crossValidations),
+                             data=dfs)
+
+    dfs$pdiff     <- stats::predict(difftree, data.frame(x=x))
+    dfs$pdiff_adj <- dfs$pdiff
+
+  Trend_minChange <- abs(Trend_minChange)
+  if(!is.na(Trend_minChange%00%NA)){
+    if(is.numeric(Trend_minChange)){
+
+    if(Trend_minChange>=max(abs(diff(dfs$pdiff)), na.rm = TRUE)){
+      warning("The largest trend difference is smaller than the value of argument Trend_minChange.\nPartitioning results are stored in variable `pdiff`, the adjusted results are stored in variable `pdiff_adj`.")
+    }
+
+    if(Trend_minChange>0){
+      checkPkg("imputeTS")
+      ind <- which(abs(diff(c(dfs$pdiff[1],dfs$pdiff)))%()%c(0,Trend_minChange))
+      for(i in ind){
+        if(all(diff(dfs$pdiff_adj[i:length(dfs$pdiff_adj)])==0)){
+          dfs$pdiff_adj[i:dplyr::last(which(diff(dfs$pdiff_adj[i:length(dfs$pdiff_adj)])==0)+i)] <- NA
+        } else {
+          dfs$pdiff_adj[i:(which(diff(dfs$pdiff_adj[i:length(dfs$pdiff_adj)])!=0)[1]+i-1)] <- NA
+        }
+      }
+      dfs$pdiff_adj <- imputeTS::na_locf(dfs$pdiff_adj)
       if(any(is.na(NAind))){
-        dfs$p_adj[NAind] <- NA
+        dfs$pdiff_adj[NAind] <- NA
       }
     }
     } # numeric
@@ -1534,31 +1571,92 @@ ts_levels <- function(y,
        }
    }# NA
 
-   tmp <- ts_duration(as.vector(dfs$p_adj))
-   dfs$epoch <- NA
-   for(r in 1:NROW(tmp)){
-     dfs$epoch[tmp$t.start[r]:tmp$t.end[r]] <- r
+   tmp_s <- ts_duration(as.vector(dfs$pdiff_adj))
+   dfs$Trend_epoch <- NA
+   for(r in 1:NROW(tmp_s)){
+     dfs$Trend_epoch[tmp_s$t.start[r]:tmp_s$t.end[r]] <- r
    }
 
+
+  } else {
+    difftree <- NA
+  }
+
   if(doLevelPlot){
-   g <- ggplot2::ggplot(dfs) +
-      geom_line(aes(x=x, y=y))
-   if(!is.na(minChange)){
-     g <- g + geom_step(aes(x=x, y=p_adj), colour = "red3", linewidth=1)
-   } else {
-     g <- g + geom_step(aes(x=x, y=p), colour = "red3", linewidth=1)
-   }
-    g <- g + theme_bw() + theme(panel.grid.minor = element_blank())
+
+    if(!returnTrends){
+      lines <- c(1, tmp$t.end[-NROW(tmp)],tmp$t.end[NROW(tmp)])
+    } else {
+      lines <- c(1, tmp_s$t.end[-NROW(tmp_s)],tmp_s$t.end[NROW(tmp_s)])
+    }
+
+    Yunit <- diff(range(dfs$y, na.rm = TRUE))/100*10
+
+    g <- ggplot2::ggplot(dfs) + geom_line(aes(x=x, y=y))
+
+      if(!is.na(minChange)){
+        g <- g + geom_step(aes(x=x, y=p_adj), colour = "red3", linewidth=1)
+      } else {
+        g <- g + geom_step(aes(x=x, y=p), colour = "red3", linewidth=1)
+      }
+
+    if(!returnTrends){
+      g <- g + geom_vline(xintercept = lines, linetype = 2, colour = "red3") +
+        annotate(geom="label",
+                 x = tmp$t.start,
+                 y = tmp$y,
+                 label = round(tmp$y,2),size = 2)
+        # annotate(geom="text",
+        #          x = rowMeans(cbind(tmp$t.start,tmp$t.end))-1,
+        #          y = max(dfs$y, na.rm = TRUE)+Yunit,
+        #          label = round(tmp$y,2), size = 2)
+    } else {
+      g <- g + geom_vline(xintercept = lines, linetype = 2, colour = "red3") +
+        annotate(geom="text",
+                 x = rowMeans(cbind(tmp_s$t.start,tmp_s$t.end))-1,
+                 y = max(dfs$y, na.rm = TRUE)+Yunit,
+                 label = round(tmp_s$y,2), size = 2) +
+        annotate(geom="label",
+                 x = tmp$t.start,
+                 y = tmp$y,
+                 label = round(tmp$y,2),size = 2)
+    }
+
+    g <- g + scale_x_continuous("") +
+      theme_bw() +
+      theme(panel.grid.minor = element_blank())
+
+
+   # g <- ggplot2::ggplot(dfs) +
+   #    geom_line(aes(x=x, y=y))
+   # if(!is.na(minChange)){
+   #   g <- g + geom_step(aes(x=x, y=p_adj), colour = "red3", linewidth=1)
+   # } else {
+   #   g <- g + geom_step(aes(x=x, y=p), colour = "red3", linewidth=1)
+   # }
+   #  g <- g + theme_bw() + theme(panel.grid.minor = element_blank())
    print(g)
+
   }
 
   if(doTreePlot){
     checkPkg("partykit")
-    plot(partykit::as.party(tree))
+    plot(partykit::as.party(leveltree))
+
+    if(returnTrends){
+      plot(partykit::as.party(difftree))
+    }
   }
 
-  return(list(tree  = tree,
-              pred  = dfs))
+  if(returnTrends){
+  return(list(pred  = dfs,
+              tree  = list(levels = leveltree, trends = difftree)
+              )[c(TRUE, returnTree)])
+  } else {
+    return(list(pred  = dfs,
+                tree  = leveltree)[c(TRUE, returnTree)])
+
+    }
 }
 
 

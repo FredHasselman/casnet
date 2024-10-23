@@ -6,17 +6,22 @@
 \usage{
 ts_levels(
   y,
-  minDataSplit = NROW(y)/4,
+  minDataSplit = NROW(y)/5,
   minLevelDuration = round(minDataSplit/3),
   changeSensitivity = 0.01,
-  maxLevels = floor(NROW(y)/minLevelDuration),
+  maxLevels = 30,
   method = c("anova", "poisson", "class", "exp")[1],
+  crossValidations = 10,
   minChange = NA,
   returnTrends = FALSE,
-  minTrendDuration = max(minLevelDuration, 2),
-  maxTrends = maxLevels,
-  removeTrendsLarger = c(-0.1, 0.1),
-  removeTrendsShorter = minTrendDuration,
+  Trend_minDataSplit = minDataSplit,
+  Trend_minLevelDuration = minLevelDuration,
+  Trend_changeSensitivity = changeSensitivity,
+  Trend_maxLevels = maxLevels,
+  Trend_method = method,
+  Trend_crossValidations = crossValidations,
+  Trend_minChange = NA,
+  returnTree = FALSE,
   doLevelPlot = FALSE,
   doTreePlot = FALSE,
   silent = FALSE
@@ -31,27 +36,37 @@ ts_levels(
 
 \item{changeSensitivity}{A number indicating a criterion of change that must occur before declaring a new level. Higher numbers indicate higher levels of change must occur before a new level is considered. For example, if \code{method = "anova"}, the overall \code{R^2} after a level is introduced must increase by the value of \code{changeSensitivity}, see the \code{cp} parameter in \code{\link[rpart:rpart.control]{rpart::rpart.control()}}. (default = \code{0.01})}
 
-\item{maxLevels}{Maximum number of levels in one series (default = floor(max(NROW(y), na.rm = TRUE)/minLevelDuration))}
+\item{maxLevels}{Approximately the maximum number of levels tht will be detectd. The value indicates the node-depth of the final tree with the root node being depth 0, see \code{\link[rpart:rpart.control]{rpart::rpart.control()}} argument \code{maxdepth} (default = 30)}
 
 \item{method}{The partitioning method to use, see the manual pages of \link{rpart} for details.}
 
-\item{minChange}{After the call to \link{rpart}, adjust detected level changes to a minimum absolute change in \code{y}. If a level change is smaller than \code{minChange}, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{sd(y, na.rm = TRUE)})}
+\item{crossValidations}{The number of cross-validations (default = \code{10})}
 
-\item{returnTrends}{Should stationary trends also be estimated and returned? Arguments \code{method} and \code{changeSensitivity} will be the same as for level detection and argument \code{minChange} will be ignored. (default = \code{FALSE})}
+\item{minChange}{After the call to \link{rpart}, adjust detected level changes to a minimum absolute change in \code{y}, e.g. \code{sd(y)} or in case of a discrete scale, a minimal scale change that represents significant level change relative to the interpretation of the scale. If a level change is smaller than \code{minChange}, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{NA})}
 
-\item{minTrendDuration}{Required if \code{returnTrends = TRUE}, the minimum duration for a trend. (default = \code{max(minLevelDuration, 2)})}
+\item{returnTrends}{Should stationary trends also be estimated and returned? Unless otherwise specified, the arguments will be the same as for the level detection and argument \code{minChange} will be ignored for trends. This command will just run \code{ts_levels(diff(y))} and add the slope segments and values to the level plot. See \code{examples} on how to create a custom plot (default = \code{FALSE})}
 
-\item{maxTrends}{Maximum number of trends in one series. (default = \code{maxLevels})}
+\item{Trend_minDataSplit}{see \code{minDataSplit}}
 
-\item{removeTrendsLarger}{Pass \code{NA} to ignore. If there are trends in the data, remove them before estimating stationary levels to improve accuracy. Provide a 2 element vector representing a range of slope values that can reasonably be considered a weakly stationary level. If \code{removeTrendsLarger} is not \code{NA} it takes precedence over \code{removeTrendShorter}. (default = \code{c(-0.1, 0.1)})}
+\item{Trend_minLevelDuration}{see \code{minLevelDuration}}
 
-\item{doLevelPlot}{Should a plot with the original series and the levels and/or trends be produced? (default = \code{FALSE})}
+\item{Trend_changeSensitivity}{see \code{changeSensitivity}}
+
+\item{Trend_maxLevels}{see \code{maxLevels}}
+
+\item{Trend_method}{see \code{method}}
+
+\item{Trend_crossValidations}{see \code{crossValidations}}
+
+\item{Trend_minChange}{see \code{minChange}}
+
+\item{returnTree}{should the tree object from \link{rpart} be returned in the output? (default = \code{FALSE})}
+
+\item{doLevelPlot}{Should a plot with the original series and the levels and/or trends be produced? If \code{returnTrends = TRUE} sloped regions will be displayed as segments (default = \code{FALSE})}
 
 \item{doTreePlot}{Should a plot of the decision tree be produced. If \code{returnTrends = TRUE} there will be 2 trees. This requires package \href{https://cran.r-project.org/web/packages/partykit/index.html}{partykit} (default = \code{FALSE})}
 
 \item{silent}{silent(-ish) mode}
-
-\item{removeTrendShorter}{Pass \code{NA} to ignore. If there are trends in the data, remove them before estimating stationary levels. Provide a trend duration in terms of data points that can reasonably be considered a period of transient behaviour before a new stationary level is reached. If \code{removeTrendsLarger} is not \code{NA} it takes precedence over \code{removeTrendShorter}. (default = \code{5})}
 }
 \value{
 A list object with fields \code{tree} and \code{pred}. The latter is a data frame with columns \code{x} (time), \code{y} (the variable of interest) and \code{p} the predicted levels in \code{y} and \code{p_adj}, the levels in \code{p} but adjusted for the value passed to \code{minChange}.

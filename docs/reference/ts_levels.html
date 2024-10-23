@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.5</span>
       </span>
     </div>
 
@@ -68,17 +68,22 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ts_levels</span><span class="op">(</span></span>
 <span>  <span class="va">y</span>,</span>
-<span>  minDataSplit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">4</span>,</span>
+<span>  minDataSplit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">5</span>,</span>
 <span>  minLevelDuration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">minDataSplit</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span>,</span>
 <span>  changeSensitivity <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  maxLevels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="va">minLevelDuration</span><span class="op">)</span>,</span>
+<span>  maxLevels <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"anova"</span>, <span class="st">"poisson"</span>, <span class="st">"class"</span>, <span class="st">"exp"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  crossValidations <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  minChange <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  returnTrends <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  minTrendDuration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">minLevelDuration</span>, <span class="fl">2</span><span class="op">)</span>,</span>
-<span>  maxTrends <span class="op">=</span> <span class="va">maxLevels</span>,</span>
-<span>  removeTrendsLarger <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
-<span>  removeTrendsShorter <span class="op">=</span> <span class="va">minTrendDuration</span>,</span>
+<span>  Trend_minDataSplit <span class="op">=</span> <span class="va">minDataSplit</span>,</span>
+<span>  Trend_minLevelDuration <span class="op">=</span> <span class="va">minLevelDuration</span>,</span>
+<span>  Trend_changeSensitivity <span class="op">=</span> <span class="va">changeSensitivity</span>,</span>
+<span>  Trend_maxLevels <span class="op">=</span> <span class="va">maxLevels</span>,</span>
+<span>  Trend_method <span class="op">=</span> <span class="va">method</span>,</span>
+<span>  Trend_crossValidations <span class="op">=</span> <span class="va">crossValidations</span>,</span>
+<span>  Trend_minChange <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  returnTree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doLevelPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doTreePlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -106,35 +111,59 @@
 
 
 <dt id="arg-maxlevels">maxLevels<a class="anchor" aria-label="anchor" href="#arg-maxlevels"></a></dt>
-<dd><p>Maximum number of levels in one series (default = floor(max(NROW(y), na.rm = TRUE)/minLevelDuration))</p></dd>
+<dd><p>Approximately the maximum number of levels tht will be detectd. The value indicates the node-depth of the final tree with the root node being depth 0, see <code><a href="https://rdrr.io/pkg/rpart/man/rpart.control.html" class="external-link">rpart::rpart.control()</a></code> argument <code>maxdepth</code> (default = 30)</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>The partitioning method to use, see the manual pages of rpart for details.</p></dd>
 
 
+<dt id="arg-crossvalidations">crossValidations<a class="anchor" aria-label="anchor" href="#arg-crossvalidations"></a></dt>
+<dd><p>The number of cross-validations (default = <code>10</code>)</p></dd>
+
+
 <dt id="arg-minchange">minChange<a class="anchor" aria-label="anchor" href="#arg-minchange"></a></dt>
-<dd><p>After the call to rpart, adjust detected level changes to a minimum absolute change in <code>y</code>. If a level change is smaller than <code>minChange</code>, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in <code>p_adj</code>. Set to <code>NA</code> to skip, which means <code>p_adj</code> will be identical to <code>p</code> (default  = <code>sd(y, na.rm = TRUE)</code>)</p></dd>
+<dd><p>After the call to rpart, adjust detected level changes to a minimum absolute change in <code>y</code>, e.g. <code>sd(y)</code> or in case of a discrete scale, a minimal scale change that represents significant level change relative to the interpretation of the scale. If a level change is smaller than <code>minChange</code>, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in <code>p_adj</code>. Set to <code>NA</code> to skip, which means <code>p_adj</code> will be identical to <code>p</code> (default  = <code>NA</code>)</p></dd>
 
 
 <dt id="arg-returntrends">returnTrends<a class="anchor" aria-label="anchor" href="#arg-returntrends"></a></dt>
-<dd><p>Should stationary trends also be estimated and returned? Arguments <code>method</code> and <code>changeSensitivity</code> will be the same as for level detection and argument <code>minChange</code> will be ignored. (default = <code>FALSE</code>)</p></dd>
+<dd><p>Should stationary trends also be estimated and returned? Unless otherwise specified, the arguments will be the same as for the level detection and argument <code>minChange</code> will be ignored for trends. This command will just run <code>ts_levels(diff(y))</code> and add the slope segments and values to the level plot. See <code>examples</code> on how to create a custom plot (default = <code>FALSE</code>)</p></dd>
 
 
-<dt id="arg-mintrendduration">minTrendDuration<a class="anchor" aria-label="anchor" href="#arg-mintrendduration"></a></dt>
-<dd><p>Required if <code>returnTrends = TRUE</code>, the minimum duration for a trend. (default = <code>max(minLevelDuration, 2)</code>)</p></dd>
+<dt id="arg-trend-mindatasplit">Trend_minDataSplit<a class="anchor" aria-label="anchor" href="#arg-trend-mindatasplit"></a></dt>
+<dd><p>see <code>minDataSplit</code></p></dd>
 
 
-<dt id="arg-maxtrends">maxTrends<a class="anchor" aria-label="anchor" href="#arg-maxtrends"></a></dt>
-<dd><p>Maximum number of trends in one series. (default = <code>maxLevels</code>)</p></dd>
+<dt id="arg-trend-minlevelduration">Trend_minLevelDuration<a class="anchor" aria-label="anchor" href="#arg-trend-minlevelduration"></a></dt>
+<dd><p>see <code>minLevelDuration</code></p></dd>
 
 
-<dt id="arg-removetrendslarger">removeTrendsLarger<a class="anchor" aria-label="anchor" href="#arg-removetrendslarger"></a></dt>
-<dd><p>Pass <code>NA</code> to ignore. If there are trends in the data, remove them before estimating stationary levels to improve accuracy. Provide a 2 element vector representing a range of slope values that can reasonably be considered a weakly stationary level. If <code>removeTrendsLarger</code> is not <code>NA</code> it takes precedence over <code>removeTrendShorter</code>. (default = <code>c(-0.1, 0.1)</code>)</p></dd>
+<dt id="arg-trend-changesensitivity">Trend_changeSensitivity<a class="anchor" aria-label="anchor" href="#arg-trend-changesensitivity"></a></dt>
+<dd><p>see <code>changeSensitivity</code></p></dd>
+
+
+<dt id="arg-trend-maxlevels">Trend_maxLevels<a class="anchor" aria-label="anchor" href="#arg-trend-maxlevels"></a></dt>
+<dd><p>see <code>maxLevels</code></p></dd>
+
+
+<dt id="arg-trend-method">Trend_method<a class="anchor" aria-label="anchor" href="#arg-trend-method"></a></dt>
+<dd><p>see <code>method</code></p></dd>
+
+
+<dt id="arg-trend-crossvalidations">Trend_crossValidations<a class="anchor" aria-label="anchor" href="#arg-trend-crossvalidations"></a></dt>
+<dd><p>see <code>crossValidations</code></p></dd>
+
+
+<dt id="arg-trend-minchange">Trend_minChange<a class="anchor" aria-label="anchor" href="#arg-trend-minchange"></a></dt>
+<dd><p>see <code>minChange</code></p></dd>
+
+
+<dt id="arg-returntree">returnTree<a class="anchor" aria-label="anchor" href="#arg-returntree"></a></dt>
+<dd><p>should the tree object from rpart be returned in the output? (default = <code>FALSE</code>)</p></dd>
 
 
 <dt id="arg-dolevelplot">doLevelPlot<a class="anchor" aria-label="anchor" href="#arg-dolevelplot"></a></dt>
-<dd><p>Should a plot with the original series and the levels and/or trends be produced? (default = <code>FALSE</code>)</p></dd>
+<dd><p>Should a plot with the original series and the levels and/or trends be produced? If <code>returnTrends = TRUE</code> sloped regions will be displayed as segments (default = <code>FALSE</code>)</p></dd>
 
 
 <dt id="arg-dotreeplot">doTreePlot<a class="anchor" aria-label="anchor" href="#arg-dotreeplot"></a></dt>
@@ -143,10 +172,6 @@
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
 <dd><p>silent(-ish) mode</p></dd>
-
-
-<dt id="arg-removetrendshorter">removeTrendShorter<a class="anchor" aria-label="anchor" href="#arg-removetrendshorter"></a></dt>
-<dd><p>Pass <code>NA</code> to ignore. If there are trends in the data, remove them before estimating stationary levels. Provide a trend duration in terms of data points that can reasonably be considered a period of transient behaviour before a new stationary level is reached. If <code>removeTrendsLarger</code> is not <code>NA</code> it takes precedence over <code>removeTrendShorter</code>. (default = <code>5</code>)</p></dd>
 
 </dl></div>
     <div id="value">
