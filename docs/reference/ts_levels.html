@@ -83,9 +83,10 @@
 <span>  Trend_method <span class="op">=</span> <span class="va">method</span>,</span>
 <span>  Trend_crossValidations <span class="op">=</span> <span class="va">crossValidations</span>,</span>
 <span>  Trend_minChange <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  returnTree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doLevelPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doTreePlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnTree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  silent <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -158,16 +159,20 @@
 <dd><p>see <code>minChange</code></p></dd>
 
 
-<dt id="arg-returntree">returnTree<a class="anchor" aria-label="anchor" href="#arg-returntree"></a></dt>
-<dd><p>should the tree object from rpart be returned in the output? (default = <code>FALSE</code>)</p></dd>
-
-
 <dt id="arg-dolevelplot">doLevelPlot<a class="anchor" aria-label="anchor" href="#arg-dolevelplot"></a></dt>
 <dd><p>Should a plot with the original series and the levels and/or trends be produced? If <code>returnTrends = TRUE</code> sloped regions will be displayed as segments (default = <code>FALSE</code>)</p></dd>
 
 
 <dt id="arg-dotreeplot">doTreePlot<a class="anchor" aria-label="anchor" href="#arg-dotreeplot"></a></dt>
-<dd><p>Should a plot of the decision tree be produced. If <code>returnTrends = TRUE</code> there will be 2 trees. This requires package <a href="https://cran.r-project.org/web/packages/partykit/index.html" class="external-link">partykit</a> (default = <code>FALSE</code>)</p></dd>
+<dd><p>Should a plot of the decision tree be produced. If <code>returnTrends = TRUE</code> there will be 2 trees. This requires package <a href="https://cran.r-project.org/web/packages/partykit/index.html" class="external-link">partykit</a>. Use <a href="https://rdrr.io/r/grid/grid.grab.html" class="external-link">grid::grid.grab</a> to grab the tree plot object as a grob (default = <code>FALSE</code>)</p></dd>
+
+
+<dt id="arg-returntree">returnTree<a class="anchor" aria-label="anchor" href="#arg-returntree"></a></dt>
+<dd><p>should the tree object from rpart be returned in the output? (default = <code>FALSE</code>)</p></dd>
+
+
+<dt id="arg-returnplot">returnPlot<a class="anchor" aria-label="anchor" href="#arg-returnplot"></a></dt>
+<dd><p>if <code>TRUE</code> returns the levelplot as a <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a> object (default = <code>FALSE</code>)</p></dd>
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>

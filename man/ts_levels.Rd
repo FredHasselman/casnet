@@ -21,9 +21,10 @@ ts_levels(
   Trend_method = method,
   Trend_crossValidations = crossValidations,
   Trend_minChange = NA,
-  returnTree = FALSE,
   doLevelPlot = FALSE,
   doTreePlot = FALSE,
+  returnTree = FALSE,
+  returnPlot = FALSE,
   silent = FALSE
 )
 }
@@ -60,11 +61,13 @@ ts_levels(
 
 \item{Trend_minChange}{see \code{minChange}}
 
-\item{returnTree}{should the tree object from \link{rpart} be returned in the output? (default = \code{FALSE})}
-
 \item{doLevelPlot}{Should a plot with the original series and the levels and/or trends be produced? If \code{returnTrends = TRUE} sloped regions will be displayed as segments (default = \code{FALSE})}
 
-\item{doTreePlot}{Should a plot of the decision tree be produced. If \code{returnTrends = TRUE} there will be 2 trees. This requires package \href{https://cran.r-project.org/web/packages/partykit/index.html}{partykit} (default = \code{FALSE})}
+\item{doTreePlot}{Should a plot of the decision tree be produced. If \code{returnTrends = TRUE} there will be 2 trees. This requires package \href{https://cran.r-project.org/web/packages/partykit/index.html}{partykit}. Use \link[grid:grid.grab]{grid::grid.grab} to grab the tree plot object as a grob (default = \code{FALSE})}
+
+\item{returnTree}{should the tree object from \link{rpart} be returned in the output? (default = \code{FALSE})}
+
+\item{returnPlot}{if \code{TRUE} returns the levelplot as a \link{ggplot2} object (default = \code{FALSE})}
 
 \item{silent}{silent(-ish) mode}
 }

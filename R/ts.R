@@ -1415,9 +1415,10 @@ ts_detrend <- function(y, polyOrder=1, adaptive = FALSE){
 #' @param Trend_method see `method`
 #' @param Trend_crossValidations see `crossValidations`
 #' @param Trend_minChange see `minChange`
-#' @param returnTree should the tree object from [rpart] be returned in the output? (default = `FALSE`)
 #' @param doLevelPlot Should a plot with the original series and the levels and/or trends be produced? If `returnTrends = TRUE` sloped regions will be displayed as segments (default = `FALSE`)
-#' @param doTreePlot Should a plot of the decision tree be produced. If `returnTrends = TRUE` there will be 2 trees. This requires package [partykit](https://cran.r-project.org/web/packages/partykit/index.html) (default = `FALSE`)
+#' @param doTreePlot Should a plot of the decision tree be produced. If `returnTrends = TRUE` there will be 2 trees. This requires package [partykit](https://cran.r-project.org/web/packages/partykit/index.html). Use [grid::grid.grab] to grab the tree plot object as a grob (default = `FALSE`)
+#' @param returnTree should the tree object from [rpart] be returned in the output? (default = `FALSE`)
+#' @param returnPlot if `TRUE` returns the levelplot as a [ggplot2] object (default = `FALSE`)
 #' @param silent silent(-ish) mode
 #'
 #' @return A list object with fields `tree` and `pred`. The latter is a data frame with columns `x` (time), `y` (the variable of interest) and `p` the predicted levels in `y` and `p_adj`, the levels in `p` but adjusted for the value passed to `minChange`.
@@ -1460,9 +1461,10 @@ ts_levels <- function(y,
                       Trend_method = method,
                       Trend_crossValidations  = crossValidations,
                       Trend_minChange = NA,
-                      returnTree = FALSE,
                       doLevelPlot = FALSE,
                       doTreePlot = FALSE,
+                      returnTree = FALSE,
+                      returnPlot = FALSE,
                       silent = FALSE){
 
   checkPkg("rpart")
@@ -1648,13 +1650,18 @@ ts_levels <- function(y,
     }
   }
 
+  if(!returnPlot){
+    g <- NA
+  }
+
   if(returnTrends){
   return(list(pred  = dfs,
-              tree  = list(levels = leveltree, trends = difftree)
-              )[c(TRUE, returnTree)])
+              tree  = list(levels = leveltree, trends = difftree),
+              plot  = invisible(g))[c(TRUE, returnTree, returnPlot)])
   } else {
-    return(list(pred  = dfs,
-                tree  = leveltree)[c(TRUE, returnTree)])
+    return(list(pred = dfs,
+                tree = leveltree,
+                plot = invisible(g))[c(TRUE, returnTree, returnPlot)])
 
     }
 }
