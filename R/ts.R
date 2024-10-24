@@ -1589,7 +1589,7 @@ ts_levels <- function(y,
     if(!returnTrends){
       lines <- c(1, tmp$t.end[-NROW(tmp)],tmp$t.end[NROW(tmp)])
     } else {
-      lines <- c(1, tmp_s$t.end[-NROW(tmp_s)],tmp_s$t.end[NROW(tmp_s)])
+      lines <- c(1, (tmp_s$t.end[-NROW(tmp_s)]-1),tmp_s$t.end[NROW(tmp_s)])
     }
 
     Yunit <- diff(range(dfs$y, na.rm = TRUE))/100*10
