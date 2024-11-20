@@ -933,6 +933,7 @@ rp_measures_main <- function(RM,
 #' @param chromatic Force chromatic RQA? (default = `FALSE`)
 #' @param matrices Return matrices? (default = `FALSE`)
 #' @param doPlot Plot (default = `TRUE`)
+#' @param minY The minimum value of the Y-axis. The upper Y limit is determined by `max(minY,max(RR))`. Set to 1 to always show the theoretical maximum (default = `0.5`)
 #' @param returnOnlyPlot Don't plot to graphics device, but do return the plot (default = `FALSE`)
 #'
 #' @return A plot and/or the data for the plot
@@ -960,6 +961,7 @@ rp_diagProfile <- function(RM,
                            chromatic = FALSE,
                            matrices  = FALSE,
                            doPlot    = TRUE,
+                           minY      = .5,
                            returnOnlyPlot = FALSE){
 
 
@@ -984,24 +986,14 @@ rp_diagProfile <- function(RM,
     AUTO <- attr(RM,"AUTO")
   }
 
-
   RM <- setTheiler(RM = RM, theiler = theiler, silent = TRUE)
-
-  # if(is.na(theiler%00%NA)){
-  #   if(!is.null(attributes(RM)$theiler)){
-  #     if(attributes(RM)$theiler>0){
-  #       message(paste0("Value found in attribute 'theiler'... assuming a theiler window of size:",attributes(RM)$theiler,"was already removed."))
-  #     }
-  #   }
-  #   theiler <- 0
-  # } else {
-  #   if(theiler < 0){
-  #     theiler <- 0
-  #   }
-  # }
 
   if(is.numeric(diagWin)){
     if(diagWin>0){
+      if(diagWin>NCOL(RM)){
+        diagWin <- NCOL(RM)
+        message("'diagWin' was larger than the size of 'RM' ... changed to 'NCOL(RM)'")
+      }
       diagWin <- seq(-diagWin,diagWin)
     } else {
       diagWin <- seq(-1*NCOL(RM),NCOL(RM))
@@ -1009,6 +1001,8 @@ rp_diagProfile <- function(RM,
   } else {
     stop("Diagonal window must be 1 positive integer!!")
   }
+
+
 
   if(doShuffle){
     if(any(is.null(y1),is.null(y2))){
@@ -1041,13 +1035,6 @@ rp_diagProfile <- function(RM,
             }
         })
        }
-
-      # else {
-      #   if(shuffleWhich %in% "y1"){
-      #   TSrnd <- tseries::surrogate(x=y2, ns=Nshuffle, fft=FALSE, amplitude = FALSE)
-      #   if(Nshuffle==1){
-      #     TSrnd <- matrix(TSrnd,ncol=1)
-      # }
     }
     emDim <- attr(RM,"emDim")
     emLag <- attr(RM,"emLag")
@@ -1085,7 +1072,10 @@ rp_diagProfile <- function(RM,
 
     #winRR <- sum(B==1, na.rm = TRUE)
     df <- plyr::ldply(diagID, function(i){
-      data.frame(index = i, RR = sum(B[,i]==1, na.rm = TRUE)/ (NROW(B)-abs(as.numeric(colnames(B)[i]))))
+      data.frame(index = i,
+                 RN = sum(B[,i]==1, na.rm = TRUE),
+                 DiagN = (NROW(B)-abs(as.numeric(colnames(B)[i]))),
+                 RR = sum(B[,i]==1, na.rm = TRUE)/(NROW(B)-abs(as.numeric(colnames(B)[i]))))
     }, .id = "Diagonal")
 
     df$group  <- 1
@@ -1102,40 +1092,6 @@ rp_diagProfile <- function(RM,
     names(out) <- "obs"
   }
 
-  # for(r in seq_along(out)){
-  #
-  #   if(r==1){
-  #     RMd <- RM
-  #   } else {
-  #     RMd <- rp(y1 = y1, y2 = TSrnd[,(r-1)],emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
-  #   }
-    #rp_lineDist(RM,d = diagWin, matrices = TRUE)
-    # B <- rp_nzdiags(RMd, removeNZ = FALSE, d = diagWin)
-    # rm(RMd)
-    #
-    # diagID <- 1:NCOL(B)
-    # names(diagID) <- colnames(B)
-    # if(length(diagWin)<NCOL(B)){
-    #   cID <- which(colnames(B)%in%diagWin)
-    #   B <- B[,cID]
-    #   diagID <- seq_along(cID)
-    #   names(diagID) <- colnames(B)
-    # }
-    #
-    # #winRR <- sum(B==1, na.rm = TRUE)
-    # df <- plyr::ldply(diagID, function(i){
-    #   data.frame(index = i, RR = sum(B[,i]==1, na.rm = TRUE)/ (NROW(B)-abs(as.numeric(colnames(B)[i]))))
-    # }, .id = "Diagonal")
-    #
-    # df$group  <- 1
-    # df$labels <- paste(df$Diagonal)
-    # # df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
-    # df$labels <- factor(df$labels,levels = df$labels, ordered = TRUE)
-    #
-    # out[[r]] <- df
-    # #rm(df,B,cID,diagID)
-  #}
-
   dy      <- plyr::ldply(out)
   if(doShuffle){
     df_shuf <- dplyr::filter(dy, .data$.id!="obs")
@@ -1143,17 +1099,21 @@ rp_diagProfile <- function(RM,
     df_shuf <- dy
   }
 
+  if(doShuffle){
   dy_m <- df_shuf %>%
     dplyr::group_by(.data$Diagonal,.data$labels) %>%
-    dplyr::summarise(`Mean Shuffled` = mean(.data$RR), sdRRrnd = stats::sd(.data$RR)) %>%
+    dplyr::summarise(meanRRrnd = mean(.data$RR, na.rm = TRUE),
+                     sdRRrnd   = stats::sd(.data$RR, na.rm = TRUE)) %>%
     dplyr::ungroup()
 
   if(Nshuffle==1){
     dy_m$sdRRrnd <- 0
   }
 
-  dy_m$ciHI <- dy_m$`Mean Shuffled` + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
-  dy_m$ciLO <- dy_m$`Mean Shuffled` - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+  dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+  dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+
+  }
 
   obs <- dy[dy$.id=="obs",]
   if(doShuffle){
@@ -1169,10 +1129,20 @@ rp_diagProfile <- function(RM,
       rm(tmp)
     }
   }
-  dy_m$Observed <- obs$RR
 
-  df <- tidyr::gather(dy_m, key = "variable", value = "RR", -c(.data$Diagonal,.data$sdRRrnd, .data$labels, .data$ciLO, .data$ciHI))
+  if(doShuffle){
+    df <- dplyr::left_join(obs, dy_m, by = c("Diagonal","labels"))
+  } else {
+    df <- obs
+    df$meanRRrnd <- NA
+    df$sdRRrnd <- NA
+    df$ciHI <- 0
+    df$ciLO <- 0
+  }
+
   df$Diagonal <- as.numeric(df$Diagonal)
+
+  #df <- tidyr::pivot_longer(dy_m, cols = , names_to =  "variable", values_to = "RR")
 
   if(doPlot){
 
@@ -1230,16 +1200,17 @@ rp_diagProfile <- function(RM,
       ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey80")
       if(doShuffle){
         maxData <- max(c(maxData,df$ciHI), na.rm = TRUE)
-        g <- g + ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3)
+        g <- g + ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
+          ggplot2::geom_line(aes_(y=~meanRRrnd))
       }
-    g <- g + ggplot2::geom_line(ggplot2::aes_(y=~RR, colour = ~variable), size = .5) +
+    g <- g + ggplot2::geom_line(ggplot2::aes_(y=~RR), size = .5) +
       #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
-      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,max(c(.5,maxData)))) +
+      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,max(c(minY,maxData)))) +
       ggplot2::scale_x_continuous(name = paste0(xname, " << recurrences due to >> ", yname),
                                   breaks = breaks, labels = labels, expand = c(0,0)) +
       # ggplot2::geom_label(x=x1,y=.8,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE, size = 3) +
       # ggplot2::geom_label(x=x2,y=.8,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE, size = 3) +
-      ggplot2::scale_colour_manual(leg, values = col) +
+      #ggplot2::scale_colour_manual(leg, values = col) +
       ggplot2::theme_bw() +
       theme(panel.grid.minor = element_blank(),
             axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5, size = rel(.6)),
@@ -1248,15 +1219,16 @@ rp_diagProfile <- function(RM,
     if(!returnOnlyPlot){
       print(g)
     }
-    if(doShuffle){
-      df <- tidyr::spread(df,key = .data$variable, value = .data$RR)
-    }
+    # if(doShuffle){
+    #   df <- tidyr::spread(df,key = .data$variable, value = .data$RR)
+    # }
 
     return(invisible(list(plot = g, data = df)))
 
   } else {
 
-    if(doShuffle){df <- tidyr::spread(df,key = .data$variable, value = .data$RR)}
+    #if(doShuffle){df <- tidyr::spread(df,key = .data$variable, value = .data$RR)}
+
     return(df)
 
   }

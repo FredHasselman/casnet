@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">casnet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.6</span>
       </span>
     </div>
 
@@ -88,6 +88,7 @@
 <span>  chromatic <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  matrices <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  minY <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  returnOnlyPlot <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -183,6 +184,10 @@ If <code>theiler</code> is a numeric vector of <code>length(theiler) == 2</code>
 
 <dt id="arg-doplot">doPlot<a class="anchor" aria-label="anchor" href="#arg-doplot"></a></dt>
 <dd><p>Plot (default = <code>TRUE</code>)</p></dd>
+
+
+<dt id="arg-miny">minY<a class="anchor" aria-label="anchor" href="#arg-miny"></a></dt>
+<dd><p>The minimum value of the Y-axis. The upper Y limit is determined by <code>max(minY,max(RR))</code>. Set to 1 to always show the theoretical maximum (default = <code>0.5</code>)</p></dd>
 
 
 <dt id="arg-returnonlyplot">returnOnlyPlot<a class="anchor" aria-label="anchor" href="#arg-returnonlyplot"></a></dt>

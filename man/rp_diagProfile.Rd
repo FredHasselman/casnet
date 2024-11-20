@@ -27,6 +27,7 @@ rp_diagProfile(
   chromatic = FALSE,
   matrices = FALSE,
   doPlot = TRUE,
+  minY = 0.5,
   returnOnlyPlot = FALSE
 )
 }
@@ -79,6 +80,8 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 \item{matrices}{Return matrices? (default = \code{FALSE})}
 
 \item{doPlot}{Plot (default = \code{TRUE})}
+
+\item{minY}{The minimum value of the Y-axis. The upper Y limit is determined by \code{max(minY,max(RR))}. Set to 1 to always show the theoretical maximum (default = \code{0.5})}
 
 \item{returnOnlyPlot}{Don't plot to graphics device, but do return the plot (default = \code{FALSE})}
 }
