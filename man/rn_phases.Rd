@@ -6,8 +6,8 @@
 \usage{
 rn_phases(
   RN,
-  maxPhases = 5,
-  minStatesinPhase = 1,
+  maxPhases = NA,
+  minStatesinPhase = 2,
   maxStatesinPhase = NROW(RN),
   useDegree = FALSE,
   inverseWeight = TRUE,
@@ -18,7 +18,7 @@ rn_phases(
   returnGraph = FALSE,
   doPhaseProfilePlot = FALSE,
   plotCentroid = FALSE,
-  space_dims = NULL,
+  dimNames = NULL,
   colOrder = FALSE,
   phaseColours = NULL,
   doSpiralPlot = FALSE,
@@ -34,7 +34,7 @@ rn_phases(
 \arguments{
 \item{RN}{A matrix produced by the function \link{rn}}
 
-\item{maxPhases}{The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent point will be labelled with "Other". If \code{NA}, the value will be set to \code{NROW(RN)}, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = \code{5})}
+\item{maxPhases}{The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent points will be labelled with "Other". If \code{NA}, the value will be set to \code{NROW(RN)}, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = \code{10})}
 
 \item{minStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases do not have a minimum number of \code{minStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{1})}
 
@@ -58,7 +58,7 @@ rn_phases(
 
 \item{plotCentroid}{Plot the centroid requested in \code{returnCentroid}? (default = \code{FALSE})}
 
-\item{space_dims}{A vector of titles to use for the dimensions. If \code{NULL} the values will be read from the attribute of \code{RN}.}
+\item{dimNames}{A vector of titles to use for the dimensions. If \code{NULL} the values will be read from the attribute of \code{RN}.}
 
 \item{colOrder}{Should the order of the dimensions reflect the order of the columns in the dataset? If \code{FALSE} the order will be based on the values of the dimensions observed in the first extracted phase (default = \code{FALSE})}
 
@@ -111,7 +111,7 @@ data("manyAnalystsESM")
 df <- manyAnalystsESM[4:10]
 RN <- rn(y1 = df, doEmbed = FALSE, weighted = TRUE, weightedBy = "si", emRad = NA)
 
-# This returns 6 phases which have minimally 1 state
+# This returns 6 phases which have minimally 2 states
 rn_phases(RN, maxPhases = 10, doPhaseProfilePlot = TRUE)
 
 # Use min. number of states as the extraction criterion

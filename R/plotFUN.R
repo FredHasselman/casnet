@@ -1947,6 +1947,7 @@ plotRN_phaseProfile <- function(phaseOutput,
     cleanUp <- outArg$cleanUp
     removeSingularities <- outArg$removeSingularities
     standardise <- outArg$standardise
+    dimNames <- outArg$dimNames
 
   } else {
     stop("The output is not from function 'casnet::rn_phases()'!")
@@ -2010,8 +2011,8 @@ plotRN_phaseProfile <- function(phaseOutput,
     dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
     dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
     dplyr::select(!(dplyr::contains(excludeVars))) %>%
-    dplyr::select(phaseName, phase_name, states_time, alpha, psize, dplyr::starts_with("dim_")) %>%
-    tidyr::pivot_longer(cols = dplyr::starts_with("dim_"), names_to = "Dimension", values_to = "Value")
+    dplyr::select(phaseName, phase_name, states_time, alpha, psize, dplyr::starts_with(dimNames)) %>%
+    tidyr::pivot_longer(cols = dplyr::starts_with(dimNames), names_to = "Dimension", values_to = "Value")
 
 
   if((returnCentroid)%in%c("mean.sd","median.mad","centroid")){

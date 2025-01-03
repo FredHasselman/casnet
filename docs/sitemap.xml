@@ -92,6 +92,11 @@
 <url><loc>/reference/inf_MSE.html</loc></url>
 <url><loc>/reference/inf_SampEn.html</loc></url>
 <url><loc>/reference/insiders.html</loc></url>
+<url><loc>/reference/irn_crossClustering.html</loc></url>
+<url><loc>/reference/irn_crossDegree.html</loc></url>
+<url><loc>/reference/irn_crossTriples.html</loc></url>
+<url><loc>/reference/irn_cross_clustering.html</loc></url>
+<url><loc>/reference/irn_plot.html</loc></url>
 <url><loc>/reference/is.date.html</loc></url>
 <url><loc>/reference/is.wholenumber.html</loc></url>
 <url><loc>/reference/layout_as_spiral.html</loc></url>
@@ -108,6 +113,7 @@
 <url><loc>/reference/mat_hamming.html</loc></url>
 <url><loc>/reference/mat_ind.html</loc></url>
 <url><loc>/reference/mat_mat2ind.html</loc></url>
+<url><loc>/reference/mat_nodeDegree.html</loc></url>
 <url><loc>/reference/mat_we2bi.html</loc></url>
 <url><loc>/reference/mi_interlayer.html</loc></url>
 <url><loc>/reference/mi_mat.html</loc></url>

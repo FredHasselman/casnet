@@ -711,3 +711,39 @@ mat_coursegrain <- function(RM,
 }
 
 
+#' Matrix node degree
+#'
+#' @param adjMAT Adjacency matrix
+#' @param mode Type of degree
+#'
+#' @return Vector of node degrees
+#'
+#' @export
+#'
+mat_nodeDegree <- function(adjMAT, mode = c("undirected","in","out")[1]){
+  degi <- list()
+  if(mode %in% "undirected"){
+    for(i in 1:NROW(adjMAT)){
+      degi[[i]] <- sum(diag(nrow=NROW(adjMAT))[,i] %*% adjMAT %*% rep(1,NROW(adjMAT)))
+    }
+    degree <- unlist(degi) *2
+  }
+
+  if(mode %in% "in"){
+    for(i in 1:NROW(adjMAT)){
+      degi[[i]] <- sum(t(diag(nrow=NROW(adjMAT)))[,i] %*% adjMAT %*% rep(1,NROW(adjMAT)))
+    }
+    degree <- unlist(degi)
+  }
+
+  if(mode %in% "out"){
+    for(i in 1:NROW(adjMAT)){
+      degi[[i]] <- sum(t(rep(1,NROW(adjMAT))) %*% adjMAT %*% diag(nrow=NROW(adjMAT))[,i])
+    }
+    degree <- unlist(degi)
+  }
+
+  return(degree)
+}
+
+

@@ -582,7 +582,7 @@ rn_recSpec <- function(RN,
 #' @inheritParams make_spiral_graph
 #' @inheritParams fd_dfa
 #' @param RN A matrix produced by the function [rn]
-#' @param maxPhases The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent point will be labelled with "Other". If `NA`, the value will be set to `NROW(RN)`, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = `5`)
+#' @param maxPhases The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent points will be labelled with "Other". If `NA`, the value will be set to `NROW(RN)`, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = `10`)
 #' @param minStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases do not have a minimum number of `minStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `1`)
 #' @param maxStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases exceeds a maximum number of `maxStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `NROW(RN)`)
 #' @param useDegree By default, node strength will be used to determine the phases. Set to `TRUE` to use the node degree (default = `FALSE`)
@@ -592,7 +592,7 @@ rn_recSpec <- function(RN,
 #' @param returnCentroid Values can be `"no"`, `"mean.sd"`, `"median.mad"`, `"centroid"`. Any other value than `"no"` will return a data frame with the central tendency and deviation measures for each phase (default = `"no"`)
 #' @param doPhaseProfilePlot Produce a profile plot of the extracted phases (default = `TRUE`)
 #' @param plotCentroid Plot the centroid requested in `returnCentroid`? (default = `FALSE`)
-#' @param space_dims A vector of titles to use for the dimensions. If `NULL` the values will be read from the attribute of `RN`.
+#' @param dimNames A vector of titles to use for the dimensions. If `NULL` the values will be read from the attribute of `RN`.
 #' @param colOrder Should the order of the dimensions reflect the order of the columns in the dataset? If `FALSE` the order will be based on the values of the dimensions observed in the first extracted phase (default = `FALSE`)
 #' @param phaseColours Colours for the different phases in the phase plot. If `epochColours` also has a value, `phaseColours` will be used instead (default = `NULL`)
 #' @param doSpiralPlot Produce a plot of the recurrence network with the nodes coloured by phases (default = `FALSE`)
@@ -614,15 +614,15 @@ rn_recSpec <- function(RN,
 #' df <- manyAnalystsESM[4:10]
 #' RN <- rn(y1 = df, doEmbed = FALSE, weighted = TRUE, weightedBy = "si", emRad = NA)
 #'
-#' # This returns 6 phases which have minimally 1 state
+#' # This returns 6 phases which have minimally 2 states
 #' rn_phases(RN, maxPhases = 10, doPhaseProfilePlot = TRUE)
 #'
 #' # Use min. number of states as the extraction criterion
 #' rn_phases(RN, maxPhases = NA, minStatesinPhase = 7, doPhaseProfilePlot = TRUE)
 #'
 rn_phases <- function(RN,
-                      maxPhases = 5,
-                      minStatesinPhase = 1,
+                      maxPhases = NA,
+                      minStatesinPhase = 2,
                       maxStatesinPhase = NROW(RN),
                       useDegree = FALSE,
                       inverseWeight = TRUE,
@@ -633,7 +633,7 @@ rn_phases <- function(RN,
                       returnGraph = FALSE,
                       doPhaseProfilePlot = FALSE,
                       plotCentroid = FALSE,
-                      space_dims = NULL,
+                      dimNames = NULL,
                       colOrder = FALSE,
                       phaseColours = NULL,
                       doSpiralPlot = FALSE,
@@ -648,17 +648,30 @@ rn_phases <- function(RN,
   checkPkg("igraph")
   checkPkg("invctr")
 
+  # Handle arguments ----
   if(!attributes(RN)$weighted%00%FALSE){
-    stop("RN has to be a weighted recurrence network.")
+    message("RN is not weighted, node degree will be used to identify prototypical states.")
+    useDegree <- TRUE
   }
 
-  if(!attributes(RN)$weightedBy%in%c("si","rt","rf")){
-    stop("RN has to be a distance weighted recurrence network.")
+  # if(!attributes(RN)$weightedBy%in%c("si","rt","rf")){
+  #   stop("RN has to be a distance weighted recurrence network.")
+  # }
+
+  if(is.null(attributes(RN)$emDims1)){
+   warning("No multivariate time series data found. Cannot produce phase profile plots.")
+    doPhaseProfilePlot <- FALSE
   }
 
   # if(!attributes(RN)$cumulative%00%FALSE){
   #   stop("RN has to be a cumulative recurrence network.")
   # }
+
+  if(is.na(maxPhases)%00%NA){
+    maxPhases <- NROW(RN)
+  } else {
+    cat(paste0("\nmaxPhases = ", maxPhases,". Any unassigned recurring states will be labelled as phase 'Other'\n"))
+  }
 
   weighted <- attributes(RN)$weighted
   directed <- attributes(RN)$directed%00%FALSE
@@ -668,41 +681,48 @@ rn_phases <- function(RN,
    directed <- "directed"
  }
 
-  # Creat graph
+
+  # Create graph ----
   gRN <- igraph::graph_from_adjacency_matrix(RN,
                                              weighted = weighted,
-                                             mode = directed)
+                                             mode = ifelse(directed,"directed","undirected"))
 
   if(inverseWeight){
     igraph::E(gRN)$weight <- (1/igraph::E(gRN)$weight)%00%0
     }
 
+
   if(is.null(igraph::V(gRN)$size)){
-    igraph::V(gRN)$size <- igraph::strength(gRN)
+    if(!useDegree){
+      igraph::V(gRN)$size <- igraph::strength(gRN)
+    } else {
+      igraph::V(gRN)$size <- igraph::degree(gRN)
+    }
   }
 
-  RN_nodes <- data.frame(time = as.numeric(igraph::V(gRN)), strength = igraph::strength(gRN))
-  # Separate degree 1 (Singularities)
+  # Node list ----
+  RN_nodes <- data.frame(time = as.numeric(igraph::V(gRN)), degree = igraph::degree(gRN), strength = igraph::strength(gRN))
+
+  # Identify nodes with degree 1 (Singularities)
   Singularities <- RN_nodes %>% dplyr::filter(igraph::degree(gRN)==1)
 
-  nonRecurring <- sum(RN_nodes$strength==0, na.rm=TRUE)
+  # Identify nodes with degree 0 (nonRecurring)
+  nonRecurring_sum <- sum(RN_nodes$degree==0, na.rm=TRUE)
+  nonRecurring <- RN_nodes %>% dplyr::filter(igraph::degree(gRN)==0)
 
-  # Remove degree 0
-  RN_nodes <- RN_nodes %>% dplyr::filter(strength>0)
 
-  # Edges
+  RN_nodes <- RN_nodes %>% dplyr::filter(degree>0)
+
+  # Edge list ----
   RN_edges <- igraph::as_data_frame(gRN)
 
+
+  # While loop ----
   last <- FALSE
   i <- 0
-  nodeID <- list()
-  phases <- list()
-  strengths <- list()
+  nodeID <-phases <- strengths <- degrees <- list()
   igraph::V(gRN)$phase <- NA
 
-  if(is.na(maxPhases)){
-    maxPhases <- NROW(RN)
-  }
 
   while(!last){
 
@@ -710,7 +730,7 @@ rn_phases <- function(RN,
     i <- i+1
 
     if(i > 1){
-      tmp_nodes   <- RN_nodes %>% dplyr::filter(!(time%in%unique(unlist(phases[1:(i-1)]))))
+      tmp_nodes   <- RN_nodes %>% dplyr::filter(!(time%in%sort(unique(unlist(phases[1:(i-1)])))))
       if(NROW(tmp_nodes)==0){
         last <- TRUE
         break
@@ -719,21 +739,31 @@ rn_phases <- function(RN,
       tmp_nodes   <- RN_nodes
     }
 
-    nodeID[[i]]    <- tmp_nodes$time[which.max(tmp_nodes$strength)]
+    if(useDegree){
+      nodeID[[i]]    <- tmp_nodes$time[which.max(tmp_nodes$degree)]
+    } else {
+      nodeID[[i]]    <- tmp_nodes$time[which.max(tmp_nodes$strength)]
+    }
+
+    degrees[[i]]   <- tmp_nodes$degree[which.max(tmp_nodes$degree)]
     strengths[[i]] <- tmp_nodes$strength[which.max(tmp_nodes$strength)]
 
     tmp_edges      <- RN_edges %>% dplyr::filter(.data$from==nodeID[[i]]|.data$to==nodeID[[i]])
+
     if(i > 1){
       tmp_edges   <- tmp_edges %>% dplyr::filter(!((.data$from%in%as.numeric(unlist(phases[1:(i-1)])))|(.data$to%in%as.numeric(unlist(phases[1:(i-1)])))))
     }
 
-    phases[[i]] <- unique(c(tmp_edges$from,tmp_edges$to))
+    phases[[i]] <- sort(unique(c(tmp_edges$from,tmp_edges$to)))
 
     igraph::V(gRN)$phase[phases[[i]]] <- i
     names(phases)[i] <- ifelse(i<10, paste0("Phase 0",i), paste("Phase",i))
 
     if(i > 1){
-      if(any(i>=NROW(RN_nodes), i==maxPhases, NROW(tmp_edges)==0, nodeID[[i]]==nodeID[[i-1]])){
+      if(nodeID[[i]]==nodeID[[i-1]]){
+        stop("Encountered same node twice!")
+      }
+      if(any(i>=NROW(RN_nodes), i==maxPhases, NROW(tmp_edges)==0)){
         last <- TRUE
         break
       }
@@ -749,18 +779,22 @@ rn_phases <- function(RN,
   # Phases[is.na(Phases)] <- max(Phases, na.rm = TRUE)+1
 
   phases    <- phases[lengths(phases)!=0]
+  cat(paste("\nFound",length(phases),"phases with at least",minStatesinPhase,"states.\n"))
   nodeID    <- nodeID[which(lengths(phases)!=0)]
   strengths <- strengths[which(lengths(phases)!=0)]
+  degrees <- degrees[which(lengths(phases)!=0)]
 
   out <- tidyr::unnest(dplyr::tibble(phase_name = names(phases),
                                      phase_number = as.numeric_discrete(names(phases)),
                                      phase_size = lengths(phases),
                                      maxState_time = as.numeric(nodeID),
+                                     maxState_degree = as.numeric(degrees),
                                      maxState_strength = as.numeric(strengths),
                                      states_time = phases,
                                      states_singularity = 0),
-                       cols = 6)
+                       cols = 7)
 
+  out$states_degree   <- igraph::degree(gRN)[out$states_time]
   out$states_strength <- igraph::strength(gRN)[out$states_time]
 
   tmp     <- plyr::ldply(seq_along(phases), function(p) data.frame(phase_name = names(phases)[[p]],
@@ -788,13 +822,18 @@ rn_phases <- function(RN,
     for(p in unique(out$phase_name)){
 
       tmp <- out %>% dplyr::filter(phase_name == p)
-      tmp <- dplyr::arrange(tmp, dplyr::desc(tmp$states_strength))
+      if(useDegree){
+        tmp <- dplyr::arrange(tmp, dplyr::desc(tmp$states_degree))
+      } else {
+        tmp <- dplyr::arrange(tmp, dplyr::desc(tmp$states_strength))
+      }
 
-      dist_remain <- strength_remain <- nodes_remain <- list()
+      dist_remain <- strength_remain <- nodes_remain <- degree_remain <- list()
 
       for(n in 1:NROW(tmp)){
-        nodes_remain[[n]] <- remains[remains%in%unique(c(RN_edges$to[RN_edges$from==tmp$states_time[n]|RN_edges$to==tmp$states_time[n]], RN_edges$from[RN_edges$to==tmp$states_time[n]|RN_edges$from==tmp$states_time[n]]))]
+        nodes_remain[[n]] <- remains[remains%in%sort(unique(c(RN_edges$to[RN_edges$from==tmp$states_time[n]|RN_edges$to==tmp$states_time[n]], RN_edges$from[RN_edges$to==tmp$states_time[n]|RN_edges$from==tmp$states_time[n]])))]
         strength_remain[[n]] <- igraph::strength(gRN)[nodes_remain[[n]]]
+        degree_remain[[n]] <- igraph::degree(gRN)[nodes_remain[[n]]]
       }
       names(nodes_remain) <- tmp$states_time # paste("Node:",tmp$states_time,"| Strength:",tmp$states_strength)
 
@@ -812,21 +851,29 @@ rn_phases <- function(RN,
                                                       phase_number = tmp$phase_number[tmp$phase_name==p][1],
                                                       phase_size = NA,
                                                       maxState_time = as.numeric(names(nodes_remain)),
+                                                      maxState_degree = tmp$states_degree,
                                                       maxState_strength = tmp$states_strength,
                                                       states_time = nodes_remain,
+                                                      states_degree = degree_remain,
                                                       states_strength = strength_remain,
                                                       states_dist2maxState = dist_remain,
                                                       states_singularity = 0),
-                                        cols = 6:8)
+                                        cols = 7:10)
 
       rm(tmp)
     }
 
     remainsOut <- plyr::ldply(remainsList)
-    remainsOut <- dplyr::arrange(remainsOut, dplyr::desc(.data$maxState_strength))
+
+    if(useDegree){
+      remainsOut <- dplyr::arrange(remainsOut, dplyr::desc(.data$maxState_degree))
+    } else {
+      remainsOut <- dplyr::arrange(remainsOut, dplyr::desc(.data$maxState_strength))
+    }
     uniIND <- plyr::laply(as.numeric(remains), function(r) which(r==remainsOut$states_time)[1])
     out <- rbind(out, remainsOut[uniIND[!is.na(uniIND)],])
-    out <- dplyr::arrange(out,.data$phase_name)
+    out <- dplyr::arrange(out,.data$states_time)
+    #out <- dplyr::arrange(out,.data$phase_name)
 
     rm(remainsOut, remainsList, uniIND)
   }
@@ -835,23 +882,27 @@ rn_phases <- function(RN,
     maxStatesinPhase <- minStatesinPhase
   }
 
-  if(!is.null(space_dims)){
-    if(length(space_dims)!=NCOL(attributes(RN)$emDims1)){
-      warning("Argument space_dims is not equal to number of phase space dimensions.")
+  # Add the dimension names
+  if(!is.null(dimNames)){
+    if(length(dimNames)!=NCOL(attributes(RN)$emDims1)){
+      warning("Argument dimNames is not equal to number of phase space dimensions.")
     }
-    tmp <- attributes(RN)$emDims1[out$states_time, ,drop = FALSE]
-    colnames(tmp) <- space_dims
-    space_dims <- tmp
+    space_dims <- attributes(RN)$emDims1[out$states_time, ,drop = FALSE]
+    colnames(space_dims) <- dimNames
   } else {
-  if(!is.null(attributes(RN)$emDims1)){
+    if(!is.null(attributes(RN)$emDims1)){
       space_dims <- attributes(RN)$emDims1[out$states_time, ,drop = FALSE]
-      colnames(space_dims) <- paste0("dim_", plyr::laply(strsplit(colnames(space_dims),split = "[.]"), function(s) s[[2]]))
-      } else {
-        stop("Could not find the attribute 'emDims1' on the Recurrence Matrix.")
-      }
+      dimNames <- paste0(plyr::laply(strsplit(colnames(space_dims),split = "[.]"), function(s) s[[2]]))
+      colnames(space_dims) <- dimNames
+    } else {
+      stop("Could not find the attribute 'emDims1' on the Recurrence Matrix.")
     }
-  out <- cbind(out,space_dims)
-  rm(space_dims)
+  }
+
+  out <- cbind(out, space_dims)
+
+  # out[,(NCOL(out)+1):(NCOL(out)+NCOL(space_dims))] <- NA
+  # colnames(out)[(NCOL(out)-NCOL(space_dims)+1):NCOL(out)] <- colnames(space_dims)
 
   # Check if we missed some recurrent states due to the stopping parameters and create an "Other" category
   ltime <- seq(1,igraph::vcount(gRN))[!seq(1,igraph::vcount(gRN))%in%sort(out$states_time)]
@@ -860,17 +911,25 @@ rn_phases <- function(RN,
   ltime <- ltime[plyr::laply(ltime, function(p) sum(RN[1:NCOL(RN),p]))>0]
 
   if(NROW(ltime)!=0){
-    lost_time <- data.frame(matrix(NA,nrow=NROW(ltime),ncol=NCOL(out),dimnames = list(NULL,colnames(out))))
+    lost_time <- data.frame(matrix(NA,nrow=NROW(ltime),ncol=NCOL(out), dimnames = list(NULL,colnames(out))))
     lost_time$states_time <- ltime
-    lost_time[,(("states_dist2maxState"%ci%lost_time)+1):NCOL(lost_time)] <- attributes(RN)$emDims1[ltime,]
+    #lost_time[,(("states_dist2maxState"%ci%lost_time)+1):NCOL(lost_time)] <- attributes(RN)$emDims1[ltime,]
+    lost_time[,(NCOL(out)-NCOL(space_dims)+1):NCOL(out)] <- attributes(RN)$emDims1[ltime,]
     lost_time$phase_name <- "Other"
     lost_time$phase_number <- max(out$phase_number, na.rm = TRUE)+1
     lost_time$phase_size <- length(ltime)
-    lost_time$states_strength <- igraph::strength(gRN)[lost_time$states_time]
+    lost_time$maxState_time <- NA
+    lost_time$maxState_degree <- max(lost_time$states_degree, na.rm = TRUE)
     lost_time$maxState_strength <- max(lost_time$states_strength, na.rm = TRUE)
-    lost_time$maxState_time <-  lost_time$states_time[which.max(lost_time$states_strength)]
     lost_time$states_singularity <- 0
+    lost_time$states_degree <- igraph::degree(gRN)[lost_time$states_time]
+    lost_time$states_strength <- igraph::strength(gRN)[lost_time$states_time]
     lost_time$states_dist2maxState <- NA
+    if(useDegree){
+      lost_time$maxState_time <- lost_time$states_time[which.max(lost_time$states_degree)]
+    } else {
+      lost_time$maxState_time <- lost_time$states_time[which.max(lost_time$states_strength)]
+    }
 
     out <- rbind(out,lost_time)
   }
@@ -882,15 +941,21 @@ rn_phases <- function(RN,
   if(NROW(norec)!=0){
     empty <- data.frame(matrix(NA,nrow=NROW(norec),ncol=NCOL(out),dimnames = list(NULL,colnames(out))))
     empty$states_time <- norec
-    empty[,(("states_dist2maxState"%ci%empty)+1):NCOL(empty)] <- attributes(RN)$emDims1[norec,]
+    #empty[,(("states_dist2maxState"%ci%empty)+1):NCOL(empty)] <- attributes(RN)$emDims1[norec,]
+    empty[,(NCOL(out)-NCOL(space_dims)+1):NCOL(out)] <- attributes(RN)$emDims1[norec,]
     empty$phase_name <- "No recurrence"
     empty$phase_number <- max(out$phase_number, na.rm = TRUE)+1
     empty$phase_size <- length(norec)
-    empty$states_strength <- .Machine$double.eps
+    empty$states_strength <- 0
+    empty$states_degree <- 0
 
     out <- rbind(out,empty)
   }
 
+  out <- dplyr::arrange(out,states_time)
+  # out[,(NCOL(out)-NCOL(space_dims)+1):NCOL(out)] <- space_dims
+  # rm(space_dims)
+  #
 
   if(plotCentroid&(returnCentroid=="no")){
     message("Specify which centroid type to return in argument 'returnCentroid'")
@@ -930,6 +995,7 @@ rn_phases <- function(RN,
     rm(space_dims)
   }
 
+  # Sort and arrange
   out <- out %>% dplyr::group_by(.data$phase_name) %>% dplyr::mutate(phase_size = dplyr::n()) %>% dplyr::ungroup()
   out <- out %>% dplyr::arrange(.data$states_time)
   out$states_singularity[out$states_time %in% Singularities$time] <- 1
@@ -943,8 +1009,7 @@ rn_phases <- function(RN,
 
   #colIND <- which(arr.ind = TRUE, sort(colIND, decreasing = TRUE))
 
-
-  # CENTROID ----
+  # centroid ----
   if((returnCentroid)%in%c("mean.sd","median.mad","centroid")){
 
     if((returnCentroid)%in%c("mean.sd","median.mad")){
@@ -1053,7 +1118,8 @@ rn_phases <- function(RN,
                                     cleanUp = cleanUp,
                                     returnCentroid = returnCentroid,
                                     removeSingularities = removeSingularities,
-                                    standardise = standardise)
+                                    standardise = standardise,
+                                    dimNames = dimNames)
 
   # phaseprofile ----
   if(doPhaseProfilePlot){
