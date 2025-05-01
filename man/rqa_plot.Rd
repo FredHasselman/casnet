@@ -4,7 +4,15 @@
 \alias{rqa_plot}
 \title{Plot large RP}
 \usage{
-rqa_plot(RM, imagePath = NA, wMax = 2048, hMax = 2048)
+rqa_plot(
+  RM,
+  imagePath = NA,
+  xlab = "",
+  ylab = "",
+  wMax = 2048,
+  hMax = 2048,
+  loadPlot = FALSE
+)
 }
 \arguments{
 \item{RM}{RM}

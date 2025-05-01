@@ -103,6 +103,8 @@ rn <- function(y1, y2 = NULL,
     # if(cumulative){
     #   dmat[upper.tri(dmat)] <- 0
     # }
+  } else {
+    mode <- "undirected"
   }
 
   #
@@ -559,7 +561,847 @@ rn_recSpec <- function(RN,
 
 }
 
+
+#' Find Phases
+#'
+#' @description
+#' Algorithm to find similar recurring states that can be considered phases, based on the node importance (`selectionMethod`) of a recurrence network. This makes most sense if the state space dimension can be interpreted.
+#'
+#' @inheritParams make_spiral_graph
+#' @inheritParams rn
+#' @param RN A matrix produced by the function [rn]
+#' @param selectionMethod How will the most "important" node be selected? Should be the name of an [igraph] function that returns local (vertex) measures (default = `"degree"`)
+#' @param inverseWeight Whether to perform the operation `1/weight` on the edge weights. This will only have an effect if wieght matters for the selection of most important nodes (e.g., `selectionMethod = "strength"`). The default is `TRUE`, so if the matrix was weighted by a distance metric (`weightedBy = "si"`) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on node strength. If the matrix was weighted by recurrence time (`weightedBy = "rt"`) and `inverseWeight = TRUE`, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If `weightedBy = "rf"`, lower frequencies will end up having more impact. (default = `TRUE`)
+#' @param maxPhases The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent points will be labelled with "Other". If `NA`, the value will be set to `NROW(RN)`, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = `10`)
+#' @param minStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases do not have a minimum number of `minStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `1`)
+#' @param maxStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases exceeds a maximum number of `maxStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `NROW(RN)`)
+#'
+#' @return A data frame with nodes and the phase sequence
+#'
+#' @export
+#'
+rn_findPhases <- function(RN,
+                          weighted = NA,
+                          inverseWeight = TRUE,
+                          directed = NA,
+                          selectionMethod = c("degree","strength","closeness","betweenness")[1],
+                          minStatesinPhase = 2,
+                          maxStatesinPhase = NROW(RN),
+                          maxPhases = NROW(RN),
+                          silent = FALSE
+){
+
+  # Check arguments
+  checkPkg("igraph")
+
+  if(is.na(maxPhases)%00%NA){
+    maxPhases <- NROW(RN)
+  }
+
+  if(!silent){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+    cat(paste0("\nRecurring states with high similarity will be considered a phase:\n\n"))
+    cat(paste0("selectionMethod = ",selectionMethod,"\nmaxPhases = ", maxPhases,"\nminStatesinPhase = ",minStatesinPhase,"\nmaxStatesinPhase = ",maxStatesinPhase,"\ninverseWeight = ",inverseWeight,"\n\nRecurring states will be grouped as a 'Phase ##', as transients (unstable phases) 'Transient ##', phase neighbours (state connects to more than 1 identified phase) 'PhaseNH ##', singularities (state recurs less often than minStatesinPhase) 'Singularity', or as not recurring 'Nonrecurring'.\n"))
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+  }
+
+  if(is.na(weighted%00%NA)){
+    weighted <- attributes(RN)$weighted
+  }
+  if(is.na(directed)){
+    directed <- attributes(RN)$directed%00%FALSE
+  }
+
+  # Create graph ----
+  gRN <- igraph::graph_from_adjacency_matrix(RN,
+                                             weighted = weighted,
+                                             mode = ifelse(directed,"directed","undirected"))
+  if(inverseWeight){
+    igraph::E(gRN)$weight <- (1/igraph::E(gRN)$weight)%00%0
+  }
+
+  if(!methods::existsFunction(selectionMethod, where = asNamespace("igraph"))){
+    selectionMethod <- "degree"
+    warning(paste("selectionMethod =",selectionMethod,"is not an igraph function, using 'degree' for node selection."))
+  } else {
+    # Handle arguments ----
+    if(!weighted){
+      selectionMethod <- "degree"
+    }
+  }
+
+  if(is.null(igraph::V(gRN)$selectNode)){
+    V(gRN)$selectNode <- eval(parse(text = paste0("igraph::",selectionMethod,"(gRN)")))
+  } else {
+    stop("V(gRN)$selectNode already exists!")
+  }
+
+  # Node list ----
+  RN_nodes <- data.frame(time = as.numeric(igraph::V(gRN)),
+                         degree = igraph::degree(gRN),
+                         strength = igraph::strength(gRN),
+                         selectNode = igraph::V(gRN)$selectNode)
+
+  # Identify nodes with degree 0 (nonRecurring)
+  ID_nonRecurring <- which(RN_nodes$degree==0)
+
+  if(minStatesinPhase>2){
+    RN_nodes$degree[RN_nodes$degree<minStatesinPhase&!(RN_nodes$time%in%ID_nonRecurring)] <- 1
+    warning(paste("Phases with less than",minStatesinPhase,"states will be considered singularities."))
+  }
+
+  # Identify nodes with degree 1 (Singularities)
+  ID_Singularities <- which(RN_nodes$degree==1)
+
+  # Edge list ----
+  RN_edges <- igraph::as_long_data_frame(gRN)
+  # Gradient provides a sign indicating future or past recurrence
+  RN_edges$gradient <- RN_edges$from_selectNode-RN_edges$to_selectNode
+
+  # While loop ----
+  last <- FALSE
+  i <- 0
+  nodeID <-phases <- strengths <- degrees <- list()
+  igraph::V(gRN)$phase <- NA
+
+  while(!last){
+    #i%++%1
+    i <- i+1
+
+    # Remove non-recurring nodes
+    tmp_nodes   <- RN_nodes |> dplyr::filter(!time%in%c(ID_nonRecurring))
+    # Remove singularities
+    tmp_nodes   <- RN_nodes |> dplyr::filter(!time%in%c(ID_Singularities))
+    if(i > 1){
+      # Remove already identified nodes
+      tmp_nodes   <- tmp_nodes |> dplyr::filter(!(time%in%sort(unique(unlist(phases[1:(i-1)])))))
+      if(NROW(tmp_nodes)==0){
+        last <- TRUE
+        break
+      }
+    }
+
+    # Most important node, in case of tie prefer first node
+    nodeID[[i]] <- tmp_nodes$time[which.max(tmp_nodes$selectNode)[1]]
+
+    # # Remove edges to singularities and non-recurring nodes
+    # tmp_edges <- RN_edges %>%
+    #   dplyr::filter(!((.data$from%in%c(ID_nonRecurring,ID_Singularities))|(.data$to%in%c(ID_nonRecurring,ID_Singularities))))
+
+
+    # Remove non-recurring nodes
+    tmp_edges  <- RN_edges |>
+      dplyr::filter(!from%in%as.numeric(ID_nonRecurring)|!to%in%as.numeric(ID_nonRecurring))
+    # Remove singularities
+    tmp_edges  <- RN_edges |>
+      dplyr::filter(!from%in%as.numeric(ID_Singularities)|!to%in%as.numeric(ID_Singularities))
+
+    if(i > 1){
+      # Remove edges to nodes already identified
+      tmp_edges <- tmp_edges |>
+        dplyr::filter(!((from%in%as.numeric(unlist(phases[1:(i-1)])))|(to%in%as.numeric(unlist(phases[1:(i-1)])))))
+    }
+
+    # Node connects to
+    tmp_edges <- tmp_edges |>
+      dplyr::filter(from%==%nodeID[[i]]|to%==%nodeID[[i]])
+
+    # Phases: All nodes connecting to the (currently) most important node
+    phases[[i]] <- sort(unique(c(tmp_edges$from,tmp_edges$to)))
+
+    igraph::V(gRN)$phase[phases[[i]]] <- i
+    names(phases)[i] <- ifelse(i<10, paste0("Phase 0",i), paste("Phase",i))
+
+    if(i > 1){
+      if(nodeID[[i]]%==%nodeID[[i-1]]){
+        stop("Encountered same node twice!")
+      }
+      if(any(i%>=%NROW(RN_nodes), i%==%maxPhases, NROW(tmp_edges)%==%0)){
+        last <- TRUE
+        break
+      }
+    }
+
+    rm(tmp_edges,tmp_nodes)
+  }
+
+  if(length(unique(unlist(phases)))!=length(unlist(phases))){
+    warning("Detected duplicate nodes in different phases!")
+  }
+
+  # Remove empty phases
+  phases    <- phases[lengths(phases)%!=%0]
+
+  nodeID    <- nodeID[which(lengths(phases)%!=%0)]
+
+  out <- dplyr::tibble(phase_name = names(phases),
+                       phase_number = as.numeric_discrete(names(phases)),
+                       phase_size = lengths(phases),
+                       maxState_time = as.numeric(nodeID),
+                       states_dist2maxState = NA,
+                       states_time2maxState = NA,
+                       states_time = phases)
+
+  out <- out |> tidyr::unnest(states_time)
+
+  out$states_degree   <- igraph::degree(gRN)[out$states_time]
+  out$states_strength <- igraph::strength(gRN)[out$states_time]
+
+  tmp     <- plyr::ldply(seq_along(phases), function(p) data.frame(phase_name = names(phases)[[p]],
+                                                                   states_time = phases[[p]],
+                                                                   maxState_time = nodeID[[p]],
+                                                                   states_dist2maxState = RN[phases[[p]], nodeID[[p]]],
+                                                                   states_time2maxState = phases[[p]]-nodeID[[p]]))
+
+  if(identical(out$states_time,tmp$states_time)){
+    out$states_dist2maxState <- tmp$states_dist2maxState
+    out$states_time2maxState <- tmp$states_time2maxState
+  } else {
+    warning("Wrong order?")
+  }
+
+  rm(tmp)
+
+  # Create data.frame for output
+  outs <- out |> dplyr::arrange(states_time)
+
+  out <- dplyr::left_join(x = RN_nodes, y = outs, by = c("time" = "states_time"))
+
+  rm(outs)
+
+  out$states_degree   <- out$degree
+  out$states_strength <- out$strength
+
+  out$phase_name[out$states_degree==0] <- "Nonrecurring"
+  out$phase_number[out$states_degree==0] <- -1
+
+  out$phase_name[out$states_degree==1] <- "Singularity"
+  out$phase_number[out$states_degree==1] <- 0
+
+  out$states_uniquePhase <- TRUE
+  out$states_multiPhase  <- ""
+
+  # These phases have not been assigned
+  checkthese <- out$time[which(is.na(out$phase_number))]
+
+  assignStrays <- list()
+
+  for(c in seq_along(checkthese)){
+
+    ids <- c(RN_edges$to[which(RN_edges$from==checkthese[c])], RN_edges$from[which(RN_edges$to==checkthese[c])])
+
+    assignStrays[[c]] <- plyr::ldply(seq_along(phases), function(p){
+      pnodes <- phases[[p]]
+      if(any(ids%in%pnodes)){
+        return(data.frame(edge_from = checkthese[c], edge_to = pnodes[which(ids%in%pnodes)], phase_name = names(phases)[p], phase_num = p))
+      }
+    })
+
+    if(length(assignStrays[[c]])==0){
+      assignStrays[[c]] <- data.frame(edge_from = checkthese[c], edge_to = ids, phase_name = NA, phase_num = NA)
+    }
+  }
+
+  names(assignStrays) <- checkthese
+  tmp_stray <- plyr::ldply(assignStrays)
+
+  rescue_strays <- tmp_stray |>
+    dplyr::filter(!is.na(phase_num)) |>
+    dplyr::group_by(.id) |>
+    dplyr::reframe(phase_num = unique(phase_num), phase_name = unique(phase_name))
+
+  for(c in seq_along(checkthese)){
+    if(any(checkthese[c]==rescue_strays$.id)){
+      if(sum(checkthese[c]==rescue_strays$.id)>1){
+
+        out$states_uniquePhase[out$time==checkthese[c]] <- FALSE
+        out$states_multiPhase[out$time==checkthese[c]]  <- paste(rescue_strays$phase_num[checkthese[c]==rescue_strays$.id],collapse = "|")
+        out$phase_name[out$time==checkthese[c]] <- paste("PhaseNH", paste(rescue_strays$phase_num[checkthese[c]==rescue_strays$.id],collapse = "|"))
+
+        if(any(out$phase_name==paste("PhaseNH", paste(rescue_strays$phase_num[checkthese[c]==rescue_strays$.id], collapse = "|")))){
+
+          out$phase_number[out$time==checkthese[c]] <- out$phase_number[which(out$phase_name==paste("PhaseNH", paste(rescue_strays$phase_num[checkthese[c]==rescue_strays$.id], collapse = "|")))][1]
+
+        } else {
+
+          out$phase_number[out$time==checkthese[c]] <- max(out$phase_number, na.rm = TRUE)+1
+
+        }
+      } else {
+
+        out$phase_number[out$time==checkthese[c]] <- rescue_strays$phase_num[rescue_strays$.id==checkthese[c]]
+        out$phase_name[out$time==checkthese[c]]   <- rescue_strays$phase_name[rescue_strays$.id==checkthese[c]]
+
+      }
+    }
+  }
+
+  transients <- tmp_stray |> dplyr::filter(is.na(phase_num))
+
+  assignTransients <- list()
+  for(c in seq_along(transients$.id)){
+
+    assignTransients[[c]] <- unique(as.numeric(transients$.id[which(transients$edge_from==as.numeric(transients$.id[c])|transients$edge_to==as.numeric(transients$.id[c]))]))
+
+  }
+
+  names(assignTransients) <- transients$.id
+
+  tmptr <- assignTransients[-which(duplicated(assignTransients))]
+  lostPhases <- list()
+  ln <- sort(lengths(tmptr), decreasing = TRUE)
+  ready <- FALSE
+  l <- 0
+
+  while(!ready){
+    ln <- sort(lengths(tmptr), decreasing = TRUE)
+    if(length(ln)%00%0==0){
+      ready <- TRUE
+    } else {
+      l <- l+1
+      ids <- tmptr[[which(names(tmptr)%in%names(ln)[1])]]
+      states <- sort(unique(unlist(tmptr[which(names(tmptr)%in%ids)])))
+      tmptr[which(names(tmptr)%in%states)] <- NULL
+      lostPhases[[l]] <- states
+      rm(states)
+    }
+  }
+
+  for(ph in seq_along(lostPhases)){
+    change <- lostPhases[[ph]][which(is.na(out$phase_name[lostPhases[[ph]]]))]
+    if(length(change)>1){
+      out$phase_name[change] <- paste0("Transient ",ifelse(ph<10,"0",""),ph)
+      out$phase_number[change] <- max(out$phase_number, na.rm = TRUE)+1
+    } else {
+      out$phase_name[change] <- "Singularity"
+      out$phase_number[change] <- 0
+    }
+  }
+
+  newN <- out |>
+    group_by(phase_name) |>
+    summarise(N = dplyr::n())
+
+  for(r in 1:NROW(newN)){
+    out$phase_size[out$phase_name%in%newN$phase_name[r]] <- newN$N[r]
+  }
+
+  return(out)
+}
+
+
+# tmprem <- RN_edges[RN_edges$from==checkthese[c]|RN_edges$to==checkthese[c],]
+#
+#   if(NROW(tmprem)>0){
+#
+#     for(r in 1:NROW(tmprem)){
+#       idNAs <- is.na(c(tmprem$from_phase[r],tmprem$to_phase[r]))
+#       if(sum(idNAs)==1){
+#         idNAs
+#
+#       }
+#     }
+
+#     assignStrays[[c]] <- unlist(llply(seq_along(phases), function(p){
+#       if(any(phases[[p]]%in%unique(c(tmprem$from,tmprem$to)))){
+#         return(p)
+#       }
+#     }))
+#   }
+# }
+
+
+
+#     return(paste("Transient to",names(phases)[p]))
+#   } else {
+#     i <- i+1
+#     phases[[i]] <- ifelse(i<10, paste0("Phase 0",i), paste("Phase",i))
+#     return(names(phases)[p])
+#   }
+# }))
+# }
+
+#   if(length(assignStrays[[c]])==1){
+#     out$phase_name[checkthese[c]]   <- assignStrays[[c]]
+#     out$phase_number[checkthese[c]] <- as.numeric(gsub("Phase ","",assignStrays[[c]]))
+#     out$states_dist2maxState[checkthese[c]] <- RN[checkthese[c], unique(out$maxState_time[which(out$phase_number==out$phase_number[checkthese[c]])])[1]]
+#     out$states_time2maxState[checkthese[c]] <- checkthese[c]-unique(out$maxState_time[which(out$phase_number==out$phase_number[checkthese[c]])])[1]
+#   } else {
+#     out$phase_name[checkthese[c]]   <- paste0("Transient? (",paste0(assignStrays[[c]],collapse = "|"),")")
+#   }
+# }
+
+
 #' Extract Phases from weighted RN
+#'
+#'  This function will extract phases (regions of attraction in phase space) based on a weighted `RN` object created with function [rn].
+#'  The assumption is that coordinates in state space that are either close in terms of distance, or are re-visited with short recurrence times,
+#'  or with high-frequency, are regions of attraction for the system.
+#'
+#'  The method used for the identification of phases is on the properties of the `RN` object:
+#'
+#'  - If weighted by distance `"si"`, the inverse distance will be used, which means higher weights correspond to closer states.
+#'  - If weighted by recurrence time `"rt"`, the inverse time will be used, which means higher weights correspond to faster recurrence times.
+#'
+#'  The procedure is as follows:
+#'
+#'  1. Identify the node with the highest strength
+#'  2. Identify the nodes that connect to this node
+#'  3. Identify the node with highest strength that does not connect to the node identified in step 1.
+#'  4. Repeat until criteria set in `maxPhases`, `minStatesinPhase` and `maxStatesinPhase` are triggered.
+#'
+#'
+#' @inheritParams make_spiral_graph
+#' @inheritParams fd_dfa
+#' @inheritParams rn_findPhases
+#' @inheritParams plotRN_phaseDensities
+#' @inheritParams plotRN_phaseProfiles
+#' @param RN A matrix produced by the function [rn]
+#' @param maxPhases The maximum number of phases to extract. These will be the phases associated with the highest node degree or node strength. All other recurrent points will be labelled with "Other". If `NA`, the value will be set to `NROW(RN)`, this will return all the potential phases in the data irrespective of their frequency/strength of recurrence  (default = `NROW(RN)`)
+#' @param minStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases do not have a minimum number of `minStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `1`)
+#' @param maxStatesinPhase A parameter applied after the extraction of phases (limited by `maxPhases`). If any extracted phases exceeds a maximum number of `maxStatesinPhase` + `1` (= the state that was selected based on node strength), the phase will be removed from the result (default = `NROW(RN)`)
+#' @param removeSingularities Will remove states that recur only once (nodes with `degree(g) == 1`) (default = `FALSE`)
+#' @param inverseWeight Whether to perform the operation `1/weight` on the edge weights. The default is `TRUE`, if the matrix was weighted by a distance metric (`weightedBy = "si"`) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on the node strength calculation used to select the phases. If the matrix was weighted by recurrence time (`weightedBy = "rt"`) and `inverseWeight = TRUE`, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If `weightedBy = "rf"`, lower frequencies will end up having more impact. (default = `TRUE`)
+#' @param returnCentroid Values can be `"no"`, `"mean.sd"`, `"median.mad"`, `"centroid"`. Any other value than `"no"` will return a data frame with the central tendency and deviation measures for each phase (default = `"no"`)
+#' @param doPhaseProfilePlot Produce a profile plot of the extracted phases (default = `TRUE`)
+#' @param plotCentroid Plot the centroid requested in `returnCentroid`? (default = `FALSE`)
+#' @param dimNames A vector of titles to use for the dimensions. If `NULL` the values will be read from the attribute of `RN`.
+#' @param colOrder Should the order of the dimensions reflect the order of the columns in the dataset? If `FALSE` the order will be based on the values of the dimensions observed in the first extracted phase (default = `FALSE`)
+#' @param phaseColours Colours for the different phases in the phase plot. If `epochColours` also has a value, `phaseColours` will be used instead (default = `NULL`)
+#' @param doSpiralPlot Produce a plot of the recurrence network with the nodes coloured by phases (default = `FALSE`)
+#' @param doPhaseSeriesPlot Produce a time series of the phases as they occur with a marginal histogram of their frequency (default = `FALSE`)
+#' @param doPhaseSpaceProjectionPlot produce a 2D `umap` projection of the phases (default = `FALSE`)
+#' @param excludeTransients Should the category "Transient" be excluded from plots? (default = `FALSE`)
+#' @param excludePhaseNeighbours Should the category "PhaseN" be excluded from plots? (default = `FALSE`)
+#' @param excludeSingularities Should the category "Singularity" be excluded from plots? (default = `TRUE`)
+#' @param excludeNonrecurring Should the category "Nonrecurring" be excluded from plots? (default = `TRUE`)
+#' @param returnGraph Returns all the graph object objects of the plots that have been produced (default = `FALSE`)
+#'
+#' @export
+#' @return A data frame with information about the phases or a list object with data and graph objects (if requested).
+#' The data frame contains the phase name, number and size, as well as properties of the prototypical state that was selected by the selection method, the node number/time (`maxState_time`), degree  (`maxState_degree`), strength  (`maxState_strength`).
+#'
+#' @family Distance matrix operations (recurrence network)
+#'
+#' @examples
+#'
+#' # Use the ManyAnalysts dataset to create a phase plot with default settings
+#' data("manyAnalystsESM")
+#' df <- manyAnalystsESM[4:10]
+#' RN <- rn(y1 = df, doEmbed = FALSE, weighted = TRUE, weightedBy = "si", emRad = NA)
+#'
+#' # This returns 6 phases which have minimally 2 states
+#' rn_phaseInfo(RN, doPhaseProfilePlot = TRUE)
+#'
+#' # Use min. number of states as the extraction criterion
+#' rn_phaseInfo(RN, maxPhases = NA, minStatesinPhase = 7, doPhaseProfilePlot = TRUE)
+#'
+rn_phaseInfo <- function(RN,
+                      maxPhases = NA,
+                      minStatesinPhase = 2,
+                      maxStatesinPhase = NROW(RN),
+                      selectionMethod = c("degree","strength","closeness","betweenness")[1],
+                      inverseWeight = TRUE,
+                      returnCentroid = c("no","mean.sd","median.mad","centroid")[1],
+                      removeSingularities = FALSE,
+                      standardise = c("none","mean.sd","median.mad","unit")[4],
+                      returnGraph = FALSE,
+                      doPhaseProfilePlot = FALSE,
+                      plotCentroid = FALSE,
+                      dimNames = NULL,
+                      colOrder = FALSE,
+                      phaseColours = NULL,
+                      doSpiralPlot = FALSE,
+                      doPhaseSeriesPlot = FALSE,
+                      doPhaseDensityPlot = FALSE,
+                      doPhaseSpacePojectionPlot = FALSE,
+                      showPhaseSize = TRUE,
+                      showEpochLegend = TRUE,
+                      epochColours = NULL,
+                      epochLabel = "Phase",
+                      excludeVars = "",
+                      excludePhases = "",
+                      excludeTransients = FALSE,
+                      excludePhaseNeighbours = FALSE,
+                      excludeSingularities = FALSE,
+                      excludeNonrecurring = TRUE,
+                      alphaDensity = .4,
+                      splitFacets = NA,
+                      silent = FALSE){
+
+  checkPkg("igraph")
+  checkPkg("invctr")
+
+  if(is.null(attributes(RN)$emDims1)){
+   warning("No multivariate time series data found. Cannot produce phase profile plots.")
+    doPhaseProfilePlot <- FALSE
+  }
+
+  if(plotCentroid&(returnCentroid=="no")){
+    message("Specify which centroid type to return in argument 'returnCentroid'")
+    plotCentroid <- FALSE
+  }
+
+  if(returnCentroid%in%"centroid"&!(standardise%in%"mean.sd")){
+    standardise <- "mean.sd"
+    warning("Changed value of standardise to 'mean.sd' which is required if returnCentroid is set to 'centroid'.")
+  }
+
+  if(minStatesinPhase>maxStatesinPhase){
+    maxStatesinPhase <- minStatesinPhase
+  }
+
+  # if(!attributes(RN)$cumulative%00%FALSE){
+  #   stop("RN has to be a cumulative recurrence network.")
+  # }
+
+  out <- rn_findPhases(RN = RN,
+                       weighted = NA,
+                       inverseWeight = inverseWeight,
+                       directed = NA,
+                       selectionMethod = selectionMethod,
+                       minStatesinPhase = minStatesinPhase,
+                       maxStatesinPhase = maxStatesinPhase,
+                       maxPhases = maxPhases,
+                       silent = silent)
+
+
+  cat(paste("\nFound",max(out$phase_number, na.rm = TRUE),"phases with at least",minStatesinPhase,"states.\n"))
+
+  # Add the dimension names
+  if(!is.null(dimNames)){
+    if(length(dimNames)!=NCOL(attributes(RN)$emDims1)){
+      warning("Argument dimNames is not equal to number of phase space dimensions.")
+    }
+    space_dims <- attributes(RN)$emDims1[out$time, ,drop = FALSE]
+    colnames(space_dims) <- dimNames
+  } else {
+    if(!is.null(attributes(RN)$emDims1)){
+      space_dims <- attributes(RN)$emDims1[out$time, ,drop = FALSE]
+      dimNames <- paste0(plyr::laply(strsplit(colnames(space_dims),split = "[.]"), function(s) s[[2]]))
+      colnames(space_dims) <- dimNames
+    } else {
+      stop("Could not find the attribute 'emDims1' on the Recurrence Matrix.")
+    }
+  }
+
+  out <- cbind(out, space_dims)
+
+  if(any(standardise%in%c("mean.sd","median.mad","unit"))){
+
+    if(standardise%in%"unit"){
+
+      space_dims <- signif(elascer(out[,(("states_multiPhase"%ci%out)+1):NCOL(out)]))
+
+    } else {
+
+      if(returnCentroid%in%"centroid"){
+
+        checkPkg("dtwclust")
+        NAind      <- which(stats::complete.cases(out[,(("states_multiPhase"%ci%out)+1):NCOL(out)]))
+        space_dims <- signif(dtwclust::zscore(data.frame(out[,(("states_multiPhase"%ci%out)+1):NCOL(out)]), multivariate = TRUE))
+        warning("Centroid calculation by dtwclust: Any NA values will be set to 0!")
+
+      } else {
+        space_dims <- signif(plyr::colwise(ts_standardise, type = standardise, adjustN = TRUE)(data.frame(out[,(("states_multiPhase"%ci%out)+1):NCOL(out)])))
+      }
+    }
+    out[,(("states_multiPhase"%ci%out)+1):NCOL(out)] <- space_dims
+    rm(space_dims)
+  }
+
+  #out  <- out[out$phase_size%[]%c(minStatesinPhase,maxStatesinPhase),]
+  out$phaseName <- paste(out$phase_name," |  N =",out$phase_size)
+
+  # centroid ----
+  if((returnCentroid)%in%c("mean.sd","median.mad","centroid")){
+
+    if((returnCentroid)%in%c("mean.sd","median.mad")){
+
+      outMeans <- plyr::ldply(unique(out$phase_name), function(p){
+
+        tmp <- out |> dplyr::ungroup() |>
+          dplyr::filter(.data$phase_name==p) |>
+          dplyr::select(dplyr::all_of(dimNames))
+
+        tmp$phase_name <- p
+        if(returnCentroid=="mean.sd"){
+          Mean <- data.frame(phase_name = p, Mean = colMeans(tmp[,-NCOL(tmp)], na.rm = TRUE))
+          SD <- plyr::colwise(sd, na.rm=TRUE)(tmp[,-NCOL(tmp)])
+          Mean$SD      <- as.numeric(t(SD))
+        }
+
+        if(returnCentroid=="median.mad"){
+          Mean <- data.frame(phase_name = p, Median = t(plyr::colwise(stats::median, na.rm=TRUE)(tmp[,-NCOL(tmp)])))
+          SD <- plyr::colwise(stats::mad, na.rm=TRUE)(tmp[,-NCOL(tmp)])
+          Mean$MAD        <- as.numeric(t(SD))
+        }
+        Mean$Dimension  <- rownames(Mean)
+        Mean$phase_size <- unique(out$phase_size[out$phase_name==p])
+        return(Mean)
+      })
+
+    }
+
+    if(returnCentroid%in%"centroid"){
+      #checkPkg("dtwclust")
+
+      NAind <- which(!stats::complete.cases(out))
+      tmpPhases <- out[stats::complete.cases(out),]
+
+      outMeansList <- list()
+      pnames <- unique(tmpPhases$phase_name)
+      for(p in seq_along(pnames)){
+        tmp <- tmpPhases %>%
+          dplyr::ungroup() %>%
+          dplyr::filter(.data$phase_name==pnames[p]) %>%
+          dplyr::select(dplyr::all_of(dimNames))
+
+        centroid <- dtwclust::shape_extraction(data.frame(tmp), znorm = FALSE)
+        outMeansList[[p]] <- data.frame(phase_name = pnames[p],
+                                        Mean = centroid,
+                                        SD = 0,
+                                        Dimension = colnames(tmp),
+                                        phase_size = unique(tmpPhases$phase_size[tmpPhases$phase_name==pnames[p]]))
+      }
+
+      outMeans <- plyr::ldply(outMeansList)
+    }
+
+    outMeans$ymin <- outMeans[,c("Median","Mean")%ci%outMeans] - outMeans[,c("MAD","SD")%ci%outMeans]
+    outMeans$ymax <- outMeans[,c("Median","Mean")%ci%outMeans] + outMeans[,c("MAD","SD")%ci%outMeans]
+    outMeans$Dimension <- forcats::fct_inorder(outMeans$Dimension)
+    outMeans$phaseName <- paste(outMeans$phase_name," |  N =",outMeans$phase_size)
+  }
+
+
+   # spiral plot ----
+  if(doSpiralPlot){
+
+      if(!is.na(epochColours%00%NA)){
+        markEpochsBy <- out$phase_name
+        epochColours <- getColours(Ncols = length(unique(markEpochsBy)))
+        names(epochColours) <- markEpochsBy
+      } else {
+        markEpochsBy <- NULL
+      }
+
+      gg <- casnet::make_spiral_graph(g = gRN,
+                                      type = "Euler",
+                                      arcs = 4,
+                                      markTimeBy = TRUE,
+                                      showEpochLegend = TRUE,
+                                      markEpochsBy = markEpochsBy,
+                                      epochColours = epochColours,
+                                      epochLabel = "Phase")
+      print(gg)
+    }
+
+
+  bCentroid <- FALSE
+  if(returnCentroid!="no"){
+    bCentroid <- TRUE
+  }
+
+  if(bCentroid){
+    listOut <- list(phaseSeries = out, phaseCentroids = outMeans)
+  } else {
+    listOut <- out
+  }
+
+  attr(listOut,"rn_phaseInfo") <- list(maxPhases = maxPhases,
+                                       minStatesinPhase = minStatesinPhase,
+                                       maxStatesinPhase = maxStatesinPhase,
+                                       returnCentroid = returnCentroid,
+                                       standardise = standardise,
+                                       dimNames = dimNames)
+
+  # phasedensity ----
+  if(doPhaseDensityPlot){
+    pd <- plotRN_phaseDensities(listOut,
+                               plotCentroid = plotCentroid,
+                               showEpochLegend = showEpochLegend,
+                               epochColours = epochColours,
+                               epochLabel   = epochLabel,
+                               excludeTransients = excludeTransients,
+                               excludePhaseNeighbours = excludePhaseNeighbours,
+                               excludeNonrecurring = excludeNonrecurring,
+                               excludeSingularities = excludeSingularities,
+                               excludeVars = "",
+                               excludePhases = "",
+                               alphaDensity = alphaDensity,
+                               splitFacets = splitFacets,
+                               returnGraph = TRUE)
+  }
+
+  # phaseprofile ----
+  if(doPhaseProfilePlot){
+    pp <- plotRN_phaseProfiles(listOut,
+                               plotCentroid = plotCentroid,
+                               showEpochLegend = showEpochLegend,
+                               epochColours = epochColours,
+                               epochLabel   = epochLabel,
+                               excludeTransients = excludeTransients,
+                               excludePhaseNeighbours = excludePhaseNeighbours,
+                               excludeNonrecurring = excludeNonrecurring,
+                               excludeSingularities = excludeSingularities,
+                               excludeVars = excludeVars,
+                               excludePhases = excludePhases,
+                               returnGraph = TRUE)
+  }
+  # phaseseries ----
+  if(doPhaseSeriesPlot){
+    ps <- plotRN_phaseTimeSeries(listOut,
+                                 showEpochLegend = showEpochLegend,
+                                 epochColours = epochColours,
+                                 excludeVars = excludeVars,
+                                 excludePhases = excludePhases,
+                                 returnGraph = TRUE)
+  }
+
+  # phasespace projection ----
+  if(doPhaseSpacePojectionPlot){
+    ppr <- plotRN_phaseProjections(RNdist = RN,
+                                   phaseOutput = listOut,
+                                   epochColours = epochColours,
+                                   showEpochLegend = showEpochLegend,
+                                   epochLabel   = epochLabel)
+  }
+
+
+  if(returnGraph){
+    listOut <- list(phases = list(phaseSeries = out, phaseCentroids = outMeans)[TRUE, Centroid],
+                    plots  = list(phaseProfile = pp, phaseSeries = ps, spiralPlot = gg, phaseDensities = pd, phaseSpaceProjection = ppr)[c(doPhaseProfilePlot, doPhaseSeriesPlot, doSpiralPlot, doPhaseDensityPlot, doPhaseSpacePojectionPlot)])
+  }
+
+  return(invisible(listOut))
+}
+
+
+#' Create transition network
+#'
+#' @inheritParams rn_phases
+#' @param phaseSequence A vector with names or numbers that represent a sequence of phases or order parameter dynamics. If a named numeric vector is passed, the names attribute will be used to represent the phases. If the variable `phase_name`, generated by [rn_phases] is used, the arguments `excludeOther` and `excludeNorec` wil be evaluated.
+#' @param threshold Provide a threshold for the relative frequencies. Values below the threshold will be set to `0`. Pass `NA` to not use a threshold (default = `NA`)
+#' @param doMatrixPlot default(`TRUE`)
+#' @param doNetworkPlot default(`TRUE`)
+#' @param returnGraph Return an [igraph::igraph()] object (default = `FALSE`)
+#'
+#' @return A transition matrix based on relative frequencies
+#'
+#' @export
+#'
+#' @examples
+#'
+#' # This will output the transition matrix, a plot of the matrix and a transition network plot.
+#' y <- c("Happy", "Happy", "Sad", "Neutral", "Neutral", "Angry", "Sad", "Sad", "Neutral")
+#' TM <- rn_transition(y)
+#'
+#' @author Fred Hasselman
+#' @author Matti Heino
+#'
+rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, doNetworkPlot = TRUE, excludeOther = FALSE, excludeNorec = TRUE, returnGraph = FALSE){
+
+  if(excludeOther){
+    phaseSequence <- phaseSequence %>% tibble::as_tibble() %>% dplyr::filter(phaseSequence != "Other")
+    phaseSequence <- phaseSequence$value
+  }
+  if(excludeNorec){
+    phaseSequence <- phaseSequence %>% tibble::as_tibble() %>% dplyr::filter(phaseSequence != "No recurrence")
+    phaseSequence <- phaseSequence$value
+  }
+
+  phaseSequence <- as.numeric_discrete(phaseSequence, sortUnique = TRUE)
+  phase_names <- names(phaseSequence)
+
+  df <- data.frame(from = dplyr::lag(phaseSequence,1), to =  phaseSequence,
+                   from_name = dplyr::lag(phase_names,1), to_name = phase_names) %>%
+    dplyr::slice(-1) %>%
+    dplyr::group_by(.data$from, .data$to) %>%
+    dplyr::summarise(N = dplyr::n(),
+                     from_name = dplyr::first(.data$from_name),
+                     to_name = dplyr::first(.data$to_name)) %>%
+    dplyr::mutate(freq = (.data$N / sum(.data$N, na.rm = TRUE))) %>%
+    dplyr::select(-.data$N) %>%
+    dplyr::ungroup()
+
+  if(!is.na(threshold)){
+    df$freq[df$freq<=threshold] <- 0
+  }
+
+  TM <- Matrix::sparseMatrix(x = df$freq,
+                             i = df$from,
+                             j = df$to,
+                             dims = rep(length(unique(phase_names)),2),
+                             dimnames = list(sort(unique(phase_names)), sort(unique(phase_names))))
+  attr(TM,"rows") <- "from"
+  attr(TM,"cols") <- "to"
+
+  mp <- NA
+  if(doMatrixPlot){
+
+    df$freq <- signif(df$freq,3)
+    df$labels <- ifelse(is.na(df$freq),"0", df$freq)
+    mp <-  ggplot(df, aes_(x = ~to_name,
+                           y = ~from_name)) +
+      geom_tile(aes_(fill = ~freq),colour = "black",size = 0.4) +
+      geom_text(aes_(label = ~labels)) +
+      scale_fill_gradient(low = "#ECE3CD",
+                          high = "#A65141",
+                          na.value = "grey",
+                          guide = "none") +
+      theme_bw() +
+      scale_y_discrete(expand = c(0, 0)) +
+      scale_x_discrete(expand = c(0, 0)) +
+      theme(axis.text.x = element_text(angle = 30, hjust = 1),
+            axis.text.y = element_text(angle = 30, hjust = 1),
+            legend.position = "right",
+            legend.title = element_blank(),
+            panel.grid = element_blank(),
+            panel.background = element_rect(fill="grey80")) +
+      coord_equal() +
+      labs(x = "To ...", y = "From ...")
+
+    print(mp)
+  }
+
+  gg <- NA
+  if(doNetworkPlot){
+
+    gg <- igraph::graph_from_adjacency_matrix(TM, mode = "directed", weighted = TRUE, diag = TRUE)
+    gg$layout <- igraph::layout_as_tree(gg,mode = "all", circular = TRUE)
+
+    gg <- plotNET_prep(gg, nodeSize = "strength", rescaleSize = c(10,20), edgeColour = TRUE, doPlot = FALSE, removeSelfLoops = FALSE)
+
+    E(gg)$curved <- .3
+    E(gg)$loop.angle <- pi/12
+    E(gg)$arrow.width <- 1
+    E(gg)$arrow.size <- .6
+
+    if(!is.na(threshold)){
+      gg <-  delete_edges(gg, E(gg)[E(gg)$weight == 0])
+    }
+
+    plot(gg)
+
+  }
+
+
+  if(returnGraph){
+    list(TransitionMatrix = TM,
+         MatrixPlot = mp,
+         TransitionNetwork = gg)[TRUE,doMatrixPlot,doNetworkPlot]
+  } else {
+    return(TM)
+  }
+}
+
+
+
+
+#' Extract Phases from weighted RN
+#'
+#' THIS IS THE OLDER VERSION OF THE FUNCTION KEPT FOR BACKWARD COMPATIBILITY
 #'
 #'  This function will extract phases (regions of attraction in phase space) based on a weighted `RN` object created with function [rn].
 #'  The assumption is that coordinates in state space that are either close in terms of distance, or are re-visited with short recurrence times,
@@ -648,6 +1490,8 @@ rn_phases <- function(RN,
   checkPkg("igraph")
   checkPkg("invctr")
 
+  message("This function uses an old version of the phase search algorithm...\nUse rn_phaseInfo(), the new algorithm will produce different results!")
+
   # Handle arguments ----
   if(!attributes(RN)$weighted%00%FALSE){
     message("RN is not weighted, node degree will be used to identify prototypical states.")
@@ -659,7 +1503,7 @@ rn_phases <- function(RN,
   # }
 
   if(is.null(attributes(RN)$emDims1)){
-   warning("No multivariate time series data found. Cannot produce phase profile plots.")
+    warning("No multivariate time series data found. Cannot produce phase profile plots.")
     doPhaseProfilePlot <- FALSE
   }
 
@@ -675,21 +1519,21 @@ rn_phases <- function(RN,
 
   weighted <- attributes(RN)$weighted
   directed <- attributes(RN)$directed%00%FALSE
- if(!directed){
-   directed <- "undirected"
- } else {
-   directed <- "directed"
- }
+  if(!directed){
+    directed <- "undirected"
+  } else {
+    directed <- "directed"
+  }
 
 
   # Create graph ----
   gRN <- igraph::graph_from_adjacency_matrix(RN,
                                              weighted = weighted,
-                                             mode = ifelse(directed,"directed","undirected"))
+                                             mode = directed)
 
   if(inverseWeight){
     igraph::E(gRN)$weight <- (1/igraph::E(gRN)$weight)%00%0
-    }
+  }
 
 
   if(is.null(igraph::V(gRN)$size)){
@@ -1075,30 +1919,30 @@ rn_phases <- function(RN,
     #outMeans$phaseName <- factor(outMeans$phaseName,unique(outMeans$phaseName), ordered = TRUE)
   }
 
-   # spiral plot ----
+  # spiral plot ----
   if(doSpiralPlot){
 
-      # Phases <-  V(gRN)$phase
-      # Phases[is.na(Phases)] <- max(Phases, na.rm = TRUE)+1
+    # Phases <-  V(gRN)$phase
+    # Phases[is.na(Phases)] <- max(Phases, na.rm = TRUE)+1
 
-      if(!is.na(epochColours%00%NA)){
-        markEpochsBy <- out$phase_name
-        epochColours <- getColours(Ncols = length(unique(markEpochsBy)))
-        names(epochColours) <- markEpochsBy
-      } else {
-        markEpochsBy <- NULL
-      }
-
-      gg <- casnet::make_spiral_graph(g = gRN,
-                                      type = "Euler",
-                                      arcs = 4,
-                                      markTimeBy = TRUE,
-                                      showEpochLegend = TRUE,
-                                      markEpochsBy = markEpochsBy,
-                                      epochColours = epochColours,
-                                      epochLabel = "Phase")
-      print(gg)
+    if(!is.na(epochColours%00%NA)){
+      markEpochsBy <- out$phase_name
+      epochColours <- getColours(Ncols = length(unique(markEpochsBy)))
+      names(epochColours) <- markEpochsBy
+    } else {
+      markEpochsBy <- NULL
     }
+
+    gg <- casnet::make_spiral_graph(g = gRN,
+                                    type = "Euler",
+                                    arcs = 4,
+                                    markTimeBy = TRUE,
+                                    showEpochLegend = TRUE,
+                                    markEpochsBy = markEpochsBy,
+                                    epochColours = epochColours,
+                                    epochLabel = "Phase")
+    print(gg)
+  }
 
 
   bCentroid <- FALSE
@@ -1147,121 +1991,293 @@ rn_phases <- function(RN,
 }
 
 
-#' Create transition network
-#'
-#' @inheritParams rn_phases
-#' @param phaseSequence A vector with names or numbers that represent a sequence of phases or order parameter dynamics. If a named numeric vector is passed, the names attribute will be used to represent the phases. If the variable `phase_name`, generated by [rn_phases] is used, the arguments `excludeOther` and `excludeNorec` wil be evaluated.
-#' @param threshold Provide a threshold for the relative frequencies. Values below the threshold will be set to `0`. Pass `NA` to not use a threshold (default = `NA`)
-#' @param doMatrixPlot default(`TRUE`)
-#' @param doNetworkPlot default(`TRUE`)
-#' @param returnGraph Return an [igraph::igraph()] object (default = `FALSE`)
-#'
-#' @return A transition matrix based on relative frequencies
-#'
-#' @export
-#'
-#' @examples
-#'
-#' # This will output the transition matrix, a plot of the matrix and a transition network plot.
-#' y <- c("Happy", "Happy", "Sad", "Neutral", "Neutral", "Angry", "Sad", "Sad", "Neutral")
-#' TM <- rn_transition(y)
-#'
-#' @author Fred Hasselman
-#' @author Matti Heino
-#'
-rn_transition <- function(phaseSequence, threshold = NA, doMatrixPlot = TRUE, doNetworkPlot = TRUE, excludeOther = FALSE, excludeNorec = TRUE, returnGraph = FALSE){
 
-  if(excludeOther){
-    phaseSequence <- phaseSequence %>% tibble::as_tibble() %>% dplyr::filter(phaseSequence != "Other")
-    phaseSequence <- phaseSequence$value
-  }
-  if(excludeNorec){
-    phaseSequence <- phaseSequence %>% tibble::as_tibble() %>% dplyr::filter(phaseSequence != "No recurrence")
-    phaseSequence <- phaseSequence$value
-  }
-
-  phaseSequence <- as.numeric_discrete(phaseSequence, sortUnique = TRUE)
-  phase_names <- names(phaseSequence)
-
-  df <- data.frame(from = dplyr::lag(phaseSequence,1), to =  phaseSequence,
-                   from_name = dplyr::lag(phase_names,1), to_name = phase_names) %>%
-    dplyr::slice(-1) %>%
-    dplyr::group_by(.data$from, .data$to) %>%
-    dplyr::summarise(N = dplyr::n(),
-                     from_name = dplyr::first(.data$from_name),
-                     to_name = dplyr::first(.data$to_name)) %>%
-    dplyr::mutate(freq = (.data$N / sum(.data$N, na.rm = TRUE))) %>%
-    dplyr::select(-.data$N) %>%
-    dplyr::ungroup()
-
-  if(!is.na(threshold)){
-    df$freq[df$freq<=threshold] <- 0
-  }
-
-  TM <- Matrix::sparseMatrix(x = df$freq,
-                             i = df$from,
-                             j = df$to,
-                             dims = rep(length(unique(phase_names)),2),
-                             dimnames = list(sort(unique(phase_names)), sort(unique(phase_names))))
-  attr(TM,"rows") <- "from"
-  attr(TM,"cols") <- "to"
-
-  mp <- NA
-  if(doMatrixPlot){
-
-    df$freq <- signif(df$freq,3)
-    df$labels <- ifelse(is.na(df$freq),"0", df$freq)
-    mp <-  ggplot(df, aes_(x = ~to_name,
-                           y = ~from_name)) +
-      geom_tile(aes_(fill = ~freq),colour = "black",size = 0.4) +
-      geom_text(aes_(label = ~labels)) +
-      scale_fill_gradient(low = "#ECE3CD",
-                          high = "#A65141",
-                          na.value = "grey",
-                          guide = "none") +
-      theme_bw() +
-      scale_y_discrete(expand = c(0, 0)) +
-      scale_x_discrete(expand = c(0, 0)) +
-      theme(axis.text.x = element_text(angle = 30, hjust = 1),
-            axis.text.y = element_text(angle = 30, hjust = 1),
-            legend.position = "right",
-            legend.title = element_blank(),
-            panel.grid = element_blank(),
-            panel.background = element_rect(fill="grey80")) +
-      coord_equal() +
-      labs(x = "To ...", y = "From ...")
-
-    print(mp)
-  }
-
-  gg <- NA
-  if(doNetworkPlot){
-
-    gg <- igraph::graph_from_adjacency_matrix(TM, mode = "directed", weighted = TRUE, diag = TRUE)
-    gg$layout <- igraph::layout_as_tree(gg,mode = "all", circular = TRUE)
-
-    gg <- plotNET_prep(gg, nodeSize = "strength", rescaleSize = c(10,20), edgeColour = TRUE, doPlot = FALSE, removeSelfLoops = FALSE)
-
-    E(gg)$curved <- .3
-    E(gg)$loop.angle <- pi/12
-    E(gg)$arrow.width <- 1
-    E(gg)$arrow.size <- .6
-
-    if(!is.na(threshold)){
-      gg <-  delete_edges(gg, E(gg)[E(gg)$weight == 0])
-    }
-
-    plot(gg)
-
-  }
-
-
-  if(returnGraph){
-    list(TransitionMatrix = TM,
-         MatrixPlot = mp,
-         TransitionNetwork = gg)[TRUE,doMatrixPlot,doNetworkPlot]
-  } else {
-    return(TM)
-  }
-}
+#  if(is.na(maxPhases)%00%NA){
+#    maxPhases <- NROW(RN)
+#  } else {
+#    cat(paste0("\nmaxPhases = ", maxPhases,". Any unassigned recurring states will be labelled as phase 'Other'\n"))
+#  }
+#
+#  weighted <- attributes(RN)$weighted
+#  directed <- attributes(RN)$directed%00%FALSE
+# # if(!directed){
+# #   directed <- "undirected"
+# # } else {
+# #   directed <- "directed"
+# # }
+#
+#  # Create graph ----
+#  gRN <- igraph::graph_from_adjacency_matrix(RN,
+#                                             weighted = weighted,
+#                                             mode = ifelse(directed,"directed","undirected"))
+#
+#  if(inverseWeight){
+#    igraph::E(gRN)$weight <- (1/igraph::E(gRN)$weight)%00%0
+#    }
+#
+#
+#  if(is.null(igraph::V(gRN)$size)){
+#    if(!useDegree){
+#      igraph::V(gRN)$size <- igraph::strength(gRN)
+#    } else {
+#      igraph::V(gRN)$size <- igraph::degree(gRN)
+#    }
+#  }
+#
+#  # Node list ----
+#  RN_nodes <- data.frame(time = as.numeric(igraph::V(gRN)), degree = igraph::degree(gRN), strength = igraph::strength(gRN))
+#
+#  # Identify nodes with degree 1 (Singularities)
+#  Singularities <- RN_nodes %>% dplyr::filter(igraph::degree(gRN)==1)
+#
+#  # Identify nodes with degree 0 (nonRecurring)
+#  nonRecurring_sum <- sum(RN_nodes$degree==0, na.rm=TRUE)
+#  nonRecurring <- RN_nodes %>% dplyr::filter(igraph::degree(gRN)==0)
+#
+#
+#  RN_nodes <- RN_nodes %>% dplyr::filter(degree>0)
+#
+#  # Edge list ----
+#  RN_edges <- igraph::as_data_frame(gRN)
+#
+#
+#  # While loop ----
+#  last <- FALSE
+#  i <- 0
+#  nodeID <-phases <- strengths <- degrees <- list()
+#  igraph::V(gRN)$phase <- NA
+#
+#
+#  while(!last){
+#
+#    #i%++%1
+#    i <- i+1
+#
+#    if(i > 1){
+#      tmp_nodes   <- RN_nodes %>% dplyr::filter(!(time%in%sort(unique(unlist(phases[1:(i-1)])))))
+#      if(NROW(tmp_nodes)==0){
+#        last <- TRUE
+#        break
+#      }
+#    } else {
+#      tmp_nodes   <- RN_nodes
+#    }
+#
+#    if(useDegree){
+#      nodeID[[i]]    <- tmp_nodes$time[which.max(tmp_nodes$degree)]
+#    } else {
+#      nodeID[[i]]    <- tmp_nodes$time[which.max(tmp_nodes$strength)]
+#    }
+#
+#    degrees[[i]]   <- tmp_nodes$degree[which.max(tmp_nodes$degree)]
+#    strengths[[i]] <- tmp_nodes$strength[which.max(tmp_nodes$strength)]
+#
+#    tmp_edges      <- RN_edges %>% dplyr::filter(.data$from==nodeID[[i]]|.data$to==nodeID[[i]])
+#
+#    if(i > 1){
+#      tmp_edges   <- tmp_edges %>% dplyr::filter(!((.data$from%in%as.numeric(unlist(phases[1:(i-1)])))|(.data$to%in%as.numeric(unlist(phases[1:(i-1)])))))
+#    }
+#
+#    phases[[i]] <- sort(unique(c(tmp_edges$from,tmp_edges$to)))
+#
+#    igraph::V(gRN)$phase[phases[[i]]] <- i
+#    names(phases)[i] <- ifelse(i<10, paste0("Phase 0",i), paste("Phase",i))
+#
+#    if(i > 1){
+#      if(nodeID[[i]]==nodeID[[i-1]]){
+#        stop("Encountered same node twice!")
+#      }
+#      if(any(i>=NROW(RN_nodes), i==maxPhases, NROW(tmp_edges)==0)){
+#        last <- TRUE
+#        break
+#      }
+#    }
+#    rm(tmp_edges,tmp_nodes)
+#  }
+#
+#  if(length(unique(unlist(phases)))!=length(unlist(phases))){
+#    warning("Detected duplicate nodes in different phases!")
+#  }
+#
+#  # Phases <-  V(gRN)$phase
+#  # Phases[is.na(Phases)] <- max(Phases, na.rm = TRUE)+1
+#
+#  phases    <- phases[lengths(phases)!=0]
+#  cat(paste("\nFound",length(phases),"phases with at least",minStatesinPhase,"states.\n"))
+#  nodeID    <- nodeID[which(lengths(phases)!=0)]
+#  strengths <- strengths[which(lengths(phases)!=0)]
+#  degrees <- degrees[which(lengths(phases)!=0)]
+#
+#  out <- tidyr::unnest(dplyr::tibble(phase_name = names(phases),
+#                                     phase_number = as.numeric_discrete(names(phases)),
+#                                     phase_size = lengths(phases),
+#                                     maxState_time = as.numeric(nodeID),
+#                                     maxState_degree = as.numeric(degrees),
+#                                     maxState_strength = as.numeric(strengths),
+#                                     states_time = phases,
+#                                     states_singularity = 0),
+#                       cols = 7)
+#
+#  out$states_degree   <- igraph::degree(gRN)[out$states_time]
+#  out$states_strength <- igraph::strength(gRN)[out$states_time]
+#
+#  tmp     <- plyr::ldply(seq_along(phases), function(p) data.frame(phase_name = names(phases)[[p]],
+#                                                                   states_time = phases[[p]],
+#                                                                   maxState_time = nodeID[[p]],
+#                                                                   states_dist2maxState = RN[phases[[p]], nodeID[[p]]],
+#                                                                   states_singularity = 0))
+#
+#  # Check nodes and phases
+#  if(identical(out$states_time,tmp$states_time)){
+#    out$states_singularity <- tmp$states_singularity
+#    out$states_dist2maxState <- tmp$states_dist2maxState
+#  } else {
+#    warning("Wrong order?")
+#  }
+#
+#  if(cleanUp){
+#
+#    remains <- seq(1,igraph::vcount(gRN))[!(seq(1,igraph::vcount(gRN))%in%out$states_time)]
+#    remains <- remains[igraph::degree(gRN)[remains]>0]
+#
+#    remainsList <- list()
+#    i <- 0
+#
+#    for(p in unique(out$phase_name)){
+#
+#      tmp <- out %>% dplyr::filter(phase_name == p)
+#      if(useDegree){
+#        tmp <- dplyr::arrange(tmp, dplyr::desc(tmp$states_degree))
+#      } else {
+#        tmp <- dplyr::arrange(tmp, dplyr::desc(tmp$states_strength))
+#      }
+#
+#      dist_remain <- strength_remain <- nodes_remain <- degree_remain <- list()
+#
+#      for(n in 1:NROW(tmp)){
+#        nodes_remain[[n]] <- remains[remains%in%sort(unique(c(RN_edges$to[RN_edges$from==tmp$states_time[n]|RN_edges$to==tmp$states_time[n]], RN_edges$from[RN_edges$to==tmp$states_time[n]|RN_edges$from==tmp$states_time[n]])))]
+#        strength_remain[[n]] <- igraph::strength(gRN)[nodes_remain[[n]]]
+#        degree_remain[[n]] <- igraph::degree(gRN)[nodes_remain[[n]]]
+#      }
+#      names(nodes_remain) <- tmp$states_time # paste("Node:",tmp$states_time,"| Strength:",tmp$states_strength)
+#
+#      dist_remain <- plyr::llply(seq_along(nodes_remain), function(d){
+#        if(length(nodes_remain[[d]])>0){
+#          RN[nodes_remain[[d]], as.numeric(names(nodes_remain)[d])]
+#        } else {
+#          NA
+#        }
+#      })
+#
+#      i <- i+1
+#
+#      remainsList[[i]] <- tidyr::unnest(dplyr::tibble(phase_name = p,
+#                                                      phase_number = tmp$phase_number[tmp$phase_name==p][1],
+#                                                      phase_size = NA,
+#                                                      maxState_time = as.numeric(names(nodes_remain)),
+#                                                      maxState_degree = tmp$states_degree,
+#                                                      maxState_strength = tmp$states_strength,
+#                                                      states_time = nodes_remain,
+#                                                      states_degree = degree_remain,
+#                                                      states_strength = strength_remain,
+#                                                      states_dist2maxState = dist_remain,
+#                                                      states_singularity = 0),
+#                                        cols = 7:10)
+#
+#      rm(tmp)
+#    }
+#
+#    remainsOut <- plyr::ldply(remainsList)
+#
+#    if(useDegree){
+#      remainsOut <- dplyr::arrange(remainsOut, dplyr::desc(.data$maxState_degree))
+#    } else {
+#      remainsOut <- dplyr::arrange(remainsOut, dplyr::desc(.data$maxState_strength))
+#    }
+#    uniIND <- plyr::laply(as.numeric(remains), function(r) which(r==remainsOut$states_time)[1])
+#    out <- rbind(out, remainsOut[uniIND[!is.na(uniIND)],])
+#    out <- dplyr::arrange(out,.data$states_time)
+#    #out <- dplyr::arrange(out,.data$phase_name)
+#
+#    rm(remainsOut, remainsList, uniIND)
+#  }
+#
+#  if(minStatesinPhase>maxStatesinPhase){
+#    maxStatesinPhase <- minStatesinPhase
+#  }
+#
+#  # Add the dimension names
+#  if(!is.null(dimNames)){
+#    if(length(dimNames)!=NCOL(attributes(RN)$emDims1)){
+#      warning("Argument dimNames is not equal to number of phase space dimensions.")
+#    }
+#    space_dims <- attributes(RN)$emDims1[out$states_time, ,drop = FALSE]
+#    colnames(space_dims) <- dimNames
+#  } else {
+#    if(!is.null(attributes(RN)$emDims1)){
+#      space_dims <- attributes(RN)$emDims1[out$states_time, ,drop = FALSE]
+#      dimNames <- paste0(plyr::laply(strsplit(colnames(space_dims),split = "[.]"), function(s) s[[2]]))
+#      colnames(space_dims) <- dimNames
+#    } else {
+#      stop("Could not find the attribute 'emDims1' on the Recurrence Matrix.")
+#    }
+#  }
+#
+#  out <- cbind(out, space_dims)
+#
+#  # out[,(NCOL(out)+1):(NCOL(out)+NCOL(space_dims))] <- NA
+#  # colnames(out)[(NCOL(out)-NCOL(space_dims)+1):NCOL(out)] <- colnames(space_dims)
+#
+#  # Check if we missed some recurrent states due to the stopping parameters and create an "Other" category
+#  ltime <- seq(1,igraph::vcount(gRN))[!seq(1,igraph::vcount(gRN))%in%sort(out$states_time)]
+#  #ltime <- ltime[!ltime%in%Singularities$time]
+#  # These time points could contain non-recurring points, i.e. distance 0 to all other points
+#  ltime <- ltime[plyr::laply(ltime, function(p) sum(RN[1:NCOL(RN),p]))>0]
+#
+#  if(NROW(ltime)!=0){
+#    lost_time <- data.frame(matrix(NA,nrow=NROW(ltime),ncol=NCOL(out), dimnames = list(NULL,colnames(out))))
+#    lost_time$states_time <- ltime
+#    #lost_time[,(("states_dist2maxState"%ci%lost_time)+1):NCOL(lost_time)] <- attributes(RN)$emDims1[ltime,]
+#    lost_time[,(NCOL(out)-NCOL(space_dims)+1):NCOL(out)] <- attributes(RN)$emDims1[ltime,]
+#    lost_time$phase_name <- "Other"
+#    lost_time$phase_number <- max(out$phase_number, na.rm = TRUE)+1
+#    lost_time$phase_size <- length(ltime)
+#    lost_time$maxState_time <- NA
+#    lost_time$maxState_degree <- max(lost_time$states_degree, na.rm = TRUE)
+#    lost_time$maxState_strength <- max(lost_time$states_strength, na.rm = TRUE)
+#    lost_time$states_singularity <- 0
+#    lost_time$states_degree <- igraph::degree(gRN)[lost_time$states_time]
+#    lost_time$states_strength <- igraph::strength(gRN)[lost_time$states_time]
+#    lost_time$states_dist2maxState <- NA
+#    if(useDegree){
+#      lost_time$maxState_time <- lost_time$states_time[which.max(lost_time$states_degree)]
+#    } else {
+#      lost_time$maxState_time <- lost_time$states_time[which.max(lost_time$states_strength)]
+#    }
+#
+#    out <- rbind(out,lost_time)
+#  }
+#
+#  # Finally add the nonrecurring states
+#  norec <- seq(1,igraph::vcount(gRN))[!seq(1,igraph::vcount(gRN))%in%sort(out$states_time)]
+#  #norec <- norec[!norec%in%Singularities$time]
+#
+#  if(NROW(norec)!=0){
+#    empty <- data.frame(matrix(NA,nrow=NROW(norec),ncol=NCOL(out),dimnames = list(NULL,colnames(out))))
+#    empty$states_time <- norec
+#    #empty[,(("states_dist2maxState"%ci%empty)+1):NCOL(empty)] <- attributes(RN)$emDims1[norec,]
+#    empty[,(NCOL(out)-NCOL(space_dims)+1):NCOL(out)] <- attributes(RN)$emDims1[norec,]
+#    empty$phase_name <- "No recurrence"
+#    empty$phase_number <- max(out$phase_number, na.rm = TRUE)+1
+#    empty$phase_size <- length(norec)
+#    empty$states_strength <- 0
+#    empty$states_degree <- 0
+#
+#    out <- rbind(out,empty)
+#  }
+#
+#  out <- dplyr::arrange(out,states_time)
+#  # out[,(NCOL(out)-NCOL(space_dims)+1):NCOL(out)] <- space_dims
+#  # rm(space_dims)
+#  #
 

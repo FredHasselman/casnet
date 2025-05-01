@@ -25,17 +25,18 @@
     casnet.syscopy = casnet_OS_options$syscopy,
     casnet.install.args = "",
     casnet.name = "Fred Hasselman", #"A toolbox for studying Complex Adaptive Systems and NETworks",
-    casnet.desc.author = '"Fred Hasselman <f.hasselman@bsi.ru.nl> [aut, cre]"',
+    casnet.desc.author = '"Fred Hasselman <fred.hasselman@ru.nl> [aut, cre]"',
     casnet.desc.license = "GP-L3",    casnet.desc.suggests = NULL,
     casnet.desc = list()
   )
   toset <- !(names(op.casnet) %in% names(op))
   if(any(toset)) options(op.casnet[toset])
 
-  for(p in c("grDevices","graphics","ggtable","stats","utils","Matrix","plyr","dplyr","tidyr","ggplot2","invctr","igraph")){
+  for(p in c("grDevices","graphics","ggtable","stats","utils","Matrix","plyr","dplyr","tidyr","ggplot2","invctr","igraph","fpCompare")){
     requireNamespace(p, quietly = TRUE)
   }
-  requireNamespace("invctr")
+  library("invctr")
+  library("fpCompare")
   invisible()
 }
 

@@ -30,6 +30,7 @@ knitr::opts_chunk$set(
 )
 library(plyr)
 library(invctr)
+library(fpCompare)
 library(tidyverse)
 library(plot3D)
 

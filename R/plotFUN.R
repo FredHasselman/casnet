@@ -1786,17 +1786,26 @@ plotMRN_win <- function(df_mrn,
   return(invisible(g))
 }
 
-
+# excludeTransients = FALSE
+# excludePhaseNeighbours = FALSE
+# excludeNonrecurring = TRUE
+# excludeSingularities = TRUE
 
 #' Phase Density for each dimension
 #'
 #' Create a ridge plot (requires package [ggridges])
 #'
-#' @param phaseOutput Output from function [casnet::rn_phases]
-#' @param excludeOther Exclude the default Phase "Other"
-#' @param excludeNorec Exclude the default Phase "No recurrence"
+#' @inheritParams plotRN_phaseProfiles
+#' @param phaseOutput Output from function [casnet::rn_phaseInfo]
+#' @param excludeTransients Should the category "Transient" be excluded from plots? (default = `FALSE`)
+#' @param excludePhaseNeighbour Should the category "PhaseNH" be excluded from plots? (default = `FALSE`)
+#' @param excludeSingularities Should the category "Singularity" be excluded from plots? (default = `TRUE`)
+#' @param excludeNonrecurring Should the category "Nonrecurring" be excluded from plots? (default = `TRUE`)
 #' @param excludeVars Exclude specific dimension variables by name. Leave empty to include all variables (default = `""`)
-#' @param excludePhases Exclude Phases by their name (variable `phase_name`). Leave empty to include all Phases (after `excludeOther` and `excludeNorec`) (default = `""`)
+#' @param excludePhases Exclude Phases by their name (variable `phase_name`). Leave empty to include all Phases (after the other exclusion arguments) (default = `""`)
+#' @param alphaDensity Alpha value for the density plots
+#' @param showPhaseSize Show the number of states in each phase in the labels (default = TRUE)
+#' @param splitFacets Integer value to indicate if sets of phases should be displayed in different facets? (default = `NA`)
 #'
 #' @return data frame with phase series.
 #'
@@ -1805,34 +1814,40 @@ plotMRN_win <- function(df_mrn,
 #' @examples
 #'
 #' RN <- rn(cumsum(rnorm(100)), emDim = 1, emLag = 1, emRad = NA, weighted = TRUE)
-#' outPhases <- rn_phases(RN)
-#' plotRN_phaseDensity(outPhases)
+#' outPhases <- rn_phaseInfo(RN)
+#' plotRN_phaseDensities(outPhases)
 #'
-plotRN_phaseDensity <- function(phaseOutput,
+plotRN_phaseDensities <- function(phaseOutput,
                                 plotCentroid = NA,
-                                excludeOther = FALSE,
-                                excludeNorec = FALSE,
+                                showEpochLegend = TRUE,
+                                epochColours = NULL,
+                                epochLabel   = "Phase",
+                                excludeTransients = FALSE,
+                                excludePhaseNeighbours = FALSE,
+                                excludeSingularities = TRUE,
+                                excludeNonrecurring = TRUE,
                                 excludeVars = "",
                                 excludePhases = "",
+                                alphaDensity = .4,
+                                splitFacets = NA,
+                                showPhaseSize = TRUE,
                                 returnGraph = FALSE){
 
   checkPkg("ggridges")
 
-  if(!is.null(attr(phaseOutput,"rn_phases"))){
+  if(!is.null(attr(phaseOutput,"rn_phaseInfo"))){
 
-    outArg <- attr(phaseOutput,"rn_phases")
+    outArg <- attr(phaseOutput,"rn_phaseInfo")
 
-    returnCentroid <- outArg$returnCentroid
     maxPhases <-  outArg$maxPhases
     minStatesinPhase <- outArg$minStatesinPhase
     maxStatesinPhase <- outArg$maxStatesinPhase
-    cleanUp <- outArg$cleanUp
     returnCentroid <- outArg$returnCentroid
-    removeSingularities <- outArg$removeSingularities
     standardise <- outArg$standardise
+    dimNames <- outArg$dimNames
 
   } else {
-    stop("The output is not from function 'casnet::rn_phases()'!")
+    stop("The output is not from function 'casnet::rn_phaseInfo()'!")
   }
 
   if(!nchar(excludePhases)>0){
@@ -1848,20 +1863,34 @@ plotRN_phaseDensity <- function(phaseOutput,
   }
 
   if(!is.data.frame(phaseOutput)){
-    out <- phaseOutput[1]$phaseSeries
+    out <- phaseOutput$phaseSeries
     if(plotCentroid){
-      if(names(phaseOutput)%in%"phaseCentroids"){
-        outMeans <- phaseOutput[1]$phaseCentroids
+      if(any(names(phaseOutput)%in%"phaseCentroids")){
+        outMeans <- phaseOutput$phaseCentroids
       }
     }
   }
 
-  Phases_long <- out %>% ungroup() %>%
-    dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
-    dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
-    dplyr::select(!(dplyr::contains(excludeVars))) %>%
-    dplyr::select(phase_name, dplyr::starts_with("dim_")) %>%
-    tidyr::pivot_longer(cols = dplyr::starts_with("dim_"), names_to = "Dimension", values_to = "Value")
+  RemoveFrames <- c("PhaseNH","Nonrecurring","Transient","Singularity")[c(excludePhaseNeighbours, excludeNonrecurring, excludeTransients, excludeSingularities)]
+
+  if(any(out$phase_size<=1)){
+  warning(paste0("Cannot compute density for these groups:\n",paste(out$phase_name[which(out$phase_size<=1)],collapse="\n")), "\n(list is not exhaustive)")
+  }
+
+  # if(showPhaseSize){
+  #   out$phase_name <- out$phaseName
+  # }
+
+  Phases_long <- out |>
+    dplyr::ungroup() |>
+    dplyr::filter(!grepl(pattern = paste0("(",RemoveFrames,")",collapse="|"),x = out$phase_name)) |>
+    dplyr::filter(!(phase_name %in% excludePhases)) |>
+    dplyr::filter(!(phase_size <= 1)) |>
+    dplyr::select(!(dplyr::contains(excludeVars))) |>
+    dplyr::select(phase_name, dplyr::all_of(dimNames)) |>
+    tidyr::pivot_longer(cols = dplyr::all_of(dimNames), names_to = "Dimension", values_to = "Value")
+
+
 
   # maxPhases
   # unique(Phases_long$phase_name)
@@ -1869,20 +1898,76 @@ plotRN_phaseDensity <- function(phaseOutput,
   # Phases$phase_name %in% unique(dplyr::arrange(data.frame(Phases$phase_name),Phases$phase_size))[1:maxPhases,1]
 
   epochColours <- getColours(Ncols = length(unique(Phases_long$phase_name)))
+  names(epochColours) <- sort(unique(Phases_long$phase_name))
 
-  pd <- ggplot(Phases_long, aes(y= Dimension, x = Value, fill = phase_name), col = "black") +
-    geom_density_ridges(
-      aes(point_color = phase_name, point_fill = phase_name),
-      point_size = .1,
-      jittered_points = TRUE,
-      position = "raincloud",
-      alpha = 0.4, scale = 0.9) +
-    scale_fill_manual(values = epochColours) +
-    scale_discrete_manual(aesthetics = "point_color", values = epochColours) +
-    #scale_discrete_manual(aesthetics = "point_size", values = .1) +
+  if(!is.na(splitFacets)){
+    if(as.numeric(splitFacets)<length(unique(Phases_long$phase_name))){
+
+      if(length(unique(Phases_long$phase_name))%%splitFacets==0){
+        repEach <- length(unique(Phases_long$phase_name))/splitFacets
+      } else {
+        repEach <- (length(unique(Phases_long$phase_name))+1)/(splitFacets)
+        message("Adjusted splitFacets")
+      }
+
+      divs <- round(seq(1,splitFacets, along.with = unique(Phases_long$phase_name)))
+      #rep(1:splitFacets, length.out = length(unique(Phases_long$phase_name)), each = repEach)
+      split_by <- split(sort(unique(Phases_long$phase_name)), divs)
+      names(split_by) <- paste("Set",1:length(split_by))
+
+
+      facets <- llply(seq_along(split_by), function(s){
+        phnames <- paste0( shQuote(split_by[[s]]),collapse=',')
+        paste0("c(",phnames,") ~ ",shQuote(names(split_by)[s]))
+      })
+      eval(parse(text=paste0("Phases_long$facets <- case_match(Phases_long$phase_name,",paste0(facets,collapse=","),")")))
+      splitFacets <- TRUE
+
+    }
+  } else {
+    splitFacets <- FALSE
+  }
+
+  xlab <- paste0("Value (",ifelse(standardise%in%"none","original",standardise)," scale)")
+
+  pd <- ggplot2::ggplot(Phases_long, aes(y= Dimension, x = Value, fill = phase_name))
+
+  if(plotCentroid){
+    pd <- pd +
+      ggridges::geom_density_ridges(aes(point_color = phase_name, vline_colour = phase_name),
+                                    jittered_points = TRUE,
+                                    quantile_lines = TRUE,
+                                    position = ggridges::position_raincloud(adjust_vlines = TRUE),
+                                    alpha = alphaDensity,
+                                    scale = 0.8,
+                                    vline_width = .2) +
+      scale_discrete_manual("Quantiles", aesthetics = "vline_color", values = epochColours)
+  } else {
+    pd <- pd + ggridges::geom_density_ridges(aes(point_color = phase_name),
+                                             jittered_points = TRUE,
+                                             position = "raincloud",
+                                             alpha = alphaDensity, scale = 0.8)
+  }
+
+  if(splitFacets){
+    pd <- pd + facet_wrap(facets~.)
+  }
+
+  pd <- pd +
+    scale_fill_manual("Phase", values = epochColours) +
+    scale_discrete_manual("Phase", aesthetics = "point_color", values = epochColours) +
+    scale_discrete_manual("Phase", aesthetics = "point_size", values = .1) +
+    scale_x_continuous(name = xlab) +
     theme_bw()
 
   print(pd)
+
+  if(splitFacets){
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+    cat("Sets contain:\n")
+    cat(paste("\n\n",paste(names(split_by),"=",split_by)),paste("\n"))
+    cat("\n~~~o~~o~~casnet~~o~~o~~~\n")
+  }
 
   if(returnGraph){
     invisible(return(pd))
@@ -1890,20 +1975,31 @@ plotRN_phaseDensity <- function(phaseOutput,
 }
 
 
-# maxPhases = 5,
-# minStatesinPhase = 1,
-# maxStatesinPhase = NROW(RN),
-# cleanUp = TRUE,
-# returnCentroid = c("no","mean.sd","median.mad","centroid")[1],
-# removeSingularities = FALSE,
-# standardise = c("none","mean.sd","median.mad","unit")[4],
-# returnGraph = FALSE,
-# doPhasePlot = FALSE,
-# plotCentroid = FALSE,
-# colOrder = FALSE,
-# phaseColours = NULL,
-# doSpiralPlot = FALSE,
-# doPhaseSeriesPlot = FALSE,
+# maxPhases = 5
+# minStatesinPhase = 1
+# maxStatesinPhase = NROW(RN)
+# cleanUp = TRUE
+# returnCentroid = c("no","mean.sd","median.mad","centroid")[1]
+# removeSingularities = FALSE
+# standardise = c("none","mean.sd","median.mad","unit")[4]
+# returnGraph = FALSE
+# doPhasePlot = FALSE
+# plotCentroid = FALSE
+# colOrder = FALSE
+# phaseColours = NULL
+# doSpiralPlot = FALSE
+# doPhaseSeriesPlot = FALSE
+# showEpochLegend = TRUE
+# epochColours = NULL
+# epochLabel   = "Phase"
+# excludeTransients = FALSE
+# excludePhaseNeighbours = FALSE
+# excludeNonrecurring = TRUE
+# excludeSingularities = TRUE
+# excludeVars = ""
+# excludePhases = ""
+# returnGraph = FALSE
+# colOrder = NA
 
 
 #' Profile Plot
@@ -1911,7 +2007,7 @@ plotRN_phaseDensity <- function(phaseOutput,
 #' Plot a profile (values of the dimensions) for each phase.
 #'
 #'
-#' @inheritParams plotRN_phaseDensity
+#' @inheritParams plotRN_phaseDensities
 #'
 #' @return plot
 #'
@@ -1920,37 +2016,38 @@ plotRN_phaseDensity <- function(phaseOutput,
 #' @examples
 #'
 #' RN <- rn(y1 = data.frame(x = rnorm(100), y= rnorm(100)), weighted = TRUE)
-#' phase_out <- rn_phases(RN, returnCentroid = "mean.sd")
-#' plotRN_phaseProfile(phaseOutput = phase_out)
+#' phase_out <- rn_phaseInfo(RN, returnCentroid = "mean.sd")
+#' plotRN_phaseProfiles(phaseOutput = phase_out)
 #'
 #'
-plotRN_phaseProfile <- function(phaseOutput,
+plotRN_phaseProfiles <- function(phaseOutput,
                                 plotCentroid = NA,
                                 showEpochLegend = TRUE,
                                 epochColours = NULL,
                                 epochLabel   = "Phase",
-                                excludeOther = FALSE,
-                                excludeNorec = TRUE,
+                                excludeTransients = FALSE,
+                                excludePhaseNeighbours = FALSE,
+                                excludeNonrecurring = TRUE,
+                                excludeSingularities = TRUE,
                                 excludeVars = "",
                                 excludePhases = "",
+                                showPhaseSize = TRUE,
                                 returnGraph = FALSE,
                                 colOrder = NA){
 
-  if(!is.null(attr(phaseOutput,"rn_phases"))){
+  if(!is.null(attr(phaseOutput,"rn_phaseInfo"))){
 
-    outArg <- attr(phaseOutput,"rn_phases")
+    outArg <- attr(phaseOutput,"rn_phaseInfo")
 
     returnCentroid <- outArg$returnCentroid
     maxPhases <-  outArg$maxPhases
     minStatesinPhase <- outArg$minStatesinPhase
     maxStatesinPhase <- outArg$maxStatesinPhase
-    cleanUp <- outArg$cleanUp
-    removeSingularities <- outArg$removeSingularities
     standardise <- outArg$standardise
     dimNames <- outArg$dimNames
 
   } else {
-    stop("The output is not from function 'casnet::rn_phases()'!")
+    stop("The output is not from function 'casnet::rn_phaseInfo()'!")
   }
 
   # bCentroid <- FALSE
@@ -2000,71 +2097,81 @@ plotRN_phaseProfile <- function(phaseOutput,
     excludeVars <- "___"
   }
 
-  if(is.na(colOrder)&plotCentroid){
+  #if(is.na(colOrder)&plotCentroid){
    # tmp <-  out %>% dplyr::group_by(phase_name) %>% dplyr::select(dplyr::starts_with("dim_"))
    #  dplyr::select(out,names(sort(colMeans(tmp[,-1], na.rm = TRUE), decreasing = TRUE)))
    #
    #  out <- dplyr::select(out,names(sort(colMeans(out, na.rm = TRUE))))
-  }
+  #}
 
-  Phases_long <- out %>% dplyr::ungroup() %>%
-    dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
-    dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
-    dplyr::select(!(dplyr::contains(excludeVars))) %>%
-    dplyr::select(phaseName, phase_name, states_time, alpha, psize, dplyr::starts_with(dimNames)) %>%
+  RemoveFrames <- c("PhaseNH","Nonrecurring","Transient","Singularity")[c(excludePhaseNeighbours,excludeNonrecurring, excludeTransients, excludeSingularities)]
+
+  # if(showPhaseSize){
+  #   out$phase_name <- out$phaseName
+  # }
+
+  Phases_long <- out |>
+    dplyr::ungroup() |>
+    dplyr::filter(!grepl(pattern = paste0("(",RemoveFrames,")",collapse="|"),x = out$phase_name)) |>
+    dplyr::filter(!(phase_name %in% excludePhases)) |>
+    dplyr::select(!(dplyr::contains(excludeVars))) |>
+    dplyr::select(time, alpha, psize, phase_name, dplyr::starts_with(dimNames)) |>
     tidyr::pivot_longer(cols = dplyr::starts_with(dimNames), names_to = "Dimension", values_to = "Value")
-
 
   if((returnCentroid)%in%c("mean.sd","median.mad","centroid")){
     Phases_long$alpha <- elascer(Phases_long$alpha, lo = .2, hi = .5)
   }
 
+  xlab <- paste0("Value (",ifelse(standardise%in%"none","original",standardise)," scale)")
+
   pp <- ggplot(data = Phases_long,
-               aes_(x = ~Dimension,
-                    y = ~Value,
-                    color = ~phase_name,
-                    alpha = ~alpha,
-                    group = ~states_time)) +
+               aes(x = Dimension,
+                    y = Value,
+                    color = phase_name,
+                    alpha = alpha,
+                    group = time)) +
     scale_size(range = c(1,4)) +
     scale_alpha_identity() +
-    geom_point(aes_(size = ~psize)) +
+    geom_point(aes(size = psize)) +
     geom_line()+
-    facet_wrap(~ phaseName) +
+    scale_x_discrete(name = xlab) +
+    facet_wrap(~ phase_name) +
     scale_color_manual(values = epochColours)
 
 
   if(plotCentroid){
+
+    outMeans <- outMeans |>
+      dplyr::ungroup() |>
+      dplyr::filter(!grepl(pattern = paste0("(",RemoveFrames,")",collapse="|"),x = outMeans$phase_name)) |>
+      dplyr::filter(!(phase_name %in% excludePhases)) |>
+      dplyr::select(!(dplyr::contains(excludeVars)))
+
     if(returnCentroid%in%c("mean.sd","centroid")){
 
-      pp <- pp + geom_line(data = outMeans, aes_(x = ~Dimension, y = ~Mean, group = ~phaseName), inherit.aes = FALSE)
+      pp <- pp + geom_line(data = outMeans, aes(x = Dimension, y = Mean, group = phase_name), inherit.aes = FALSE)
 
       if(returnCentroid%in%c("mean.sd")){
 
-      # if(returnCentroid%in%"centroid"){
-      #   pp <- pp +
-      #     geom_line(data = outMeans,
-      #                        aes_(x = ~Dimension, y = ~Mean, color = ~phaseName, group = ~phaseName), inherit.aes = FALSE)
-      # } else {
-
         pp <- pp +
           geom_linerange(data = outMeans,
-                         aes_(x = ~Dimension, y = ~Mean, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+                         aes(x = Dimension, y = Mean, ymin = ymin, ymax = ymax),  inherit.aes = FALSE)
       }
 
       pp <- pp +
         geom_point(data = outMeans,
-                   aes_(x = ~Dimension, y = ~Mean, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+                   aes(x = Dimension, y = Mean, fill = phase_name, group = phase_name), pch = 21, inherit.aes = FALSE) +
         scale_fill_manual(values = epochColours)
 
       } else {
 
         pp <- pp +
           geom_linerange(data = outMeans,
-                         aes_(x = ~Dimension, y = ~Median, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+                         aes(x = Dimension, y = Median, ymin = ymin, ymax = ymax),  inherit.aes = FALSE)
 
         pp <- pp +
           geom_point(data = outMeans,
-                     aes_(x = ~Dimension, y = ~Median, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+                     aes(x = Dimension, y = Median, fill = phase_name, group = phase_name), pch = 21, inherit.aes = FALSE) +
           scale_fill_manual(values = epochColours)
       }
     }
@@ -2081,79 +2188,11 @@ plotRN_phaseProfile <- function(phaseOutput,
 }
 
 
-
-# Phases_long$alpha <- elascer(Phases_long$alpha, lo = .2, hi = .5)
-# if((plotCentroid)%in%c("mean.sd","median.mad","centroid")){
-#   Phases_long$alpha <- elascer(Phases_long$alpha, lo = .2, hi = .5)
-# }
-#
-# if((plotCentroid)%in%c("mean.sd","median.mad")){
-#
-#   outMeans <- plyr::ldply(unique(out$phase_name), function(p){
-#     tmp <- out %>% dplyr::ungroup() %>% dplyr::filter(.data$phase_name==p) %>% dplyr::select(dplyr::starts_with("dim_"))
-#     tmp$phase_name <- p
-#     if(plotCentroid=="mean.sd"){
-#       Mean <- data.frame(phase_name = p, Mean = colMeans(tmp[,-NCOL(tmp)], na.rm = TRUE))
-#       SD <- plyr::colwise(sd, na.rm=TRUE)(tmp[,-NCOL(tmp)])
-#     }
-#     if(plotCentroid=="median.mad"){
-#       Mean <- data.frame(phase_name = p, Mean = plyr::colwise(stats::median, na.rm=TRUE)(tmp[,-NCOL(tmp)]))
-#       SD <- plyr::colwise(stats::mad, na.rm=TRUE)(tmp[,-NCOL(tmp)])
-#     }
-#     Mean$SD         <- as.numeric(t(SD))
-#     Mean$Dimension  <- rownames(Mean)
-#     Mean$phase_size <- unique(out$phase_size[out$phase_name==p])
-#     return(Mean)
-#   })
-# }
-#
-# if(plotCentroid%in%"centroid"){
-#   #checkPkg("dtwclust")
-#
-#   NAind <- which(!stats::complete.cases(out))
-#   tmpPhases <- out[stats::complete.cases(out),]
-#
-#   outMeansList <- list()
-#   pnames <- unique(tmpPhases$phase_name)
-#   for(p in seq_along(pnames)){
-#     tmp <- tmpPhases %>%
-#       dplyr::ungroup() %>%
-#       dplyr::filter(.data$phase_name==pnames[p]) %>%
-#       dplyr::select(dplyr::starts_with("dim_"))
-#
-#     centroid <- dtwclust::shape_extraction(data.frame(tmp), znorm = FALSE)
-#     outMeansList[[p]] <- data.frame(phase_name = pnames[p],
-#                                     Mean = centroid,
-#                                     SD = 0,
-#                                     Dimension = colnames(tmp),
-#                                     phase_size = unique(tmpPhases$phase_size[tmpPhases$phase_name==pnames[p]]))
-#   }
-#
-#   outMeans <- plyr::ldply(outMeansList)
-# }
-#
-#
-# if(excludeOther){
-#   outMeans <- outMeans %>% dplyr::filter(.data$phase_name != "Other")
-# }
-# if(excludeNorec){
-#   outMeans <- outMeans %>% dplyr::filter(.data$phase_name != "No recurrence")
-# }
-#
-# outMeans$ymin <- outMeans$Mean - outMeans$SD
-# outMeans$ymax <- outMeans$Mean + outMeans$SD
-# #outMeans$states_time <- outMeans
-# outMeans$Dimension <- forcats::fct_inorder(outMeans$Dimension)
-# outMeans$phaseName <- paste(outMeans$phase_name,"  |  N =",outMeans$phase_size)
-# outMeans$phaseName <- factor(outMeans$phaseName,unique(outMeans$phaseName), ordered = TRUE)
-
-
-
 #' Phase Series plot
 #'
 #' Plot the sequence of phases as a time series.
 #'
-#' @inheritParams plotRN_phaseDensity
+#' @inheritParams plotRN_phaseDensities
 #'
 #' @return phase density plot
 #' @export
@@ -2161,37 +2200,32 @@ plotRN_phaseProfile <- function(phaseOutput,
 #' @examples
 #'
 #' RN <- rn(y1 = rnorm(100), weighted = TRUE)
-#' phase_out <- rn_phases(RN)
-#' plotRN_phaseDensity(phase_out)
+#' phase_out <- rn_phaseInfo(RN)
+#' plotRN_phaseTimeSeries(phase_out)
 #'
 #'
-plotRN_phaseSeries <- function(phaseOutput,
+plotRN_phaseTimeSeries <- function(phaseOutput,
                                showEpochLegend = TRUE,
                                epochColours = NULL,
                                epochLabel = "Phase",
-                               excludeOther = FALSE,
-                               excludeNorec = TRUE,
                                excludeVars = "",
                                excludePhases = "",
-                               plotCentroid = FALSE,
                                returnGraph = FALSE){
 
 
-  if(!is.null(attr(phaseOutput,"rn_phases"))){
+  if(!is.null(attr(phaseOutput,"rn_phaseInfo"))){
 
-    outArg <- attr(phaseOutput,"rn_phases")
+    outArg <- attr(phaseOutput,"rn_phaseInfo")
 
     returnCentroid <- outArg$returnCentroid
     maxPhases <-  outArg$maxPhases
     minStatesinPhase <- outArg$minStatesinPhase
     maxStatesinPhase <- outArg$maxStatesinPhase
-    cleanUp <- outArg$cleanUp
     returnCentroid <- outArg$returnCentroid
-    removeSingularities <- outArg$removeSingularities
     standardise <- outArg$standardise
 
   } else {
-    stop("The output is not from function 'casnet::rn_phases()'!")
+    stop("The output is not from function 'casnet::rn_phaseInfo()'!")
   }
 
   # if(length(phaseOutput)>1){
@@ -2207,11 +2241,7 @@ plotRN_phaseSeries <- function(phaseOutput,
 
   if(!is.data.frame(phaseOutput)){
     out <- phaseOutput$phaseSeries
-    if(plotCentroid){
-      if("phaseCentroids"%in%names(phaseOutput)){
-        outMeans <- phaseOutput$phaseCentroids
-      }
-    }
+    outMeans <- phaseOutput$phaseCentroids
   } else {
     out <- phaseOutput
   }
@@ -2230,11 +2260,12 @@ plotRN_phaseSeries <- function(phaseOutput,
     excludeVars <- "___"
   }
 
-  out$maxState_strength[is.na(out$maxState_strength)] <- min(out$maxState_strength, na.rm = TRUE)/2
+  #out$maxState_strength[is.na(out$maxState_strength)] <- min(out$maxState_strength, na.rm = TRUE)/2
 
-  p <- ggplot(out, aes_(x = ~states_time, y = ~phase_name, fill = ~phase_name, group = 1)) +
+
+  p <- ggplot(out, aes(x = time, y = phase_name, fill = phase_name, group = 1)) +
     geom_line(colour = "grey60") +
-    geom_point(aes_(size = ~maxState_strength+1), pch=21, alpha = .8) +
+    geom_point(aes(size = selectNode+1), pch=21, alpha = .8) +
     scale_fill_manual(values = epochColours, guide = "none") +
     scale_x_continuous("Time", expand = c(.05,.2)) +
     scale_y_discrete("Phase") +
@@ -2246,7 +2277,7 @@ plotRN_phaseSeries <- function(phaseOutput,
     dplyr::count(phase_name) %>%
     dplyr::mutate(pct = n/NROW(out))
 
-  h <- ggplot(tmp, aes_(y = ~phase_name, fill = ~phase_name, x = ~pct, label = scales::percent(tmp$pct))) +
+  h <- ggplot(tmp, aes(y = phase_name, fill = phase_name, x = pct, label = scales::percent(pct))) +
     geom_col(position= "dodge") +
     geom_label(position = position_dodge(width = .9),
                vjust = 0.5,
@@ -2274,20 +2305,22 @@ plotRN_phaseSeries <- function(phaseOutput,
 #'
 #' 2D umap projection of multidimensional Phase Space. Categories "No recurrence" and "Other" are removed.
 #'
-#' @inheritParams plotRN_phaseProfile
+#' @inheritParams plotRN_phaseProfiles
 #' @param RNdist A distance matrix (unthresholded) created with [rn] or [rp]
-#' @param PhaseOut Output from function [rn_phases] based on the thresholded matrix in `RNdist`
+#' @param PhaseOutput Output from function [rn_phaseInfo] based on the thresholded matrix in `RNdist`
 #'
 #' @return Dataframe with coordinates
 #' @export
 #'
-plotRN_phaseProjection <- function(RNdist,
+plotRN_phaseProjections <- function(RNdist,
                                    phaseOutput,
+                                   # excludeTransients = FALSE,
+                                   # excludePhaseNeighbours = FALSE,
+                                   # excludeNonrecurring = TRUE,
+                                   # excludeSingularities = TRUE,
                                    epochColours = NULL,
                                    showEpochLegend = TRUE,
-                                   epochLabel   = "Phase",
-                                   excludeOther = TRUE,
-                                   excludeNorec = TRUE){
+                                   epochLabel   = "Phase"){
 
   if(length(phaseOutput)>1){
     phaseOutput <- phaseOutput$phaseSeries
@@ -2295,15 +2328,22 @@ plotRN_phaseProjection <- function(RNdist,
 
   checkPkg("umap")
 
-  if(!(attributes(RNdist)$method %in% c("euclidean","manhattan","cosine","pearson","pearson2"))){
+  if(!(tolower(attributes(RNdist)$method) %in% c("euclidean","manhattan","cosine","pearson","pearson2"))){
     warning('Distance measure cannot be used with umap!\nShould be one of: "euclidean","manhattan","cosine","pearson","pearson2"\nResults will be based on assuming "euclidean"... Change the distance measure of RNdist')
     method <- "euclidean"
   } else {
-    method <- attributes(RNdist)$method
+    method <- tolower(attributes(RNdist)$method)
   }
 
+  # phaseOutput <- phaseOutput |>
+  #   dplyr::ungroup() |>
+  #   dplyr::filter(!grepl(pattern = paste0("(",RemoveFrames,")",collapse="|"),x = out$phase_name)) |>
+  #   dplyr::filter(!(phase_name %in% excludePhases)) |>
+  #   dplyr::select(!(dplyr::contains(excludeVars)))
+
+
   custom.config <- umap::umap.defaults
-  custom.config$n_neighbours <- max(phaseOutput$phase_size)
+  custom.config$n_neighbours <- max(phaseOutput$phase_size, na.rm = TRUE)
   custom.config$metric <- method
   custom.config$random_state <- 1234
 
@@ -2312,16 +2352,7 @@ plotRN_phaseProjection <- function(RNdist,
   df.umap$labels <- phaseOutput$phase_name
   df.umap$size <- phaseOutput$phase_size
 
-  if(excludeOther){
-    df.umap <- df.umap %>% filter(!(labels %in% c("Other")))
-  }
-
-  if(excludeNorec){
-    df.umap <- df.umap %>% filter(!(labels %in% c("No recurrence")))
-  }
-
   dfepochs <- phaseOutput %>% group_by(phase_name) %>% summarize(phase_size = first(phase_size))
-
 
   epochColours <- getColours(Ncols = NROW(dfepochs))
   names(epochColours) <- dfepochs$phase_name
@@ -2340,7 +2371,6 @@ plotRN_phaseProjection <- function(RNdist,
     geom_point(aes(size = size)) +
     scale_x_continuous("") +
     scale_y_continuous("") +
-    #scale_size_manual(epochLabel, values = sort(epochSizes)) +
     scale_color_manual(epochLabel, values = epochColours) +
     theme_void()
 
@@ -2349,224 +2379,6 @@ plotRN_phaseProjection <- function(RNdist,
  return(invisible(df.umap))
 
 }
-
-
-#
-# phases <- casnet::rn_phases(RN$RN,
-#                             standardise = "unit",
-#                             maxPhases = 100,
-#                             minStatesinPhase = 1,
-#                             returnGraph = FALSE,
-#                             doPhaseProfilePlot = FALSE,
-#                             doSpiralPlot = FALSE,
-#                             # returnCentroid = "centroid",
-#                             cleanUp = TRUE,
-#                             excludeNorec = FALSE,
-#                             excludeOther = FALSE)
-
-
-### Create a variable which is based on the mean of each dimension; this
-# goes to the phase colour
-
-# phases <- phases %>%
-#   dplyr::mutate(phase_stringency = select(starts_with("dim_"), colMeans, na.rm=TRUE),
-#                 phase_name_ordered = factor(phase_name)) %>%
-#   dplyr::ungroup() %>%
-#   dplyr::mutate(phase_colour_stringency = forcats::fct_reorder(.x = phase_stringency,
-#                                                                .f = phase_name_ordered,
-#                                                                .fun = median))
-# phases$
-#
-# phases$
-#
-#     ### Prepare data
-#
-#     phases_viz <- phases %>%
-#       # dplyr::filter(phase_name != "No recurrence" &
-#       #                 phase_name != "Other") %>%
-#       tidyr::pivot_longer(cols = contains("dim_"),
-#                           names_to = "Dimension",
-#                           values_to = "Value") %>%
-#       dplyr::mutate(Dimension = stringr::str_replace(string = Dimension,
-#                                                      pattern = "dim_",
-#                                                      replacement = ""))
-#
-#     total_number_of_phases <- length(unique(phases_viz$phase_name_ordered))
-#
-#     ### Draw plot
-#     phases_viz %>%
-#       ggplot(aes(fill = phase_colour_stringency,
-#                  x = Value,
-#                  y = Dimension)) +
-#       ggridges::geom_density_ridges(
-#         aes(point_colour = phase_colour_stringency),
-#         jittered_points = TRUE,
-#         position = "raincloud",
-#         scale = 0.9,
-#         alpha = 0.7,
-#         point_alpha = 0.9,
-#         point_size = 0.5) +
-#       scale_discrete_manual("point_colour",
-#                             values = viridis::inferno(n =
-#                                                         total_number_of_phases,
-#                                                       end = 0.9,
-#                                                       direction = -1),
-#                             name = "Phase name") +
-#       scale_fill_viridis_d(option = "inferno",
-#                            name = "Phase name",
-#                            end = 0.9,
-#                            direction = -1) +
-#       labs(title = paste0("All phases: ", figure_identifier)) +
-#       theme_bw()
-#
-# Phases_long <- Phases %>% ungroup() %>%
-#   dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
-#   dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
-#   dplyr::select(!(dplyr::contains(excludeVars))) %>%
-#   select(phase_name, starts_with("dim_")) %>%
-#   pivot_longer(cols = starts_with("dim_"), names_to = "Dimension", values_to = "Value")
-#
-#
-#
-
-
-
-# Complex Networks# graph2svg <- function(TDM,pname){
-#
-#   # Create weighted Term-Term matrix
-#   tTM <- as.matrix(TDM)
-#   TTM <- tTM %*% t(tTM)
-#   TTM <- log1p(TTM)
-#
-#   g <- graph.adjacency(TTM,weighted=T,mode="undirected",diag=F)
-#   g <- simplify(g)
-#
-#   # Remove vertices that were used in the search query
-#   Vrem <- which(igraph::V(g)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
-#   g <- (g - igraph::V(g)$name[Vrem])
-#
-#   # Set colors and sizes for vertices
-#   igraph::V(g)$degree <- igraph::degree(g)
-#   rev         <- scaleRange(log1p(igraph::V(g)$degree))
-#   rev[rev<=0.3]<-0.3
-#
-#   igraph::V(g)$color       <- grDevices::rgb(scaleRange(igraph::V(g)$degree), 1-scaleRange(igraph::V(g)$degree),  0, rev)
-#   igraph::V(g)$size        <- 10*scaleRange(igraph::V(g)$degree)
-#   igraph::V(g)$frame.color <- NA
-#
-#   # set vertex labels and their colors and sizes
-#   igraph::V(g)$label       <- igraph::V(g)$name
-#   igraph::V(g)$label.color <- grDevices::rgb(0, 0, 0, rev)
-#   igraph::V(g)$label.cex   <- scaleRange(igraph::V(g)$degree)+.1
-#
-#   # set edge width and color
-#   rew <- scaleRange(igraph::E(g)$weight)
-#   rew[rew<=0.3]<-0.3
-#
-#   igraph::E(g)$width <- 2*scaleRange(igraph::E(g)$weight)
-#   igraph::E(g)$color <- grDevices::rgb(.5, .5, 0, rew)
-#   set.seed(958)
-#
-#   svg(paste(pname,sep=""),width=8,height=8)
-#   graphics::plot(g, layout=layout.fruchterman.reingold(g))
-#   dev.off()
-#
-#   return(g)
-# }
-#
-# # Plot vertex neighbourhood
-# hoodGraph2svg <- function(TDM,Vname,pname){
-#
-#   # Create weighted Term-Term matrix
-#   tTM <- as.matrix(TDM)
-#   TTM <- tTM %*% t(tTM)
-#   TTM <- log1p(TTM)
-#
-#   ig <- graph.adjacency(TTM,weighted=T,mode="undirected",diag=F)
-#   ig <- simplify(ig)
-#
-#   # Remove vertices that were used in the search query
-#   Vrem <- which(igraph::V(ig)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
-#   ig <- (ig - igraph::V(ig)$name[Vrem])
-#
-#   # This is a deletion specific for the Neighbourhood graphs
-#   Vrem <- which(igraph::V(ig)$name %in% c("~rdsp~","~imp~","~som~","~bod~","~mlt~"))
-#   ig   <- ig - igraph::V(ig)$name[Vrem]
-#
-#   idx <- which(igraph::V(ig)$name==Vname)
-#   sg  <- graph.neighborhood(ig, order = 1, nodes=igraph::V(ig)[idx], mode = 'all')[[1]]
-#
-#   # set colors and sizes for vertices
-#   igraph::V(sg)$igraph::degree <- igraph::degree(sg)
-#
-#   rev<-scaleRange(log1p(igraph::V(sg)$igraph::degree))
-#   rev[rev<=0.3]<-0.3
-#
-#   igraph::V(sg)$color <- grDevices::rgb(scaleRange(igraph::V(sg)$igraph::degree), 1-scaleRange(log1p(igraph::V(sg)$igraph::degree*igraph::V(sg)$igraph::degree)),  0, rev)
-#
-#   igraph::V(sg)$size        <- 35*scaleRange(igraph::V(sg)$igraph::degree)
-#   igraph::V(sg)$frame.color <- NA
-#
-#   # set vertex labels and their colors and sizes
-#   igraph::V(sg)$label       <- igraph::V(sg)$name
-#   igraph::V(sg)$label.color <- grDevices::rgb(0, 0, 0, rev)
-#   igraph::V(sg)$label.cex   <- scaleRange(igraph::V(sg)$igraph::degree)
-#
-#   # set edge width and color
-#   rew<-scaleRange(igraph::E(sg)$weight)
-#   rew[rew<=0.3]<-0.3
-#
-#   igraph::E(sg)$width <- 6*scaleRange(igraph::E(sg)$weight)
-#   igraph::E(sg)$color <- grDevices::rgb(.5, .5, 0, rew)
-#
-#   idV <- which(igraph::V(sg)$name==Vname)
-#   idE <- incident(sg,igraph::V(sg)[[idV]])
-#   igraph::E(sg)$color[idE] <- grDevices::rgb(0, 0, 1 ,0.8)
-#
-#   set.seed(958)
-#
-#   idx <- which(igraph::V(sg)$name==Vname)
-#   svg(paste(pname,sep=""),width=8,height=8)
-#   graphics::plot(sg,layout=layout.star(sg,center=igraph::V(sg)[idx]))
-#   dev.off()
-#
-#   return(sg)
-# }
-
-
-#
-# #' PSDslope
-# #'
-# #' @param y    A time series object, or a vector that can be converted to a time series object.
-# #' @param fs    Sample frequency (defults to 1).
-# #' @param nfft    Number of frequencies to estimate (defaults to next power of 2)
-# #' @param fitRange    Vector of length 2 with range of frequencies to perform log-log fit.
-# #' @param doPlot    Plot the log-log spectrum and slope.
-# #'
-# #' @return
-# #' @export
-# #'
-# #' @examples
-# #'
-# PSDslope <- function(y  = stats::ts(rnorm(n = 1024), frequency = 1),
-#                      fs = stats::frequency(y),
-#                      nfft = 2^(nextpow2(length(y)/2)),
-#                      fitRange = c(1,round(.1*nfft)),
-#                      doPlot = FALSE){
-#   require(oce)
-#   require(signal)
-#   if(!stats::is.ts(y)){stats::ts(y, frequency = fs)}
-#
-#   win <- signal::hamming(n=nfft)
-#
-#   perioGram <- oce::pwelch(x = y, window = win, fs = stats::frequency(y), nfft = nfft, doPlot = FALSE)
-#   spec <- data.frame(Frequency = perioGram$freq, Power = perioGram$spec)
-#   spec[1,1:2] <- NA
-#   fit <- stats::lm(log10(spec$Power[fitRange[1]:fitRange[2]])~log10(spec$Power[fitRange[1]:fitRange[2]]))
-#   return(list(spec = spec,
-#               slope = fit)
-#   )
-# }
 
 
 # Themes, layouts ----
@@ -3016,7 +2828,7 @@ make_spiral_graph <- function(g,
 #'
 getColours <- function(Ncols, continuous = FALSE, Dcols = c(0,1)){
 
-  pl <- c("#A65141","#ABB2C4","#C89284","#7896BC","#E1CAC2","#536489","#ECE3CD","#575E7A","#BEBEC4","#C4AD75","#30261E","#BC964D","#3D434D","#D29E55","#B4B6A7","#9B7342","#E8D69D","#48211A","#EBDAB4","#3D4B68","#E8DCCF","#3E688C","#9D3D2D","#507074","#9A756C","#546959","#93725F","#858563","#E1D3B1","#A6B4BB","#78828C","#AA9C6A","#91A193","#CDB16E","#1B528D","#B8A98F","#6E432D","#4F5B71","#D9B196","#20304F","#827561","#98A39E","#8B4F31","#7E7B65","#C1B6A1","#775E45","#C0B3A2","#5A524A","#BBA27F","#3A3935","#C9BDA3","#626961","#8A4F42","#8D8A77","#947B5E","#5D3C30","#AA8470","#493A2C")
+   pl <- c("#A65141","#ABB2C4","#EBDAB4","#7896BC","#E1CAC2","#7E7B65","#536489","#ECE3CD","#546959","#575E7A","#C4AD75","#BEBEC4","#30261E","#BC964D","#3D434D","#D29E55","#B4B6A7","#9B7342","#E8D69D","#48211A","#3D4B68","#E8DCCF","#3E688C","#9D3D2D","#507074","#9A756C","#93725F","#858563","#E1D3B1","#A6B4BB","#78828C","#AA9C6A","#91A193","#CDB16E","#1B528D","#B8A98F","#6E432D","#4F5B71","#D9B196","#20304F","#827561","#98A39E","#8B4F31","#C1B6A1","#775E45","#C0B3A2","#5A524A","#BBA27F","#3A3935","#C9BDA3","#626961","#8A4F42","#8D8A77","#947B5E","#5D3C30","#AA8470","#493A2C","#C89284")
 
   cols <- NULL
   if(!continuous){
@@ -3067,4 +2879,779 @@ gg_plotHolder <- function(){
   )
 
 }
+
+
+
+# Deprecated -----
+
+
+#' Phase Density for each dimension
+#'
+#' Create a ridge plot (requires package [ggridges])
+#'
+#' @param phaseOutput Output from function [casnet::rn_phases]
+#' @param excludeOther Exclude the default Phase "Other"
+#' @param excludeNorec Exclude the default Phase "No recurrence"
+#' @param excludeVars Exclude specific dimension variables by name. Leave empty to include all variables (default = `""`)
+#' @param excludePhases Exclude Phases by their name (variable `phase_name`). Leave empty to include all Phases (after `excludeOther` and `excludeNorec`) (default = `""`)
+#'
+#' @return data frame with phase series.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' RN <- rn(cumsum(rnorm(100)), emDim = 1, emLag = 1, emRad = NA, weighted = TRUE)
+#' outPhases <- rn_phases(RN)
+#' plotRN_phaseDensity(outPhases)
+#'
+plotRN_phaseDensity <- function(phaseOutput,
+                                plotCentroid = NA,
+                                excludeOther = FALSE,
+                                excludeNorec = FALSE,
+                                excludeVars = "",
+                                excludePhases = "",
+                                returnGraph = FALSE){
+
+  checkPkg("ggridges")
+
+  if(!is.null(attr(phaseOutput,"rn_phases"))){
+
+    outArg <- attr(phaseOutput,"rn_phases")
+
+    returnCentroid <- outArg$returnCentroid
+    maxPhases <-  outArg$maxPhases
+    minStatesinPhase <- outArg$minStatesinPhase
+    maxStatesinPhase <- outArg$maxStatesinPhase
+    cleanUp <- outArg$cleanUp
+    returnCentroid <- outArg$returnCentroid
+    removeSingularities <- outArg$removeSingularities
+    standardise <- outArg$standardise
+
+  } else {
+    stop("The output is not from function 'casnet::rn_phases()'!")
+  }
+
+  if(!nchar(excludePhases)>0){
+    excludePhases <- "___"
+  }
+  if(!nchar(excludeVars)>0){
+    excludeVars <- "___"
+  }
+
+  plotCentroid <- FALSE
+  if(is.na(plotCentroid)&(nchar(returnCentroid)>0)){
+    plotCentroid <- TRUE
+  }
+
+  if(!is.data.frame(phaseOutput)){
+    out <- phaseOutput[1]$phaseSeries
+    if(plotCentroid){
+      if(names(phaseOutput)%in%"phaseCentroids"){
+        outMeans <- phaseOutput[1]$phaseCentroids
+      }
+    }
+  }
+
+  Phases_long <- out %>% ungroup() %>%
+    dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
+    dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
+    dplyr::select(!(dplyr::contains(excludeVars))) %>%
+    dplyr::select(phase_name, dplyr::starts_with("dim_")) %>%
+    tidyr::pivot_longer(cols = dplyr::starts_with("dim_"), names_to = "Dimension", values_to = "Value")
+
+  # maxPhases
+  # unique(Phases_long$phase_name)
+  # %[which(Phases$phase_size %in% unique(sort(Phases$phase_size, decreasing = TRUE))[1:maxPhases])]
+  # Phases$phase_name %in% unique(dplyr::arrange(data.frame(Phases$phase_name),Phases$phase_size))[1:maxPhases,1]
+
+  epochColours <- getColours(Ncols = length(unique(Phases_long$phase_name)))
+
+  pd <- ggplot(Phases_long, aes(y= Dimension, x = Value, fill = phase_name), col = "black") +
+    geom_density_ridges(
+      aes(point_color = phase_name, point_fill = phase_name),
+      point_size = .1,
+      jittered_points = TRUE,
+      position = "raincloud",
+      alpha = 0.4, scale = 0.9) +
+    scale_fill_manual(values = epochColours) +
+    scale_discrete_manual(aesthetics = "point_color", values = epochColours) +
+    #scale_discrete_manual(aesthetics = "point_size", values = .1) +
+    theme_bw()
+
+  print(pd)
+
+  if(returnGraph){
+    invisible(return(pd))
+  }
+}
+
+#' Profile Plot
+#'
+#' Plot a profile (values of the dimensions) for each phase.
+#'
+#'
+#' @inheritParams plotRN_phaseDensity
+#'
+#' @return plot
+#'
+#' @export
+#'
+#' @examples
+#'
+#' RN <- rn(y1 = data.frame(x = rnorm(100), y= rnorm(100)), weighted = TRUE)
+#' phase_out <- rn_phases(RN, returnCentroid = "mean.sd")
+#' plotRN_phaseProfile(phaseOutput = phase_out)
+#'
+#'
+plotRN_phaseProfile <- function(phaseOutput,
+                                plotCentroid = NA,
+                                showEpochLegend = TRUE,
+                                epochColours = NULL,
+                                epochLabel   = "Phase",
+                                excludeOther = FALSE,
+                                excludeNorec = TRUE,
+                                excludeVars = "",
+                                excludePhases = "",
+                                returnGraph = FALSE,
+                                colOrder = NA){
+
+  if(!is.null(attr(phaseOutput,"rn_phases"))){
+
+    outArg <- attr(phaseOutput,"rn_phases")
+
+    returnCentroid <- outArg$returnCentroid
+    maxPhases <-  outArg$maxPhases
+    minStatesinPhase <- outArg$minStatesinPhase
+    maxStatesinPhase <- outArg$maxStatesinPhase
+    cleanUp <- outArg$cleanUp
+    removeSingularities <- outArg$removeSingularities
+    standardise <- outArg$standardise
+    dimNames <- outArg$dimNames
+
+  } else {
+    stop("The output is not from function 'casnet::rn_phases()'!")
+  }
+
+  # bCentroid <- FALSE
+  # if(returnCentroid!="no"){
+  #   bCentroid <- TRUE
+  # }
+  # if(returnGraph){
+  #   return(invisible(list(phases = list(phaseSeries = out, phaseCentroids = outMeans)[TRUE, bCentroid],
+  #                         plots  = list(phasePlot = pp, phaseSeriesplot = ps, spiralPlot = gg)[c(doPhasePlot, doPhaseSeriesPlot, doSpiralPlot)])))
+  # } else {
+  #   if(bCentroid){
+  #     return(list(phaseSeries = out, phaseCentroids = outMeans))
+  #   } else {
+  #     return(out)
+  #   }
+  # }
+
+  plotCentroid <- FALSE
+
+  if(is.na(plotCentroid)&(!returnCentroid%in%"no")){
+    plotCentroid <- TRUE
+  }
+
+  if(!is.data.frame(phaseOutput)){
+    out <- phaseOutput$phaseSeries
+    if(!returnCentroid%in%"no"){
+      if("phaseCentroids"%in%names(phaseOutput)){
+        outMeans <- phaseOutput$phaseCentroids
+        plotCentroid <- TRUE
+      }
+    }
+  } else {
+    out <- phaseOutput
+  }
+
+  if(is.null(epochColours)){
+    epochColours <- getColours(Ncols = length(unique(out$phase_name))+5)
+  }
+
+  out$alpha <- .9
+  out$psize <- out$phase_size
+
+  if(!nchar(excludePhases)>0){
+    excludePhases <- "___"
+  }
+  if(!nchar(excludeVars)>0){
+    excludeVars <- "___"
+  }
+
+  if(is.na(colOrder)&plotCentroid){
+    # tmp <-  out %>% dplyr::group_by(phase_name) %>% dplyr::select(dplyr::starts_with("dim_"))
+    #  dplyr::select(out,names(sort(colMeans(tmp[,-1], na.rm = TRUE), decreasing = TRUE)))
+    #
+    #  out <- dplyr::select(out,names(sort(colMeans(out, na.rm = TRUE))))
+  }
+
+  Phases_long <- out %>% dplyr::ungroup() %>%
+    dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
+    dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
+    dplyr::select(!(dplyr::contains(excludeVars))) %>%
+    dplyr::select(phaseName, phase_name, states_time, alpha, psize, dplyr::starts_with(dimNames)) %>%
+    tidyr::pivot_longer(cols = dplyr::starts_with(dimNames), names_to = "Dimension", values_to = "Value")
+
+
+  if((returnCentroid)%in%c("mean.sd","median.mad","centroid")){
+    Phases_long$alpha <- elascer(Phases_long$alpha, lo = .2, hi = .5)
+  }
+
+  pp <- ggplot(data = Phases_long,
+               aes_(x = ~Dimension,
+                    y = ~Value,
+                    color = ~phase_name,
+                    alpha = ~alpha,
+                    group = ~states_time)) +
+    scale_size(range = c(1,4)) +
+    scale_alpha_identity() +
+    geom_point(aes_(size = ~psize)) +
+    geom_line()+
+    facet_wrap(~ phaseName) +
+    scale_color_manual(values = epochColours)
+
+
+  if(plotCentroid){
+    if(returnCentroid%in%c("mean.sd","centroid")){
+
+      pp <- pp + geom_line(data = outMeans, aes_(x = ~Dimension, y = ~Mean, group = ~phaseName), inherit.aes = FALSE)
+
+      if(returnCentroid%in%c("mean.sd")){
+
+        # if(returnCentroid%in%"centroid"){
+        #   pp <- pp +
+        #     geom_line(data = outMeans,
+        #                        aes_(x = ~Dimension, y = ~Mean, color = ~phaseName, group = ~phaseName), inherit.aes = FALSE)
+        # } else {
+
+        pp <- pp +
+          geom_linerange(data = outMeans,
+                         aes_(x = ~Dimension, y = ~Mean, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+      }
+
+      pp <- pp +
+        geom_point(data = outMeans,
+                   aes_(x = ~Dimension, y = ~Mean, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+        scale_fill_manual(values = epochColours)
+
+    } else {
+
+      pp <- pp +
+        geom_linerange(data = outMeans,
+                       aes_(x = ~Dimension, y = ~Median, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+
+      pp <- pp +
+        geom_point(data = outMeans,
+                   aes_(x = ~Dimension, y = ~Median, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+        scale_fill_manual(values = epochColours)
+    }
+  }
+
+  pp <- pp + theme_bw() +
+    theme(legend.position = "none") +
+    coord_flip()
+
+  print(pp)
+
+  if(returnGraph){
+    invisible(return(pp))
+  }
+}
+
+
+
+#' Phase Series plot
+#'
+#' Plot the sequence of phases as a time series.
+#'
+#' @inheritParams plotRN_phaseDensity
+#'
+#' @return phase density plot
+#' @export
+#'
+#' @examples
+#'
+#' RN <- rn(y1 = rnorm(100), weighted = TRUE)
+#' phase_out <- rn_phases(RN)
+#' plotRN_phaseDensity(phase_out)
+#'
+#'
+plotRN_phaseSeries <- function(phaseOutput,
+                               showEpochLegend = TRUE,
+                               epochColours = NULL,
+                               epochLabel = "Phase",
+                               excludeOther = FALSE,
+                               excludeNorec = TRUE,
+                               excludeVars = "",
+                               excludePhases = "",
+                               plotCentroid = FALSE,
+                               returnGraph = FALSE){
+
+
+  if(!is.null(attr(phaseOutput,"rn_phases"))){
+
+    outArg <- attr(phaseOutput,"rn_phases")
+
+    returnCentroid <- outArg$returnCentroid
+    maxPhases <-  outArg$maxPhases
+    minStatesinPhase <- outArg$minStatesinPhase
+    maxStatesinPhase <- outArg$maxStatesinPhase
+    cleanUp <- outArg$cleanUp
+    returnCentroid <- outArg$returnCentroid
+    removeSingularities <- outArg$removeSingularities
+    standardise <- outArg$standardise
+
+  } else {
+    stop("The output is not from function 'casnet::rn_phases()'!")
+  }
+
+  # if(length(phaseOutput)>1){
+  #   phaseCentroid <- phaseOutput$phaseCentroids
+  #   phaseOutput <- phaseOutput$phaseSeries
+  # }
+  #
+  # epochColours <- getColours(Ncols = length(unique(phaseOutput$phase_name)))
+
+  # if(is.na(plotCentroid)){ #|(!returnCentroid%in%"no")){
+  #   plotCentroid <- TRUE
+  # }
+
+  if(!is.data.frame(phaseOutput)){
+    out <- phaseOutput$phaseSeries
+    if(plotCentroid){
+      if("phaseCentroids"%in%names(phaseOutput)){
+        outMeans <- phaseOutput$phaseCentroids
+      }
+    }
+  } else {
+    out <- phaseOutput
+  }
+
+  if(is.null(epochColours)){
+    epochColours <- getColours(Ncols = length(unique(out$phase_name))+5)
+  }
+
+  out$alpha <- .9
+  out$psize <- out$phase_size
+
+  if(!nchar(excludePhases)>0){
+    excludePhases <- "___"
+  }
+  if(!nchar(excludeVars)>0){
+    excludeVars <- "___"
+  }
+
+  out$maxState_strength[is.na(out$maxState_strength)] <- min(out$maxState_strength, na.rm = TRUE)/2
+
+  p <- ggplot(out, aes_(x = ~states_time, y = ~phase_name, fill = ~phase_name, group = 1)) +
+    geom_line(colour = "grey60") +
+    geom_point(aes_(size = ~maxState_strength+1), pch=21, alpha = .8) +
+    scale_fill_manual(values = epochColours, guide = "none") +
+    scale_x_continuous("Time", expand = c(.05,.2)) +
+    scale_y_discrete("Phase") +
+    scale_size(guide="none", range = c(1,6)) +
+    theme_bw() +
+    theme(panel.grid.minor = element_blank())
+
+  tmp <- out %>%
+    dplyr::count(phase_name) %>%
+    dplyr::mutate(pct = n/NROW(out))
+
+  h <- ggplot(tmp, aes_(y = ~phase_name, fill = ~phase_name, x = ~pct, label = scales::percent(pct))) +
+    geom_col(position= "dodge") +
+    geom_label(position = position_dodge(width = .9),
+               vjust = 0.5,
+               hjust = .5,
+               fill = "white",
+               size = 3) +
+    scale_fill_manual(values = epochColours, guide = "none") +
+    scale_x_continuous("Frequency", expand = c(0.05,0), limits = c(0, max(tmp$pct, na.rm = TRUE)+.05), labels = scales::percent) +
+    theme_bw() +
+    theme(axis.text.y = element_blank(),
+          axis.title.y = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.grid.major.x = element_blank())
+
+  ps <- cowplot::plot_grid(p,h,ncol = 2, rel_widths = c(.75,.25))
+  print(ps)
+
+  if(returnGraph){
+    invisible(return(ps))
+  }
+}
+
+
+#' Plot Phase Space Projection
+#'
+#' 2D umap projection of multidimensional Phase Space. Categories "No recurrence" and "Other" are removed.
+#'
+#' @inheritParams plotRN_phaseDensity
+#' @param RNdist A distance matrix (unthresholded) created with [rn] or [rp]
+#' @param PhaseOut Output from function [rn_phases] based on the thresholded matrix in `RNdist`
+#'
+#' @return Dataframe with coordinates
+#' @export
+#'
+plotRN_phaseProjection <- function(RNdist,
+                                   phaseOutput,
+                                   epochColours = NULL,
+                                   showEpochLegend = TRUE,
+                                   epochLabel   = "Phase",
+                                   excludeOther = TRUE,
+                                   excludeNorec = TRUE){
+
+  if(length(phaseOutput)>1){
+    phaseOutput <- phaseOutput$phaseSeries
+  }
+
+  checkPkg("umap")
+
+  if(!(attributes(RNdist)$method %in% c("euclidean","manhattan","cosine","pearson","pearson2"))){
+    warning('Distance measure cannot be used with umap!\nShould be one of: "euclidean","manhattan","cosine","pearson","pearson2"\nResults will be based on assuming "euclidean"... Change the distance measure of RNdist')
+    method <- "euclidean"
+  } else {
+    method <- attributes(RNdist)$method
+  }
+
+  custom.config <- umap::umap.defaults
+  custom.config$n_neighbours <- max(phaseOutput$phase_size)
+  custom.config$metric <- method
+  custom.config$random_state <- 1234
+
+  rn.umap <-  umap::umap(RNdist, config = custom.config, input = "dist")
+  df.umap <- data.frame(rn.umap$layout)
+  df.umap$labels <- phaseOutput$phase_name
+  df.umap$size <- phaseOutput$phase_size
+
+  if(excludeOther){
+    df.umap <- df.umap %>% filter(!(labels %in% c("Other")))
+  }
+
+  if(excludeNorec){
+    df.umap <- df.umap %>% filter(!(labels %in% c("No recurrence")))
+  }
+
+  dfepochs <- phaseOutput %>% group_by(phase_name) %>% summarize(phase_size = first(phase_size))
+
+
+  epochColours <- getColours(Ncols = NROW(dfepochs))
+  names(epochColours) <- dfepochs$phase_name
+
+  #
+  # ID <- ldply(names(epochColours), function(n){
+  #
+  # })
+  # phaseOutput[]
+  #
+
+  epochSizes <- dfepochs$phase_size
+  names(epochSizes) <- dfepochs$phase_name
+
+  g <- ggplot(df.umap, aes(x = X1, y = X2, colour = labels)) +
+    geom_point(aes(size = size)) +
+    scale_x_continuous("") +
+    scale_y_continuous("") +
+    #scale_size_manual(epochLabel, values = sort(epochSizes)) +
+    scale_color_manual(epochLabel, values = epochColours) +
+    theme_void()
+
+  print(g)
+
+  return(invisible(df.umap))
+
+}
+
+
+
+
+
+
+
+
+# Phases_long$alpha <- elascer(Phases_long$alpha, lo = .2, hi = .5)
+# if((plotCentroid)%in%c("mean.sd","median.mad","centroid")){
+#   Phases_long$alpha <- elascer(Phases_long$alpha, lo = .2, hi = .5)
+# }
+#
+# if((plotCentroid)%in%c("mean.sd","median.mad")){
+#
+#   outMeans <- plyr::ldply(unique(out$phase_name), function(p){
+#     tmp <- out %>% dplyr::ungroup() %>% dplyr::filter(.data$phase_name==p) %>% dplyr::select(dplyr::starts_with("dim_"))
+#     tmp$phase_name <- p
+#     if(plotCentroid=="mean.sd"){
+#       Mean <- data.frame(phase_name = p, Mean = colMeans(tmp[,-NCOL(tmp)], na.rm = TRUE))
+#       SD <- plyr::colwise(sd, na.rm=TRUE)(tmp[,-NCOL(tmp)])
+#     }
+#     if(plotCentroid=="median.mad"){
+#       Mean <- data.frame(phase_name = p, Mean = plyr::colwise(stats::median, na.rm=TRUE)(tmp[,-NCOL(tmp)]))
+#       SD <- plyr::colwise(stats::mad, na.rm=TRUE)(tmp[,-NCOL(tmp)])
+#     }
+#     Mean$SD         <- as.numeric(t(SD))
+#     Mean$Dimension  <- rownames(Mean)
+#     Mean$phase_size <- unique(out$phase_size[out$phase_name==p])
+#     return(Mean)
+#   })
+# }
+#
+# if(plotCentroid%in%"centroid"){
+#   #checkPkg("dtwclust")
+#
+#   NAind <- which(!stats::complete.cases(out))
+#   tmpPhases <- out[stats::complete.cases(out),]
+#
+#   outMeansList <- list()
+#   pnames <- unique(tmpPhases$phase_name)
+#   for(p in seq_along(pnames)){
+#     tmp <- tmpPhases %>%
+#       dplyr::ungroup() %>%
+#       dplyr::filter(.data$phase_name==pnames[p]) %>%
+#       dplyr::select(dplyr::starts_with("dim_"))
+#
+#     centroid <- dtwclust::shape_extraction(data.frame(tmp), znorm = FALSE)
+#     outMeansList[[p]] <- data.frame(phase_name = pnames[p],
+#                                     Mean = centroid,
+#                                     SD = 0,
+#                                     Dimension = colnames(tmp),
+#                                     phase_size = unique(tmpPhases$phase_size[tmpPhases$phase_name==pnames[p]]))
+#   }
+#
+#   outMeans <- plyr::ldply(outMeansList)
+# }
+#
+#
+# if(excludeOther){
+#   outMeans <- outMeans %>% dplyr::filter(.data$phase_name != "Other")
+# }
+# if(excludeNorec){
+#   outMeans <- outMeans %>% dplyr::filter(.data$phase_name != "No recurrence")
+# }
+#
+# outMeans$ymin <- outMeans$Mean - outMeans$SD
+# outMeans$ymax <- outMeans$Mean + outMeans$SD
+# #outMeans$time <- outMeans
+# outMeans$Dimension <- forcats::fct_inorder(outMeans$Dimension)
+# outMeans$phaseName <- paste(outMeans$phase_name,"  |  N =",outMeans$phase_size)
+# outMeans$phaseName <- factor(outMeans$phaseName,unique(outMeans$phaseName), ordered = TRUE)
+
+
+#
+# phases <- casnet::rn_phases(RN$RN,
+#                             standardise = "unit",
+#                             maxPhases = 100,
+#                             minStatesinPhase = 1,
+#                             returnGraph = FALSE,
+#                             doPhaseProfilePlot = FALSE,
+#                             doSpiralPlot = FALSE,
+#                             # returnCentroid = "centroid",
+#                             cleanUp = TRUE,
+#                             excludeNorec = FALSE,
+#                             excludeOther = FALSE)
+
+
+### Create a variable which is based on the mean of each dimension; this
+# goes to the phase colour
+
+# phases <- phases %>%
+#   dplyr::mutate(phase_stringency = select(starts_with("dim_"), colMeans, na.rm=TRUE),
+#                 phase_name_ordered = factor(phase_name)) %>%
+#   dplyr::ungroup() %>%
+#   dplyr::mutate(phase_colour_stringency = forcats::fct_reorder(.x = phase_stringency,
+#                                                                .f = phase_name_ordered,
+#                                                                .fun = median))
+# phases$
+#
+# phases$
+#
+#     ### Prepare data
+#
+#     phases_viz <- phases %>%
+#       # dplyr::filter(phase_name != "No recurrence" &
+#       #                 phase_name != "Other") %>%
+#       tidyr::pivot_longer(cols = contains("dim_"),
+#                           names_to = "Dimension",
+#                           values_to = "Value") %>%
+#       dplyr::mutate(Dimension = stringr::str_replace(string = Dimension,
+#                                                      pattern = "dim_",
+#                                                      replacement = ""))
+#
+#     total_number_of_phases <- length(unique(phases_viz$phase_name_ordered))
+#
+#     ### Draw plot
+#     phases_viz %>%
+#       ggplot(aes(fill = phase_colour_stringency,
+#                  x = Value,
+#                  y = Dimension)) +
+#       ggridges::geom_density_ridges(
+#         aes(point_colour = phase_colour_stringency),
+#         jittered_points = TRUE,
+#         position = "raincloud",
+#         scale = 0.9,
+#         alpha = 0.7,
+#         point_alpha = 0.9,
+#         point_size = 0.5) +
+#       scale_discrete_manual("point_colour",
+#                             values = viridis::inferno(n =
+#                                                         total_number_of_phases,
+#                                                       end = 0.9,
+#                                                       direction = -1),
+#                             name = "Phase name") +
+#       scale_fill_viridis_d(option = "inferno",
+#                            name = "Phase name",
+#                            end = 0.9,
+#                            direction = -1) +
+#       labs(title = paste0("All phases: ", figure_identifier)) +
+#       theme_bw()
+#
+# Phases_long <- Phases %>% ungroup() %>%
+#   dplyr::filter(!(.data$phase_name %in% c("Other","No recurrence")[c(excludeOther,excludeNorec)])) %>%
+#   dplyr::filter(!(.data$phase_name %in% excludePhases)) %>%
+#   dplyr::select(!(dplyr::contains(excludeVars))) %>%
+#   select(phase_name, starts_with("dim_")) %>%
+#   pivot_longer(cols = starts_with("dim_"), names_to = "Dimension", values_to = "Value")
+#
+#
+#
+
+
+
+# Complex Networks# graph2svg <- function(TDM,pname){
+#
+#   # Create weighted Term-Term matrix
+#   tTM <- as.matrix(TDM)
+#   TTM <- tTM %*% t(tTM)
+#   TTM <- log1p(TTM)
+#
+#   g <- graph.adjacency(TTM,weighted=T,mode="undirected",diag=F)
+#   g <- simplify(g)
+#
+#   # Remove vertices that were used in the search query
+#   Vrem <- which(igraph::V(g)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
+#   g <- (g - igraph::V(g)$name[Vrem])
+#
+#   # Set colors and sizes for vertices
+#   igraph::V(g)$degree <- igraph::degree(g)
+#   rev         <- scaleRange(log1p(igraph::V(g)$degree))
+#   rev[rev<=0.3]<-0.3
+#
+#   igraph::V(g)$color       <- grDevices::rgb(scaleRange(igraph::V(g)$degree), 1-scaleRange(igraph::V(g)$degree),  0, rev)
+#   igraph::V(g)$size        <- 10*scaleRange(igraph::V(g)$degree)
+#   igraph::V(g)$frame.color <- NA
+#
+#   # set vertex labels and their colors and sizes
+#   igraph::V(g)$label       <- igraph::V(g)$name
+#   igraph::V(g)$label.color <- grDevices::rgb(0, 0, 0, rev)
+#   igraph::V(g)$label.cex   <- scaleRange(igraph::V(g)$degree)+.1
+#
+#   # set edge width and color
+#   rew <- scaleRange(igraph::E(g)$weight)
+#   rew[rew<=0.3]<-0.3
+#
+#   igraph::E(g)$width <- 2*scaleRange(igraph::E(g)$weight)
+#   igraph::E(g)$color <- grDevices::rgb(.5, .5, 0, rew)
+#   set.seed(958)
+#
+#   svg(paste(pname,sep=""),width=8,height=8)
+#   graphics::plot(g, layout=layout.fruchterman.reingold(g))
+#   dev.off()
+#
+#   return(g)
+# }
+#
+# # Plot vertex neighbourhood
+# hoodGraph2svg <- function(TDM,Vname,pname){
+#
+#   # Create weighted Term-Term matrix
+#   tTM <- as.matrix(TDM)
+#   TTM <- tTM %*% t(tTM)
+#   TTM <- log1p(TTM)
+#
+#   ig <- graph.adjacency(TTM,weighted=T,mode="undirected",diag=F)
+#   ig <- simplify(ig)
+#
+#   # Remove vertices that were used in the search query
+#   Vrem <- which(igraph::V(ig)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
+#   ig <- (ig - igraph::V(ig)$name[Vrem])
+#
+#   # This is a deletion specific for the Neighbourhood graphs
+#   Vrem <- which(igraph::V(ig)$name %in% c("~rdsp~","~imp~","~som~","~bod~","~mlt~"))
+#   ig   <- ig - igraph::V(ig)$name[Vrem]
+#
+#   idx <- which(igraph::V(ig)$name==Vname)
+#   sg  <- graph.neighborhood(ig, order = 1, nodes=igraph::V(ig)[idx], mode = 'all')[[1]]
+#
+#   # set colors and sizes for vertices
+#   igraph::V(sg)$igraph::degree <- igraph::degree(sg)
+#
+#   rev<-scaleRange(log1p(igraph::V(sg)$igraph::degree))
+#   rev[rev<=0.3]<-0.3
+#
+#   igraph::V(sg)$color <- grDevices::rgb(scaleRange(igraph::V(sg)$igraph::degree), 1-scaleRange(log1p(igraph::V(sg)$igraph::degree*igraph::V(sg)$igraph::degree)),  0, rev)
+#
+#   igraph::V(sg)$size        <- 35*scaleRange(igraph::V(sg)$igraph::degree)
+#   igraph::V(sg)$frame.color <- NA
+#
+#   # set vertex labels and their colors and sizes
+#   igraph::V(sg)$label       <- igraph::V(sg)$name
+#   igraph::V(sg)$label.color <- grDevices::rgb(0, 0, 0, rev)
+#   igraph::V(sg)$label.cex   <- scaleRange(igraph::V(sg)$igraph::degree)
+#
+#   # set edge width and color
+#   rew<-scaleRange(igraph::E(sg)$weight)
+#   rew[rew<=0.3]<-0.3
+#
+#   igraph::E(sg)$width <- 6*scaleRange(igraph::E(sg)$weight)
+#   igraph::E(sg)$color <- grDevices::rgb(.5, .5, 0, rew)
+#
+#   idV <- which(igraph::V(sg)$name==Vname)
+#   idE <- incident(sg,igraph::V(sg)[[idV]])
+#   igraph::E(sg)$color[idE] <- grDevices::rgb(0, 0, 1 ,0.8)
+#
+#   set.seed(958)
+#
+#   idx <- which(igraph::V(sg)$name==Vname)
+#   svg(paste(pname,sep=""),width=8,height=8)
+#   graphics::plot(sg,layout=layout.star(sg,center=igraph::V(sg)[idx]))
+#   dev.off()
+#
+#   return(sg)
+# }
+
+
+#
+# #' PSDslope
+# #'
+# #' @param y    A time series object, or a vector that can be converted to a time series object.
+# #' @param fs    Sample frequency (defults to 1).
+# #' @param nfft    Number of frequencies to estimate (defaults to next power of 2)
+# #' @param fitRange    Vector of length 2 with range of frequencies to perform log-log fit.
+# #' @param doPlot    Plot the log-log spectrum and slope.
+# #'
+# #' @return
+# #' @export
+# #'
+# #' @examples
+# #'
+# PSDslope <- function(y  = stats::ts(rnorm(n = 1024), frequency = 1),
+#                      fs = stats::frequency(y),
+#                      nfft = 2^(nextpow2(length(y)/2)),
+#                      fitRange = c(1,round(.1*nfft)),
+#                      doPlot = FALSE){
+#   require(oce)
+#   require(signal)
+#   if(!stats::is.ts(y)){stats::ts(y, frequency = fs)}
+#
+#   win <- signal::hamming(n=nfft)
+#
+#   perioGram <- oce::pwelch(x = y, window = win, fs = stats::frequency(y), nfft = nfft, doPlot = FALSE)
+#   spec <- data.frame(Frequency = perioGram$freq, Power = perioGram$spec)
+#   spec[1,1:2] <- NA
+#   fit <- stats::lm(log10(spec$Power[fitRange[1]:fitRange[2]])~log10(spec$Power[fitRange[1]:fitRange[2]]))
+#   return(list(spec = spec,
+#               slope = fit)
+#   )
+# }
+
+
 

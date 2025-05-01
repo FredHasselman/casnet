@@ -84,11 +84,13 @@ rn_phases(
 A data frame with information about the phases or a list object with data and graph objects (if requested).
 }
 \description{
+THIS IS THE OLDER VERSION OF THE FUNCTION KEPT FOR BACKWARD COMPATIBILITY
+}
+\details{
 This function will extract phases (regions of attraction in phase space) based on a weighted \code{RN} object created with function \link{rn}.
 The assumption is that coordinates in state space that are either close in terms of distance, or are re-visited with short recurrence times,
 or with high-frequency, are regions of attraction for the system.
-}
-\details{
+
 The method used for the identification of phases is on the properties of the \code{RN} object:
 \itemize{
 \item If weighted by distance \code{"si"}, the inverse distance will be used, which means higher weights correspond to closer states.
@@ -124,6 +126,7 @@ Other Distance matrix operations (recurrence network):
 \code{\link{mat_di2ch}()},
 \code{\link{mat_di2we}()},
 \code{\link{rn}()},
+\code{\link{rn_phaseInfo}()},
 \code{\link{rn_plot}()},
 \code{\link{rn_recSpec}()}
 }

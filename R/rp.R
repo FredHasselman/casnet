@@ -251,12 +251,12 @@ rp <- function(y1, y2 = NULL,
 
   if(doPlot){
 
-    if(rp_size(RM = dmat)$rp_size_total>1024){
-      warning("Plotting will take a long time. Consider running rp_plot(..., courseGrain = TRUE)", immediate. = TRUE)
+    if(rp_size(RM = dmat)$rp_size_total%>>%1024){
+      warning("Plotting will take a long time. Consider running rp_plot(..., courseGrain = TRUE), or rqa_plot()", immediate. = TRUE)
     }
     rp_plot(RM = dmat, courseGrain = FALSE)
 
-    # if(...length()>0){
+    # if(...length()%>>%0){
     #   dotArgs <- list(...)
     #   nameOK  <- names(dotArgs)%in%methods::formalArgs(rp_plot)
     #   dotArgs <- dotArgs[nameOk]
@@ -404,7 +404,7 @@ rp_measures <- function(RM,
   }
 
   if(use_rqa_par){
-    if(max(dim(RM))>2046){
+    if(max(dim(RM))%>>%2046){
 
       y1 <- attributes(RM)$emDims1
       y2 <- attributes(RM)$emDims2
@@ -466,7 +466,7 @@ rp_measures <- function(RM,
 
       rm(meltRP)
 
-      if(NROW(chromaNumbers)>=(NROW(RM)/2)){
+      if(NROW(chromaNumbers)%>=%(NROW(RM)/2)){
         warning(paste("Chromatic RQA will have a large number of categories:",NROW(chromaNumbers)))
       }
 
@@ -796,10 +796,10 @@ rp_measures_main <- function(RM,
     Nboot <- 1
   }
 
-  if(Nboot>1|doParallel){
+  if(Nboot%>>%1|doParallel){
     checkPkg("parallel")
     mc.cores <- parallel::detectCores()-1
-    if(Nboot<mc.cores) mc.cores <- Nboot
+    if(Nboot%<<%c.cores) mc.cores <- Nboot
   }
 
   NRows <- NROW(RM)
@@ -846,7 +846,7 @@ rp_measures_main <- function(RM,
 
   dfori <- tidyr::gather(as.data.frame(out), key = "measure", value = "value")
 
-  if(Nboot>1){
+  if(Nboot%>>%1){
 
     cat(paste0("Bootstrapping Recurrence Matrix... ",Nboot," iterations...\n"))
     cat(paste0("Estimated duration: ", round((difftime(tend,tstart, units = "mins")*Nboot)/max((round(mc.cores/2)-1),1), digits=1)," min.\n"))
@@ -968,7 +968,7 @@ rp_diagProfile <- function(RM,
   # crqa_results_xy <– crqa(ts1 = lorData$x, ts2 = lorData$y, delay = 9, embed = 4, rescale = 2, radius = 20, normalize = 2, mindiagline = 2, minvertline = 2, tw = 0, whiteline = FALSE, recpt = FALSE, side = “both”) # compute cross-recurrence plot
   #
 
-  if(!all(as.vector(RM)==0|as.vector(RM)==1)){
+  if(!all(as.vector(RM)%==%0|as.vector(RM)%==%1)){
     stop("Expecting a binary (0,1) matrix.")
   }
 
@@ -1019,7 +1019,7 @@ rp_diagProfile <- function(RM,
 
         if(shuffleWhich %in% "y1"){
          TSrnd <- plyr::llply(0:Nshuffle, function(r){
-           if(r==0){
+           if(r%==%0){
              return(y1)
            } else {
            return(data.frame(y1[sample.int(n = NROW(y1), size = NROW(y1)),]))
@@ -1028,7 +1028,7 @@ rp_diagProfile <- function(RM,
         }
         if(shuffleWhich %in% "y2"){
           TSrnd <- plyr::llply(0:Nshuffle, function(r){
-            if(r==0){
+            if(r%==%0){
               return(y2)
             } else {
             return(data.frame(y2[sample.int(n = NROW(y2), size = NROW(y2)),]))
@@ -1063,24 +1063,24 @@ rp_diagProfile <- function(RM,
 
     diagID <- 1:NCOL(B)
     names(diagID) <- colnames(B)
-    if(length(diagWin)<NCOL(B)){
+    if(length(diagWin) %<<% NCOL(B)){
       cID <- which(colnames(B)%in%diagWin)
       B <- B[,cID]
       diagID <- seq_along(cID)
       names(diagID) <- colnames(B)
     }
 
-    #winRR <- sum(B==1, na.rm = TRUE)
+    #winRR <- sum(B%==%1, na.rm = TRUE)
     df <- plyr::ldply(diagID, function(i){
       data.frame(index = i,
-                 RN = sum(B[,i]==1, na.rm = TRUE),
+                 RN = sum(B[,i] %==% 1, na.rm = TRUE),
                  DiagN = (NROW(B)-abs(as.numeric(colnames(B)[i]))),
-                 RR = sum(B[,i]==1, na.rm = TRUE)/(NROW(B)-abs(as.numeric(colnames(B)[i]))))
+                 RR = sum(B[,i] %==% 1, na.rm = TRUE)/(NROW(B)-abs(as.numeric(colnames(B)[i]))))
     }, .id = "Diagonal")
 
     df$group  <- 1
     df$labels <- paste(df$Diagonal)
-    # df$labels[df$Diagonal==0] <- ifelse(AUTO,"LOI","LOS")
+    # df$labels[df$Diagonal%==%0] <- ifelse(AUTO,"LOI","LOS")
     df$labels <- factor(df$labels,levels = df$labels, ordered = TRUE)
     return(df)
   })
@@ -1106,7 +1106,7 @@ rp_diagProfile <- function(RM,
                      sdRRrnd   = stats::sd(.data$RR, na.rm = TRUE)) %>%
     dplyr::ungroup()
 
-  if(Nshuffle==1){
+  if(Nshuffle%==%1){
     dy_m$sdRRrnd <- 0
   }
 
@@ -1160,7 +1160,7 @@ rp_diagProfile <- function(RM,
     # }
 
 
-    # if(which.min(c(length(breaks),length(labels)))==1){
+    # if(which.min(c(length(breaks),length(labels)))%==%1){
     #   labels <- labels[1:length(breaks)]
     # } else {
     #   breaks <- breaks[1:length(labels)]
@@ -1169,13 +1169,13 @@ rp_diagProfile <- function(RM,
     breaks <- seq_along(as.numeric(levels(df$labels)))
     labels <- sort(unique(c(as.numeric(levels(df$labels))[breaks],0)))
 
-    if(length(breaks)>21){
+    if(length(breaks) %>>% 21){
       ID <- round(seq(1,length(breaks),length.out = 21))
-      if(any(labels[ID]==0)){
+      if(any(labels[ID] %==% 0)){
         labels <- labels[ID]
         breaks <- ID
       } else {
-        breaks <- sort(c(which(labels==0),ID))
+        breaks <- sort(c(which(labels %==% 0),ID))
         labels <- labels[breaks]
       }
     }
@@ -1184,7 +1184,7 @@ rp_diagProfile <- function(RM,
     x2 <- round((which.max(as.numeric(paste(df$Diagonal))))-(length(diagWin)*.1))
     yL <- max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
     # col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
-    if(Nshuffle>0){
+    if(Nshuffle%>>%0){
       col <- c("Mean Shuffled" = "grey40","Observed" = "black")
       leg <- paste0("Diagonal Profile\n(N surrogates = ",Nshuffle,")")
     } else {
@@ -1360,7 +1360,7 @@ rp_cl            <- function(y1,
 
   os <- get_os()
   sysinf <- Sys.info()
-  if(os%in%"osx"&as.numeric(strsplit(sysinf[which(names(sysinf)%in%"release")],"[.]")[[1]][1])>=19){
+  if(os%in%"osx"&as.numeric(strsplit(sysinf[which(names(sysinf)%in%"release")],"[.]")[[1]][1])%>=%19){
     stop("As of macOS Catalina, 32-bit applications are no longer supported, please use rp_measures() to conduct Recurrence Quantification Analysis.")
   }
 
@@ -1373,10 +1373,10 @@ rp_cl            <- function(y1,
     y2 <- zoo::as.zoo(y2)
     N1 <- NROW(y1)
     N2 <- NROW(y2)
-    if(N1>N2){
+    if(N1%>>%N2){
       y2[N2:(N1+(N1-N2))] <- 0
     }
-    if(N1<N2){
+    if(N1%<<%2){
       y1[N1:(N2+(N2-N1))] <- 0
     }
     df <- cbind.data.frame(y1=unclass(y1),y2=unclass(y2))
@@ -1402,7 +1402,7 @@ rp_cl            <- function(y1,
 
   if(is.null(y2)){
     cat("\nPerforming auto-RQA\n")
-    if(theiler<1){theiler=1}
+    if(theiler%<<%1){theiler <- 1}
   } else {
     cat("\nPerforming cross-RQA\n")
   }
@@ -1412,7 +1412,7 @@ rp_cl            <- function(y1,
   }
 
   windowedAnalysis <- FALSE
-  if(win==NROW(df)|step==(NROW(df))){
+  if(win%==%NROW(df)|step%==%(NROW(df))){
     win <- step <- NROW(df)
     wIndex <- seq(1,NROW(df))
     if(is.na(emRad)){cat(paste("Radius will be calulated to yield targetValue =",targetValue,"RR...\n"))}
@@ -1427,14 +1427,14 @@ rp_cl            <- function(y1,
   if(windowedAnalysis){
 
     # Check window length vs. embedding
-    if(win < (emLag*emDim)){
+    if(win %<<%(emLag*emDim)){
 
       stop(paste0("The size of win = ", win, " must be larger than the product of emLag = ",emLag, " and emDim = ", emDim))
 
     } else {
 
       # Adjust time series lengths
-      if((dplyr::last(wIndex)+win-NROW(df))>0){
+      if((dplyr::last(wIndex)+win-NROW(df))%>>%0){
 
         yy1 <- ts_trimfill(x=seq(1,dplyr::last(wIndex)+win),y=df[,1])
         yy2 <- rep(NA,length(yy1))
@@ -1478,9 +1478,9 @@ rp_cl            <- function(y1,
 
     # How many cores is optimal?
     cores_available <- parallel::detectCores(logical = logical)-1
-    if(cores_available>1){
-      if(length(wIndices)%%2==0){odd_windows <- FALSE} else {odd_windows <- TRUE}
-      if(cores_available%%2==0){odd_cores <- FALSE} else {odd_cores <- TRUE}
+    if(cores_available%>>%1){
+      if(length(wIndices)%%2%==%0){odd_windows <- FALSE} else {odd_windows <- TRUE}
+      if(cores_available%%2%==%0){odd_cores <- FALSE} else {odd_cores <- TRUE}
       if(odd_windows&!odd_cores){cores_available<-cores_available-1}
       if(!odd_windows&odd_cores){cores_available<-cores_available-1}
     } else {
@@ -1607,8 +1607,8 @@ rp_cl            <- function(y1,
 
   wPlot <- which(doPlot%in%c("noplot","rp","distmat"))
 
-  if(wPlot>1){
-    if(wPlot==2){
+  if(wPlot%>>%1){
+    if(wPlot%==%2){
       if(windowedAnalysis){
         plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1], y2 = df[ind,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE))
         cowplot::plot_grid(plotList)
@@ -1616,7 +1616,7 @@ rp_cl            <- function(y1,
         rp(y1 = df[,1], y2 = df[,2], emDim = emDim, emLag = emLag, emRad = emRad, doPlot = TRUE)
       }
     }
-    if(wPlot==3){
+    if(wPlot%==%3){
       if(windowedAnalysis){
         plotList <- plyr::llply(wIndices, function(ind) rp(y1 = df[ind,1],y2 = df[ind,2], emDim = emDim, emLag = emLag, doPlot = TRUE))
         cowplot::plot_grid(plotList)
@@ -1879,10 +1879,10 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
   # Loosely based on MATLAB function spdiags() by Rob Schreiber - Copyright 1984-2014 The MathWorks, Inc.
 
   # if(!is.na(win)){
-  #   if(length(win)==1){
+  #   if(length(win)%==%1){
   #     win <- c(-win,win)
   #   }
-  #   if(length(win)==2){
+  #   if(length(win)%==%2){
   #       win <- sort(win)
   #   }
   #   if(!length(win)%[]%c(1,2)){
@@ -1892,7 +1892,7 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
 
   if(grepl("matrix",class(RM)[1],ignore.case = TRUE)){
 
-    if(all(RM>0)){warning("All matrix elements are nonzero.")}
+    if(all(RM%>>%0)){warning("All matrix elements are nonzero.")}
 
     s  <- Sys.time()
 
@@ -1929,17 +1929,17 @@ rp_nzdiags <- function(RM=NULL, d=NULL, returnVectorList=TRUE, returnNZtriplets=
     colnames(B) <- paste(d)
 
     for(i in seq_along(d)){
-      B[(nzdiags$row[nzdiags$ndiag==d[i]]+1), i] <- nzdiags$value[nzdiags$ndiag==d[i]]
+      B[(nzdiags$row[nzdiags$ndiag%==%d[i]]+1), i] <- nzdiags$value[nzdiags$ndiag%==%d[i]]
     }
 
-    zID <- which(Matrix::colSums(Matrix::as.matrix(B))==0)
-    if(length(zID)>0){
+    zID <- which(Matrix::colSums(Matrix::as.matrix(B))%==%0)
+    if(length(zID)%>>%0){
       if(removeNZ){
         B  <- B[,-zID]
         nzdiags <- nzdiags[nzdiags$ndiag%in%zID,]
       }
     }
-    #dl <- plyr::llply(seq_along(toList),function(dd){RM[indMat==toList[[dd]]]}, .progress = plyr::progress_text(char = "o~o"))
+    #dl <- plyr::llply(seq_along(toList),function(dd){RM[indMat%==%toList[[dd]]]}, .progress = plyr::progress_text(char = "o~o"))
     e  <- Sys.time()
 
     if(!silent){cat(paste0("\nTime: ", round(difftime(e,s, units = "mins"), digits=1)," min.\n"))}
@@ -1964,7 +1964,7 @@ rp_nzdiags_matlab <- function(RP,d=NULL){
 
     A <- RP
 
-    if(all(A>0)){warning("All matrix elements are nonzero.")}
+    if(all(A%>>%0)){warning("All matrix elements are nonzero.")}
 
     # create an indicator for all diagonals in the matrix
     ind   <- col(A)-row(A)
@@ -1975,7 +1975,7 @@ rp_nzdiags_matlab <- function(RP,d=NULL){
     if(is.null(d)){
 
       # Get diagonals which have nonzero elements
-      keepID <-plyr::ldply(spd, function(di) any(di>0))
+      keepID <-plyr::ldply(spd, function(di) any(di%>>%0))
       nzdiag <- spd[keepID$V1]
       # Indices of nonzero diagonals
       d      <- as.numeric(keepID$.id[keepID$V1])
@@ -2016,7 +2016,7 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
 
     A <- RP
 
-    if(all(A>0)){warning("All matrix elements are nonzero.")}
+    if(all(A%>>%0)){warning("All matrix elements are nonzero.")}
 
     # create an indicator for all diagonals in the matrix
     ind   <- col(A)-row(A)
@@ -2027,7 +2027,7 @@ rp_nzdiags_chroma <- function(RP, d=NULL){
     if(is.null(d)){
 
       # Get diagonals which have nonzero elements
-      keepID <-plyr::ldply(spd, function(di) any(di>0))
+      keepID <-plyr::ldply(spd, function(di) any(di%>>%0))
       nzdiag <- spd[keepID$V1]
       # Indices of nonzero diagonals
       d      <- as.numeric(keepID$.id[keepID$V1])
@@ -2103,13 +2103,13 @@ rp_lineDist <- function(RM,
   # For boot()
   # RP <- RP[indices,]
 
-  if(!all(as.vector(RM)==0|as.vector(RM)==1)){stop("Matrix should be a binary (0,1) matrix!!")}
+  if(!all(as.vector(RM)%==%0|as.vector(RM)%==%1)){stop("Matrix should be a binary (0,1) matrix!!")}
 
   if(recurrenceTimes){
     RM <- Matrix::Matrix(1-RM,sparse = TRUE)
   }
 
-  if(length(d)<=2){
+  if(length(d)%<=%2){
     suppressMessages(RM <- setTheiler(RM, theiler))
   } else {
     if(!is.null(attributes(RM)$theiler)){
@@ -2118,32 +2118,32 @@ rp_lineDist <- function(RM,
   }
 
   if(!is.null(d)){
-    if(length(d)==1){d <- seq(-d,d)}
-    if(length(d)==2){d <- seq(min(d),max(d))}
+    if(length(d)%==%1){d <- seq(-d,d)}
+    if(length(d)%==%2){d <- seq(min(d),max(d))}
   }
 
   B <- rp_nzdiags(RM)
-  V <- Matrix::as.matrix(RM)[,colSums(Matrix::as.matrix(RM))>0]
+  V <- Matrix::as.matrix(RM)[,colSums(Matrix::as.matrix(RM))%>>%0]
 
   RPt <- Matrix::t(RM)
 
-  H <- Matrix::as.matrix(RPt)[,colSums(Matrix::as.matrix(RPt))>0]
+  H <- Matrix::as.matrix(RPt)[,colSums(Matrix::as.matrix(RPt))%>>%0]
   rm(RPt)
 
-  if(NCOL(B)==0|is.null(dim(B))){
+  if(NCOL(B)%==%0|is.null(dim(B))){
 
     B <- matrix(0)
   }
-  if(NCOL(V)==0|is.null(dim(V))){
+  if(NCOL(V)%==%0|is.null(dim(V))){
     V <- matrix(0)
   }
-  if(NCOL(H)==0|is.null(dim(H))){
+  if(NCOL(H)%==%0|is.null(dim(H))){
     H <- matrix(0)
   }
 
   # TEST
   # if(invert){
-  #   IDremove <- which(B[1,]==1)
+  #   IDremove <- which(B[1,]%==%1)
   #   for(i in IDremove){
   #     l1 <- which(diff(c(B[1,IDremove[i]],B[,IDremove[i]]))!=0)
   #     if(l1 > DLmin){
@@ -2184,17 +2184,17 @@ rp_lineDist <- function(RM,
 
   # Get consecutive nonzero segments from indices, their difference is the segment length
   # We added a row of 0s so we'll get sequences of -1, 1, -1
-  diagonals.dist   <- sort(which(diff(D)==-1)-which(diff(D)==1))
-  verticals.dist   <- sort(which(diff(V)==-1)-which(diff(V)==1))
-  horizontals.dist <- sort(which(diff(H)==-1)-which(diff(H)==1))
+  diagonals.dist   <- sort(which(diff(D)%==%-1)-which(diff(D)%==%1))
+  verticals.dist   <- sort(which(diff(V)%==%-1)-which(diff(V)%==%1))
+  horizontals.dist <- sort(which(diff(H)%==%-1)-which(diff(H)%==%1))
 
   diagonals.dist   <- diagonals.dist[diagonals.dist%[]%c(DLmin,DLmax)]
   verticals.dist   <- verticals.dist[verticals.dist%[]%c(VLmin,VLmax)]
   horizontals.dist <- horizontals.dist[horizontals.dist%[]%c(HLmin,HLmax)]
 
-  if(length(diagonals.dist)==0){diagonals.dist <- NA}
-  if(length(verticals.dist)==0){verticals.dist <- NA}
-  if(length(horizontals.dist)==0){horizontals.dist <- NA}
+  if(length(diagonals.dist)%==%0){diagonals.dist <- NA}
+  if(length(verticals.dist)%==%0){verticals.dist <- NA}
+  if(length(horizontals.dist)%==%0){horizontals.dist <- NA}
 
   return(list(diagonals.dist   = diagonals.dist,
               verticals.dist   = verticals.dist,
@@ -2368,7 +2368,7 @@ rp_plot <- function(RM,
       radiusValue <- attr(RM,"emRad")
     }
   } else {
-    if(is.numeric(radiusValue)&radiusValue>=0){
+    if(is.numeric(radiusValue)&radiusValue%>=%0){
       if(is.na(attr(RM,"emRad")%00%NA)){
         attr(RM,"emRad") <- radiusValue
       }
@@ -2405,9 +2405,9 @@ rp_plot <- function(RM,
 
   # Size check
   reduced <- FALSE
-  if((rp_size(RM=RM)$rp_size_total>=maxSize)&courseGrain){
+  if((rp_size(RM=RM)$rp_size_total%>=%maxSize)&courseGrain){
     message("NOTE: To speed up the plotting process, the RP will represent a coursegrained matrix. Set argument 'courseGrain = FALSE' to see the full matrix.")
-    if((rp_size(RM=RM)$rp_size_total/2)>=maxSize){
+    if((rp_size(RM=RM)$rp_size_total/2)%>=%maxSize){
       target_height <- round(sqrt(maxSize))
       target_width  <- round(sqrt(maxSize))
     } else {
@@ -2451,7 +2451,7 @@ rp_plot <- function(RM,
 
   if(chromatic){
     if(is.null(attr(RM,"chromaNames"))){
-      chromaNumbers <- sort(unique(meltRP$value))[sort(unique(meltRP$value))>0]
+      chromaNumbers <- sort(unique(meltRP$value))[sort(unique(meltRP$value))%>>%0]
       names(chromaNumbers) <- c("No recurrence", paste("Cat.", chromaNames))
       attr(RM,"chromaNames") <- chromaNumbers
       chromaNames <- names(chromaNumbers)
@@ -2473,7 +2473,7 @@ rp_plot <- function(RM,
       NAid <- data.frame(attr(RM,"NAij"))
       NAid$value <- NA
       colnames(NAid)[1:2] <- c("Var1","Var2")
-      #meltRP$value[meltRP$Var1==NAid[,2]&meltRP$Var2==NAid[,1]] <- NA
+      #meltRP$value[meltRP$Var1%==%NAid[,2]&meltRP$Var2%==%NAid[,1]] <- NA
       meltRP <- rbind(meltRP,NAid)
     } else {
       message("Cannot find any NA to draw!")
@@ -2514,7 +2514,7 @@ rp_plot <- function(RM,
     plotRadiusRRbar <- FALSE
 
     if(!is.null(markEpochsLOI)){
-      if(is.factor(markEpochsLOI)&length(markEpochsLOI)==max(c(NROW(RM),NCOL(RM)))){
+      if(is.factor(markEpochsLOI)&length(markEpochsLOI)%==%max(c(NROW(RM),NCOL(RM)))){
         start <- max(meltRP$value, na.rm = TRUE) + 1
         #cpal <- paletteer::paletteer_d(package = "rcartocolor",palette = "Safe", n = nlevels(markEpochsLOI))
         cpal <- getColours(Ncols = nlevels(markEpochsLOI))
@@ -2533,12 +2533,12 @@ rp_plot <- function(RM,
         LOIvals <- as.numeric_discrete(markEpochsLOI, sortUnique = TRUE)
         for(i in 1:N){
           j <- i
-          meltRP$value[meltRP$Var1==i&meltRP$Var2==j] <- start + LOIvals[i]
+          meltRP$value[meltRP$Var1%==%i&meltRP$Var2%==%j] <- start + LOIvals[i]
         }
 
         # uni <- sort(unique(meltRP$value))
         # LOIvals <- as.numeric_discrete()
-        # if(length(uni)==length(names(colvec))){
+        # if(length(uni)%==%length(names(colvec))){
         #   which()
         #
         # }
@@ -2589,8 +2589,8 @@ rp_plot <- function(RM,
 
         # CHECK VECTOR LENGTHS
         allEqual <- FALSE
-        if(length(unique(meltRP$value))==length(chromaNames)){
-          if(length(unique(meltRP$value))==length(chromaNumbers)){
+        if(length(unique(meltRP$value))%==%length(chromaNames)){
+          if(length(unique(meltRP$value))%==%length(chromaNumbers)){
             allEqual <- TRUE
           }
         }
@@ -2688,16 +2688,16 @@ rp_plot <- function(RM,
       # Create a custom legend
       distrange  <- round(seq(0, max(RM,na.rm = TRUE),length.out=7),2)
       resol      <- sort(unique(round(as.vector(RM),2)))
-      if(length(resol)<7){
+      if(length(resol) %<<% 7){
         resol <- distrange
       }
-      if(length(resol)>100){
+      if(length(resol) %>>% 100){
         resol <- round(seq(0, max(RM,na.rm = TRUE),length.out=100),2)
       }
       resol <- resol %>% tibble::as_tibble() %>% dplyr::mutate(y= seq(exp(0),exp(1),length.out=NROW(resol)), x=0.5)
 
       distrange <- plyr::ldply(c(0.001, 0.005, 0.01, 0.05, 0.1, 0.5), function(t){
-        suppressWarnings(suppressMessages(est_radius(RM,targetValue = t, silent = TRUE, maxIter = 100, radiusOnFail = "percentile")))
+        suppressWarnings(suppressMessages(est_radius(RM, targetValue = t, silent = TRUE, maxIter = 100, radiusOnFail = "percentile")))
       })
 
       if(AUTO){
@@ -2714,8 +2714,8 @@ rp_plot <- function(RM,
       resol <- resol[-1,]
 
       if(!is.na(radiusValue)){
-        barValue <- round(RecScale$RR[which(round(RecScale$epsilon,4)>=radiusValue)[1]],4)
-        barValue <- resol$value[which(resol$y>=log(barValue))[1]]
+        barValue <- round(RecScale$RR[which(round(RecScale$epsilon,4)%>=%radiusValue)[1]],4)
+        barValue <- resol$value[which(resol$y%>=%log(barValue))[1]]
       } else {
         barValue <- mean(meltRP$value, na.rm = TRUE)
       }
@@ -2842,11 +2842,11 @@ rp_plot <- function(RM,
   xdims <- ""
   ydims <- ""
 
-  if(!is.null(attr(RM,"emDims1.name"))|nchar(xlabel)>0){
-    xdims <- ifelse(nchar(xlabel)>0, xlabel, paste(attr(RM,"emDims1.name"), collapse = " "))
+  if(!is.null(attr(RM,"emDims1.name"))|nchar(xlabel)%>>%0){
+    xdims <- ifelse(nchar(xlabel)%>>%0, xlabel, paste(attr(RM,"emDims1.name"), collapse = " "))
   }
-  if(!is.null(attr(RM,"emDims2.name"))|nchar(ylabel)>0){
-    ydims <- ifelse(nchar(ylabel)>0, ylabel, paste(attr(RM,"emDims2.name"), collapse = " "))
+  if(!is.null(attr(RM,"emDims2.name"))|nchar(ylabel)%>>%0){
+    ydims <- ifelse(nchar(ylabel)%>>%0, ylabel, paste(attr(RM,"emDims2.name"), collapse = " "))
     if(AUTO){
       ydims <- xdims
     }
@@ -3128,7 +3128,7 @@ rp_plot <- function(RM,
     title <- paste(title,"(coursegrained matrix)")
   }
 
-  if(nchar(title)>0){
+  if(nchar(title)%>>%0){
     grT <- ggplot2::ggplot(data.frame(x=1,y=1)) +
       ggplot2::geom_text(ggplot2::aes_(x=~x,y=~y), label=title) +
       theme_void() +
@@ -3238,25 +3238,25 @@ rp_size <- function(RM = NULL, dims = NULL, AUTO = NULL, theiler = NULL){
     }
   }
 
-  if(length(theiler)==1){
-    if(theiler==1){
+  if(length(theiler)%==%1){
+    if(theiler%==%1){
       minDiag <- RMdiag
     }
-    if(theiler>1){
+    if(theiler%>>%1){
       minDiag <- sum(rep(RMdiag,length(seq(-theiler,theiler))) - abs(seq(-theiler,theiler)))
     }
   }
 
-  if(length(theiler)==2){
+  if(length(theiler)%==%2){
     minDiag <- sum(rep(RMdiag,length(seq(min(theiler),max(theiler)))) - abs(seq(min(theiler),max(theiler))))
   }
 
-  if(length(theiler)>2){
+  if(length(theiler)%>>%2){
     minDiag <- sum(rep(RMdiag,length(theiler)) - abs(theiler))
   }
 
   return(list(rp_size_total = R_N, rp_size_theiler = R_N - minDiag))
-  #cumprod(dim(mat))[2] - ifelse((includeDiag&theiler==0),length(Matrix::diag(mat)),ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
+  #cumprod(dim(mat))[2] - ifelse((includeDiag&theiler%==%0),length(Matrix::diag(mat)),ifelse(theiler>0,Matrix::nnzero(Matrix::band(mat,-theiler,theiler)),0)))
 }
 
 
@@ -3352,7 +3352,7 @@ rp_calc <- function(RM,
     emRad <- NA
   }
 
-  if(!all(as.vector(RM)==0|as.vector(RM)==1)){
+  if(!all(as.vector(RM)%==%0|as.vector(RM)%==%1)){
     if(!chromatic){
       stop("Need a thresholded recurrence matrix")
     } else {
@@ -3366,9 +3366,9 @@ rp_calc <- function(RM,
   #Proportion recurrence / Recurrence Rate
   RR <- RP_N/recmatsize$rp_size_theiler
 
-  if(length(RR)==0){RR<-0}
+  if(length(RR)%==%0){RR<-0}
 
-  if(RR==1){
+  if(RR%==%1){
     warning("Everything is recurring!\nReturning empty vector")
     return(rp_empty())
   }
@@ -3439,7 +3439,7 @@ rp_calc <- function(RM,
     #Proportion recurrence / Recurrence Rate un upper
     lineMeasures_upper$RR <- lineMeasures_upper$RP_N / recmatsize_u$rp_size_theiler
 
-    if(length(lineMeasures_upper$RR)==0){lineMeasures_upper$RR<-0}
+    if(length(lineMeasures_upper$RR)%==%0){lineMeasures_upper$RR<-0}
 
 
     SING_u <- rp_lineDist(RMu,
@@ -3475,7 +3475,7 @@ rp_calc <- function(RM,
     #Proportion recurrence / Recurrence Rate in lower
     lineMeasures_lower$RR <- lineMeasures_lower$RP_N / recmatsize_l$rp_size_theiler
 
-    if(length(lineMeasures_lower$RR)==0){lineMeasures_lower$RR<-0}
+    if(length(lineMeasures_lower$RR)%==%0){lineMeasures_lower$RR<-0}
 
     SING_l <- rp_lineDist(RMl,
                           DLmin = 1, DLmax = DLmax,
@@ -3570,7 +3570,7 @@ rp_calc_lineMeasures <- function(RM,
                                  matrices  = FALSE){
 
   #Get line segments
-  # if(Matrix::nnzero(RM)>0)
+  # if(Matrix::nnzero(RM)%>>%0)
   lineSegments <- rp_lineDist(RM,
                               DLmin = DLmin, DLmax = DLmax,
                               VLmin = VLmin, VLmax = VLmax,

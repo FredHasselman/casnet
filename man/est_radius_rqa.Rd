@@ -7,6 +7,8 @@
 est_radius_rqa(
   y1 = NULL,
   y2 = NULL,
+  emDim = NA,
+  emLag = NA,
   AUTO = NULL,
   method = "Euclidean",
   startRadius = NULL,
@@ -26,6 +28,10 @@ est_radius_rqa(
 \item{y1}{A numeric vector or time series}
 
 \item{y2}{A numeric vector or time series for cross recurrence}
+
+\item{emDim}{The embedding dimensions}
+
+\item{emLag}{The embedding lag}
 
 \item{AUTO}{Auto-recurrence? (default = \code{FALSE})}
 

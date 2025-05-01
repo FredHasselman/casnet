@@ -281,7 +281,7 @@ mat_mat2ind <- function(mat){
 mat_ind <- function(Xlength, Ylength, index, diagonal = FALSE){
 
   if(diagonal){
-    if(index>=0){
+    if(index %>=% 0){
       Xx <- seq(1,(Xlength-index))
       Yy <- seq((index+1),Ylength)
     } else {

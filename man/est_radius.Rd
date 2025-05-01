@@ -9,8 +9,9 @@ est_radius(
   RM = NULL,
   y1 = NULL,
   y2 = NULL,
-  emLag = 1,
-  emDim = 1,
+  emLag = NA,
+  emDim = NA,
+  doEmbed = TRUE,
   method = "Euclidean",
   type = c("fixed", "optimal")[1],
   startRadius = NULL,
@@ -39,6 +40,8 @@ est_radius(
 \item{emLag}{The embedding lag}
 
 \item{emDim}{The embedding dimensions}
+
+\item{doEmbed}{If \code{FALSE}, a distance matrix will be returned that is not embedded by \code{emDim} and \code{emLag} (Multidimensional RQA). If \code{y1} and/or \code{y2} are data frames, the columns will be used as the state space dimensions (default = \code{TRUE})}
 
 \item{method}{Distance measure to use. Any option that is valid for argument \code{method} of \code{\link[proxy:dist]{proxy::dist()}}. Type \code{proxy::pr_DB$get_entries()} to see a list of all the options. Common methods are: \verb{"Euclidean", "Manhattan", "Minkowski", "Chebysev"} (or the same but shorter: \verb{"L2","L1","Lp", "max"} distance). To use the shape based distance for phase-based recurrence use \code{"SBD"} (default = \code{"Euclidean"})}
 

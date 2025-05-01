@@ -72,7 +72,7 @@ rqa_par <- function(y1,
   # #}
 
   if(chromatic){
-    if(abs(diff(range(y1)))==1){
+    if(abs(diff(range(y1)))%==%1){
       message("There is only 1 ctategory, chromatic (C)RQA is not sensible. Setting chromatic to FALSE...")
       chromatic <- FALSE
     }
@@ -104,10 +104,6 @@ rqa_par <- function(y1,
 
   # Estimate radius?
   if(is.na(emRad%00%NA)){
-    # if(!is.null(attributes(RM)$emRad)){
-    #   emRad <- attributes(RM)$emRad
-    # } else {
-      # Check for attributes
       if(is.na(targetValue)){
         targetValue <- .05
       }
@@ -118,16 +114,10 @@ rqa_par <- function(y1,
         emLag <- 1
       }
 
-      # emRad <- est_radius_rqa(y1 = et1,
-      #                         y2 = et2,
-      #                         AUTO = AUTO,
-      #                         targetValue = targetValue,
-      #                         radiusOnFail = "quantile",
-      #                         theiler = theiler,
-      #                         method = method,
-      #                         silent = silent)
-
       emRad <- est_radius(y1 = et1,
+                          y2 = et2,
+                          emDim = emDim,
+                          emLag = emLag,
                           targetValue = targetValue,
                           radiusOnFail = "quantile",
                           theiler = theiler,
@@ -145,11 +135,6 @@ rqa_par <- function(y1,
   if("error"%in%class(dist_method$value)){
     stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
   }
-
-  # if(method == "SBD"){
-  #   message("Make sure all phase space dimensions are on the same scale when using Shape Based Distance.")
-  #   dmat <- Matrix::as.matrix(dmat)
-  # }
 
   if(is.na(DLmax)){
       DLmax <- NROW(et1)
@@ -177,6 +162,24 @@ rqa_par <- function(y1,
                            anisotropyHV = anisotropyHV,
                            asymmetryUL = asymmetryUL,
                            silent = silent)
+
+    if(doPlot){
+
+      if(is.null(xlab)){xlab <- ""}
+      if(is.null(ylab)){ylab <- ""}
+
+      imgPath <- rqa_plot(RM = rp(y1 = et1,
+                                  y2 = et2,
+                                  emRad = emRad,
+                                  doEmbed = FALSE,
+                                  method = method),
+                                  xlab = xlab,
+                                  ylab = ylab)
+
+      message(paste("\nSaved Recurrence Plot as:\n",imgPath))
+    }
+
+    return(RQAout)
 
   #require(parallel)
 #
@@ -212,6 +215,7 @@ rqa_par <- function(y1,
 #     attr(dmat,"chromaNames") <- chromaNames
 #     attr(dmat,"chromaDims") <- chromaDims
 #   }
+
 }
 
 # y2 = NULL
@@ -300,7 +304,7 @@ rqa_getSeries <- function(y1, y2 = NULL,
   if(!is.data.frame(y1)){
     id <- deparse(substitute(y1))
     y1 <- as.data.frame(y1)
-    if(length(id)==NCOL(y1)){
+    if(length(id)%==%NCOL(y1)){
       colnames(y1) <- id
     }
   }
@@ -308,7 +312,7 @@ rqa_getSeries <- function(y1, y2 = NULL,
   if(!is.data.frame(y2)){
     id <- deparse(substitute(y2))
     y2 <- as.data.frame(y2)
-    if(length(id)==NCOL(y2)){
+    if(length(id)%==%NCOL(y2)){
       colnames(y2) <- id
     }
   }
@@ -356,7 +360,7 @@ rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, dia
     withSplits <- FALSE
   }
 
-  if(is.na(emRad%00%NA)){
+  if(is.na(emRad %00% NA)){
     stop("Need a value for emRad!")
   }
 
@@ -367,7 +371,7 @@ rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, dia
     Ylength <- NROW(y2)
   }
 
-  # if(all(symmetrical,theiler==0,!diagonal)){
+  # if(all(symmetrical,theiler%==%0,!diagonal)){
   #   symmetrical <- FALSE
   # }
 
@@ -381,7 +385,7 @@ rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, dia
   if(withSplits){
 
   splits <- seq.int(1,max(lengths(inds)),by= splitSize)
-  if(dplyr::last(splits)<max(lengths(inds))){
+  if(dplyr::last(splits) %<<% max(lengths(inds))){
     splits <- c(splits,max(lengths(inds)))
   }
 
@@ -398,40 +402,59 @@ rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, dia
   # X <- matrix(y1[inds$r,], ncol = 2)
   }
 
-  if(all(is.na(y2))){
-    Y <- matrix(y1[inds$c,], nrow = NROW(inds$c))
+  if(symmetrical){
+    Y <- y1[inds$c,]
   } else {
-    Y <- matrix(y2[inds$c,], nrow = NROW(inds$c))
+    Y <- y2[inds$c,]
   }
-  X <- matrix(y1[inds$r,], nrow = NROW(inds$r))
+
+  if(NROW(inds$r)==1){
+    X <- matrix(y1[inds$r,], ncol = NCOL(Y))
+    Y <- as.matrix(Y)
+  } else {
+    X <- y1[inds$r,]
+  }
+
   rm(inds, y1, y2)
 
   if(!diagonal){
-    if((index+theiler)<Ylength){
-      if(theiler>0){
+    if((index+theiler) %<<% Ylength){
+      if(theiler %>>% 0){
         Y[index+(theiler-1),] <- NA
       }
     }
   }
 
-  if(horizontal){
-    D   <- float::as.float(proxy::dist(X, Y, pairwise = diagonal, diag = TRUE, method = method))
-  } else {
-    D   <- float::as.float(proxy::dist(Y, X, pairwise = diagonal, diag = TRUE, method = method))
-  }
+  # if(horizontal){
+  #   D   <- float::as.float(proxy::dist(X, Y, pairwise = diagonal, diag = TRUE, method = method))
+  # } else {
+  #   D   <- float::as.float(proxy::dist(Y, X, pairwise = diagonal, diag = TRUE, method = method))
+  # }
+
+  D   <- float::as.float(proxy::dist(X, Y, pairwise = diagonal, diag = TRUE, method = method))
+
   rm(X,Y)
 
-  minDist  <- min(D[D>float::as.float(0)], na.rm = TRUE)
-  minDistN <- sum((D==float::as.float(minDist)), na.rm = TRUE)
-  maxDist  <- max(D[D>float::as.float(0)], na.rm = TRUE)
-  meanDist <- float::colMeans(D[D>float::as.float(0)], na.rm = TRUE)
-  idx <- bit::as.bit(D<=float::as.float(emRad))
+  if(sum(D > float::as.float(0), na.rm = TRUE) == length(D)){
+    minDist  <- min(D, na.rm = TRUE)
+    maxDist  <- max(D, na.rm = TRUE)
+    meanDist <- float::colMeans(D, na.rm = TRUE)
+  } else {
+    minDist  <- min(D[D > float::as.float(0)], na.rm = TRUE)
+    maxDist  <- max(D[D > float::as.float(0)], na.rm = TRUE)
+    meanDist <- float::colMeans(D[D > float::as.float(0)], na.rm = TRUE)
+  }
+
+  minDistN <- sum((D %==% float::as.float(minDist)), na.rm = TRUE)
+  idx <- bit::as.bit(D %<=% float::as.float(emRad))
+
   rm(D)
 
   attr(idx,"minDist")  <- minDist
   attr(idx,"minDistN") <- minDistN
   attr(idx,"maxDist")  <- maxDist
   attr(idx,"meanDist") <- meanDist
+  attr(idx,"lines") <- c("horizontal" = horizontal, "diagonal" = diagonal, "symmetrical" = symmetrical)
   #return(bit::as.bit(idx))
   return(idx)
 }
@@ -478,7 +501,7 @@ rqa_fast <- function(y1, y2 = NA, index, theiler, emRad, symmetrical = TRUE, dia
 #' @export
 #'
 rqa_lineDist <- function(idx){
-  sort(which(diff(c(0,as.numeric(idx),0))==-1)-which(diff(c(0,as.numeric(idx),0))==1))
+  sort(which(diff(c(0,as.numeric(idx),0))%==%-1)-which(diff(c(0,as.numeric(idx),0))%==%1))
 }
 
 #' Fast RQA
@@ -523,12 +546,22 @@ rqa_measures <- function(y1,
   }
 
   if(!is.matrix(y1)){
-    stop("Input is not a data frame.")
+    stop("Input is not a matrix.")
   }
 
   # if(AUTO){
   #   y2 <- NA
   # }
+
+  if(is.na(DLmax)){
+    DLmax <- NROW(y1)
+  }
+  if(is.na(VLmax)){
+    VLmax <- NROW(y1)
+  }
+  if(is.na(HLmax)){
+    HLmax <- NROW(y1)
+  }
 
   lineMeasures_global <- rqa_calc(y1 = y1, y2 = y2,
                                   emRad = emRad,
@@ -557,7 +590,7 @@ rqa_measures <- function(y1,
       message("Matrix is symmetrical so Horizontal/Vertical anisotropic ratios will be 0.")
     }
     out_hv_ani <- data.frame(
-      Nlines_ani   = ((lineMeasures_global$N_hlp - lineMeasures_global$N_vlp)  / (lineMeasures_global$N_hlp  + lineMeasures_global$N_vlp))%00%NA,
+      Nlines_ani = ((lineMeasures_global$N_hlp - lineMeasures_global$N_vlp)  / (lineMeasures_global$N_hlp  + lineMeasures_global$N_vlp))%00%NA,
       LAM_ani  = (lineMeasures_global$LAM_hl - lineMeasures_global$LAM_vl) / (lineMeasures_global$LAM_hl + lineMeasures_global$LAM_vl),
       MEAN_ani = (lineMeasures_global$TT_hl  - lineMeasures_global$TT_vl)  / (lineMeasures_global$TT_hl  + lineMeasures_global$TT_vl),
       MAX_ani  = (lineMeasures_global$MAX_hl - lineMeasures_global$MAX_vl) / (lineMeasures_global$MAX_hl + lineMeasures_global$MAX_vl),
@@ -666,8 +699,8 @@ rqa_measures <- function(y1,
   #     ENT_hl_asym  = (lineMeasures_upper$ENT_hl - lineMeasures_lower$ENT_hl)/ (lineMeasures_upper$ENT_hl + lineMeasures_lower$ENT_hl),
   #     ENT_vl_asym  = (lineMeasures_upper$ENT_vl - lineMeasures_lower$ENT_vl)/ (lineMeasures_upper$ENT_vl + lineMeasures_lower$ENT_vl)
   #   )
-  #
-  #
+
+
   } else {
     lineMeasures_upper <- NA
     lineMeasures_lower <- NA
@@ -870,7 +903,19 @@ rqa_calc <- function(y1,
   if(is.null(AUTO)){
     if(all(is.na(y2))){
       AUTO <- TRUE
+    } else {
+       AUTO <- isTRUE(all.equal(y1,y2))
     }
+  }
+
+  if(is.na(DLmax)){
+    DLmax <- NROW(y1)
+  }
+  if(is.na(VLmax)){
+    VLmax <- NROW(y1)
+  }
+  if(is.na(HLmax)){
+    HLmax <- NROW(y1)
   }
 
   # lineSegments <- rqa_calc_lineMeasures(y1 = y1,
@@ -893,22 +938,22 @@ rqa_calc <- function(y1,
   # Diagonals ----
 
   # Includes LOS (main diagonal)
-  if(theiler==0){
+  if(theiler %==% 0){
     rows <- c(-(NROW(y1)-1):(NROW(y1)-1))
   } else {
     rows <- c(-(NROW(y1)-1):(-theiler), (theiler):(NROW(y1)-1))
   }
 
-  if(!is.na(corridor)){
-    if(length(corridor)==1){
+  if(!all(is.na(corridor))){
+    if(length(corridor) %==% 1){
       corridor <- c(-abs(corridor),abs(corridor))
     }
-    if(length(corridor!=2)){
+    if(length(corridor) %!=% 2){
       stop("Argument corridor has to be a length 1 or 2 numeric vector.")
     }
     if(all(corridor%[]%c(rows[1],rows[length(rows)]))){
       rows[1] <- corridor[1]
-      rows(length(rows)) <- corridor[2]
+      rows[length(rows)] <- corridor[2]
     } else {
       stop("Argument corridor specifies diagonal indices beyond the matrix dimensions.")
     }
@@ -921,23 +966,23 @@ rqa_calc <- function(y1,
   addDiag <- 0
   if(!asymmetryUL){
     if(AUTO){ # If symmetric, we can do just half the matrix
-      if(theiler == 0){
-        rows <- rows[rows>=1]
+      if(theiler %==% 0){
+        rows <- rows[rows %>=% 1]
         addDiag <- NROW(y1) # Add the diagonal as a line length when theiler = 0
       } else {
-        rows <- rows[rows>=theiler]
+        rows <- rows[rows %>=% theiler]
       }
     }
   } else {
-    if(theiler == 0){
+    if(theiler %==% 0){
       message("NOTE: 'theiler' is set to 0 >> The Upper vs. Lower triangle asymmetry ratio excludes the main diagonal.")
       theiler <- 1
     }
     if(asymmetryUL%in%"upper"){
-      rows <- rows[rows<=-theiler]
+      rows <- rows[rows %<=% -theiler]
     }
     if(asymmetryUL%in%"lower"){
-      rows <- rows[rows>=theiler]
+      rows <- rows[rows %>=% theiler]
     }
   }
 
@@ -972,7 +1017,7 @@ rqa_calc <- function(y1,
     RP_N <- (2*sum(sapply(outD,sum))+addDiag)
     diagonals.distY <- diagonals.distX
     singularities.dist <- c(singularities.dist,singularities.dist)
-    if(theiler==0){
+    if(theiler %==% 0){
       diagonals.distX <- c(diagonals.distX, addDiag)
     }
   } else {
@@ -1002,7 +1047,7 @@ rqa_calc <- function(y1,
     horizontals.dist <- verticals.dist
   } else {
 
-    outH <- future.apply::future_mapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method))
+    outH <- future.apply::future_mapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y2, y2 = y1, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method))
 
    # outH <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method), mc.cores = numCores)
 
@@ -1050,7 +1095,6 @@ rqa_calc <- function(y1,
   N_vl <- sum(freq_vl, na.rm = TRUE)%00%0
   N_hl <- sum(freq_hl, na.rm = TRUE)%00%0
   N_hv <- sum(freq_hv, na.rm = TRUE)%00%0
-
 
   #Number of recurrent points on diagonal, vertical and horizontal lines
   N_dlp <- sum(freqvec_dl*freq_dl, na.rm = TRUE)
@@ -1310,27 +1354,571 @@ rqa_stitchRows <- function(rowA, rowB, revA = FALSE){
 #'
 #' @export
 #'
-rqa_plot <- function(RM, imagePath = NA, wMax = 2048, hMax = 2048){
+rqa_plot <- function(RM, imagePath = NA, xlab = "", ylab = "", wMax = 2048, hMax = 2048, loadPlot = FALSE){
 
   if(is.na(imagePath)){
-    imagePath <- getwd()
+    imagePath <- file.path(getwd(),"RP_0.png")
+  } else {
+    if(dir.exists(imagePath)){
+      ind <- 0
+      fileName <- file.path(imagePath, paste0("RP_",ind,".png"))
+      if(file.exists(fileName)){
+        ind <- ind + length(list.files(path = imagePath, pattern = "(RP\\_)"))%00%0
+      }
+      fileName <- file.path(imagePath,paste0("RP_",ind,".png"))
+    } else {
+      stop("imagePath does not exist.")
+    }
   }
 
   if(all(stats::na.exclude(as.vector(RM))%in%c(0,1))){
     cols <- c("white", "black")
   } else {
     cols <- scales::gradient_n_pal(colours = c("black","red3", "white", "steelblue"),
-                                   values = c(0, 0.0001,(mean(stats::na.exclude(as.vector(RM)), na.rm = TRUE)/max(stats::na.exclude(as.vector(RM)), na.rm = TRUE)),1))(as.vector(RM))
+                                   values = c(0, 0.0001, (mean(stats::na.exclude(as.vector(RM)), na.rm = TRUE) / max(stats::na.exclude(as.vector(RM)), na.rm = TRUE)),1))(as.vector(RM))
   }
 
   mar_old <- par("mar")  #lets not permanently change values
   xpd_old <- par("xpd")  #lets not permanently change values
   par(mar=rep(0, 4), xpd = NA)
-  png(filename = paste0(imagePath,"RPtmp.png"), width = min(wMax,dim(RM[1])), height = min(wMax,dim(RM[2])), units = "px")
-  graphics::image(as.matrix(RM), bty ="n",axes=FALSE,frame.plot=FALSE, xaxt="n", ann=FALSE, yaxt="n", asp=1, useRaster = TRUE, col = cols)
+  grDevices::png(filename = fileName, width = wMax, height = wMax, units = "px")
+  graphics::image(as.matrix(RM), bty ="n", axes=FALSE, frame.plot=FALSE, xaxt="n", ann=FALSE, yaxt="n", asp=1, useRaster = TRUE, col = cols, xlab = xlab, ylab = ylab)
   dev.off()
   par(mar=mar_old, xpd=xpd_old)
 
-  return(paste0(imagePath,"RPtmp.png"))
+  return(fileName)
+}
 
+#' Cross Diagonal Recurrence Profiles
+#'
+#' @inheritParams rqa_par
+#'
+#' @returns Data file with CDRP output
+#'
+#'
+rqa_diagProfile2 <- function(y1,
+                            y2 = NULL,
+                            emDim = 1,
+                            emLag = 1,
+                            emRad = NULL,
+                            targetValue = .05,
+                            theiler = 0,
+                            corridor = NA,
+                            doEmbed = TRUE,
+                            chromatic = FALSE,
+                            AUTO = FALSE,
+                            method = c("Euclidean","SBD")[1],
+                            doPlot = TRUE,
+                            silent = TRUE){
+
+  if(chromatic){
+    if(abs(diff(range(y1)))%==%1){
+      message("There is only 1 ctategory, chromatic (C)RQA is not sensible. Setting chromatic to FALSE...")
+      chromatic <- FALSE
+    }
+  }
+
+  if(any(!doEmbed,chromatic)){
+    emDim <- 1
+    emLag <- 0
+    if(chromatic){
+      emRad <- 0
+    }
+  }
+
+  # Embed series
+  tmp <- rqa_getSeries(y1 = y1,
+                       y2 = y2,
+                       emDim = emDim,
+                       emLag = emLag,
+                       chromatic = chromatic,
+                       doEmbed = doEmbed)
+
+  et1 <- tmp$et1
+  et2 <- tmp$et2
+
+  chromaDims  <- attributes(tmp)$chromaDims
+  chromaNames <- attributes(tmp)$chromaNames
+
+  rm(tmp)
+
+  # Estimate radius?
+  if(is.na(emRad%00%NA)){
+    if(is.na(targetValue)){
+      targetValue <- .05
+    }
+    if(is.null(emDim)){
+      emDim <- 1
+    }
+    if(is.null(emLag)){
+      emLag <- 1
+    }
+
+    emRad <- est_radius(y1 = et1,
+                        targetValue = targetValue,
+                        radiusOnFail = "quantile",
+                        theiler = theiler,
+                        method = method,
+                        silent = silent)
+    if(!emRad$Converged){
+      warning("Radius did not converge, using quantile...")
+    }
+
+    emRad <- emRad$Radius
+  }
+
+  dist_method <- return_error(proxy::pr_DB$get_entry(method))
+  if("error"%in%class(dist_method$value)){
+    stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
+  }
+
+
+  # Diagonals ----
+
+  # Includes LOS (main diagonal)
+  # if(theiler %==% 0){
+  #
+  # } else {
+  #   rows <- c(-(NROW(y1)-1):(-theiler), (theiler):(NROW(y1)-1))
+  # }
+
+  rows <- c(-(NROW(y1)-1):(NROW(y1)-1))
+
+  if(!all(is.na(corridor))){
+    if(!all(corridor%[]%c(rows[1],last(rows)))){
+      stop("Argument corridor specifies diagonal indices beyond the matrix dimensions.")
+    }
+    if(length(corridor) %==% 1){
+      rows <- -abs(corridor):abs(corridor)
+    }
+    if(length(corridor) %==% 2){
+      rows <- corridor[1]:corridor[2]
+    } else {
+      stop("Argument corridor has to be a length 1 or 2 numeric vector.")
+    }
+  }
+
+  future::plan("multisession")
+
+  outD <- future.apply::future_mapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
+  profile <- laply(outD, function(d) sum(d))
+
+  if(doPlot){
+    plot(ts(profile/ (NROW(y1) + abs(rows))))
+  }
+
+}
+
+
+
+
+
+#' Diagonal Recurrence Profile
+#'
+#' @aliases crqa_diagprofile
+#' @inheritParams rqa_par
+#' @param diagWin Window around the line of synchrony
+#' @param xname Label for x-axis
+#' @param yname Label for y-axis
+#' @param doShuffle Should a shuffled baseline be calculated (default = `FALSE`)
+#' @param shuffleWhich Which of the time series should be shuffled: 'y1' or 'y2'? (default = 'y2')
+#' @param Nshuffle How many shuffled versions to make up the baseline? The default is `19`, which is the minimum for a one-sided surrogate test.
+#' @param AUTO Auto-recurrence? (default = `FALSE`)
+#' @param doEmbed If `doShuffle = TRUE`, should the data in y1 and y2 be considered embedded time series? The temporal order of all columns in `y2` will be randomly shuffled in the same way, keeping coordinates together (default = `FALSE`)
+#' @param chromatic Force chromatic RQA? (default = `FALSE`)
+#' @param doPlot Plot (default = `TRUE`)
+#' @param minY The upper limit of the Y-axis. If `NA`, the limit is determined by `max(minY,max(RR))`. Set to 1 to always show the theoretical maximum (default = `NA`)
+#' @param returnOnlyPlot Don't plot to graphics device, but do return the plot (default = `FALSE`)
+#'
+#' @return A plot and/or the data for the plot
+#'
+#' @export
+#'
+rqa_diagProfile <- function(y1     = NULL,
+                           y2      = NULL,
+                           emDim   = 1,
+                           emLag   = 1,
+                           emRad   = NA,
+                           targetValue = NA,
+                           diagWin = NULL,
+                           xname = "X-axis",
+                           yname = "Y-axis",
+                           theiler = 0,
+                           doShuffle = FALSE,
+                           shuffleWhich = "y1",
+                           Nshuffle  = 19,
+                           doEmbed   = TRUE,
+                           AUTO      = NULL,
+                           chromatic = FALSE,
+                           method = c("Euclidean","SBD")[1],
+                           doPlot    = TRUE,
+                           minY      = NA,
+                           returnOnlyPlot = FALSE){
+
+
+  # crqa_results_xy <– crqa(ts1 = lorData$x, ts2 = lorData$y, delay = 9, embed = 4, rescale = 2, radius = 20, normalize = 2, mindiagline = 2, minvertline = 2, tw = 0, whiteline = FALSE, recpt = FALSE, side = “both”) # compute cross-recurrence plot
+  #
+
+  checkPkg("future.apply")
+  checkPkg("bit")
+  checkPkg("float")
+
+  if(method == "SBD"){
+    checkPkg("dtwclust")
+  }
+
+  if(is.null(AUTO)){
+    stop("Auto-RQA or Cross-RQA? (Provide a value for AUTO)")
+  }
+
+  # if(!rescaleDist%in%"none"){
+  #   warning("Cannot rescale distance matrix, please rescale the time series to standardeviation (z-score) or unit scale (min/max)")
+  # }
+
+  # if(is.na(chromatic)){
+  #   # if(!is.null(attr(RM,"chromatic"))){
+  #   #   chromatic <- attr(RM,"chromatic")
+  #   # } else {
+  #   chromatic <- FALSE
+  # }
+  # #}
+
+  if(chromatic){
+    if(abs(diff(range(y1)))%==%1){
+      message("There is only 1 ctategory, chromatic (C)RQA is not sensible. Setting chromatic to FALSE...")
+      chromatic <- FALSE
+    }
+  }
+
+  if(any(!doEmbed,chromatic)){
+    emDim <- 1
+    emLag <- 0
+    if(chromatic){
+      emRad <- 0
+    }
+  }
+
+  # Embed series if necessary
+  tmp <- rqa_getSeries(y1 = y1,
+                       y2 = y2,
+                       emDim = emDim,
+                       emLag = emLag,
+                       chromatic = chromatic,
+                       doEmbed = doEmbed)
+
+  y1 <- tmp$et1
+  y2 <- tmp$et2
+
+  chromaDims  <- attributes(tmp)$chromaDims
+  chromaNames <- attributes(tmp)$chromaNames
+
+  rm(tmp)
+
+  # Estimate radius?
+  if(is.na(emRad%00%NA)){
+    if(is.na(targetValue)){
+      targetValue <- .05
+    }
+    if(is.null(emDim)){
+      emDim <- 1
+    }
+    if(is.null(emLag)){
+      emLag <- 1
+    }
+
+    emRad <- est_radius(y1 = y1,
+                        y2 = y2,
+                        emDim = emDim,
+                        emLag = emLag,
+                        targetValue = targetValue,
+                        radiusOnFail = "quantile",
+                        theiler = theiler,
+                        method = method,
+                        silent = silent)
+
+    if(!emRad$Converged){
+      warning("Radius did not converge, using quantile...")
+    }
+
+    emRad <- emRad$Radius
+  }
+
+  # Check distance measure
+  dist_method <- return_error(proxy::pr_DB$get_entry(method))
+  if("error"%in%class(dist_method$value)){
+    stop("Unknown distance metric!\nUse proxy::pr_DB$get_entries() to see a list of valid options.")
+  }
+
+  if(is.numeric(diagWin)){
+    if(diagWin %>>% 0){
+      if(diagWin %>>% NROW(y1)){
+        diagWin <- NROW(y1)
+        message("'diagWin' was larger than the size of 'RM' ... changed to 'NROW(y1)'")
+      }
+      diagWin <- seq(-diagWin,diagWin)
+    } else {
+      diagWin <- seq(-1*NROW(y1),NROW(y1))
+    }
+  } else {
+    stop("Diagonal window must be 1 positive integer!!")
+  }
+
+
+  if(doShuffle){
+    if(any(is.null(y1),is.null(y2))){
+      stop("Need time series (y1 and y2) in order to do the shuffle!!")
+    } else {
+      cat("Calculating diagonal recurrence profiles... \n")
+
+      if(!is.data.frame(y1)){
+        y1 <- data.frame(y1)
+      }
+      if(!is.data.frame(y2)){
+        y2 <- data.frame(y2)
+      }
+
+      if(shuffleWhich %in% "y1"){
+        TSrnd <- plyr::llply(0:Nshuffle, function(r){
+          if(r%==%0){
+            return(y1)
+          } else {
+            return(data.frame(y1[sample.int(n = NROW(y1), size = NROW(y1)),]))
+          }
+        })
+      }
+      if(shuffleWhich %in% "y2"){
+        TSrnd <- plyr::llply(0:Nshuffle, function(r){
+          if(r%==%0){
+            return(y2)
+          } else {
+            return(data.frame(y2[sample.int(n = NROW(y2), size = NROW(y2)),]))
+          }
+        })
+      }
+    }
+    # emDim <- attr(RM,"emDim")
+    # emLag <- attr(RM,"emLag")
+    # emRad <- attr(RM,"emRad")
+  } else {
+    Nshuffle <- 0
+    TSrnd<- list(y1)
+  }
+
+  #out <- vector(mode = "list", length = Nshuffle+1)
+
+  future::plan("multisession")
+
+  out <- plyr::llply(seq_along(TSrnd), function(r){
+
+    if(doShuffle){
+
+      yr <- as.data.frame(TSrnd[[r]])
+
+      if(shuffleWhich %in% "y1"){
+        #RMtmp <- rp(y1 = r, y2 = y2, emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+        outD <- future.apply::future_mapply(FUN = rqa_fast, index = diagWin, MoreArgs = list(y1 = yr, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
+      } else {
+        #RMtmp <- rp(y1 = y1, y2 = r, emDim = emDim, emLag = emLag, emRad = emRad, to.sparse = TRUE)
+        outD <- future.apply::future_mapply(FUN = rqa_fast, index = diagWin, MoreArgs = list(y1 = y1, y2 = yr, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+
+      }
+    } else {
+      outD <- future.apply::future_mapply(FUN = rqa_fast, index = diagWin, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+    }
+
+
+
+    # B <- rp_nzdiags(RMtmp, removeNZ = FALSE, d = diagWin)
+    # rm(RMtmp)
+    #
+    # diagID <- 1:NCOL(B)
+    # names(diagID) <- colnames(B)
+    # if(length(diagWin)%<<%COL(B)){
+    #   cID <- which(colnames(B)%in%diagWin)
+    #   B <- B[,cID]
+    #   diagID <- seq_along(cID)
+    #   names(diagID) <- colnames(B)
+    # }
+
+    profile <- plyr::laply(outD, function(d) sum(d))
+
+    df <- data.frame( Diagonal = seq_along(diagWin),
+                      index = seq_along(diagWin),
+                      RN = profile,
+                      DiagN = (NROW(y1)-abs(diagWin)),
+                      RR = profile / (NROW(y1)-abs(diagWin)),
+                      group  = 1,
+                      labels = paste(diagWin)
+                      # df$labels[df$Diagonal%==%0] <- ifelse(AUTO,"LOI","LOS")
+    )
+    df$labels <- factor(df$labels,levels = df$labels, ordered = TRUE)
+
+    # #winRR <- sum(B%==%1, na.rm = TRUE)
+    # df <- plyr::ldply(diagID, function(i){
+    #   data.frame(index = i,
+    #              RN = sum(B[,i]%==%1, na.rm = TRUE),
+    #              DiagN = (NROW(B)-abs(as.numeric(colnames(B)[i]))),
+    #              RR = sum(B[,i]%==%1, na.rm = TRUE)/(NROW(B)-abs(as.numeric(colnames(B)[i]))))
+    # }, .id = "Diagonal")
+
+    return(df)
+  })
+
+  future::plan("sequential")
+
+  if(doShuffle){
+    names(out) <- c("obs",paste0("Shuffled", 1:Nshuffle))
+  } else {
+    names(out) <- "obs"
+  }
+
+  dy      <- plyr::ldply(out)
+  if(doShuffle){
+    df_shuf <- dplyr::filter(dy, .data$.id!="obs")
+  } else {
+    df_shuf <- dy
+  }
+
+  if(doShuffle){
+    dy_m <- df_shuf %>%
+      dplyr::group_by(.data$Diagonal,.data$labels) %>%
+      dplyr::summarise(meanRRrnd = mean(.data$RR, na.rm = TRUE),
+                       sdRRrnd   = stats::sd(.data$RR, na.rm = TRUE)) %>%
+      dplyr::ungroup()
+
+    if(Nshuffle%==%1){
+      dy_m$sdRRrnd <- 0
+    }
+
+    dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+    dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+
+  }
+
+  obs <- dy[dy$.id=="obs",]
+  if(doShuffle){
+    if(!all(obs$Diagonal%in%dy_m$Diagonal)){
+      notInd <- which(!obs$Diagonal%in%dy_m$Diagonal)
+      tmp <- matrix(nrow = NROW(dy_m), ncol = NCOL(dy_m), dimnames = list(NULL,colnames(dy_m)))
+      for(r in 1:NROW(dy_m)){
+        if(!r%in%notInd){
+          tmp[r,] <- obs[r,]
+        }
+      }
+      obs <- tmp
+      rm(tmp)
+    }
+  }
+
+  if(doShuffle){
+    df <- dplyr::left_join(obs, dy_m, by = c("Diagonal","labels"))
+  } else {
+    df <- obs
+    df$meanRRrnd <- NA
+    df$sdRRrnd <- NA
+    df$ciHI <- 0
+    df$ciLO <- 0
+  }
+
+  df$Diagonal <- as.numeric(df$Diagonal)
+
+  #df <- tidyr::pivot_longer(dy_m, cols = , names_to =  "variable", values_to = "RR")
+
+  if(doPlot){
+
+    # Diags <- as.numeric(levels(df$labels))
+    # Diags[is.na(Diags)] <- 0
+
+    # if(length(diagWin)>21){
+    #   ext <- max(min(abs(Diags),na.rm = TRUE),abs(max(Diags,na.rm = TRUE)))-1
+    #   breaks <- which(Diags%in%(c(seq(-ext,-1,length.out = 10),0,seq(1,ext,length.out = 10))))
+    #   labels <- sort(unique(c(Diags[breaks],0)))
+    #   breaks <- sort(unique(c(breaks,stats::median(breaks))))
+    # } else {
+    #   breaks <- seq_along(Diags)
+    #   labels <- sort(unique(c(Diags[breaks],0)))
+    # }
+
+
+    # if(which.min(c(length(breaks),length(labels)))%==%1){
+    #   labels <- labels[1:length(breaks)]
+    # } else {
+    #   breaks <- breaks[1:length(labels)]
+    # }
+
+    breaks <- seq_along(as.numeric(levels(df$labels)))
+    labels <- sort(unique(c(as.numeric(levels(df$labels))[breaks],0)))
+
+    if(length(breaks)%>>%21){
+      ID <- round(seq(1,length(breaks),length.out = 21))
+      if(any(labels[ID]%==%0)){
+        labels <- labels[ID]
+        breaks <- ID
+      } else {
+        breaks <- sort(c(which(labels%==%0),ID))
+        labels <- labels[breaks]
+      }
+    }
+
+    x1 <- round((which.min(as.numeric(paste(df$Diagonal))))+(length(diagWin)*.1))
+    x2 <- round((which.max(as.numeric(paste(df$Diagonal))))-(length(diagWin)*.1))
+    yL <- max(as.numeric(paste(df$RR)),na.rm = TRUE)+0.1
+    # col <- c("ciHI" = "grey70", "ciLO" = "grey70", "meanRRrnd" = "grey40","y_obs" = "black")
+    if(Nshuffle%>>%0){
+      col <- c("Mean Shuffled" = "grey70","Observed" = "black")
+      leg <- paste0("Diagonal Profile\n(N surrogates = ",Nshuffle,")")
+    } else {
+      col <- c("Observed" = "black")
+      leg <- paste0("Diagonal Profile")
+    }
+
+    #siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
+    #g<- ggplot(df, aes_(x = ~labels, y = ~RR, colour = ~variable))
+    #   geom_line() + theme_bw()
+    if(doShuffle){
+     maxData <- max(c(df$RR,df$ciHI), na.rm = TRUE)
+    } else {
+     maxData <- max(df$RR, na.rm = TRUE)
+    }
+    if(is.na(minY)){
+      minY <- maxData
+    }
+    g <- ggplot2::ggplot(df, ggplot2::aes(x=Diagonal)) +
+      ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey80")
+
+    if(doShuffle){
+      g <- g + ggplot2::geom_ribbon(ggplot2::aes(ymin=ciLO, ymax=ciHI), alpha=0.3, colour = "grey60") +
+        ggplot2::geom_line(aes(y=meanRRrnd), colour = "grey70")
+    }
+    g <- g + ggplot2::geom_line(ggplot2::aes(y=RR), size = .5) +
+      #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
+      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0, max(c(minY,maxData)))) +
+      ggplot2::scale_x_continuous(name = paste0(xname, " << recurrences due to >> ", yname),
+                                  breaks = breaks, labels = labels, expand = c(0,0)) +
+      # ggplot2::geom_label(x=x1,y=.8,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE, size = 3) +
+      # ggplot2::geom_label(x=x2,y=.8,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE, size = 3) +
+      # ggplot2::scale_colour_manual(leg, values = col) +
+      ggplot2::theme_bw() +
+      theme(panel.grid.minor = element_blank(),
+            axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5, size = rel(.6)),
+            axis.title.x = element_text(size = rel(.8)))
+
+    if(!returnOnlyPlot){
+      print(g)
+    }
+    # if(doShuffle){
+    #   df <- tidyr::spread(df,key = .data$variable, value = .data$RR)
+    # }
+
+    return(invisible(list(plot = g, data = df)))
+
+  } else {
+
+    #if(doShuffle){df <- tidyr::spread(df,key = .data$variable, value = .data$RR)}
+
+    return(df)
+
+  }
 }

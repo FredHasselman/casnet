@@ -35,8 +35,9 @@
 est_radius <- function(RM = NULL,
                        y1 = NULL,
                        y2 = NULL,
-                       emLag = 1,
-                       emDim = 1,
+                       emLag = NA,
+                       emDim = NA,
+                       doEmbed = TRUE,
                        method = "Euclidean",
                        type           = c("fixed","optimal")[1],
                        startRadius    = NULL,
@@ -54,10 +55,30 @@ est_radius <- function(RM = NULL,
                        radiusOnFail   = c("tiny","huge","percentile")[1],
                        silent         = FALSE){
 
+
+
+  if(!doEmbed){
+    emDim <- 1
+    emLag <- 0
+  }
+
   optimOK <- FALSE
-  if(is.null(RM)&!is.null(y1)){
-    optimOK <- TRUE
-    RM <- rp(y1=y1, y2=y2,emDim=emDim, emLag=emLag, method = method)
+  if(is.null(RM)){
+    if(!is.null(y1)){
+      optimOK <- TRUE
+      if(any(NCOL(y1)>1,!doEmbed)){
+        message("Not embedding time series...")
+        RM <- rp(y1=y1, y2=y2, method = method, doEmbed = FALSE)
+      } else {
+        if(any(is.na(emDim), is.na(emLag))){
+          stop("Need embedding parameters for delay embedding...")
+        } else {
+          RM <- rp(y1=y1, y2=y2, emDim=emDim, emLag=emLag, method = method)
+        }
+      }
+    } else {
+      stop("Need a value for RM or y1 (and/or y2)")
+    }
   }
 
   if(any(is.na(RM))){
@@ -78,9 +99,9 @@ est_radius <- function(RM = NULL,
   if(is.null(startRadius)){
     if(type=="fixed"){
       if(AUTO){
-        startRadius <- as.numeric(stats::quantile(unique(as.vector(RM[lower.tri(RM)])),probs = ifelse(targetValue>=1,.05,targetValue)))
+        startRadius <- as.numeric(stats::quantile(unique(as.vector(RM[lower.tri(RM)])),probs = ifelse(targetValue%>=%1,.05,targetValue)))
       } else {
-        startRadius <- as.numeric(stats::quantile(unique(as.vector(RM)),probs = ifelse(targetValue>=1,.05,targetValue)))
+        startRadius <- as.numeric(stats::quantile(unique(as.vector(RM)),probs = ifelse(targetValue%>=%1,.05,targetValue)))
         }
     } else {
       startRadius <- seq(0,1.5,by=0.001)
@@ -103,8 +124,8 @@ est_radius <- function(RM = NULL,
     tollo <- targetValue-tol #(1-tol),
     tolhi <- targetValue+tol #(tol+1),
     rp.size <- rp_size(RM=RM,AUTO = AUTO,theiler = theiler)$rp_size_theiler
-    minDist <- suppressMessages(min(RM[RM>0], na.rm = TRUE))
-    minRR   <- (sum((as.vector(RM)>0)&(as.vector(RM)==minDist)))/rp.size
+    minDist <- suppressMessages(min(RM[RM%>>%0], na.rm = TRUE))
+    minRR   <- (sum((as.vector(RM)%>>%0)&(as.vector(RM)%==%minDist)))/rp.size
 
 
 
@@ -122,17 +143,17 @@ est_radius <- function(RM = NULL,
                            Converged   = Converged, check.names = FALSE)
 
     exitIter <- FALSE
-    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"??",tol,"for", targetMeasure,"\n"))}
+    if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"+/-",tol,"for", targetMeasure,"\n"))}
 
-    if(tryRadius<=minDist){
+    if(tryRadius %<=% minDist){
       warning(paste("The minimum RR possible for this matrix is", round(Measure,3),
                     "because the minimum distance is:", round(minDist,3)))
       minRRfound <- TRUE
       exitIter   <- TRUE
     }
 
-    # if(theiler == 0){
-    #   if((NROW(y1)/RP_max)>targetValue){
+    # if(theiler %==% 0){
+    #   if((NROW(y1)/RP_max)%>>%targetValue){
     #     stop(paste0("The minimum RR possible including the diagonal is: ",round(NROW(y1)/RP_max,3),", which is larger than the targetValue for RR: ",targetValue))
     #   }
     # }
@@ -148,7 +169,7 @@ est_radius <- function(RM = NULL,
 
       if(!silent){cat(paste("Iteration",iter,"\n"))}
 
-      RP_N <- sum((as.vector(RM)>0)&(as.vector(RM)<tryRadius))
+      RP_N <- sum((as.vector(RM) %>>% 0)&(as.vector(RM) %<<% tryRadius))
 
       # RMs <- mat_di2bi(RM, emRad = tryRadius, convMat = TRUE)
       # #Total nr. recurrent points
@@ -178,14 +199,14 @@ est_radius <- function(RM = NULL,
                                              AUTO        = AUTO,
                                              Converged   = Converged)
 
-      if(tryRadius<=minDist){
+      if(tryRadius %<=% minDist){
         warning(paste("The minimum RR possible for this matrix is",round(minRR,3), "because the minimum distance is:",round(minDist,3)))
         minRRfound <- TRUE
         exitIter <- TRUE
       }
 
-      if(any(Measure%[]%c(tollo,tolhi),(iter>=maxIter))){
-        if(Measure%[]%c(tollo,tolhi)){
+      if(any(Measure %[]% c(tollo,tolhi),(iter %>=% maxIter))){
+        if(Measure %[]% c(tollo,tolhi)){
           Converged <- TRUE
           if(!silent){
             message("\nConverged! Found an appropriate radius...")
@@ -195,7 +216,8 @@ est_radius <- function(RM = NULL,
         exitIter <- TRUE
       }
 
-      if(round(Measure,digits = 2)>round(targetValue,digits = 2)){
+      #if(round(Measure,digits = 2) %>>% round(targetValue,digits = 2)){
+      if(Measure %>>% targetValue){
         tryRadius <- tryRadius*(min(c(0.8,1-abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) # tol*2
       } else {
         tryRadius <- tryRadius*(min(c(1.8,1+abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) #1+(tol*2)
@@ -204,7 +226,7 @@ est_radius <- function(RM = NULL,
 
     } # While ....
 
-    if(iter>=maxIter){
+    if(iter %>=% maxIter){
       warning("Max. iterations reached!")
       iterList$stopRadius[iter] <- tryRadius
       #iterlist$Measure[iter] <- Measure
@@ -214,7 +236,7 @@ est_radius <- function(RM = NULL,
       iterList$Radius[iter] <- dplyr::case_when(
         radiusOnFail%in%"tiny" ~ 0 + .Machine$double.eps,
         radiusOnFail%in%"huge" ~ 1 + max(RM),
-        radiusOnFail%in%"percentile" ~ as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))), probs = ifelse(targetValue>=1,.05,targetValue)))
+        radiusOnFail%in%"percentile" ~ as.numeric(stats::quantile(unique(as.vector(Matrix::tril(RM,-1))), probs = ifelse(targetValue %>=% 1,.05,targetValue)))
       )
       warning(paste0("\nTarget not found, try increasing tolerance, max. iterations, or, change value of startRadius.\nreturning radius: ",iterList$Radius[iter]))
       iterList$stopRadius[iter] <- tryRadius
@@ -257,16 +279,16 @@ est_radius <- function(RM = NULL,
                      T1  = pROC::roc(cases=dfREC$T1[caseID], controls=dfREC$T1[controlID]))
 
 
-      optimal.radius <- list(RR  = dfREC$emRad[(dfREC$RR>=min(pROC::coords(rocREC$RR,
+      optimal.radius <- list(RR  = dfREC$emRad[(dfREC$RR%>=%min(pROC::coords(rocREC$RR,
                                                                            "b",best.method="c",
                                                                            ret="t")))][1],
-                             DET = dfREC$emRad[(dfREC$DET  >=min(pROC::coords(rocREC$DET,
+                             DET = dfREC$emRad[(dfREC$DET  %>=%min(pROC::coords(rocREC$DET,
                                                                               "b",best.method="c",
                                                                               ret="t")))][1],
-                             LAM = dfREC$emRad[(dfREC$LAM  >=min(pROC::coords(rocREC$LAM,
+                             LAM = dfREC$emRad[(dfREC$LAM  %>=%min(pROC::coords(rocREC$LAM,
                                                                               "b",best.method="c",
                                                                               ret="t")))][1],
-                             T1  = dfREC$emRad[(dfREC$T1   >=min(pROC::coords(rocREC$T1,
+                             T1  = dfREC$emRad[(dfREC$T1   %>=%min(pROC::coords(rocREC$T1,
                                                                               "b",best.method="c",
                                                                               ret="t")))][1]
       )
@@ -409,6 +431,8 @@ est_radius <- function(RM = NULL,
 #'
 est_radius_rqa <- function(y1 = NULL,
                        y2 = NULL,
+                       emDim = NA,
+                       emLag = NA,
                        AUTO = NULL,
                        method = "Euclidean",
                        startRadius    = NULL,
@@ -442,6 +466,10 @@ est_radius_rqa <- function(y1 = NULL,
   if(!doEmbed){
     emDim <- 1
     emLag <- 0
+  } else {
+    if(any(is.na(emDim), is.na(emLag))){
+      stop("Need embedding parameters for delay embedding...")
+    }
   }
 
   # Embed series
@@ -481,8 +509,8 @@ est_radius_rqa <- function(y1 = NULL,
 
   RP_max <- rp_size(dims = dims, AUTO = AUTO, theiler = theiler)$rp_size_theiler
 
-  if(theiler == 0){
-    if((NROW(y1)/RP_max)>targetValue){
+  if(theiler %==% 0){
+    if((NROW(y1)/RP_max)%>>%targetValue){
       stop(paste0("The minimum RR possible including the diagonal is: ",round(NROW(y1)/RP_max,3),", which is larger than the targetValue for RR: ",targetValue))
     }
   }
@@ -499,10 +527,10 @@ est_radius_rqa <- function(y1 = NULL,
     #startRadius <- mean(c(as.numeric(minDist),as.numeric(maxDist)), na.rm = TRUE)
     if(!AUTO){
       startRadius <- as.numeric(stats::quantile(unique(proxy::dist(x = y1, y = y2, pairwise = FALSE, method = method)),
-                                                probs = ifelse(targetValue>=1, .05, targetValue)))
+                                                probs = ifelse(targetValue%>=%1, .05, targetValue)))
     } else {
       startRadius <- as.numeric(stats::quantile(unique(proxy::dist(x = y1, y = y1, pairwise = FALSE, method = method)),
-                                                probs = ifelse(targetValue>=1, .05, targetValue)))
+                                                probs = ifelse(targetValue%>=%1, .05, targetValue)))
     }
   }
 
@@ -534,7 +562,7 @@ est_radius_rqa <- function(y1 = NULL,
                            Converged   = Converged, check.names = FALSE)
 
     # Includes LOS (main diagonal)
-    if(theiler==0){
+    if(theiler%==%0){
       rows <- c(-(NROW(y1)-1):(NROW(y1)-1))
     } else {
       rows <- c(-(NROW(y1)-1):(-theiler), (theiler):(NROW(y1)-1))
@@ -542,11 +570,11 @@ est_radius_rqa <- function(y1 = NULL,
 
     if(AUTO){
       addDiag <- 0
-      if(theiler == 0){
-        rows <- rows[rows>=1]
+      if(theiler %==% 0){
+        rows <- rows[rows%>=%1]
         addDiag <- NROW(y1)
       } else {
-        rows <- rows[rows>=theiler]
+        rows <- rows[rows%>=%theiler]
       }
     }
 
@@ -571,14 +599,14 @@ est_radius_rqa <- function(y1 = NULL,
 
       }
 
-      if(iter == 0){
+      if(iter %==% 0){
 
         if(useParallel){
 
           minDist    <- float::as.float(future.apply::future_sapply(outD, function(d) as.numeric(attributes(d)$minDist)))
           minDistN   <- float::as.float(future.apply::future_sapply(outD, function(d) as.numeric(attributes(d)$minDistN)))
           minRP_dist <- float::as.float(min(minDist, na.rm = TRUE))
-          minRP_N    <- sum(minDistN[minDist==minRP_dist], na.rm = TRUE)
+          minRP_N    <- sum(minDistN[minDist%==%minRP_dist], na.rm = TRUE)
           maxDist    <- float::as.float(future.apply::future_sapply(outD, function(d) as.numeric(attributes(d)$maxDist)))
           maxRP_dist <- float::as.float(max(maxDist, na.rm = TRUE))
 
@@ -587,7 +615,7 @@ est_radius_rqa <- function(y1 = NULL,
           minDist    <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$minDist)))
           minDistN   <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$minDistN)))
           minRP_dist <- float::as.float(min(minDist, na.rm = TRUE))
-          minRP_N    <- sum(minDistN[minDist==minRP_dist], na.rm = TRUE)
+          minRP_N    <- sum(minDistN[minDist%==%minRP_dist], na.rm = TRUE)
           maxDist    <- float::as.float(sapply(outD, function(d) as.numeric(attributes(d)$maxDist)))
           maxRP_dist <- float::as.float(max(maxDist, na.rm = TRUE))
 
@@ -608,7 +636,7 @@ est_radius_rqa <- function(y1 = NULL,
         #   warning("Cannot rescale distance matrix, please rescale the time series to standardeviation (z-score) or unit scale (min/max)")
         # }
 
-        if(targetValue<=minRR){
+        if(targetValue%<=%minRR){
           warning(paste("The minimum RR possible for this matrix is", round(minRR,3),
                         "because the minimum distance is:", round(as.numeric(minRP_dist),3)))
           minRRfound <- TRUE
@@ -653,7 +681,7 @@ est_radius_rqa <- function(y1 = NULL,
                                              AUTO        = AUTO,
                                              Converged   = Converged)
 
-      if(any(Measure%[]%c(tollo,tolhi),(iter>=maxIter),(Measure<=minRR))){
+      if(any(Measure%[]%c(tollo,tolhi),(iter%>=%maxIter),(Measure%<=%minRR))){
         if(Measure%[]%c(tollo,tolhi)){
           Converged <- TRUE
           if(!silent){
@@ -662,12 +690,12 @@ est_radius_rqa <- function(y1 = NULL,
         }
         iterList$Converged[iter] <- Converged
         exitIter <- TRUE
-        if(Measure<=minRR){
+        if(Measure%<=%minRR){
           minRRfound <- TRUE
         }
       }
 
-      if(round(Measure,digits = 2)>round(targetValue,digits = 2)){
+      if(round(Measure,digits = 2)%>>%round(targetValue,digits = 2)){
         tryRadius <- tryRadius*(min(c(0.8,1-abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) # tol*2
       } else {
         tryRadius <- tryRadius*(min(c(1.8,1+abs(round(Measure,digits = 2)-round(targetValue,digits = 2))))) #1+(tol*2)
@@ -682,7 +710,7 @@ est_radius_rqa <- function(y1 = NULL,
 
     }
 
-    if(iter>=maxIter){
+    if(iter%>=%maxIter){
       warning("Max. iterations reached!")
       iterList$stopRadius[iter] <- tryRadius
       #iterlist$Measure[iter] <- Measure
@@ -768,10 +796,12 @@ est_parameters <- function(y,
                            silent   = TRUE,
                            ...){
 
+  checkPkg("fpCompare")
+
   if(!is.null(dim(y))){stop("y must be a 1D numeric vector!")}
 
-  if(length(nnRadius)!=1){stop("nnRadius must have 1 numeric value")}
-  if(length(nnSize)!=1){stop("nnSize must have 1 numeric value")}
+  if(length(nnRadius)%!=%1){stop("nnRadius must have 1 numeric value")}
+  if(length(nnSize)%!=%1){stop("nnSize must have 1 numeric value")}
 
   if(any(is.na(y))){warning("Removing NA in y before estimation!")}
   y <- y[!is.na(y)]
@@ -785,13 +815,13 @@ est_parameters <- function(y,
 
   #y <- ts_standardise(y, adjustN = FALSE)
 
-  if(minVecLength<20){
+  if(minVecLength%<<%0){
     stop("Please collect more data!")
   }
 
   if(!is.na(maxDim%00%NA)&!is.na(maxLag%00%NA)){
-    if((NROW(y)-(maxDim*maxLag))<minVecLength){
-      maxDim <- (1:maxDim)[max(which(NROW(y)-(1:maxDim*maxLag)>=minVecLength), na.rm = TRUE)]
+    if((NROW(y)-(maxDim*maxLag))%<<%minVecLength){
+      maxDim <- (1:maxDim)[max(which(NROW(y)-(1:maxDim*maxLag)%>=%minVecLength), na.rm = TRUE)]
       message(paste("Changed value of maxDim to",maxDim,"\n"))
     }
   }
@@ -800,7 +830,7 @@ est_parameters <- function(y,
 
   doLags <- c(1:maxLag)
   if(!is.null(emLag)){
-    if(NROW(emLag)==1){
+    if(NROW(emLag)%==%1){
       lagMethods <- c(lagMethods, "user.lag") #  lag = emLag, ami = 0)
       doLags <- unique(sort(c(1:maxLag,emLag)))
     } else {
@@ -809,13 +839,13 @@ est_parameters <- function(y,
   }
 
 
-  if(nchar(estimateDimensions)>1){
+  if(nchar(estimateDimensions)%>>%1){
     mi <- mif(data.frame(y),lags = doLags)
     #est_emLag(y,selection.methods = lagMethods, maxLag = maxLag)
     emLags <- cbind.data.frame(selection.methods = lagMethods, lag = NA)
     for(m in seq_along(emLags$selection.methods)){
       if(emLags$selection.methods[m]%in%"first.minimum"){
-        if(length(doLags)>2){
+        if(length(doLags)%>>%2){
           emLags$lag[m] <- which(attributes(ts_symbolic(data.frame(mi)))$mi_sym_label%in%"trough")[1]%00%NA
           if(is.na(emLags$lag[m])){
             emLags$lag[m] <- as.numeric(which.min(mi))
@@ -917,7 +947,7 @@ est_parameters <- function(y,
 
           #allN <- nonlinearTseries::findAllNeighbours(surrDims, radius = nnSize*sd(y))
           #Nn <- sum(plyr::laply(allN, length), na.rm = TRUE)
-          #   if(D==1){Nn.max <- Nn}
+          #   if(D%==%1){Nn.max <- Nn}
 
 
         } #R
@@ -928,16 +958,16 @@ est_parameters <- function(y,
     # df$Nn.pct <- df$Nn/df$Nn.max
 
     opt <-plyr::ldply(unique(df$emLag), function(n){
-      id <- which((df$Nn.pct<=nnThres)&(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag")))
-      if(length(id)>0){
-        #idmin <- id[df$emDim[id]==min(df$emDim[id], na.rm = TRUE)]
-        # if(length(idmin)>0){
+      id <- which((df$Nn.pct%<=%nnThres)&(df$emLag%==%n)&(!(df$emLag.method%in%"maximum.lag")))
+      if(length(id)%>>%0){
+        #idmin <- id[df$emDim[id]%==%min(df$emDim[id], na.rm = TRUE)]
+        # if(length(idmin)%>>%0){
         #   return(df[idmin,])
         #}
         df <- df[id,]
         return(df[!duplicated(df),])
       } else {
-        return(df[which.min(df$Nn.pct[(df$emLag==n)&(!(df$emLag.method%in%"maximum.lag"))]),])
+        return(df[which.min(df$Nn.pct[(df$emLag%==%n)&(!(df$emLag.method%in%"maximum.lag"))]),])
       }
     }
     )
@@ -950,7 +980,7 @@ est_parameters <- function(y,
                   preferSmallestInLargestHood = opt[which(min(opt$emLag, na.rm=TRUE)&min(opt$emDim, na.rm=TRUE)&max(opt$Nradius, na.rm = TRUE)),]
     )
 
-    #opt <- opt[opt$emDim==min(opt$emDim),][1,]
+    #opt <- opt[opt$emDim%==%min(opt$emDim),][1,]
     opDim <- min(unique(opt$emDim), na.rm = TRUE)
     #opt <- opt[!duplicated(opt),]
 
@@ -958,15 +988,9 @@ est_parameters <- function(y,
     opDim <- NA
   }
 
-
-  #opDim <- min(df$emDim[df$Nn.pct<nnThres], na.rm = TRUE)
-  # opLag <- tau(y,
-  #              selection.methods = ami.method,
-  #              maxLag =maxLag)$opLag[1]
   opLag <- min(unique(opt$emLag), na.rm = TRUE)
-  #opRad = NULL
 
-  opt <- opt[all(opt$emDim==opDim,opt$emLag==opLag),]
+  opt <- opt[all(opt$emDim%==%opDim,opt$emLag%==%opLag),]
 
   df$emLag <- factor(df$emLag)
   # df$Nns   <- interaction(df$Nsize,df$Nradius)
@@ -992,18 +1016,18 @@ est_parameters <- function(y,
     myPalNn <- myPal
     names(myPalNn) <- emLags$lag[!is.na(emLags$lag)]
 
-    gNdims <- ggplot2::ggplot(df, ggplot2::aes_(y = ~Nn.pct, x = ~emDim, colour = ~emLag)) +
-      ggplot2::geom_rect(ggplot2::aes_(xmin = ~startAt, xmax = ~stopAt, fill = ~f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
+    gNdims <- ggplot2::ggplot(df, ggplot2::aes(y = Nn.pct, x = emDim, colour = emLag)) +
+      ggplot2::geom_rect(ggplot2::aes(xmin = startAt, xmax = stopAt, fill = f), ymin = -Inf, ymax = Inf, data = dfs, inherit.aes = FALSE) +
       ggplot2::scale_fill_manual(values = scales::alpha(c("grey", "white"),.2), guide="none") +
       ggplot2::geom_hline(yintercept = nnThres, linetype = 2, colour = "grey60") +
       ggplot2::geom_hline(yintercept = c(0,100),   colour = "grey60") +
       ggplot2::geom_hline(yintercept = 50, colour = "grey90") +
       ggplot2::geom_line(position  = ggplot2::position_dodge(.4)) +
       ggplot2::geom_point(position = ggplot2::position_dodge(.4)) +
+      ggplot2::facet_wrap(vars(Nns.f), ncol=2) +
       ggplot2::annotate("text",x=maxDim/3,y=nnThres, label="threshold", size = .8) +
       ggplot2::xlab("Embedding Dimension") +
       ggplot2::ylab("Nearest neigbours (% of max.)") +
-      ggplot2::facet_wrap(~Nns.f, ncol=2) +
       ggplot2::scale_x_continuous(breaks=emDims) +
       ggplot2::scale_y_continuous(breaks = c(nnThres,50,100)) +
       ggplot2::scale_color_manual("Lag", values = myPalNn ) +
@@ -1011,7 +1035,8 @@ est_parameters <- function(y,
       ggplot2::theme(strip.background = element_rect(colour = "grey90", fill = "grey90"),
                      strip.text.x = element_text(colour = "black", face = "bold"),
                      panel.spacing = ggplot2::unit(1, "lines"),
-                     legend.position = c(.9, .8),
+                     legend.position = "inside",
+                     legend.position.inside = c(.9,.8),
                      legend.background = element_rect(colour = "grey10",fill = "grey90"),
                      legend.title = element_text(face = "bold"),
                      legend.key = element_rect(colour = "grey90", fill = "grey90"),
@@ -1020,16 +1045,17 @@ est_parameters <- function(y,
                      panel.grid.minor.y = element_blank()
       )
 
-    gDelay <- ggplot2::ggplot(dfMI, ggplot2::aes_(y = ~ami, x = ~emDelay)) +
+    gDelay <- ggplot2::ggplot(dfMI, ggplot2::aes(y = ami, x = emDelay)) +
       ggplot2::geom_line() +
-      ggplot2::geom_vline(data = emLags,  ggplot2::aes_(colour=factor(emLags$selection.method),
-                                                        xintercept = ~lag), alpha = .3) +
-      ggplot2::geom_point(data = emLags,  ggplot2::aes_(x = ~lag, y = ~ami, colour = factor(emLags$selection.method)), size = 2) +
+      ggplot2::geom_vline(data = emLags,  ggplot2::aes(colour=factor(selection.methods),
+                                                        xintercept = lag), alpha = .3) +
+      ggplot2::geom_point(data = emLags,  ggplot2::aes(x = lag, y = ami, colour = factor(selection.methods)), size = 2) +
       ggplot2::xlab("Embedding Lag") +
       ggplot2::ylab("Average Mututal Information") +
       ggplot2::scale_color_manual("Lag", values = myPalLag) +
       ggplot2::theme_bw() +
-      ggplot2::theme(legend.position = c(.95, .95),
+      ggplot2::theme(legend.position = "inside",
+                     legend.position.inside = c(.95, .95),
                      legend.justification = c("right", "top"),
                      legend.box.just = "right",
                      legend.margin = margin(6, 6, 6, 6),
@@ -1044,7 +1070,6 @@ est_parameters <- function(y,
       )
 
     g <- gridExtra::grid.arrange(gDelay, gNdims, ncol=1, nrow=2)
-    #grid::grid.newpage()
     grid::grid.draw(g)
 
   } else {
