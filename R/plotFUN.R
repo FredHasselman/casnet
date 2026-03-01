@@ -993,10 +993,10 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
 
   g <- ggplot2::ggplot(corfun,ggplot2::aes(x=lag,y=r)) +
-    ggplot2::geom_hline(yintercept = 0, colour="grey",size=1) +
+    ggplot2::geom_hline(yintercept = 0, colour="grey",linewidth=1) +
     ggplot2::geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),ggplot2::aes(x=x,y=y),colour="grey50") +
     ggplot2::geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
-    ggplot2::geom_ribbon(aes(ymin=~ciL,ymax=ciU),fill="grey70",colour="grey50") +
+    ggplot2::geom_ribbon(aes(ymin=ciL,ymax=ciU),fill="grey70",colour="grey50") +
     ggplot2::geom_path(colour="grey50") +
     ggplot2::geom_point(aes(fill = sig, colour=sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
     ggplot2::facet_grid(type ~ .) +
@@ -1068,7 +1068,7 @@ plotRED_mif <- function(mif.OUT = NULL,
                            type = c(rep(attributes(mif.OUT)$miType,NROW(mif.OUT)))) #,rep(attributes(mifunPMIF)$miType,NROW(mifunPMIF))))
 
   g <- ggplot2::ggplot(mifun_long,ggplot2::aes(x=lag,y=mi)) +
-    ggplot2::geom_hline(yintercept = 0, colour="grey",size=1) +
+    ggplot2::geom_hline(yintercept = 0, colour="grey",linewidth=1) +
     #  ggplot2::geom_line(data = data.frame(x=c(0,mifun_long$lag[1]),y=c(1,mifun_long$mi[1])),ggplot2::aes(x=x,y=y),colour="grey50")
 
     # if(length(lags)<=50){
