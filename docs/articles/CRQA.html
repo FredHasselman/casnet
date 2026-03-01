@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@
                         <h4 data-toc-skip class="author">Fred
 Hasselman</h4>
             
-            <h4 data-toc-skip class="date">2025-05-01</h4>
+            <h4 data-toc-skip class="date">2026-03-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/CRQA.Rmd" class="external-link"><code>vignettes/CRQA.Rmd</code></a></small>
       <div class="d-none name"><code>CRQA.Rmd</code></div>
@@ -144,7 +144,7 @@ and it allows for a comparison of the output.</p>
 <span><span class="va">data_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">1.3</span>, <span class="fl">0.7</span>, <span class="fl">0.8</span>, <span class="fl">1.4</span>, <span class="fl">1.6</span>, <span class="fl">1.2</span>, <span class="fl">0.4</span>, <span class="fl">1.1</span>, <span class="fl">0.8</span>, <span class="fl">0.2</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html" class="external-link">ts</a></span><span class="op">(</span><span class="va">data_points</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"b"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="CRQA_files/figure-html/unnamed-chunk-3-1.png" width="576" style="display: block; margin: auto;"></p>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
 <p>First, we create a distance matrix based on the (delay embedded) time
 series and decide on a threshold criterion to turn it into a recurrence
 matrix of <code>0</code>s and <code>1</code>s. We already have a radius
@@ -161,7 +161,7 @@ radius will yield.</p>
 <span></span>
 <span><span class="va">RM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">data_points</span>, emDim <span class="op">=</span> <span class="va">emDim</span>, emLag <span class="op">=</span> <span class="va">emLag</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RM</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, drawGrid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="CRQA_files/figure-html/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;"></p>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
 <p>The code below applies the threshold <code>emRad</code> to the
 distance matrix, which generates a sparse matrix (class
 <code>dgcMatrix</code>, see package [Matrix]).</p>
@@ -311,7 +311,7 @@ stored as attributes of the matrix object.</p>
 coordinate <code>(1,1)</code> in the left lower corner.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RM</span>, plotDimensions <span class="op">=</span> <span class="cn">TRUE</span>, drawGrid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="CRQA_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;"></p>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
 <p>Because this analysis concerns Auto-RQA, the diagonal is usually
 excluded from the calculations of RQA measures. This can be achieved by
 setting the <code>theiler</code> parameter to <code>1</code>. This is in
@@ -619,7 +619,7 @@ this difference becomes noticeable for very large time series
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">noise</span> <span class="op">&lt;-</span> <span class="fu">casnet</span><span class="fu">::</span><span class="fu"><a href="../reference/noise_powerlaw.html">noise_powerlaw</a></span><span class="op">(</span>N<span class="op">=</span><span class="fl">10000</span>, seed <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html" class="external-link">ts</a></span><span class="op">(</span><span class="va">noise</span><span class="op">)</span>,type <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="CRQA_files/figure-html/unnamed-chunk-12-1.png" width="576" style="display: block; margin: auto;"></p>
+<p><img src="CRQA_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#est_radius_rqa(ts_embed(noise, emDim = emDim, emLag = emLag), noise, AUTO = TRUE)</span></span></code></pre></div>
 <pre><code>RQA Result:
@@ -1049,7 +1049,7 @@ Ratio laminarity / determinism (LAM/DET): 1.014530</code></pre>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">include_graphics</a></span><span class="op">(</span><span class="st">"recurrence_plot_python.png"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="recurrence_plot_python.png" alt="RP produced by PyRQA" width="6577"><p class="caption">
+<img src="recurrence_plot_python.png" class="r-plt" alt="RP produced by PyRQA" width="6577"><p class="caption">
 RP produced by PyRQA
 </p>
 </div>
@@ -1078,7 +1078,7 @@ Julia (<a href="https://code.visualstudio.com/docs/languages/julia" class="exter
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

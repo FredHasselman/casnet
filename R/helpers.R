@@ -226,6 +226,27 @@ is.date <- function(x){
 
 
 
+#' Rounding by truncation
+#'
+#' @param number number
+#' @param digits digits
+#'
+#' @returns True rounding
+#'
+#' @export
+#'
+#' @keywords internal
+#'
+round_trunc <- function(number, digits) {
+  nsign <- sign(number)
+  number <- abs(number) * 10^digits
+  number <- number + 0.5 + sqrt(.Machine$double.eps)
+  number <- trunc(number)
+  number <- number / 10 ^ digits
+  number * nsign
+  return(number)
+}
+
 # doChecks <- function(y,standardise=FALSE,center=FALSE,){
 #   nextPow2 <- nextn(y,factors = 2)
 #   prevPow2 <- nextn(y,factors = 2)-1

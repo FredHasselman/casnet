@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,24 +79,68 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">RN</span> <span class="op">&lt;-</span> <span class="fu"><a href="rn.html">rn</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Set `weightedBy` to 'si' due to the value of `weighted`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> `emRad` was set to NA due to the value `weighted = TRUE`, if you want an unthresholded matrix set `weighted = FALSE`</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Set `weightedBy` to 'si' due to the value `weighted = TRUE`</span>
 <span class="r-in"><span><span class="va">phase_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="rn_phaseInfo.html">rn_phaseInfo</a></span><span class="op">(</span><span class="va">RN</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states with high similarity will be considered a phase:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states with high similarity will be considered a phase</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selectionMethod = degree</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> maxPhases = 100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> minStatesinPhase = 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> maxStatesinPhase = 100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> inverseWeight = TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states will be grouped as a 'Phase ##', as transients (unstable phases) 'Transient ##', phase neighbours (state connects to more than 1 identified phase) 'PhaseNH ##', singularities (state recurs less often than minStatesinPhase) 'Singularity', or as not recurring 'Nonrecurring'.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Looking for phases...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 39 is template for phase 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 17 is template for phase 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=22 [Phase 01.1] | State at t=43 [Phase 01.5] | State at t=63 [Phase 01.10] &gt;&gt; will be labelled as Transient(s)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 12 is template for phase 3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 33 is template for phase 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 42 is template for phase 5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 2 is template for phase 6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 28 is template for phase 7 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=37 [Phase 01.3] | State at t=44 [Phase 01.6] | State at t=52 [Phase 01.7] | State at t=59 [Phase 01.9] | State at t=97 [Phase 01.13] &gt;&gt; will be labelled as Transient(s)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Found 11 phases with at least 2 states.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 86 is template for phase 8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=3 [Phase 02.1] | State at t=48 [Phase 02.5] | State at t=67 [Phase 02.6] | State at t=84 [Phase 02.7] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 1 is template for phase 9 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=15 [Phase 06.3] | State at t=40 [Phase 06.4] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 70 is template for phase 10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=14 [Phase 03.6] | State at t=26 [Phase 04.1] | State at t=68 [Phase 04.2] | State at t=73 [Phase 04.6] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 4 is template for phase 11 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=20 [Phase 08.1] | State at t=100 [Phase 08.3] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 38 is template for phase 12 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=98 [Phase 06.7] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 57 is template for phase 13 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=5 [Phase 11.2] | State at t=23 [Phase 11.3] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 76 is template for phase 14 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 85 is template for phase 15 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=72 [Phase 13.3] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 31 is template for phase 16 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=50 [Phase 15.1] | State at t=62 [Phase 15.2] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 93 is template for phase 17 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=16 [Phase 09.2] | State at t=25 [Phase 09.3] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Found 17 phases with at least 2 states.</span>
 <span class="r-in"><span><span class="fu">plotRN_phaseTimeSeries</span><span class="op">(</span><span class="va">phase_out</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotRN_phaseTimeSeries-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -112,7 +156,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

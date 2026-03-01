@@ -49,7 +49,7 @@ A list object with a (windowed) Multiplex Recurrence Matrix based on \code{MRNwe
 }
 }
 \description{
-This function will create a Multiplex Recurrence Network from a list of \link{igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{MRNweightedBy} is set to \code{"InterLayerMI"}, \code{"InterLayerCor"}, \code{"EdgeOvelap"}, or "\code{JRP}") and \emph{Layer importance} (not implemented yet). The former generates weighted MRN based on \emph{Interlayer Mutual Information}, \emph{Interlayer Correlation}, \emph{Edge Overlap}, \emph{Joint Recurrence Rate}.
+This function will create a Multiplex Recurrence Network from a list of \link[igraph:aaa-igraph-package]{igraph::igraph} objects that can be considered the layers of a network. The layers must have the same number of nodes. There are two modes of operation: \emph{Layer similarity} (\code{MRNweightedBy} is set to \code{"InterLayerMI"}, \code{"InterLayerCor"}, \code{"EdgeOvelap"}, or "\code{JRP}") and \emph{Layer importance} (not implemented yet). The former generates weighted MRN based on \emph{Interlayer Mutual Information}, \emph{Interlayer Correlation}, \emph{Edge Overlap}, \emph{Joint Recurrence Rate}.
 }
 \examples{
 

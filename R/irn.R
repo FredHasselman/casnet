@@ -138,7 +138,7 @@ irn_plot <- function(RMxy,
 #' @param Ay Adjacency matrix y
 #' @param Axy Adjacency matrix xy
 #'
-#' @return list object with triasngles and triads
+#' @return list object with triangles and triads
 #'
 #' @export
 #'
@@ -151,7 +151,68 @@ irn_crossTriples <- function(Ax,Ay,Axy){
   Matrix::diag(Ay) <- 0
 
   # x -> y
-  Kxy <- cross_degree(Axy)
+  Kxy <- irn_crossDegree(Axy)
+
+  v_ind <- which(Kxy>0)
+  vp_ind <- pq_ind <- qv_ind <- Triads <- Triangles <- vector("list",max(v_ind))
+
+  Triangles[1:max(v_ind)] <- 0
+  Triads[1:max(v_ind)] <- 0
+
+  for(v in v_ind){
+    vp_ind[[v]] <- which(Ay[v,]>0)%00%NA
+    #cat(paste(v,"\n"))
+
+    if(any(is.na(vp_ind[[v]]))){
+      pq_ind[[v]] <- 0
+      Triads[[v]] <- NA
+    } else {
+      pq_ind[[v]] <- llply(vp_ind[[v]], function(p){
+        ind <- which(Ay[p,]>0)%00%0
+        return(ind[ind!=p])
+      })
+      Triads[[v]] <- length(unlist(pq_ind[[v]]))%00%0
+    }
+
+    if(is.na(Triads[[v]])){
+      Triads[[v]] <- 0
+      Triangles[[v]] <- 0
+    } else {
+      Triangles[[v]] <- sum(unlist(llply(pq_ind[[v]], function(q){
+        qtmp <- llply(q, function(qv){
+          ind <- which(Ayx[qv,]>0)%00%NULL
+          ind[ind==v]
+        })
+        return(sum(lengths(qtmp)))
+      })), na.rm = TRUE)
+    }
+  }
+  return(list(triads = unlist(Triads),
+              triangles = unlist(Triangles)))
+}
+
+
+
+#' Directed Cross Triples
+#'
+#' @param Ax Adjacency matrix x
+#' @param Ay Adjacency matrix y
+#' @param Axy Adjacency matrix xy
+#'
+#' @return list object with triangles and triads
+#'
+#' @export
+#'
+irn_directedCrossTriples <- function(Ax,Ay,Axy){
+
+  Ayx <- Matrix::t(Axy)
+
+  # p != q
+  Matrix::diag(Ax) <- 0
+  Matrix::diag(Ay) <- 0
+
+  # x -> y
+  Kxy <- irn_crossDegree(Axy)
 
   v_ind <- which(Kxy>0)
   vp_ind <- pq_ind <- qv_ind <- Triads <- Triangles <- vector("list",max(v_ind))
@@ -196,12 +257,13 @@ irn_crossTriples <- function(Ax,Ay,Axy){
 #'
 #' @param Axy Adjacency matrix xy
 #'
-#' @return list object wih local and global cross-degree
+#' @return list object with local and global cross-degree
 #' @export
 #'
 irn_crossDegree <- function(Axy){
-  Kxy <- degree(graph_from_adjacency_matrix(as.matrix(Axy)), mode = "out", loops = TRUE)
+  Kxy <- igraph::degree(igraph::graph_from_adjacency_matrix(as.matrix(Axy)), mode = "out", loops = TRUE)
 }
+
 
 #' Cross CLustering Coefficient
 #'

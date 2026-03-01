@@ -18,7 +18,7 @@ monoH(
 \arguments{
 \item{TSm}{TS matrix with 2 columns \code{t} (1st) and \code{y} (second)}
 
-\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} will be ignored (default = \code{NA})}
 
 \item{removeTrend}{Method to use for global detrending (default = \code{"poly"})}
 

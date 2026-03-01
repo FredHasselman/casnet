@@ -48,7 +48,7 @@ rn_phaseInfo(
 
 \item{maxStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases exceeds a maximum number of \code{maxStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{NROW(RN)})}
 
-\item{selectionMethod}{How will the most "important" node be selected? Should be the name of an \link{igraph} function that returns local (vertex) measures (default = \code{"degree"})}
+\item{selectionMethod}{How will the most "important" node be selected? Should be the name of an \link[igraph:aaa-igraph-package]{igraph::igraph} function that returns local (vertex) measures (default = \code{"degree"})}
 
 \item{inverseWeight}{Whether to perform the operation \code{1/weight} on the edge weights. The default is \code{TRUE}, if the matrix was weighted by a distance metric (\code{weightedBy = "si"}) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on the node strength calculation used to select the phases. If the matrix was weighted by recurrence time (\code{weightedBy = "rt"}) and \code{inverseWeight = TRUE}, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If \code{weightedBy = "rf"}, lower frequencies will end up having more impact. (default = \code{TRUE})}
 
@@ -96,7 +96,7 @@ rn_phaseInfo(
 
 \item{alphaDensity}{Alpha value for the density plots}
 
-\item{splitFacets}{Integer value to indicate if sets of phases should be displayed in different facets? (default = \code{NA})}
+\item{splitFacets}{Integer value to indicate if sets of phases should be displayed in different facets? Pass an integer equalt to, or larger than the number of phases found to display all phases for which a density can be calculated (default = \code{NA})}
 
 \item{silent}{Silent-ish mode (default = \code{FALSE})}
 

@@ -96,6 +96,7 @@
 <url><loc>/reference/irn_crossDegree.html</loc></url>
 <url><loc>/reference/irn_crossTriples.html</loc></url>
 <url><loc>/reference/irn_cross_clustering.html</loc></url>
+<url><loc>/reference/irn_directedCrossTriples.html</loc></url>
 <url><loc>/reference/irn_plot.html</loc></url>
 <url><loc>/reference/is.date.html</loc></url>
 <url><loc>/reference/is.wholenumber.html</loc></url>
@@ -168,6 +169,7 @@
 <url><loc>/reference/rn_strengthDist.html</loc></url>
 <url><loc>/reference/rn_transition.html</loc></url>
 <url><loc>/reference/roc_noise.html</loc></url>
+<url><loc>/reference/round_trunc.html</loc></url>
 <url><loc>/reference/rp.html</loc></url>
 <url><loc>/reference/rp_calc.html</loc></url>
 <url><loc>/reference/rp_checkfix.html</loc></url>

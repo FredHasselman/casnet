@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,6 @@
 <span>  scaleMax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">10</span><span class="op">)</span>,</span>
 <span>  scaleS <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  dataMin <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  relativeEntropy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -129,11 +128,11 @@
 
 
 <dt id="arg-scalemax">scaleMax<a class="anchor" aria-label="anchor" href="#arg-scalemax"></a></dt>
-<dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code>, in which case bins of size <code>&lt; dataMin</code> will be removed (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
+<dd><p>Maximum scale (in data points) to use for log-log regression (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
 
 
 <dt id="arg-scales">scaleS<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
-<dd><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> and <code>dataMin</code> will be ignored (default = <code>NA</code>)</p></dd>
+<dd><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> will be ignored (default = <code>NA</code>)</p></dd>
 
 
 <dt id="arg-overlap">overlap<a class="anchor" aria-label="anchor" href="#arg-overlap"></a></dt>
@@ -183,7 +182,7 @@
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Information based complexity measures:
-<code><a href="inf_SampEn.html">inf_SampEn</a>()</code></p></div>
+<code><a href="inf_SampEn.html">inf_SampEn()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -198,10 +197,10 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Multi Scale Entropy </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Full range (n = 10)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slope = -0.14 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Slope = -0.1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Fit range (n = 7)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slope = -0.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Slope = -0.08</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
 <span class="r-in"><span></span></span>
@@ -217,7 +216,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

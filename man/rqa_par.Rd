@@ -43,7 +43,7 @@ rqa_par(
 
 \item{emLag}{The embedding lag}
 
-\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
+\item{emRad}{The radius threshold on the distance measure that determines the global Recurrence Rate. If the radius is not provided it will be estimated with default settings using function \link{est_radius} (default = \code{NULL})}
 
 \item{theiler}{Use a \code{theiler} window around the main diagonal (Line of Identity/Synchronisation) to remove auto-correlations at short time-lags:
 \itemize{
@@ -99,5 +99,5 @@ RQA
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
-Calculate (C)RQA measures without creating a recurrence matrix. Can handle very large time series and requires package \link{future.apply} to be installed.
+Calculate (C)RQA measures without creating a recurrence matrix. Can handle very large time series and requires package \link[future.apply:future.apply]{future.apply::future.apply} to be installed.
 }

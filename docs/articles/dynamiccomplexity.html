@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@
                         <h4 data-toc-skip class="author">Merlijn Olthof
 &amp; Fred Hasselman</h4>
             
-            <h4 data-toc-skip class="date">2025-05-01</h4>
+            <h4 data-toc-skip class="date">2026-03-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/FredHasselman/casnet/blob/HEAD/vignettes/dynamiccomplexity.Rmd" class="external-link"><code>vignettes/dynamiccomplexity.Rmd</code></a></small>
       <div class="d-none name"><code>dynamiccomplexity.Rmd</code></div>
@@ -180,7 +180,7 @@ around 3/4 of the measurement period.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">variable</span><span class="op">~</span><span class="va">.</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid.minor <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>                     axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">90</span>, vjust <span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>The shift in ‘feeling down’ is identified in measurement 93.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lvl</span><span class="op">$</span><span class="va">tree</span><span class="op">$</span><span class="va">splits</span></span></code></pre></div>
@@ -230,19 +230,19 @@ signal.</p>
 <code class="sourceCode R"><span><span class="va">dc.ruminate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">ruminate</span>, win<span class="op">=</span><span class="fl">12</span>, scale_min<span class="op">=</span><span class="fl">0</span>, scale_max<span class="op">=</span><span class="fl">100</span>, doPlot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dc.ruminate</span><span class="op">$</span><span class="va">df</span>, type<span class="op">=</span><span class="st">'l'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v<span class="op">=</span><span class="fl">93</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>And for multiple variables, in which case we can produce a nice
 looking complexity resonance diagram:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dc.case</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span><span class="op">(</span><span class="va">df</span>, win<span class="op">=</span><span class="fl">12</span>, scale_min<span class="op">=</span><span class="fl">0</span>, scale_max<span class="op">=</span><span class="fl">100</span>, useTimeVector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">dateTimesS</span><span class="op">)</span>,  timeStamp <span class="op">=</span> <span class="st">"1999-01-31"</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>If you do not have any date/time information, the x-axis will display
 integers. By setting <code>colOrder = NA</code>, we can order the output
 columns based on mean dynamic complexity, resulting in a more
 comprehensive diagram:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dc.case</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_win.html">dc_win</a></span><span class="op">(</span><span class="va">df</span>, win<span class="op">=</span><span class="fl">12</span>, scale_min<span class="op">=</span><span class="fl">0</span>, scale_max<span class="op">=</span><span class="fl">100</span>, useTimeVector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">dateTimesS</span><span class="op">)</span>,  timeStamp <span class="op">=</span> <span class="st">"1999-01-31"</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span>, colOrder <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>One may aggregate the dynamic complexity values of multiple items,
 for example by averaging (other options would be clustering, either
 data-driven or theory-driven).</p>
@@ -250,7 +250,7 @@ data-driven or theory-driven).</p>
 <code class="sourceCode R"><span><span class="va">mean_DC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">dc.case</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mean_DC</span>, type<span class="op">=</span><span class="st">'line'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v<span class="op">=</span><span class="fl">93</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>Check the help pages for many more options for plotting, for example,
 marking specific time points with argument <code>markID</code>, setting
 certain time periods to <code>NA</code> with <code>NAdates</code> or
@@ -279,7 +279,7 @@ can thus differ when more or less observations are used as input.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ccp.case</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dc_ccp.html">dc_ccp</a></span><span class="op">(</span>df_win <span class="op">=</span> <span class="va">dc.case</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plotDC_ccp.html">plotDC_ccp</a></span><span class="op">(</span>df_ccp <span class="op">=</span> <span class="va">ccp.case</span>, win <span class="op">=</span> <span class="fl">12</span>, useTimeVector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">dateTimesS</span><span class="op">)</span>,  timeStamp <span class="op">=</span> <span class="st">"1999-01-31"</span>, colOrder <span class="op">=</span> <span class="cn">NA</span>, title <span class="op">=</span> <span class="st">"Cumulative Complexity Peak Plot"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -307,17 +307,17 @@ recommend Kelso et al., (1987).</p>
 <code class="sourceCode R"><span><span class="va">var.ruminate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/var_win.html">var_win</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">ruminate</span>, win<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude</a></span><span class="op">(</span><span class="va">var.ruminate</span><span class="op">$</span><span class="va">df</span><span class="op">)</span>, type<span class="op">=</span><span class="st">'l'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v<span class="op">=</span><span class="fl">93</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>…and for the full dataset:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">var.case</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/var_win.html">var_win</a></span><span class="op">(</span><span class="va">df</span>, win<span class="op">=</span><span class="fl">12</span>, useTimeVector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">dateTimesS</span><span class="op">)</span>,  timeStamp <span class="op">=</span> <span class="st">"1999-01-31"</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span>, colOrder <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>One may aggregate the variance time series:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mean_var</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">var.case</span><span class="op">$</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mean_var</span>, type<span class="op">=</span><span class="st">'line'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v<span class="op">=</span><span class="fl">93</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="using-ac_win">Using <code>ac_win()</code><a class="anchor" aria-label="anchor" href="#using-ac_win"></a>
@@ -329,17 +329,17 @@ as 12 data points is very little for autocorrelation.</p>
 <code class="sourceCode R"><span><span class="va">ac.ruminate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ac_win.html">ac_win</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">ruminate</span>, win<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude</a></span><span class="op">(</span><span class="va">ac.ruminate</span><span class="op">$</span><span class="va">df</span><span class="op">)</span>, type<span class="op">=</span><span class="st">'l'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v<span class="op">=</span><span class="fl">93</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>…and for the full dataset:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ac.case</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ac_win.html">ac_win</a></span><span class="op">(</span><span class="va">df</span>, win<span class="op">=</span><span class="fl">28</span>, useTimeVector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">dateTimesS</span><span class="op">)</span>,  timeStamp <span class="op">=</span> <span class="st">"1999-01-31"</span>, doPlot <span class="op">=</span> <span class="cn">TRUE</span>, colOrder <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 <p>One may aggregate the autocorrelation time series:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mean_ac</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">ac.case</span><span class="op">$</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mean_ac</span>, type<span class="op">=</span><span class="st">'line'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v<span class="op">=</span><span class="fl">93</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;"></p>
+<p><img src="dynamiccomplexity_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -393,7 +393,7 @@ preprint arXiv:2009.04445.</em> <a href="https://arxiv.org/abs/2009.04445v1" cla
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

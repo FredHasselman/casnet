@@ -22,7 +22,7 @@ fd_allan(
 
 \item{fs}{Sample frequency in Hz}
 
-\item{useSD}{Use the standarddeviation instead of variance?}
+\item{useSD}{Use the standard deviation instead of variance?}
 
 \item{doPlot}{Return the log-log scale versus fluctuation plot with linear fit (default = \code{TRUE}).}
 

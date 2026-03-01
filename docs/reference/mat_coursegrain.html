@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,6 +111,10 @@
 <span class="r-in"><span><span class="co"># Continuous</span></span></span>
 <span class="r-in"><span><span class="va">RMc1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMc1</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>`aes_()` was deprecated in ggplot2 3.0.0.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use tidy evaluation idioms with `aes()`</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">casnet</span> package.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;</span><a href="https://github.com/FredHasselman/casnet/issues" class="external-link"><span style="color: #0000BB; font-style: italic;">https://github.com/FredHasselman/casnet/issues</span></a><span style="color: #0000BB; font-style: italic;">&gt;</span>.</span>
 <span class="r-plt img"><img src="mat_coursegrain-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">RMc2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMc1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Continuous matrix... using summary function 'mean(x, na.rm = TRUE)' for coursegraining.</span>
@@ -140,12 +144,10 @@
 <span class="r-in"><span><span class="co"># Categorical</span></span></span>
 <span class="r-in"><span><span class="va">RMl1</span> <span class="op">&lt;-</span> <span class="fu"><a href="rp.html">rp</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span>, min <span class="op">=</span> <span class="fl">1</span>, max <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>, chromatic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMl1</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Multiple components found; returning the first one. To return all, use `return_all = TRUE`.</span>
 <span class="r-plt img"><img src="mat_coursegrain-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">RMl2</span> <span class="op">&lt;-</span> <span class="fu">mat_coursegrain</span><span class="op">(</span><span class="va">RMl1</span>, categorical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Categorical matrix... using summary function 'attributes(ftable(x))$col.vars[[which.max(ftable(x))]]' for coursegraining.</span>
 <span class="r-in"><span><span class="fu"><a href="rp_plot.html">rp_plot</a></span><span class="op">(</span><span class="va">RMl2</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Multiple components found; returning the first one. To return all, use `return_all = TRUE`.</span>
 <span class="r-plt img"><img src="mat_coursegrain-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -159,7 +161,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

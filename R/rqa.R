@@ -12,6 +12,7 @@
 #'
 #' @inheritParams rp
 #' @inheritParams rp_measures
+#' @param emRad The radius threshold on the distance measure that determines the global Recurrence Rate. If the radius is not provided it will be estimated with default settings using function [est_radius] (default = `NULL`)
 #'
 #'
 #' @export
@@ -506,7 +507,7 @@ rqa_lineDist <- function(idx){
 
 #' Fast RQA
 #'
-#' @description Calculates RQA measures without building the recurrence matrix. Requires package [parallel].
+#' @description Calculates RQA measures without building the recurrence matrix. Requires package [parallel::parallel].
 #'
 #' @inheritParams rp
 #' @inheritParams rp_measures
@@ -535,6 +536,15 @@ rqa_measures <- function(y1,
                          recurrenceTimes = FALSE,
                          distributions = FALSE,
                          silent = TRUE){
+
+
+  if(is.null(AUTO)){
+    if(all(is.na(y2))){
+      AUTO <- TRUE
+    } else {
+      AUTO <- isTRUE(all.equal(y1,y2))
+    }
+  }
 
   if(is.na(theiler%00%NA)){
     if(AUTO){
@@ -589,6 +599,7 @@ rqa_measures <- function(y1,
     if(AUTO){
       message("Matrix is symmetrical so Horizontal/Vertical anisotropic ratios will be 0.")
     }
+
     out_hv_ani <- data.frame(
       Nlines_ani = ((lineMeasures_global$N_hlp - lineMeasures_global$N_vlp)  / (lineMeasures_global$N_hlp  + lineMeasures_global$N_vlp))%00%NA,
       LAM_ani  = (lineMeasures_global$LAM_hl - lineMeasures_global$LAM_vl) / (lineMeasures_global$LAM_hl + lineMeasures_global$LAM_vl),
@@ -978,12 +989,12 @@ rqa_calc <- function(y1,
       message("NOTE: 'theiler' is set to 0 >> The Upper vs. Lower triangle asymmetry ratio excludes the main diagonal.")
       theiler <- 1
     }
-    if(asymmetryUL%in%"upper"){
-      rows <- rows[rows %<=% -theiler]
-    }
-    if(asymmetryUL%in%"lower"){
-      rows <- rows[rows %>=% theiler]
-    }
+    # if(asymmetryUL%in%"upper"){
+    #   rows <- rows[rows %<=% -theiler]
+    # }
+    # if(asymmetryUL%in%"lower"){
+    #   rows <- rows[rows %>=% theiler]
+    # }
   }
 
   #cl <- parallel::makeCluster(numCores)
@@ -1004,7 +1015,15 @@ rqa_calc <- function(y1,
 
   future::plan("multisession")
 
-  outD <- future.apply::future_mapply(FUN = rqa_fast, index = rows, MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = AUTO, diagonal = TRUE, method = method))
+  outD <- future.apply::future_mapply(FUN = rqa_fast,
+                                      index = rows,
+                                      MoreArgs = list(y1 = y1,
+                                                      y2 = y2,
+                                                      emRad = emRad,
+                                                      theiler = theiler,
+                                                      symmetrical = AUTO,
+                                                      diagonal = TRUE,
+                                                      method = method))
 
   diagonals.distX <- sort(unlist(future.apply::future_lapply(outD, FUN = rqa_lineDist)))
 
@@ -1031,7 +1050,15 @@ rqa_calc <- function(y1,
 
   # Verticals ----
 
-  outV <- future.apply::future_mapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = TRUE, diagonal = FALSE, theiler = theiler, method = method))
+  outV <- future.apply::future_mapply(FUN = rqa_fast,
+                                      index = 1:NROW(y1),
+                                      MoreArgs = list(y1 = y1,
+                                                      y2 = y2,
+                                                      emRad = emRad,
+                                                      symmetrical = TRUE,
+                                                      diagonal = FALSE,
+                                                      theiler = theiler,
+                                                      method = method))
 
   #outV <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, symmetrical = TRUE, diagonal = FALSE, theiler = theiler, method = method), mc.cores = numCores)
 
@@ -1047,7 +1074,15 @@ rqa_calc <- function(y1,
     horizontals.dist <- verticals.dist
   } else {
 
-    outH <- future.apply::future_mapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y2, y2 = y1, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method))
+    outH <- future.apply::future_mapply(FUN = rqa_fast,
+                                        index = 1:NROW(y1),
+                                        MoreArgs = list(y1 = y2,
+                                                        y2 = y1,
+                                                        emRad = emRad,
+                                                        theiler = theiler,
+                                                        symmetrical = FALSE,
+                                                        diagonal = FALSE,
+                                                        method = method))
 
    # outH <- parallel::mcmapply(FUN = rqa_fast, index = 1:NROW(y1), MoreArgs = list(y1 = y1, y2 = y2, emRad = emRad, theiler = theiler, symmetrical = FALSE, diagonal = FALSE, method = method), mc.cores = numCores)
 
@@ -1529,6 +1564,7 @@ rqa_diagProfile2 <- function(y1,
 #' @param chromatic Force chromatic RQA? (default = `FALSE`)
 #' @param doPlot Plot (default = `TRUE`)
 #' @param minY The upper limit of the Y-axis. If `NA`, the limit is determined by `max(minY,max(RR))`. Set to 1 to always show the theoretical maximum (default = `NA`)
+#' @param plotDET plot Determinism profile instead of Recurrence Rate (default = `FALSE`)
 #' @param returnOnlyPlot Don't plot to graphics device, but do return the plot (default = `FALSE`)
 #'
 #' @return A plot and/or the data for the plot
@@ -1554,6 +1590,9 @@ rqa_diagProfile <- function(y1     = NULL,
                            method = c("Euclidean","SBD")[1],
                            doPlot    = TRUE,
                            minY      = NA,
+                           plotDET   = FALSE,
+                           DLmin     = 2,
+                           DLmax     = NROW(y1),
                            returnOnlyPlot = FALSE){
 
 
@@ -1635,7 +1674,7 @@ rqa_diagProfile <- function(y1     = NULL,
                         radiusOnFail = "quantile",
                         theiler = theiler,
                         method = method,
-                        silent = silent)
+                        silent = TRUE)
 
     if(!emRad$Converged){
       warning("Radius did not converge, using quantile...")
@@ -1742,13 +1781,25 @@ rqa_diagProfile <- function(y1     = NULL,
     #   names(diagID) <- colnames(B)
     # }
 
-    profile <- plyr::laply(outD, function(d) sum(d))
+    profile <- plyr::laply(outD, function(d) sum(d, na.rm = TRUE))
+
+    profileDET <- future.apply::future_lapply(outD, FUN = rqa_lineDist)
+    profileDET <- plyr::laply(profileDET, function(d){
+      if(length(d)>0){
+        d <- d[d%[]%c(DLmin,DLmax)]
+        return(sum(d,na.rm = TRUE))
+      } else {
+        return(0)
+      }
+    })
+
 
     df <- data.frame( Diagonal = seq_along(diagWin),
                       index = seq_along(diagWin),
                       RN = profile,
                       DiagN = (NROW(y1)-abs(diagWin)),
                       RR = profile / (NROW(y1)-abs(diagWin)),
+                      DET = profileDET / (NROW(y1)-abs(diagWin)),
                       group  = 1,
                       labels = paste(diagWin)
                       # df$labels[df$Diagonal%==%0] <- ifelse(AUTO,"LOI","LOS")
@@ -1785,16 +1836,20 @@ rqa_diagProfile <- function(y1     = NULL,
     dy_m <- df_shuf %>%
       dplyr::group_by(.data$Diagonal,.data$labels) %>%
       dplyr::summarise(meanRRrnd = mean(.data$RR, na.rm = TRUE),
-                       sdRRrnd   = stats::sd(.data$RR, na.rm = TRUE)) %>%
+                       sdRRrnd   = stats::sd(.data$RR, na.rm = TRUE),
+                       meanDETrnd = mean(.data$DET, na.rm = TRUE),
+                       sdDETrnd = stats::sd(.data$DET, na.rm = TRUE)) %>%
       dplyr::ungroup()
 
     if(Nshuffle%==%1){
       dy_m$sdRRrnd <- 0
+      dy_m$sdDETrnd <- 0
     }
 
-    dy_m$ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
-    dy_m$ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
-
+    dy_m$RR_ciHI <- dy_m$meanRRrnd + 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+    dy_m$RR_ciLO <- dy_m$meanRRrnd - 1.96*(dy_m$sdRRrnd/sqrt(Nshuffle))
+    dy_m$DET_ciHI <- dy_m$meanDETrnd + 1.96*(dy_m$sdDETrnd/sqrt(Nshuffle))
+    dy_m$DET_ciLO <- dy_m$meanDETrnd - 1.96*(dy_m$sdDETrnd/sqrt(Nshuffle))
   }
 
   obs <- dy[dy$.id=="obs",]
@@ -1818,8 +1873,12 @@ rqa_diagProfile <- function(y1     = NULL,
     df <- obs
     df$meanRRrnd <- NA
     df$sdRRrnd <- NA
-    df$ciHI <- 0
-    df$ciLO <- 0
+    df$meanDETrnd <- NA
+    df$sdDETrnd <- NA
+    df$RR_ciHI <- 0
+    df$RR_ciLO <- 0
+    df$DET_ciHI <- 0
+    df$DET_ciLO <- 0
   }
 
   df$Diagonal <- as.numeric(df$Diagonal)
@@ -1877,10 +1936,19 @@ rqa_diagProfile <- function(y1     = NULL,
     #siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
     #g<- ggplot(df, aes_(x = ~labels, y = ~RR, colour = ~variable))
     #   geom_line() + theme_bw()
+
     if(doShuffle){
-     maxData <- max(c(df$RR,df$ciHI), na.rm = TRUE)
+      if(plotDET){
+        maxData <- max(c(df$DET,df$ciHI), na.rm = TRUE)
+      } else {
+        maxData <- max(c(df$RR,df$ciHI), na.rm = TRUE)
+      }
     } else {
-     maxData <- max(df$RR, na.rm = TRUE)
+      if(plotDET){
+        maxData <- max(df$DET, na.rm = TRUE)
+      } else {
+        maxData <- max(df$RR, na.rm = TRUE)
+     }
     }
     if(is.na(minY)){
       minY <- maxData
@@ -1889,13 +1957,24 @@ rqa_diagProfile <- function(y1     = NULL,
       ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey80")
 
     if(doShuffle){
-      g <- g + ggplot2::geom_ribbon(ggplot2::aes(ymin=ciLO, ymax=ciHI), alpha=0.3, colour = "grey60") +
-        ggplot2::geom_line(aes(y=meanRRrnd), colour = "grey70")
+      if(plotDET){
+      g <- g + ggplot2::geom_ribbon(ggplot2::aes(ymin=DET_ciLO, ymax=DET_ciHI), alpha=0.3, colour = "grey60") +
+        ggplot2::geom_line(aes(y=meanDETrnd), colour = "grey70")
+      } else {
+        g <- g + ggplot2::geom_ribbon(ggplot2::aes(ymin=RR_ciLO, ymax=RR_ciHI), alpha=0.3, colour = "grey60") +
+          ggplot2::geom_line(aes(y=meanRRrnd), colour = "grey70")
+      }
     }
-    g <- g + ggplot2::geom_line(ggplot2::aes(y=RR), size = .5) +
+    if(plotDET){
+      g <- g + ggplot2::geom_line(ggplot2::aes(y=DET), size = .5) +
+        ggplot2::scale_y_continuous("Determinism",limits = c(0, max(c(minY,maxData))))
+    } else {
+      g <- g + ggplot2::geom_line(ggplot2::aes(y=RR), size = .5) +
+        ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0, max(c(minY,maxData))))
+    }
+
       #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
-      ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0, max(c(minY,maxData)))) +
-      ggplot2::scale_x_continuous(name = paste0(xname, " << recurrences due to >> ", yname),
+    g <- g + ggplot2::scale_x_continuous(name = paste0(xname, " << recurrences due to >> ", yname),
                                   breaks = breaks, labels = labels, expand = c(0,0)) +
       # ggplot2::geom_label(x=x1,y=.8,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE, size = 3) +
       # ggplot2::geom_label(x=x2,y=.8,label=paste0("Recurrences due to\n ",yname),hjust="right", inherit.aes = FALSE, size = 3) +

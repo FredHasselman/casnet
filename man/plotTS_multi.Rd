@@ -48,7 +48,7 @@ plotTS_multi(
 \item{overlap}{Multiplier for scaling the series around the y-offset. Default is \code{offset + elascer(y, lo = -.45*overlap, hi = .45*overlap)} and if \code{useRibbon = TRUE} it is \code{offset + elascer(y, lo = 0*overlap, hi = .95*overlap)}. (default = \code{1})}
 }
 \value{
-A \link{ggplot} object.
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Plot Multivariate Time Series Data

@@ -176,14 +176,14 @@ fd_psd <- function(y,
                      scaleMin = NA,
                      scaleMax = NA,
                      scaleResolution = NA,
-                     dataMin = NA,
+                     #dataMin = NA,
                      scaleS = NULL,
                      overlap = NA,
                      silent = silent
   )
 
   scaleS  <- attr(y, "scaleS")
-  dataMin <- attr(y, "dataMin")
+  #dataMin <- attr(y, "dataMin")
 
   N <- NROW(y)
 
@@ -303,7 +303,7 @@ fd_psd <- function(y,
 #' @param scaleMin sm
 #' @param scaleMax smm
 #' @param scaleResolution sr
-#' @param dataMin dm
+# #' @param dataMin dm
 #' @param scaleS sc
 #' @param overlap ov
 #' @param silent si
@@ -323,7 +323,7 @@ fd_prepSeries <- function(y,
                           scaleMin = NA,
                           scaleMax = NA,
                           scaleResolution = NA,
-                          dataMin = NA,
+                         # dataMin = NA,
                           scaleS = NA,
                           overlap = NA,
                           silent = TRUE){
@@ -335,12 +335,13 @@ fd_prepSeries <- function(y,
   y_ori <- y
 
   if(is.na(scaleMin)){
-    scaleMin <- 16
+    scaleMin <- 2
   }
 
   if(is.na(scaleMax)){
     scaleMax <- floor(NROW(y)/2)
   }
+
 
   if(is.na(scaleResolution)){
     scaleResolution <- stats::nextn(log2(scaleMax)-log2(scaleMin), factors = 2)
@@ -373,6 +374,10 @@ fd_prepSeries <- function(y,
       #scaleS[which.max(scaleS)] <- floor(NROW(y)/2)
     }
 
+    # if(max(scaleS)>(NROW(y)/2)){
+    #   scaleS <- scaleS[scaleS<=(NROW(y)/2)]
+    # }
+
   if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
     stop("Something wrong with vector passed to scaleS.... \nUsing defaults: (scaleMax-scaleMin)/scaleResolution")
   }
@@ -392,9 +397,9 @@ fd_prepSeries <- function(y,
     y <- ts_standardise(y, type = standardise,  adjustN = FALSE)
   }
 
-  if(is.na(dataMin)){
-    dataMin <- ceiling(NROW(y)/max(scaleS, na.rm = TRUE))+1
-  }
+  # if(is.na(dataMin)){
+  #   dataMin <- ceiling(NROW(y)/max(scaleS, na.rm = TRUE))+1
+  # }
 
   # if(adjustSumOrder){
   #   y       <- ts_sumorder(y_ori, scaleS = scaleS, polyOrder = polyOrder, dataMin = dataMin)
@@ -413,7 +418,7 @@ fd_prepSeries <- function(y,
   attr(y,"scaleMin")    <- scaleMin
   attr(y,"scaleMax")    <- scaleMax
   attr(y,"scaleResolution") <- scaleResolution
-  attr(y,"dataMin")     <- dataMin
+ # attr(y,"dataMin")     <- dataMin
   attr(y,"scaleS")      <- scaleS
   attr(y,"overlap")     <- overlap
 
@@ -465,7 +470,7 @@ fd_sda <- function(y,
                    scaleMin = 4,
                    scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
                    scaleResolution = log2(scaleMax)-log2(scaleMin),
-                   dataMin = NA,
+                  # dataMin = NA,
                    scaleS = NA,
                    overlap = 0,
                    doPlot = FALSE,
@@ -486,7 +491,7 @@ fd_sda <- function(y,
                      scaleMin = scaleMin,
                      scaleMax = scaleMax,
                      scaleResolution = scaleResolution,
-                     dataMin = dataMin,
+                     #dataMin = dataMin,
                      scaleS = scaleS,
                      overlap = overlap,
                      silent = silent
@@ -494,7 +499,7 @@ fd_sda <- function(y,
 
 
   scaleS  <- attr(y, "scaleS")
-  dataMin <- attr(y, "dataMin")
+ # dataMin <- attr(y, "dataMin")
 
   Hadj    <- attr(y,"Hadj")
   Hglobal <- attr(y,"Hglobal.excl")
@@ -512,9 +517,6 @@ fd_sda <- function(y,
   #   scaleS <- unique(round(2^(seq(scaleMin, scaleMax, by=((scaleMax-scaleMin)/scaleResolution)))))
   # }
 
-  if(max(scaleS)>(NROW(y)/2)){
-    scaleS <- scaleS[scaleS<=(NROW(y)/2)]
-  }
 
   # if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
   #   message("Something wrong with vector passed to scaleS.... \nUsing default: (scaleMax-scaleMin)/scaleResolution")
@@ -539,8 +541,8 @@ fd_sda <- function(y,
   scale <- out$scale[out$scale%[]%c(scaleMin,scaleMax)]
   sd    <- out$sd[out$scale%[]%c(scaleMin,scaleMax)]
 
-  fitRange1 <- which(lengths(lapply(scale, function(s){ts_slice(y,s)}))<NROW(y))
-  fitRange2 <- which(lengths(lapply(scale, function(s){ts_slice(y,s)}))%[)%c(dataMin,NROW(y)))
+  fitRange1 <- which(sort(lengths(lapply(scale, function(s){ts_slice(y,s)})))<NROW(y))
+  fitRange2 <- which(sort(lengths(lapply(scale, function(s){ts_slice(y,s)})))%[)%c(scaleMin,scaleMax))
 
   lmfit1        <- stats::lm(log(sd[fitRange1]) ~ log(scale[fitRange1]))
   lmfit2        <- stats::lm(log(sd[fitRange2]) ~ log(scale[fitRange2]))
@@ -607,10 +609,11 @@ fd_sda <- function(y,
 #' @param removeTrendSegment Method to use for detrending in the bins (default = `"poly"`)
 #' @param polyOrderSegment The DFA order, the order of polynomial trend to remove from the bin if `removeTrendSegment = "poly"`. If `removeTrendSegment = "adaptive"` polynomials `1` to `polyOrder` will be evaluated and the best fitting polynomial (R squared) will be removed (default = `1`)
 #' @param scaleMin   Minimum scale (in data points) to use for log-log regression (default = `4`)
-#' @param scaleMax   Maximum scale (in data points) to use for log-log regression. This value will be ignored if `dataMin` is not `NA`, in which case bins of size `< dataMin` will be removed (default = `stats::nextn(floor(NROW(y)/4), factors = 2)`)
+#' @param scaleMax   Maximum scale (in data points) to use for log-log regression (default = `stats::nextn(floor(NROW(y)/4), factors = 2)`)
+# This value will be ignored if `dataMin` is not `NA`, in which case bins of size `< dataMin` will be removed
 #' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculated as: `seq(scaleMin, scaleMax, length.out = scaleResolution)` (default =  `round(log2(scaleMax-scaleMin))`).
-#' #' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if `length(y) = 1024` and `dataMin = 4`, the maximum scale used to calculate the slope will be `1024 / 4 = 256`. This value will take precedence over the `scaleMax` (default = `NA`)
-#' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` and `dataMin` will be ignored (default = `NA`)
+# #' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if `length(y) = 1024` and `dataMin = 4`, the maximum scale used to calculate the slope will be `1024 / 4 = 256`. This value will take precedence over the `scaleMax` (default = `NA`)
+#' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` will be ignored (default = `NA`)
 #' @param overlap A number in `[0 ... 1]` representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with step-size `floor(.5 * 4) = 2`, so for scale `128` step-size will be `64` (default = `NA`)
 #' @param y    A numeric vector or time series object.
 #' @param doPlot   Output the log-log scale versus fluctuation plot with linear fit by calling function `plotFD_loglog()` (default = `TRUE`)
@@ -676,7 +679,7 @@ fd_dfa <- function(y,
                    scaleMin = 4,
                    scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
                    scaleResolution = log2(scaleMax)-log2(scaleMin),
-                   dataMin = NA,
+                  # dataMin = NA,
                    scaleS = NA,
                    overlap = NA,
                    doPlot = FALSE,
@@ -697,7 +700,7 @@ fd_dfa <- function(y,
                  scaleMin = scaleMin,
                  scaleMax = scaleMax,
                  scaleResolution = scaleResolution,
-                 dataMin = dataMin,
+                # dataMin = dataMin,
                  scaleS = scaleS,
                  overlap = overlap,
                  silent = silent
@@ -711,7 +714,7 @@ fd_dfa <- function(y,
   }
 
   scaleS  <- attr(y, "scaleS")
-  dataMin <- attr(y, "dataMin")
+  #dataMin <- attr(y, "dataMin")
 
   if(removeTrendSegment%in%"adaptive"){
     adaptive <- TRUE
@@ -722,7 +725,7 @@ fd_dfa <- function(y,
   TSm    <- as.matrix(cbind(t=1:NROW(y),y=y))
   DFAout <- monoH(TSm = TSm, scaleS = scaleS, removeTrend = removeTrendSegment, polyOrder = polyOrderSegment, overlap = overlap, returnPLAW = TRUE, returnSegments = TRUE)
 
-  fitRange <- which(lapply(DFAout$segments,NROW)>=dataMin)
+  fitRange <- which(lapply(DFAout$segments,NROW)>=scaleMin)
 
   lmfit1 <- stats::lm(DFAout$PLAW$bulk.log2 ~ DFAout$PLAW$size.log2, na.action=stats::na.omit)
   H1     <- lmfit1$coefficients[2] + attr(y,"Hadj")
@@ -826,7 +829,7 @@ fd_dfa <- function(y,
 #' @param scaleMax Maximum scale value (as `2^scale`) to use (default = `max` of `log2(nrows)` and `log2(ncols)`)
 #' @param scaleMin Minimium scale value (as `2^scale`) to use (default = `0`)
 #' @param scaleS If not `NA`, pass a numeric vector listing the scales (as a power of `2`) on which to evaluate the boxcount. Arguments `scaleMax`, `scaleMin`, and `scaleResolution` will be ignored (default = `NA`)
-#' @param dataMin Minimum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMin`)
+# #' @param dataMin Minimum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMin`)
 #' @param maxData Maximum number of time/data points inside a box for it to be included in the slope estimation (default = `2^scaleMax`)
 #' @param doPlot Return the log-log scale versus bulk plot with linear fit (default = `TRUE`).
 #' @param returnPlot Return ggplot2 object (default = `FALSE`)
@@ -1269,7 +1272,7 @@ fd_sev <- function(y,
 #'
 #' @param y A numeric vector or time series object
 #' @param fs Sample frequency in Hz
-#' @param useSD Use the standarddeviation instead of variance?
+#' @param useSD Use the standard deviation instead of variance?
 #' @param doPlot   Return the log-log scale versus fluctuation plot with linear fit (default = `TRUE`).
 #' @param returnPlot Return ggplot2 object (default = `FALSE`)
 #' @param returnPLAW Return the power law data (default = `FALSE`)
@@ -1458,7 +1461,7 @@ fd_mfdfa <- function(y,
                      scaleMin = 16,
                      scaleMax = stats::nextn(floor(NROW(y)/4), factors = 2),
                      scaleResolution = round(log2(scaleMax-scaleMin)),
-                     dataMin = NA,
+                     #dataMin = NA,
                      scaleS = NA,
                      overlap = NA,
                      qq = seq(-5, 5,length.out=101),
@@ -1476,7 +1479,7 @@ fd_mfdfa <- function(y,
                       scaleMin = scaleMin,
                       scaleMax = scaleMax,
                       scaleResolution = scaleResolution,
-                      dataMin = dataMin,
+                      #dataMin = dataMin,
                       scaleS = scaleS,
                       overlap = overlap,
                       silent = silent)
@@ -1490,7 +1493,7 @@ fd_mfdfa <- function(y,
   y <- rp_copy_attributes(source = yy, target = y)
 
   scaleS  <- attr(y, "scaleS")
-  dataMin <- attr(y, "dataMin")
+  #dataMin <- attr(y, "dataMin")
 
   qq <- c(qq,(qq[length(qq)]+.1))
 
@@ -1906,7 +1909,7 @@ inf_MSE <- function(y,
                     scaleMax = floor(NROW(y)/10),
                     scaleS = NA,
                     overlap = 0,
-                    dataMin = 4,
+                    #dataMin = 4,
                     relativeEntropy = FALSE,
                     doPlot = FALSE,
                     returnPlot = FALSE,

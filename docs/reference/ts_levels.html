@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +93,7 @@
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>The partitioning method to use, see the manual pages of rpart for details.</p></dd>
+<dd><p>The partitioning method to use, see the manual pages of <a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart</a> for details.</p></dd>
 
 
 <dt id="arg-crossvalidations">crossValidations<a class="anchor" aria-label="anchor" href="#arg-crossvalidations"></a></dt>
@@ -101,7 +101,7 @@
 
 
 <dt id="arg-minchange">minChange<a class="anchor" aria-label="anchor" href="#arg-minchange"></a></dt>
-<dd><p>After the call to rpart, adjust detected level changes to a minimum absolute change in <code>y</code>, e.g. <code>sd(y)</code> or in case of a discrete scale, a minimal scale change that represents significant level change relative to the interpretation of the scale. If a level change is smaller than <code>minChange</code>, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in <code>p_adj</code>. Set to <code>NA</code> to skip, which means <code>p_adj</code> will be identical to <code>p</code> (default  = <code>NA</code>)</p></dd>
+<dd><p>After the call to <a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart</a>, adjust detected level changes to a minimum absolute change in <code>y</code>, e.g. <code>sd(y)</code> or in case of a discrete scale, a minimal scale change that represents significant level change relative to the interpretation of the scale. If a level change is smaller than <code>minChange</code>, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in <code>p_adj</code>. Set to <code>NA</code> to skip, which means <code>p_adj</code> will be identical to <code>p</code> (default  = <code>NA</code>)</p></dd>
 
 
 <dt id="arg-returntrends">returnTrends<a class="anchor" aria-label="anchor" href="#arg-returntrends"></a></dt>
@@ -145,11 +145,11 @@
 
 
 <dt id="arg-returntree">returnTree<a class="anchor" aria-label="anchor" href="#arg-returntree"></a></dt>
-<dd><p>should the tree object from rpart be returned in the output? (default = <code>FALSE</code>)</p></dd>
+<dd><p>should the tree object from <a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart</a> be returned in the output? (default = <code>FALSE</code>)</p></dd>
 
 
 <dt id="arg-returnplot">returnPlot<a class="anchor" aria-label="anchor" href="#arg-returnplot"></a></dt>
-<dd><p>if <code>TRUE</code> returns the levelplot as a <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2</a> object (default = <code>FALSE</code>)</p></dd>
+<dd><p>if <code>TRUE</code> returns the levelplot as a <a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2::ggplot2</a> object (default = <code>FALSE</code>)</p></dd>
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
@@ -163,27 +163,27 @@
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Time series operations:
-<code><a href="ts_center.html">ts_center</a>()</code>,
-<code><a href="ts_changeindex.html">ts_changeindex</a>()</code>,
-<code><a href="ts_checkfix.html">ts_checkfix</a>()</code>,
-<code><a href="ts_detrend.html">ts_detrend</a>()</code>,
-<code><a href="ts_diff.html">ts_diff</a>()</code>,
-<code><a href="ts_discrete.html">ts_discrete</a>()</code>,
-<code><a href="ts_duration.html">ts_duration</a>()</code>,
-<code><a href="ts_embed.html">ts_embed</a>()</code>,
-<code><a href="ts_integrate.html">ts_integrate</a>()</code>,
-<code><a href="ts_peaks.html">ts_peaks</a>()</code>,
-<code><a href="ts_permtest_block.html">ts_permtest_block</a>()</code>,
-<code><a href="ts_permtest_transmat.html">ts_permtest_transmat</a>()</code>,
-<code><a href="ts_rasterize.html">ts_rasterize</a>()</code>,
-<code><a href="ts_sd.html">ts_sd</a>()</code>,
-<code><a href="ts_slice.html">ts_slice</a>()</code>,
-<code><a href="ts_slopes.html">ts_slopes</a>()</code>,
-<code><a href="ts_standardise.html">ts_standardise</a>()</code>,
-<code><a href="ts_sumorder.html">ts_sumorder</a>()</code>,
-<code><a href="ts_symbolic.html">ts_symbolic</a>()</code>,
-<code><a href="ts_trimfill.html">ts_trimfill</a>()</code>,
-<code><a href="ts_windower.html">ts_windower</a>()</code></p></div>
+<code><a href="ts_center.html">ts_center()</a></code>,
+<code><a href="ts_changeindex.html">ts_changeindex()</a></code>,
+<code><a href="ts_checkfix.html">ts_checkfix()</a></code>,
+<code><a href="ts_detrend.html">ts_detrend()</a></code>,
+<code><a href="ts_diff.html">ts_diff()</a></code>,
+<code><a href="ts_discrete.html">ts_discrete()</a></code>,
+<code><a href="ts_duration.html">ts_duration()</a></code>,
+<code><a href="ts_embed.html">ts_embed()</a></code>,
+<code><a href="ts_integrate.html">ts_integrate()</a></code>,
+<code><a href="ts_peaks.html">ts_peaks()</a></code>,
+<code><a href="ts_permtest_block.html">ts_permtest_block()</a></code>,
+<code><a href="ts_permtest_transmat.html">ts_permtest_transmat()</a></code>,
+<code><a href="ts_rasterize.html">ts_rasterize()</a></code>,
+<code><a href="ts_sd.html">ts_sd()</a></code>,
+<code><a href="ts_slice.html">ts_slice()</a></code>,
+<code><a href="ts_slopes.html">ts_slopes()</a></code>,
+<code><a href="ts_standardise.html">ts_standardise()</a></code>,
+<code><a href="ts_sumorder.html">ts_sumorder()</a></code>,
+<code><a href="ts_symbolic.html">ts_symbolic()</a></code>,
+<code><a href="ts_trimfill.html">ts_trimfill()</a></code>,
+<code><a href="ts_windower.html">ts_windower()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -221,7 +221,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

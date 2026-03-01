@@ -51,8 +51,6 @@ fd_boxcount2D(
 
 \item{scaleS}{If not \code{NA}, pass a numeric vector listing the scales (as a power of \code{2}) on which to evaluate the boxcount. Arguments \code{scaleMax}, \code{scaleMin}, and \code{scaleResolution} will be ignored (default = \code{NA})}
 
-\item{dataMin}{Minimum number of time/data points inside a box for it to be included in the slope estimation (default = \code{2^scaleMin})}
-
 \item{maxData}{Maximum number of time/data points inside a box for it to be included in the slope estimation (default = \code{2^scaleMax})}
 
 \item{doPlot}{Return the log-log scale versus bulk plot with linear fit (default = \code{TRUE}).}

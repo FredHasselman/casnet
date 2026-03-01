@@ -48,11 +48,12 @@ Let's create some noise series:
 
 ```{r}
 library(casnet)
-y0 <- noise_powerlaw(alpha = -2, N = 512)
-y1 <- noise_powerlaw(alpha = -1, N = 512)
-y2 <- noise_powerlaw(alpha =  0, N = 512)
-y3 <- noise_powerlaw(alpha =  1, N = 512)
-y4 <- noise_powerlaw(alpha =  2, N = 512)
+set.seed(1)
+y0 <- noise_powerlaw(alpha = -2, N = 1024)
+y1 <- noise_powerlaw(alpha = -1, N = 1024)
+y2 <- noise_powerlaw(alpha =  0, N = 1024)
+y3 <- noise_powerlaw(alpha =  1, N = 1024)
+y4 <- noise_powerlaw(alpha =  2, N = 1024)
 
 plotTS_multi(data.frame(y0,y1,y2,y3,y4))
 
@@ -76,7 +77,7 @@ cowplot::plot_grid(plotlist = sdaPlots, ncol = 1)
 
 ```
 
-To increase the resolution of the bins adjust the argument `scaleResolution` and/or the values of `scaleMin` and `scaleMax`, OR the value `dataMin`.
+To increase the resolution of the bins adjust the argument `scaleResolution` and/or the values of `scaleMin` and `scaleMax`
 
 At a resolution of `32` there appear to be 2 scaling regions
 
@@ -85,10 +86,10 @@ t <- 2 # Pink noise
 fd_sda(ts_list[[t]], silent = TRUE,  scaleResolution = 32, noTitle = TRUE, tsName = noiseNames[t], doPlot = TRUE)
 ```
 
-Below the argument `dataMin`, which defaults to `4`, is used to adjust the fit range.
+Below the argument `scaleMin`, which defaults to `4`, is used to adjust the fit range.
 
 ```{r}
-fd_sda(ts_list[[t]],  silent = TRUE, scaleResolution = 32, dataMin = 10, noTitle = TRUE, tsName = noiseNames[t], doPlot = TRUE)
+fd_sda(ts_list[[t]],  silent = TRUE, scaleResolution = 32, scaleMin = 10, scaleMax = 256, noTitle = TRUE, tsName = noiseNames[t], doPlot = TRUE)
 ```
 
 This is probably not a good idea...

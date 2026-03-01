@@ -37,7 +37,7 @@ plotRN_phaseDensities(
 
 \item{alphaDensity}{Alpha value for the density plots}
 
-\item{splitFacets}{Integer value to indicate if sets of phases should be displayed in different facets? (default = \code{NA})}
+\item{splitFacets}{Integer value to indicate if sets of phases should be displayed in different facets? Pass an integer equalt to, or larger than the number of phases found to display all phases for which a density can be calculated (default = \code{NA})}
 
 \item{showPhaseSize}{Show the number of states in each phase in the labels (default = TRUE)}
 
@@ -47,7 +47,7 @@ plotRN_phaseDensities(
 data frame with phase series.
 }
 \description{
-Create a ridge plot (requires package \link{ggridges})
+Create a ridge plot (requires package \link[ggridges:ggridges-package]{ggridges::ggridges})
 }
 \examples{
 

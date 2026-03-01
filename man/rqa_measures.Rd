@@ -74,5 +74,5 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 RQA measures
 }
 \description{
-Calculates RQA measures without building the recurrence matrix. Requires package \link{parallel}.
+Calculates RQA measures without building the recurrence matrix. Requires package \link[parallel:parallel-package]{parallel::parallel}.
 }

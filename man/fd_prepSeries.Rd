@@ -14,7 +14,6 @@ fd_prepSeries(
   scaleMin = NA,
   scaleMax = NA,
   scaleResolution = NA,
-  dataMin = NA,
   scaleS = NA,
   overlap = NA,
   silent = TRUE
@@ -38,8 +37,6 @@ fd_prepSeries(
 \item{scaleMax}{smm}
 
 \item{scaleResolution}{sr}
-
-\item{dataMin}{dm}
 
 \item{scaleS}{sc}
 

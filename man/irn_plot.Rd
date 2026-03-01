@@ -31,9 +31,9 @@ irn_plot(
 
 \item{merge_seed}{Seed}
 
-\item{curvature}{The \code{curvature} parameter for edges see \code{\link[=geom_curve]{geom_curve()}} (default = \code{-0.7})}
+\item{curvature}{The \code{curvature} parameter for edges see \code{\link[ggplot2:geom_segment]{ggplot2::geom_curve()}} (default = \code{-0.7})}
 
-\item{angle}{The \code{angle} parameter for edges see \code{\link[=geom_curve]{geom_curve()}} (default = \code{90})}
+\item{angle}{The \code{angle} parameter for edges see \code{\link[ggplot2:geom_segment]{ggplot2::geom_curve()}} (default = \code{90})}
 
 \item{scaleEdgeSize}{Scale the size of the edges by a constant: \code{E(g)$width * scaleEdgeSize} (default = \code{1/5})}
 

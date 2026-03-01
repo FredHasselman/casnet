@@ -30,7 +30,7 @@ rqa_diagProfile2(
 
 \item{emLag}{The embedding lag}
 
-\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
+\item{emRad}{The radius threshold on the distance measure that determines the global Recurrence Rate. If the radius is not provided it will be estimated with default settings using function \link{est_radius} (default = \code{NULL})}
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 

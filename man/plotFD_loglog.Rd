@@ -30,7 +30,7 @@ plotFD_loglog(
 
 \item{doPlot}{Display the plot (A plot object is always returned invisibly)}
 
-\item{returnPlot}{return a \link{ggplot2} object}
+\item{returnPlot}{return a \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} object}
 }
 \value{
 A ggplot object

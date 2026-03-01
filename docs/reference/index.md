@@ -1,0 +1,202 @@
+# Package index
+
+## All functions
+
+- [`ColouredNoise`](ColouredNoise.md) : Coloured noise data
+- [`RNG`](RNG.md) : Random Number Sequences
+- [`SWtestE()`](SWtestE.md) : Small World test
+- [`ac_win()`](ac_win.md) : Windowed autocorrelation function
+- [`add_alpha()`](add_alpha.md) : Add transparency to a colour
+- [`as.numeric_character()`](as.numeric_character.md) : Character vector
+  to named numeric vector
+- [`as.numeric_discrete()`](as.numeric_discrete.md) : Discrete (factor
+  or character) to numeric vector
+- [`as.numeric_factor()`](as.numeric_factor.md) : Numeric factor to
+  numeric vector
+- [`bandReplace()`](bandReplace.md) : Replace matrix diagonals
+- [`checkPkg()`](checkPkg.md) : Check package
+- [`createCorridor()`](createCorridor.md) : Corridor analysis
+- [`dc_ccp()`](dc_ccp.md) : Cumulative Complexity Peaks (CCP)
+- [`dc_d()`](dc_d.md) : Distribution Uniformity
+- [`dc_f()`](dc_f.md) : Fluctuation Intensity
+- [`dc_win()`](dc_win.md) : Dynamic Complexity
+- [`eig_win()`](eig_win.md) : Windowed Eigenvalue (PCA)
+- [`elascer()`](elascer.md) : Elastic Scaler - A Flexible Rescale
+  Function
+- [`est_emDim()`](est_emDim.md) : Estimate number of embedding
+  dimensions
+- [`est_emLag()`](est_emLag.md) : Estimate embedding lag (tau)
+- [`est_maxPhases()`](est_maxPhases.md) : Estimate the maximum number of
+  Phases
+- [`est_parameters()`](est_parameters.md) : Estimate RQA parameters
+- [`est_radius()`](est_radius.md) : Estimate Radius.
+- [`est_radius_rqa()`](est_radius_rqa.md) : Estimate Radius without
+  building a recurrence matrix
+- [`fd_RR()`](fd_RR.md) : Relative Roughness
+- [`fd_allan()`](fd_allan.md) : Allan Variance Analysis
+- [`fd_boxcount2D()`](fd_boxcount2D.md) : 2D Boxcount for 1D signal
+- [`fd_dfa()`](fd_dfa.md) : Detrended Fluctuation Analysis (DFA)
+- [`fd_mfdfa()`](fd_mfdfa.md) : Multi-fractal Detrended Fluctuation
+  Analysis
+- [`fd_psd()`](fd_psd.md) : Power Spectral Density Slope (PSD).
+- [`fd_sda()`](fd_sda.md) : Standardised Dispersion Analysis (SDA).
+- [`fd_sev()`](fd_sev.md) : Calculate FD using Sevcik's method
+- [`flight_Cauchy()`](flight_Cauchy.md) : Create Cauchy Flight
+- [`flight_LevyPareto()`](flight_LevyPareto.md) : Create a Levy-Pareto
+  flight
+- [`flight_Rayleigh()`](flight_Rayleigh.md) : Create Rayleigh Flight
+  (Brownian Motion)
+- [`fnn()`](fnn.md) : False Nearest Neighbours
+- [`getColours()`](getColours.md) : Get some nice colours
+- [`getPairs()`](getPairs.md) : Get all combinations
+- [`get_os()`](get_os.md) : Which OS is running?
+- [`growth_ac()`](growth_ac.md) : Examples of dynamical growth models
+  (maps)
+- [`growth_ac_cond()`](growth_ac_cond.md) : Examples of conditional
+  dynamical growth models (maps)
+- [`inf_MSE()`](inf_MSE.md) : Multi-Scale Entropy
+- [`inf_SampEn()`](inf_SampEn.md) : Sample Entropy
+- [`irn_crossClustering()`](irn_crossClustering.md) : Cross CLustering
+  Coefficient
+- [`irn_crossDegree()`](irn_crossDegree.md) : Cross Degree
+- [`irn_crossTriples()`](irn_crossTriples.md) : Cross Triples
+- [`irn_directedCrossTriples()`](irn_directedCrossTriples.md) : Directed
+  Cross Triples
+- [`irn_plot()`](irn_plot.md) : Inter system recurrence networks
+- [`is.date()`](is.date.md) : It's a Date!
+- [`layout_as_spiral()`](layout_as_spiral.md) : Layout a graph on a
+  spiral
+- [`lv_Ndim()`](lv_Ndim.md) : Lotka-Volterra model for N species
+- [`make_spiral_graph()`](make_spiral_graph.md) : Make Spiral Graph
+- [`manyAnalystsESM`](manyAnalystsESM.md) : Data from the Many Analysts
+  study.
+- [`mat_coursegrain()`](mat_coursegrain.md) : Course grain a matrix for
+  plotting
+- [`mat_di2bi()`](mat_di2bi.md) : Distance to binary matrix
+- [`mat_di2ch()`](mat_di2ch.md) : Distance to chromatic matrix
+- [`mat_di2we()`](mat_di2we.md) : Distance to weighted matrix
+- [`mat_hamming()`](mat_hamming.md) : Calculate Hamming distance
+- [`mat_ind()`](mat_ind.md) : Get indices of matrix diagonals, rows, or
+  columns
+- [`mat_mat2ind()`](mat_mat2ind.md) : Matrix to indexed data frame
+- [`mat_nodeDegree()`](mat_nodeDegree.md) : Matrix node degree
+- [`mat_we2bi()`](mat_we2bi.md) : Weighted to Binary matrix
+- [`mi_interlayer()`](mi_interlayer.md) : Inter-layer mutual information
+- [`mi_mat()`](mi_mat.md) : Mutual Information variations
+- [`mif()`](mif.md) : Mutual Information Function
+- [`mrn()`](mrn.md) : Multiplex Recurrence Network
+- [`mrn_plot()`](mrn_plot.md) : Multiplex Recurrence Network Plot
+- [`noise_fBm()`](noise_fBm.md) : Generate fractional Brownian motion
+- [`noise_fGn()`](noise_fGn.md) : Generate fractional Gaussian noise
+- [`noise_powerlaw()`](noise_powerlaw.md) : Generate noise series with
+  power law scaling exponent
+- [`plotDC_ccp()`](plotDC_ccp.md) : Plot Cumulative Complexity Peaks
+- [`plotDC_lvl()`](plotDC_lvl.md) : Plot Peaks versus Levels
+- [`plotDC_res()`](plotDC_res.md) : Plot Complexity Resonance Diagram
+- [`plotFD_loglog()`](plotFD_loglog.md) : Plot output from fluctuation
+  analyses based on log-log regression
+- [`plotMRN_win()`](plotMRN_win.md) : Plot windowed Multiplex Recurrence
+  Network measures
+- [`plotNET_BA()`](plotNET_BA.md) : Example of Barabasi scale-free
+  network
+- [`plotNET_SW()`](plotNET_SW.md) : Example of Strogatz-Watts
+  small-world network
+- [`plotNET_groupColour()`](plotNET_groupColour.md) : Vertex and Edge
+  Group Colours
+- [`plotNET_groupWeight()`](plotNET_groupWeight.md) : Set Edge weights
+  by group
+- [`plotNET_prep()`](plotNET_prep.md) : Plot Network Based on RQA
+- [`plotRED_acf()`](plotRED_acf.md) : Plot ACF and PACF
+- [`plotRED_mif()`](plotRED_mif.md) : Plot various MI functions
+- [`plotRN_phaseDensities()`](plotRN_phaseDensities.md) : Phase Density
+  for each dimension
+- [`plotRN_phaseDensity()`](plotRN_phaseDensity.md) : Phase Density for
+  each dimension
+- [`plotRN_phaseProfile()`](plotRN_phaseProfile.md) : Profile Plot
+- [`plotRN_phaseProfiles()`](plotRN_phaseProfiles.md) : Profile Plot
+- [`plotRN_phaseProjection()`](plotRN_phaseProjection.md) : Plot Phase
+  Space Projection
+- [`plotRN_phaseProjections()`](plotRN_phaseProjections.md) : Plot Phase
+  Space Projection
+- [`plotRN_phaseSeries()`](plotRN_phaseSeries.md) : Phase Series plot
+- [`plotRN_phaseTimeSeries()`](plotRN_phaseTimeSeries.md) : Phase Series
+  plot
+- [`plotSUR_hist()`](plotSUR_hist.md) : Surrogate Test
+- [`plotTS_multi()`](plotTS_multi.md) : Plot Multivariate Time Series
+  Data
+- [`repmat()`](repmat.md) : Repeat Copies of a Matrix
+- [`rn()`](rn.md) : Create a Recurrence Network Matrix
+- [`rn_findPhases()`](rn_findPhases.md) : Find Phases
+- [`rn_measures()`](rn_measures.md) : Recurrence Network Measures
+- [`rn_phaseInfo()`](rn_phaseInfo.md) : Extract Phases from weighted RN
+- [`rn_phases()`](rn_phases.md) : Extract Phases from weighted RN
+- [`rn_plot()`](rn_plot.md) : Plot (thresholded) distance matrix as a
+  network
+- [`rn_recSpec()`](rn_recSpec.md) : Recurrence Time Spectrum
+- [`rn_strengthDist()`](rn_strengthDist.md) : Strength versus Degree
+  scaling relation
+- [`rn_transition()`](rn_transition.md) : Create transition network
+- [`rp()`](rp.md) : Create a Distance Matrix
+- [`rp_cl()`](rp_cl.md) : Fast (C)RQA (command line crp)
+- [`rp_copy_attributes()`](rp_copy_attributes.md) : Copy Matrix
+  Attributes
+- [`rp_diagProfile()`](rp_diagProfile.md) : Diagonal Recurrence Profile
+- [`rp_lineDist()`](rp_lineDist.md) : Line length distributions
+- [`rp_measures()`](rp_measures.md) : Get (C)RQA measures based on a
+  binary matrix
+- [`rp_nzdiags()`](rp_nzdiags.md) : rp_nzdiags
+- [`rp_plot()`](rp_plot.md) : Plot (thresholded) distance matrix as a
+  recurrence plot
+- [`rp_size()`](rp_size.md) : rp_size
+- [`rqa_diagProfile()`](rqa_diagProfile.md) : Diagonal Recurrence
+  Profile
+- [`rqa_diagProfile2()`](rqa_diagProfile2.md) : Cross Diagonal
+  Recurrence Profiles
+- [`rqa_fast()`](rqa_fast.md) : Fast rqa
+- [`rqa_lineDist()`](rqa_lineDist.md) : Fast line dist
+- [`rqa_measures()`](rqa_measures.md) : Fast RQA
+- [`rqa_par()`](rqa_par.md) **\[experimental\]** : Massively Parallel
+  RQA analysis
+- [`rqa_stitchRows()`](rqa_stitchRows.md) : Stitch rows
+- [`sa2fd_dfa()`](sa2fd_dfa.md) : Informed Dimension estimate from DFA
+  slope (H)
+- [`sa2fd_psd()`](sa2fd_psd.md) : Informed Dimension estimate from
+  Spectral Slope (aplha)
+- [`sa2fd_sda()`](sa2fd_sda.md) : Informed Dimension estimate from SDA
+  slope.
+- [`setTheiler()`](setTheiler.md) : Set theiler window on a distance
+  matrix or recurrence matrix.
+- [`set_command_line_rp()`](set_command_line_rp.md) : Set command line
+  RQA executable
+- [`ts_center()`](ts_center.md) : Center a vector
+- [`ts_changeindex()`](ts_changeindex.md) : Find change indices
+- [`ts_checkfix()`](ts_checkfix.md) : Check and/or Fix a vector
+- [`ts_coarsegrain()`](ts_coarsegrain.md) : Course grain a time series
+- [`ts_cp()`](ts_cp.md) : Change Profile
+- [`ts_detrend()`](ts_detrend.md) : Detrend a time series
+- [`ts_diff()`](ts_diff.md) : Derivative of time series
+- [`ts_discrete()`](ts_discrete.md) : Discrete representation
+- [`ts_duration()`](ts_duration.md) : Time series to Duration series
+- [`ts_embed()`](ts_embed.md) : Delay embedding of a time series
+- [`ts_integrate()`](ts_integrate.md) : Create a timeseries profile
+- [`ts_levels()`](ts_levels.md) : Detect levels in time series
+- [`ts_peaks()`](ts_peaks.md) : Find Peaks or Wells
+- [`ts_permtest_block()`](ts_permtest_block.md) : Permutation Test:
+  Block Randomisation
+- [`ts_permtest_transmat()`](ts_permtest_transmat.md) : Permutation
+  Test: Transition Matrix
+- [`ts_rasterize()`](ts_rasterize.md) : Turn a 1D time series vector
+  into a 2D curve
+- [`ts_sd()`](ts_sd.md) : Standard Deviation estimates
+- [`ts_slice()`](ts_slice.md) : Slice a Matrix
+- [`ts_slope()`](ts_slope.md) : Calculate Kendall's tau in sliding
+  window or around change point.
+- [`ts_slopes()`](ts_slopes.md) : Detect slopes in time series
+- [`ts_standardise()`](ts_standardise.md) : Standardise a vector
+- [`ts_sumorder()`](ts_sumorder.md) : Adjust time series by summation
+  order
+- [`ts_symbolic()`](ts_symbolic.md) : Symbolic representation
+- [`ts_transmat()`](ts_transmat.md) : Transition matrix
+- [`ts_trimfill()`](ts_trimfill.md) : Trim or Fill Vectors
+- [`ts_windower()`](ts_windower.md) : Get sliding window indices
+- [`var_win()`](var_win.md) : Windowed variance

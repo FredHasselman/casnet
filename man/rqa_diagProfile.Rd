@@ -25,6 +25,9 @@ rqa_diagProfile(
   method = c("Euclidean", "SBD")[1],
   doPlot = TRUE,
   minY = NA,
+  plotDET = FALSE,
+  DLmin = 2,
+  DLmax = NROW(y1),
   returnOnlyPlot = FALSE
 )
 }
@@ -37,7 +40,7 @@ rqa_diagProfile(
 
 \item{emLag}{The embedding lag}
 
-\item{emRad}{The threshold (emRad) to apply to the distance matrix to create a binary or weighted matrix. If \code{NULL}, an unthresholded matrix will be created (default = \code{NULL})}
+\item{emRad}{The radius threshold on the distance measure that determines the global Recurrence Rate. If the radius is not provided it will be estimated with default settings using function \link{est_radius} (default = \code{NULL})}
 
 \item{targetValue}{A value passed to \code{est_radius(...,type="fixed", targetMeasure="RR")} if \code{is.na(emRad)==TRUE}.}
 
@@ -73,6 +76,12 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 \item{doPlot}{Plot (default = \code{TRUE})}
 
 \item{minY}{The upper limit of the Y-axis. If \code{NA}, the limit is determined by \code{max(minY,max(RR))}. Set to 1 to always show the theoretical maximum (default = \code{NA})}
+
+\item{plotDET}{plot Determinism profile instead of Recurrence Rate (default = \code{FALSE})}
+
+\item{DLmin}{Minimal diagonal line length (default = \code{2})}
+
+\item{DLmax}{Maximal diagonal line length (default = length of diagonal -1)}
 
 \item{returnOnlyPlot}{Don't plot to graphics device, but do return the plot (default = \code{FALSE})}
 }

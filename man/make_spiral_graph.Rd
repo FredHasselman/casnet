@@ -51,9 +51,9 @@ make_spiral_graph(
 
 \item{rev}{If \code{TRUE} the vertex with the highest index will be placed in the centre of the spiral (default = \code{FALSE})}
 
-\item{curvature}{The \code{curvature} parameter for edges see \code{\link[=geom_curve]{geom_curve()}} (default = \code{-0.7})}
+\item{curvature}{The \code{curvature} parameter for edges see \code{\link[ggplot2:geom_segment]{ggplot2::geom_curve()}} (default = \code{-0.7})}
 
-\item{angle}{The \code{angle} parameter for edges see \code{\link[=geom_curve]{geom_curve()}} (default = \code{90})}
+\item{angle}{The \code{angle} parameter for edges see \code{\link[ggplot2:geom_segment]{ggplot2::geom_curve()}} (default = \code{90})}
 
 \item{markTimeBy}{Include a vector that indicates time. The time will be displayed on the plot. Pass \code{TRUE} to generate auto labels (experimental)}
 
@@ -105,7 +105,7 @@ make_spiral_graph(
 A ggplot object.
 }
 \description{
-Turn an \link{igraph} object into a spiral graph returning a \link{ggplot2} object.
+Turn an \link[igraph:aaa-igraph-package]{igraph::igraph} object into a spiral graph returning a \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} object.
 }
 \note{
 To keep the igraph object, use the layout function \code{\link[=layout_as_spiral]{layout_as_spiral()}} when plotting the graph.

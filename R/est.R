@@ -67,7 +67,7 @@ est_radius <- function(RM = NULL,
     if(!is.null(y1)){
       optimOK <- TRUE
       if(any(NCOL(y1)>1,!doEmbed)){
-        message("Not embedding time series...")
+        if(!silent){message("Not embedding time series...")}
         RM <- rp(y1=y1, y2=y2, method = method, doEmbed = FALSE)
       } else {
         if(any(is.na(emDim), is.na(emLag))){
@@ -128,6 +128,8 @@ est_radius <- function(RM = NULL,
     minRR   <- (sum((as.vector(RM)%>>%0)&(as.vector(RM)%==%minDist)))/rp.size
 
 
+    if(!silent){message(paste0("The minimal possible RR based on the minimal nonzero distance value (",signif(minDist,4),") is: ", round(minRR,4)*100,"%"))}
+
 
     iterList <- data.frame(iter        = seqIter,
                            Measure     = Measure,
@@ -146,8 +148,8 @@ est_radius <- function(RM = NULL,
     if(!silent){cat(paste("\nSearching for a radius that will yield",targetValue,"+/-",tol,"for", targetMeasure,"\n"))}
 
     if(tryRadius %<=% minDist){
-      warning(paste("The minimum RR possible for this matrix is", round(Measure,3),
-                    "because the minimum distance is:", round(minDist,3)))
+      warning(paste0("Current radius value ", signif(tryRadius,4),
+                    " <= minimum distance value ", signif(minDist,4), " so the min. possible RR% is ",signif(minRR,4)*100,"%"))
       minRRfound <- TRUE
       exitIter   <- TRUE
     }
@@ -200,7 +202,6 @@ est_radius <- function(RM = NULL,
                                              Converged   = Converged)
 
       if(tryRadius %<=% minDist){
-        warning(paste("The minimum RR possible for this matrix is",round(minRR,3), "because the minimum distance is:",round(minDist,3)))
         minRRfound <- TRUE
         exitIter <- TRUE
       }

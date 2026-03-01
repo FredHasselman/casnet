@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,8 +88,8 @@
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Redundancy measures (mutual information):
-<code><a href="mi_interlayer.html">mi_interlayer</a>()</code>,
-<code><a href="mi_mat.html">mi_mat</a>()</code></p></div>
+<code><a href="mi_interlayer.html">mi_interlayer()</a></code>,
+<code><a href="mi_mat.html">mi_mat()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -153,17 +153,17 @@
 <span class="r-in"><span><span class="va">y</span><span class="op">$</span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">y2</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="va">y</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      -10       -9       -8       -7       -6       -5       -4       -3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1.834929 1.736090 1.970503 1.833393 1.955936 1.964817 1.937624 2.039731 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.856324 1.760333 1.972326 1.894520 2.037140 2.018302 1.954398 2.060624 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       -2       -1        0        1        2        3        4        5 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1.826218 1.881377 1.881377 1.881377 2.003972 1.933971 1.925013 1.982503 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.906130 1.928654 1.928654 1.928654 2.038830 2.000205 2.000832 2.005716 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        6        7        8        9       10       11       12       13 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1.972004 1.826775 1.756128 1.733573 2.485812 1.819047 1.866779 1.838623 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2.048216 1.819364 1.788236 1.757781 2.533057 1.860127 1.881443 1.885172 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       14       15       16       17       18       19       20       21 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1.886196 1.910751 1.887256 1.857787 2.008641 1.966172 1.943974 2.106459 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.917186 1.949878 1.866049 1.886839 2.044955 2.026359 1.994301 2.138082 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       22       23       24       25       26       27       28       29 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1.953648 1.914736 1.856459 1.881538 1.949608 1.809318 1.935573 1.857520 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.997720 1.975022 1.898101 1.912561 2.014143 1.856500 2.003992 1.897845 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       30 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1.871952 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1.886449 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"miType")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "I(X;Y|Z)"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"lags")</span>
@@ -177,17 +177,17 @@
 <span class="r-in"><span><span class="va">y</span><span class="op">$</span><span class="va">y3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="fu">mif</span><span class="op">(</span><span class="va">y</span>,lags <span class="op">=</span> <span class="va">lags</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      -10       -9       -8       -7       -6       -5       -4       -3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4.993314 4.988131 4.985059 4.985194 5.130505 5.133889 5.125356 5.120978 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4.999962 4.993003 4.995222 4.995344 5.147024 5.141590 5.140739 5.136341 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       -2       -1        0        1        2        3        4        5 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5.120084 5.119594 5.119594 5.119594 5.120177 5.121040 5.125480 5.130071 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5.137842 5.135579 5.135579 5.135579 5.136183 5.136404 5.140863 5.143714 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        6        7        8        9       10       11       12       13 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5.131867 4.980106 4.981731 4.988115 4.991903 4.998527 4.996337 5.004096 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5.149050 4.999075 4.997191 4.992986 5.002092 5.001638 5.010102 5.010770 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       14       15       16       17       18       19       20       21 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5.007288 5.126603 5.125768 5.132465 5.135320 5.139722 5.140392 5.142012 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5.011519 5.146876 5.141826 5.146757 5.152094 5.152936 5.155416 5.158851 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       22       23       24       25       26       27       28       29 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5.146356 5.147014 5.146989 5.151418 4.997510 4.998788 5.009308 5.015651 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5.163217 5.165698 5.167500 5.166540 5.012652 5.010329 5.015428 5.019965 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       30 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5.011882 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5.027103 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"miType")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "I(X;Y;Z;...;N)"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"lags")</span>
@@ -209,7 +209,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

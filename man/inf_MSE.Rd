@@ -21,7 +21,6 @@ inf_MSE(
   scaleMax = floor(NROW(y)/10),
   scaleS = NA,
   overlap = 0,
-  dataMin = 4,
   relativeEntropy = FALSE,
   doPlot = FALSE,
   returnPlot = FALSE,
@@ -59,9 +58,9 @@ inf_MSE(
 
 \item{scaleMin}{Minimum scale (in data points) to use for log-log regression (default = \code{4})}
 
-\item{scaleMax}{Maximum scale (in data points) to use for log-log regression. This value will be ignored if \code{dataMin} is not \code{NA}, in which case bins of size \verb{< dataMin} will be removed (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
+\item{scaleMax}{Maximum scale (in data points) to use for log-log regression (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
 
-\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} will be ignored (default = \code{NA})}
 
 \item{overlap}{A number in \verb{[0 ... 1]} representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
 

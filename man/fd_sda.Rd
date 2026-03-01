@@ -14,7 +14,6 @@ fd_sda(
   scaleMin = 4,
   scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
   scaleResolution = log2(scaleMax) - log2(scaleMin),
-  dataMin = NA,
   scaleS = NA,
   overlap = 0,
   doPlot = FALSE,
@@ -41,12 +40,11 @@ fd_sda(
 
 \item{scaleMin}{Minimum scale (in data points) to use for log-log regression (default = \code{4})}
 
-\item{scaleMax}{Maximum scale (in data points) to use for log-log regression. This value will be ignored if \code{dataMin} is not \code{NA}, in which case bins of size \verb{< dataMin} will be removed (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
+\item{scaleMax}{Maximum scale (in data points) to use for log-log regression (default = \code{stats::nextn(floor(NROW(y)/4), factors = 2)})}
 
-\item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculated as: \code{seq(scaleMin, scaleMax, length.out = scaleResolution)} (default =  \code{round(log2(scaleMax-scaleMin))}).
-#' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if \code{length(y) = 1024} and \code{dataMin = 4}, the maximum scale used to calculate the slope will be \code{1024 / 4 = 256}. This value will take precedence over the \code{scaleMax} (default = \code{NA})}
+\item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculated as: \code{seq(scaleMin, scaleMax, length.out = scaleResolution)} (default =  \code{round(log2(scaleMax-scaleMin))}).}
 
-\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} and \code{dataMin} will be ignored (default = \code{NA})}
+\item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} will be ignored (default = \code{NA})}
 
 \item{overlap}{A number in \verb{[0 ... 1]} representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
 

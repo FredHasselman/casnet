@@ -14,7 +14,7 @@ irn_crossTriples(Ax, Ay, Axy)
 \item{Axy}{Adjacency matrix xy}
 }
 \value{
-list object with triasngles and triads
+list object with triangles and triads
 }
 \description{
 Cross Triples

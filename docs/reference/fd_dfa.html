@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +55,6 @@
 <span>  scaleMin <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  scaleMax <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/nextn.html" class="external-link">nextn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
 <span>  scaleResolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMax</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMin</span><span class="op">)</span>,</span>
-<span>  dataMin <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  scaleS <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -109,16 +108,15 @@
 
 
 <dt id="arg-scalemax">scaleMax<a class="anchor" aria-label="anchor" href="#arg-scalemax"></a></dt>
-<dd><p>Maximum scale (in data points) to use for log-log regression. This value will be ignored if <code>dataMin</code> is not <code>NA</code>, in which case bins of size <code>&lt; dataMin</code> will be removed (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
+<dd><p>Maximum scale (in data points) to use for log-log regression (default = <code>stats::nextn(floor(NROW(y)/4), factors = 2)</code>)</p></dd>
 
 
 <dt id="arg-scaleresolution">scaleResolution<a class="anchor" aria-label="anchor" href="#arg-scaleresolution"></a></dt>
-<dd><p>The scales at which detrended fluctuation will be evaluated are calculated as: <code>seq(scaleMin, scaleMax, length.out = scaleResolution)</code> (default =  <code>round(log2(scaleMax-scaleMin))</code>).
-#' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if <code>length(y) = 1024</code> and <code>dataMin = 4</code>, the maximum scale used to calculate the slope will be <code>1024 / 4 = 256</code>. This value will take precedence over the <code>scaleMax</code> (default = <code>NA</code>)</p></dd>
+<dd><p>The scales at which detrended fluctuation will be evaluated are calculated as: <code>seq(scaleMin, scaleMax, length.out = scaleResolution)</code> (default =  <code>round(log2(scaleMax-scaleMin))</code>).</p></dd>
 
 
 <dt id="arg-scales">scaleS<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
-<dd><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> and <code>dataMin</code> will be ignored (default = <code>NA</code>)</p></dd>
+<dd><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> will be ignored (default = <code>NA</code>)</p></dd>
 
 
 <dt id="arg-overlap">overlap<a class="anchor" aria-label="anchor" href="#arg-overlap"></a></dt>
@@ -168,12 +166,12 @@ A list object containing:</p><ul><li><p>A data matrix <code>PLAW</code> with col
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Fluctuation Analyses:
-<code><a href="fd_RR.html">fd_RR</a>()</code>,
-<code><a href="fd_allan.html">fd_allan</a>()</code>,
-<code><a href="fd_mfdfa.html">fd_mfdfa</a>()</code>,
-<code><a href="fd_psd.html">fd_psd</a>()</code>,
-<code><a href="fd_sda.html">fd_sda</a>()</code>,
-<code><a href="fd_sev.html">fd_sev</a>()</code></p></div>
+<code><a href="fd_RR.html">fd_RR()</a></code>,
+<code><a href="fd_allan.html">fd_allan()</a></code>,
+<code><a href="fd_mfdfa.html">fd_mfdfa()</a></code>,
+<code><a href="fd_psd.html">fd_psd()</a></code>,
+<code><a href="fd_sda.html">fd_sda()</a></code>,
+<code><a href="fd_sev.html">fd_sev()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -220,7 +218,7 @@ A list object containing:</p><ul><li><p>A data matrix <code>PLAW</code> with col
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Full range (n = 7)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Slope = 1.49 | FD = 1.07 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Exclude large bin sizes (n = 7)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Exclude large bin sizes (n = 6)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Slope = 1.49 | FD = 1.07 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Detrending: poly</span>
@@ -257,7 +255,7 @@ A list object containing:</p><ul><li><p>A data matrix <code>PLAW</code> with col
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

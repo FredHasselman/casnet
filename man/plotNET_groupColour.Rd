@@ -36,7 +36,7 @@ plotNET_groupColour(
 
 \item{doPlot}{Plot the igraph object}
 
-\item{returnPlot}{return the \link{ggplot2} object}
+\item{returnPlot}{return the \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} object}
 }
 \value{
 An igraph object with vertices and/or edges coloured by groups listed in \code{groups}

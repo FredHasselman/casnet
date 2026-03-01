@@ -105,10 +105,10 @@ plotTS_multi <- function(df,timeVec = NA, groupVec = NA, useVarNames = TRUE, col
 
 
 
-  g <- ggplot2::ggplot(pdat, ggplot2::aes_(x=~time, y = ~y_offset, group = ~timeSeries))
+  g <- ggplot2::ggplot(pdat, ggplot2::aes(x=time, y = y_offset, group = timeSeries))
 
   if(useRibbon){
-    g <- g + geom_ribbon(aes_(ymin = ~ymin, ymax = ~y_offset, fill = ~ycol, colour = ~ycol)) +
+    g <- g + geom_ribbon(aes(ymin = ymin, ymax = y_offset, fill = ycol, colour = ycol)) +
       scale_fill_manual(values = c("0"="grey30","1"="grey70"), guide = "none") +
       scale_color_manual(values = c("0"="grey90","1"="grey90"), guide = "none")
   } else {
@@ -665,13 +665,13 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
                                        rep(fd.OUT[[3]]$method,NROW(fd.OUT[[3]]$fitlm2$fitted.values))))
   }
 
-  g <- ggplot2::ggplot(data.frame(fd.OUT$PLAW), ggplot2::aes(x=size,y=bulk), na.rm=TRUE) +
+  g <- ggplot2::ggplot(data.frame(fd.OUT$PLAW), ggplot2::aes(x=size,y=bulk)) +
     ggplot2::geom_point() +
     ggplot2::ggtitle(label = title, subtitle = subtitle)
 
   # if(logBase=="e"){
   # evalT<-
-  #   paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
+  #   paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes(x=x,y=y, colour = Method, fill = Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
   #     ggplot2::scale_y_continuous(name = "',paste0(ylabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(e^.x)), trans = scales::log_trans(base = ',logBaseNum,')) + ggplot2::annotation_logticks()')
   #
   # eval(parse(text = evalT))
@@ -679,7 +679,7 @@ plotFD_loglog <- function(fd.OUT, title="", subtitle="", xlabel="Bin size", ylab
   #
   # if(logBase=="2"){
   #   evalT<-
-  #     paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes_(x=~x,y=~y, colour = ~Method, fill = ~Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
+  #     paste0('g <- g + ggplot2::geom_smooth(data = logSlopes,  ggplot2::aes(x=x,y=y, colour = Method, fill = Method), method="lm", alpha = .2) + ggplot2::scale_x_continuous(name = "',paste0(xlabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) +
   #            ggplot2::scale_y_continuous(name = "',paste0(ylabel," (",logFormat,")"),'", breaks = scales::trans_breaks(',logFormat,', function(x) ',logBaseNum,'^x), labels =  scales::trans_format(',logFormat,',scales::math_format(2^.x)), trans = scales::log_trans(base = ',logBaseNum,')) + ggplot2::annotation_logticks()')
   #
   #   eval(parse(text = evalT))
@@ -868,10 +868,10 @@ plotSUR_hist <- function(surrogateValues,
     # }
 
 
-    g <- ggplot2:: ggplot(df.dist,aes_(x=~rank_dist_bin)) +
+    g <- ggplot2:: ggplot(df.dist,aes(x=rank_dist_bin)) +
       geom_histogram(breaks= seq(1,(max(df.dist$rank_dist_bin)+1))-.5,colour="white") +
       geom_vline(xintercept = dist_lines, colour="steelblue") +
-      geom_point(data=obs, aes_(x=~x, y=~y,colour=~obs), size=5) +
+      geom_point(data=obs, aes(x=x, y=y,colour=obs), size=5) +
       scale_x_continuous(name = measureName, breaks = breaks, labels = labels) +
       scale_color_manual("Observed",values="red", breaks="obs", labels = pLabel) +
       ggtitle(label = title, subtitle = paste0(nsides,"-sided test with ",length(surrogateValues)," surrogate values. The observed value has (max) rank ",rank_obs,".")) +
@@ -992,14 +992,14 @@ plotRED_acf <- function(y, Lmax = max(round(NROW(y)/4),10),alpha=.05 ,doPlot = T
   groupColours <-  scales::brewer_pal(palette="RdBu")(11)
   cols <- c("yes"=groupColours[9],"no"=groupColours[3])
 
-  g <- ggplot2::ggplot(corfun,ggplot2::aes_(x=~lag,y=~r)) +
+  g <- ggplot2::ggplot(corfun,ggplot2::aes(x=lag,y=r)) +
     ggplot2::geom_hline(yintercept = 0, colour="grey",size=1) +
-    ggplot2::geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),ggplot2::aes_(x=~x,y=~y),colour="grey50") +
+    ggplot2::geom_line(data = data.frame(x=c(0,corfun$lag[1]),y=c(1,corfun$r[1])),ggplot2::aes(x=x,y=y),colour="grey50") +
     ggplot2::geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21) +
-    ggplot2::geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
+    ggplot2::geom_ribbon(aes(ymin=~ciL,ymax=ciU),fill="grey70",colour="grey50") +
     ggplot2::geom_path(colour="grey50") +
-    ggplot2::geom_point(aes_(fill = ~sig, colour=~sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
-    ggplot2::facet_grid(type ~.) +
+    ggplot2::geom_point(aes(fill = sig, colour=sig),pch=21, cex=(1 + .01*(NROW(y)/Lmax))) +
+    ggplot2::facet_grid(type ~ .) +
     ggplot2::scale_fill_manual(bquote(p < .(siglevel)),values = cols,
                                labels =  list("yes"= expression(rho != 0),
                                               "no" = expression(rho == 0))) +
@@ -1067,17 +1067,17 @@ plotRED_mif <- function(mif.OUT = NULL,
                            mi = c(mif.OUT),
                            type = c(rep(attributes(mif.OUT)$miType,NROW(mif.OUT)))) #,rep(attributes(mifunPMIF)$miType,NROW(mifunPMIF))))
 
-  g <- ggplot2::ggplot(mifun_long,ggplot2::aes_(x=~lag,y=~mi)) +
+  g <- ggplot2::ggplot(mifun_long,ggplot2::aes(x=lag,y=mi)) +
     ggplot2::geom_hline(yintercept = 0, colour="grey",size=1) +
-    #  ggplot2::geom_line(data = data.frame(x=c(0,mifun_long$lag[1]),y=c(1,mifun_long$mi[1])),ggplot2::aes_(x=~x,y=~y),colour="grey50")
+    #  ggplot2::geom_line(data = data.frame(x=c(0,mifun_long$lag[1]),y=c(1,mifun_long$mi[1])),ggplot2::aes(x=x,y=y),colour="grey50")
 
     # if(length(lags)<=50){
     #  g <- g + ggplot2::geom_point(x=0,y=1,colour=groupColours[10],fill=groupColours[9],size=2,pch=21)
     # }
-    #geom_ribbon(aes_(ymin=~ciL,ymax=~ciU),fill="grey70",colour="grey50") +
+    #geom_ribbon(aes(ymin=ciL,ymax=ciU),fill="grey70",colour="grey50") +
     ggplot2::geom_path(colour="grey50") +
     ggplot2::geom_point(pch=21, cex=(1 + .01*(NROW(mifun_long$mi)/nbins))) +
-    ggplot2::facet_grid(type ~.) +
+    ggplot2::facet_grid(type ~ .) +
     # scale_fill_manual(bquote(p < .(siglevel)),values = cols,
     #                   labels =  list("yes"= expression(rho != 0),
     #                                  "no" = expression(rho == 0))) +
@@ -1227,8 +1227,6 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   }
 
 
-
-
   if(PlotMeanDC){
     df_win$meanDC <- rowMeans(as.matrix(df_win[-c("time"%ci%df_win)]), na.rm = TRUE)
     colnames(df_win)[colnames(df_win)%in%"meanDC"]<-"Mean DC"
@@ -1242,14 +1240,16 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
     }
   }
 
-  dfp <- tidyr::gather(df_win, key = "variable", value = "value", c(-.data$time), factor_key = colOrder)
+  dfp <- df_win |> tidyr::gather(key = "variable", value = "value", c(-time), factor_key = colOrder)
   dfp$time <- as.numeric(dfp$time)
 
-  g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
+
+
+  g <- ggplot2::ggplot(dfp, ggplot2::aes(x=time, y=variable, fill=value)) +
        ggplot2::geom_raster(interpolate = FALSE) +
        ggplot2::scale_fill_gradient2(resVariable,low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
        ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, size=.1) +
-       ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="steelblue", alpha=.9, size=.1) +
+       ggplot2::geom_hline(yintercept=length(unique(dfp$variable))-.5, colour="steelblue", alpha=.9, size=.1) +
        ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
 
   if(trimFirstWin){
@@ -1396,10 +1396,10 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
   }
 
 
-  g <- ggplot2::ggplot(dfp, ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
+  g <- ggplot2::ggplot(dfp, ggplot2::aes(x=time, y=variable, fill=value)) +
     ggplot2::geom_raster(interpolate = FALSE) +
     ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, size=.1) +
-    ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="grey90", alpha=1, size=.1) +
+    ggplot2::geom_hline(yintercept=length(unique(dfp$variable))-.5, colour="grey90", alpha=1, size=.1) +
     ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
 
 
@@ -1579,12 +1579,12 @@ plotDC_lvl <-  function(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE, co
 
   cols <- eval(parse(text=paste0("c('Sum of Sig. DC peaks' = 'black','",levelName,"' = 'red3', 'Sig. CCP' = 'steelblue')")))
 
-  g <- ggplot(lvl, aes_(x = ~time, y = ~DC, colour = ~variable)) +
+  g <- ggplot(lvl, aes(x = time, y = DC, colour = variable)) +
     #geom_path(data = lvl, aes(x= time, y = lvl), colour = "red3", size = 1)  +
     geom_path(size=1) +
-    geom_vline(data = ccp, aes_(xintercept=~ccp), colour = "steelblue") +
-    geom_point(aes_(y=~y1), pch = 25, fill = "steelblue", size =3, show.legend = FALSE) +
-    geom_point(aes_(y=~y2), pch = 24, fill = "steelblue", size =3, show.legend = FALSE) +
+    geom_vline(data = ccp, aes(xintercept=ccp), colour = "steelblue") +
+    geom_point(aes(y=y1), pch = 25, fill = "steelblue", size =3, show.legend = FALSE) +
+    geom_point(aes(y=y2), pch = 24, fill = "steelblue", size =3, show.legend = FALSE) +
     scale_y_discrete(ylabel, breaks = NULL, labels = "", expand = c(0,0)) +
     scale_x_continuous(xlabel,
                        breaks = majorBreaks,
@@ -1615,7 +1615,7 @@ plotDC_lvl <-  function(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE, co
   #                     labels = c("0","Sig. DC level","5","Sig. CCP"))
   #
   #
-  # g <- ggplot2::ggplot(dfp[complete.cases(dfp),], ggplot2::aes_(x=~time, y=~variable, fill=~value)) +
+  # g <- ggplot2::ggplot(dfp[complete.cases(dfp),], ggplot2::aes(x=time, y=variable, fill=value)) +
   #   ggplot2::geom_raster(interpolate = FALSE) +
   #   ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, size=.1) +
   #   ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="grey90", alpha=1, size=.1) +
@@ -1686,7 +1686,7 @@ plotMRN_win <- function(df_mrn,
       dplyr::select(dplyr::one_of(c("Time",vars))) %>%
       tidyr::pivot_longer(-t,names_to = "measure",values_to = "y")
 
-    g <-  ggplot2::ggplot(data = df_long, aes_(x= ~Time, y = ~y, colour = ~measure))
+    g <-  ggplot2::ggplot(data = df_long, aes(x= Time, y = y, colour = measure))
 
     if(plotSD){
 
@@ -1699,11 +1699,11 @@ plotMRN_win <- function(df_mrn,
       df_long$ymin <- (df_long$y - df_longSD$y_SD)
       df_long$ymax <- (df_long$y + df_longSD$y_SD)
 
-      g <- g + ggplot2::geom_ribbon(data = df_long, aes_(ymin = ~ymin, ymax = ~ymax, fill = ~measure), colour = "white",  alpha = .3)
+      g <- g + ggplot2::geom_ribbon(data = df_long, aes(ymin = ymin, ymax = ymax, fill = measure), colour = "white",  alpha = .3)
     }
 
     g <- g + geom_line() +
-      facet_grid(measure~., scales="free_y") +
+      facet_grid(measure ~ ., scales="free_y") +
       scale_x_continuous(limits = c(0,max(df$Time)),expand = c(0.1,0.1)) +
       scale_fill_manual(values = cols) +
       scale_colour_manual(values = cols) +
@@ -1805,7 +1805,7 @@ plotMRN_win <- function(df_mrn,
 #' @param excludePhases Exclude Phases by their name (variable `phase_name`). Leave empty to include all Phases (after the other exclusion arguments) (default = `""`)
 #' @param alphaDensity Alpha value for the density plots
 #' @param showPhaseSize Show the number of states in each phase in the labels (default = TRUE)
-#' @param splitFacets Integer value to indicate if sets of phases should be displayed in different facets? (default = `NA`)
+#' @param splitFacets Integer value to indicate if sets of phases should be displayed in different facets? Pass an integer equalt to, or larger than the number of phases found to display all phases for which a density can be calculated (default = `NA`)
 #'
 #' @return data frame with phase series.
 #'
@@ -1923,6 +1923,9 @@ plotRN_phaseDensities <- function(phaseOutput,
       eval(parse(text=paste0("Phases_long$facets <- case_match(Phases_long$phase_name,",paste0(facets,collapse=","),")")))
       splitFacets <- TRUE
 
+    } else {
+      Phases_long$facets <- Phases_long$phase_name
+      splitFacets <- TRUE
     }
   } else {
     splitFacets <- FALSE
@@ -1950,7 +1953,7 @@ plotRN_phaseDensities <- function(phaseOutput,
   }
 
   if(splitFacets){
-    pd <- pd + facet_wrap(facets~.)
+    pd <- pd + facet_wrap(facets ~ .)
   }
 
   pd <- pd +
@@ -2718,8 +2721,8 @@ make_spiral_graph <- function(g,
     }
   }
 
-  gg <- ggplot(gNodes,aes_(x=~V1,y=~V2)) +
-    geom_curve(data=gEdges, aes_(x = ~from.x,
+  gg <- ggplot(gNodes,aes(x=~V1,y=~V2)) +
+    geom_curve(data=gEdges, aes(x = ~from.x,
                                  xend = ~to.x,
                                  y = ~from.y,
                                  yend = ~to.y,
@@ -2729,7 +2732,7 @@ make_spiral_graph <- function(g,
                angle = angle,
                size = gEdges$width * scaleEdgeSize,
                alpha = alphaE) +
-    geom_point(aes_(fill = ~labels, size = ~size), pch=21, colour = vBc, alpha = alphaV) +
+    geom_point(aes(fill = ~labels, size = ~size), pch=21, colour = vBc, alpha = alphaV) +
     ggtitle(label = title, subtitle = subtitle) +
     scale_fill_manual(epochLabel, values = unique(gNodes$colour)) +
     scale_size(sizeLabel, range = scaleVertexSize) +
@@ -2869,7 +2872,7 @@ getColours <- function(Ncols, continuous = FALSE, Dcols = c(0,1)){
 # Empty plot
 gg_plotHolder <- function(){
   return(ggplot2::ggplot() +
-           ggplot2::geom_blank(ggplot2::aes_(1,1)) +
+           ggplot2::geom_blank(ggplot2::aes(1,1)) +
            ggplot2::theme(line = element_blank(),
                           text  = element_blank(),
                           title = element_blank(),
@@ -3100,51 +3103,51 @@ plotRN_phaseProfile <- function(phaseOutput,
   }
 
   pp <- ggplot(data = Phases_long,
-               aes_(x = ~Dimension,
-                    y = ~Value,
-                    color = ~phase_name,
-                    alpha = ~alpha,
-                    group = ~states_time)) +
+               aes(x = Dimension,
+                    y = Value,
+                    color = phase_name,
+                    alpha = alpha,
+                    group = states_time)) +
     scale_size(range = c(1,4)) +
     scale_alpha_identity() +
-    geom_point(aes_(size = ~psize)) +
+    geom_point(aes(size = psize)) +
     geom_line()+
-    facet_wrap(~ phaseName) +
+    facet_wrap( ~ phaseName) +
     scale_color_manual(values = epochColours)
 
 
   if(plotCentroid){
     if(returnCentroid%in%c("mean.sd","centroid")){
 
-      pp <- pp + geom_line(data = outMeans, aes_(x = ~Dimension, y = ~Mean, group = ~phaseName), inherit.aes = FALSE)
+      pp <- pp + geom_line(data = outMeans, aes(x = Dimension, y = Mean, group = phaseName), inherit.aes = FALSE)
 
       if(returnCentroid%in%c("mean.sd")){
 
         # if(returnCentroid%in%"centroid"){
         #   pp <- pp +
         #     geom_line(data = outMeans,
-        #                        aes_(x = ~Dimension, y = ~Mean, color = ~phaseName, group = ~phaseName), inherit.aes = FALSE)
+        #                        aes(x = Dimension, y = Mean, color = phaseName, group = phaseName), inherit.aes = FALSE)
         # } else {
 
         pp <- pp +
           geom_linerange(data = outMeans,
-                         aes_(x = ~Dimension, y = ~Mean, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+                         aes(x = Dimension, y = Mean, ymin = ymin, ymax = ymax),  inherit.aes = FALSE)
       }
 
       pp <- pp +
         geom_point(data = outMeans,
-                   aes_(x = ~Dimension, y = ~Mean, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+                   aes(x = Dimension, y = Mean, fill = phase_name, group = phaseName), pch = 21, inherit.aes = FALSE) +
         scale_fill_manual(values = epochColours)
 
     } else {
 
       pp <- pp +
         geom_linerange(data = outMeans,
-                       aes_(x = ~Dimension, y = ~Median, ymin = ~ymin, ymax = ~ymax),  inherit.aes = FALSE)
+                       aes(x = Dimension, y = Median, ymin = ymin, ymax = ymax),  inherit.aes = FALSE)
 
       pp <- pp +
         geom_point(data = outMeans,
-                   aes_(x = ~Dimension, y = ~Median, fill = ~phase_name, group = ~phaseName), pch = 21, inherit.aes = FALSE) +
+                   aes(x = Dimension, y = Median, fill = phase_name, group = phaseName), pch = 21, inherit.aes = FALSE) +
         scale_fill_manual(values = epochColours)
     }
   }
@@ -3245,9 +3248,9 @@ plotRN_phaseSeries <- function(phaseOutput,
 
   out$maxState_strength[is.na(out$maxState_strength)] <- min(out$maxState_strength, na.rm = TRUE)/2
 
-  p <- ggplot(out, aes_(x = ~states_time, y = ~phase_name, fill = ~phase_name, group = 1)) +
+  p <- ggplot(out, aes(x = states_time, y = phase_name, fill = phase_name, group = 1)) +
     geom_line(colour = "grey60") +
-    geom_point(aes_(size = ~maxState_strength+1), pch=21, alpha = .8) +
+    geom_point(aes(size = maxState_strength+1), pch=21, alpha = .8) +
     scale_fill_manual(values = epochColours, guide = "none") +
     scale_x_continuous("Time", expand = c(.05,.2)) +
     scale_y_discrete("Phase") +
@@ -3259,7 +3262,7 @@ plotRN_phaseSeries <- function(phaseOutput,
     dplyr::count(phase_name) %>%
     dplyr::mutate(pct = n/NROW(out))
 
-  h <- ggplot(tmp, aes_(y = ~phase_name, fill = ~phase_name, x = ~pct, label = scales::percent(pct))) +
+  h <- ggplot(tmp, aes(y = phase_name, fill = phase_name, x = pct, label = scales::percent(pct))) +
     geom_col(position= "dodge") +
     geom_label(position = position_dodge(width = .9),
                vjust = 0.5,
@@ -3527,7 +3530,7 @@ plotRN_phaseProjection <- function(RNdist,
 #   g <- simplify(g)
 #
 #   # Remove vertices that were used in the search query
-#   Vrem <- which(igraph::V(g)$name %in% c("~dev~","~dys~","~sld~","development","children","dyslexia"))
+#   Vrem <- which(igraph::V(g)$name %in% c("dev","~dys~","~sld~","development","children","dyslexia"))
 #   g <- (g - igraph::V(g)$name[Vrem])
 #
 #   # Set colors and sizes for vertices

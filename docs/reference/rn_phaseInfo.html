@@ -11,7 +11,7 @@ or with high-frequency, are regions of attraction for the system."><meta propert
 
     <a class="navbar-brand me-2" href="../index.html">casnet</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,7 +106,7 @@ or with high-frequency, are regions of attraction for the system.</p>
 
 
 <dt id="arg-selectionmethod">selectionMethod<a class="anchor" aria-label="anchor" href="#arg-selectionmethod"></a></dt>
-<dd><p>How will the most "important" node be selected? Should be the name of an <a href="https://r.igraph.org/reference/aaa-igraph-package.html" class="external-link">igraph</a> function that returns local (vertex) measures (default = <code>"degree"</code>)</p></dd>
+<dd><p>How will the most "important" node be selected? Should be the name of an igraph::igraph function that returns local (vertex) measures (default = <code>"degree"</code>)</p></dd>
 
 
 <dt id="arg-inverseweight">inverseWeight<a class="anchor" aria-label="anchor" href="#arg-inverseweight"></a></dt>
@@ -202,7 +202,7 @@ or with high-frequency, are regions of attraction for the system.</p>
 
 
 <dt id="arg-splitfacets">splitFacets<a class="anchor" aria-label="anchor" href="#arg-splitfacets"></a></dt>
-<dd><p>Integer value to indicate if sets of phases should be displayed in different facets? (default = <code>NA</code>)</p></dd>
+<dd><p>Integer value to indicate if sets of phases should be displayed in different facets? Pass an integer equalt to, or larger than the number of phases found to display all phases for which a density can be calculated (default = <code>NA</code>)</p></dd>
 
 
 <dt id="arg-silent">silent<a class="anchor" aria-label="anchor" href="#arg-silent"></a></dt>
@@ -230,13 +230,13 @@ The data frame contains the phase name, number and size, as well as properties o
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other Distance matrix operations (recurrence network):
-<code><a href="mat_di2bi.html">mat_di2bi</a>()</code>,
-<code><a href="mat_di2ch.html">mat_di2ch</a>()</code>,
-<code><a href="mat_di2we.html">mat_di2we</a>()</code>,
-<code><a href="rn.html">rn</a>()</code>,
-<code><a href="rn_phases.html">rn_phases</a>()</code>,
-<code><a href="rn_plot.html">rn_plot</a>()</code>,
-<code><a href="rn_recSpec.html">rn_recSpec</a>()</code></p></div>
+<code><a href="mat_di2bi.html">mat_di2bi()</a></code>,
+<code><a href="mat_di2ch.html">mat_di2ch()</a></code>,
+<code><a href="mat_di2we.html">mat_di2we()</a></code>,
+<code><a href="rn.html">rn()</a></code>,
+<code><a href="rn_phases.html">rn_phases()</a></code>,
+<code><a href="rn_plot.html">rn_plot()</a></code>,
+<code><a href="rn_recSpec.html">rn_recSpec()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -246,25 +246,75 @@ The data frame contains the phase name, number and size, as well as properties o
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"manyAnalystsESM"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">manyAnalystsESM</span><span class="op">[</span><span class="fl">4</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">RN</span> <span class="op">&lt;-</span> <span class="fu"><a href="rn.html">rn</a></span><span class="op">(</span>y1 <span class="op">=</span> <span class="va">df</span>, doEmbed <span class="op">=</span> <span class="cn">FALSE</span>, weighted <span class="op">=</span> <span class="cn">TRUE</span>, weightedBy <span class="op">=</span> <span class="st">"si"</span>, emRad <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> `emRad` was set to NA due to the value `weighted = TRUE`, if you want an unthresholded matrix set `weighted = FALSE`</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># This returns 6 phases which have minimally 2 states</span></span></span>
 <span class="r-in"><span><span class="fu">rn_phaseInfo</span><span class="op">(</span><span class="va">RN</span>, doPhaseProfilePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states with high similarity will be considered a phase:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states with high similarity will be considered a phase</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selectionMethod = degree</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> maxPhases = 122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> minStatesinPhase = 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> maxStatesinPhase = 122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> inverseWeight = TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states will be grouped as a 'Phase ##', as transients (unstable phases) 'Transient ##', phase neighbours (state connects to more than 1 identified phase) 'PhaseNH ##', singularities (state recurs less often than minStatesinPhase) 'Singularity', or as not recurring 'Nonrecurring'.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Looking for phases...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 76 is template for phase 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 1 is template for phase 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=9 [Phase 01.5] | State at t=37 [Phase 01.9] | State at t=40 [Phase 01.10] | State at t=48 [Phase 01.15] | State at t=122 [Phase 01.20] &gt;&gt; will be labelled as Transient(s)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 17 is template for phase 3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=4 [Phase 01.2] | State at t=10 [Phase 01.6] | State at t=13 [Phase 01.7] | State at t=35 [Phase 01.8] | State at t=46 [Phase 01.13] | State at t=47 [Phase 01.14] | State at t=122 [Phase 01.20] &gt;&gt; will be labelled as Transient(s)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Found 11 phases with at least 2 states.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 75 is template for phase 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=100 [Phase 01.18] | State at t=119 [Phase 01.19] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 38 is template for phase 5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=2 [Phase 02.2] | State at t=36 [Phase 02.5] | State at t=55 [Phase 02.9] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 54 is template for phase 6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=2 [Phase 02.2] | State at t=43 [Phase 02.6] | State at t=55 [Phase 02.9] | State at t=107 [Phase 02.11] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 85 is template for phase 7 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 7 is template for phase 8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=60 [Phase 07.3] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 50 is template for phase 9 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=43 [Phase 02.6] | State at t=45 [Phase 02.7] | State at t=52 [Phase 02.8] | State at t=67 [Phase 02.10] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 59 is template for phase 10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 39 is template for phase 11 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=4 [Phase 01.2] | State at t=13 [Phase 01.7] | State at t=47 [Phase 01.14] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 34 is template for phase 12 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=20 [Phase 01.18] | State at t=36 [Phase 02.5] | State at t=100 [Phase 07.1] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 89 is template for phase 13 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=16 [Phase 02.3] | State at t=43 [Phase 02.6] | State at t=67 [Phase 02.10] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 106 is template for phase 14 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=79 [Phase 04.2] | State at t=105 [Phase 04.5] | State at t=116 [Phase 04.6] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 51 is template for phase 15 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=2 [Phase 02.2] | State at t=117 [Phase 06.3] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 78 is template for phase 16 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 115 is template for phase 17 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=105 [Phase 04.5] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Found 17 phases with at least 2 states.</span>
 <span class="r-plt img"><img src="rn_phaseInfo-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Use min. number of states as the extraction criterion</span></span></span>
@@ -272,21 +322,27 @@ The data frame contains the phase name, number and size, as well as properties o
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states with high similarity will be considered a phase:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states with high similarity will be considered a phase</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> selectionMethod = degree</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> maxPhases = 122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> minStatesinPhase = 7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> maxStatesinPhase = 122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> inverseWeight = TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Recurring states will be grouped as a 'Phase ##', as transients (unstable phases) 'Transient ##', phase neighbours (state connects to more than 1 identified phase) 'PhaseNH ##', singularities (state recurs less often than minStatesinPhase) 'Singularity', or as not recurring 'Nonrecurring'.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ~~~o~~o~~casnet~~o~~o~~~</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Phases with less than 7 states will be considered singularities.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dplyr::filter(tmp_stray, !is.na(phase_num)):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `!is.na(phase_num)`.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'phase_num' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Looking for phases...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 76 is template for phase 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 1 is template for phase 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=9 [Phase 01.5] | State at t=37 [Phase 01.9] | State at t=40 [Phase 01.10] | State at t=48 [Phase 01.15] | State at t=122 [Phase 01.20] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 17 is template for phase 3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=4 [Phase 01.2] | State at t=10 [Phase 01.6] | State at t=13 [Phase 01.7] | State at t=35 [Phase 01.8] | State at t=46 [Phase 01.13] | State at t=47 [Phase 01.14] | State at t=122 [Phase 01.20] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> State at time 75 is template for phase 4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...Found state(s) already assigned to a phase in a previous iteration step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...State at t=100 [Phase 01.18] | State at t=119 [Phase 01.19] &gt;&gt; will be labelled as Transient(s)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Found 4 phases with at least 7 states.</span>
+<span class="r-plt img"><img src="rn_phaseInfo-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -299,7 +355,7 @@ The data frame contains the phase name, number and size, as well as properties o
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

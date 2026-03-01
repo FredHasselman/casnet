@@ -27,9 +27,9 @@ ts_slopes(
 
 \item{maxSlopes}{Maximum number of levels in one series (default = floor(max(NROW(y), na.rm = TRUE)/minSlopeDuration))}
 
-\item{method}{The partitioning method to use, see the manual pages of \link{rpart} for details.}
+\item{method}{The partitioning method to use, see the manual pages of \link[rpart:rpart]{rpart::rpart} for details.}
 
-\item{minChange}{After the call to \link{rpart}, adjust detected slope value to a minimum absolute change in \code{y}. If a slope value is smaller than \code{minChange}, the previous slope will be continued. Set e.g. to \code{sd(diff(y), na.rm = TRUE)}. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{NA})}
+\item{minChange}{After the call to \link[rpart:rpart]{rpart::rpart}, adjust detected slope value to a minimum absolute change in \code{y}. If a slope value is smaller than \code{minChange}, the previous slope will be continued. Set e.g. to \code{sd(diff(y), na.rm = TRUE)}. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{NA})}
 
 \item{doSlopePlot}{Should a plot with the original series and the levels be produced? (default = \code{FALSE})}
 

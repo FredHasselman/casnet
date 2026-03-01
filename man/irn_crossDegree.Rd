@@ -10,7 +10,7 @@ irn_crossDegree(Axy)
 \item{Axy}{Adjacency matrix xy}
 }
 \value{
-list object wih local and global cross-degree
+list object with local and global cross-degree
 }
 \description{
 Cross Degree

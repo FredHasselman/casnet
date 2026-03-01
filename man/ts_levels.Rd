@@ -39,11 +39,11 @@ ts_levels(
 
 \item{maxLevels}{Approximately the maximum number of levels tht will be detectd. The value indicates the node-depth of the final tree with the root node being depth 0, see \code{\link[rpart:rpart.control]{rpart::rpart.control()}} argument \code{maxdepth} (default = 30)}
 
-\item{method}{The partitioning method to use, see the manual pages of \link{rpart} for details.}
+\item{method}{The partitioning method to use, see the manual pages of \link[rpart:rpart]{rpart::rpart} for details.}
 
 \item{crossValidations}{The number of cross-validations (default = \code{10})}
 
-\item{minChange}{After the call to \link{rpart}, adjust detected level changes to a minimum absolute change in \code{y}, e.g. \code{sd(y)} or in case of a discrete scale, a minimal scale change that represents significant level change relative to the interpretation of the scale. If a level change is smaller than \code{minChange}, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{NA})}
+\item{minChange}{After the call to \link[rpart:rpart]{rpart::rpart}, adjust detected level changes to a minimum absolute change in \code{y}, e.g. \code{sd(y)} or in case of a discrete scale, a minimal scale change that represents significant level change relative to the interpretation of the scale. If a level change is smaller than \code{minChange}, the previous level will be continued. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{NA})}
 
 \item{returnTrends}{Should stationary trends also be estimated and returned? Unless otherwise specified, the arguments will be the same as for the level detection and argument \code{minChange} will be ignored for trends. This command will just run \code{ts_levels(diff(y))} and add the slope segments and values to the level plot. See \code{examples} on how to create a custom plot (default = \code{FALSE})}
 
@@ -65,9 +65,9 @@ ts_levels(
 
 \item{doTreePlot}{Should a plot of the decision tree be produced. If \code{returnTrends = TRUE} there will be 2 trees. This requires package \href{https://cran.r-project.org/web/packages/partykit/index.html}{partykit}. Use \link[grid:grid.grab]{grid::grid.grab} to grab the tree plot object as a grob (default = \code{FALSE})}
 
-\item{returnTree}{should the tree object from \link{rpart} be returned in the output? (default = \code{FALSE})}
+\item{returnTree}{should the tree object from \link[rpart:rpart]{rpart::rpart} be returned in the output? (default = \code{FALSE})}
 
-\item{returnPlot}{if \code{TRUE} returns the levelplot as a \link{ggplot2} object (default = \code{FALSE})}
+\item{returnPlot}{if \code{TRUE} returns the levelplot as a \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} object (default = \code{FALSE})}
 
 \item{silent}{silent(-ish) mode}
 }

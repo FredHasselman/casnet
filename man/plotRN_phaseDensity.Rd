@@ -29,7 +29,7 @@ plotRN_phaseDensity(
 data frame with phase series.
 }
 \description{
-Create a ridge plot (requires package \link{ggridges})
+Create a ridge plot (requires package \link[ggridges:ggridges-package]{ggridges::ggridges})
 }
 \examples{
 
