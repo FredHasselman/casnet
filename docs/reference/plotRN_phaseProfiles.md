@@ -77,63 +77,57 @@ phase_out <- rn_phaseInfo(RN, returnCentroid = "mean.sd")
 #> 
 #> 
 #> Looking for phases...
-#> State at time 28 is template for phase 1 
-#> State at time 15 is template for phase 2 
-#> State at time 41 is template for phase 3 
-#> State at time 17 is template for phase 4 
-#> State at time 91 is template for phase 5 
+#> State at time 30 is template for phase 1 
+#> State at time 66 is template for phase 2 
+#> State at time 22 is template for phase 3 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=9 [Phase 02.2] | State at t=82 [Phase 02.10] >> will be labelled as Transient(s)
+#> ...State at t=26 [Phase 01.7] | State at t=54 [Phase 01.9] | State at t=59 [Phase 01.11] | State at t=92 [Phase 01.15] >> will be labelled as Transient(s)
 #> 
-#> State at time 65 is template for phase 6 
-#> State at time 5 is template for phase 7 
+#> State at time 7 is template for phase 4 
+#> State at time 32 is template for phase 5 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=33 [Phase 01.5] | State at t=46 [Phase 01.9] | State at t=66 [Phase 01.12] >> will be labelled as Transient(s)
+#> ...State at t=58 [Phase 03.6] >> will be labelled as Transient(s)
 #> 
-#> State at time 76 is template for phase 8 
+#> State at time 69 is template for phase 6 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=1 [Phase 01.1] | State at t=9 [Phase 01.14] | State at t=67 [Phase 02.2] | State at t=98 [Phase 05.4] >> will be labelled as Transient(s)
+#> ...State at t=41 [Phase 02.4] | State at t=74 [Phase 02.8] | State at t=88 [Phase 02.9] | State at t=89 [Phase 02.10] >> will be labelled as Transient(s)
 #> 
-#> State at time 90 is template for phase 9 
+#> State at time 67 is template for phase 7 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=8 [Phase 03.1] | State at t=22 [Phase 03.2] | State at t=63 [Phase 03.10] >> will be labelled as Transient(s)
+#> ...State at t=4 [Phase 02.1] | State at t=12 [Phase 02.6] | State at t=63 [Phase 02.11] | State at t=95 [Phase 04.3] >> will be labelled as Transient(s)
 #> 
-#> State at time 100 is template for phase 10 
+#> State at time 27 is template for phase 8 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=27 [Phase 06.2] | State at t=50 [Phase 06.3] | State at t=79 [Phase 06.6] >> will be labelled as Transient(s)
+#> ...State at t=46 [Phase 05.4] | State at t=62 [Phase 05.6] | State at t=72 [Phase 06.2] >> will be labelled as Transient(s)
 #> 
-#> State at time 42 is template for phase 11 
+#> State at time 3 is template for phase 9 
+#> State at time 34 is template for phase 10 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=58 [Phase 03.7] | State at t=59 [Phase 03.8] | State at t=85 [Phase 03.11] >> will be labelled as Transient(s)
+#> ...State at t=46 [Phase 06.2] | State at t=49 [Phase 08.2] | State at t=80 [Phase 08.3] >> will be labelled as Transient(s)
 #> 
-#> State at time 23 is template for phase 12 
+#> State at time 79 is template for phase 11 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=18 [Phase 04.3] | State at t=68 [Phase 04.6] >> will be labelled as Transient(s)
+#> ...State at t=37 [Phase 03.3] | State at t=58 [Phase 03.6] | State at t=84 [Phase 05.7] >> will be labelled as Transient(s)
 #> 
-#> State at time 70 is template for phase 13 
+#> State at time 78 is template for phase 12 
+#> State at time 94 is template for phase 13 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=61 [Phase 10.1] >> will be labelled as Transient(s)
+#> ...State at t=21 [Phase 04.4] | State at t=42 [Phase 04.7] >> will be labelled as Transient(s)
 #> 
-#> State at time 80 is template for phase 14 
+#> State at time 16 is template for phase 14 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=31 [Phase 04.5] | State at t=95 [Phase 04.8] >> will be labelled as Transient(s)
+#> ...State at t=20 [Phase 02.2] >> will be labelled as Transient(s)
 #> 
-#> State at time 4 is template for phase 15 
-#> State at time 69 is template for phase 16 
+#> State at time 19 is template for phase 15 
+#> State at time 35 is template for phase 16 
+#> State at time 44 is template for phase 17 
+#> State at time 48 is template for phase 18 
 #> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=66 [Phase 01.12] >> will be labelled as Transient(s)
-#> 
-#> State at time 89 is template for phase 17 
-#> ...Found state(s) already assigned to a phase in a previous iteration step:
-#> ...State at t=73 [Phase 06.5] | State at t=87 [Phase 06.7] >> will be labelled as Transient(s)
+#> ...State at t=5 [Phase 09.2] >> will be labelled as Transient(s)
 #> 
 #> 
-#> Found 17 phases with at least 2 states.
+#> Found 18 phases with at least 2 states.
 plotRN_phaseProfiles(phaseOutput = phase_out)
-#> Warning: Removed 2 rows containing missing values or values outside the scale range
-#> (`geom_segment()`).
-#> Warning: Removed 2 rows containing missing values or values outside the scale range
-#> (`geom_segment()`).
 
 
 ```

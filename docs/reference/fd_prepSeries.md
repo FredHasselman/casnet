@@ -16,6 +16,7 @@ fd_prepSeries(
   scaleMax = NA,
   scaleResolution = NA,
   scaleS = NA,
+  Nyquist = TRUE,
   overlap = NA,
   silent = TRUE
 )
@@ -62,6 +63,10 @@ fd_prepSeries(
 - scaleS:
 
   sc
+
+- Nyquist:
+
+  Ny
 
 - overlap:
 

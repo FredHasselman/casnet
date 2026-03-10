@@ -305,6 +305,7 @@ fd_psd <- function(y,
 #' @param scaleResolution sr
 # #' @param dataMin dm
 #' @param scaleS sc
+#' @param Nyquist Ny
 #' @param overlap ov
 #' @param silent si
 #'
@@ -325,6 +326,7 @@ fd_prepSeries <- function(y,
                           scaleResolution = NA,
                          # dataMin = NA,
                           scaleS = NA,
+                          Nyquist = TRUE,
                           overlap = NA,
                           silent = TRUE){
 
@@ -367,18 +369,19 @@ fd_prepSeries <- function(y,
 
 
   if(!all(is.na(scaleS))){
+    if(Nyquist){
     # Nyquist-ish
     if(max(scaleS)>floor(NROW(y)/2)){
-      warning(paste("The maximum bin should be smaller than floor(NROW(y)/2) data points. Changed to",floor(NROW(y)/2)))
+      warning(paste("The maximum bin should be smaller than floor(NROW(y)/2) data points. Changed to",floor(NROW(y)/2), "\nSet Nyquist = FALSE to include full range."))
       scaleS <- seq(min(scaleS),floor(NROW(y)/2),length.out = NROW(scaleS))
       #scaleS[which.max(scaleS)] <- floor(NROW(y)/2)
     }
+  }
+    if(max(scaleS)>(NROW(y))){
+      scaleS <- scaleS[scaleS<=(NROW(y))]
+    }
 
-    # if(max(scaleS)>(NROW(y)/2)){
-    #   scaleS <- scaleS[scaleS<=(NROW(y)/2)]
-    # }
-
-  if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,(NROW(y)/2)))){
+  if(!all(is.numeric(scaleS),length(scaleS)>0,scaleS%[]%c(2,NROW(y)))){
     stop("Something wrong with vector passed to scaleS.... \nUsing defaults: (scaleMax-scaleMin)/scaleResolution")
   }
   }
@@ -444,6 +447,7 @@ fd_prepSeries <- function(y,
 #'
 #' @inheritParams fd_dfa
 #'
+#' @param packageFractal Mimic the procedure used in discontinued package `fractal` by William Constantine and Donald Percival (default = `TRUE`)
 #' @author Fred Hasselman
 #' @references Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 #'
@@ -472,7 +476,9 @@ fd_sda <- function(y,
                    scaleResolution = log2(scaleMax)-log2(scaleMin),
                   # dataMin = NA,
                    scaleS = NA,
+                   Nyquist = TRUE,
                    overlap = 0,
+                   packageFractal = TRUE,
                    doPlot = FALSE,
                    returnPlot = FALSE,
                    returnPLAW = FALSE,
@@ -493,6 +499,7 @@ fd_sda <- function(y,
                      scaleResolution = scaleResolution,
                      #dataMin = dataMin,
                      scaleS = scaleS,
+                     Nyquist = Nyquist,
                      overlap = overlap,
                      silent = silent
   )
@@ -536,21 +543,48 @@ fd_sda <- function(y,
   #   Hglobal <- NA
   # }
 
+
+  if(packageFractal){
+
+   message("This method (package::fractal) ignores argument overlap.")
+
   out <- SDA(y, front = FALSE, scaleS)
 
   scale <- out$scale[out$scale%[]%c(scaleMin,scaleMax)]
-  sd    <- out$sd[out$scale%[]%c(scaleMin,scaleMax)]
+  Msd    <- out$sd[out$scale%[]%c(scaleMin,scaleMax)]
+
+
+  } else {
+
+    Msd <- numeric(length(scaleS))
+    sdaSD_scale <- list()
+
+    for(ns in 1:length(scaleS)){
+
+    outSD <- plyr::ldply(ts_slice(y = y, epochSz = scaleS[ns], overlap = overlap), function(sv){return(ts_sd(sv,na.rm = TRUE))})
+
+    sdaSD_scale[[ns]] <- outSD$V1
+
+    Msd[ns] <- mean(sdaSD_scale[[ns]],na.rm = TRUE)
+
+    }
+
+    scale <- scaleS[scaleS%[]%c(scaleMin,scaleMax)]
+    Msd   <- Msd[which(scaleS%[]%c(scaleMin,scaleMax))]
+
+
+  }
 
   fitRange1 <- which(sort(lengths(lapply(scale, function(s){ts_slice(y,s)})))<NROW(y))
   fitRange2 <- which(sort(lengths(lapply(scale, function(s){ts_slice(y,s)})))%[)%c(scaleMin,scaleMax))
 
-  lmfit1        <- stats::lm(log(sd[fitRange1]) ~ log(scale[fitRange1]))
-  lmfit2        <- stats::lm(log(sd[fitRange2]) ~ log(scale[fitRange2]))
+  lmfit1        <- stats::lm(log(Msd[fitRange1]) ~ log(scale[fitRange1]))
+  lmfit2        <- stats::lm(log(Msd[fitRange2]) ~ log(scale[fitRange2]))
 
   outList <- list(
     PLAW  =  cbind.data.frame(freq.norm = stats::frequency(y)/scale[fitRange1],
                               size = scale[fitRange1],
-                              bulk = sd[fitRange1]),
+                              bulk = Msd[fitRange1]),
     fullRange = list(sap = stats::coef(lmfit1)[2],
                      H = 1+stats::coef(lmfit1)[2] + Hadj,
                      FD = sa2fd_sda(stats::coef(lmfit1)[2]),
@@ -614,6 +648,7 @@ fd_sda <- function(y,
 #' @param scaleResolution  The scales at which detrended fluctuation will be evaluated are calculated as: `seq(scaleMin, scaleMax, length.out = scaleResolution)` (default =  `round(log2(scaleMax-scaleMin))`).
 # #' @param dataMin Minimum number of data points in a bin required for inclusion in calculation of the scaling relation. For example if `length(y) = 1024` and `dataMin = 4`, the maximum scale used to calculate the slope will be `1024 / 4 = 256`. This value will take precedence over the `scaleMax` (default = `NA`)
 #' @param scaleS If not `NA`, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments `scaleMax, scaleMin, scaleResolution` will be ignored (default = `NA`)
+#' @param Nyquist Check if the largest bin/frequency meets the Nyquist criterium? (default = `TRUE`)
 #' @param overlap A number in `[0 ... 1]` representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If `length(y) = 1024` and overlap is `.5`, a scale of `4` will be considered a sliding window of size `4` with step-size `floor(.5 * 4) = 2`, so for scale `128` step-size will be `64` (default = `NA`)
 #' @param y    A numeric vector or time series object.
 #' @param doPlot   Output the log-log scale versus fluctuation plot with linear fit by calling function `plotFD_loglog()` (default = `TRUE`)
@@ -681,6 +716,7 @@ fd_dfa <- function(y,
                    scaleResolution = log2(scaleMax)-log2(scaleMin),
                   # dataMin = NA,
                    scaleS = NA,
+                   Nyquist = TRUE,
                    overlap = NA,
                    doPlot = FALSE,
                    returnPlot = FALSE,
@@ -702,6 +738,7 @@ fd_dfa <- function(y,
                  scaleResolution = scaleResolution,
                 # dataMin = dataMin,
                  scaleS = scaleS,
+                 Nyquist = Nyquist,
                  overlap = overlap,
                  silent = silent
                  )
@@ -1716,8 +1753,8 @@ monoH <- function(TSm, scaleS, removeTrend = c("no","poly","adaptive","bridge")[
 
   dfaRMS_scale <- vector("list",length(scaleS))
 
-  if(max(scaleS)>NROW(TSm)/2){
-    scaleS <- scaleS[scaleS<=NROW(TSm)/2]
+  if(max(scaleS)>NROW(TSm)){
+    scaleS <- scaleS[scaleS<=NROW(TSm)]
   }
 
   F2 <- numeric(length(scaleS))

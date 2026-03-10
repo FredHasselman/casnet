@@ -54,7 +54,9 @@
 <span>  scaleMax <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/nextn.html" class="external-link">nextn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
 <span>  scaleResolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMax</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMin</span><span class="op">)</span>,</span>
 <span>  scaleS <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  Nyquist <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  packageFractal <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returnPLAW <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -109,8 +111,16 @@
 <dd><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> will be ignored (default = <code>NA</code>)</p></dd>
 
 
+<dt id="arg-nyquist">Nyquist<a class="anchor" aria-label="anchor" href="#arg-nyquist"></a></dt>
+<dd><p>Check if the largest bin/frequency meets the Nyquist criterium? (default = <code>TRUE</code>)</p></dd>
+
+
 <dt id="arg-overlap">overlap<a class="anchor" aria-label="anchor" href="#arg-overlap"></a></dt>
 <dd><p>A number in <code>[0 ... 1]</code> representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If <code>length(y) = 1024</code> and overlap is <code>.5</code>, a scale of <code>4</code> will be considered a sliding window of size <code>4</code> with step-size <code>floor(.5 * 4) = 2</code>, so for scale <code>128</code> step-size will be <code>64</code> (default = <code>NA</code>)</p></dd>
+
+
+<dt id="arg-packagefractal">packageFractal<a class="anchor" aria-label="anchor" href="#arg-packagefractal"></a></dt>
+<dd><p>Mimic the procedure used in discontinued package <code>fractal</code> by William Constantine and Donald Percival (default = <code>TRUE</code>)</p></dd>
 
 
 <dt id="arg-doplot">doPlot<a class="anchor" aria-label="anchor" href="#arg-doplot"></a></dt>

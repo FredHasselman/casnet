@@ -16,7 +16,9 @@ fd_sda(
   scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
   scaleResolution = log2(scaleMax) - log2(scaleMin),
   scaleS = NA,
+  Nyquist = TRUE,
   overlap = 0,
+  packageFractal = TRUE,
   doPlot = FALSE,
   returnPlot = FALSE,
   returnPLAW = FALSE,
@@ -82,6 +84,11 @@ fd_sda(
   to evaluate the detrended fluctuations. Arguments
   `scaleMax, scaleMin, scaleResolution` will be ignored (default = `NA`)
 
+- Nyquist:
+
+  Check if the largest bin/frequency meets the Nyquist criterium?
+  (default = `TRUE`)
+
 - overlap:
 
   A number in `[0 ... 1]` representing the amount of 'bin overlap' when
@@ -90,6 +97,11 @@ fd_sda(
   `.5`, a scale of `4` will be considered a sliding window of size `4`
   with step-size `floor(.5 * 4) = 2`, so for scale `128` step-size will
   be `64` (default = `NA`)
+
+- packageFractal:
+
+  Mimic the procedure used in discontinued package `fractal` by William
+  Constantine and Donald Percival (default = `TRUE`)
 
 - doPlot:
 

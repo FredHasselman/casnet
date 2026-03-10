@@ -17,6 +17,7 @@ fd_dfa(
   scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
   scaleResolution = log2(scaleMax) - log2(scaleMin),
   scaleS = NA,
+  Nyquist = TRUE,
   overlap = NA,
   doPlot = FALSE,
   returnPlot = FALSE,
@@ -51,6 +52,8 @@ fd_dfa(
 \item{scaleResolution}{The scales at which detrended fluctuation will be evaluated are calculated as: \code{seq(scaleMin, scaleMax, length.out = scaleResolution)} (default =  \code{round(log2(scaleMax-scaleMin))}).}
 
 \item{scaleS}{If not \code{NA}, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments \verb{scaleMax, scaleMin, scaleResolution} will be ignored (default = \code{NA})}
+
+\item{Nyquist}{Check if the largest bin/frequency meets the Nyquist criterium? (default = \code{TRUE})}
 
 \item{overlap}{A number in \verb{[0 ... 1]} representing the amount of 'bin overlap' when calculating the fluctuation. This reduces impact of arbitrary time series begin and end points. If \code{length(y) = 1024} and overlap is \code{.5}, a scale of \code{4} will be considered a sliding window of size \code{4} with step-size \code{floor(.5 * 4) = 2}, so for scale \code{128} step-size will be \code{64} (default = \code{NA})}
 

@@ -1926,7 +1926,7 @@ ts_standardise <- function(y, na.rm = TRUE, keepNAvalues = TRUE, type = c("mean.
     }
     switch(type,
            mean.sd    = return(((y - mean(y, na.rm = na.rm)) / ts_sd(y,na.rm = na.rm, type = SDtype))[idNA]),
-           median.mad = return(((y - stats::median(y, na.rm=na.rm)) / stats::mad(y, na.rm = na.rm))[idNA])
+           median.mad = return(((y - stats::median(y, na.rm=na.rm)) / ifelse(stats::mad(y, na.rm = na.rm),0,1))[idNA])
     )
   }
 }

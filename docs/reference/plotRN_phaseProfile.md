@@ -59,7 +59,7 @@ phase_out <- rn_phases(RN, returnCentroid = "mean.sd")
 #> This function uses an old version of the phase search algorithm...
 #> Use rn_phaseInfo(), the new algorithm will produce different results!
 #> 
-#> Found 19 phases with at least 2 states.
+#> Found 9 phases with at least 2 states.
 #> Warning: no non-missing arguments to max; returning -Inf
 #> Warning: no non-missing arguments to max; returning -Inf
 plotRN_phaseProfile(phaseOutput = phase_out)

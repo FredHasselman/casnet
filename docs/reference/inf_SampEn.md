@@ -105,9 +105,9 @@ inf_SampEn(y)
 #> 
 #> fd_SampEn:   Sample rate was set to 1.
 #> 
-#> [1] 2.621039
+#> [1] 2.433613
 #> attr(,"Relative Entropy")
-#> [1] 0.5691513
+#> [1] 0.5284524
 
 # Similarity threshold is r = 0.2
 inf_SampEn(y, D = 1)
@@ -115,7 +115,7 @@ inf_SampEn(y, D = 1)
 #> 
 #> fd_SampEn:   Sample rate was set to 1.
 #> 
-#> [1] 2.484907
+#> [1] 2.463853
 #> attr(,"Relative Entropy")
-#> [1] 0.5395906
+#> [1] 0.5350189
 ```

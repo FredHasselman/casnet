@@ -58,7 +58,7 @@ phase_out <- rn_phases(RN)
 #> This function uses an old version of the phase search algorithm...
 #> Use rn_phaseInfo(), the new algorithm will produce different results!
 #> 
-#> Found 18 phases with at least 2 states.
+#> Found 15 phases with at least 2 states.
 #> Warning: no non-missing arguments to max; returning -Inf
 #> Warning: no non-missing arguments to max; returning -Inf
 plotRN_phaseDensity(phase_out)

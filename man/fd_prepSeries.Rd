@@ -15,6 +15,7 @@ fd_prepSeries(
   scaleMax = NA,
   scaleResolution = NA,
   scaleS = NA,
+  Nyquist = TRUE,
   overlap = NA,
   silent = TRUE
 )
@@ -39,6 +40,8 @@ fd_prepSeries(
 \item{scaleResolution}{sr}
 
 \item{scaleS}{sc}
+
+\item{Nyquist}{Ny}
 
 \item{overlap}{ov}
 

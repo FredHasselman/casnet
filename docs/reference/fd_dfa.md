@@ -18,6 +18,7 @@ fd_dfa(
   scaleMax = stats::nextn(floor(NROW(y)/2), factors = 2),
   scaleResolution = log2(scaleMax) - log2(scaleMin),
   scaleS = NA,
+  Nyquist = TRUE,
   overlap = NA,
   doPlot = FALSE,
   returnPlot = FALSE,
@@ -94,6 +95,11 @@ fd_dfa(
   If not `NA`, it should be a numeric vector listing the scales on which
   to evaluate the detrended fluctuations. Arguments
   `scaleMax, scaleMin, scaleResolution` will be ignored (default = `NA`)
+
+- Nyquist:
+
+  Check if the largest bin/frequency meets the Nyquist criterium?
+  (default = `TRUE`)
 
 - overlap:
 

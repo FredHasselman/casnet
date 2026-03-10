@@ -42,22 +42,22 @@ numeric values as names.
 # Continuous
 i <- runif(10,0,9)
 as.numeric_discrete(i)
-#>   4.48  2.608  6.596  6.953  7.871  1.574 0.3082  2.883  3.621  1.761 
-#>      3      2      5      5      5      1      1      2      3      1 
+#>  0.7268   7.509   5.407   1.415 0.06659   4.198    4.48   2.608   6.596   6.953 
+#>       1       5       4       1       1       3       3       2       5       5 
 
 # Integer
 as.numeric_discrete(round(i))
-#> 4 3 7 7 8 2 0 3 4 2 
-#> 4 3 7 7 8 2 0 3 4 2 
+#> 1 8 5 1 0 4 4 3 7 7 
+#> 1 8 5 1 0 4 4 3 7 7 
 
 # Factor with NAs
 f <- factor(c(round(runif(9,0,9)),NA))
 as.numeric_discrete(f)
-#> 4 1 3 9 3 6 7 2 9 
-#> 4 1 3 9 3 6 7 2 9 
+#> 8 2 0 3 4 2 4 1 3 
+#> 8 2 0 3 4 2 4 1 3 
 as.numeric_discrete(f, keepNA = FALSE)
-#> 4 1 3 9 3 6 7 2 9 
-#> 4 1 3 9 3 6 7 2 9 
+#> 8 2 0 3 4 2 4 1 3 
+#> 8 2 0 3 4 2 4 1 3 
 
 # Character vector
 c <- c("Thank","you", "for", "the flowers")

@@ -56,9 +56,7 @@ outPhases <- rn_phases(RN)
 #> This function uses an old version of the phase search algorithm...
 #> Use rn_phaseInfo(), the new algorithm will produce different results!
 #> 
-#> Found 16 phases with at least 2 states.
-#> Warning: no non-missing arguments to max; returning -Inf
-#> Warning: no non-missing arguments to max; returning -Inf
+#> Found 20 phases with at least 2 states.
 plotRN_phaseDensity(outPhases)
 #> Error in ungroup(.): could not find function "ungroup"
 ```

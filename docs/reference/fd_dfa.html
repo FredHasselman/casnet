@@ -56,6 +56,7 @@
 <span>  scaleMax <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/nextn.html" class="external-link">nextn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">NROW</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, factors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
 <span>  scaleResolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMax</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">scaleMin</span><span class="op">)</span>,</span>
 <span>  scaleS <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  Nyquist <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  doPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returnPlot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -117,6 +118,10 @@
 
 <dt id="arg-scales">scaleS<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
 <dd><p>If not <code>NA</code>, it should be a numeric vector listing the scales on which to evaluate the detrended fluctuations. Arguments <code>scaleMax, scaleMin, scaleResolution</code> will be ignored (default = <code>NA</code>)</p></dd>
+
+
+<dt id="arg-nyquist">Nyquist<a class="anchor" aria-label="anchor" href="#arg-nyquist"></a></dt>
+<dd><p>Check if the largest bin/frequency meets the Nyquist criterium? (default = <code>TRUE</code>)</p></dd>
 
 
 <dt id="arg-overlap">overlap<a class="anchor" aria-label="anchor" href="#arg-overlap"></a></dt>

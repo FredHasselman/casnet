@@ -188,10 +188,10 @@ out <- inf_MSE(y, r=.5, scaleMin=1, scaleMax=10, returnInfo = TRUE, doPlot = FAL
 #>  Multi Scale Entropy 
 #> 
 #>  Full range (n = 10)
-#> Slope = -0.1 
+#> Slope = -0.14 
 #> 
 #>  Fit range (n = 7)
-#> Slope = -0.08
+#> Slope = -0.12
 #> 
 #> ~~~o~~o~~casnet~~o~~o~~~
 
