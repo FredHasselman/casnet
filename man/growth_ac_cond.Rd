@@ -52,8 +52,8 @@ val = c(0.3, 3, 0.9, 0.1, 1.3))
 xyplot(growth_ac_cond(cond=cond))
 }
 \seealso{
-Other autocatalytic growth functions: 
-\code{\link{growth_ac}()}
+Other autocatalytic growth functions:
+\code{\link[=growth_ac]{growth_ac()}}
 }
 \author{
 Fred Hasselman

@@ -1389,10 +1389,10 @@ rqa_stitchRows <- function(rowA, rowB, revA = FALSE){
 #'
 #' @export
 #'
-rqa_plot <- function(RM, imagePath = NA, xlab = "", ylab = "", wMax = 2048, hMax = 2048, loadPlot = FALSE){
+rqa_plot <- function(RM, imagePath = NA, fileName = "RP_0.png", xlab = "", ylab = "", wMax = 2048, hMax = 2048, loadPlot = FALSE){
 
   if(is.na(imagePath)){
-    imagePath <- file.path(getwd(),"RP_0.png")
+    imagePath <- file.path(getwd(),fileName)
   } else {
     if(dir.exists(imagePath)){
       ind <- 0
@@ -1406,6 +1406,7 @@ rqa_plot <- function(RM, imagePath = NA, xlab = "", ylab = "", wMax = 2048, hMax
     }
   }
 
+
   if(all(stats::na.exclude(as.vector(RM))%in%c(0,1))){
     cols <- c("white", "black")
   } else {
@@ -1417,9 +1418,14 @@ rqa_plot <- function(RM, imagePath = NA, xlab = "", ylab = "", wMax = 2048, hMax
   xpd_old <- par("xpd")  #lets not permanently change values
   par(mar=rep(0, 4), xpd = NA)
   grDevices::png(filename = fileName, width = wMax, height = wMax, units = "px")
-  graphics::image(as.matrix(RM), bty ="n", axes=FALSE, frame.plot=FALSE, xaxt="n", ann=FALSE, yaxt="n", asp=1, useRaster = TRUE, col = cols, xlab = xlab, ylab = ylab)
+  graphics::image(as.matrix(RM), bty ="n", axes=TRUE, frame.plot=FALSE, xaxt="n", ann=FALSE, yaxt="n", asp=1, useRaster = TRUE, col = cols, xlab = xlab, ylab = ylab)
   dev.off()
   par(mar=mar_old, xpd=xpd_old)
+
+  if(loadPlot){
+    img <- png::readPNG(imagePath)
+    grid::grid.raster(img)
+  }
 
   return(fileName)
 }
@@ -1954,7 +1960,7 @@ rqa_diagProfile <- function(y1     = NULL,
       minY <- maxData
     }
     g <- ggplot2::ggplot(df, ggplot2::aes(x=Diagonal)) +
-      ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey80")
+      ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], linewidth=1, colour = "grey80")
 
     if(doShuffle){
       if(plotDET){
@@ -1966,14 +1972,14 @@ rqa_diagProfile <- function(y1     = NULL,
       }
     }
     if(plotDET){
-      g <- g + ggplot2::geom_line(ggplot2::aes(y=DET), size = .5) +
+      g <- g + ggplot2::geom_line(ggplot2::aes(y=DET), linewidth = .5) +
         ggplot2::scale_y_continuous("Determinism",limits = c(0, max(c(minY,maxData))))
     } else {
-      g <- g + ggplot2::geom_line(ggplot2::aes(y=RR), size = .5) +
+      g <- g + ggplot2::geom_line(ggplot2::aes(y=RR), linewidth = .5) +
         ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0, max(c(minY,maxData))))
     }
 
-      #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
+      #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", linewidth = 1) +
     g <- g + ggplot2::scale_x_continuous(name = paste0(xname, " << recurrences due to >> ", yname),
                                   breaks = breaks, labels = labels, expand = c(0,0)) +
       # ggplot2::geom_label(x=x1,y=.8,label=paste0("Recurrences due to\n ",xname),hjust="left", inherit.aes = FALSE, size = 3) +

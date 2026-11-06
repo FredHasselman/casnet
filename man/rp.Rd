@@ -93,16 +93,16 @@ Create a Distance Matrix
 The calculation of the (C)RQA measures in \link{casnet} can be different from other packages. For example, depending on the value of \code{theiler} the main diagonal can be included or excluded from the calculations, whereas some software will always include the diagonal.
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): 
-\code{\link{bandReplace}()},
-\code{\link{createCorridor}()},
-\code{\link{mat_di2bi}()},
-\code{\link{mat_di2ch}()},
-\code{\link{mat_di2we}()},
-\code{\link{mat_hamming}()},
-\code{\link{rp_lineDist}()},
-\code{\link{rp_nzdiags}()},
-\code{\link{rp_plot}()},
-\code{\link{rp_size}()}
+Other Distance matrix operations (recurrence plot):
+\code{\link[=bandReplace]{bandReplace()}},
+\code{\link[=createCorridor]{createCorridor()}},
+\code{\link[=mat_di2bi]{mat_di2bi()}},
+\code{\link[=mat_di2ch]{mat_di2ch()}},
+\code{\link[=mat_di2we]{mat_di2we()}},
+\code{\link[=mat_hamming]{mat_hamming()}},
+\code{\link[=rp_lineDist]{rp_lineDist()}},
+\code{\link[=rp_nzdiags]{rp_nzdiags()}},
+\code{\link[=rp_plot]{rp_plot()}},
+\code{\link[=rp_size]{rp_size()}}
 }
 \concept{Distance matrix operations (recurrence plot)}

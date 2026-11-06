@@ -48,7 +48,7 @@ rn_phaseInfo(
 
 \item{maxStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases exceeds a maximum number of \code{maxStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{NROW(RN)})}
 
-\item{selectionMethod}{How will the most "important" node be selected? Should be the name of an \link[igraph:aaa-igraph-package]{igraph::igraph} function that returns local (vertex) measures (default = \code{"degree"})}
+\item{selectionMethod}{How will the most "important" node be selected? Should be the name of an \link[igraph:igraph]{igraph} function that returns local (vertex) measures (default = \code{"degree"})}
 
 \item{inverseWeight}{Whether to perform the operation \code{1/weight} on the edge weights. The default is \code{TRUE}, if the matrix was weighted by a distance metric (\code{weightedBy = "si"}) edges with smaller distances (recurring coordinates closer to the current coordinate) have greater impact on the node strength calculation used to select the phases. If the matrix was weighted by recurrence time (\code{weightedBy = "rt"}) and \code{inverseWeight = TRUE}, recurrent points with shorter recurrence times will have greater impact on the strength calculation. If \code{weightedBy = "rf"}, lower frequencies will end up having more impact. (default = \code{TRUE})}
 
@@ -141,13 +141,13 @@ rn_phaseInfo(RN, maxPhases = NA, minStatesinPhase = 7, doPhaseProfilePlot = TRUE
 
 }
 \seealso{
-Other Distance matrix operations (recurrence network): 
-\code{\link{mat_di2bi}()},
-\code{\link{mat_di2ch}()},
-\code{\link{mat_di2we}()},
-\code{\link{rn}()},
-\code{\link{rn_phases}()},
-\code{\link{rn_plot}()},
-\code{\link{rn_recSpec}()}
+Other Distance matrix operations (recurrence network):
+\code{\link[=mat_di2bi]{mat_di2bi()}},
+\code{\link[=mat_di2ch]{mat_di2ch()}},
+\code{\link[=mat_di2we]{mat_di2we()}},
+\code{\link[=rn]{rn()}},
+\code{\link[=rn_phases]{rn_phases()}},
+\code{\link[=rn_plot]{rn_plot()}},
+\code{\link[=rn_recSpec]{rn_recSpec()}}
 }
 \concept{Distance matrix operations (recurrence network)}

@@ -42,16 +42,16 @@ plotNET_prep(
 \item{doPlot}{Plot the igraph object.}
 }
 \value{
-an \link[igraph:aaa-igraph-package]{igraph::igraph} object
+an \link[igraph:igraph]{igraph} object
 }
 \description{
 Plot Network Based on RQA
 }
 \seealso{
-Other tools for plotting networks: 
-\code{\link{plotNET_BA}()},
-\code{\link{plotNET_SW}()},
-\code{\link{plotNET_groupColour}()},
-\code{\link{plotNET_groupWeight}()}
+Other tools for plotting networks:
+\code{\link[=plotNET_BA]{plotNET_BA()}},
+\code{\link[=plotNET_SW]{plotNET_SW()}},
+\code{\link[=plotNET_groupColour]{plotNET_groupColour()}},
+\code{\link[=plotNET_groupWeight]{plotNET_groupWeight()}}
 }
 \concept{tools for plotting networks}

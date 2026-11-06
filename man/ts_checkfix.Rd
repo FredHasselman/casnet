@@ -69,27 +69,27 @@ A 'check' report and/or a 'fixed' vector y.
 Check and/or Fix a vector
 }
 \seealso{
-Other Time series operations: 
-\code{\link{ts_center}()},
-\code{\link{ts_changeindex}()},
-\code{\link{ts_detrend}()},
-\code{\link{ts_diff}()},
-\code{\link{ts_discrete}()},
-\code{\link{ts_duration}()},
-\code{\link{ts_embed}()},
-\code{\link{ts_integrate}()},
-\code{\link{ts_levels}()},
-\code{\link{ts_peaks}()},
-\code{\link{ts_permtest_block}()},
-\code{\link{ts_permtest_transmat}()},
-\code{\link{ts_rasterize}()},
-\code{\link{ts_sd}()},
-\code{\link{ts_slice}()},
-\code{\link{ts_slopes}()},
-\code{\link{ts_standardise}()},
-\code{\link{ts_sumorder}()},
-\code{\link{ts_symbolic}()},
-\code{\link{ts_trimfill}()},
-\code{\link{ts_windower}()}
+Other Time series operations:
+\code{\link[=ts_center]{ts_center()}},
+\code{\link[=ts_changeindex]{ts_changeindex()}},
+\code{\link[=ts_detrend]{ts_detrend()}},
+\code{\link[=ts_diff]{ts_diff()}},
+\code{\link[=ts_discrete]{ts_discrete()}},
+\code{\link[=ts_duration]{ts_duration()}},
+\code{\link[=ts_embed]{ts_embed()}},
+\code{\link[=ts_integrate]{ts_integrate()}},
+\code{\link[=ts_levels]{ts_levels()}},
+\code{\link[=ts_peaks]{ts_peaks()}},
+\code{\link[=ts_permtest_block]{ts_permtest_block()}},
+\code{\link[=ts_permtest_transmat]{ts_permtest_transmat()}},
+\code{\link[=ts_rasterize]{ts_rasterize()}},
+\code{\link[=ts_sd]{ts_sd()}},
+\code{\link[=ts_slice]{ts_slice()}},
+\code{\link[=ts_slopes]{ts_slopes()}},
+\code{\link[=ts_standardise]{ts_standardise()}},
+\code{\link[=ts_sumorder]{ts_sumorder()}},
+\code{\link[=ts_symbolic]{ts_symbolic()}},
+\code{\link[=ts_trimfill]{ts_trimfill()}},
+\code{\link[=ts_windower]{ts_windower()}}
 }
 \concept{Time series operations}

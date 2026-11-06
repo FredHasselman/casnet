@@ -87,13 +87,13 @@ Schiepek, G. (2003). A Dynamic Systems Approach to Clinical Case Formulation. \e
 Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations and phase transitions in short term and coarse-grained time series-a method for the real-time monitoring of human change processes. \emph{Biological cybernetics, 102(3)}, 197-207. https://doi.org/10.1007/s00422-009-0362-1
 }
 \seealso{
-Other Dynamic Complexity functions: 
-\code{\link{dc_ccp}()},
-\code{\link{dc_d}()},
-\code{\link{dc_f}()},
-\code{\link{plotDC_ccp}()},
-\code{\link{plotDC_lvl}()},
-\code{\link{plotDC_res}()}
+Other Dynamic Complexity functions:
+\code{\link[=dc_ccp]{dc_ccp()}},
+\code{\link[=dc_d]{dc_d()}},
+\code{\link[=dc_f]{dc_f()}},
+\code{\link[=plotDC_ccp]{plotDC_ccp()}},
+\code{\link[=plotDC_lvl]{plotDC_lvl()}},
+\code{\link[=plotDC_res]{plotDC_res()}}
 }
 \author{
 Merlijn Olthof

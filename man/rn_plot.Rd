@@ -48,13 +48,13 @@ A nice plot of the recurrence network
 Plot (thresholded) distance matrix as a network
 }
 \seealso{
-Other Distance matrix operations (recurrence network): 
-\code{\link{mat_di2bi}()},
-\code{\link{mat_di2ch}()},
-\code{\link{mat_di2we}()},
-\code{\link{rn}()},
-\code{\link{rn_phaseInfo}()},
-\code{\link{rn_phases}()},
-\code{\link{rn_recSpec}()}
+Other Distance matrix operations (recurrence network):
+\code{\link[=mat_di2bi]{mat_di2bi()}},
+\code{\link[=mat_di2ch]{mat_di2ch()}},
+\code{\link[=mat_di2we]{mat_di2we()}},
+\code{\link[=rn]{rn()}},
+\code{\link[=rn_phaseInfo]{rn_phaseInfo()}},
+\code{\link[=rn_phases]{rn_phases()}},
+\code{\link[=rn_recSpec]{rn_recSpec()}}
 }
 \concept{Distance matrix operations (recurrence network)}

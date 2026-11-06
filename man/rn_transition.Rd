@@ -27,7 +27,7 @@ rn_transition(
 
 \item{excludeNorec}{Should the category "No recurrence" be excluded from plots? (default = \code{TRUE})}
 
-\item{returnGraph}{Return an \code{\link[igraph:aaa-igraph-package]{igraph::igraph()}} object (default = \code{FALSE})}
+\item{returnGraph}{Return an \code{\link[igraph:igraph]{igraph::igraph()}} object (default = \code{FALSE})}
 }
 \value{
 A transition matrix based on relative frequencies

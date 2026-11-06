@@ -72,17 +72,17 @@ Copyright (C) 2009 Stefan Schinkel, University of Potsdam
 \url{http://www.agnld.uni-potsdam.de}
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): 
-\code{\link{bandReplace}()},
-\code{\link{createCorridor}()},
-\code{\link{mat_di2bi}()},
-\code{\link{mat_di2ch}()},
-\code{\link{mat_di2we}()},
-\code{\link{mat_hamming}()},
-\code{\link{rp}()},
-\code{\link{rp_nzdiags}()},
-\code{\link{rp_plot}()},
-\code{\link{rp_size}()}
+Other Distance matrix operations (recurrence plot):
+\code{\link[=bandReplace]{bandReplace()}},
+\code{\link[=createCorridor]{createCorridor()}},
+\code{\link[=mat_di2bi]{mat_di2bi()}},
+\code{\link[=mat_di2ch]{mat_di2ch()}},
+\code{\link[=mat_di2we]{mat_di2we()}},
+\code{\link[=mat_hamming]{mat_hamming()}},
+\code{\link[=rp]{rp()}},
+\code{\link[=rp_nzdiags]{rp_nzdiags()}},
+\code{\link[=rp_plot]{rp_plot()}},
+\code{\link[=rp_size]{rp_size()}}
 }
 \author{
 Fred Hasselman

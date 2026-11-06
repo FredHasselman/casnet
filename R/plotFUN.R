@@ -1248,8 +1248,8 @@ plotDC_res <-  function(df_win, win, useVarNames = TRUE, colOrder = TRUE, useTim
   g <- ggplot2::ggplot(dfp, ggplot2::aes(x=time, y=variable, fill=value)) +
        ggplot2::geom_raster(interpolate = FALSE) +
        ggplot2::scale_fill_gradient2(resVariable,low='steelblue', high='red3', mid='whitesmoke', midpoint=(max(dfp$value, na.rm=TRUE)/2), na.value='white') +
-       ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, size=.1) +
-       ggplot2::geom_hline(yintercept=length(unique(dfp$variable))-.5, colour="steelblue", alpha=.9, size=.1) +
+       ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="steelblue", alpha=.9, linewidth=.1) +
+       ggplot2::geom_hline(yintercept=length(unique(dfp$variable))-.5, colour="steelblue", alpha=.9, linewidth=.1) +
        ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
 
   if(trimFirstWin){
@@ -1398,8 +1398,8 @@ plotDC_ccp <-  function(df_ccp, win, useVarNames = TRUE, colOrder = TRUE, useTim
 
   g <- ggplot2::ggplot(dfp, ggplot2::aes(x=time, y=variable, fill=value)) +
     ggplot2::geom_raster(interpolate = FALSE) +
-    ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, size=.1) +
-    ggplot2::geom_hline(yintercept=length(unique(dfp$variable))-.5, colour="grey90", alpha=1, size=.1) +
+    ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, linewidth=.1) +
+    ggplot2::geom_hline(yintercept=length(unique(dfp$variable))-.5, colour="grey90", alpha=1, linewidth=.1) +
     ggplot2::scale_y_discrete(ylabel, expand = c(0,0))
 
 
@@ -1580,8 +1580,8 @@ plotDC_lvl <-  function(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE, co
   cols <- eval(parse(text=paste0("c('Sum of Sig. DC peaks' = 'black','",levelName,"' = 'red3', 'Sig. CCP' = 'steelblue')")))
 
   g <- ggplot(lvl, aes(x = time, y = DC, colour = variable)) +
-    #geom_path(data = lvl, aes(x= time, y = lvl), colour = "red3", size = 1)  +
-    geom_path(size=1) +
+    #geom_path(data = lvl, aes(x= time, y = lvl), colour = "red3", linewidth = 1)  +
+    geom_path(linewidth=1) +
     geom_vline(data = ccp, aes(xintercept=ccp), colour = "steelblue") +
     geom_point(aes(y=y1), pch = 25, fill = "steelblue", size =3, show.legend = FALSE) +
     geom_point(aes(y=y2), pch = 24, fill = "steelblue", size =3, show.legend = FALSE) +
@@ -1617,8 +1617,8 @@ plotDC_lvl <-  function(df_win, df_ccp = NA, df_lvl, win, useVarNames = TRUE, co
   #
   # g <- ggplot2::ggplot(dfp[complete.cases(dfp),], ggplot2::aes(x=time, y=variable, fill=value)) +
   #   ggplot2::geom_raster(interpolate = FALSE) +
-  #   ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, size=.1) +
-  #   ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="grey90", alpha=1, size=.1) +
+  #   ggplot2::geom_vline(xintercept=minorBreaks-.5, colour="grey90", alpha=1, linewidth=.1) +
+  #   ggplot2::geom_hline(yintercept=1:NROW(dfp)-.5, colour="grey90", alpha=1, linewidth=.1) +
   #   ggplot2::scale_y_discrete(ylabel, expand = c(0,0)) +
   #   ggplot2::scale_x_continuous(xlabel,
   #                               breaks = majorBreaks,

@@ -65,7 +65,7 @@ inf_SampEn(y, D = 1)
 \seealso{
 info_MSE
 
-Other Information based complexity measures: 
-\code{\link{inf_MSE}()}
+Other Information based complexity measures:
+\code{\link[=inf_MSE]{inf_MSE()}}
 }
 \concept{Information based complexity measures}

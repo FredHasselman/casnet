@@ -63,10 +63,10 @@ plot(g)
 
 }
 \seealso{
-Other tools for plotting networks: 
-\code{\link{plotNET_BA}()},
-\code{\link{plotNET_SW}()},
-\code{\link{plotNET_groupColour}()},
-\code{\link{plotNET_prep}()}
+Other tools for plotting networks:
+\code{\link[=plotNET_BA]{plotNET_BA()}},
+\code{\link[=plotNET_SW]{plotNET_SW()}},
+\code{\link[=plotNET_groupColour]{plotNET_groupColour()}},
+\code{\link[=plotNET_prep]{plotNET_prep()}}
 }
 \concept{tools for plotting networks}

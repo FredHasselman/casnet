@@ -33,17 +33,17 @@ A matrix object with nonzero diagonals as columns and/or a dataframe with coordi
 Get all nonzero diagonals of a binary matrix, or, diagonals specified as a vector by argument \code{d}.
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): 
-\code{\link{bandReplace}()},
-\code{\link{createCorridor}()},
-\code{\link{mat_di2bi}()},
-\code{\link{mat_di2ch}()},
-\code{\link{mat_di2we}()},
-\code{\link{mat_hamming}()},
-\code{\link{rp}()},
-\code{\link{rp_lineDist}()},
-\code{\link{rp_plot}()},
-\code{\link{rp_size}()}
+Other Distance matrix operations (recurrence plot):
+\code{\link[=bandReplace]{bandReplace()}},
+\code{\link[=createCorridor]{createCorridor()}},
+\code{\link[=mat_di2bi]{mat_di2bi()}},
+\code{\link[=mat_di2ch]{mat_di2ch()}},
+\code{\link[=mat_di2we]{mat_di2we()}},
+\code{\link[=mat_hamming]{mat_hamming()}},
+\code{\link[=rp]{rp()}},
+\code{\link[=rp_lineDist]{rp_lineDist()}},
+\code{\link[=rp_plot]{rp_plot()}},
+\code{\link[=rp_size]{rp_size()}}
 }
 \author{
 Fred Hasselman

@@ -36,7 +36,7 @@ Either an invisible ggplot2 object r a list containing the plot and the data
 Plot various MI functions
 }
 \seealso{
-Other Plot redundancy functions: 
-\code{\link{plotRED_acf}()}
+Other Plot redundancy functions:
+\code{\link[=plotRED_acf]{plotRED_acf()}}
 }
 \concept{Plot redundancy functions}

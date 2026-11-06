@@ -21,6 +21,11 @@ Useful links:
 \author{
 \strong{Maintainer}: Fred Hasselman \email{fred.hasselman@ru.nl} (\href{https://orcid.org/0000-0003-1384-8361}{ORCID}) [copyright holder]
 
+Authors:
+\itemize{
+  \item Fred Hasselman \email{fred.hasselman@ru.nl} (\href{https://orcid.org/0000-0003-1384-8361}{ORCID}) [copyright holder]
+}
+
 Other contributors:
 \itemize{
   \item Merlijn Olthof \email{merlijn.olthof@ru.nl} [contributor]

@@ -7,6 +7,7 @@
 rqa_plot(
   RM,
   imagePath = NA,
+  fileName = "RP_0.png",
   xlab = "",
   ylab = "",
   wMax = 2048,

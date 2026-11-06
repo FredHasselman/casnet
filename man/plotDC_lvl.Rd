@@ -57,12 +57,12 @@ An invisible ggplot2 object.
 Produce a plot in which the output of \code{dc_win()} and \code{dc_ccp()} on the same multivariate timeseries data is combined with the output of \code{ts_level()} on a state variable of the same length as the multivariate data.
 }
 \seealso{
-Other Dynamic Complexity functions: 
-\code{\link{dc_ccp}()},
-\code{\link{dc_d}()},
-\code{\link{dc_f}()},
-\code{\link{dc_win}()},
-\code{\link{plotDC_ccp}()},
-\code{\link{plotDC_res}()}
+Other Dynamic Complexity functions:
+\code{\link[=dc_ccp]{dc_ccp()}},
+\code{\link[=dc_d]{dc_d()}},
+\code{\link[=dc_f]{dc_f()}},
+\code{\link[=dc_win]{dc_win()}},
+\code{\link[=plotDC_ccp]{plotDC_ccp()}},
+\code{\link[=plotDC_res]{plotDC_res()}}
 }
 \concept{Dynamic Complexity functions}

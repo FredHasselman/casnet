@@ -30,7 +30,7 @@ Either an invisible ggplot2 object r a list containing the plot and the data
 Plot ACF and PACF
 }
 \seealso{
-Other Plot redundancy functions: 
-\code{\link{plotRED_mif}()}
+Other Plot redundancy functions:
+\code{\link[=plotRED_mif]{plotRED_mif()}}
 }
 \concept{Plot redundancy functions}

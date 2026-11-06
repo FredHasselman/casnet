@@ -25,7 +25,7 @@ rn_findPhases(
 
 \item{directed}{Should the matrix be considered to represent a directed network? (default = \code{FALSE})}
 
-\item{selectionMethod}{How will the most "important" node be selected? Should be the name of an \link[igraph:aaa-igraph-package]{igraph::igraph} function that returns local (vertex) measures (default = \code{"degree"})}
+\item{selectionMethod}{How will the most "important" node be selected? Should be the name of an \link[igraph:igraph]{igraph} function that returns local (vertex) measures (default = \code{"degree"})}
 
 \item{minStatesinPhase}{A parameter applied after the extraction of phases (limited by \code{maxPhases}). If any extracted phases do not have a minimum number of \code{minStatesinPhase} + \code{1} (= the state that was selected based on node strength), the phase will be removed from the result (default = \code{1})}
 

@@ -51,13 +51,13 @@ Calculate FD using Sevcik's method
 Sevcik, C. (1998). A procedure to Estimate the Fractal Dimension of Waveforms. Paper available at http://arxiv.org/pdf/1003.5266.pdf
 }
 \seealso{
-Other Fluctuation Analyses: 
-\code{\link{fd_RR}()},
-\code{\link{fd_allan}()},
-\code{\link{fd_dfa}()},
-\code{\link{fd_mfdfa}()},
-\code{\link{fd_psd}()},
-\code{\link{fd_sda}()}
+Other Fluctuation Analyses:
+\code{\link[=fd_RR]{fd_RR()}},
+\code{\link[=fd_allan]{fd_allan()}},
+\code{\link[=fd_dfa]{fd_dfa()}},
+\code{\link[=fd_mfdfa]{fd_mfdfa()}},
+\code{\link[=fd_psd]{fd_psd()}},
+\code{\link[=fd_sda]{fd_sda()}}
 }
 \author{
 Fred Hasselman

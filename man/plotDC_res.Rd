@@ -70,12 +70,12 @@ An invisible ggplot2 object.
 Plot Complexity Resonance Diagram
 }
 \seealso{
-Other Dynamic Complexity functions: 
-\code{\link{dc_ccp}()},
-\code{\link{dc_d}()},
-\code{\link{dc_f}()},
-\code{\link{dc_win}()},
-\code{\link{plotDC_ccp}()},
-\code{\link{plotDC_lvl}()}
+Other Dynamic Complexity functions:
+\code{\link[=dc_ccp]{dc_ccp()}},
+\code{\link[=dc_d]{dc_d()}},
+\code{\link[=dc_f]{dc_f()}},
+\code{\link[=dc_win]{dc_win()}},
+\code{\link[=plotDC_ccp]{plotDC_ccp()}},
+\code{\link[=plotDC_lvl]{plotDC_lvl()}}
 }
 \concept{Dynamic Complexity functions}

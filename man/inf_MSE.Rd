@@ -98,7 +98,7 @@ out <- inf_MSE(y, r=.5, scaleMin=1, scaleMax=10, returnInfo = TRUE, doPlot = FAL
 
 }
 \seealso{
-Other Information based complexity measures: 
-\code{\link{inf_SampEn}()}
+Other Information based complexity measures:
+\code{\link[=inf_SampEn]{inf_SampEn()}}
 }
 \concept{Information based complexity measures}

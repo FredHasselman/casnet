@@ -224,7 +224,7 @@ rn_plot <- function(RN,
                     plotSurrogate = NA,
                     returnOnlyObject = FALSE){
 
-  if(attributes(RN)$directed&attributes(RN)$cumulative&is.na(attributes(RN)$emRad)){
+  if(attributes(RN)$directed%00%FALSE&attributes(RN)$cumulative%00%FALSE&is.na(attributes(RN)$emRad)){
     warning("Plotting an unthresholded, directed, distance plot may not yield a sensible result!")
   }
 

@@ -21,7 +21,7 @@ plotMRN_win(
 
 \item{layerMeasures}{Character vector indicating which layer similarity measure(s) should be plotted. Valid elements in the vector are: \code{"InterLayerMI"}, \code{"InterLayerCor"}, \code{"EdgeOverlap"}, \code{"JRP"}.}
 
-\item{vertexMeasures}{Character vector indicating which vertex measure(s) should be plotted.  Valid elements in the vector are: \code{"none"}, \code{"degree"},\code{"strength"},\code{"transitivity"} (= clustering),\code{"closeness"},\code{"betweenness"}. See the \link[igraph:aaa-igraph-package]{igraph::igraph} The calculations  depend on the value of \code{MRNweightedBy} that was used with function \code{\link[=mrn]{mrn()}}.}
+\item{vertexMeasures}{Character vector indicating which vertex measure(s) should be plotted.  Valid elements in the vector are: \code{"none"}, \code{"degree"},\code{"strength"},\code{"transitivity"} (= clustering),\code{"closeness"},\code{"betweenness"}. See the \link[igraph:igraph]{igraph} The calculations  depend on the value of \code{MRNweightedBy} that was used with function \code{\link[=mrn]{mrn()}}.}
 
 \item{weighted}{If \code{vertexMeasures} is not equal to \code{"none"}, should the graph be considered weighted? (default = \code{FALSE})}
 
@@ -40,8 +40,8 @@ a ggplot object
 Plot windowed Multiplex Recurrence Network measures
 }
 \seealso{
-Other Tools for windowed analyses: 
-\code{\link{ts_windower}()}
+Other Tools for windowed analyses:
+\code{\link[=ts_windower]{ts_windower()}}
 }
 \concept{Tools for plotting multiplex recurrence networks}
 \concept{Tools for windowed analyses}

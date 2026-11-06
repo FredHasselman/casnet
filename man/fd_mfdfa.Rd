@@ -85,12 +85,12 @@ fd_mfdfa(y=y, doPlot = TRUE)
 
 }
 \seealso{
-Other Fluctuation Analyses: 
-\code{\link{fd_RR}()},
-\code{\link{fd_allan}()},
-\code{\link{fd_dfa}()},
-\code{\link{fd_psd}()},
-\code{\link{fd_sda}()},
-\code{\link{fd_sev}()}
+Other Fluctuation Analyses:
+\code{\link[=fd_RR]{fd_RR()}},
+\code{\link[=fd_allan]{fd_allan()}},
+\code{\link[=fd_dfa]{fd_dfa()}},
+\code{\link[=fd_psd]{fd_psd()}},
+\code{\link[=fd_sda]{fd_sda()}},
+\code{\link[=fd_sev]{fd_sev()}}
 }
 \concept{Fluctuation Analyses}

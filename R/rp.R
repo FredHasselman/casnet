@@ -1193,18 +1193,18 @@ rp_diagProfile <- function(RM,
     }
 
     #siz <- c("ciHI" = .5, "ciLO" = .5, "meanRRrnd" = .5,"y_obs" = 1)
-    #g<- ggplot(df, aes_(x = ~labels, y = ~RR, colour = ~variable))
+    #g<- ggplot(df, aes(x = labels, y = RR, colour = variable))
     #   geom_line() + theme_bw()
     maxData <- max(df$RR, na.rm = TRUE)
-    g <- ggplot2::ggplot(df, ggplot2::aes_(x=~Diagonal)) +
+    g <- ggplot2::ggplot(df, ggplot2::aes(x=Diagonal)) +
       ggplot2::geom_vline(xintercept = df$Diagonal[df$labels=="0"][1], size=1, colour = "grey80")
       if(doShuffle){
         maxData <- max(c(maxData,df$ciHI), na.rm = TRUE)
-        g <- g + ggplot2::geom_ribbon(ggplot2::aes_(ymin=~ciLO, ymax=~ciHI), alpha=0.3) +
-          ggplot2::geom_line(aes_(y=~meanRRrnd))
+        g <- g + ggplot2::geom_ribbon(ggplot2::aes(ymin=ciLO, ymax=ciHI), alpha=0.3) +
+          ggplot2::geom_line(aes(y=meanRRrnd))
       }
-    g <- g + ggplot2::geom_line(ggplot2::aes_(y=~RR), size = .5) +
-      #ggplot2::geom_line(ggplot2::aes_(y=~y_obs), colour = "black", size = 1) +
+    g <- g + ggplot2::geom_line(ggplot2::aes(y=RR), size = .5) +
+      #ggplot2::geom_line(ggplot2::aes(y=y_obs), colour = "black", linewidth = 1) +
       ggplot2::scale_y_continuous("Recurrence Rate",limits = c(0,max(c(minY,maxData)))) +
       ggplot2::scale_x_continuous(name = paste0(xname, " << recurrences due to >> ", yname),
                                   breaks = breaks, labels = labels, expand = c(0,0)) +
@@ -2610,8 +2610,8 @@ rp_plot <- function(RM,
         showL <- FALSE
         tmp <- data.frame(x = 1:length(chromaNames), y = 1:length(chromaNames), cols = chromaNames)
 
-        grL <- ggplot(tmp, aes_(x = ~x, y = ~y)) +
-          geom_point(aes_(colour = ~cols, fill = ~cols), pch=22, size =10) +
+        grL <- ggplot(tmp, aes(x = x, y = y)) +
+          geom_point(aes(colour = cols, fill = ~cols), pch=22, size =10) +
           scale_fill_manual(name  = "Phases", breaks = chromaNames,
                             values = colvec,
                             na.translate = TRUE,
@@ -2635,11 +2635,11 @@ rp_plot <- function(RM,
   ## Unthresholded END ##
 
   # Main plot ----
-  gRP <-  ggplot2::ggplot(ggplot2::aes_(x=~Var1, y=~Var2, fill = ~value), data= meltRP) +
+  gRP <-  ggplot2::ggplot(ggplot2::aes(x=Var1, y=Var2, fill = value), data= meltRP) +
     ggplot2::geom_raster(hjust = 0, vjust=0, show.legend = showL)
 
   if(drawDiagonal){
-    gRP <- gRP + ggplot2::geom_abline(slope = 1,colour = diagColour, size = 1)
+    gRP <- gRP + ggplot2::geom_abline(slope = 1,colour = diagColour, linewidth = 1)
   }
 
   ## Unthresholded START ----
@@ -2720,7 +2720,7 @@ rp_plot <- function(RM,
         barValue <- mean(meltRP$value, na.rm = TRUE)
       }
 
-      gDist <-  ggplot2::ggplot(resol,ggplot2::aes_(x=~x,y=~y,fill=~value)) +
+      gDist <-  ggplot2::ggplot(resol,ggplot2::aes(x=x,y=y,fill=value)) +
         ggplot2::geom_tile(show.legend = FALSE) +
         ggplot2::scale_y_continuous(name = "Recurrence Rate", breaks = log(round(RecScale$RR,3)), labels = paste(round(RecScale$RR,3)), sec.axis = dup_axis(name=expression(paste("recurrence threshold",~ epsilon)), labels = paste(round(RecScale$epsilon,3)))) +
         ggplot2::scale_fill_gradient2(low      = "red3",
@@ -2896,10 +2896,10 @@ rp_plot <- function(RM,
 
   if(plotDimensions){
 
-    gy1 <- ggplot2::ggplot(y1, ggplot2::aes_(y=~Value, x= ~tm,  group= ~Dimension)) +
-      ggplot2::geom_line(aes_(colour=~Dimension), show.legend = FALSE) +
+    gy1 <- ggplot2::ggplot(y1, ggplot2::aes(y=Value, x= tm,  group= Dimension)) +
+      ggplot2::geom_line(aes(colour=Dimension), show.legend = FALSE) +
       ggplot2::xlab(xdims) + ggplot2::ylab(" ") +
-      ggplot2::geom_vline(ggplot2::aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, linewidth=.5) +
       ggplot2::scale_color_grey() +
       ggplot2::scale_x_continuous(expand = c(0,0)) +
       ggplot2::scale_y_continuous(expand = c(0,0)) +
@@ -2917,10 +2917,10 @@ rp_plot <- function(RM,
                      plot.margin = margin(0,0,0,0, unit = "pt")) +
       ggplot2::coord_cartesian(expand = FALSE)  # +  coord_fixed(1/10)
 
-    gy2 <- ggplot2::ggplot(y2, ggplot2::aes_(y=~Value, x=~tm, group=~Dimension)) +
-      ggplot2::geom_line(ggplot2::aes_(colour=~Dimension), show.legend = FALSE) +
+    gy2 <- ggplot2::ggplot(y2, ggplot2::aes(y=Value, x=tm, group=Dimension)) +
+      ggplot2::geom_line(ggplot2::aes(colour=Dimension), show.legend = FALSE) +
       ggplot2::ylab(" ") + ggplot2::xlab(ydims) +
-      ggplot2::geom_vline(ggplot2::aes_(xintercept = ~tmna), colour = scales::muted("slategray4"),alpha=.1, size=.5) +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = tmna), colour = scales::muted("slategray4"),alpha=.1, linewidth=.5) +
       ggplot2::scale_color_grey() +
       ggplot2::scale_x_continuous(expand = c(0,0)) +
       ggplot2::theme(panel.background = element_blank(),
@@ -2948,8 +2948,8 @@ rp_plot <- function(RM,
                         tm        = rep(0,length(unique(y1$Dimension)),each=2),
                         Dimension =  rep(unique(y1$Dimension),each=2))
 
-      gdl <- ggplot2::ggplot(y1l, ggplot2::aes_(y=~Value, x=~tm, colour=~Dimension)) +
-        ggplot2::geom_line(show.legend = TRUE, size = 2) + ggplot2::scale_color_grey() +
+      gdl <- ggplot2::ggplot(y1l, ggplot2::aes(y=Value, x=tm, colour=Dimension)) +
+        ggplot2::geom_line(show.legend = TRUE, linewidth = 2) + ggplot2::scale_color_grey() +
         scale_x_continuous() +
         theme_void() + theme(legend.text = element_text(size=rel(2)),
                              legend.title = element_text(size=rel(2)),
@@ -2979,8 +2979,8 @@ rp_plot <- function(RM,
     #rpOUTdat <- cbind(rpOUTdat,rpOUTdat)
     rpOUTdat$label <-  paste0(rpOUTdat$measure,":\n",rpOUTdat$value)
 
-    gA <-ggplot2::ggplot(rpOUTdat,ggplot2::aes_(x=~x,y=~y)) +
-      ggplot2::geom_text(ggplot2::aes_(label=~label), family="mono", hjust="left", vjust="center", size=3, parse = FALSE) +
+    gA <-ggplot2::ggplot(rpOUTdat,ggplot2::aes(x=x,y=y)) +
+      ggplot2::geom_text(ggplot2::aes(label=label), family="mono", hjust="left", vjust="center", size=3, parse = FALSE) +
       #scale_x_continuous(limits = c(0,.3)) +
       ggplot2::theme_void() +
       ggplot2::theme(plot.margin = margin(0,5,0,5, unit = "pt"))
@@ -3130,7 +3130,7 @@ rp_plot <- function(RM,
 
   if(nchar(title)%>>%0){
     grT <- ggplot2::ggplot(data.frame(x=1,y=1)) +
-      ggplot2::geom_text(ggplot2::aes_(x=~x,y=~y), label=title) +
+      ggplot2::geom_text(ggplot2::aes(x=x,y=y), label=title) +
       theme_void() +
       theme(plot.margin = margin(0,0,0,0, unit = "pt"))
     gt  <- gtable::gtable_add_rows(x = gt, heights =  unit(c(.1),"null"), pos=0)

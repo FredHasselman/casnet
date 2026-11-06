@@ -24,26 +24,26 @@ A matrix with 0s and the unordered categorical values that are recurring
 Distance matrix to chromatic matrix based on unordered categorical series
 }
 \seealso{
-Other Distance matrix operations (recurrence plot): 
-\code{\link{bandReplace}()},
-\code{\link{createCorridor}()},
-\code{\link{mat_di2bi}()},
-\code{\link{mat_di2we}()},
-\code{\link{mat_hamming}()},
-\code{\link{rp}()},
-\code{\link{rp_lineDist}()},
-\code{\link{rp_nzdiags}()},
-\code{\link{rp_plot}()},
-\code{\link{rp_size}()}
+Other Distance matrix operations (recurrence plot):
+\code{\link[=bandReplace]{bandReplace()}},
+\code{\link[=createCorridor]{createCorridor()}},
+\code{\link[=mat_di2bi]{mat_di2bi()}},
+\code{\link[=mat_di2we]{mat_di2we()}},
+\code{\link[=mat_hamming]{mat_hamming()}},
+\code{\link[=rp]{rp()}},
+\code{\link[=rp_lineDist]{rp_lineDist()}},
+\code{\link[=rp_nzdiags]{rp_nzdiags()}},
+\code{\link[=rp_plot]{rp_plot()}},
+\code{\link[=rp_size]{rp_size()}}
 
-Other Distance matrix operations (recurrence network): 
-\code{\link{mat_di2bi}()},
-\code{\link{mat_di2we}()},
-\code{\link{rn}()},
-\code{\link{rn_phaseInfo}()},
-\code{\link{rn_phases}()},
-\code{\link{rn_plot}()},
-\code{\link{rn_recSpec}()}
+Other Distance matrix operations (recurrence network):
+\code{\link[=mat_di2bi]{mat_di2bi()}},
+\code{\link[=mat_di2we]{mat_di2we()}},
+\code{\link[=rn]{rn()}},
+\code{\link[=rn_phaseInfo]{rn_phaseInfo()}},
+\code{\link[=rn_phases]{rn_phases()}},
+\code{\link[=rn_plot]{rn_plot()}},
+\code{\link[=rn_recSpec]{rn_recSpec()}}
 }
 \concept{Distance matrix operations (recurrence network)}
 \concept{Distance matrix operations (recurrence plot)}

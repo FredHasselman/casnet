@@ -45,12 +45,12 @@ A dataframe with the Allan Factor (variance), Alan standard deviation and error 
 Allan Variance Analysis
 }
 \seealso{
-Other Fluctuation Analyses: 
-\code{\link{fd_RR}()},
-\code{\link{fd_dfa}()},
-\code{\link{fd_mfdfa}()},
-\code{\link{fd_psd}()},
-\code{\link{fd_sda}()},
-\code{\link{fd_sev}()}
+Other Fluctuation Analyses:
+\code{\link[=fd_RR]{fd_RR()}},
+\code{\link[=fd_dfa]{fd_dfa()}},
+\code{\link[=fd_mfdfa]{fd_mfdfa()}},
+\code{\link[=fd_psd]{fd_psd()}},
+\code{\link[=fd_sda]{fd_sda()}},
+\code{\link[=fd_sev]{fd_sev()}}
 }
 \concept{Fluctuation Analyses}

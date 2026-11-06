@@ -27,9 +27,9 @@ ts_slopes(
 
 \item{maxSlopes}{Maximum number of levels in one series (default = floor(max(NROW(y), na.rm = TRUE)/minSlopeDuration))}
 
-\item{method}{The partitioning method to use, see the manual pages of \link[rpart:rpart]{rpart::rpart} for details.}
+\item{method}{The partitioning method to use, see the manual pages of \link[rpart:rpart]{rpart} for details.}
 
-\item{minChange}{After the call to \link[rpart:rpart]{rpart::rpart}, adjust detected slope value to a minimum absolute change in \code{y}. If a slope value is smaller than \code{minChange}, the previous slope will be continued. Set e.g. to \code{sd(diff(y), na.rm = TRUE)}. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{NA})}
+\item{minChange}{After the call to \link[rpart:rpart]{rpart}, adjust detected slope value to a minimum absolute change in \code{y}. If a slope value is smaller than \code{minChange}, the previous slope will be continued. Set e.g. to \code{sd(diff(y), na.rm = TRUE)}. Note that this is an iterative process starting at the beginning of the series and 'correcting' towards the end. The results are stored in \code{p_adj}. Set to \code{NA} to skip, which means \code{p_adj} will be identical to \code{p} (default  = \code{NA})}
 
 \item{doSlopePlot}{Should a plot with the original series and the levels be produced? (default = \code{FALSE})}
 
@@ -59,28 +59,28 @@ lines(wn2$pred$p, col = "steelblue", lwd = 2)
 
 }
 \seealso{
-Other Time series operations: 
-\code{\link{ts_center}()},
-\code{\link{ts_changeindex}()},
-\code{\link{ts_checkfix}()},
-\code{\link{ts_detrend}()},
-\code{\link{ts_diff}()},
-\code{\link{ts_discrete}()},
-\code{\link{ts_duration}()},
-\code{\link{ts_embed}()},
-\code{\link{ts_integrate}()},
-\code{\link{ts_levels}()},
-\code{\link{ts_peaks}()},
-\code{\link{ts_permtest_block}()},
-\code{\link{ts_permtest_transmat}()},
-\code{\link{ts_rasterize}()},
-\code{\link{ts_sd}()},
-\code{\link{ts_slice}()},
-\code{\link{ts_standardise}()},
-\code{\link{ts_sumorder}()},
-\code{\link{ts_symbolic}()},
-\code{\link{ts_trimfill}()},
-\code{\link{ts_windower}()}
+Other Time series operations:
+\code{\link[=ts_center]{ts_center()}},
+\code{\link[=ts_changeindex]{ts_changeindex()}},
+\code{\link[=ts_checkfix]{ts_checkfix()}},
+\code{\link[=ts_detrend]{ts_detrend()}},
+\code{\link[=ts_diff]{ts_diff()}},
+\code{\link[=ts_discrete]{ts_discrete()}},
+\code{\link[=ts_duration]{ts_duration()}},
+\code{\link[=ts_embed]{ts_embed()}},
+\code{\link[=ts_integrate]{ts_integrate()}},
+\code{\link[=ts_levels]{ts_levels()}},
+\code{\link[=ts_peaks]{ts_peaks()}},
+\code{\link[=ts_permtest_block]{ts_permtest_block()}},
+\code{\link[=ts_permtest_transmat]{ts_permtest_transmat()}},
+\code{\link[=ts_rasterize]{ts_rasterize()}},
+\code{\link[=ts_sd]{ts_sd()}},
+\code{\link[=ts_slice]{ts_slice()}},
+\code{\link[=ts_standardise]{ts_standardise()}},
+\code{\link[=ts_sumorder]{ts_sumorder()}},
+\code{\link[=ts_symbolic]{ts_symbolic()}},
+\code{\link[=ts_trimfill]{ts_trimfill()}},
+\code{\link[=ts_windower]{ts_windower()}}
 }
 \author{
 Fred Hasselman

@@ -84,13 +84,13 @@ fd_sda
 Hasselman, F. (2013). When the blind curve is finite: dimension estimation and model inference based on empirical waveforms. Frontiers in Physiology, 4, 75. https://doi.org/10.3389/fphys.2013.00075
 }
 \seealso{
-Other Fluctuation Analyses: 
-\code{\link{fd_RR}()},
-\code{\link{fd_allan}()},
-\code{\link{fd_dfa}()},
-\code{\link{fd_mfdfa}()},
-\code{\link{fd_psd}()},
-\code{\link{fd_sev}()}
+Other Fluctuation Analyses:
+\code{\link[=fd_RR]{fd_RR()}},
+\code{\link[=fd_allan]{fd_allan()}},
+\code{\link[=fd_dfa]{fd_dfa()}},
+\code{\link[=fd_mfdfa]{fd_mfdfa()}},
+\code{\link[=fd_psd]{fd_psd()}},
+\code{\link[=fd_sev]{fd_sev()}}
 }
 \author{
 Fred Hasselman

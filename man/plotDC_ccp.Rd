@@ -69,12 +69,12 @@ An invisible ggplot2 object.
 Plot Cumulative Complexity Peaks
 }
 \seealso{
-Other Dynamic Complexity functions: 
-\code{\link{dc_ccp}()},
-\code{\link{dc_d}()},
-\code{\link{dc_f}()},
-\code{\link{dc_win}()},
-\code{\link{plotDC_lvl}()},
-\code{\link{plotDC_res}()}
+Other Dynamic Complexity functions:
+\code{\link[=dc_ccp]{dc_ccp()}},
+\code{\link[=dc_d]{dc_d()}},
+\code{\link[=dc_f]{dc_f()}},
+\code{\link[=dc_win]{dc_win()}},
+\code{\link[=plotDC_lvl]{plotDC_lvl()}},
+\code{\link[=plotDC_res]{plotDC_res()}}
 }
 \concept{Dynamic Complexity functions}

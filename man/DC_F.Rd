@@ -51,13 +51,13 @@ Schiepek, G., & Strunk, G. (2010). The identification of critical fluctuations a
 \seealso{
 Use \code{\link[=dc_win]{dc_win()}} to get the dynamic complexity measure.
 
-Other Dynamic Complexity functions: 
-\code{\link{dc_ccp}()},
-\code{\link{dc_d}()},
-\code{\link{dc_win}()},
-\code{\link{plotDC_ccp}()},
-\code{\link{plotDC_lvl}()},
-\code{\link{plotDC_res}()}
+Other Dynamic Complexity functions:
+\code{\link[=dc_ccp]{dc_ccp()}},
+\code{\link[=dc_d]{dc_d()}},
+\code{\link[=dc_win]{dc_win()}},
+\code{\link[=plotDC_ccp]{plotDC_ccp()}},
+\code{\link[=plotDC_lvl]{plotDC_lvl()}},
+\code{\link[=plotDC_res]{plotDC_res()}}
 }
 \author{
 Merlijn Olthof

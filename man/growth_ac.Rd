@@ -34,8 +34,8 @@ Autocatalytic Growth: Iterating differential equations (maps)
 growth_ac(Y0 = 0.01, r = 4, type = "logistic")
 }
 \seealso{
-Other autocatalytic growth functions: 
-\code{\link{growth_ac_cond}()}
+Other autocatalytic growth functions:
+\code{\link[=growth_ac_cond]{growth_ac_cond()}}
 }
 \author{
 Fred Hasselman

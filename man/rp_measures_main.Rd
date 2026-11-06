@@ -63,9 +63,9 @@ If \code{theiler} is a numeric vector of \code{length(theiler) == 2} it is possi
 Use \code{rp_measures}
 }
 \seealso{
-Other Recurrence Quantification Analysis: 
-\code{\link{rp_cl}()},
-\code{\link{rp_measures}()}
+Other Recurrence Quantification Analysis:
+\code{\link[=rp_cl]{rp_cl()}},
+\code{\link[=rp_measures]{rp_measures()}}
 }
 \concept{Recurrence Quantification Analysis}
 \keyword{internal}

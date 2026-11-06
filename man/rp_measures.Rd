@@ -86,8 +86,8 @@ A list object containing (C)RQA measures (and matrices if requested)
 A zoo of measures based on singular recurrent points, diagonal, vertical and horizontal line structures (anisotropic) will be caluclated.
 }
 \seealso{
-Other Recurrence Quantification Analysis: 
-\code{\link{rp_cl}()},
-\code{\link{rp_measures_main}()}
+Other Recurrence Quantification Analysis:
+\code{\link[=rp_cl]{rp_cl()}},
+\code{\link[=rp_measures_main]{rp_measures_main()}}
 }
 \concept{Recurrence Quantification Analysis}

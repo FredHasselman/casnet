@@ -36,7 +36,7 @@ plotNET_groupColour(
 
 \item{doPlot}{Plot the igraph object}
 
-\item{returnPlot}{return the \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} object}
+\item{returnPlot}{return the \link[ggplot2:ggplot2]{ggplot2} object}
 }
 \value{
 An igraph object with vertices and/or edges coloured by groups listed in \code{groups}
@@ -45,10 +45,10 @@ An igraph object with vertices and/or edges coloured by groups listed in \code{g
 Identify Vertex and/or Edge groups by colour.
 }
 \seealso{
-Other tools for plotting networks: 
-\code{\link{plotNET_BA}()},
-\code{\link{plotNET_SW}()},
-\code{\link{plotNET_groupWeight}()},
-\code{\link{plotNET_prep}()}
+Other tools for plotting networks:
+\code{\link[=plotNET_BA]{plotNET_BA()}},
+\code{\link[=plotNET_SW]{plotNET_SW()}},
+\code{\link[=plotNET_groupWeight]{plotNET_groupWeight()}},
+\code{\link[=plotNET_prep]{plotNET_prep()}}
 }
 \concept{tools for plotting networks}

@@ -22,11 +22,11 @@ The ami function with requested minima
 A wrapper for \link[nonlinearTseries:timeLag]{nonlinearTseries::timeLag}
 }
 \seealso{
-Other Estimate Recurrence Parameters: 
-\code{\link{est_emDim}()},
-\code{\link{est_parameters}()},
-\code{\link{est_parameters_roc}()},
-\code{\link{est_radius}()},
-\code{\link{est_radius_rqa}()}
+Other Estimate Recurrence Parameters:
+\code{\link[=est_emDim]{est_emDim()}},
+\code{\link[=est_parameters]{est_parameters()}},
+\code{\link[=est_parameters_roc]{est_parameters_roc()}},
+\code{\link[=est_radius]{est_radius()}},
+\code{\link[=est_radius_rqa]{est_radius_rqa()}}
 }
 \concept{Estimate Recurrence Parameters}

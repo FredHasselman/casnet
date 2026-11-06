@@ -82,11 +82,11 @@ A dataframe listing settings used to search for the radius, the radius found giv
 Find a fixed or optimal radius.
 }
 \seealso{
-Other Estimate Recurrence Parameters: 
-\code{\link{est_emDim}()},
-\code{\link{est_emLag}()},
-\code{\link{est_parameters}()},
-\code{\link{est_parameters_roc}()},
-\code{\link{est_radius_rqa}()}
+Other Estimate Recurrence Parameters:
+\code{\link[=est_emDim]{est_emDim()}},
+\code{\link[=est_emLag]{est_emLag()}},
+\code{\link[=est_parameters]{est_parameters()}},
+\code{\link[=est_parameters_roc]{est_parameters_roc()}},
+\code{\link[=est_radius_rqa]{est_radius_rqa()}}
 }
 \concept{Estimate Recurrence Parameters}
